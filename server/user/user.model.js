@@ -1,20 +1,50 @@
+const bcrypt = require("bcryptjs");
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/lib/sequelize");
 
-module.exports = sequelize.define("user", {
+const User = sequelize.define("user", {
+    id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
+    },
     name: {
-        type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        type: DataTypes.STRING
     },
     email: {
+        unique: true,
+        allowNull: false,
         type: DataTypes.STRING,
-        allowNull: false
     },
     password: {
         type: DataTypes.STRING
     },
     role: {
-        type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        type: DataTypes.STRING
+    }
+}, {
+    schema: "ciam",
+    tableName: "users",
+    timestamps: true,
+    createdAt: "created_at",
+    updatedAt: "updated_at",
+    instanceMethods: {
+        validPassword(password) {
+            return bcrypt.compareSync(password, this.password);
+        }
     }
 });
+
+const setHashedPassword = user => {
+    if(user.changed("password")) {
+        user.password = bcrypt.hashSync(user.password, 8);
+    }
+};
+
+User.beforeCreate(setHashedPassword);
+User.beforeUpdate(setHashedPassword);
+
+module.exports = User;

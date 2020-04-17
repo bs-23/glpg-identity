@@ -1,8 +1,9 @@
 const Sequelize = require("sequelize");
 
-const sequelize = new Sequelize("ciam-dev", "postgres", "root", {
+const sequelize = new Sequelize(process.env.PGDATABASE, process.env.PGUSER, process.env.PGPASSWORD, {
     dialect: "postgres",
-    host: "localhost"
+    host: process.env.PGHOST,
+    port: process.env.PGPORT
 });
 
 module.exports = sequelize;

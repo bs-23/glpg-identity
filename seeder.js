@@ -1,7 +1,8 @@
 const async = require("async");
-const User = require("./server/user/user.model");
 
 const userSeeder = function(callback) {
+    const User = require("./server/user/user.model");
+
     User.findOrCreate({where: {email: "admin@glpg-ciam.com"}, defaults: {
         name: "Super Admin",
         password: "strong-password",
@@ -11,7 +12,7 @@ const userSeeder = function(callback) {
     });
 };
 
-//require("dotenv").config();
+require("dotenv").config();
 
 async.waterfall([userSeeder], function(err) {
     if (err) console.error(err);
