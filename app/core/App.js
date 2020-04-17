@@ -15,15 +15,13 @@ class App extends React.Component {
 
     render() {
         return (
-            <>
-                <Switch>
-                    <PublicRoute path="/login" component={Login}/>
+            <Switch>
+                <PublicRoute path="/login" component={Login}/>
 
-                    <PrivateRoute exact path="/" component={Dashboard}/>
+                <PrivateRoute exact path="/" component={Dashboard}/>
 
-                    <Route component={NoMatch}/>
-                </Switch>
-            </>
+                <Route component={NoMatch}/>
+            </Switch>
         );
     }
 }
