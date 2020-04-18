@@ -19,11 +19,11 @@ class Login extends React.Component {
                                 <Form onSubmit={handleSubmit}>
                                     <div className="form-group">
                                         <Field className="form-control" type="email" name="email" placeholder="Email address" />
-                                        <div className="invalid-feedback"><ErrorMessage name="email" /></div>
+                                        <div className="invalid-feedback"><ErrorMessage name="email"/></div>
                                     </div>
                                     <div className="form-group">
                                         <Field className="form-control" type="password" name="password" placeholder="Password" />
-                                        <div className="invalid-feedback"><ErrorMessage name="password" /></div>
+                                        <div className="invalid-feedback"><ErrorMessage name="password"/></div>
                                     </div>
                                     <button type="submit" className="btn btn-info btn-block">Submit</button>
                                 </Form>

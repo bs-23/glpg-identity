@@ -47,9 +47,6 @@ function initGlobalConfig() {
         client: {
             js: getGlobbedPaths(assets.client.js, ["public/"]),
             css: getGlobbedPaths(assets.client.css, ["public/"])
-        },
-        server: {
-            models: getGlobbedPaths(assets.server.models)
         }
     };
 

@@ -24,6 +24,9 @@ const User = sequelize.define("user", {
     role: {
         allowNull: false,
         type: DataTypes.STRING
+    },
+    created_by: {
+        type: DataTypes.UUID
     }
 }, {
     schema: "ciam",

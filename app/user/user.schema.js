@@ -16,9 +16,6 @@ export const registerSchema = object().shape({
     email: string()
         .email("This field should be an valid email address.")
         .required("This field must not be empty."),
-    phoneNumber: string()
-        .required("This field must not be empty.")
-        .matches(/^(?:\+88|01)?\d{11}\r?$/, "This field should be an valid phone number."),
     password: string()
         .min(8, "This field must be at least 8 characters long.")
         .required("This field must not be empty.")
