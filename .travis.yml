@@ -3,7 +3,7 @@ language: node_js
 node_js:
   - "13"
 
-  sudo: false
+sudo: false
 
 branches:
   only: master
