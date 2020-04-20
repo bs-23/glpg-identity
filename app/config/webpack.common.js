@@ -12,20 +12,13 @@ module.exports = {
 
     resolve: {
         modules: [path.join(process.cwd(), "app"), "node_modules"],
-        extensions: [".js", ".css"],
+        extensions: [".js", ".css", ".scss"],
         symlinks: false
     },
 
     plugins: [
         new CleanWebpackPlugin({
             verbose: true
-        }),
-
-        new webpack.ProvidePlugin({
-            $: "jquery",
-            jQuery: "jquery",
-            "window.jQuery": "jquery",
-            Popper: ["popper.js", "default"]
         }),
 
         new LodashModuleReplacementPlugin({
@@ -43,10 +36,11 @@ module.exports = {
                 loader: "babel-loader"
             },
             {
-                test: /\.css$/,
+                test: /\.(scss|css)$/,
                 use: [
                     "style-loader",
-                    "css-loader"
+                    "css-loader",
+                    "sass-loader"
                 ]
             },
             {

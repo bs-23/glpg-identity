@@ -33,13 +33,14 @@ PGPASSWORD=<postgresql_password>
 ```bash
 $ cd /path/to/project
 $ yarn install          # install dependencies
-$ npm start             # development build
-$ npm run production    # production build
+$ yarn start            # development build
+$ yarn production       # production build
 ```
 
 ## Database Seeding
 > This will create the default admin user for the dashbaord.
+
 ```bash
 $ cd /path/to/project
-$ npm run seed
+$ yarn seed
 ```

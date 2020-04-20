@@ -26,9 +26,7 @@ class PublicRoute extends React.Component {
                             state: { from: props.location }
                         }} />
                     ) : (
-                        <div className="components bg-success">
-                            <Component {...props}/>
-                        </div>
+                        <Component {...props}/>
                     )
                 )
             }}/>

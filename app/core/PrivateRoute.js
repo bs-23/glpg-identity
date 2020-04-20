@@ -17,9 +17,7 @@ class PrivateRoute extends React.Component {
                 return (
                     isAuthenticated ? (
                         <>
-                            <div>
-                                <Component {...props}/>
-                            </div>
+                            <Component {...props}/>
                         </>
                     ) : (
                         <Redirect push to={{

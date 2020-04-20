@@ -10,25 +10,21 @@ class Login extends React.Component {
         const { handleSubmit } = this.props;
 
         return (
-            <div id="login">
-                <div className="container">
-                    <div className="row ">
-                        <div className="col-lg-5 col-md-8 col-12 mx-auto p-0 rounded shadow border bg-white">
-                            <div className="p-3 bg-light h5 rounded-top">Log-in to your account</div>
-                            <div className="card-body">
-                                <Form onSubmit={handleSubmit}>
-                                    <div className="form-group">
-                                        <Field className="form-control" type="email" name="email" placeholder="Email address" />
-                                        <div className="invalid-feedback"><ErrorMessage name="email"/></div>
-                                    </div>
-                                    <div className="form-group">
-                                        <Field className="form-control" type="password" name="password" placeholder="Password" />
-                                        <div className="invalid-feedback"><ErrorMessage name="password"/></div>
-                                    </div>
-                                    <button type="submit" className="btn btn-info btn-block">Submit</button>
-                                </Form>
+            <div className="container">
+                <div className="col-lg-5 col-md-8 col-12 mx-auto p-0 shadow border bg-white">
+                    <div className="p-3 bg-light h5 rounded-top">Log-in to your account</div>
+                    <div className="card-body">
+                        <Form onSubmit={handleSubmit}>
+                            <div className="form-group">
+                                <Field className="form-control" type="email" name="email" placeholder="Email address" autoComplete="username"/>
+                                <div className="invalid-feedback"><ErrorMessage name="email"/></div>
                             </div>
-                        </div>
+                            <div className="form-group">
+                                <Field className="form-control" type="password" name="password" placeholder="Password" autoComplete="current-password"/>
+                                <div className="invalid-feedback"><ErrorMessage name="password"/></div>
+                            </div>
+                            <button type="submit" className="btn btn-info btn-block">Submit</button>
+                        </Form>
                     </div>
                 </div>
             </div>

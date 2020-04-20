@@ -8,6 +8,9 @@ import PrivateRoute from "./PrivateRoute";
 import Login from "../user/components/Login";
 import Dashboard from "../user/components/Dashboard";
 
+import "bootstrap/scss/bootstrap";
+import "./App.scss";
+
 class App extends React.Component {
     constructor(props) {
         super();
