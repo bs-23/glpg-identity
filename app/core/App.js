@@ -6,6 +6,7 @@ import NoMatch from "./NoMatch";
 import PublicRoute from "./PublicRoute";
 import PrivateRoute from "./PrivateRoute";
 import Login from "../user/login.component";
+import Dashboard from "../user/dashboard.component";
 
 import "bootstrap/scss/bootstrap";
 import "./App.scss";
@@ -20,7 +21,7 @@ class App extends React.Component {
             <Switch>
                 <PublicRoute path="/login" component={Login}/>
 
-                {/* <PrivateRoute exact path="/" component={Dashboard}/> */}
+                <PrivateRoute exact path="/" component={Dashboard}/>
 
                 <Route component={NoMatch}/>
             </Switch>
