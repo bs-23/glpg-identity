@@ -1,9 +1,9 @@
 import React from "react";
 import { Form, withFormik, Field, ErrorMessage } from "formik";
 
-import store from "../../store";
-import { login } from "../user.actions";
-import { loginSchema } from "../user.schema";
+import store from "../store";
+import { login } from "./user.actions";
+import { loginSchema } from "./user.schema";
 
 class Login extends React.Component {
     render() {

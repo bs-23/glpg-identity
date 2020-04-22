@@ -1,10 +1,9 @@
 ## GLPG CIAM
 
-[![Build Status](https://travis-ci.com/bs-23/glpg-ciam.svg?token=MzSs9Q4pu5W2TDL3FHze&branch=master)](https://travis-ci.com/bs-23/glpg-ciam)
-
 ## Built with
 - [Express](https://expressjs.com/)
 - [Formik](https://jaredpalmer.com/formik/)
+- [Jest](https://jestjs.io/)
 - [Passport](http://passportjs.org/)
 - [PostgreSQL](https://www.postgresql.org/)
 - [React](https://reactjs.org/)
@@ -13,17 +12,13 @@
 
 ## Configuring environment variables
 
-> Rename .env.example file to .env and adjust your environment variables:
+> Create a .env file and adjust your environment variables:
 
 ```bash
+
 PORT=5050
 TOKEN_SECRET=<auth_token_secret>
-
-PGHOST=<postgresql_host>
-PGPORT=<postgresql_port>
-PGDATABASE=<postgresql_database>
-PGUSER=<postgresql_user>
-PGPASSWORD=<postgresql_password>
+POSTGRES_DATABASE_URL=<postgresql_connection_string>
 
 ```
 
@@ -38,9 +33,16 @@ $ yarn production       # production build
 ```
 
 ## Database Seeding
-> This will create the default admin user for the dashbaord.
+> This will create the default system admin
 
 ```bash
 $ cd /path/to/project
 $ yarn seed
+```
+
+## Unit Tests
+
+```bash
+$ cd /path/to/project
+$ yarn test
 ```

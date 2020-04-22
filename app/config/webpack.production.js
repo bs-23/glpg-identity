@@ -13,7 +13,7 @@ module.exports = webpackMerge(commonConfig, {
     },
 
     output: {
-        path: helpers.root("public/bundles"),
+        path: helpers.root("wwwroot/bundles"),
         filename: "[name].[contenthash].js"
     },
 

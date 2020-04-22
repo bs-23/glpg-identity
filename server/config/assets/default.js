@@ -1,6 +1,6 @@
 module.exports = {
     client: {
-        css: "public/bundles/app.css",
-        js: "public/bundles/app.js"
+        css: "wwwroot/bundles/app.css",
+        js: "wwwroot/bundles/app.js"
     }
 };

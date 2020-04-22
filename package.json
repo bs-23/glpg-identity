@@ -9,7 +9,8 @@
     "pm2:production": "cross-env NODE_ENV=production pm2 start server.js",
     "webpack:production": "cross-env NODE_ENV=production webpack --progress",
     "production": "run-s webpack:production pm2:production",
-    "seed": "node seeder.js"
+    "seed": "node seeder.js",
+    "test": "cross-env NODE_ENV=test jest --testTimeout=10000"
   },
   "dependencies": {
     "async": "^3.2.0",
@@ -19,11 +20,9 @@
     "cookie-parser": "^1.4.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "express-graphql": "^0.9.0",
     "express-hbs": "^2.3.1",
     "formik": "^2.1.4",
     "glob": "^7.1.6",
-    "graphql": "^15.0.0",
     "jsonwebtoken": "^8.5.1",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
@@ -50,6 +49,7 @@
     "clean-webpack-plugin": "^3.0.0",
     "cross-env": "^7.0.2",
     "css-loader": "^3.4.2",
+    "jest": "^25.4.0",
     "lodash-webpack-plugin": "^0.11.5",
     "mini-css-extract-plugin": "^0.9.0",
     "node-sass": "^4.13.1",
@@ -59,6 +59,7 @@
     "redux-logger": "^3.0.6",
     "sass-loader": "^8.0.2",
     "style-loader": "^1.1.3",
+    "supertest": "^4.0.2",
     "terser-webpack-plugin": "^2.3.5",
     "url-loader": "^4.0.0",
     "webpack": "^4.42.0",

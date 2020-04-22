@@ -7,7 +7,7 @@ module.exports = webpackMerge(commonConfig, {
     mode: "development",
 
     output: {
-        path: helpers.root("public/bundles"),
+        path: helpers.root("wwwroot/bundles"),
         filename: "[name].js"
     },
 

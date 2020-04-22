@@ -1,5 +1,4 @@
 const path = require("path");
-const webpack = require("webpack");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const LodashModuleReplacementPlugin = require("lodash-webpack-plugin");
 
@@ -33,7 +32,11 @@ module.exports = {
             {
                 test: /\.js?$/,
                 exclude: /node_modules/,
-                loader: "babel-loader"
+                loader: "babel-loader",
+                options: {
+                    plugins: ["react-html-attrs", "@babel/plugin-proposal-object-rest-spread"],
+                    presets: [["@babel/preset-env", { targets: {"node": "current"} }], "@babel/preset-react" ]
+                }
             },
             {
                 test: /\.(scss|css)$/,

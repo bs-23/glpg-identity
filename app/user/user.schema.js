@@ -18,5 +18,7 @@ export const registerSchema = object().shape({
         .required("This field must not be empty."),
     password: string()
         .min(8, "This field must be at least 8 characters long.")
+        .required("This field must not be empty."),
+    role: string()
         .required("This field must not be empty.")
 });

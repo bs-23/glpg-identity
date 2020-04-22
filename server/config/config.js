@@ -45,8 +45,8 @@ function initGlobalConfig() {
 
     let config = {
         client: {
-            js: getGlobbedPaths(assets.client.js, ["public/"]),
-            css: getGlobbedPaths(assets.client.css, ["public/"])
+            js: getGlobbedPaths(assets.client.js, ["wwwroot/"]),
+            css: getGlobbedPaths(assets.client.css, ["wwwroot/"])
         }
     };
 

@@ -27,6 +27,9 @@ const User = sequelize.define("user", {
     },
     created_by: {
         type: DataTypes.UUID
+    },
+    updated_by: {
+        type: DataTypes.UUID
     }
 }, {
     schema: "ciam",
