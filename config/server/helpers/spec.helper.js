@@ -18,7 +18,7 @@ beforeAll(async (done) => {
     await sequelize.query("CREATE SCHEMA IF NOT EXISTS ciam;")
     await sequelize.sync({alter: true});
 
-    const User = require("../../user/user.model");
+    const User = require("../../../modules/user/server/user.model");
     await User.create(admin);
     done();
 });

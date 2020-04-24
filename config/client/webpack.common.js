@@ -6,7 +6,7 @@ module.exports = {
     devtool: "eval-source-map",
 
     entry: {
-        app: "./app/main.js"
+        app: "./modules/core/client/main.js"
     },
 
     resolve: {

@@ -1,7 +1,7 @@
 const async = require("async");
 
 const userSeeder = function(callback) {
-    const User = require("./server/user/user.model");
+    const User = require("./modules/user/server/user.model");
 
     User.findOrCreate({where: {email: "admin@glpg-ciam.com"}, defaults: {
         name: "Super Admin",

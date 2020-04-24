@@ -7,8 +7,6 @@ const cookieParser = require("cookie-parser");
 module.exports = function() {
     let app = express();
 
-    app.enable("trust proxy");
-
     app.use(cookieParser());
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
@@ -16,7 +14,7 @@ module.exports = function() {
 
     app.engine("html", hbs.express4({ extname: ".html" }));
     app.set("view engine", "html");
-    app.set("views", path.join(process.cwd(), "server/core"));
+    app.set("views", path.join(process.cwd(), "modules/core/server"));
 
     app.set("port", process.env.PORT);
 

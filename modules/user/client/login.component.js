@@ -1,7 +1,7 @@
 import React from "react";
 import { Form, withFormik, Field, ErrorMessage } from "formik";
 
-import store from "../store";
+import store from "../../core/client/store";
 import { login } from "./user.actions";
 import { loginSchema } from "./user.schema";
 

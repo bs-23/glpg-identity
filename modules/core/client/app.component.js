@@ -5,11 +5,11 @@ import { withRouter, Switch, Route } from "react-router-dom";
 import NoMatch from "./NoMatch";
 import PublicRoute from "./PublicRoute";
 import PrivateRoute from "./PrivateRoute";
-import Login from "../user/login.component";
-import Dashboard from "../user/dashboard.component";
+import Login from "../../user/client/login.component";
+import Dashboard from "../../user/client/dashboard.component";
 
 import "bootstrap/scss/bootstrap";
-import "./App.scss";
+import "./app.component.scss";
 
 class App extends React.Component {
     constructor(props) {
