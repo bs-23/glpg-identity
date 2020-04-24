@@ -7,7 +7,7 @@ describe("User Api", () => {
 
     it("Should get 401 Unauthorized http status code with invalid email or password", async () => {
         const response = await request(app)
-            .post("/api/login")
+            .post("/login")
             .send({
                 email: "garbage@emaill.com",
                 password: "garbage-password"
@@ -18,7 +18,7 @@ describe("User Api", () => {
 
     it("Should login with valid email and password", async () => {
         const response = await request(app)
-            .post("/api/login")
+            .post("/login")
             .send({
                 email: user.email,
                 password: user.password

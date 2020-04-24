@@ -1,12 +1,12 @@
 import axios from "axios";
 import Types from "./user.types";
 
-export function getUserProfile() {
+export function getLoggedInUserProfile() {
     return {
         type: Types.GET_PROFILE,
         payload: axios({
             method: "get",
-            url: "/api/profile"
+            url: "/users/getLoggedInUserProfile"
         })
     };
 }
@@ -16,7 +16,7 @@ export function login(data) {
         type: Types.LOGIN,
         payload: axios({
             method: "post",
-            url: "/api/login",
+            url: "/login",
             data: data
         })
     };

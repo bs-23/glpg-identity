@@ -7,6 +7,7 @@ import PublicRoute from "./PublicRoute";
 import PrivateRoute from "./PrivateRoute";
 import Login from "../../user/client/login.component";
 import Dashboard from "../../user/client/dashboard.component";
+import { getLoggedInUserProfile } from "../../user/client/user.actions";
 
 import "bootstrap/scss/bootstrap";
 import "./app.component.scss";
@@ -14,6 +15,7 @@ import "./app.component.scss";
 class App extends React.Component {
     constructor(props) {
         super();
+        props.getLoggedInUserProfile();
     }
 
     render() {
@@ -29,4 +31,12 @@ class App extends React.Component {
     }
 }
 
-export default withRouter(connect(null, null)(App));
+const mapDispatchToProps = dispatch => {
+    return {
+        getLoggedInUserProfile: function() {
+            dispatch(getLoggedInUserProfile());
+        }
+    };
+};
+
+export default withRouter(connect(null, mapDispatchToProps)(App));

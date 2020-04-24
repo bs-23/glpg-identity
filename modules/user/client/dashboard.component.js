@@ -1,11 +1,10 @@
 import React from "react";
+import { useSelector } from "react-redux";
 
-class Dashboard extends React.Component {
-    render() {
-        return (
-            <h2>This is the Dashboard!</h2>
-        );
-    };
+export default function Dashboard() {
+    const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
+
+    return (
+        <h2>Hello {loggedInUser.name}, this is your dashboard. <a href="/logout">Logout</a></h2>
+    );
 }
-
-export default Dashboard;

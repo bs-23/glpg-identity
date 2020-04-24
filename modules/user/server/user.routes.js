@@ -1,9 +1,14 @@
 const passport = require("passport");
 const controller = require("./user.controller");
 
-module.exports = function(app) {
-    app.route("/api/login").post(controller.login);
+module.exports = app => {
+    app.post("/login", controller.login);
 
-    app.route("/api/users")
+    app.get("/logout", passport.authenticate("user-jwt", { session: false }), controller.logout);
+
+    app.route("/users")
         .post(passport.authenticate("user-jwt", { session: false }), controller.createUser);
+
+    app.route("/users/getLoggedInUserProfile")
+        .get(passport.authenticate("user-jwt", { session: false }), controller.getLoggedInUserProfile);
 };

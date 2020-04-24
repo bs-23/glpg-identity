@@ -16,11 +16,15 @@ function formatProfile(user) {
     let profile = {
         name: user.name,
         email: user.email,
-        role: user.role
+        type: user.type
     };
 
     return profile;
 };
+
+async function getLoggedInUserProfile(req, res) {
+    res.json(formatProfile(req.user));
+}
 
 async function login(req, res) {
     try {
@@ -46,6 +50,10 @@ async function login(req, res) {
     }
 }
 
+async function logout(req, res) {
+    res.clearCookie("access_token").redirect("/");
+}
+
 async function createUser(req, res) {
     const {name, email, password, role} = req.body;
 
@@ -68,4 +76,6 @@ async function createUser(req, res) {
 }
 
 exports.login = login;
+exports.logout = logout;
 exports.createUser = createUser;
+exports.getLoggedInUserProfile = getLoggedInUserProfile;

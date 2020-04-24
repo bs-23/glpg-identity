@@ -4,7 +4,7 @@ import { Route, Redirect } from "react-router-dom";
 
 const mapStateToProps = (state) => {
     return {
-        isAuthenticated: state.userReducer.isLoggedIn
+        isAuthenticated: state.userReducer.loggedInUser
     };
 };
 
