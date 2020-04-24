@@ -3,10 +3,10 @@ const async = require("async");
 const userSeeder = function(callback) {
     const User = require("./modules/user/server/user.model");
 
-    User.findOrCreate({where: {email: "admin@glpg-ciam.com"}, defaults: {
-        name: "Super Admin",
+    User.findOrCreate({where: {email: "system-admin@glpg-ciam.com"}, defaults: {
+        name: "System Admin",
         password: "strong-password",
-        role: "super_admin"
+        type: "System Admin"
     }}).then(function() {
         callback();
     });

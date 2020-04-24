@@ -1,17 +1,17 @@
 const path = require("path");
-const passport = require("passport");
+const config = require("../config");
 
 module.exports.start = async function() {
     require("dotenv").config();
-    require("./passport")(passport);
+
     const sequelize = require("./sequelize");
+    await sequelize.sync();
 
     const app = require("./express")();
 
-    await sequelize.sync({alter: true});
-
-    require(path.join(process.cwd(), "modules/user/server/user.routes"))(app, passport);
-    require(path.join(process.cwd(), "modules/core/server/core.routes"))(app);
+    config.server.strategies.forEach(function (strategy) {
+        require(path.resolve(strategy))();
+    });
 
     app.listen(app.get("port"), function() {
         console.info("Server running on port %s in %s mode...", app.get("port"), app.settings.env);

@@ -1,10 +1,6 @@
 const request = require("supertest");
-const passport = require("passport");
-const app = require("../../../config/server/lib/express")();
 const specHelper = require("../../../config/server/helpers/spec.helper");
-
-//require("../config/lib/passport")(passport);
-require("./user.routes")(app, passport);
+const app = require("../../../config/server/lib/express")();
 
 describe("User Api", () => {
     const user = specHelper.users.admin;

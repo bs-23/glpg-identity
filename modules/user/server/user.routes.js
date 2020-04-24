@@ -1,6 +1,7 @@
+const passport = require("passport");
 const controller = require("./user.controller");
 
-module.exports = function(app, passport) {
+module.exports = function(app) {
     app.route("/api/login").post(controller.login);
 
     app.route("/api/users")

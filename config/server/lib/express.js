@@ -21,5 +21,9 @@ module.exports = function() {
     app.locals.jsFiles = config.client.js;
     app.locals.cssFiles = config.client.css;
 
+    config.server.routes.forEach(function (routePath) {
+        require(path.resolve(routePath))(app);
+    });
+
     return app;
 };

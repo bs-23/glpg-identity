@@ -16,7 +16,7 @@ const User = sequelize.define("user", {
     email: {
         unique: true,
         allowNull: false,
-        type: DataTypes.STRING,
+        type: DataTypes.STRING
     },
     password: {
         type: DataTypes.STRING
@@ -24,9 +24,12 @@ const User = sequelize.define("user", {
     phone: {
         type: DataTypes.STRING
     },
-    role: {
-        allowNull: false,
-        type: DataTypes.STRING
+    type: {
+        type: DataTypes.ENUM,
+        values: ["System Admin", "GDS", "LDS"]
+    },
+    permissions: {
+        type: DataTypes.ARRAY(DataTypes.STRING)
     },
     is_active: {
         type: DataTypes.BOOLEAN,
