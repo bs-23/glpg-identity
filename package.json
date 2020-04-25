@@ -10,7 +10,12 @@
     "webpack:production": "cross-env NODE_ENV=production webpack --progress",
     "production": "run-s webpack:production pm2:production",
     "seed": "node seeder.js",
-    "test": "cross-env NODE_ENV=test jest --testTimeout=10000"
+    "test": "jest"
+  },
+  "jest": {
+    "verbose": true,
+    "coverageReporters": ["text"],
+    "collectCoverage": true
   },
   "dependencies": {
     "async": "^3.2.0",
