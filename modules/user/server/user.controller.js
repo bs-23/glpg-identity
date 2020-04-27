@@ -29,12 +29,9 @@ async function getLoggedInUserProfile(req, res) {
 async function login(req, res) {
     try {
         const {email, password} = req.body;
-        const user = await User.findOne({ where: {email: email}, attributes: ["id", "name", "email"] });
+        const user = await User.findOne({ where: {email: email}, attributes: ["id", "name", "email", "password"] });
 
-        // if(!user || !user.validPassword(password)) {
-        //     return res.status(401).send("Invalid email or password.");
-        // }
-        if(!user) {
+        if(!user || !user.validPassword(password)) {
             return res.status(401).send("Invalid email or password.");
         }
 
@@ -55,13 +52,14 @@ async function logout(req, res) {
 }
 
 async function createUser(req, res) {
-    const {name, email, password, role} = req.body;
+    const {name, email, password, role, permissions} = req.body;
 
     try {
         const [doc, created] = await User.findOrCreate({ email: email}, {
             name:  name,
             password: password,
             role: role,
+            permissions: permissions,
             created_by: req.user.id
         });
 

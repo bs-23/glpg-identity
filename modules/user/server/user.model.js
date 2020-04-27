@@ -19,7 +19,10 @@ const User = sequelize.define("user", {
         type: DataTypes.STRING
     },
     password: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
+        set(value) {
+            this.setDataValue("password", bcrypt.hashSync(value, 8));
+        }
     },
     phone: {
         type: DataTypes.STRING
@@ -27,6 +30,9 @@ const User = sequelize.define("user", {
     type: {
         type: DataTypes.ENUM,
         values: ["System Admin", "GDS", "LDS"]
+    },
+    countries: {
+        type: DataTypes.ARRAY(DataTypes.STRING)
     },
     permissions: {
         type: DataTypes.ARRAY(DataTypes.STRING)
@@ -46,21 +52,11 @@ const User = sequelize.define("user", {
     tableName: "users",
     timestamps: true,
     createdAt: "created_at",
-    updatedAt: "updated_at",
-    instanceMethods: {
-        validPassword(password) {
-            return bcrypt.compareSync(password, this.password);
-        }
-    }
+    updatedAt: "updated_at"
 });
 
-const setHashedPassword = user => {
-    if(user.changed("password")) {
-        user.password = bcrypt.hashSync(user.password, 8);
-    }
-};
-
-User.beforeCreate(setHashedPassword);
-User.beforeUpdate(setHashedPassword);
+User.prototype.validPassword = function (password) {
+    return bcrypt.compareSync(password, this.password);
+}
 
 module.exports = User;

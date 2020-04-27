@@ -1,6 +1,6 @@
 process.env.NODE_ENV = "test";
 process.env.TOKEN_SECRET = "6368451b-50bc9a455e62";
-process.env.POSTGRES_DATABASE_URL = "postgres://postgres:root@localhost:5432/ciam-test";
+process.env.POSTGRES_DATABASE_URL = "postgres://postgres:root@localhost:5432/ciam_test";
 
 const path = require("path");
 const config = require("../config");
