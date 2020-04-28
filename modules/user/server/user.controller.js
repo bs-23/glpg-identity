@@ -22,7 +22,7 @@ function formatProfile(user) {
     return profile;
 };
 
-async function getLoggedInUserProfile(req, res) {
+async function getSignedInUserProfile(req, res) {
     res.json(formatProfile(req.user));
 }
 
@@ -64,7 +64,7 @@ async function createUser(req, res) {
         });
 
         if(!created) {
-            return res.status(400).send("This email address already exists.");
+            return res.status(400).send("Email address already exists.");
         }
 
         res.json(doc);
@@ -76,4 +76,4 @@ async function createUser(req, res) {
 exports.login = login;
 exports.logout = logout;
 exports.createUser = createUser;
-exports.getLoggedInUserProfile = getLoggedInUserProfile;
+exports.getSignedInUserProfile = getSignedInUserProfile;

@@ -1,6 +1,7 @@
+const path = require("path");
 const bcrypt = require("bcryptjs");
 const { DataTypes } = require("sequelize");
-const sequelize = require("../../../config/server/lib/sequelize");
+const sequelize = require(path.join(process.cwd(), "config/server/lib/sequelize"));
 
 const User = sequelize.define("user", {
     id: {
@@ -29,7 +30,7 @@ const User = sequelize.define("user", {
     },
     type: {
         type: DataTypes.ENUM,
-        values: ["System Admin", "GDS", "LDS"]
+        values: ["System Admin", "Site Admin"]
     },
     countries: {
         type: DataTypes.ARRAY(DataTypes.STRING)

@@ -1,12 +1,12 @@
 import axios from "axios";
 import Types from "./user.types";
 
-export function getLoggedInUserProfile() {
+export function getSignedInUserProfile() {
     return {
         type: Types.GET_PROFILE,
         payload: axios({
             method: "get",
-            url: "/users/getLoggedInUserProfile"
+            url: "/users/getSignedInUserProfile"
         })
     };
 }

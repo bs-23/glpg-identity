@@ -9,6 +9,6 @@ module.exports = app => {
     app.route("/users")
         .post(passport.authenticate("user-jwt", { session: false }), controller.createUser);
 
-    app.route("/users/getLoggedInUserProfile")
-        .get(passport.authenticate("user-jwt", { session: false }), controller.getLoggedInUserProfile);
+    app.route("/users/getSignedInUserProfile")
+        .get(passport.authenticate("user-jwt", { session: false }), controller.getSignedInUserProfile);
 };

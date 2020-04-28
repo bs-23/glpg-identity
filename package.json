@@ -10,14 +10,7 @@
     "webpack:production": "cross-env NODE_ENV=production webpack --progress",
     "production": "run-s webpack:production pm2:production",
     "seed": "node seeder.js",
-    "test": "jest"
-  },
-  "jest": {
-    "verbose": true,
-    "coverageReporters": [
-      "text"
-    ],
-    "collectCoverage": true
+    "test": "jest --forceExit --detectOpenHandles"
   },
   "dependencies": {
     "async": "^3.2.0",
