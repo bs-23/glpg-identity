@@ -15,15 +15,13 @@
 > Create a .env file and adjust your environment variables:
 
 ```bash
-
 PORT=5050
 TOKEN_SECRET=<auth_token_secret>
 POSTGRES_DATABASE_URL=<postgresql_connection_string>
-
 ```
 
 ## Installation and bootstrapping
-> You need to have [Node.js](https://nodejs.org/en/) and [PostgreSQL](https://www.postgresql.org/) installed on your machine before running the followings:
+> You need to have [Node.js](https://nodejs.org/en/), [Yarn](https://classic.yarnpkg.com/en/docs/install/#windows-stable) and [PostgreSQL](https://www.postgresql.org/) installed on your machine before running the followings:
 
 ```bash
 $ cd /path/to/project
