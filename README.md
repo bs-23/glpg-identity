@@ -21,7 +21,7 @@ POSTGRES_DATABASE_URL=<postgresql_connection_string>
 ```bash
 $ cd /path/to/project
 $ yarn install          # install dependencies
-$ yarn seed             # seeding default system admin
+$ yarn seed             # seed the database
 $ yarn start            # development build
 $ yarn production       # production build
 $ yarn test             # running unit tests for node.js code
