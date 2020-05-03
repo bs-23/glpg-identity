@@ -14,7 +14,8 @@
 ```bash
 PORT=5050
 TOKEN_SECRET=<auth_token_secret>
-POSTGRES_DATABASE_URL=<postgresql_connection_string>
+POSTGRES_URL=<postgresql_connection_string>
+POSTGRES_DATABASE=<database_name>
 ```
 
 ## Available commands
