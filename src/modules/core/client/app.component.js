@@ -8,6 +8,7 @@ import PrivateRoute from "./PrivateRoute";
 import Login from "../../user/client/login.component";
 import Dashboard from "../../user/client/dashboard.component";
 import { getSignedInUserProfile } from "../../user/client/user.actions";
+import UserCreate from "../../user/client/userCreate.component";
 
 import "bootstrap/scss/bootstrap";
 import "./app.component.scss";
@@ -21,11 +22,13 @@ class App extends React.Component {
     render() {
         return (
             <Switch>
-                <PublicRoute path="/login" component={Login}/>
+                <PublicRoute path="/login" component={Login} />
 
-                <PrivateRoute exact path="/" component={Dashboard}/>
+                <PrivateRoute exact path="/" component={Dashboard} />
 
-                <Route component={NoMatch}/>
+                <PrivateRoute exact path="/create-user" component={UserCreate} />
+
+                <Route component={NoMatch} />
             </Switch>
         );
     }
@@ -33,7 +36,7 @@ class App extends React.Component {
 
 const mapDispatchToProps = dispatch => {
     return {
-        getSignedInUserProfile: function() {
+        getSignedInUserProfile: function () {
             dispatch(getSignedInUserProfile());
         }
     };

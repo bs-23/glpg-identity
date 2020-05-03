@@ -21,3 +21,15 @@ export function login(data) {
         })
     };
 }
+
+export function createSiteAdmin(data) {
+    return {
+        type: Types.CREATE_SITE_ADMIN,
+        payload: axios({
+            method: "post",
+            url: "/users",
+            data: data
+        })
+    };
+}
+

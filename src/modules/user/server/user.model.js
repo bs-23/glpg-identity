@@ -33,7 +33,8 @@ const User = sequelize.define("user", {
     },
     type: {
         type: DataTypes.ENUM,
-        values: ["System Admin", "Site Admin"]
+        values: ["System Admin", "Site Admin"],
+        defaultValue: "Site Admin"
     },
     countries: {
         type: DataTypes.ARRAY(DataTypes.STRING)
