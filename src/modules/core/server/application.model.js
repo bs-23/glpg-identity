@@ -1,6 +1,6 @@
 const path = require("path");
 const { DataTypes } = require("sequelize");
-const sequelize = require(path.join(process.cwd(), "config/server/lib/sequelize"));
+const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequelize"));
 
 const Application = sequelize.define("application", {
     id: {

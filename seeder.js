@@ -3,9 +3,9 @@ const async = require("async");
 
 async function init() {
     require("dotenv").config();
-    const sequelize = require(path.join(process.cwd(), "config/server/lib/sequelize"));
+    const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequelize"));
     await sequelize.query("CREATE SCHEMA IF NOT EXISTS ciam");
-    const User = require(path.join(process.cwd(), "modules/user/server/user.model"));
+    const User = require(path.join(process.cwd(), "src/modules/user/server/user.model"));
     await sequelize.sync();
 
     function userSeeder(callback) {

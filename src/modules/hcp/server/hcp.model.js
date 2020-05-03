@@ -1,9 +1,9 @@
 const path = require("path");
 const bcrypt = require("bcryptjs");
 const { DataTypes } = require("sequelize");
-const sequelize = require(path.join(process.cwd(), "config/server/lib/sequelize"));
+const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequelize"));
 
-const User = sequelize.define("user", {
+const HcpProfile = sequelize.define("hcp_profile", {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -11,6 +11,7 @@ const User = sequelize.define("user", {
         defaultValue: DataTypes.UUIDV4
     },
     application_id: {
+        allowNull: false,
         type: DataTypes.UUID
     },
     name: {
@@ -31,16 +32,6 @@ const User = sequelize.define("user", {
     phone: {
         type: DataTypes.STRING
     },
-    type: {
-        type: DataTypes.ENUM,
-        values: ["System Admin", "Site Admin"]
-    },
-    countries: {
-        type: DataTypes.ARRAY(DataTypes.STRING)
-    },
-    permissions: {
-        type: DataTypes.ARRAY(DataTypes.STRING)
-    },
     is_active: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
@@ -53,14 +44,14 @@ const User = sequelize.define("user", {
     }
 }, {
     schema: "ciam",
-    tableName: "users",
+    tableName: "hcp_profiles",
     timestamps: true,
     createdAt: "created_at",
     updatedAt: "updated_at"
 });
 
-User.prototype.validPassword = function (password) {
+HcpProfile.prototype.validPassword = function (password) {
     return bcrypt.compareSync(password, this.password);
 }
 
-module.exports = User;
+module.exports = HcpProfile;

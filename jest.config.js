@@ -4,6 +4,6 @@ module.exports = {
         "text"
     ],
     collectCoverage: true,
-    globalSetup: "./config/server/jest/jest.setup.js",
-    globalTeardown: "./config/server/jest/jest.teardown.js"
+    globalSetup: "./src/config/server/jest/jest.setup.js",
+    globalTeardown: "./src/config/server/jest/jest.teardown.js"
 };

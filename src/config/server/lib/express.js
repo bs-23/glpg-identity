@@ -14,7 +14,7 @@ module.exports = function() {
 
     app.engine("html", hbs.express4({ extname: ".html" }));
     app.set("view engine", "html");
-    app.set("views", path.join(process.cwd(), "modules/core/server"));
+    app.set("views", path.join(process.cwd(), "src/modules/core/server"));
 
     app.set("port", process.env.PORT);
 

@@ -1,7 +1,7 @@
 const path = require("path");
 const request = require("supertest");
-const app = require(path.join(process.cwd(), "config/server/lib/express"))();
-const specHelper = require(path.join(process.cwd(), "config/server/jest/spec.helper"));
+const app = require(path.join(process.cwd(), "src/config/server/lib/express"))();
+const specHelper = require(path.join(process.cwd(), "src/config/server/jest/spec.helper"));
 
 describe("User Api", () => {
     const systemAdmin = specHelper.users.systemAdmin;
