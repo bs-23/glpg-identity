@@ -6,7 +6,7 @@ function generateAccessToken(user) {
         id: user.id,
         name: user.name,
         email: user.email
-    }, process.env.TOKEN_SECRET,{
+    }, process.env.TOKEN_SECRET, {
         expiresIn: "2d",
         issuer: user.id.toString()
     });
@@ -28,10 +28,10 @@ async function getSignedInUserProfile(req, res) {
 
 async function login(req, res) {
     try {
-        const {email, password} = req.body;
-        const user = await User.findOne({ where: {email: email}, attributes: ["id", "name", "email", "password"] });
+        const { email, password } = req.body;
+        const user = await User.findOne({ where: { email: email }, attributes: ["id", "name", "email", "password"] });
 
-        if(!user || !user.validPassword(password)) {
+        if (!user || !user.validPassword(password)) {
             return res.status(401).send("Invalid email or password.");
         }
 
@@ -42,7 +42,7 @@ async function login(req, res) {
 
         res.json(formatProfile(user));
 
-    } catch(err) {
+    } catch (err) {
         console.log(err);
     }
 }
@@ -52,23 +52,26 @@ async function logout(req, res) {
 }
 
 async function createUser(req, res) {
-    const {name, email, password, role, permissions} = req.body;
+    const { name, email, password, type, phone, countries } = req.body;
 
     try {
-        const [doc, created] = await User.findOrCreate({ email: email}, {
-            name:  name,
-            password: password,
-            role: role,
-            permissions: permissions,
-            created_by: req.user.id
+        const [doc, created] = await User.findOrCreate({
+            where: { email: email }, defaults: {
+                name: name,
+                password: password,
+                phone: phone,
+                type: type,
+                countries: [countries],
+                created_by: req.user.id
+            }
         });
 
-        if(!created) {
+        if (!created) {
             return res.status(400).send("Email address already exists.");
         }
 
         res.json(doc);
-    } catch(error) {
+    } catch (err) {
         console.log(err);
     }
 }
