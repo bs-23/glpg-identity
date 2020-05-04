@@ -26,7 +26,7 @@ class App extends React.Component {
 
                 <PrivateRoute exact path="/" component={Dashboard} />
 
-                <PrivateRoute exact path="/create-user" component={UserCreate} />
+                <PrivateRoute exact path="/users/create" component={UserCreate} />
 
                 <Route component={NoMatch} />
             </Switch>

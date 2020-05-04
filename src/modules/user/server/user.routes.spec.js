@@ -31,4 +31,21 @@ describe("User Api", () => {
         expect(response.statusCode).toBe(200);
         expect(response.res.headers["content-type"]).toMatch("application/json");
     });
+
+    it("Should create new site admin", async () => {
+        const response = await request(app)
+            .post("/users")
+            .set("Cookie", [`access_token=${systemAdmin.access_token}`])
+            .send({
+                name: "testUser1",
+                email: "testUser1@gmail.com",
+                password: "abcpassword",
+                phone: "880111111",
+                type: "Site Admin",
+                countries: "USA"
+            });
+
+        expect(response.statusCode).toBe(200);
+        expect(response.res.headers["content-type"]).toMatch("application/json");
+    });
 });

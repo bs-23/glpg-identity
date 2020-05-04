@@ -99,7 +99,9 @@ UserCreate = withFormik({
             phone: values.phone,
             isActive: Boolean(values.isActive)
 
-        })).catch(error => {
+        })).then(() => {
+            window.location = '/';
+        }).catch(error => {
             alert(error.response.data);
         });
     },
