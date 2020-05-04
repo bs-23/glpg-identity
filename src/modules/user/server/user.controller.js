@@ -1,5 +1,7 @@
+const path = require("path");
 const jwt = require("jsonwebtoken");
 const User = require("./user.model");
+const Client = require(path.join(process.cwd(), "src/modules/core/server/client.model"));
 
 function generateAccessToken(user) {
     return jwt.sign({
@@ -52,17 +54,23 @@ async function logout(req, res) {
 }
 
 async function createUser(req, res) {
-    const { name, email, password, type, phone, countries } = req.body;
+    const { name, email, password, phone, countries, is_active } = req.body;
 
     try {
+        const client = await Client.findOne({ where: { email: "service.hcp@glpg-hcp.com" }, attributes: ["id"] });
+
+        if(!client) return res.sendStatus(500);
+
         const [doc, created] = await User.findOrCreate({
             where: { email: email }, defaults: {
                 name: name,
                 password: password,
                 phone: phone,
-                type: type,
-                countries: [countries],
-                created_by: req.user.id
+                countries: countries,
+                is_active: is_active,
+                created_by: req.user.id,
+                updated_by: req.user.id,
+                client_id: client.id
             }
         });
 
@@ -70,7 +78,7 @@ async function createUser(req, res) {
             return res.status(400).send("Email address already exists.");
         }
 
-        res.json(doc);
+        res.sendStatus(200);
     } catch (err) {
         console.log(err);
     }

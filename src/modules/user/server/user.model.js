@@ -8,10 +8,20 @@ const User = sequelize.define("user", {
         allowNull: false,
         primaryKey: true,
         type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4
+        defaultValue: DataTypes.UUIDV4,
+        validate: {
+            isUUID: 4
+        }
     },
-    application_id: {
-        type: DataTypes.UUID
+    client_id: {
+        type: DataTypes.UUID,
+        validate: {
+            customValidator(value) {
+                if (value === null && this.type !== "System Admin") {
+                    throw new Error("Client id can't be null unless user is System Admin");
+                }
+            }
+        }
     },
     name: {
         allowNull: false,
@@ -20,7 +30,10 @@ const User = sequelize.define("user", {
     email: {
         unique: true,
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
+        validate: {
+            isEmail: true
+        }
     },
     password: {
         type: DataTypes.STRING,

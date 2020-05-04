@@ -9,6 +9,11 @@ config.server.strategies.forEach(function (strategy) {
 });
 
 module.exports = {
+    client: {
+        name: "Test Client",
+        email: "service.hcp@glpg-hcp.com",
+        password: "xxx-xxx-xxx",
+    },
     users: {
         systemAdmin: {
             id: "f29b63e5-36c7-4210-a5a8-c1e9d0c5b9e4",

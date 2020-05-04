@@ -5,10 +5,10 @@ import { withRouter, Switch, Route } from "react-router-dom";
 import NoMatch from "./NoMatch";
 import PublicRoute from "./PublicRoute";
 import PrivateRoute from "./PrivateRoute";
-import Login from "../../user/client/login.component";
-import Dashboard from "../../user/client/dashboard.component";
+import Login from "../../user/client/components/login.component";
+import Dashboard from "../../user/client/components/dashboard.component";
 import { getSignedInUserProfile } from "../../user/client/user.actions";
-import UserCreate from "../../user/client/userCreate.component";
+import UserForm from "../../user/client/components/user-form.component";
 
 import "bootstrap/scss/bootstrap";
 import "./app.component.scss";
@@ -22,11 +22,11 @@ class App extends React.Component {
     render() {
         return (
             <Switch>
-                <PublicRoute path="/login" component={Login} />
+                <PublicRoute path="/login" component={Login}/>
 
-                <PrivateRoute exact path="/" component={Dashboard} />
+                <PrivateRoute exact path="/" component={Dashboard}/>
 
-                <PrivateRoute exact path="/users/create" component={UserCreate} />
+                <PrivateRoute exact path="/users/create" component={UserForm}/>
 
                 <Route component={NoMatch} />
             </Switch>

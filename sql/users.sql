@@ -7,12 +7,12 @@ ALTER TYPE ciam.enum_users_type
 CREATE TABLE ciam.users
 (
     id uuid NOT NULL,
-    application_id uuid,
+    client_id uuid,
     name character varying(255) COLLATE pg_catalog."default" NOT NULL,
     email character varying(255) COLLATE pg_catalog."default" NOT NULL,
     password character varying(255) COLLATE pg_catalog."default",
     phone character varying(255) COLLATE pg_catalog."default",
-    type ciam.enum_users_type,
+    type ciam.enum_users_type DEFAULT 'Site Admin'::ciam.enum_users_type,
     countries character varying(255)[] COLLATE pg_catalog."default",
     permissions character varying(255)[] COLLATE pg_catalog."default",
     is_active boolean DEFAULT false,
