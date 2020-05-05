@@ -5,7 +5,7 @@ module.exports = async () => {
 
     const path = require("path");
     const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequelize"));
-    const specHelper = require(path.join(process.cwd(), "src/config/server/jest/spec.helper"));
+    const specHelper = require(path.join(process.cwd(), "jest/spec.helper"));
 
     await sequelize.query("CREATE SCHEMA IF NOT EXISTS ciam");
     const User = require(path.join(process.cwd(), "src/modules/user/server/user.model"));

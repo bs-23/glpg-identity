@@ -12,7 +12,7 @@ function generateAccessToken(user) {
         expiresIn: "2d",
         issuer: user.id.toString()
     });
-};
+}
 
 function formatProfile(user) {
     let profile = {
@@ -22,7 +22,7 @@ function formatProfile(user) {
     };
 
     return profile;
-};
+}
 
 async function getSignedInUserProfile(req, res) {
     res.json(formatProfile(req.user));
@@ -78,7 +78,7 @@ async function createUser(req, res) {
             return res.status(400).send("Email address already exists.");
         }
 
-        res.sendStatus(200);
+        res.json(doc);
     } catch (err) {
         console.log(err);
     }

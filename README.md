@@ -7,6 +7,7 @@
 - [PostgreSQL v12.2](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads)
 - [pgAdmin v4](https://www.pgadmin.org/)
 - [Visual Studio Code](https://code.visualstudio.com/)
+- [Sonarqube](https://www.sonarqube.org/)
 
 ## Configure environment variables
 > Create a .env file and adjust the following environment variables. DONOT include this file in version control.
