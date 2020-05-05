@@ -1,0 +1,11 @@
+/*SCSS Architecture using SMACSS and BEM for Scalable and Maintainable*/
+
+/*Vendors – libs like bootstartp, font-awesome etc..*/
+@import "bootstrap/scss/bootstrap";
+
+/*Base  – Variables, Mixins and Functions (no actual CSS output)*/
+
+/*Layout – CSS resets which might include Eric Meyer’s reset, Normalize.css, or your own batch of code*/
+
+/*Components – Aesthetic classes for styling any & all page elements (often combined with the structure of object classes)*/
+@import "components/app.component";

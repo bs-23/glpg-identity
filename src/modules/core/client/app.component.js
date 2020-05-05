@@ -10,8 +10,7 @@ import Dashboard from "../../user/client/components/dashboard.component";
 import { getSignedInUserProfile } from "../../user/client/user.actions";
 import UserForm from "../../user/client/components/user-form.component";
 
-import "bootstrap/scss/bootstrap";
-import "./app.component.scss";
+import "../../content/scss/main.scss";
 
 class App extends React.Component {
     constructor(props) {
