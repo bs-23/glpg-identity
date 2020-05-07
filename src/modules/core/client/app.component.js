@@ -1,6 +1,6 @@
-import React from "react";
-import { connect } from "react-redux";
-import { withRouter, Switch, Route } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { Switch, Route } from "react-router-dom";
 
 import "bootstrap/scss/bootstrap";
 import "./app.scss";
@@ -13,33 +13,22 @@ import Dashboard from "../../user/client/components/dashboard.component";
 import { getSignedInUserProfile } from "../../user/client/user.actions";
 import UserRoutes from "../../user/client/user.routes";
 
-class App extends React.Component {
-    constructor(props) {
-        super();
-        props.getSignedInUserProfile();
-    }
+export default function App() {
+    const dispatch = useDispatch();
 
-    render() {
-        return (
-            <Switch>
-                <PublicRoute path="/login" component={Login}/>
+    useEffect(() => {
+        dispatch(getSignedInUserProfile());
+    }, []);
 
-                <PrivateRoute exact path="/" component={Dashboard}/>
+    return (
+        <Switch>
+            <PublicRoute path="/login" component={Login}/>
 
-                <Route path="/users" component={UserRoutes}/>
+            <PrivateRoute exact path="/" component={Dashboard}/>
 
-                <Route component={NoMatch} />
-            </Switch>
-        );
-    }
+            <Route path="/users" component={UserRoutes}/>
+
+            <Route component={NoMatch} />
+        </Switch>
+    );
 }
-
-const mapDispatchToProps = dispatch => {
-    return {
-        getSignedInUserProfile: function () {
-            dispatch(getSignedInUserProfile());
-        }
-    };
-};
-
-export default withRouter(connect(null, mapDispatchToProps)(App));
