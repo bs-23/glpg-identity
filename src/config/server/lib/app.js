@@ -1,10 +1,10 @@
 const path = require("path");
 const config = require("../config");
 
-module.exports.start = async function() {
+module.exports.start = async function() {  
     require("dotenv").config();
 
-    const app = require("./express")();
+    const app = require("./express")(); 
 
     config.server.strategies.forEach(function (strategy) {
         require(path.resolve(strategy))();

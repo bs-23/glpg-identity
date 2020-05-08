@@ -10,7 +10,7 @@ function generateAccessToken(user) {
         email: user.email
     }, process.env.TOKEN_SECRET, {
         expiresIn: "2d",
-        issuer: user.id.toString()
+        issuer: user.id.toString() 
     });
 };
 
