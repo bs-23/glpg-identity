@@ -12,3 +12,4 @@ module.exports = app => {
     app.route("/users/getSignedInUserProfile")
         .get(passport.authenticate("user-jwt", { session: false }), controller.getSignedInUserProfile);
 };
+ 

@@ -1,5 +1,6 @@
 const path = require("path");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const LodashModuleReplacementPlugin = require("lodash-webpack-plugin");
 
 module.exports = {
@@ -41,7 +42,9 @@ module.exports = {
             {
                 test: /\.(scss|css)$/,
                 use: [
-                    "style-loader",
+                    {
+                        loader: MiniCssExtractPlugin.loader
+                    },
                     "css-loader",
                     "sass-loader"
                 ]

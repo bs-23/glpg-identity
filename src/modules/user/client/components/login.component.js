@@ -5,6 +5,8 @@ import store from "../../../core/client/store";
 import { login } from "../user.actions";
 import { loginSchema } from "../user.schema";
 
+import "./user.scss";
+
 class Login extends React.Component {
     render() {
         const { handleSubmit } = this.props;

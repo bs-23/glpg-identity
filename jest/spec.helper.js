@@ -1,12 +1,6 @@
-const path = require("path");
 const jwt = require("jsonwebtoken");
-const config = require("../config");
 
 process.env.TOKEN_SECRET = "6368451b-50bc9a455e62";
-
-config.server.strategies.forEach(function (strategy) {
-    require(path.resolve(strategy))();
-});
 
 module.exports = {
     client: {

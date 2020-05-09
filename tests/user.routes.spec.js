@@ -2,7 +2,7 @@ const path = require("path");
 const request = require("supertest");
 const jwt = require("jsonwebtoken");
 const app = require(path.join(process.cwd(), "src/config/server/lib/express"))();
-const specHelper = require(path.join(process.cwd(), "src/config/server/jest/spec.helper"));
+const specHelper = require(path.join(process.cwd(), "jest/spec.helper"));
 
 describe("User Routes", () => {
     const systemAdmin = specHelper.users.systemAdmin;
@@ -45,6 +45,7 @@ describe("User Routes", () => {
                 });
 
             expect(response.statusCode).toBe(200);
+            expect(response.res.headers["content-type"]).toMatch("application/json");
         });
 
         it("Should get an error when creating new site admin with duplicate email", async () => {

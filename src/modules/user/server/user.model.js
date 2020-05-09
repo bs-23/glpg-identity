@@ -10,7 +10,7 @@ const User = sequelize.define("user", {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         validate: {
-            isUUID: 4
+            isUUID: 4 
         }
     },
     client_id: {
