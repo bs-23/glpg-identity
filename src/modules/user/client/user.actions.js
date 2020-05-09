@@ -22,9 +22,9 @@ export function login(data) {
     };
 }
 
-export function createSiteAdmin(data) {
+export function createUser(data) {
     return {
-        type: Types.CREATE_SITE_ADMIN,
+        type: Types.CREATE_USER,
         payload: axios({
             method: "post",
             url: "/users",
@@ -32,4 +32,3 @@ export function createSiteAdmin(data) {
         })
     };
 }
-

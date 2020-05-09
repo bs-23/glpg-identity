@@ -1,8 +1,9 @@
 const path = require("path");
+const bcrypt = require("bcryptjs");
 const { DataTypes } = require("sequelize");
 const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequelize"));
 
-const Application = sequelize.define("application", {
+const Client = sequelize.define("client", {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -12,6 +13,20 @@ const Application = sequelize.define("application", {
     name: {
         allowNull: false,
         type: DataTypes.STRING
+    },
+    email: {
+        unique: true,
+        allowNull: false,
+        type: DataTypes.STRING,
+        validate: {
+            isEmail: true
+        }
+    },
+    password: {
+        type: DataTypes.STRING,
+        set(value) {
+            this.setDataValue("password", bcrypt.hashSync(value, 8));
+        }
     },
     is_active: {
         type: DataTypes.BOOLEAN,
@@ -25,10 +40,14 @@ const Application = sequelize.define("application", {
     }
 }, {
     schema: "ciam",
-    tableName: "applications",
+    tableName: "clients",
     timestamps: true,
     createdAt: "created_at",
     updatedAt: "updated_at"
 });
 
-module.exports = Application;
+Client.prototype.validPassword = function (password) {
+    return bcrypt.compareSync(password, this.password);
+}
+
+module.exports = Client;

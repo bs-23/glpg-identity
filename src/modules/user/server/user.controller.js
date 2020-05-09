@@ -1,5 +1,7 @@
+const path = require("path");
 const jwt = require("jsonwebtoken");
 const User = require("./user.model");
+const Client = require(path.join(process.cwd(), "src/modules/core/server/client.model"));
 
 function generateAccessToken(user) {
     return jwt.sign({
@@ -10,7 +12,7 @@ function generateAccessToken(user) {
         expiresIn: "2d",
         issuer: user.id.toString()
     });
-};
+}
 
 function formatProfile(user) {
     let profile = {
@@ -20,7 +22,7 @@ function formatProfile(user) {
     };
 
     return profile;
-};
+}
 
 async function getSignedInUserProfile(req, res) {
     res.json(formatProfile(req.user));
@@ -52,17 +54,23 @@ async function logout(req, res) {
 }
 
 async function createUser(req, res) {
-    const { name, email, password, type, phone, countries } = req.body;
+    const { name, email, password, phone, countries, is_active } = req.body;
 
     try {
+        const client = await Client.findOne({ where: { email: "service.hcp@glpg-hcp.com" }, attributes: ["id"] });
+
+        if(!client) return res.sendStatus(500);
+
         const [doc, created] = await User.findOrCreate({
             where: { email: email }, defaults: {
                 name: name,
                 password: password,
                 phone: phone,
-                type: type,
-                countries: [countries],
-                created_by: req.user.id
+                countries: countries,
+                is_active: is_active,
+                created_by: req.user.id,
+                updated_by: req.user.id,
+                client_id: client.id
             }
         });
 
