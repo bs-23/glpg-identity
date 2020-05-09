@@ -11,8 +11,8 @@ phases:
             - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
             - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
             - echo running unit test
-            - yarn install
-            - yarn test
+            - npm install
+            - npm test
             - echo unit test completed
     build:
         commands:
