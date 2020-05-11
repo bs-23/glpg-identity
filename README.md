@@ -17,6 +17,8 @@ PORT=5050
 TOKEN_SECRET=<auth_token_secret>
 POSTGRES_URL=<postgresql_connection_string>
 POSTGRES_DATABASE=<database_name>
+SONARQUBE_URL=<sonarqube_url>
+SONARQUBE_TOKEN=<sonarqube_token>
 ```
 
 ## Available commands
