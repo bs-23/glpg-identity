@@ -7,7 +7,24 @@ import { createUser } from "../user.actions";
 import { registerSchema } from "../user.schema";
 
 class UserForm extends React.Component {
+
     render() {
+        const permissionList = [
+            { id: 0, value: 'User Management' },
+            { id: 1, value: 'HCP Management' },
+            { id: 2, value: 'Persona Management' },
+            { id: 4, value: 'Email Campaign' }
+        ];
+
+        const countryList = [
+            { id: 0, name: 'UK' },
+            { id: 1, name: 'Russia' },
+            { id: 2, name: 'Germany' },
+            { id: 3, name: 'Norway' },
+            { id: 4, name: 'Netherland' },
+            { id: 5, name: 'Finland' },
+            { id: 6, name: 'Italy' },
+        ];
         const { handleSubmit, isSubmitting } = this.props;
 
         return (
@@ -18,33 +35,35 @@ class UserForm extends React.Component {
                         <div className="card-body">
                             <Form onSubmit={handleSubmit}>
                                 <div className="form-group">
-                                    <Field className="form-control" type="name" name="name" placeholder="Name"/>
-                                    <div className="invalid-feedback"><ErrorMessage name="name"/></div>
+                                    <Field className="form-control" type="name" name="name" placeholder="Name" />
+                                    <div className="invalid-feedback"><ErrorMessage name="name" /></div>
                                 </div>
                                 <div className="form-group">
-                                    <Field className="form-control" type="email" name="email" placeholder="Email address" autoComplete="username"/>
-                                    <div className="invalid-feedback"><ErrorMessage name="email"/></div>
+                                    <Field className="form-control" type="email" name="email" placeholder="Email address" autoComplete="username" />
+                                    <div className="invalid-feedback"><ErrorMessage name="email" /></div>
                                 </div>
                                 <div className="form-group">
-                                    <Field className="form-control" type="password" name="password" placeholder="Password" autoComplete="current-password"/>
-                                    <div className="invalid-feedback"><ErrorMessage name="password"/></div>
+                                    <Field className="form-control" type="password" name="password" placeholder="Password" autoComplete="current-password" />
+                                    <div className="invalid-feedback"><ErrorMessage name="password" /></div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="country">Select Countries</label>
+                                    <label for="country">Select Countries:</label>
                                     <Field as="select" name="countries" className="form-control" multiple>
-                                        <option value="USA">USA</option>
-                                        <option value="UK">UK</option>
-                                        <option value="Germany">Germany</option>
-                                        <option value="Brazil">Brazil</option>
-                                        <option value="Russia">Russia</option>
+                                        {countryList.map(item => <option key={item.id} value={item.name}>{item.name}</option>)}
+                                    </Field>
+                                </div>
+                                <div class="form-group">
+                                    <label for="permissions">Grant Permissions:</label>
+                                    <Field as="select" name="permissions" className="form-control" multiple>
+                                        {permissionList.map(item => <option key={item.id} value={item.value}>{item.value}</option>)}
                                     </Field>
                                 </div>
                                 <div className="form-group">
-                                    <Field className="form-control" type="text" name="phone" placeholder="Phone"/>
-                                    <div className="invalid-feedback"><ErrorMessage name="phone"/></div>
+                                    <Field className="form-control" type="text" name="phone" placeholder="Phone" />
+                                    <div className="invalid-feedback"><ErrorMessage name="phone" /></div>
                                 </div>
                                 <div className="form-group">
-                                    <Field type="checkbox" name="is_active"/> Is Active
+                                    <Field type="checkbox" name="is_active" /> Is Active
                                 </div>
                                 <button type="submit" className="btn btn-info btn-block" disabled={isSubmitting}>Submit</button>
                             </Form>
@@ -67,6 +86,7 @@ UserForm = withFormik({
             email: "",
             password: "",
             countries: [],
+            permissions: [],
             phone: "",
             is_active: false
         };
@@ -80,11 +100,12 @@ UserForm = withFormik({
             email: values.email,
             password: values.password,
             countries: values.countries,
+            permissions: values.permissions,
             phone: values.phone,
             is_active: values.is_active
         };
 
-        props.createUser(formData).then(function() {
+        props.createUser(formData).then(function () {
             resetForm();
         }).catch(error => {
             console.log(error);
