@@ -121,21 +121,27 @@ async function changePassword(req, res) {
         }
 
         if (newPassword !== confirmPassword) {
-            return res.status(401).send('Paswords should match');
+            return res.status(400).send('Paswords should match');
         }
 
         if (currentPassword === newPassword) {
             return res
-                .status(401)
+                .status(400)
                 .send('New Password should be different from current password');
         }
 
+        if (newPassword.length < 8) {
+            return res
+                .status(400)
+                .send('New Password must be at least 8 characters long');
+        }
+
         user.password = newPassword;
-        user.save();
+        await user.save();
 
         res.json(formatProfile(user));
     } catch (err) {
-        console.log(err);
+        console.log(err.errors[0].message);
     }
 }
 

@@ -82,7 +82,7 @@ ChangePasswordForm = withFormik({
 
     handleSubmit: (values, { setSubmitting, resetForm, props }) => {
         setSubmitting(false);
-        console.log('Form values: ', values);
+
         const formData = {
             currentPassword: values.currentPassword,
             newPassword: values.newPassword,
@@ -91,10 +91,12 @@ ChangePasswordForm = withFormik({
 
         props
             .changePassword(formData)
-            .then(function() {
+            .then(function(data) {
+                console.log('Change password returned data', data);
                 resetForm();
             })
             .catch(error => {
+                console.log('Change Password Error', error);
                 alert(error.response.data);
             });
     },

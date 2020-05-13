@@ -103,6 +103,45 @@ describe('User Routes', () => {
             expect(response.statusCode).toBe(401);
         });
 
+        it('Should not change password because passwords is short', async () => {
+            const response = await request(app)
+                .post('/users/changePassword')
+                .set('Cookie', [`access_token=${systemAdmin.access_token}`])
+                .send({
+                    currentPassword: systemAdmin.password,
+                    newPassword: 'aaaa',
+                    confirmPassword: 'aaaa',
+                });
+
+            expect(response.statusCode).toBe(400);
+        });
+
+        it('Should not change password because passwords dont match', async () => {
+            const response = await request(app)
+                .post('/users/changePassword')
+                .set('Cookie', [`access_token=${systemAdmin.access_token}`])
+                .send({
+                    currentPassword: systemAdmin.password,
+                    newPassword: 'aaaaaaaa',
+                    confirmPassword: 'bbbbbbbb',
+                });
+
+            expect(response.statusCode).toBe(400);
+        });
+
+        it('Should not change password because current password is invalid', async () => {
+            const response = await request(app)
+                .post('/users/changePassword')
+                .set('Cookie', [`access_token=${systemAdmin.access_token}`])
+                .send({
+                    currentPassword: 'inavlid_password',
+                    newPassword: 'aaaaaaaa',
+                    confirmPassword: 'aaaaaaaa',
+                });
+
+            expect(response.statusCode).toBe(401);
+        });
+
         it('Should change password', async () => {
             const response = await request(app)
                 .post('/users/changePassword')
@@ -117,32 +156,6 @@ describe('User Routes', () => {
             expect(response.res.headers['content-type']).toMatch(
                 'application/json'
             );
-        });
-
-        it('Should not change password because passwords dont match', async () => {
-            const response = await request(app)
-                .post('/users/changePassword')
-                .set('Cookie', [`access_token=${systemAdmin.access_token}`])
-                .send({
-                    currentPassword: systemAdmin.password,
-                    newPassword: 'aaaaaaaa',
-                    confirmPassword: 'bbbbbbbb',
-                });
-
-            expect(response.statusCode).toBe(401);
-        });
-
-        it('Should not change password because current password is invalid', async () => {
-            const response = await request(app)
-                .post('/users/changePassword')
-                .set('Cookie', [`access_token=${systemAdmin.access_token}`])
-                .send({
-                    currentPassword: 'inavlid_password',
-                    newPassword: 'aaaaaaaa',
-                    confirmPassword: 'aaaaaaaa',
-                });
-
-            expect(response.statusCode).toBe(401);
         });
     });
 });
