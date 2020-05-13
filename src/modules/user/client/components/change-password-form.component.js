@@ -95,7 +95,7 @@ ChangePasswordForm = withFormik({
                 resetForm();
             })
             .catch(error => {
-                console.log(error);
+                alert(error.response.data);
             });
     },
 
