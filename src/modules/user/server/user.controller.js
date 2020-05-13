@@ -54,12 +54,12 @@ async function logout(req, res) {
 }
 
 async function createUser(req, res) {
-    const { name, email, password, phone, countries, is_active } = req.body;
+    const { name, email, password, phone, countries, permissions, is_active } = req.body;
 
     try {
         const client = await Client.findOne({ where: { email: "service.hcp@glpg-hcp.com" }, attributes: ["id"] });
 
-        if(!client) return res.sendStatus(500);
+        if (!client) return res.sendStatus(500);
 
         const [doc, created] = await User.findOrCreate({
             where: { email: email }, defaults: {
@@ -67,6 +67,7 @@ async function createUser(req, res) {
                 password: password,
                 phone: phone,
                 countries: countries,
+                permissions: permissions,
                 is_active: is_active,
                 created_by: req.user.id,
                 updated_by: req.user.id,

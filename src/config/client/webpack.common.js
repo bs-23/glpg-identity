@@ -36,7 +36,7 @@ module.exports = {
                 loader: "babel-loader",
                 options: {
                     plugins: ["react-html-attrs", "@babel/plugin-proposal-object-rest-spread"],
-                    presets: [["@babel/preset-env", { targets: {"node": "current"} }], "@babel/preset-react" ]
+                    presets: [["@babel/preset-env", { targets: { "node": "current" } }], "@babel/preset-react"]
                 }
             },
             {

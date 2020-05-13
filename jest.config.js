@@ -3,5 +3,8 @@ module.exports = {
     collectCoverage: true,
     globalSetup: "./jest/jest.setup.js",
     globalTeardown: "./jest/jest.teardown.js",
-    testResultsProcessor: "jest-sonar-reporter"
-};
+    testResultsProcessor: "jest-sonar-reporter",
+    transform: {
+        "^.+\\.jsx?$": "babel-jest"
+    }
+}

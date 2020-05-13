@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const app = require(path.join(process.cwd(), "src/config/server/lib/express"))();
 const specHelper = require(path.join(process.cwd(), "jest/spec.helper"));
 
+
 describe("User Routes", () => {
     const systemAdmin = specHelper.users.systemAdmin;
 

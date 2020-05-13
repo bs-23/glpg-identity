@@ -1,9 +1,9 @@
-FROM node:12.7-alpine AS builder
+FROM node:14.1-alpine AS builder
 WORKDIR /app
 COPY . .
 RUN yarn install
 
-FROM node:12.7-alpine AS prod
+FROM node:14.1-alpine AS prod
 WORKDIR /app
 COPY --from=builder /app ./
 # Install pm2 dependency into image
