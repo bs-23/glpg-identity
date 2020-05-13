@@ -10,15 +10,15 @@ phases:
             - REPOSITORY_URI=$(aws sts get-caller-identity --query 'Account' --output text).dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${REPO_NAME}
             - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
             - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
-            # - echo running unit test and code quality test using sonarqube
-            # - yarn install
-            # - npm test
-            # - echo unit test completed
+            - echo running unit test and code quality test using sonarqube
+            - yarn install
+            - yarn test
+            - echo unit test completed
             # - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-3.3.0.1492-linux.zip
             # - unzip sonar-scanner-cli-3.3.0.1492-linux.zip
             # - export PATH=$PATH:./sonar-scanner-3.3.0.1492-linux/bin/
             # - sonar-scanner -D"sonar.projectKey=node-app" -D"sonar.sources=." -D"sonar.host.url=http://104.197.180.5:9000" -D"sonar.login=dbb5b6ad0bba077ab93a4f36ba860d48c84eb1a7"
-            # - yarn sonarqube
+            - yarn sonarqube
     build:
         commands:
             - echo build Docker image on `date`
