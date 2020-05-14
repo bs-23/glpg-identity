@@ -18,12 +18,12 @@ class Login extends React.Component {
                     <div className="card-body">
                         <Form onSubmit={handleSubmit}>
                             <div className="form-group">
-                                <Field className="form-control" type="email" name="email" placeholder="Email address" autoComplete="username" />
-                                <div className="invalid-feedback"><ErrorMessage name="email" /></div>
+                                <Field className="form-control" data-testid="email" type="email" name="email" placeholder="Email address" autoComplete="username" />
+                                <div className="invalid-feedback" data-testid="email-error"><ErrorMessage id="email-error" name="email" /></div>
                             </div>
                             <div className="form-group">
-                                <Field className="form-control" type="password" name="password" placeholder="Password" autoComplete="current-password" />
-                                <div className="invalid-feedback"><ErrorMessage name="password" /></div>
+                                <Field className="form-control" data-testid="password" type="password" name="password" placeholder="Password" autoComplete="current-password" />
+                                <div className="invalid-feedback" data-testid="password-error"><ErrorMessage name="password" /></div>
                             </div>
                             <button type="submit" className="btn btn-info btn-block">Submit</button>
                         </Form>

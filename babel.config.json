@@ -1,6 +1,9 @@
 {
     "presets": [
         [
+            "@babel/preset-react"
+        ],
+        [
             "env",
             {
                 "targets": {

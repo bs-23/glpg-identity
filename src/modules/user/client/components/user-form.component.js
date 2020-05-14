@@ -35,35 +35,37 @@ class UserForm extends React.Component {
                         <div className="card-body">
                             <Form onSubmit={handleSubmit}>
                                 <div className="form-group">
-                                    <Field className="form-control" type="name" name="name" placeholder="Name" />
-                                    <div className="invalid-feedback"><ErrorMessage name="name" /></div>
+                                    <Field data-testid="name" className="form-control" type="name" name="name" placeholder="Name" />
+                                    <div className="invalid-feedback" data-testid="nameError"><ErrorMessage name="name" /></div>
                                 </div>
                                 <div className="form-group">
-                                    <Field className="form-control" type="email" name="email" placeholder="Email address" autoComplete="username" />
-                                    <div className="invalid-feedback"><ErrorMessage name="email" /></div>
+                                    <Field data-testid="email" className="form-control" type="email" name="email" placeholder="Email address" autoComplete="username" />
+                                    <div className="invalid-feedback" data-testid="emailError"><ErrorMessage name="email" /></div>
                                 </div>
                                 <div className="form-group">
-                                    <Field className="form-control" type="password" name="password" placeholder="Password" autoComplete="current-password" />
-                                    <div className="invalid-feedback"><ErrorMessage name="password" /></div>
+                                    <Field data-testid="password" className="form-control" type="password" name="password" placeholder="Password" autoComplete="current-password" />
+                                    <div className="invalid-feedback" data-testid="passwordError"><ErrorMessage name="password" /></div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="country">Select Countries:</label>
-                                    <Field as="select" name="countries" className="form-control" multiple>
+                                <div className="form-group">
+                                    <label htmlFor="country">Select Countries:</label>
+                                    <Field data-testid="country" as="select" name="countries" className="form-control" multiple>
                                         {countryList.map(item => <option key={item.id} value={item.name}>{item.name}</option>)}
                                     </Field>
                                 </div>
-                                <div class="form-group">
-                                    <label for="permissions">Grant Permissions:</label>
-                                    <Field as="select" name="permissions" className="form-control" multiple>
+                                <div className="form-group">
+                                    <label htmlFor="permissions">Grant Permissions:</label>
+                                    <Field data-testid="permission" as="select" name="permissions" className="form-control" multiple>
                                         {permissionList.map(item => <option key={item.id} value={item.value}>{item.value}</option>)}
                                     </Field>
                                 </div>
                                 <div className="form-group">
-                                    <Field className="form-control" type="text" name="phone" placeholder="Phone" />
-                                    <div className="invalid-feedback"><ErrorMessage name="phone" /></div>
+                                    <Field data-testid="phone" className="form-control" type="text" name="phone" placeholder="Phone" />
+                                    <div className="invalid-feedback">
+                                        <ErrorMessage name="phone" data-testid="phoneError"/>
+                                    </div>
                                 </div>
                                 <div className="form-group">
-                                    <Field type="checkbox" name="is_active" /> Is Active
+                                    <Field type="checkbox" name="is_active" data-testid="is_active"/> Is Active
                                 </div>
                                 <button type="submit" className="btn btn-info btn-block" disabled={isSubmitting}>Submit</button>
                             </Form>
