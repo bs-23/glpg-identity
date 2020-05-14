@@ -36,8 +36,6 @@ describe("UserForm component", () => {
             fireEvent.change(name, {target: {value: 'mockname'}})
             fireEvent.change(email, {target: {value: 'mockemail'}})
             fireEvent.change(password, {target: {value: 'mockpassword'}})
-            fireEvent.change(country, {target: {value: '3'}})
-            fireEvent.change(permission, {target: {value: '2'}})
             fireEvent.change(phone, {target: {value: 'mockphone'}})
         })
 

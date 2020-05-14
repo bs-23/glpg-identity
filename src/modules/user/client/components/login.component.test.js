@@ -89,19 +89,8 @@ describe("Login component", () => {
         const password_error = getByTestId('password-error')
 
         await waitFor(() => {
-            fireEvent.change(email, {
-                target: {
-                    value: "habib@gmail.com"
-                }
-            })
-        })
-
-        await waitFor(() => {
-            fireEvent.change(password, {
-                target: {
-                    value: "mypasswordiswrong"
-                }
-            })
+            fireEvent.change(email, {target: {value: "mockemail@gmail.com"}})
+            fireEvent.change(password, {target: {value: 'mockpassword'}})
         })
 
         await waitFor(() => {

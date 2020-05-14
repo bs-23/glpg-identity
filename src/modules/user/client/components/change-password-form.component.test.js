@@ -35,6 +35,7 @@ describe("ChangePasswordForm component", () => {
             fireEvent.change(confirm_password, {target: {value: 'newpassword'}})
         })
         
+        // console.log(current_password.value, ' <========>', new_password.value, '<=========> ', confirm_password.value)
         expect(current_password.value).toEqual("currentpassword")
         expect(new_password.value).toEqual("newpassword")
         expect(confirm_password.value).toEqual("newpassword")
