@@ -108,7 +108,7 @@ async function createUser(req, res) {
 }
 
 async function changePassword(req, res) {
-    const { currentPassword, newPassword, confirmPassword } = req.body; 
+    const { currentPassword, newPassword, confirmPassword } = req.body;
 
     try {
         const user = await User.findOne({
@@ -120,8 +120,14 @@ async function changePassword(req, res) {
             return res.status(401).send('Current Password not valid');
         }
 
+        if (newPassword.length < 8) {
+            return res
+                .status(400)
+                .send('New Password must be at least 8 characters long');
+        }
+
         if (newPassword !== confirmPassword) {
-            return res.status(400).send('Paswords should match');
+            return res.status(400).send('Passwords should match');
         }
 
         if (currentPassword === newPassword) {
@@ -130,18 +136,13 @@ async function changePassword(req, res) {
                 .send('New Password should be different from current password');
         }
 
-        if (newPassword.length < 8) {
-            return res
-                .status(400)
-                .send('New Password must be at least 8 characters long');
-        }
-
         user.password = newPassword;
         await user.save();
 
         res.json(formatProfile(user));
     } catch (err) {
-        console.log(err.errors[0].message);
+        console.log(err);
+        res.status(400).send('Unknown error occured');
     }
 }
 

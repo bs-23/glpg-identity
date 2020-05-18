@@ -6,71 +6,86 @@ import { Form, withFormik, Field, ErrorMessage } from 'formik';
 import { changePassword } from '../user.actions';
 import { changePasswordSchema } from '../user.schema';
 
-class ChangePasswordForm extends React.Component {
-    render() {
-        const { handleSubmit, isSubmitting } = this.props;
-
-        return (
-            <div className="container">
-                <div className="row">
-                    <div className="col-lg-5 col-md-8 col-12 my-4 mx-auto p-0 shadow border bg-white">
-                        <div className="p-3 bg-light h5 rounded-top">
-                            Change Password
+let ChangePasswordForm = ({ handleSubmit, isSubmitting }) => (
+    <div className="container">
+        <div className="row">
+            <div className="col-lg-5 col-md-8 col-12 my-4 mx-auto p-0 shadow border bg-white">
+                <div className="p-3 bg-light h5 rounded-top">
+                    Change Password
+                </div>
+                <div className="card-body">
+                    <Form onSubmit={handleSubmit}>
+                        <div className="form-group">
+                            <Field
+                                className="form-control"
+                                type="text"
+                                name="username"
+                                placeholder="Username"
+                                data-testid="username"
+                                autoComplete="username"
+                                hidden
+                            />
+                            <Field
+                                className="form-control"
+                                type="password"
+                                name="currentPassword"
+                                placeholder="Current Password"
+                                data-testid="currentPassword"
+                                autoComplete="on"
+                            />
+                            <div
+                                className="invalid-feedback"
+                                data-testid="currentPasswordError"
+                            >
+                                <ErrorMessage name="currentPassword" />
+                            </div>
                         </div>
-                        <div className="card-body">
-                            <Form onSubmit={handleSubmit}>
-                                <div className="form-group">
-                                    <Field
-                                        className="form-control"
-                                        type="password"
-                                        name="currentPassword"
-                                        placeholder="Current Password"
-                                        data-testid="currentPassword"
-                                    />
-                                    <div className="invalid-feedback" data-testid="currentPasswordError">
-                                        <ErrorMessage name="currentPassword" />
-                                    </div>
-                                </div>
-                                <div className="form-group">
-                                    <Field
-                                        className="form-control"
-                                        type="password"
-                                        name="newPassword"
-                                        placeholder="New Password"
-                                        data-testid="newPassword"
-                                    />
-                                    <div className="invalid-feedback" data-testid="newPasswordError">
-                                        <ErrorMessage name="newPassword" />
-                                    </div>
-                                </div>
-                                <div className="form-group">
-                                    <Field
-                                        className="form-control"
-                                        type="password"
-                                        name="confirmPassword"
-                                        placeholder="Confirm New Password"
-                                        autoComplete="current-password"
-                                        data-testid="confirmPassword"
-                                    />
-                                    <div className="invalid-feedback" data-testid="confirmPasswordError">
-                                        <ErrorMessage name="confirmPassword" />
-                                    </div>
-                                </div>
-                                <button
-                                    type="submit"
-                                    className="btn btn-info btn-block"
-                                    disabled={isSubmitting}
-                                >
-                                    Submit
-                                </button>
-                            </Form>
+                        <div className="form-group">
+                            <Field
+                                className="form-control"
+                                type="password"
+                                name="newPassword"
+                                placeholder="New Password"
+                                data-testid="newPassword"
+                                autoComplete="on"
+                            />
+                            <div
+                                className="invalid-feedback"
+                                data-testid="newPasswordError"
+                            >
+                                <ErrorMessage name="newPassword" />
+                            </div>
                         </div>
-                    </div>
+                        <div className="form-group">
+                            <Field
+                                className="form-control"
+                                type="password"
+                                name="confirmPassword"
+                                placeholder="Confirm New Password"
+                                autoComplete="current-password"
+                                data-testid="confirmPassword"
+                                autoComplete="on"
+                            />
+                            <div
+                                className="invalid-feedback"
+                                data-testid="confirmPasswordError"
+                            >
+                                <ErrorMessage name="confirmPassword" />
+                            </div>
+                        </div>
+                        <button
+                            type="submit"
+                            className="btn btn-info btn-block"
+                            disabled={isSubmitting}
+                        >
+                            Submit
+                        </button>
+                    </Form>
                 </div>
             </div>
-        );
-    }
-}
+        </div>
+    </div>
+);
 
 ChangePasswordForm = withFormik({
     enableReinitialize: true,
@@ -95,11 +110,9 @@ ChangePasswordForm = withFormik({
         props
             .changePassword(formData)
             .then(function(data) {
-                console.log('Change password returned data', data);
                 resetForm();
             })
             .catch(error => {
-                console.log('Change Password Error', error);
                 alert(error.response.data);
             });
     },
