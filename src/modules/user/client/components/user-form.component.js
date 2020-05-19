@@ -1,12 +1,19 @@
-import React from "react";
+import React, { useEffect } from 'react';
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import { Form, withFormik, Field, ErrorMessage } from "formik";
-
+import { getCountryList } from '../../../core/client/country.actions';
 import { createUser } from "../user.actions";
 import { registerSchema } from "../user.schema";
 
 class UserForm extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            countries: []
+        };
+    }
 
     render() {
         const permissionList = [
@@ -16,15 +23,6 @@ class UserForm extends React.Component {
             { id: 4, value: 'Email Campaign' }
         ];
 
-        const countryList = [
-            { id: 0, name: 'UK' },
-            { id: 1, name: 'Russia' },
-            { id: 2, name: 'Germany' },
-            { id: 3, name: 'Norway' },
-            { id: 4, name: 'Netherland' },
-            { id: 5, name: 'Finland' },
-            { id: 6, name: 'Italy' },
-        ];
         const { handleSubmit, isSubmitting } = this.props;
 
         return (
@@ -49,7 +47,7 @@ class UserForm extends React.Component {
                                 <div className="form-group">
                                     <label htmlFor="country">Select Countries:</label>
                                     <Field data-testid="country" as="select" name="countries" className="form-control" multiple>
-                                        {countryList.map(item => <option key={item.id} value={item.name}>{item.name}</option>)}
+                                        {(this.state.countries).map(item => <option key={item.id} value={item.name}>{item.name}</option>)}
                                     </Field>
                                 </div>
                                 <div className="form-group">
@@ -61,11 +59,11 @@ class UserForm extends React.Component {
                                 <div className="form-group">
                                     <Field data-testid="phone" className="form-control" type="text" name="phone" placeholder="Phone" />
                                     <div className="invalid-feedback">
-                                        <ErrorMessage name="phone" data-testid="phoneError"/>
+                                        <ErrorMessage name="phone" data-testid="phoneError" />
                                     </div>
                                 </div>
                                 <div className="form-group">
-                                    <Field type="checkbox" name="is_active" data-testid="is_active"/> Is Active
+                                    <Field type="checkbox" name="is_active" data-testid="is_active" /> Is Active
                                 </div>
                                 <button type="submit" className="btn btn-info btn-block" disabled={isSubmitting}>Submit</button>
                             </Form>
@@ -74,6 +72,15 @@ class UserForm extends React.Component {
                 </div>
             </div>
         )
+    }
+
+    componentDidMount() {
+        this.props.getCountryList()
+            .then(res => {
+                this.setState({
+                    countries: res.value.data
+                });
+            });
     }
 }
 
@@ -119,7 +126,8 @@ UserForm = withFormik({
 
 const mapDispatchToProps = dispatch => {
     return {
-        createUser: formData => dispatch(createUser(formData))
+        createUser: formData => dispatch(createUser(formData)),
+        getCountryList: () => dispatch(getCountryList())
     };
 };
 

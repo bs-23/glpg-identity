@@ -1,16 +1,15 @@
-import Types from "./user.types";
+import Types from "./country.types";
 
 const initialState = {
-    loggedInUser: null
+    countries: []
 }
 
 export default function reducer(state = initialState, action) {
     switch (action.type) {
-        case Types.LOGIN_FULFILLED:
-        case Types.GET_PROFILE_FULFILLED: {
+        case Types.GET_COUNTRY_LIST: {
             return {
                 ...state,
-                loggedInUser: action.payload.data
+                countries: action.payload.data
             };
         }
     }
