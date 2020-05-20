@@ -1,7 +1,7 @@
 import thunk from "redux-thunk";
 import promise from "redux-promise-middleware";
 import { applyMiddleware, createStore, compose } from "redux";
-import reducers from "./reducers";
+import reducers from "./reducers/reducers";
 
 const middlewares = [promise, thunk];
 
@@ -12,7 +12,7 @@ if (process.env.NODE_ENV === "development") {
 
     middlewares.push(logger);
 
-    if(window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) {
+    if (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) {
         composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__;
     }
 }

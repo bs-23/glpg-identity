@@ -1,5 +1,5 @@
 import axios from 'axios';
-import Types from './country.types';
+import Types from '../types/country.types';
 
 export function getCountryList() {
     return {

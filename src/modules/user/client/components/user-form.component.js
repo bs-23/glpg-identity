@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import { Form, withFormik, Field, ErrorMessage } from "formik";
-import { getCountryList } from '../../../core/client/country.actions';
+import { getCountryList } from '../../../core/client/actions/country.actions';
 import { createUser } from "../user.actions";
 import { registerSchema } from "../user.schema";
 
