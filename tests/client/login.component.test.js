@@ -1,0 +1,127 @@
+import React from 'react';
+import { render, waitFor, fireEvent, act } from '@testing-library/react';
+import Enzyme, { configure, shallow, mount } from 'enzyme';
+import Adapter from 'enzyme-adapter-react-16';
+import { Provider } from 'react-redux';
+import Login from '../../src/modules/user/client/components/login.component';
+
+import store from '../../src/modules/core/client/store.js';
+
+configure({ adapter: new Adapter() });
+
+describe('Login component', () => {
+    it('should render the login component', () => {
+        const wrapper = shallow(
+            <Provider store={store}>
+                <Login />
+            </Provider>
+        );
+        expect(wrapper.exists()).toBe(true);
+    });
+
+    it('should fill out the email input', async () => {
+        const { container } = render(
+            <Provider store={store}>
+                <Login />
+            </Provider>
+        );
+        const email = container.querySelector('input[name="email"]');
+
+        await waitFor(() => {
+            fireEvent.change(email, {
+                target: {
+                    value: 'habib@gmail.com',
+                },
+            });
+        });
+
+        expect(email.value).toEqual('habib@gmail.com');
+    });
+
+    it('should fill out the password input', async () => {
+        const { container } = render(
+            <Provider store={store}>
+                <Login />
+            </Provider>
+        );
+        const password = container.querySelector('input[name="password"]');
+
+        await waitFor(() => {
+            fireEvent.change(password, {
+                target: {
+                    value: 'testingpassword',
+                },
+            });
+        });
+
+        expect(password.value).toEqual('testingpassword');
+    });
+
+    it('should return error if email is not set', async () => {
+        const { getByTestId, container } = render(
+            <Provider store={store}>
+                <Login />
+            </Provider>
+        );
+
+        const submit = container.querySelector('button[type="submit"]');
+
+        const email_error = getByTestId('email-error');
+
+        act(() => {
+            fireEvent.click(submit);
+        });
+
+        await waitFor(() => {
+            expect(email_error.innerHTML).toBeTruthy();
+        });
+    });
+
+    it('should return error if password is not set', async () => {
+        const { getByTestId, container } = render(
+            <Provider store={store}>
+                <Login />
+            </Provider>
+        );
+
+        const submit = container.querySelector('button[type="submit"]');
+
+        const password_error = getByTestId('password-error');
+
+        await waitFor(() => {
+            fireEvent.click(submit);
+        });
+
+        expect(password_error.innerHTML).toBeTruthy();
+    });
+
+    it('should return no error if email and password set', async () => {
+        const { getByTestId, container } = render(
+            <Provider store={store}>
+                <Login />
+            </Provider>
+        );
+
+        const submit = container.querySelector('button[type="submit"]');
+
+        const email = getByTestId('email');
+        const password = getByTestId('password');
+
+        const email_error = getByTestId('email-error');
+        const password_error = getByTestId('password-error');
+
+        await waitFor(() => {
+            fireEvent.change(email, {
+                target: { value: 'mockemail@gmail.com' },
+            });
+            fireEvent.change(password, { target: { value: 'mockpassword' } });
+        });
+
+        await waitFor(() => {
+            fireEvent.click(submit);
+        });
+
+        expect(email_error.innerHTML).toBeFalsy();
+        expect(password_error.innerHTML).toBeFalsy();
+    });
+});
