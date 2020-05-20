@@ -44,9 +44,17 @@ async function init() {
             { "name": "Poland" }
         ];
 
-        Country.bulkCreate(countryList, { returning: true }).then(function () {
-            callback();
-        });
+        Country.destroy({ truncate: true })
+            .then(() => {
+                Country.bulkCreate(countryList, {
+                    returning: true,
+                    ignoreDuplicates: false
+                }).then(function () {
+                    callback();
+                });
+            });
+
+
     }
 
     async.waterfall([clientSeeder, userSeeder, countrySeeder], function (err) {

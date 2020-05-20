@@ -5,10 +5,12 @@ const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequel
 const Country = sequelize.define("country", {
     id: {
         allowNull: false,
-        type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true,
-        unique: true
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        validate: {
+            isUUID: 4,
+        },
     },
     name: {
         allowNull: false,
