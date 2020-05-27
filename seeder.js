@@ -7,7 +7,7 @@ async function init() {
     await sequelize.query("CREATE SCHEMA IF NOT EXISTS ciam");
     const Client = require(path.join(process.cwd(), "src/modules/core/server/client.model"));
     const User = require(path.join(process.cwd(), "src/modules/user/server/user.model"));
-    const Country = require(path.join(process.cwd(), "src/modules/core/server/country.model"));
+    const Country = require(path.join(process.cwd(), "src/modules/core/server/country/country.model"));
     await sequelize.sync();
 
     function clientSeeder(callback) {
