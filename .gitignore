@@ -29,3 +29,8 @@ bundles
 
 # Sonarqube
 .scannerwork
+
+# Ignore all .css and .css.map
+# =======
+*.css
+*.css.map
