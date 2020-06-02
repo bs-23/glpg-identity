@@ -44,3 +44,13 @@ export function changePassword(data) {
     };
 }
 
+export function getSiteAdminList() {
+    return {
+        type: Types.GET_SITE_ADMIN_LIST,
+        payload: axios({
+            method: 'get',
+            url: '/get_site_admin_list'
+        })
+    };
+}
+

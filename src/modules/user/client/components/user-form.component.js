@@ -4,6 +4,7 @@ import { withRouter } from "react-router-dom";
 import { NavLink } from 'react-router-dom';
 import { Form, withFormik, Field, ErrorMessage } from "formik";
 import { getCountryList } from '../../../core/client/actions/country.actions';
+import { getSiteAdminList } from '../user.actions'
 import { createUser } from "../user.actions";
 import { registerSchema } from "../user.schema";
 import { useSelector } from 'react-redux';
@@ -125,6 +126,9 @@ class UserForm extends React.Component {
     }
 
     componentDidMount() {
+        this.props.loadSiteAdminList()
+            
+
         this.props.getCountryList()
             .then(res => {
                 this.setState({
@@ -177,7 +181,8 @@ UserForm = withFormik({
 const mapDispatchToProps = dispatch => {
     return {
         createUser: formData => dispatch(createUser(formData)),
-        getCountryList: () => dispatch(getCountryList())
+        getCountryList: () => dispatch(getCountryList()),
+        loadSiteAdminList: () => dispatch(getSiteAdminList())
     };
 };
 
