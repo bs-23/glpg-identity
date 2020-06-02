@@ -146,8 +146,79 @@ async function changePassword(req, res) {
     }
 }
 
+async function changeSiteAdminAccountStatus(req, res) {
+    const {
+        email,
+        is_active
+    } = req.body;
+
+    try{
+        const user = await User.findOne({
+            where: {
+                email
+            },
+            attributes: ['id', 'name', 'email', 'is_active' ],
+        });
+
+        if(!user) return res.status(404).send('Account is already deleted or not found');
+
+        user.update({ is_active });
+
+        return res.status(200).send('Successfully changed the status');
+    }
+    catch(err){
+        return res.status(500).send('Internal server error');
+    }
+}
+
+async function deleteSiteAdminAccount(req, res){
+    const {
+        email
+    } = req.body;
+
+    try{
+        const user = await User.findOne({
+            where: {
+                email
+            }
+        })
+
+        if(!user) return res.status(404).send('Account is already deleted or not found');
+
+        await User.destroy({
+            where: {
+                email
+            }
+        })
+
+        return res.status(200).send('Successfully deleted the account of site admin')
+    }
+    catch(err){
+        return res.status(500).send('Internal server error');
+    }
+}
+
+async function getSiteAdminList(req, res){
+    try{
+        const users = await User.findAll({
+            where: {
+                type: 'Site Admin'
+            },
+            attributes: ['id', 'name', 'email', 'type', 'phone', 'is_active' ],
+        })
+
+        return res.status(200).json(users)
+    }
+    catch(err){
+        return res.status(500).send('Internal server error');
+    }
+}
+
 exports.login = login;
 exports.logout = logout;
 exports.createUser = createUser;
 exports.getSignedInUserProfile = getSignedInUserProfile;
 exports.changePassword = changePassword;
+exports.changeSiteAdminAccountStatus = changeSiteAdminAccountStatus
+exports.deleteSiteAdminAccount = deleteSiteAdminAccount
+exports.getSiteAdminList = getSiteAdminList
