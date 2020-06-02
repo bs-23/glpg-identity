@@ -8,6 +8,7 @@ async function init() {
     const Client = require(path.join(process.cwd(), "src/modules/core/server/client.model"));
     const User = require(path.join(process.cwd(), "src/modules/user/server/user.model"));
     const Country = require(path.join(process.cwd(), "src/modules/core/server/country/country.model"));
+    const Hcp_profiles = require(path.join(process.cwd(), "src/modules/hcp/server/hcp.model"));
     await sequelize.sync();
 
     function clientSeeder(callback) {
@@ -20,6 +21,19 @@ async function init() {
             callback();
         });
     }
+
+    function HcpSeeder(callback) {
+        Hcp_profiles.findOrCreate({
+            where: { email: "test@glpg-hcp.com" }, defaults: {
+                name: "test",
+                password: "test-password",
+                application_id: "1b655255-91f6-453f-a169-71bee7a115a1"
+            }
+        }).then(function () {
+            callback();
+        });
+    }
+
 
     function userSeeder(callback) {
         User.findOrCreate({
@@ -57,7 +71,7 @@ async function init() {
 
     }
 
-    async.waterfall([clientSeeder, userSeeder, countrySeeder], function (err) {
+    async.waterfall([clientSeeder, userSeeder, countrySeeder, HcpSeeder], function (err) {
         if (err) console.error(err);
         else console.info("DB seed completed!");
         process.exit();
