@@ -11,7 +11,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import Breadcrumb from 'react-bootstrap/Breadcrumb';
 
 class UserForm extends React.Component {
-    
+
     constructor(props) {
         super(props);
         this.state = {
@@ -76,44 +76,44 @@ class UserForm extends React.Component {
                                     <div className="row">
                                         <div className="col-12 col-sm-6">
                                             <Form onSubmit={handleSubmit}>
-                                        <div className="form-group">
-                                            <Field data-testid="name" className="form-control" type="name" name="name" placeholder="Name" />
-                                            <div className="invalid-feedback" data-testid="nameError"><ErrorMessage name="name" /></div>
-                                        </div>
-                                        <div className="form-group">
-                                            <Field data-testid="email" className="form-control" type="email" name="email" placeholder="Email address" autoComplete="username" />
-                                            <div className="invalid-feedback" data-testid="emailError"><ErrorMessage name="email" /></div>
-                                        </div>
-                                        <div className="form-group">
-                                            <Field data-testid="password" className="form-control" type="password" name="password" placeholder="Password" autoComplete="current-password" />
-                                            <div className="invalid-feedback" data-testid="passwordError"><ErrorMessage name="password" /></div>
-                                        </div>
-                                        <div className="form-group">
-                                            <label htmlFor="country">Select Countries:</label>
-                                            <Field data-testid="country" as="select" name="countries" className="form-control" multiple>
-                                                {(this.state.countries).map(item => <option key={item.id} value={item.name}>{item.name}</option>)}
-                                            </Field>
-                                        </div>
-                                        <div className="form-group">
-                                            <label htmlFor="permissions">Grant Permissions:</label>
-                                            <Field data-testid="permission" as="select" name="permissions" className="form-control" multiple>
-                                                {permissionList.map(item => <option key={item.id} value={item.value}>{item.value}</option>)}
-                                            </Field>
-                                        </div>
-                                        <div className="form-group">
-                                            <Field data-testid="phone" className="form-control" type="text" name="phone" placeholder="Phone" />
-                                            <div className="invalid-feedback">
-                                                <ErrorMessage name="phone" data-testid="phoneError" />
-                                            </div>
-                                        </div>
-                                        <div className="form-group">
-                                            <Field type="checkbox" name="is_active" data-testid="is_active" /> Is Active
+                                                <div className="form-group">
+                                                    <Field data-testid="name" className="form-control" type="name" name="name" placeholder="Name" />
+                                                    <div className="invalid-feedback" data-testid="nameError"><ErrorMessage name="name" /></div>
+                                                </div>
+                                                <div className="form-group">
+                                                    <Field data-testid="email" className="form-control" type="email" name="email" placeholder="Email address" autoComplete="username" />
+                                                    <div className="invalid-feedback" data-testid="emailError"><ErrorMessage name="email" /></div>
+                                                </div>
+                                                <div className="form-group">
+                                                    <Field data-testid="password" className="form-control" type="password" name="password" placeholder="Password" autoComplete="current-password" />
+                                                    <div className="invalid-feedback" data-testid="passwordError"><ErrorMessage name="password" /></div>
+                                                </div>
+                                                <div className="form-group">
+                                                    <label htmlFor="country">Select Countries:</label>
+                                                    <Field data-testid="country" as="select" name="countries" className="form-control" multiple>
+                                                        {(this.state.countries).map(item => <option key={item.id} value={item.name}>{item.name}</option>)}
+                                                    </Field>
+                                                </div>
+                                                <div className="form-group">
+                                                    <label htmlFor="permissions">Grant Permissions:</label>
+                                                    <Field data-testid="permission" as="select" name="permissions" className="form-control" multiple>
+                                                        {permissionList.map(item => <option key={item.id} value={item.value}>{item.value}</option>)}
+                                                    </Field>
+                                                </div>
+                                                <div className="form-group">
+                                                    <Field data-testid="phone" className="form-control" type="text" name="phone" placeholder="Phone" />
+                                                    <div className="invalid-feedback">
+                                                        <ErrorMessage name="phone" data-testid="phoneError" />
+                                                    </div>
+                                                </div>
+                                                <div className="form-group">
+                                                    <Field type="checkbox" name="is_active" data-testid="is_active" /> Is Active
                                 </div>
-                                        <button type="submit" className="btn btn-info btn-block" disabled={isSubmitting}>Submit</button>
-                                    </Form>
+                                                <button type="submit" className="btn btn-info btn-block" disabled={isSubmitting}>Submit</button>
+                                            </Form>
                                         </div>
                                     </div>
-                                    
+
                                 </div>
                             </div>
 

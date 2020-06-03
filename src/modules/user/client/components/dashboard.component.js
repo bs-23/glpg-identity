@@ -36,12 +36,12 @@ export default function Dashboard() {
                                         User and Permission Service
                                     </NavLink>
                                     <NavLink to="" className="p-5 border shadow-sm m-2 h4 pb-0 mb-0 text-muted text-decoration-none">
-                                       Form Data Service
+                                        Form Data Service
                                     </NavLink>
                                     <NavLink to="" className="p-5 border shadow-sm m-2 h4 pb-0 mb-0 text-muted text-decoration-none">
                                         Tag and Persona Service
                                     </NavLink>
-                                    <NavLink to="" className="p-5 border shadow-sm m-2 h4 pb-0 mb-0 text-muted text-decoration-none">
+                                    <NavLink to="/hcp" className="p-5 border shadow-sm m-2 h4 pb-0 mb-0 text-decoration-none">
                                         HCP Service
                                     </NavLink>
                                     <NavLink to="" className="p-5 border shadow-sm m-2 h4 pb-0 mb-0 text-muted text-decoration-none">

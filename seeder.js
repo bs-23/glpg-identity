@@ -23,11 +23,18 @@ async function init() {
     }
 
     function HcpSeeder(callback) {
+        //will be used later
+        // Hcp_profiles.sync({
+        //     alter: true
+        // }).then(function () {
+        //     callback();
+        // });
+
         Hcp_profiles.findOrCreate({
             where: { email: "test@glpg-hcp.com" }, defaults: {
                 name: "test",
                 password: "test-password",
-                application_id: "1b655255-91f6-453f-a169-71bee7a115a1"
+                application_id: "95c3905f-76f3-46b8-aed1-3d9d6699b700"
             }
         }).then(function () {
             callback();

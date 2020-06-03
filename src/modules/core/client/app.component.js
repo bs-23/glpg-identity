@@ -12,6 +12,8 @@ import Login from "../../user/client/components/login.component";
 import Dashboard from "../../user/client/components/dashboard.component";
 import { getSignedInUserProfile } from "../../user/client/user.actions";
 import UserRoutes from "../../user/client/user.routes";
+import HcpRoutes from "../../hcp/client/hcp.routes";
+
 
 export default function App() {
     const dispatch = useDispatch();
@@ -22,11 +24,13 @@ export default function App() {
 
     return (
         <Switch>
-            <PublicRoute path="/login" component={Login}/>
+            <PublicRoute path="/login" component={Login} />
 
-            <PrivateRoute exact path="/" component={Dashboard}/>
+            <PrivateRoute exact path="/" component={Dashboard} />
 
-            <Route path="/users" component={UserRoutes}/>
+            <Route path="/users" component={UserRoutes} />
+
+            <Route path="/hcp" component={HcpRoutes} />
 
             <Route component={NoMatch} />
         </Switch>
