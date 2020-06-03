@@ -6,8 +6,8 @@ import Breadcrumb from 'react-bootstrap/Breadcrumb';
 import Table from '../common/table.component'
 import ShowEntries from '../common/show-entries.component'
 import Pagination from '../common/pagination.component'
-import searchByQuery from '../../../util/searchbyquery'
-import paginate from '../../../util/paginate'
+import searchByQuery from '../../util/searchbyquery'
+import paginate from '../../util/paginate'
 import Search from '../common/search.component'
 import _ from 'lodash'
 
@@ -78,8 +78,25 @@ export default function Users() {
         </svg>
     )
 
+    // function getId(){
+    //     let x = 0;
+    //     return function() {
+    //         x++;
+    //         return <p>{ x }</p>
+    //     }
+    // }
+    let x = 0;
+    function getId(){
+        x++;
+        return <p> { x }</p>
+    }
+
     const columns = [
-        { path: 'id', label: '#' },
+        { 
+            key: 'id', 
+            label: '#', 
+            content: () => getId()
+        },
         { path: 'name', label: 'Name' },
         { path: 'email', label: 'Email' },
         { 
