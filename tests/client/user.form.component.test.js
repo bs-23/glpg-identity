@@ -32,15 +32,15 @@ describe('UserForm component', () => {
         const phone = getByTestId('phone');
 
         await waitFor(() => {
-            fireEvent.change(name, { target: { value: 'mockname' } });
-            fireEvent.change(email, { target: { value: 'mockemail' } });
-            fireEvent.change(password, { target: { value: 'mockpassword' } });
-            fireEvent.change(phone, { target: { value: 'mockphone' } });
+            fireEvent.change(name, { target: { value: 'a' } });
+            fireEvent.change(email, { target: { value: 'a' } });
+            fireEvent.change(password, { target: { value: 'a' } });
+            fireEvent.change(phone, { target: { value: 'a' } });
         });
 
-        expect(name.value).toEqual('mockname');
-        expect(email.value).toEqual('mockemail');
-        expect(password.value).toEqual('mockpassword');
-        expect(phone.value).toEqual('mockphone');
+        expect(name.value).toEqual('a');
+        expect(email.value).toEqual('a');
+        expect(password.value).toEqual('a');
+        expect(phone.value).toEqual('a');
     });
 });
