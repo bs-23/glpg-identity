@@ -2,13 +2,27 @@ const path = require('path');
 const request = require('supertest');
 const jwt = require('jsonwebtoken');
 
+const User = require(path.join(
+    process.cwd(),
+    'src/modules/user/server/user.model'
+));
+
 const app = require(path.join(
     process.cwd(),
     'src/config/server/lib/express'
 ))();
+
 const specHelper = require(path.join(process.cwd(), 'jest/spec.helper'));
 
 describe('User Routes', () => {
+    afterEach(async () => { 
+        await User.destroy({
+            where: {
+                type: 'Site Admin'
+            }
+        })
+    });
+
     const { systemAdmin } = specHelper.users;
 
     it('Should get 401 Unauthorized http status code with invalid credential', async () => {
@@ -65,6 +79,15 @@ describe('User Routes', () => {
         });
 
         it('Should get an error when creating new site admin with duplicate email', async () => {
+            await request(app)
+                .post('/users')
+                .set('Cookie', [`access_token=${systemAdmin.access_token}`])
+                .send({
+                    name: 'testUser',
+                    email: 'testUser@gmail.com',
+                    password: 'abcpassword',
+                });
+            
             const response = await request(app)
                 .post('/users')
                 .set('Cookie', [`access_token=${systemAdmin.access_token}`])
@@ -158,4 +181,171 @@ describe('User Routes', () => {
             );
         });
     });
+
+    describe('POST /change_site_admin_account_status', () => {
+        let token; 
+        let email;
+        let is_active;
+        let user;
+
+        const exec = async () => {
+            return await request(app)
+                .post('/change_site_admin_account_status')
+                .set('Cookie', [`access_token=${token}`])
+                .send({
+                    email,
+                    is_active
+                });
+        }
+
+        beforeEach(async () => {
+            user = await User.create({
+                name: 'a',
+                email: 'a@gmail.com',
+                is_active: false
+            })
+            
+            token = systemAdmin.access_token;
+            email = 'a@gmail.com';
+            is_active = true;
+        })
+
+        it('Should return 401 if system admin is not logged in', async () => {
+            token = '';
+            email = 'a@gmail.com';
+            is_active = 1;
+
+            const response = await exec()
+
+            expect(response.statusCode).toBe(401);
+        });
+
+        it('should return 404 if email is invalid', async () => {
+            email = 'a'
+            is_active = 1;
+
+            const response = await exec()
+
+            expect(response.statusCode).toBe(404)
+        })
+
+        it('should change the status of the site admin account if it is valid', async () => {
+            const response = await exec()
+
+            const updatedUser = await User.findOne({
+                where: {
+                    id: user.id
+                }
+            })
+
+            expect(response.statusCode).toBe(200)
+            expect(updatedUser.is_active).toBe(true)
+        })
+
+        it('should return the updated site admin if it is valid', async () => {
+            const response = await exec();
+      
+            expect(response.body).toHaveProperty('id');
+            expect(response.body).toHaveProperty('email', email);
+            expect(response.body).toHaveProperty('is_active', is_active);
+        });
+    })
+
+    describe('POST /delete_site_admin_account', () => {
+        let token; 
+        let email;
+        let user;
+
+        const exec = async () => {
+            return await request(app)
+                .post('/delete_site_admin_account')
+                .set('Cookie', [`access_token=${token}`])
+                .send({
+                    email
+                });
+        }
+
+        beforeEach(async () => {
+            user = await User.create({
+                name: 'a',
+                email: 'a@gmail.com'
+            })
+            
+            token = systemAdmin.access_token;
+            email = 'a@gmail.com';
+        })
+
+        it('Should return 401 if system admin is not logged in', async () => {
+            token = '';
+            email = 'a@gmail.com';
+
+            const response = await exec();
+
+            expect(response.statusCode).toBe(401);
+        })
+
+        it('Should return 404 if email is invalid', async () => {
+            email = 'a';
+
+            const response = await exec();
+
+            expect(response.statusCode).toBe(404);
+        })
+
+        it('should delete the user if it is valid', async () => {
+            const response = await exec();
+
+            const deleteddUser = await User.findOne({
+                where: {
+                    id: user.id
+                }
+            })
+
+            expect(response.statusCode).toBe(200)
+            expect(deleteddUser).toBeFalsy()
+        })
+
+        it('should return the deleted site admin if it is valid', async () => {
+            const response = await exec();
+      
+            expect(response.body).toHaveProperty('id');
+            expect(response.body).toHaveProperty('email', email);
+        });
+    })
+
+    describe('GET /get_site_admin_list', () => {
+        let token; 
+
+        const exec = async () => {
+            return await request(app)
+                .get('/get_site_admin_list')
+                .set('Cookie', [`access_token=${token}`])
+        }
+
+        beforeEach(async () => {
+            await User.create({
+                name: 'a',
+                email: 'a@gmail.com',
+                type: 'Site Admin'
+            })
+            
+            token = systemAdmin.access_token;
+        })
+
+        it('Should return 401 if system admin is not logged in', async () => {
+            token = '';
+
+            const response = await exec();
+
+            expect(response.statusCode).toBe(401);
+        })
+
+        it('should return all site admins', async () => {
+            const response = await exec();
+
+            expect(response.statusCode).toBe(200);
+            expect(response.body.length).toBe(1);
+            expect(response.body.some(u => u.name === 'a' && u.email === 'a@gmail.com')).toBeTruthy();
+        })
+    })
 });

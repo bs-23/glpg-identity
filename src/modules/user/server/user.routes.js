@@ -25,5 +25,20 @@ module.exports = app => {
         passport.authenticate('user-jwt', { session: false }),
         controller.changePassword
     );
+
+    app.route('/change_site_admin_account_status').post(
+        passport.authenticate('user-jwt', { session: false }),
+        controller.changeSiteAdminAccountStatus
+    )
+
+    app.route('/delete_site_admin_account').post(
+        passport.authenticate('user-jwt', { session: false }),
+        controller.deleteSiteAdminAccount
+    )
+
+    app.route('/get_site_admin_list').get(
+        passport.authenticate('user-jwt', { session: false }),
+        controller.getSiteAdminList
+    )
 };
  
