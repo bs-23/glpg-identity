@@ -241,6 +241,14 @@ describe('User Routes', () => {
             expect(response.statusCode).toBe(200)
             expect(updatedUser.is_active).toBe(true)
         })
+
+        it('should return the updated site admin if it is valid', async () => {
+            const response = await exec();
+      
+            expect(response.body).toHaveProperty('id');
+            expect(response.body).toHaveProperty('email', email);
+            expect(response.body).toHaveProperty('is_active', is_active);
+        });
     })
 
     describe('POST /delete_site_admin_account', () => {
@@ -296,6 +304,13 @@ describe('User Routes', () => {
             expect(response.statusCode).toBe(200)
             expect(deleteddUser).toBeFalsy()
         })
+
+        it('should return the deleted site admin if it is valid', async () => {
+            const response = await exec();
+      
+            expect(response.body).toHaveProperty('id');
+            expect(response.body).toHaveProperty('email', email);
+        });
     })
 
     describe('GET /get_site_admin_list', () => {

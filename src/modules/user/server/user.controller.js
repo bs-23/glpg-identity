@@ -157,14 +157,14 @@ async function changeSiteAdminAccountStatus(req, res) {
             where: {
                 email
             },
-            attributes: ['id', 'name', 'email', 'is_active' ],
+            attributes: ['id', 'name', 'email', 'type', 'phone', 'is_active' ],
         });
 
         if(!user) return res.status(404).send('Account is already deleted or not found');
 
         user.update({ is_active });
 
-        return res.status(200).send('Successfully changed the status');
+        return res.status(200).json(user);
     }
     catch(err){
         return res.status(500).send('Internal server error');
@@ -180,7 +180,8 @@ async function deleteSiteAdminAccount(req, res){
         const user = await User.findOne({
             where: {
                 email
-            }
+            },
+            attributes: ['id', 'name', 'email', 'type', 'phone', 'is_active' ],
         })
 
         if(!user) return res.status(404).send('Account is already deleted or not found');
@@ -191,7 +192,7 @@ async function deleteSiteAdminAccount(req, res){
             }
         })
 
-        return res.status(200).send('Successfully deleted the account of site admin')
+        return res.status(200).json(user)
     }
     catch(err){
         return res.status(500).send('Internal server error');

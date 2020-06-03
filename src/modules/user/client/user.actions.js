@@ -54,3 +54,24 @@ export function getSiteAdminList() {
     };
 }
 
+export function changeSiteAdminAccountStatus(data) {
+    return {
+        type: Types.CHANGE_SITE_ADMIN_ACCOUNT_STATUS,
+        payload: axios({
+            method: 'post',
+            url: '/change_site_admin_account_status',
+            data,
+        }),
+    };
+}
+
+export function deleteSiteAdminAccount(data){
+    return {
+        type: Types.DELETE_SITE_ADMIN_ACCOUNT,
+        payload: axios({
+            method: 'post',
+            url: '/delete_site_admin_account',
+            data,
+        }),
+    };
+}

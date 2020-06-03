@@ -1,11 +1,112 @@
-import React from "react";
-import { useSelector } from 'react-redux';
+import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { NavLink } from 'react-router-dom';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Breadcrumb from 'react-bootstrap/Breadcrumb';
+import Table from '../common/table.component'
+import ShowEntries from '../common/show-entries.component'
+import Pagination from '../common/pagination.component'
+import searchByQuery from '../../../util/searchbyquery'
+import paginate from '../../../util/paginate'
+import Search from '../common/search.component'
+import _ from 'lodash'
+
+import { 
+    getSiteAdminList, 
+    changeSiteAdminAccountStatus, 
+    deleteSiteAdminAccount 
+} from '../user.actions'
 
 export default function Users() {
+    const dispatch = useDispatch()
+
+    const [sortColumn, setSortColumn] = useState({ path: 'id', order: 'asc' });
+    const [pageSize, setPageSize] = useState(5);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [searchQuery, setSearchQuery] = useState('');
+
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
+    const users = useSelector(state => state.userReducer.siteAdmins);
+
+    useEffect( () => {
+        dispatch(getSiteAdminList())
+    }, [])
+
+    const handlePageChange = (page) => setCurrentPage(page)
+
+    const handleSort = sort => setSortColumn(sort)
+
+    const handleEntryChange = (value) => {
+        setPageSize(value)
+        if(value >= users.length) setCurrentPage(1)
+    }
+
+    const handleStatusClick = ({ email, is_active }) => {
+        dispatch(changeSiteAdminAccountStatus({ email, is_active: !is_active }) )
+    }
+
+    const handleDeleteClick = ({ email }) => {
+        if (window.confirm("Are you sure?")) {
+            dispatch(deleteSiteAdminAccount({ email }))
+        }
+    }
+
+    const getStatus = ({ email, is_active }) => (
+        <label 
+            style={{ cursor: 'pointer' }}
+            className="switch" 
+            onClick={() => handleStatusClick({ email, is_active }) } 
+        >
+            <input type="checkbox" checked={is_active} /> 
+            <span className="slider round">{ is_active == 1 ? " Active" : " Disabled" }</span>
+        </label>
+    )
+
+    const getAction = ({ email }) => (
+        <svg 
+            onClick={() => handleDeleteClick({ email }) } 
+            style={{ cursor: 'pointer' }} 
+            class="bi bi-trash" 
+            width="1em" 
+            height="1em" 
+            viewBox="0 0 16 16" 
+            fill="currentColor" 
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+        </svg>
+    )
+
+    const columns = [
+        { path: 'id', label: '#' },
+        { path: 'name', label: 'Name' },
+        { path: 'email', label: 'Email' },
+        { 
+            path: '',
+            label: 'Status',
+            content: user => getStatus(user)
+        },
+        { 
+          key: '',
+          label: 'Action',
+          content: user => getAction(user)
+        }
+    ]
+
+    const getPageDate = () => {
+        const filtered = searchByQuery(users, columns, searchQuery)
+    
+        const paginated = paginate(filtered, currentPage, pageSize)
+    
+        const sorted = _.orderBy(paginated, [sortColumn.path], [sortColumn.order])
+    
+        return { totalCount: filtered.length, data: sorted }
+    }
+    
+    const { totalCount, data: usersList } = getPageDate()
+
+
     return (
         <main>
             <header className="app__header bg-success py-2">
@@ -51,36 +152,32 @@ export default function Users() {
                                         Create new user
                                     </NavLink>
                                 </div>
-                                <table className="table">
-                                    <thead className="table-secondary">
-                                        <tr>
-                                            <th scope="col">#</th>
-                                            <th scope="col">First</th>
-                                            <th scope="col">Last</th>
-                                            <th scope="col">Handle</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <th scope="row">1</th>
-                                            <td>Mark</td>
-                                            <td>Otto</td>
-                                            <td>@mdo</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">2</th>
-                                            <td>Jacob</td>
-                                            <td>Thornton</td>
-                                            <td>@fat</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">3</th>
-                                            <td>Larry</td>
-                                            <td>the Bird</td>
-                                            <td>@twitter</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+
+                                <br/>
+                                <Search 
+                                    onChange={ e => setSearchQuery(e.target.value)} 
+                                    placeholder="Search by keyword" 
+                                />
+
+                                <br/>
+                                <ShowEntries 
+                                    handleEntryChange={handleEntryChange} 
+                                    highValue={totalCount}
+                                /> <br/>
+
+                                <Table 
+                                    data={usersList} 
+                                    columns={columns}
+                                    sortColumn={sortColumn}
+                                    onSort={handleSort}
+                                />
+
+                                <Pagination 
+                                    itemsCount={totalCount} 
+                                    pageSize={pageSize} 
+                                    currentPage={currentPage}
+                                    onPageChange={handlePageChange}
+                                />
                             </div>
                         </div>
                         
