@@ -57,7 +57,7 @@ export default function Users() {
             className="switch" 
             onClick={() => handleStatusClick({ email, is_active }) } 
         >
-            <input type="checkbox" checked={is_active} /> 
+            <input type="checkbox" defaultChecked={is_active} /> 
             <span className="slider round">{ is_active == 1 ? " Active" : " Disabled" }</span>
         </label>
     )
@@ -83,12 +83,12 @@ export default function Users() {
         { path: 'name', label: 'Name' },
         { path: 'email', label: 'Email' },
         { 
-            path: '',
+            key: 'status',
             label: 'Status',
             content: user => getStatus(user)
         },
         { 
-          key: '',
+          key: 'action',
           label: 'Action',
           content: user => getAction(user)
         }
