@@ -1,4 +1,4 @@
-import Types from "../types/country.types";
+import Types from "./country.types";
 
 const initialState = {
     countries: []
