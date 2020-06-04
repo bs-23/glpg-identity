@@ -4,7 +4,7 @@ const controller = require('./hcp.controller');
 
 module.exports = app => {
 
-    app.route('/hcpUsers').get(
+    app.route('/hcp-users').get(
         passport.authenticate('user-jwt', { session: false }),
         controller.getHcpUserList
     );

@@ -1,11 +1,19 @@
-import React from "react";
-import { useSelector } from 'react-redux';
+import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Breadcrumb from 'react-bootstrap/Breadcrumb';
+import { getHcpUserList } from '../hcp.actions';
+
 
 export default function HcpUsers() {
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(getHcpUserList())
+    }, []);
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
+    const hcpUsers = useSelector(state => state.hcpReducer.hcpUsers);
+
     return (
         <main>
             <header className="app__header bg-success py-2">
@@ -65,14 +73,25 @@ export default function HcpUsers() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
+
+                                        {hcpUsers.map((item, key) => (
+                                            <tr key={key}>
+                                                <th scope="row">{key + 1}</th>
+                                                <td>{item.name}</td>
+                                                <td>{item.email}</td>
+                                                <td>{item.phone}</td>
+                                                <td></td>
+                                                <td></td>
+                                            </tr>
+                                        ))}
+                                        {/* <tr>
                                             <th scope="row">1</th>
                                             <td>Mark</td>
                                             <td>Otto@gmail.com</td>
                                             <td>123455677</td>
                                             <td></td>
                                             <td></td>
-                                        </tr>
+                                        </tr> */}
                                     </tbody>
                                 </table>
                             </div>
@@ -84,3 +103,4 @@ export default function HcpUsers() {
         </main>
     );
 }
+
