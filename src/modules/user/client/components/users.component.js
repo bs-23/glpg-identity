@@ -5,7 +5,6 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import Breadcrumb from 'react-bootstrap/Breadcrumb';
 import Table from '../../../core/client/common/table.component'
 import Pagination from '../../../core/client/common/pagination.component'
-import searchByQuery from '../../../core/client/util/searchbyquery'
 import paginate from '../../../core/client/util/paginate'
 import _ from 'lodash'
 
@@ -23,11 +22,29 @@ export default function Users() {
     const [searchQuery, setSearchQuery] = useState('');
 
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
-    const users = useSelector(state => state.userReducer.siteAdmins);
+    const siteAdmins = useSelector(state => state.userReducer.siteAdmins); 
+    const users = siteAdmins.filter(siteAdmin => {
+        if(searchQuery === 'Active') { 
+            if(siteAdmin.is_active) return true;
+            return false;
+        }
+        if(searchQuery === 'Inactive') {
+            if(!siteAdmin.is_active) return true;
+            return false
+        }
+        return true;
+    })
+    
 
     useEffect( () => {
         dispatch(getSiteAdminList())
-    }, [])
+    }, [searchQuery])
+
+    const handleFilterClick = (e, query) => {
+        e.preventDefault();
+        
+        setSearchQuery(query)
+    }
 
     const handlePageChange = (page) => setCurrentPage(page)
 
@@ -93,13 +110,11 @@ export default function Users() {
     ]
 
     const getPageDate = () => {
-        const filtered = searchByQuery(users, columns, searchQuery)
-    
-        const paginated = paginate(filtered, currentPage, pageSize)
+        const paginated = paginate(users, currentPage, pageSize)
     
         const sorted = _.orderBy(paginated, [sortColumn.path], [sortColumn.order])
     
-        return { totalCount: filtered.length, data: sorted }
+        return { totalCount: users.length, data: sorted }
     }
     
     const { totalCount, data: usersList } = getPageDate()
@@ -146,15 +161,30 @@ export default function Users() {
                             <div>
                                 <div className="d-flex justify-content-between align-items-center">
                                     <h2 className="">User list</h2>
-                                    
+
                                     <Dropdown className="ml-auto">
                                         <Dropdown.Toggle variant="light" id="dropdown-basic" className="mt-2">
+                                        <svg class="bi bi-filter" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd" d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
+                                        </svg>
                                             Filter
                                         </Dropdown.Toggle>
                                         <Dropdown.Menu>
-                                            <Dropdown.Item>Active</Dropdown.Item>
-                                            <Dropdown.Item>Inactive</Dropdown.Item>
-                                            <Dropdown.Item>None</Dropdown.Item>
+                                            <Dropdown.Item 
+                                                onClick={e => handleFilterClick(e, 'Active')}
+                                            >
+                                                Active
+                                            </Dropdown.Item>
+                                            <Dropdown.Item
+                                                onClick={e => handleFilterClick(e, 'Inactive')}
+                                            >
+                                                Inactive
+                                            </Dropdown.Item>
+                                            <Dropdown.Item
+                                                onClick={ e => handleFilterClick(e, '')}
+                                            >
+                                                None
+                                            </Dropdown.Item>
                                         </Dropdown.Menu>
                                     </Dropdown>
                                     
