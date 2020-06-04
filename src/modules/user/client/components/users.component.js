@@ -3,12 +3,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { NavLink } from 'react-router-dom';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Breadcrumb from 'react-bootstrap/Breadcrumb';
-import Table from '../common/table.component'
-import ShowEntries from '../common/show-entries.component'
-import Pagination from '../common/pagination.component'
-import searchByQuery from '../../util/searchbyquery'
-import paginate from '../../util/paginate'
-import Search from '../common/search.component'
+import Table from '../../../core/client/common/table.component'
+import ShowEntries from '../../../core/client/common/show-entries.component'
+import Pagination from '../../../core/client/common/pagination.component'
+import Search from '../../../core/client/common/search.component'
+import searchByQuery from '../../../core/client/util/searchbyquery'
+import paginate from '../../../core/client/util/paginate'
 import _ from 'lodash'
 
 import { 
