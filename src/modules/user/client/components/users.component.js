@@ -4,16 +4,13 @@ import { NavLink } from 'react-router-dom';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Breadcrumb from 'react-bootstrap/Breadcrumb';
 import Table from '../../../core/client/common/table.component'
-import ShowEntries from '../../../core/client/common/show-entries.component'
 import Pagination from '../../../core/client/common/pagination.component'
-import Search from '../../../core/client/common/search.component'
 import searchByQuery from '../../../core/client/util/searchbyquery'
 import paginate from '../../../core/client/util/paginate'
 import _ from 'lodash'
 
 import { 
     getSiteAdminList, 
-    changeSiteAdminAccountStatus, 
     deleteSiteAdminAccount 
 } from '../user.actions'
 
@@ -36,30 +33,14 @@ export default function Users() {
 
     const handleSort = sort => setSortColumn(sort)
 
-    const handleEntryChange = (value) => {
-        setPageSize(value)
-        if(value >= users.length) setCurrentPage(1)
-    }
-
-    const handleStatusClick = ({ email, is_active }) => {
-        dispatch(changeSiteAdminAccountStatus({ email, is_active: !is_active }) )
-    }
-
     const handleDeleteClick = ({ email }) => {
         if (window.confirm("Are you sure?")) {
             dispatch(deleteSiteAdminAccount({ email }))
         }
     }
 
-    const getStatus = ({ email, is_active }) => (
-        <label 
-            style={{ cursor: 'pointer' }}
-            className="switch" 
-            onClick={() => handleStatusClick({ email, is_active }) } 
-        >
-            <input type="checkbox" defaultChecked={is_active} /> 
-            <span className="slider round">{ is_active == 1 ? " Active" : " Disabled" }</span>
-        </label>
+    const getStatus = ({ is_active }) => (
+        <span className={is_active ? 'active' : 'inactive' }>{ is_active == 1 ? " Active" : " Inactive" }</span>
     )
 
     const getAction = ({ email }) => (
@@ -78,27 +59,23 @@ export default function Users() {
         </svg>
     )
 
-    // function getId(){
-    //     let x = 0;
-    //     return function() {
-    //         x++;
-    //         return <p>{ x }</p>
-    //     }
-    // }
-    let x = 0;
-    function getId(){
-        x++;
-        return <p> { x }</p>
-    }
+    const getSign = () => (
+        <svg 
+            class="bi bi-chevron-right" 
+            width="1em" 
+            height="1em" 
+            viewBox="0 0 16 16" 
+            fill="currentColor" 
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+        </svg>
+    )
 
     const columns = [
-        { 
-            key: 'id', 
-            label: '#', 
-            content: () => getId()
-        },
         { path: 'name', label: 'Name' },
         { path: 'email', label: 'Email' },
+        { path: 'phone', label: 'Phone' },
         { 
             key: 'status',
             label: 'Status',
@@ -108,6 +85,10 @@ export default function Users() {
           key: 'action',
           label: 'Action',
           content: user => getAction(user)
+        },
+        {
+            key: 'left_sign',
+            content: () => getSign()
         }
     ]
 
@@ -165,22 +146,22 @@ export default function Users() {
                             <div>
                                 <div className="d-flex justify-content-between align-items-center">
                                     <h2 className="">User list</h2>
+                                    
+                                    <Dropdown className="ml-auto">
+                                        <Dropdown.Toggle variant="light" id="dropdown-basic" className="mt-2">
+                                            Filter
+                                        </Dropdown.Toggle>
+                                        <Dropdown.Menu>
+                                            <Dropdown.Item>Active</Dropdown.Item>
+                                            <Dropdown.Item>Inactive</Dropdown.Item>
+                                            <Dropdown.Item>None</Dropdown.Item>
+                                        </Dropdown.Menu>
+                                    </Dropdown>
+                                    
                                     <NavLink to="/users/create" className="btn btn-primary ml-auto">
                                         Create new user
                                     </NavLink>
                                 </div>
-
-                                <br/>
-                                <Search 
-                                    onChange={ e => setSearchQuery(e.target.value)} 
-                                    placeholder="Search by keyword" 
-                                />
-
-                                <br/>
-                                <ShowEntries 
-                                    handleEntryChange={handleEntryChange} 
-                                    highValue={totalCount}
-                                /> <br/>
 
                                 <Table 
                                     data={usersList} 
