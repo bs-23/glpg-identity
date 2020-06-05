@@ -20,7 +20,6 @@
   "dependencies": {
     "async": "^3.2.0",
     "axios": "^0.19.2",
-    "axios-mock-adapter": "^1.18.1",
     "babel-polyfill": "^6.26.0",
     "bcryptjs": "^2.4.3",
     "bootstrap": "^4.5.0",
@@ -54,6 +53,7 @@
     "@babel/preset-env": "^7.9.6",
     "@babel/preset-react": "^7.9.4",
     "@testing-library/react": "^10.0.4",
+    "axios-mock-adapter": "^1.18.1",
     "babel-core": "^7.0.0-0",
     "babel-jest": "^26.0.1",
     "babel-loader": "^8.1.0",
