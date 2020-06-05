@@ -9,6 +9,7 @@ async function init() {
     const User = require(path.join(process.cwd(), "src/modules/user/server/user.model"));
     const Country = require(path.join(process.cwd(), "src/modules/core/server/country/country.model"));
     const Hcp_profiles = require(path.join(process.cwd(), "src/modules/hcp/server/hcp.model"));
+    const Personas = require(path.join(process.cwd(), "src/modules/hcp/server/personas.model"));
     await sequelize.sync();
 
     function clientSeeder(callback) {
@@ -21,26 +22,6 @@ async function init() {
             callback();
         });
     }
-
-    function HcpSeeder(callback) {
-        //will be used later
-        // Hcp_profiles.sync({
-        //     alter: true
-        // }).then(function () {
-        //     callback();
-        // });
-
-        Hcp_profiles.findOrCreate({
-            where: { email: "test@glpg-hcp.com" }, defaults: {
-                name: "test",
-                password: "test-password",
-                application_id: "95c3905f-76f3-46b8-aed1-3d9d6699b700"
-            }
-        }).then(function () {
-            callback();
-        });
-    }
-
 
     function userSeeder(callback) {
         User.findOrCreate({
@@ -78,7 +59,39 @@ async function init() {
 
     }
 
-    async.waterfall([clientSeeder, userSeeder, countrySeeder, HcpSeeder], function (err) {
+    function HcpSeeder(callback) {
+        //will be used later
+        // Hcp_profiles.sync({
+        //     alter: true
+        // }).then(function () {
+        //     callback();
+        // });
+
+        Hcp_profiles.findOrCreate({
+            where: { email: "test@glpg-hcp.com" }, defaults: {
+                name: "test",
+                password: "test-password",
+                application_id: "95c3905f-76f3-46b8-aed1-3d9d6699b700"
+            }
+        }).then(function () {
+            callback();
+        });
+    }
+
+    function PersonaSeeder(callback) {
+
+        Personas.findOrCreate({
+            where: { title: "Lorem Ipsum" }, defaults: {
+                description: "Just a text",
+                tags: ["Lorem", "Ipsum"]
+            }
+        }).then(function () {
+            callback();
+        });
+    }
+
+
+    async.waterfall([clientSeeder, userSeeder, countrySeeder, HcpSeeder, PersonaSeeder], function (err) {
         if (err) console.error(err);
         else console.info("DB seed completed!");
         process.exit();
