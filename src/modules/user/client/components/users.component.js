@@ -3,9 +3,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { NavLink } from 'react-router-dom';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Breadcrumb from 'react-bootstrap/Breadcrumb';
-import Table from '../../../core/client/common/table.component'
-import Pagination from '../../../core/client/common/pagination.component'
-import paginate from '../../../core/client/util/paginate'
+import Table from '../common/table.component'
+import Pagination from '../common/pagination.component'
+import paginate from '../util/paginate'
 import _ from 'lodash'
 
 import { 
@@ -16,10 +16,13 @@ import {
 export default function Users() {
     const dispatch = useDispatch()
 
-    const [sortColumn, setSortColumn] = useState({ path: 'id', order: 'asc' });
+    
+    const [sortColumn, setSortColumn] = useState({ path: 'name', order: 'asc' });
     const [pageSize, setPageSize] = useState(5);
     const [currentPage, setCurrentPage] = useState(1);
     const [searchQuery, setSearchQuery] = useState('');
+
+
 
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
     const siteAdmins = useSelector(state => state.userReducer.siteAdmins); 
@@ -36,9 +39,12 @@ export default function Users() {
     })
     
 
+
     useEffect( () => {
         dispatch(getSiteAdminList())
     }, [searchQuery])
+
+
 
     const handleFilterClick = (e, query) => {
         e.preventDefault();
@@ -50,19 +56,21 @@ export default function Users() {
 
     const handleSort = sort => setSortColumn(sort)
 
-    const handleDeleteClick = ({ email }) => {
+    const handleDeleteSiteAdmin = ({ email }) => {
         if (window.confirm("Are you sure?")) {
             dispatch(deleteSiteAdminAccount({ email }))
         }
     }
 
     const getStatus = ({ is_active }) => (
-        <span className={is_active ? 'active' : 'inactive' }>{ is_active == 1 ? " Active" : " Inactive" }</span>
+        <span className={is_active ? 'active' : 'inactive' }>
+            { is_active == 1 ? " Active" : " Inactive" }
+        </span>
     )
 
     const getAction = ({ email }) => (
         <svg 
-            onClick={() => handleDeleteClick({ email }) } 
+            onClick={() => handleDeleteSiteAdmin({ email }) } 
             style={{ cursor: 'pointer' }} 
             class="bi bi-trash" 
             width="1em" 
@@ -89,6 +97,8 @@ export default function Users() {
         </svg>
     )
 
+
+
     const columns = [
         { path: 'name', label: 'Name' },
         { path: 'email', label: 'Email' },
@@ -108,6 +118,8 @@ export default function Users() {
             content: () => getSign()
         }
     ]
+
+    
 
     const getPageDate = () => {
         const paginated = paginate(users, currentPage, pageSize)
