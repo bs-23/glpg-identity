@@ -9,4 +9,14 @@ module.exports = app => {
         controller.getHcpUserList
     );
 
+    app.route('/hcpUsersStatusChange').post(
+        passport.authenticate('user-jwt', { session: false }),
+        controller.changeHcpUserStatus
+    );
+
+    app.route('/editHcpUserProfile').post(
+        passport.authenticate('user-jwt', { session: false }),
+        controller.editHcpProfile
+    );
+
 };
