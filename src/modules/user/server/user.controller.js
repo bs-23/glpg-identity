@@ -1,8 +1,5 @@
-const path = require('path');
 const jwt = require('jsonwebtoken');
 const User = require('./user.model');
-
-const Client = require(path.join(process.cwd(), 'src/modules/core/server/client.model'));
 
 function generateAccessToken(user) {
     return jwt.sign({
@@ -46,7 +43,7 @@ async function login(req, res) {
 
         res.json(formatProfile(user));
     } catch (err) {
-        res.sendStatus(500);
+        res.status(500).send(err);
     }
 }
 
@@ -61,17 +58,11 @@ async function createUser(req, res) {
         password,
         phone,
         countries,
-        permissions
+        permissions,
+        client_id
     } = req.body;
 
     try {
-        const client = await Client.findOne({
-            where: { email: 'service.hcp@glpg-hcp.com' },
-            attributes: ['id']
-        });
-
-        if (!client) return res.sendStatus(500);
-
         const [doc, created] = await User.findOrCreate({
             where: { email },
             defaults: {
@@ -82,7 +73,7 @@ async function createUser(req, res) {
                 permissions,
                 created_by: req.user.id,
                 updated_by: req.user.id,
-                client_id: client.id
+                client_id
             }
         });
 
@@ -92,7 +83,7 @@ async function createUser(req, res) {
 
         res.json(doc);
     } catch (err) {
-        console.log(err);
+        res.status(500).send(err);
     }
 }
 
@@ -115,7 +106,7 @@ async function changePassword(req, res) {
 
         res.json(formatProfile(user));
     } catch (err) {
-        res.sendStatus(400);
+        res.status(500).send(err);
     }
 }
 
@@ -125,17 +116,17 @@ async function deleteUser(req, res) {
 
         res.json({id: req.params.id});
     } catch(err) {
-        res.sendStatus(500);
+        res.status(500).send(err);
     }
 }
 
 async function getUsers(req, res) {
     try {
-        const users = await User.findAll({ where: { type: 'site_admin' }});
+        const users = await User.findAll({ where: { type: 'basic' }});
 
         res.json(users);
     } catch(err) {
-        res.sendStatus(500);
+        res.status(500).send(err);
     }
 }
 

@@ -5,18 +5,15 @@ async function getHcps(req, res) {
         const hcps = await Hcp.findAll({
             attributes: { exclude: ['password'] }
         });
+
         res.json(hcps);
     } catch (error) {
-        return res.status(500).send(error);
+        res.status(500).send(err);
     }
 }
 
 async function editHcp(req, res) {
-    const {
-        name,
-        email,
-        phone
-    } = req.body;
+    const { name, phone } = req.body;
 
     try {
         const hcpUser = await Hcp.findOne({ where: { id: req.params.id }});
@@ -26,9 +23,8 @@ async function editHcp(req, res) {
         hcpUser.update({ name, phone });
 
         res.json(hcpUser);
-    }
-    catch (err) {
-        res.sendStatus(500);
+    } catch (err) {
+        res.status(500).send(err);
     }
 }
 

@@ -18,11 +18,11 @@ const User = sequelize.define('user', {
         type: DataTypes.UUID,
         validate: {
             customValidator(value) {
-                if (value === null && this.type !== 'System Admin') {
-                    throw new Error("Client id can't be null unless user is System Admin");
+                if (value === null && this.type !== 'admin') {
+                    throw new Error("client_id is required for basic user");
                 }
             }
-        },
+        }
     },
     name: {
         allowNull: false,
@@ -47,8 +47,8 @@ const User = sequelize.define('user', {
     },
     type: {
         type: DataTypes.ENUM,
-        values: ['system_admin', 'site_admin'],
-        defaultValue: 'site_admin'
+        values: ['admin', 'basic'],
+        defaultValue: 'basic'
     },
     countries: {
         type: DataTypes.ARRAY(DataTypes.STRING)
@@ -57,10 +57,24 @@ const User = sequelize.define('user', {
         type: DataTypes.ARRAY(DataTypes.STRING)
     },
     created_by: {
-        type: DataTypes.UUID
+        type: DataTypes.UUID,
+        validate: {
+            customValidator(value) {
+                if (value === null && this.type !== 'admin') {
+                    throw new Error("created_by is required for basic user");
+                }
+            }
+        }
     },
     updated_by: {
-        type: DataTypes.UUID
+        type: DataTypes.UUID,
+        validate: {
+            customValidator(value) {
+                if (value === null && this.type !== 'admin') {
+                    throw new Error("updated_by is required for basic user");
+                }
+            }
+        }
     },
 }, {
     schema: 'ciam',

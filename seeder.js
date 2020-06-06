@@ -18,7 +18,7 @@ async function init() {
         Client.findOrCreate({
             where: { email: "service.hcp@glpg-hcp.com" }, defaults: {
                 name: "AEM HCP Portal Service User",
-                password: "strong-password"
+                password: "temporary-password"
             }
         }).then(function() {
             callback();
@@ -27,10 +27,10 @@ async function init() {
 
     function userSeeder(callback) {
         User.findOrCreate({
-            where: { email: "system-admin@glpg-ciam.com" }, defaults: {
-                name: "System Admin",
-                password: "strong-password",
-                type: "system_admin"
+            where: { email: "admin@glpg-cdp.com" }, defaults: {
+                name: "Admin",
+                password: "temporary-password",
+                type: "admin"
             }
         }).then(function() {
             callback();
@@ -58,7 +58,7 @@ async function init() {
         });
     }
 
-    async.waterfall([clientSeeder, userSeeder, countriesSeeder], function (err) {
+    async.waterfall([clientSeeder, userSeeder, countriesSeeder], function(err) {
         if (err) console.error(err);
         else console.info("DB seed completed!");
         process.exit();

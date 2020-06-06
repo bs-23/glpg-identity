@@ -11,8 +11,14 @@ import UserForm from '../../src/modules/user/client/components/user-form.compone
 configure({ adapter: new Adapter() });
 
 describe('UserForm component', () => {
+    const wrapperComponent = () => (
+        <Provider store={store}>
+            <UserForm/>
+        </Provider>
+    );
+
     it('Should render UserForm component', () => {
-        const wrapper = shallow(<UserForm />);
+        const wrapper = shallow(<wrapperComponent/>);
         expect(wrapper.exists()).toBe(true);
     });
 

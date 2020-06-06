@@ -48,6 +48,6 @@ const Client = sequelize.define("client", {
 
 Client.prototype.validPassword = function (password) {
     return bcrypt.compareSync(password, this.password);
-}
+};
 
 module.exports = Client;
