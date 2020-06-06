@@ -1,16 +1,12 @@
-const path = require('path');
-const jwt = require('jsonwebtoken');
 const Country = require('./country.model');
 
-
-async function getCountryList(req, res) {
+async function getCountries(req, res) {
     try {
-        const country = await Country.findAll();
-        return res.json(country);
+        const countries = await Country.findAll();
+        res.json(countries);
     } catch (error) {
         console.log(error);
     }
 }
 
-
-exports.getCountryList = getCountryList;
+exports.getCountries = getCountries;

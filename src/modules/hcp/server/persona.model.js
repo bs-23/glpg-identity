@@ -2,7 +2,7 @@ const path = require("path");
 const { DataTypes } = require("sequelize");
 const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequelize"));
 
-const Personas = sequelize.define("personas", {
+const Persona = sequelize.define("personas", {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -36,4 +36,4 @@ const Personas = sequelize.define("personas", {
     updatedAt: "updated_at"
 });
 
-module.exports = Personas;
+module.exports = Persona;

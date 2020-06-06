@@ -1,44 +1,19 @@
-/* eslint-disable quotes */
 const passport = require('passport');
 const controller = require('./user.controller');
 
 module.exports = app => {
-    app.post('/login', controller.login);
+    app.post('/api/login', controller.login);
 
-    app.get(
-        '/logout',
-        passport.authenticate('user-jwt', { session: false }),
-        controller.logout
-    );
+    app.get('/api/logout', passport.authenticate('user-jwt', { session: false }), controller.logout);
 
-    app.route('/users').post(
-        passport.authenticate('user-jwt', { session: false }),
-        controller.createUser
-    );
+    app.route('/api/users')
+        .get(passport.authenticate('user-jwt', { session: false }), controller.getUsers)
+        .post(passport.authenticate('user-jwt', { session: false }), controller.createUser);
 
-    app.route('/users/getSignedInUserProfile').get(
-        passport.authenticate('user-jwt', { session: false }),
-        controller.getSignedInUserProfile
-    );
+    app.route('/api/users/:id')
+        .delete(passport.authenticate("user-jwt", { session: false }), controller.deleteUser);
 
-    app.route('/users/changePassword').post(
-        passport.authenticate('user-jwt', { session: false }),
-        controller.changePassword
-    );
+    app.get('/api/users/getSignedInUserProfile', passport.authenticate('user-jwt', { session: false }), controller.getSignedInUserProfile);
 
-    app.route('/change_site_admin_account_status').post(
-        passport.authenticate('user-jwt', { session: false }),
-        controller.changeSiteAdminAccountStatus
-    )
-
-    app.route('/delete_site_admin_account').post(
-        passport.authenticate('user-jwt', { session: false }),
-        controller.deleteSiteAdminAccount
-    )
-
-    app.route('/get_site_admin_list').get(
-        passport.authenticate('user-jwt', { session: false }),
-        controller.getSiteAdminList
-    )
+    app.post('/api/users/changePassword', passport.authenticate('user-jwt', { session: false }), controller.changePassword);
 };
- 

@@ -1,38 +1,38 @@
 import React from 'react';
-import { render, waitFor, fireEvent, act, wait } from '@testing-library/react';
-import Enzyme, { configure, shallow, mount } from 'enzyme';
+import { render, waitFor, fireEvent } from '@testing-library/react';
+import { configure, shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import { MemoryRouter, withRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import store from '../../src/modules/core/client/store.js';
 import axios from 'axios'
 import MockAdapter from 'axios-mock-adapter'
-import ChangePasswordForm from '../../src/modules/user/client/components/change-password-form.component';
+import PasswordForm from '../../src/modules/user/client/components/password.component';
 
 configure({ adapter: new Adapter() });
 
-describe('ChangePasswordForm component', () => {
+describe('PasswordForm component', () => {
     let fakeAxios;
 
     beforeEach(() => {
         fakeAxios = new MockAdapter(axios)
-    })
+    });
 
     const wrapperComponent = () => (
         <Provider store={store}>
             <MemoryRouter>
-                <ChangePasswordForm />
+                <PasswordForm/>
             </MemoryRouter>
         </Provider>
-    )
+    );
 
-    it('should render the changePasswordForm component', () => {
+    it('Should render the PasswordForm component', () => {
         const wrapper = shallow(wrapperComponent());
         expect(wrapper.exists()).toBe(true);
     });
 
-    it('should fill out the current password, new password and confirm password', async () => {
-        const { getByTestId, container } = render(wrapperComponent());
+    it('Should fill out the current password, new password and confirm password', async () => {
+        const { getByTestId } = render(wrapperComponent());
         const current_password = getByTestId('currentPassword');
         const new_password = getByTestId('newPassword');
         const confirm_password = getByTestId('newPassword');

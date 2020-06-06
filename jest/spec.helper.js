@@ -1,25 +1,37 @@
 const jwt = require("jsonwebtoken");
+const faker = require("faker");
 
-process.env.TOKEN_SECRET = "6368451b-50bc9a455e62";
+process.env.TOKEN_SECRET = faker.random.uuid();
 
 module.exports = {
     client: {
         name: "Test Client",
-        email: "service.hcp@glpg-hcp.com",
-        password: "xxx-xxx-xxx",
+        email: faker.internet.email(),
+        password: faker.internet.password()
     },
     users: {
         systemAdmin: {
             id: "f29b63e5-36c7-4210-a5a8-c1e9d0c5b9e4",
-            name: "System Admin",
-            type: "System Admin",
+            name: faker.name.firstName(),
+            type: "system_admin",
             email: "system-admin@ciam.com",
-            password: "xxx-xxx-xxx",
+            password: faker.internet.password(8),
             access_token: jwt.sign({
                 id: "f29b63e5-36c7-4210-a5a8-c1e9d0c5b9e4",
-                name: "System Admin",
+                name: faker.name.firstName(),
                 email: "system-admin@ciam.com",
             }, process.env.TOKEN_SECRET, { expiresIn: "2d", issuer: "f29b63e5-36c7-4210-a5a8-c1e9d0c5b9e4" })
+        },
+        siteAdmin: {
+            id: "f29b63e5-36c7-4210-a5a8-c1e9d0c5b9e5",
+            name: faker.name.firstName(),
+            email: "site-admin@ciam.com",
+            password: faker.internet.password(8),
+            access_token: jwt.sign({
+                id: "f29b63e5-36c7-4210-a5a8-c1e9d0c5b9e5",
+                name: faker.name.firstName(),
+                email: "site-admin@ciam.com",
+            }, process.env.TOKEN_SECRET, { expiresIn: "2d", issuer: "f29b63e5-36c7-4210-a5a8-c1e9d0c5b9e5" })
         }
     }
 };

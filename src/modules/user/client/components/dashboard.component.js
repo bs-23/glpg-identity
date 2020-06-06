@@ -1,28 +1,9 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 
-import ChangePasswordFormComponent from './change-password-form.component';
-
 export default function Dashboard() {
-    const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
-
     return (
         <main>
-            <header className="app__header bg-success py-2">
-                <div className="container-fluid">
-                    <div className="row align-items-center">
-                        <div className="col-12 col-sm-6">
-                            <div className="d-flex">
-                                <h1 className="mb-0 text-white mr-5">CDP</h1>
-                            </div>
-                        </div>
-                        <div className="col-12 col-sm-6 text-right">
-                            <h6 className="mr-3 mb-0 text-white d-inline-block">{loggedInUser.name}</h6><a className="btn btn-danger" href="/logout">Logout</a>
-                        </div>
-                    </div>
-                </div>
-            </header>
             <div className="app__content">
                 <div className="container-fluid">
                     <div className="row">
@@ -33,23 +14,24 @@ export default function Dashboard() {
                             <div>
                                 <div className="d-flex flex-wrap">
                                     <NavLink to="/users" className="p-5 border shadow-sm m-2 h4 pb-0 mb-0">
-                                        User and Permission Service
+                                        CDP Users
                                     </NavLink>
                                     <NavLink to="" className="p-5 border shadow-sm m-2 h4 pb-0 mb-0 text-muted text-decoration-none">
-                                        Form Data Service
+                                        Forms Management
                                     </NavLink>
                                     <NavLink to="" className="p-5 border shadow-sm m-2 h4 pb-0 mb-0 text-muted text-decoration-none">
-                                        Tag and Persona Service
+                                        Tag and Persona Management
                                     </NavLink>
-                                    <NavLink to="/hcp" className="p-5 border shadow-sm m-2 h4 pb-0 mb-0 text-decoration-none">
-                                        HCP Service
+                                    <NavLink to="/hcps" className="p-5 border shadow-sm m-2 h4 pb-0 mb-0 text-decoration-none">
+                                        HCP Profiles
                                     </NavLink>
                                     <NavLink to="" className="p-5 border shadow-sm m-2 h4 pb-0 mb-0 text-muted text-decoration-none">
-                                        Campaign Service
+                                        Campaign Management
                                     </NavLink>
                                 </div>
                             </div>
                         </div>
+
                         <div className="col-12 col-sm-4 bg-light p-3">
                             <h4>FAQ</h4>
                             <div className="list-group">

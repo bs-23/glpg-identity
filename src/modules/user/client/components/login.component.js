@@ -29,9 +29,7 @@ export default function Login() {
                                         dispatch(login({
                                             email: values.email,
                                             password: values.password
-                                        })).catch(error => {
-                                            alert(error.response.data);
-                                        });
+                                        }));
 
                                         actions.setSubmitting(false);
                                     }}

@@ -1,106 +1,71 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { NavLink } from 'react-router-dom';
-import Dropdown from 'react-bootstrap/Dropdown';
-import Breadcrumb from 'react-bootstrap/Breadcrumb';
-import { getHcpUserList } from '../hcp.actions';
+import { getHcpProfiles } from '../hcp.actions';
 
-
-export default function HcpUsers() {
+export default function hcps() {
     const dispatch = useDispatch();
+
     useEffect(() => {
-        dispatch(getHcpUserList())
+        dispatch(getHcpProfiles())
     }, []);
-    const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
-    const hcpUsers = useSelector(state => state.hcpReducer.hcpUsers);
+
+    const hcps = useSelector(state => state.hcpReducer.hcps);
 
     return (
         <main>
-            <header className="app__header bg-success py-2">
-                <div className="container-fluid">
-                    <div className="row align-items-center">
-                        <div className="col-12 col-sm-6">
-                            <div className="d-flex">
-                                <h1 className="mb-0 text-white mr-5">CDP</h1>
-                                <Dropdown>
-                                    <Dropdown.Toggle variant="secondary" id="dropdown-basic" className="mt-2">
-                                        Service
-                                    </Dropdown.Toggle>
-                                    <Dropdown.Menu>
-                                        <Dropdown.Item href="/users">User and Permission Service</Dropdown.Item>
-                                        <Dropdown.Item href="#/action-2">Form Data Service</Dropdown.Item>
-                                        <Dropdown.Item href="#/action-3">Tag and Persona Service</Dropdown.Item>
-                                        <Dropdown.Item href="#/action-4">HCP Service</Dropdown.Item>
-                                        <Dropdown.Item href="#/action-5">Campaign Service</Dropdown.Item>
-                                    </Dropdown.Menu>
-                                </Dropdown>
-                            </div>
-                        </div>
-                        <div className="col-12 col-sm-6 text-right">
-                            <h6 className="mr-3 mb-0 text-white d-inline-block">{loggedInUser.name}</h6><a className="btn btn-danger" href="/logout">Logout</a>
-                        </div>
-                    </div>
-                </div>
-            </header>
             <div className="app__content">
-                <Breadcrumb>
-                    <Breadcrumb.Item href="/">
-                        Dashboard
-                    </Breadcrumb.Item>
-                    <Breadcrumb.Item >HCP Management</Breadcrumb.Item>
-                    <Breadcrumb.Item active>HCP User List</Breadcrumb.Item>
-                </Breadcrumb>
+                <nav aria-label="breadcrumb">
+                    <ol className="breadcrumb">
+                        <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
+                        <li className="breadcrumb-item active">HCP Profiles</li>
+                    </ol>
+                </nav>
                 <div className="container-fluid">
                     <div className="row">
                         <div className="col-12">
                             <div>
                                 <div className="d-flex justify-content-between align-items-center">
-                                    <h2 className="">HCP User list</h2>
+                                    <h2 className="">HCP Profiles</h2>
                                     <NavLink to="" className="btn btn-primary ml-auto">
                                         Create HCP Profile
                                     </NavLink>
                                 </div>
-                                <table className="table">
-                                    <thead className="table-secondary">
-                                        <tr>
-                                            <th scope="col">#</th>
-                                            <th scope="col">Name</th>
-                                            <th scope="col">Email</th>
-                                            <th scope="col">Phone</th>
-                                            <th scope="col">Status</th>
-                                            <th scope="col">Action</th>
-                                            <th scope="col"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
 
-                                        {hcpUsers.map((item, key) => (
-                                            <tr key={key}>
-                                                <th scope="row">{key + 1}</th>
-                                                <td>{item.name}</td>
-                                                <td>{item.email}</td>
-                                                <td>{item.phone}</td>
-                                                <td></td>
-                                                <td></td>
+                                { hcps.length > 0 &&
+                                    <table className="table">
+                                        <thead className="table-secondary">
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                                <th>Phone</th>
+                                                <th>Status</th>
+                                                <th>Action</th>
+                                                <th></th>
                                             </tr>
-                                        ))}
-                                        {/* <tr>
-                                            <th scope="row">1</th>
-                                            <td>Mark</td>
-                                            <td>Otto@gmail.com</td>
-                                            <td>123455677</td>
-                                            <td></td>
-                                            <td></td>
-                                        </tr> */}
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            {hcps.map(row => (
+                                                <tr key={row.id}>
+                                                    <td>{row.name}</td>
+                                                    <td>{row.email}</td>
+                                                    <td>{row.phone}</td>
+                                                    <td>{row.is_active}</td>
+                                                    <td></td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                }
+
+                                { hcps.length === 0 &&
+                                    <>No profiles found!</>
+                                }
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
         </main>
     );
 }
-

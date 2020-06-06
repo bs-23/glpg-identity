@@ -6,8 +6,8 @@ export function getSignedInUserProfile() {
         type: Types.GET_PROFILE,
         payload: axios({
             method: 'get',
-            url: '/users/getSignedInUserProfile',
-        }),
+            url: '/api/users/getSignedInUserProfile'
+        })
     };
 }
 
@@ -16,9 +16,9 @@ export function login(data) {
         type: Types.LOGIN,
         payload: axios({
             method: 'post',
-            url: '/login',
-            data,
-        }),
+            url: '/api/login',
+            data
+        })
     };
 }
 
@@ -27,8 +27,8 @@ export function createUser(data) {
         type: Types.CREATE_USER,
         payload: axios({
             method: 'post',
-            url: '/users',
-            data,
+            url: '/api/users',
+            data
         }),
     };
 }
@@ -38,40 +38,28 @@ export function changePassword(data) {
         type: Types.CHANGE_PASSWORD,
         payload: axios({
             method: 'post',
-            url: '/users/changePassword',
-            data,
-        }),
-    };
-}
-
-export function getSiteAdminList() {
-    return {
-        type: Types.GET_SITE_ADMIN_LIST,
-        payload: axios({
-            method: 'get',
-            url: '/get_site_admin_list'
+            url: '/api/users/changePassword',
+            data
         })
     };
 }
 
-export function changeSiteAdminAccountStatus(data) {
+export function getUsers() {
     return {
-        type: Types.CHANGE_SITE_ADMIN_ACCOUNT_STATUS,
+        type: Types.GET_USERS,
         payload: axios({
-            method: 'post',
-            url: '/change_site_admin_account_status',
-            data,
-        }),
+            method: 'get',
+            url: '/api/users'
+        })
     };
 }
 
-export function deleteSiteAdminAccount(data){
+export function deleteUser(id) {
     return {
-        type: Types.DELETE_SITE_ADMIN_ACCOUNT,
+        type: Types.DELETE_USER,
         payload: axios({
-            method: 'post',
-            url: '/delete_site_admin_account',
-            data,
-        }),
+            method: 'delete',
+            url: `/api/users/${id}`
+        })
     };
 }

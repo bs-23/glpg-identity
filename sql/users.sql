@@ -1,8 +1,16 @@
+-- Type: enum_users_type
+
+-- DROP TYPE ciam.enum_users_type;
+
 CREATE TYPE ciam.enum_users_type AS ENUM
-    ('System Admin', 'Site Admin');
+    ('system_admin', 'site_admin');
 
 ALTER TYPE ciam.enum_users_type
     OWNER TO postgres;
+
+-- Table: ciam.users
+
+-- DROP TABLE ciam.users;
 
 CREATE TABLE ciam.users
 (
@@ -12,10 +20,9 @@ CREATE TABLE ciam.users
     email character varying(255) COLLATE pg_catalog."default" NOT NULL,
     password character varying(255) COLLATE pg_catalog."default",
     phone character varying(255) COLLATE pg_catalog."default",
-    type ciam.enum_users_type DEFAULT 'Site Admin'::ciam.enum_users_type,
+    type ciam.enum_users_type DEFAULT 'site_admin'::ciam.enum_users_type,
     countries character varying(255)[] COLLATE pg_catalog."default",
     permissions character varying(255)[] COLLATE pg_catalog."default",
-    is_active boolean DEFAULT false,
     created_by uuid,
     updated_by uuid,
     created_at timestamp with time zone NOT NULL,

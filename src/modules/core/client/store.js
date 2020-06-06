@@ -1,7 +1,7 @@
 import thunk from "redux-thunk";
 import promise from "redux-promise-middleware";
 import { applyMiddleware, createStore, compose } from "redux";
-import reducers from "./country/reducers";
+import reducers from "./reducers";
 
 const middlewares = [promise, thunk];
 

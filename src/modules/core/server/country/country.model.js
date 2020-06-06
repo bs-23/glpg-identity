@@ -9,10 +9,22 @@ const Country = sequelize.define("country", {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         validate: {
-            isUUID: 4,
-        },
+            isUUID: 4
+        }
     },
     name: {
+        allowNull: false,
+        type: DataTypes.STRING
+    },
+    country_iso2: {
+        allowNull: false,
+        type: DataTypes.STRING
+    },
+    country_iso3: {
+        allowNull: false,
+        type: DataTypes.STRING
+    },
+    codebase: {
         allowNull: false,
         type: DataTypes.STRING
     }
@@ -23,6 +35,5 @@ const Country = sequelize.define("country", {
     createdAt: "created_at",
     updatedAt: "updated_at"
 });
-
 
 module.exports = Country;

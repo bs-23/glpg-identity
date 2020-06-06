@@ -14,7 +14,6 @@ import { getSignedInUserProfile } from "../../user/client/user.actions";
 import UserRoutes from "../../user/client/user.routes";
 import HcpRoutes from "../../hcp/client/hcp.routes";
 
-
 export default function App() {
     const dispatch = useDispatch();
 
@@ -30,7 +29,7 @@ export default function App() {
 
             <Route path="/users" component={UserRoutes} />
 
-            <Route path="/hcp" component={HcpRoutes} />
+            <Route path="/hcps" component={HcpRoutes} />
 
             <Route component={NoMatch} />
         </Switch>

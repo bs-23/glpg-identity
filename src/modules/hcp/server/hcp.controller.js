@@ -1,73 +1,36 @@
-const path = require('path');
-const jwt = require('jsonwebtoken');
 const Hcp = require('./hcp.model');
 
-async function getHcpUserList(req, res) {
+async function getHcps(req, res) {
     try {
-        const hcpUsers = await Hcp.findAll({
+        const hcps = await Hcp.findAll({
             attributes: { exclude: ['password'] }
         });
-        return res.json(hcpUsers);
+        res.json(hcps);
     } catch (error) {
-        return res.status(500).send('Internal server error');
+        return res.status(500).send(error);
     }
 }
 
-async function changeHcpUserStatus(req, res) {
-    const {
-        email,
-        is_active
-    } = req.body;
-
-    if (is_active === undefined) return res.status(404).send('status not defined');
-
-    try {
-        const hcpUser = await Hcp.findOne({
-            where: {
-                email
-            },
-            attributes: ['id', 'name', 'email', 'phone', 'is_active'],
-        });
-
-        if (!hcpUser) return res.status(404).send('Account is already deleted or not found');
-
-        hcpUser.update({ is_active });
-
-        return res.status(200).json(hcpUser);
-    }
-    catch (err) {
-        return res.status(500).send('Internal server error');
-    }
-}
-
-async function editHcpProfile(req, res) {
+async function editHcp(req, res) {
     const {
         name,
         email,
-        phone,
-        is_active
+        phone
     } = req.body;
 
     try {
-        const hcpUser = await Hcp.findOne({
-            where: {
-                email
-            },
-            attributes: ['id', 'name', 'email', 'phone', 'is_active'],
-        });
+        const hcpUser = await Hcp.findOne({ where: { id: req.params.id }});
 
-        if (!hcpUser) return res.status(404).send('Account is already deleted or not found');
+        if (!hcpUser) return res.sendStatus(404);
 
-        hcpUser.update({ is_active, name, phone });
+        hcpUser.update({ name, phone });
 
-        return res.status(200).json(hcpUser);
+        res.json(hcpUser);
     }
     catch (err) {
-        return res.status(500).send('Internal server error');
+        res.sendStatus(500);
     }
 }
 
-
-exports.getHcpUserList = getHcpUserList;
-exports.changeHcpUserStatus = changeHcpUserStatus;
-exports.editHcpProfile = editHcpProfile;
+exports.getHcps = getHcps;
+exports.editHcp = editHcp;

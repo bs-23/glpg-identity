@@ -1,22 +1,10 @@
-/* eslint-disable quotes */
 const passport = require('passport');
 const controller = require('./hcp.controller');
 
 module.exports = app => {
+    app.route('/api/hcps')
+        .get(passport.authenticate('user-jwt', { session: false }), controller.getHcps)
 
-    app.route('/hcp-users').get(
-        passport.authenticate('user-jwt', { session: false }),
-        controller.getHcpUserList
-    );
-
-    app.route('/hcpUsersStatusChange').post(
-        passport.authenticate('user-jwt', { session: false }),
-        controller.changeHcpUserStatus
-    );
-
-    app.route('/editHcpUserProfile').post(
-        passport.authenticate('user-jwt', { session: false }),
-        controller.editHcpProfile
-    );
-
+    app.route('/api/hcps/:id')
+        .put(passport.authenticate('user-jwt', { session: false }), controller.editHcp);
 };

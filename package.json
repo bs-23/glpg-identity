@@ -1,5 +1,5 @@
 {
-  "name": "glpg-ciam",
+  "name": "glpg-cdp",
   "version": "0.1.0",
   "author": "Brain Station 23 Limited",
   "scripts": {
@@ -40,6 +40,7 @@
     "react-bootstrap": "^1.0.1",
     "react-dom": "^16.13.1",
     "react-redux": "^7.2.0",
+    "react-router-bootstrap": "^0.25.0",
     "react-router-dom": "^5.1.2",
     "redux": "^4.0.5",
     "redux-promise-middleware": "^6.1.2",
@@ -66,6 +67,7 @@
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
     "enzyme-to-json": "^3.4.4",
+    "faker": "^4.1.0",
     "jest": "^26.0.1",
     "jest-sonar-reporter": "^2.0.0",
     "mini-css-extract-plugin": "^0.9.0",
