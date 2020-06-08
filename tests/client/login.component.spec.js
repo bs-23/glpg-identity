@@ -15,6 +15,7 @@ describe('Login component', () => {
 
     beforeAll(() => {
         fakeAxios = new MockAdapter(axios);
+        window.alert = jest.fn();
     });
 
     const userSlice = () => store.getState().userReducer;
