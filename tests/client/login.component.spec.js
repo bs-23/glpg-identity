@@ -46,7 +46,7 @@ describe('Login component', () => {
 
     it('Should not login successfully if response is 500', async () => {
         const { container } = render(wrapperComponent());
-        const email = container.querySelector('input[name="email"]');
+        const email = container.querySelector('input[name="email"]'); 
         const password = container.querySelector('input[name="password"]');
         const submit = container.querySelector('button[type="submit"]');
         fakeAxios.onPost('/api/login').reply(500);
@@ -60,7 +60,7 @@ describe('Login component', () => {
             fireEvent.click(submit);
         });
 
-        expect(userSlice().loggedInUser).toBeNull();
+        expect(userSlice().loggedInUser).toBeFalsy();
     });
 
     it('Should login successfully if response is 200', async () => {
