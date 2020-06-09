@@ -4,7 +4,7 @@ const express = require("express");
 const config = require("../config");
 const cookieParser = require("cookie-parser");
 
-module.exports = function() { 
+module.exports = function () {
     let app = express();
 
     app.use(cookieParser());

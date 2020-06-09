@@ -1,0 +1,4 @@
+export default {
+    GET_HCPS: 'GET_HCPS',
+    GET_HCPS_FULFILLED: 'GET_HCPS_FULFILLED'
+};

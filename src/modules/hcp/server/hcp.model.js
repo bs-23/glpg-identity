@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const { DataTypes } = require("sequelize");
 const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequelize"));
 
-const HcpProfile = sequelize.define("hcp_profile", {
+const Hcp = sequelize.define("hcps", {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -44,14 +44,14 @@ const HcpProfile = sequelize.define("hcp_profile", {
     }
 }, {
     schema: "ciam",
-    tableName: "hcp_profiles",
+    tableName: "hcps",
     timestamps: true,
     createdAt: "created_at",
     updatedAt: "updated_at"
 });
 
-HcpProfile.prototype.validPassword = function (password) {
+Hcp.prototype.validPassword = function (password) {
     return bcrypt.compareSync(password, this.password);
-}
+};
 
-module.exports = HcpProfile;
+module.exports = Hcp;

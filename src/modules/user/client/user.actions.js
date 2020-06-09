@@ -6,8 +6,8 @@ export function getSignedInUserProfile() {
         type: Types.GET_PROFILE,
         payload: axios({
             method: 'get',
-            url: '/users/getSignedInUserProfile',
-        }),
+            url: '/api/users/getSignedInUserProfile'
+        })
     };
 }
 
@@ -16,9 +16,9 @@ export function login(data) {
         type: Types.LOGIN,
         payload: axios({
             method: 'post',
-            url: '/login',
-            data,
-        }),
+            url: '/api/login',
+            data
+        })
     };
 }
 
@@ -27,8 +27,8 @@ export function createUser(data) {
         type: Types.CREATE_USER,
         payload: axios({
             method: 'post',
-            url: '/users',
-            data,
+            url: '/api/users',
+            data
         }),
     };
 }
@@ -38,8 +38,28 @@ export function changePassword(data) {
         type: Types.CHANGE_PASSWORD,
         payload: axios({
             method: 'post',
-            url: '/users/changePassword',
-            data,
-        }),
+            url: '/api/users/changePassword',
+            data
+        })
+    };
+}
+
+export function getUsers() {
+    return {
+        type: Types.GET_USERS,
+        payload: axios({
+            method: 'get',
+            url: '/api/users'
+        })
+    };
+}
+
+export function deleteUser(id) {
+    return {
+        type: Types.DELETE_USER,
+        payload: axios({
+            method: 'delete',
+            url: `/api/users/${id}`
+        })
     };
 }

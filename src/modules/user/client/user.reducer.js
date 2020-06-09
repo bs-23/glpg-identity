@@ -1,10 +1,11 @@
 import Types from "./user.types";
 
 const initialState = {
-    loggedInUser: null
-}
+    loggedInUser: null,
+    users: []
+};
 
-export default function reducer(state=initialState, action) {
+export default function reducer(state = initialState, action) {
     switch (action.type) {
         case Types.LOGIN_FULFILLED:
         case Types.GET_PROFILE_FULFILLED: {
@@ -12,6 +13,18 @@ export default function reducer(state=initialState, action) {
                 ...state,
                 loggedInUser: action.payload.data
             };
+        }
+        case Types.GET_USERS_FULFILLED: {
+            return {
+                ...state,
+                users: action.payload.data
+            };
+        }
+        case Types.DELETE_USER_FULFILLED: {
+            return {
+                ...state,
+                users: state.users.filter(u => u.id !== action.payload.data.id)
+            }
         }
     }
     return state;

@@ -10,9 +10,15 @@ module.exports = async () => {
     await sequelize.query("CREATE SCHEMA IF NOT EXISTS ciam");
     const User = require(path.join(process.cwd(), "src/modules/user/server/user.model"));
     const Client = require(path.join(process.cwd(), "src/modules/core/server/client.model"));
+    const Country = require(path.join(process.cwd(), "src/modules/core/server/country/country.model"));
 
     await sequelize.sync();
 
-    await Client.create(specHelper.client);
-    await User.create(specHelper.users.systemAdmin);
+    await Client.create(specHelper.defaultClient);
+    await User.create(specHelper.users.defaultUser);
+    await User.create(specHelper.users.defaultAdmin);
+    await Country.bulkCreate(specHelper.countries, {
+        returning: true,
+        ignoreDuplicates: false
+    });
 };

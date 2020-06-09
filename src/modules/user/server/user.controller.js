@@ -1,32 +1,23 @@
-const path = require('path');
 const jwt = require('jsonwebtoken');
 const User = require('./user.model');
 
-const Client = require(path.join(
-    process.cwd(),
-    'src/modules/core/server/client.model'
-));
-
 function generateAccessToken(user) {
-    return jwt.sign(
-        {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-        },
-        process.env.TOKEN_SECRET,
-        {
-            expiresIn: '2d',
-            issuer: user.id.toString(),
-        }
-    );
+    return jwt.sign({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+    }, process.env.TOKEN_SECRET, {
+        expiresIn: '2d',
+        issuer: user.id.toString()
+    });
 }
 
 function formatProfile(user) {
     const profile = {
+        id: user.id,
         name: user.name,
         email: user.email,
-        type: user.type,
+        type: user.type
     };
 
     return profile;
@@ -39,10 +30,7 @@ async function getSignedInUserProfile(req, res) {
 async function login(req, res) {
     try {
         const { email, password } = req.body;
-        const user = await User.findOne({
-            where: { email },
-            attributes: ['id', 'name', 'email', 'password'],
-        });
+        const user = await User.findOne({ where: { email }});
 
         if (!user || !user.validPassword(password)) {
             return res.status(401).send('Invalid email or password.');
@@ -50,12 +38,12 @@ async function login(req, res) {
 
         res.cookie('access_token', generateAccessToken(user), {
             expires: new Date(Date.now() + 8.64e7),
-            httpOnly: true,
+            httpOnly: true
         });
 
         res.json(formatProfile(user));
     } catch (err) {
-        console.log(err);
+        res.status(500).send(err);
     }
 }
 
@@ -71,17 +59,10 @@ async function createUser(req, res) {
         phone,
         countries,
         permissions,
-        is_active,
+        client_id
     } = req.body;
 
     try {
-        const client = await Client.findOne({
-            where: { email: 'service.hcp@glpg-hcp.com' },
-            attributes: ['id'],
-        });
-
-        if (!client) return res.sendStatus(500);
-
         const [doc, created] = await User.findOrCreate({
             where: { email },
             defaults: {
@@ -90,50 +71,34 @@ async function createUser(req, res) {
                 phone,
                 countries,
                 permissions,
-                is_active,
                 created_by: req.user.id,
                 updated_by: req.user.id,
-                client_id: client.id,
-            },
+                client_id
+            }
         });
 
         if (!created) {
-            return res.status(400).send('Email address already exists.');
+            return res.sendStatus(400);
         }
 
         res.json(doc);
     } catch (err) {
-        console.log(err);
+        res.status(500).send(err);
     }
 }
 
 async function changePassword(req, res) {
-    const { currentPassword, newPassword, confirmPassword } = req.body; 
+    const { currentPassword, newPassword, confirmPassword } = req.body;
 
     try {
-        const user = await User.findOne({
-            where: { email: req.user.dataValues.email },
-            attributes: ['id', 'name', 'email', 'password'],
-        });
+        const user = await User.findOne({ where: { id: req.user.id }});
 
         if (!user || !user.validPassword(currentPassword)) {
-            return res.status(401).send('Current Password not valid');
+            return res.status(400).send('Current Password not valid');
         }
 
         if (newPassword !== confirmPassword) {
-            return res.status(400).send('Paswords should match');
-        }
-
-        if (currentPassword === newPassword) {
-            return res
-                .status(400)
-                .send('New Password should be different from current password');
-        }
-
-        if (newPassword.length < 8) {
-            return res
-                .status(400)
-                .send('New Password must be at least 8 characters long');
+            return res.status(400).send('Passwords should match');
         }
 
         user.password = newPassword;
@@ -141,7 +106,27 @@ async function changePassword(req, res) {
 
         res.json(formatProfile(user));
     } catch (err) {
-        console.log(err.errors[0].message);
+        res.status(500).send(err);
+    }
+}
+
+async function deleteUser(req, res) {
+    try {
+        await User.destroy({ where: { id: req.params.id }});
+
+        res.json({id: req.params.id});
+    } catch(err) {
+        res.status(500).send(err);
+    }
+}
+
+async function getUsers(req, res) {
+    try {
+        const users = await User.findAll({ where: { type: 'basic' }});
+
+        res.json(users);
+    } catch(err) {
+        res.status(500).send(err);
     }
 }
 
@@ -150,3 +135,5 @@ exports.logout = logout;
 exports.createUser = createUser;
 exports.getSignedInUserProfile = getSignedInUserProfile;
 exports.changePassword = changePassword;
+exports.deleteUser = deleteUser;
+exports.getUsers = getUsers;
