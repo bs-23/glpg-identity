@@ -1,9 +1,10 @@
-const path = require("path");
-const bcrypt = require("bcryptjs");
-const { DataTypes } = require("sequelize");
-const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequelize"));
+const path = require('path');
+const bcrypt = require('bcryptjs');
+const { DataTypes } = require('sequelize');
 
-const User = sequelize.define("user", {
+const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
+
+const User = sequelize.define('user', {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -17,8 +18,8 @@ const User = sequelize.define("user", {
         type: DataTypes.UUID,
         validate: {
             customValidator(value) {
-                if (value === null && this.type !== "System Admin") {
-                    throw new Error("Client id can't be null unless user is System Admin");
+                if (value === null && this.type !== 'admin') {
+                    throw new Error("client_id is required for basic user");
                 }
             }
         }
@@ -38,7 +39,7 @@ const User = sequelize.define("user", {
     password: {
         type: DataTypes.STRING,
         set(value) {
-            this.setDataValue("password", bcrypt.hashSync(value, 8));
+            this.setDataValue('password', bcrypt.hashSync(value, 8));
         }
     },
     phone: {
@@ -46,8 +47,8 @@ const User = sequelize.define("user", {
     },
     type: {
         type: DataTypes.ENUM,
-        values: ["System Admin", "Site Admin"],
-        defaultValue: "Site Admin"
+        values: ['admin', 'basic'],
+        defaultValue: 'basic'
     },
     countries: {
         type: DataTypes.ARRAY(DataTypes.STRING)
@@ -55,26 +56,36 @@ const User = sequelize.define("user", {
     permissions: {
         type: DataTypes.ARRAY(DataTypes.STRING)
     },
-    is_active: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false
-    },
     created_by: {
-        type: DataTypes.UUID
+        type: DataTypes.UUID,
+        validate: {
+            customValidator(value) {
+                if (value === null && this.type !== 'admin') {
+                    throw new Error("created_by is required for basic user");
+                }
+            }
+        }
     },
     updated_by: {
-        type: DataTypes.UUID
-    }
+        type: DataTypes.UUID,
+        validate: {
+            customValidator(value) {
+                if (value === null && this.type !== 'admin') {
+                    throw new Error("updated_by is required for basic user");
+                }
+            }
+        }
+    },
 }, {
-    schema: "ciam",
-    tableName: "users",
+    schema: 'ciam',
+    tableName: 'users',
     timestamps: true,
-    createdAt: "created_at",
-    updatedAt: "updated_at"
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
 });
 
-User.prototype.validPassword = function (password) {
+User.prototype.validPassword = function(password) {
     return bcrypt.compareSync(password, this.password);
-}
+};
 
 module.exports = User;

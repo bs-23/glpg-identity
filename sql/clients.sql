@@ -1,3 +1,7 @@
+-- Table: ciam.clients
+
+-- DROP TABLE ciam.clients;
+
 CREATE TABLE ciam.clients
 (
     id uuid NOT NULL,

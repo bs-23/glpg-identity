@@ -1,4 +1,4 @@
-## GLPG CIAM
+## GLPG CDP
 
 ## Dev Environment Setup
 - [Git](https://git-scm.com/)
