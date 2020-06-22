@@ -6,17 +6,18 @@ CREATE TABLE ciam.hcps
 (
     id uuid NOT NULL,
     application_id uuid NOT NULL,
-    name character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    first_name character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    last_name character varying(255) COLLATE pg_catalog."default" NOT NULL,
     email character varying(255) COLLATE pg_catalog."default" NOT NULL,
     password character varying(255) COLLATE pg_catalog."default",
     phone character varying(255) COLLATE pg_catalog."default",
-    is_active boolean DEFAULT false,
+    is_active boolean,
+    one_key_id character varying(255) COLLATE pg_catalog."default",
     created_by uuid,
     updated_by uuid,
-    created_at timestamp with time zone NOT NULL,
-    updated_at timestamp with time zone NOT NULL,
-    CONSTRAINT hcps_pkey PRIMARY KEY (id),
-    CONSTRAINT hcps_email_key UNIQUE (email)
+    created_at time with time zone NOT NULL,
+    updated_at time with time zone NOT NULL,
+    CONSTRAINT hcps_pkey PRIMARY KEY (id)
 )
 
 TABLESPACE pg_default;
