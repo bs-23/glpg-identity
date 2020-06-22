@@ -14,7 +14,11 @@ const Hcp = sequelize.define("hcps", {
         allowNull: false,
         type: DataTypes.UUID
     },
-    name: {
+    first_name: {
+        allowNull: false,
+        type: DataTypes.STRING
+    },
+    last_name: {
         allowNull: false,
         type: DataTypes.STRING
     },
@@ -35,6 +39,10 @@ const Hcp = sequelize.define("hcps", {
     is_active: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
+    },
+    one_key_id: {
+        allowNull: false,
+        type: DataTypes.STRING
     },
     created_by: {
         type: DataTypes.UUID
