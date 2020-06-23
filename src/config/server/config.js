@@ -7,7 +7,7 @@ let getGlobbedPaths = function (globPatterns, excludes) {
 
     let output = [];
 
-    if (_.isArray(globPatterns)) { 
+    if (_.isArray(globPatterns)) {
         globPatterns.forEach(function (globPattern) {
             output = _.union(output, getGlobbedPaths(globPattern, excludes));
         });

@@ -1,12 +1,14 @@
+const path = require('path');
 const jwt = require('jsonwebtoken');
 const User = require('./user.model');
+const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
 function generateAccessToken(user) {
     return jwt.sign({
         id: user.id,
         name: user.name,
         email: user.email,
-    }, process.env.TOKEN_SECRET, {
+    }, nodecache.getValue('TOKEN_SECRET'), {
         expiresIn: '2d',
         issuer: user.id.toString()
     });

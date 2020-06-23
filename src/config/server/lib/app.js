@@ -1,9 +1,9 @@
 module.exports.start = async function() {
-    require("dotenv").config();
+    require('dotenv').config();
 
-    const app = require("./express")(); 
+    const app = await require('./express')();
 
-    app.listen(app.get("port"), function() {
-        console.info("Server running on port %s in %s mode...", app.get("port"), app.settings.env);
+    app.listen(app.get('port'), function() {
+        console.info('Server running on port %s in %s mode...', app.get('port'), app.settings.env);
     });
 };

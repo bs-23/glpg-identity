@@ -19,6 +19,10 @@ POSTGRES_URL=<postgresql_connection_string>
 POSTGRES_DATABASE=<database_name>
 SONARQUBE_URL=<sonarqube_url>
 SONARQUBE_TOKEN=<sonarqube_token>
+AWS_ACCESS_KEY_ID=<aws_access_key_id>
+AWS_SECRET_ACCESS_KEY=<aws_secret_access_key>
+AWS_REGION=<aws_region>
+AWS_SECRET_NAME=<aws_secret_name>
 ```
 
 ## Available commands

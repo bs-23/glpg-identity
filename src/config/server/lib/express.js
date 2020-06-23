@@ -1,10 +1,12 @@
 const path = require("path");
 const hbs = require("express-hbs");
 const express = require("express");
-const config = require("../config");
+const config = require("../config")
+const nodecache = require("./nodecache");
 const cookieParser = require("cookie-parser");
+const secretsManager = require('./secrets-manager');
 
-module.exports = function () {
+module.exports = async function () {
     let app = express();
 
     app.use(cookieParser());
@@ -17,6 +19,14 @@ module.exports = function () {
     app.set("views", path.join(process.cwd(), "src/modules/core/server"));
 
     app.set("port", process.env.PORT);
+
+    const secrets = await secretsManager.getSecrets();
+
+    for (var key in secrets) {
+        if (secrets.hasOwnProperty(key)) {
+            nodecache.setValue(key, secrets[key]);
+        }
+    }
 
     app.locals.jsFiles = config.client.js;
     app.locals.cssFiles = config.client.css;

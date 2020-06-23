@@ -1,5 +1,9 @@
-const Sequelize = require("sequelize");
+const Sequelize = require('sequelize');
+const nodecache = require('./nodecache');
 
-const sequelize = new Sequelize(`${process.env.POSTGRES_URL}/${process.env.POSTGRES_DATABASE}`, {logging: false});
+const postgresUrl = nodecache.getValue("POSTGRES_URL");
+const postgresDatabase = nodecache.getValue("POSTGRES_DATABASE");
+
+const sequelize = new Sequelize(`${postgresUrl}/${postgresDatabase}`, {logging: false});
 
 module.exports = sequelize;
