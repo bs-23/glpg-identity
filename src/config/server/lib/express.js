@@ -22,8 +22,8 @@ module.exports = async function () {
 
     const secrets = await secretsManager.getSecrets();
 
-    for (var key in secrets) {
-        if (secrets.hasOwnProperty(key)) {
+    for (const key in secrets) {
+        if(secrets.hasOwnProperty(key)) {
             nodecache.setValue(key, secrets[key]);
         }
     }
