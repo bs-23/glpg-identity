@@ -7,7 +7,7 @@ export default function Navbar() {
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
 
     return (
-        <header className="app__header bg-success py-2">
+        <header className="app__header bg-success py-2 shadow-sm">
             <div className="container-fluid">
                 <div className="row align-items-center">
                     <div className="col-12 col-sm-6">
