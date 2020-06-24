@@ -71,28 +71,28 @@ async function init() {
         });
     }
 
-    function countriesSeeder(callback) {
-        const countries = [
-            { "name": "Belgium", "country_iso2": "BE", "country_iso3": "BEL", "codebase": "WBE" },
-            { "name": "France", "country_iso2": "FR", "country_iso3": "FRA", "codebase": "WFR" },
-            { "name": "Germany", "country_iso2": "DE", "country_iso3": "DEU", "codebase": "WDE" },
-            { "name": "Italy", "country_iso2": "IT", "country_iso3": "ITA", "codebase": "WIT" },
-            { "name": "Netherlands", "country_iso2": "NL", "country_iso3": "NLD", "codebase": "WNL" },
-            { "name": "Spain", "country_iso2": "ES", "country_iso3": "ESP", "codebase": "WES" },
-            { "name": "United Kingdom", "country_iso2": "GB", "country_iso3": "GBR", "codebase": "WUK" }
-        ];
+    // function countriesSeeder(callback) {
+    //     const countries = [
+    //         { "name": "Belgium", "country_iso2": "BE", "country_iso3": "BEL", "codebase": "WBE" },
+    //         { "name": "France", "country_iso2": "FR", "country_iso3": "FRA", "codebase": "WFR" },
+    //         { "name": "Germany", "country_iso2": "DE", "country_iso3": "DEU", "codebase": "WDE" },
+    //         { "name": "Italy", "country_iso2": "IT", "country_iso3": "ITA", "codebase": "WIT" },
+    //         { "name": "Netherlands", "country_iso2": "NL", "country_iso3": "NLD", "codebase": "WNL" },
+    //         { "name": "Spain", "country_iso2": "ES", "country_iso3": "ESP", "codebase": "WES" },
+    //         { "name": "United Kingdom", "country_iso2": "GB", "country_iso3": "GBR", "codebase": "WUK" }
+    //     ];
 
-        Country.destroy({ truncate: true }).then(() => {
-            Country.bulkCreate(countries, {
-                returning: true,
-                ignoreDuplicates: false
-            }).then(function () {
-                callback();
-            });
-        });
-    }
+    //     Country.destroy({ truncate: true }).then(() => {
+    //         Country.bulkCreate(countries, {
+    //             returning: true,
+    //             ignoreDuplicates: false
+    //         }).then(function () {
+    //             callback();
+    //         });
+    //     });
+    // }
 
-    async.waterfall([clientSeeder, userSeeder, countriesSeeder, tempHcpsSeeder], function (err) {
+    async.waterfall([clientSeeder, userSeeder, tempHcpsSeeder], function (err) {
         if (err) console.error(err);
         else console.info("DB seed completed!");
         process.exit();

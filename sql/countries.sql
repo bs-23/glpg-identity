@@ -8,7 +8,7 @@ CREATE TABLE ciam.countries
     name character varying(255) COLLATE pg_catalog."default" NOT NULL,
     country_iso2 character varying(255) COLLATE pg_catalog."default" NOT NULL,
     country_iso3 character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    codebase character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    codebase character varying(255) COLLATE pg_catalog."default",
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
     CONSTRAINT countries_pkey PRIMARY KEY (id)
