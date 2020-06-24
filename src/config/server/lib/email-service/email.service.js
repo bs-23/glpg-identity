@@ -1,80 +1,83 @@
-const fs = require("fs");
-const path = require("path");
-const nodemailer = require("nodemailer");
+const fs = require('fs');
+const path = require('path');
+var AWS = require('aws-sdk');
+const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
+const region = nodecache.getValue('AWS_REGION');
+const SES = new AWS.SES({ region });
+
+// Set the region
+AWS.config.update({
+  accessKeyId: nodecache.getValue('AWS_ACCESS_KEY_ID'),
+  secretAccessKey: nodecache.getValue('AWS_SECRET_ACCESS_KEY'),
+  region
+});
 
 /**
  *
  * @param {string} options.templateName Name of teh template to use
- * @param {string} options.from From email address
- * @param {string} options.to To email address
+ * @param {string} options.fromAddress From email address
+ * @param {string} options.toAddresses To email address
  * @param {string} options.subject Subject line for email
  * @param {string} options.replacer Values to be replaced in the template
+ * @param {[string]} options.replyToAddresses Reply to email addresses
  */
 async function send(options) {
-    const template = await getTemplate(options.templateName);
+  const template = await getTemplate(options.templateName);
 
-    const html = options.replacer
-        ? transformTemplate(template, options.replacer)
-        : template;
+  const htmlBody = options.replacer
+    ? transformTemplate(template, options.replacer)
+    : template;
 
-    // Generate test SMTP service account from ethereal.email
-    // Only needed if you don't have a real mail account for testing
-    let testAccount = await nodemailer.createTestAccount();
+  // Create SES sendEmail params
+  var params = {
+    Destination: {
+      CcAddresses: [],
+      ToAddresses: options.toAddresses,
+    },
+    Message: {
+      Body: {
+        Html: {
+          Charset: 'UTF-8',
+          Data: htmlBody,
+        }
+      },
+      Subject: {
+        Charset: 'UTF-8',
+        Data: options.subject,
+      },
+    },
+    Source: options.fromAddress || 'glpg.cdp@gmail.com',
+    ReplyToAddresses: options.replyToAddresses || ['glpg.cdp@gmail.com'],
+  };
 
-    // create reusable transporter object using the default SMTP transport
-    let transporter = nodemailer.createTransport({
-        host: "smtp.ethereal.email",
-        port: 587,
-        secure: false, // true for 465, false for other ports
-        auth: {
-            user: testAccount.user, // generated ethereal user
-            pass: testAccount.pass, // generated ethereal password
-        },
-    });
-
-    const mailOptions = {
-        from: options.from, // sender address
-        to: options.to, // list of receivers
-        subject: options.subject, // Subject line
-        // text: "Hello world?hjsgfs fsd fsdf sdf sdf sdf", // plain text body
-        html: html,
-    };
-
-    // send mail with defined transport object
-    let info = await transporter.sendMail(mailOptions);
-
-    console.log("Message sent: %s", info.messageId);
-    // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-
-    // Preview only available when sending through an Ethereal account
-    console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-    // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+  const response = await SES.sendEmail(params).promise();
+  return response;
 }
 
 async function getTemplate(templateName) {
-    const templateText = fs.readFileSync(
-        path.join(
-            process.cwd(),
-            `src/config/server/lib/email-service/templates/${templateName}.html`
-        ),
-        "utf8"
-    );
+  const templateText = fs.readFileSync(
+    path.join(
+      process.cwd(),
+      `src/config/server/lib/email-service/templates/${templateName}.html`
+    ),
+    'utf8'
+  );
 
-    return templateText;
+  return templateText;
 }
 
 function transformTemplate(templateText, replacer) {
-    for (var key in replacer) {
-        if (replacer.hasOwnProperty(key)) {
-            const replacerKey = `[[${key}]]`;
-            const value = `${replacer[key]}`;
-            templateText = templateText
-                ? templateText.replace(replacerKey, value)
-                : "";
-        }
+  for (var key in replacer) {
+    if (replacer.hasOwnProperty(key)) {
+      const replacerKey = `[[${key}]]`;
+      const value = `${replacer[key]}`;
+      templateText = templateText
+        ? templateText.replace(replacerKey, value)
+        : '';
     }
+  }
 
-    return templateText;
+  return templateText;
 }
 
 exports.send = send;

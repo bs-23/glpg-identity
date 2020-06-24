@@ -3,8 +3,6 @@ const jwt = require('jsonwebtoken');
 const User = require('./user.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
-const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service.js'));
-
 function generateAccessToken(user) {
     return jwt.sign({
         id: user.id,
@@ -134,27 +132,6 @@ async function getUsers(req, res) {
     }
 }
 
-async function sendEmail(req, res) {
-    try {
-        const options = {
-            templateName: 'test-template',
-            from: "faisal.amin@bs-23.com",
-            to: "faisal.amin.cste@gmail.com",
-            subject: 'Hello, from nodemailer',
-            replacer: {
-                param1: '1111111',
-                param2: '22222222',
-                param3: '333333333'
-            }
-        };
-
-        await emailService.send(options);
-        res.json('Email sent.');
-    } catch (error) {
-        res.status(500).send(error);
-    }
-}
-
 exports.login = login;
 exports.logout = logout;
 exports.createUser = createUser;
@@ -162,4 +139,3 @@ exports.getSignedInUserProfile = getSignedInUserProfile;
 exports.changePassword = changePassword;
 exports.deleteUser = deleteUser;
 exports.getUsers = getUsers;
-exports.sendEmail = sendEmail;
