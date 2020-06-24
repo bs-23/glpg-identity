@@ -1,3 +1,4 @@
+@import url('https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
 .invalid-feedback {
     display: block;
 }
@@ -13,4 +14,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.fa-xs {
+    font-size: .65em;
 }
