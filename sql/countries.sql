@@ -4,14 +4,14 @@
 
 CREATE TABLE ciam.countries
 (
-    id uuid NOT NULL,
-    name character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    country_iso2 character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    country_iso3 character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    codebase character varying(255) COLLATE pg_catalog."default",
-    created_at timestamp with time zone NOT NULL,
-    updated_at timestamp with time zone NOT NULL,
-    CONSTRAINT countries_pkey PRIMARY KEY (id)
+    CountryID integer NOT NULL,
+    CountryName character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    Country_IS02 character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    Country_IS03 character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    CodBase character varying(255) COLLATE pg_catalog."default",
+    Created_At timestamp with time zone NOT NULL,
+    Updated_At timestamp with time zone NOT NULL,
+    CONSTRAINT countries_pkey PRIMARY KEY (CountryID)
 )
 
 TABLESPACE pg_default;
