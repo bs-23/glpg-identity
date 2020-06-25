@@ -1,0 +1,16 @@
+version: 0.2
+
+env:
+    parameter-store:
+        SONARQUBE_TOKEN: "dbb5b6ad0bba077ab93a4f36ba860d48c84eb1a7"
+        SONARQUBE_ENDPOINT: "http://104.197.180.5:9000"
+
+phases:
+    install:
+        commands:
+            - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-3.3.0.1492-linux.zip
+            - unzip sonar-scanner-cli-3.3.0.1492-linux.zip
+            - export PATH=$PATH:./sonar-scanner-3.3.0.1492-linux/bin/
+    build:
+        commands:
+            - sonar-scanner

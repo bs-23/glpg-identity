@@ -16,6 +16,16 @@
     justify-content: center;
 }
 
+.app__content {
+    flex: 1;
+    display: flex;
+    position: relative;
+}
+
+.bg-success {
+    background: #144D44 !important;
+}
+
 .fa-xs {
     font-size: .65em;
 }
