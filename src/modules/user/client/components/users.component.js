@@ -57,7 +57,7 @@ export default function Users() {
                                                 <td>{row.name}</td>
                                                 <td>{row.email}</td>
                                                 <td>{row.phone}</td>
-                                                <td>{row.client_id}</td>
+                                                <td>{row.application_id}</td>
                                                 <td><a onClick={() => onDeleteUser(row.id)} href="#">Delete</a></td>
                                             </tr>
                                         ))}

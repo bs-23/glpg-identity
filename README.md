@@ -15,8 +15,8 @@
 ```bash
 PORT=5050
 TOKEN_SECRET=<auth_token_secret>
-POSTGRES_URL=<postgresql_connection_string>
-POSTGRES_DATABASE=<database_name>
+POSTGRES_CDP_URL=<postgresql_connection_string>
+POSTGRES_CDP_DATABASE=<database_name>
 AWS_ACCESS_KEY_ID=<aws_access_key_id>
 AWS_SECRET_ACCESS_KEY=<aws_secret_access_key>
 AWS_REGION=<aws_region>
@@ -31,6 +31,6 @@ $ yarn install          # install dependencies
 $ yarn seed             # generate required database schemas
 $ yarn start            # development build
 $ yarn production       # production build
-$ yarn test             # rununit tests
+$ yarn test             # run unit tests
 $ yarn sonarqube        # run sonarqube analysis
 ```

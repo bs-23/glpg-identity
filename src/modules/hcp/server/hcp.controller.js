@@ -1,11 +1,10 @@
-const Hcp = require('./hcp.model');
+const Hcp = require('./hcp_profile.model');
 
 async function getHcps(req, res) {
     const page = req.query.page - 1;
     const limit = 10;
     let is_active = req.query.is_active === 'null' ? null : req.query.is_active;
     const offset = page * limit;
-
 
     try {
         const hcps = await Hcp.findAll({
@@ -16,7 +15,9 @@ async function getHcps(req, res) {
             offset: offset, limit: limit,
             order: [['id', 'DESC']]
         });
+
         const totalUser = await Hcp.count();
+
         const data = {
             users: hcps,
             page: page + 1,
@@ -25,7 +26,6 @@ async function getHcps(req, res) {
             start: limit * page + 1,
             end: ((offset + limit) > totalUser) ? totalUser : (offset + limit),
             is_active: is_active
-
         }
 
         res.json(data);

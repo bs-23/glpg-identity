@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const { DataTypes } = require("sequelize");
 const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequelize"));
 
-const Hcp = sequelize.define("hcp_profiles", {
+const HcpProfile = sequelize.cdpConnector.define("hcp_profiles", {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -13,6 +13,10 @@ const Hcp = sequelize.define("hcp_profiles", {
     application_id: {
         allowNull: false,
         type: DataTypes.UUID
+    },
+    uuid: {
+        unique: true,
+        type: DataTypes.STRING
     },
     first_name: {
         allowNull: false,
@@ -40,10 +44,6 @@ const Hcp = sequelize.define("hcp_profiles", {
         type: DataTypes.BOOLEAN,
         defaultValue: false
     },
-    one_key_id: {
-        allowNull: false,
-        type: DataTypes.STRING
-    },
     created_by: {
         type: DataTypes.UUID
     },
@@ -58,8 +58,8 @@ const Hcp = sequelize.define("hcp_profiles", {
     updatedAt: "updated_at"
 });
 
-Hcp.prototype.validPassword = function (password) {
+HcpProfile.prototype.validPassword = function (password) {
     return bcrypt.compareSync(password, this.password);
 };
 
-module.exports = Hcp;
+module.exports = HcpProfile;

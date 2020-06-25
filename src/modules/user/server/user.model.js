@@ -4,7 +4,7 @@ const { DataTypes } = require('sequelize');
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 
-const User = sequelize.define('user', {
+const User = sequelize.cdpConnector.define('users', {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -14,12 +14,12 @@ const User = sequelize.define('user', {
             isUUID: 4
         }
     },
-    client_id: {
+    application_id: {
         type: DataTypes.UUID,
         validate: {
             customValidator(value) {
                 if (value === null && this.type !== 'admin') {
-                    throw new Error("client_id is required for basic user");
+                    throw new Error("application_id is required for basic user");
                 }
             }
         }

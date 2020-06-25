@@ -4,13 +4,13 @@ const jwt = require("jsonwebtoken");
 process.env.TOKEN_SECRET = "super-secret-private-key";
 const defaultUserId = "ce2f07f9-c40b-43b8-8200-124de9fc2e46";
 const defaultAdminId = "f29b63e5-36c7-4210-a5a8-c1e9d0c5b9e4";
-const defaultClientId = "9017a1ee-3391-40a0-ad50-70bc7f1657f0";
+const defaultApplicationId = "9017a1ee-3391-40a0-ad50-70bc7f1657f0";
 
 module.exports = {
-    defaultClient: {
-        id: defaultClientId,
+    defaultApplication: {
+        id: defaultApplicationId,
         name: faker.company.companyName(),
-        email: "default-client@cdp.com",
+        email: "hcp-portal@glpg.com",
         password: faker.internet.password(8),
         created_by: defaultAdminId,
         updated_by: defaultAdminId,
@@ -31,7 +31,7 @@ module.exports = {
         },
         defaultUser: {
             id: defaultUserId,
-            client_id: defaultClientId,
+            application_id: defaultApplicationId,
             name: "Default User",
             email: "default-user@cdp.com",
             password: "strong-password",
@@ -43,6 +43,5 @@ module.exports = {
                 email: "default-user@cdp.com",
             }, process.env.TOKEN_SECRET, { expiresIn: "2d", issuer: defaultUserId })
         }
-    },
-    countries: [{ "name": "Belgium", "country_iso2": "BE", "country_iso3": "BEL", "codebase": "WBE" }]
+    }
 };

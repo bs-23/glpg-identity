@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const { DataTypes } = require("sequelize");
 const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequelize"));
 
-const Client = sequelize.define("client", {
+const Application = sequelize.cdpConnector.define("applications", {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -40,14 +40,14 @@ const Client = sequelize.define("client", {
     }
 }, {
     schema: "ciam",
-    tableName: "clients",
+    tableName: "applications",
     timestamps: true,
     createdAt: "created_at",
     updatedAt: "updated_at"
 });
 
-Client.prototype.validPassword = function (password) {
+Application.prototype.validPassword = function (password) {
     return bcrypt.compareSync(password, this.password);
 };
 
-module.exports = Client;
+module.exports = Application;

@@ -1,11 +1,13 @@
-const Country = require('./country.model');
+const path = require('path');
+const { QueryTypes } = require('sequelize');
+const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 
 async function getCountries(req, res) {
     try {
-        const countries = await Country.findAll();
+        const countries = await sequelize.datasyncConnector.query("SELECT * FROM datasync.countries", { type: QueryTypes.SELECT });
         res.json(countries);
-    } catch (error) {
-        console.log(error);
+    } catch (err) {
+        res.status(500).send(err);
     }
 }
 

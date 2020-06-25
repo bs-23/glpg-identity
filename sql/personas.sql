@@ -15,8 +15,3 @@ CREATE TABLE ciam.personas
     updated_date time with time zone NOT NULL,
     CONSTRAINT personas_pkey PRIMARY KEY (id)
 )
-
-TABLESPACE pg_default;
-
-ALTER TABLE ciam.personas
-    OWNER to postgres;
