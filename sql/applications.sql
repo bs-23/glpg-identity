@@ -1,8 +1,8 @@
--- Table: ciam.clients
+-- Table: ciam.applications
 
--- DROP TABLE ciam.clients;
+-- DROP TABLE ciam.applications;
 
-CREATE TABLE ciam.clients
+CREATE TABLE ciam.applications
 (
     id uuid NOT NULL,
     name character varying(255) COLLATE pg_catalog."default" NOT NULL,
@@ -13,11 +13,6 @@ CREATE TABLE ciam.clients
     updated_by uuid,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
-    CONSTRAINT clients_pkey PRIMARY KEY (id),
-    CONSTRAINT clients_email_key UNIQUE (email)
+    CONSTRAINT applications_pkey PRIMARY KEY (id),
+    CONSTRAINT applications_email_key UNIQUE (email)
 )
-
-TABLESPACE pg_default;
-
-ALTER TABLE ciam.clients
-    OWNER to postgres;

@@ -17,7 +17,7 @@ const secretsManager = require(path.join(process.cwd(), 'src/config/server/lib/s
         serverUrl: nodecache.getValue('SONARQUBE_URL'),
         token: nodecache.getValue('SONARQUBE_TOKEN'),
         options: {
-            'sonar.sources': 'src/modules/core/server, src/modules/user/server',
+            'sonar.sources': 'src/modules/core/server, src/modules/user/server, src/modules/hcp/server',
             'sonar.tests': 'tests',
             'sonar.inclusions': '**',
             'sonar.test.inclusions': 'tests/**/*.spec.js',

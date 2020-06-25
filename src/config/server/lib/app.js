@@ -1,6 +1,4 @@
 module.exports.start = async function() {
-    require('dotenv').config();
-
     const app = await require('./express')();
 
     app.listen(app.get('port'), function() {

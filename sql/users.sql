@@ -5,9 +5,6 @@
 CREATE TYPE ciam.enum_users_type AS ENUM
     ('admin', 'basic');
 
-ALTER TYPE ciam.enum_users_type
-    OWNER TO postgres;
-
 -- Table: ciam.users
 
 -- DROP TABLE ciam.users;
@@ -15,7 +12,7 @@ ALTER TYPE ciam.enum_users_type
 CREATE TABLE ciam.users
 (
     id uuid NOT NULL,
-    client_id uuid,
+    application_id uuid,
     name character varying(255) COLLATE pg_catalog."default" NOT NULL,
     email character varying(255) COLLATE pg_catalog."default" NOT NULL,
     password character varying(255) COLLATE pg_catalog."default",
@@ -30,8 +27,3 @@ CREATE TABLE ciam.users
     CONSTRAINT users_pkey PRIMARY KEY (id),
     CONSTRAINT users_email_key UNIQUE (email)
 )
-
-TABLESPACE pg_default;
-
-ALTER TABLE ciam.users
-    OWNER to postgres;

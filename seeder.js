@@ -4,15 +4,26 @@ const async = require("async");
 async function init() {
     require("dotenv").config();
 
-    const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequelize"));
-    await sequelize.query("CREATE SCHEMA IF NOT EXISTS ciam");
+    const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
+    const secretsManager = require(path.join(process.cwd(), 'src/config/server/lib/secrets-manager'));
 
-    const Client = require(path.join(process.cwd(), "src/modules/core/server/client.model"));
+    const secrets = await secretsManager.getSecrets();
+
+    for (const key in secrets) {
+        if(secrets.hasOwnProperty(key)) {
+            nodecache.setValue(key, secrets[key]);
+        }
+    }
+
+    const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
+
+    await sequelize.cdpConnector.query("CREATE SCHEMA IF NOT EXISTS ciam");
+
+    const Application = require(path.join(process.cwd(), "src/modules/core/server/application.model"));
     const User = require(path.join(process.cwd(), "src/modules/user/server/user.model"));
-    const Country = require(path.join(process.cwd(), "src/modules/core/server/country/country.model"));
-    const HCP = require(path.join(process.cwd(), "src/modules/hcp/server/hcp.model"));
+    const HCP = require(path.join(process.cwd(), "src/modules/hcp/server/hcp_profile.model"));
 
-    await sequelize.sync();
+    await sequelize.cdpConnector.sync();
 
     function tempHcpsSeeder(callback) {
         const hcpUsers = [
@@ -20,21 +31,7 @@ async function init() {
             { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john2", "last_name": "doe", "email": "abc2@gmail.com", "password": "strong-password", "phone": "12345567", "one_key_id": "ABCD12345", "is_active": false },
             { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john3", "last_name": "doe", "email": "abc3@gmail.com", "password": "strong-password", "phone": "12345567", "one_key_id": "ABCD12345", "is_active": true },
             { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john4", "last_name": "doe", "email": "abc4@gmail.com", "password": "strong-password", "phone": "12345567", "one_key_id": "ABCD12345", "is_active": false },
-            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john5", "last_name": "doe", "email": "abc5@gmail.com", "password": "strong-password", "phone": "12345567", "one_key_id": "ABCD12345", "is_active": true },
-            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john6", "last_name": "doe", "email": "abc6@gmail.com", "password": "strong-password", "phone": "12345567", "one_key_id": "ABCD12345", "is_active": true },
-            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john7", "last_name": "doe", "email": "abc7@gmail.com", "password": "strong-password", "phone": "12345567", "one_key_id": "ABCD12345", "is_active": true },
-            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john8", "last_name": "doe", "email": "abc8@gmail.com", "password": "strong-password", "phone": "12345567", "one_key_id": "ABCD12345", "is_active": false },
-            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john9", "last_name": "doe", "email": "abc9@gmail.com", "password": "strong-password", "phone": "12345567", "one_key_id": "ABCD12345", "is_active": true },
-            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john10", "last_name": "doe", "email": "abc10@gmail.com", "password": "strong-password", "phone": "12345567", "one_key_id": "ABCD12345", "is_active": true },
-            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john11", "last_name": "doe", "email": "abc11@gmail.com", "password": "strong-password", "phone": "12345567", "one_key_id": "ABCD12345", "is_active": false },
-            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john12", "last_name": "doe", "email": "abc12@gmail.com", "password": "strong-password", "phone": "12345567", "one_key_id": "ABCD12345", "is_active": true },
-            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john13", "last_name": "doe", "email": "abc13@gmail.com", "password": "strong-password", "phone": "12345567", "one_key_id": "ABCD12345", "is_active": true },
-            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john14", "last_name": "doe", "email": "abc14@gmail.com", "password": "strong-password", "phone": "12345567", "one_key_id": "ABCD12345", "is_active": true },
-            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john15", "last_name": "doe", "email": "abc15@gmail.com", "password": "strong-password", "phone": "12345567", "one_key_id": "ABCD12345", "is_active": true },
-            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john16", "last_name": "doe", "email": "abc16@gmail.com", "password": "strong-password", "phone": "12345567", "one_key_id": "ABCD12345", "is_active": false },
-            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john17", "last_name": "doe", "email": "abc17@gmail.com", "password": "strong-password", "phone": "12345567", "one_key_id": "ABCD12345", "is_active": true },
-            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john18", "last_name": "doe", "email": "abc18@gmail.com", "password": "strong-password", "phone": "12345567", "one_key_id": "ABCD12345", "is_active": true },
-            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john19", "last_name": "doe", "email": "abc19@gmail.com", "password": "strong-password", "phone": "12345567", "one_key_id": "ABCD12345", "is_active": false }
+            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john5", "last_name": "doe", "email": "abc5@gmail.com", "password": "strong-password", "phone": "12345567", "one_key_id": "ABCD12345", "is_active": true }
         ];
 
         HCP.destroy({ truncate: true }).then(() => {
@@ -47,11 +44,10 @@ async function init() {
         });
     }
 
-
-    function clientSeeder(callback) {
-        Client.findOrCreate({
-            where: { email: "service.hcp@glpg-hcp.com" }, defaults: {
-                name: "AEM HCP Portal Service User",
+    function applicationSeeder(callback) {
+        Application.findOrCreate({
+            where: { email: "hcp-portal@glpg.com" }, defaults: {
+                name: "Authoring Experience Service Account",
                 password: "temporary-password"
             }
         }).then(function () {
@@ -71,28 +67,7 @@ async function init() {
         });
     }
 
-    // function countriesSeeder(callback) {
-    //     const countries = [
-    //         { "name": "Belgium", "country_iso2": "BE", "country_iso3": "BEL", "codebase": "WBE" },
-    //         { "name": "France", "country_iso2": "FR", "country_iso3": "FRA", "codebase": "WFR" },
-    //         { "name": "Germany", "country_iso2": "DE", "country_iso3": "DEU", "codebase": "WDE" },
-    //         { "name": "Italy", "country_iso2": "IT", "country_iso3": "ITA", "codebase": "WIT" },
-    //         { "name": "Netherlands", "country_iso2": "NL", "country_iso3": "NLD", "codebase": "WNL" },
-    //         { "name": "Spain", "country_iso2": "ES", "country_iso3": "ESP", "codebase": "WES" },
-    //         { "name": "United Kingdom", "country_iso2": "GB", "country_iso3": "GBR", "codebase": "WUK" }
-    //     ];
-
-    //     Country.destroy({ truncate: true }).then(() => {
-    //         Country.bulkCreate(countries, {
-    //             returning: true,
-    //             ignoreDuplicates: false
-    //         }).then(function () {
-    //             callback();
-    //         });
-    //     });
-    // }
-
-    async.waterfall([clientSeeder, userSeeder, tempHcpsSeeder], function (err) {
+    async.waterfall([applicationSeeder, userSeeder, tempHcpsSeeder], function (err) {
         if (err) console.error(err);
         else console.info("DB seed completed!");
         process.exit();

@@ -4,10 +4,7 @@ const supertest = require('supertest');
 
 const app = require(path.join(process.cwd(), 'src/config/server/lib/express'));
 
-const User = require(path.join(
-    process.cwd(),
-    'src/modules/user/server/user.model'
-));
+const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
 
 const specHelper = require(path.join(process.cwd(), 'jest/spec.helper'));
 const { defaultAdmin, defaultUser } = specHelper.users;
@@ -36,9 +33,7 @@ describe('User Routes', () => {
         });
 
         expect(response.statusCode).toBe(200);
-        expect(response.res.headers['content-type']).toMatch(
-            'application/json'
-        );
+        expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
     it('Should get the signed in user profile', async () => {
@@ -47,9 +42,7 @@ describe('User Routes', () => {
             .set('Cookie', [`access_token=${defaultUser.access_token}`]);
 
         expect(response.statusCode).toBe(200);
-        expect(response.res.headers['content-type']).toMatch(
-            'application/json'
-        );
+        expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
     it('Should create new user', async () => {
@@ -60,13 +53,11 @@ describe('User Routes', () => {
                 name: faker.name.firstName(),
                 email: faker.internet.email(),
                 password: faker.internet.password(8),
-                client_id: specHelper.defaultClient.id,
+                application_id: specHelper.defaultApplication.id,
             });
 
         expect(response.statusCode).toBe(200);
-        expect(response.res.headers['content-type']).toMatch(
-            'application/json'
-        );
+        expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
     it('Should get an error when creating new user with duplicate email', async () => {
@@ -106,9 +97,7 @@ describe('User Routes', () => {
             });
 
         expect(response.statusCode).toBe(200);
-        expect(response.res.headers['content-type']).toMatch(
-            'application/json'
-        );
+        expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
     it('should return all CDP users', async () => {
@@ -127,7 +116,7 @@ describe('User Routes', () => {
             name: faker.name.firstName(),
             email: faker.internet.email(),
             password: faker.internet.password(8),
-            client_id: specHelper.defaultClient.id,
+            application_id: specHelper.defaultApplication.id,
         });
 
         const response = await request

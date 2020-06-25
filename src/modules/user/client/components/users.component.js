@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux';
 import { NavLink } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { getUsers, deleteUser } from '../user.actions';
 
@@ -59,7 +59,7 @@ export default function Users() {
                                             <td>{row.name}</td>
                                             <td>{row.email}</td>
                                             <td>{row.phone}</td>
-                                            <td>{row.client_id}</td>
+                                            <td>{row.application_id}</td>
                                             <td><a onClick={() => onDeleteUser(row.id)} href="#">Delete</a></td>
                                         </tr>
                                     ))}

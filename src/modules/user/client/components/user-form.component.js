@@ -61,7 +61,6 @@ export default function UserForm() {
                                         validationSchema={registerSchema}
                                         onSubmit={(values, actions) => {
                                             dispatch(createUser(values));
-
                                             actions.resetForm();
                                             actions.setSubmitting(false);
                                         }}
@@ -83,7 +82,7 @@ export default function UserForm() {
                                                 <div className="form-group">
                                                     <label htmlFor="country">Select Countries:</label>
                                                     <Field data-testid="country" as="select" name="countries" className="form-control" multiple>
-                                                        {countries.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
+                                                        {countries.map(item => <option key={item.countryid} value={item.countryid}>{item.countryname}</option>)}
                                                     </Field>
                                                 </div>
                                                 <div className="form-group">

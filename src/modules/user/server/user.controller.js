@@ -61,7 +61,7 @@ async function createUser(req, res) {
         phone,
         countries,
         permissions,
-        client_id
+        application_id
     } = req.body;
 
     try {
@@ -73,9 +73,9 @@ async function createUser(req, res) {
                 phone,
                 countries,
                 permissions,
+                application_id,
                 created_by: req.user.id,
-                updated_by: req.user.id,
-                client_id
+                updated_by: req.user.id
             }
         });
 

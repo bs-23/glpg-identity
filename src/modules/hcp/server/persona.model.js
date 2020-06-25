@@ -2,7 +2,7 @@ const path = require("path");
 const { DataTypes } = require("sequelize");
 const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequelize"));
 
-const Persona = sequelize.define("personas", {
+const Persona = sequelize.cdpConnector.define("personas", {
     id: {
         allowNull: false,
         primaryKey: true,

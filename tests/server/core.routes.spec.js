@@ -20,12 +20,10 @@ describe('Core Routes', () => {
         expect(response.res.headers['content-type']).toMatch('text/html');
     });
 
-    it('should return all available countries', async () => {
+    it('Should return all available countries', async () => {
         const response = await request
             .get('/api/countries')
-            .set('Cookie', [
-                `access_token=${specHelper.users.defaultAdmin.access_token}`,
-            ]);
+            .set('Cookie', [`access_token=${specHelper.users.defaultAdmin.access_token}`]);
 
         expect(response.statusCode).toBe(200);
     });
