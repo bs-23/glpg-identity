@@ -10,25 +10,26 @@ export default function Dashboard() {
                 <div className="row h-100">
                     <div className="col-12 col-sm-8 col-md-9">
                         <h2 className="mt-5">
-                            Dashboard {' '}
+                           Category of Services
                         </h2>
                         <div>
                             <div className="d-flex flex-wrap">
-                                <NavLink to="/users" className="p-5 border shadow-sm m-2 h4 pb-0 mb-0">
-                                    CDP Users
-                                </NavLink>
-                                <NavLink to="" className="p-5 border shadow-sm m-2 h4 pb-0 mb-0 text-muted text-decoration-none">
-                                    Forms Management
-                                </NavLink>
-                                <NavLink to="" className="p-5 border shadow-sm m-2 h4 pb-0 mb-0 text-muted text-decoration-none">
-                                    Tag and Persona Management
-                                </NavLink>
                                 <NavLink to="/hcps" className="p-5 border shadow-sm m-2 h4 pb-0 mb-0">
-                                    HCP Profiles
+                                    Information Management
                                 </NavLink>
                                 <NavLink to="" className="p-5 border shadow-sm m-2 h4 pb-0 mb-0 text-muted text-decoration-none">
-                                    Campaign Management
+                                    Marketing & Promotion Management
                                 </NavLink>
+                                <NavLink to="/users" className="p-5 border shadow-sm m-2 h4 pb-0 mb-0">
+                                    User Management
+                                </NavLink>
+                                <NavLink to="" className="p-5 border shadow-sm m-2 h4 pb-0 mb-0 text-muted text-decoration-none">
+                                    Sample Request Management
+                                </NavLink>
+                                <NavLink to="" className="p-5 border shadow-sm m-2 h4 pb-0 mb-0 text-muted text-decoration-none">
+                                    Tag & Persona Management
+                                </NavLink>
+                               
                             </div>
                         </div>
                     </div>

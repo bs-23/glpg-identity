@@ -18,11 +18,11 @@ export default function Navbar() {
                                     Service
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
-                                    <LinkContainer to="users"><Dropdown.Item>CDP Users</Dropdown.Item></LinkContainer>
-                                    <LinkContainer to="#"><Dropdown.Item>Forms Management</Dropdown.Item></LinkContainer>
-                                    <LinkContainer to="#"><Dropdown.Item>Tag and Persona Management</Dropdown.Item></LinkContainer>
-                                    <LinkContainer to="hcps"><Dropdown.Item>HCP Profiles</Dropdown.Item></LinkContainer>
-                                    <LinkContainer to="#"><Dropdown.Item>Campaign Management</Dropdown.Item></LinkContainer>
+                                    <LinkContainer to="hcps"><Dropdown.Item>Information Management</Dropdown.Item></LinkContainer>
+                                    <LinkContainer to="#"><Dropdown.Item>Marketing & Promotion Management</Dropdown.Item></LinkContainer>
+                                    <LinkContainer to="users"><Dropdown.Item>User Management</Dropdown.Item></LinkContainer>
+                                    <LinkContainer to="#"><Dropdown.Item>Sample Request Management</Dropdown.Item></LinkContainer>
+                                    <LinkContainer to="#"><Dropdown.Item>Tag & Persona Management</Dropdown.Item></LinkContainer>
                                 </Dropdown.Menu>
                             </Dropdown>
                         </div>
