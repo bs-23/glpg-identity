@@ -6,6 +6,9 @@ const nodecache = require("./nodecache");
 const cookieParser = require("cookie-parser");
 const secretsManager = require('./secrets-manager');
 
+const swagger = require('./swagger/swagger');
+const swaggerUi = require("swagger-ui-express");
+
 module.exports = async function () {
     let app = express();
 
@@ -13,6 +16,8 @@ module.exports = async function () {
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
     app.use(express.static(path.join(process.cwd(), "wwwroot")));
+
+    app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swagger.specs));
 
     app.engine("html", hbs.express4({ extname: ".html" }));
     app.set("view engine", "html");
