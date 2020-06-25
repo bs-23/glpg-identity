@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const { DataTypes } = require("sequelize");
 const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequelize"));
 
-const Hcp = sequelize.define("hcps", {
+const Hcp = sequelize.define("hcp_profiles", {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -52,7 +52,7 @@ const Hcp = sequelize.define("hcps", {
     }
 }, {
     schema: "ciam",
-    tableName: "hcps",
+    tableName: "hcp_profiles",
     timestamps: true,
     createdAt: "created_at",
     updatedAt: "updated_at"

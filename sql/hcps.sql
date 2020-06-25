@@ -1,8 +1,8 @@
--- Table: ciam.hcps
+-- Table: ciam.hcp_profiles
 
--- DROP TABLE ciam.hcps;
+-- DROP TABLE ciam.hcp_profiles;
 
-CREATE TABLE ciam.hcps
+CREATE TABLE ciam.hcp_profiles
 (
     id uuid NOT NULL,
     application_id uuid NOT NULL,
@@ -17,10 +17,10 @@ CREATE TABLE ciam.hcps
     updated_by uuid,
     created_at time with time zone NOT NULL,
     updated_at time with time zone NOT NULL,
-    CONSTRAINT hcps_pkey PRIMARY KEY (id)
+    CONSTRAINT hcp_profiles_pkey PRIMARY KEY (id)
 )
 
 TABLESPACE pg_default;
 
-ALTER TABLE ciam.hcps
+ALTER TABLE ciam.hcp_profiles
     OWNER to postgres;
