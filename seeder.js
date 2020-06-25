@@ -4,7 +4,19 @@ const async = require("async");
 async function init() {
     require("dotenv").config();
 
-    const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequelize"));
+    const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
+    const secretsManager = require(path.join(process.cwd(), 'src/config/server/lib/secrets-manager'));
+
+    const secrets = await secretsManager.getSecrets();
+
+    for (const key in secrets) {
+        if(secrets.hasOwnProperty(key)) {
+            nodecache.setValue(key, secrets[key]);
+        }
+    }
+
+    const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
+
     await sequelize.cdpConnector.query("CREATE SCHEMA IF NOT EXISTS ciam");
 
     const Application = require(path.join(process.cwd(), "src/modules/core/server/application.model"));
