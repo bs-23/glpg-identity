@@ -5,7 +5,6 @@ const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodeca
 const region = nodecache.getValue('AWS_REGION');
 const SES = new AWS.SES({ region });
 
-// Set the region
 AWS.config.update({
   accessKeyId: nodecache.getValue('AWS_ACCESS_KEY_ID'),
   secretAccessKey: nodecache.getValue('AWS_SECRET_ACCESS_KEY'),
