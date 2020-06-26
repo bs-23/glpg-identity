@@ -4,6 +4,7 @@ import { NavLink } from 'react-router-dom';
 import { getHcpProfiles, editHcpProfiles, hcpsSort } from '../hcp.actions';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { LinkContainer } from 'react-router-bootstrap';
+import "./hcp.scss";
 
 export default function hcps() {
     const dispatch = useDispatch();
@@ -118,7 +119,7 @@ export default function hcps() {
                                                 <th>Email<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'email')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'email')}></i></span></th>
                                                 <th>Lastname<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'last_name')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'last_name')}></i></span></th>
                                                 <th>Phone<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'phone')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'phone')}></i></span></th>
-                                                <th>UUID & one key ID<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'one_key_id')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'one_key_id')}></i></span></th>
+                                                <th>UUID & one key ID<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'uuid')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'uuid')}></i></span></th>
                                                 <th>Status<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'is_active')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'is_active')}></i></span></th>
                                                 <th>Action</th>
                                                 <th></th>
@@ -133,7 +134,7 @@ export default function hcps() {
                                                             <td><input type="text" className="bg-secondary" value={row.email} readOnly /></td>
                                                             <td><input type="text" value={state.last_name} onChange={e => handleChange(e, index, 'last_name')} /></td>
                                                             <td><input type="text" value={state.phone} onChange={e => handleChange(e, index, 'phone')} /></td>
-                                                            <td><input type="text" className="bg-secondary" value={row.one_key_id} readOnly /></td>
+                                                            <td><input type="text" className="bg-secondary" value={row.uuid} readOnly /></td>
                                                         </React.Fragment>
                                                         :
 
@@ -142,7 +143,7 @@ export default function hcps() {
                                                             <td>{row.email}</td>
                                                             <td>{row.last_name}</td>
                                                             <td>{row.phone}</td>
-                                                            <td>{row.one_key_id}</td>
+                                                            <td>{row.uuid}</td>
                                                         </React.Fragment>
 
                                                     }
@@ -157,7 +158,7 @@ export default function hcps() {
                                                                 <i className="fa fa-check text-success px-2" onClick={() => handleSubmit(row.id)}></i>
                                                                 <i className="fa fa-times text-danger px-2" onClick={() => removeItem()}></i>
                                                             </React.Fragment> :
-                                                            <span><i className="fa fa-pencil px-2" onClick={() => addItem('id' + index, row)}></i></span>
+                                                            <span><i className="fas fa-pencil-alt px-2" onClick={() => addItem('id' + index, row)}></i></span>
 
                                                         }
                                                     </td>

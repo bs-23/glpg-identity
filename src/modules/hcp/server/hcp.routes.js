@@ -7,4 +7,10 @@ module.exports = app => {
 
     app.route('/api/hcps/:id')
         .put(passport.authenticate('user-jwt', { session: false }), controller.editHcp);
+
+    app.route('/api/hcpsProfile')
+        .get(passport.authenticate('user-jwt', { session: false }), controller.getHcpsById);
+
+    app.route('/api/resetHcpsPassword')
+        .post(passport.authenticate('user-jwt', { session: false }), controller.resetHcpPassword);
 };

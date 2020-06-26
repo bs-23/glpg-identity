@@ -10,7 +10,7 @@ async function init() {
     const secrets = await secretsManager.getSecrets();
 
     for (const key in secrets) {
-        if(secrets.hasOwnProperty(key)) {
+        if (secrets.hasOwnProperty(key)) {
             nodecache.setValue(key, secrets[key]);
         }
     }
@@ -27,11 +27,11 @@ async function init() {
 
     function tempHcpsSeeder(callback) {
         const hcpUsers = [
-            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john1", "last_name": "doe", "email": "abc1@gmail.com", "password": "strong-password", "phone": "12345567", "one_key_id": "ABCD12345", "is_active": true },
-            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john2", "last_name": "doe", "email": "abc2@gmail.com", "password": "strong-password", "phone": "12345567", "one_key_id": "ABCD12345", "is_active": false },
-            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john3", "last_name": "doe", "email": "abc3@gmail.com", "password": "strong-password", "phone": "12345567", "one_key_id": "ABCD12345", "is_active": true },
-            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john4", "last_name": "doe", "email": "abc4@gmail.com", "password": "strong-password", "phone": "12345567", "one_key_id": "ABCD12345", "is_active": false },
-            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john5", "last_name": "doe", "email": "abc5@gmail.com", "password": "strong-password", "phone": "12345567", "one_key_id": "ABCD12345", "is_active": true }
+            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john1", "last_name": "doe", "email": "abc1@gmail.com", "password": "strong-password", "phone": "12345567", "uuid": "ABCD123451", "is_active": true },
+            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john2", "last_name": "doe", "email": "abc2@gmail.com", "password": "strong-password", "phone": "12345567", "uuid": "ABCD123452", "is_active": false },
+            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john3", "last_name": "doe", "email": "abc3@gmail.com", "password": "strong-password", "phone": "12345567", "uuid": "ABCD123453", "is_active": true },
+            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john4", "last_name": "doe", "email": "abc4@gmail.com", "password": "strong-password", "phone": "12345567", "uuid": "ABCD123454", "is_active": false },
+            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john5", "last_name": "doe", "email": "abc5@gmail.com", "password": "strong-password", "phone": "12345567", "uuid": "ABCD123455", "is_active": true }
         ];
 
         HCP.destroy({ truncate: true }).then(() => {

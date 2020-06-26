@@ -31,3 +31,6 @@ $ yarn production       # production build
 $ yarn test             # run unit tests
 $ yarn sonarqube        # run sonarqube analysis
 ```
+
+## API Documentation
+Go to `/api-docs` for Swagger Documentation of the API.
