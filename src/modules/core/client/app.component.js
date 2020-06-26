@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { Switch, Route } from "react-router-dom";
 
 import "bootstrap/scss/bootstrap";
+import "@fortawesome/fontawesome-free/css/all.css";
 import "./app.scss";
 
 import NoMatch from "./NoMatch";

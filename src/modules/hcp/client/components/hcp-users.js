@@ -157,7 +157,7 @@ export default function hcps() {
                                                                 <i className="fa fa-check text-success px-2" onClick={() => handleSubmit(row.id)}></i>
                                                                 <i className="fa fa-times text-danger px-2" onClick={() => removeItem()}></i>
                                                             </React.Fragment> :
-                                                            <span><i className="fa fa-pencil px-2" onClick={() => addItem('id' + index, row)}></i></span>
+                                                            <span><i className="fas fa-pencil-alt px-2" onClick={() => addItem('id' + index, row)}></i></span>
 
                                                         }
                                                     </td>
