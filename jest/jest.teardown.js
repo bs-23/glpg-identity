@@ -1,10 +1,12 @@
-module.exports = async function () {
-    require("dotenv").config();
+const path = require('path');
+const config = require(path.join(process.cwd(), 'src/config/server/config'));
 
-    process.env.POSTGRES_DATABASE = "ciam_test";
+module.exports = async function() {
+    await config.initEnvironmentVariables();
 
-    const path = require("path");
-    const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequelize"));
+    process.env.POSTGRES_DATABASE = 'ciam_test';
+
+    const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 
     await sequelize.cdpConnector.query('DROP SCHEMA "ciam" CASCADE');
     await sequelize.cdpConnector.close();

@@ -1,11 +1,13 @@
-module.exports = async () => {
-    require('dotenv').config();
+const path = require('path');
+const config = require(path.join(process.cwd(), 'src/config/server/config'));
 
-    process.env.POSTGRES_DATABASE = 'ciam_test';
+module.exports = async function() {
+    await config.initEnvironmentVariables();
 
-    const path = require('path');
-    const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
+    process.env.POSTGRES_CDP_DATABASE = 'ciam_test';
+
     const specHelper = require(path.join(process.cwd(), 'jest/spec.helper'));
+    const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 
     await sequelize.cdpConnector.query('CREATE SCHEMA IF NOT EXISTS ciam');
     const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));

@@ -1,13 +1,15 @@
 const path = require('path');
 const supertest = require('supertest');
 
-const app = require(path.join(process.cwd(), 'src/config/server/lib/express'));
-
 const specHelper = require(path.join(process.cwd(), 'jest/spec.helper'));
+const app = require(path.join(process.cwd(), 'src/config/server/lib/express'));
 
 let request;
 
 beforeAll(async () => {
+    const config = require(path.join(process.cwd(), 'src/config/server/config'));
+    await config.initEnvironmentVariables();
+
     const appInstance = await app();
     request = supertest(appInstance);
 });
