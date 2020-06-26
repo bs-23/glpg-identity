@@ -2,18 +2,9 @@ const path = require("path");
 const async = require("async");
 
 async function init() {
-    require("dotenv").config();
+    const config = require(path.join(process.cwd(), 'src/config/server/config'));
 
-    const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
-    const secretsManager = require(path.join(process.cwd(), 'src/config/server/lib/secrets-manager'));
-
-    const secrets = await secretsManager.getSecrets();
-
-    for (const key in secrets) {
-        if (secrets.hasOwnProperty(key)) {
-            nodecache.setValue(key, secrets[key]);
-        }
-    }
+    await config.initEnvironmentVariables();
 
     const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 

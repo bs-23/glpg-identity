@@ -7,13 +7,12 @@
 - [PostgreSQL v12.2](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads)
 - [pgAdmin v4](https://www.pgadmin.org/)
 - [Visual Studio Code](https://code.visualstudio.com/)
-- [Sonarqube](https://www.sonarqube.org/)
 
 ## Environment variables for local development
 > Create a .env file and adjust the following environment variables. DONOT include this file in version control.
 
 ```bash
-PORT=5050
+PORT=<express_server_port>
 TOKEN_SECRET=<auth_token_secret>
 POSTGRES_CDP_URL=<postgresql_connection_string>
 POSTGRES_CDP_DATABASE=<database_name>
@@ -21,8 +20,6 @@ AWS_ACCESS_KEY_ID=<aws_access_key_id>
 AWS_SECRET_ACCESS_KEY=<aws_secret_access_key>
 AWS_REGION=<aws_region>
 AWS_SECRET_NAME=<aws_secret_name>
-SONARQUBE_URL=<sonarqube_url>
-SONARQUBE_TOKEN=<sonarqube_token>
 ```
 
 ## Available npm scripts

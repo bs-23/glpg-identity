@@ -37,7 +37,22 @@ let getGlobbedPaths = function (globPatterns, excludes) {
     return output;
 };
 
-function initGlobalConfig() {
+async function initEnvironmentVariables() {
+    require('dotenv').config();
+
+    const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
+    const secretsManager = require(path.join(process.cwd(), 'src/config/server/lib/secrets-manager'));
+
+    const secrets = await secretsManager.getSecrets();
+
+    for (const key in secrets) {
+        if(secrets.hasOwnProperty(key)) {
+            nodecache.setValue(key, secrets[key]);
+        }
+    }
+}
+
+function getGlobalConfig() {
     let defaultAssets = require(path.join(process.cwd(), "src/config/server/assets/default"));
     let environmentAssets = process.env.NODE_ENV === "production" ? require(path.join(process.cwd(), "src/config/server/assets/production")) : {};
 
@@ -57,4 +72,5 @@ function initGlobalConfig() {
     return config;
 }
 
-module.exports = initGlobalConfig();
+exports.getGlobalConfig = getGlobalConfig;
+exports.initEnvironmentVariables = initEnvironmentVariables;

@@ -1,9 +1,11 @@
+const path = require('path');
+const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
+
 exports.config = {
     app_name: ['Customer Data Platform'],
-    license_key: process.env.NEWRELIC_LICENSE_KEY,
+    license_key: nodecache.getValue('NEWRELIC_LICENSE_KEY'),
     logging: {
-        level: 'trace',
-        filepath: './newrelic_agent.log'
+        level: 'info'
     },
     utilization: {
         detect_aws: false,

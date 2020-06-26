@@ -1,17 +1,10 @@
-require('dotenv').config();
 const path = require('path');
 const sonarqubeScanner = require('sonarqube-scanner');
+const config = require(path.join(process.cwd(), 'src/config/server/config'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
-const secretsManager = require(path.join(process.cwd(), 'src/config/server/lib/secrets-manager'));
 
 (async function() {
-    const secrets = await secretsManager.getSecrets();
-
-    for (const key in secrets) {
-        if(secrets.hasOwnProperty(key)) {
-            nodecache.setValue(key, secrets[key]);
-        }
-    }
+    await config.initEnvironmentVariables();
 
     sonarqubeScanner({
         serverUrl: nodecache.getValue('SONARQUBE_URL'),

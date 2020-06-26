@@ -2,16 +2,17 @@ const path = require('path');
 const faker = require('faker');
 const supertest = require('supertest');
 
+const specHelper = require(path.join(process.cwd(), 'jest/spec.helper'));
 const app = require(path.join(process.cwd(), 'src/config/server/lib/express'));
 
-const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
-
-const specHelper = require(path.join(process.cwd(), 'jest/spec.helper'));
 const { defaultAdmin, defaultUser } = specHelper.users;
 
 let request;
 
 beforeAll(async () => {
+    const config = require(path.join(process.cwd(), 'src/config/server/config'));
+    await config.initEnvironmentVariables();
+
     const appInstance = await app();
     request = supertest(appInstance);
 });
@@ -109,6 +110,8 @@ describe('User Routes', () => {
     });
 
     it('Should delete an user', async () => {
+        const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
+
         const id = faker.random.uuid();
 
         await User.create({

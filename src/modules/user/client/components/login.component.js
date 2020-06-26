@@ -5,7 +5,7 @@ import { Form, Formik, Field, ErrorMessage } from "formik";
 import { login } from "../user.actions";
 import { loginSchema } from "../user.schema";
 
-import "./user.scss";
+import "./login.scss";
 
 export default function Login() {
     const dispatch = useDispatch();

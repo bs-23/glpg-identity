@@ -1,10 +1,8 @@
 const path = require("path");
 const hbs = require("express-hbs");
 const express = require("express");
-const config = require("../config")
-const nodecache = require("./nodecache");
+const config = require("../config");
 const cookieParser = require("cookie-parser");
-const secretsManager = require('./secrets-manager');
 
 const swagger = require('./swagger/swagger');
 const swaggerUi = require("swagger-ui-express");
@@ -25,22 +23,16 @@ module.exports = async function () {
 
     app.set("port", process.env.PORT);
 
-    const secrets = await secretsManager.getSecrets();
+    const globalConfig = config.getGlobalConfig();
 
-    for (const key in secrets) {
-        if(secrets.hasOwnProperty(key)) {
-            nodecache.setValue(key, secrets[key]);
-        }
-    }
+    app.locals.jsFiles = globalConfig.client.js;
+    app.locals.cssFiles = globalConfig.client.css;
 
-    app.locals.jsFiles = config.client.js;
-    app.locals.cssFiles = config.client.css;
-
-    config.server.routes.forEach(function (routePath) {
+    globalConfig.server.routes.forEach(function (routePath) {
         require(path.resolve(routePath))(app);
     });
 
-    config.server.strategies.forEach(function (strategy) {
+    globalConfig.server.strategies.forEach(function (strategy) {
         require(path.resolve(strategy))();
     });
 
