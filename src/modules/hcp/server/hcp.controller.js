@@ -13,7 +13,7 @@ async function getHcps(req, res) {
             },
             attributes: { exclude: ['password'] },
             offset: offset, limit: limit,
-            order: [['id', 'DESC']]
+            order: [['created_at', 'ASC'], ['id', 'ASC']]
         });
 
         const totalUser = await Hcp.count();
@@ -50,5 +50,44 @@ async function editHcp(req, res) {
     }
 }
 
+async function getHcpsById(req, res) {
+    console.log("hi");
+    const { email, uuid } = req.body;
+
+    try {
+        const hcpUser = await Hcp.findOne({ where: { email: email, uuid: uuid }, attributes: { exclude: ['password'] } });
+
+        if (!hcpUser) return res.status(404).send('HCP user not found');
+
+        console.log(hcpUser);
+
+        res.json(hcpUser);
+
+    } catch (err) {
+        res.status(500).send(err);
+    }
+}
+
+async function resetHcpPassword(req, res) {
+    const { email, uuid, password } = req.body;
+
+    try {
+        const hcpUser = await Hcp.findOne({ where: { email: email, uuid: uuid } });
+
+        if (!hcpUser) return res.status(404).send('HCP user not found');
+
+        hcpUser.update({ password });
+
+        res.status(200).send("password reset successfully");
+    } catch (err) {
+        res.status(500).send(err);
+    }
+}
+
+
+
+
 exports.getHcps = getHcps;
 exports.editHcp = editHcp;
+exports.resetHcpPassword = resetHcpPassword;
+exports.getHcpsById = getHcpsById;
