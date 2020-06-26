@@ -34,8 +34,8 @@ export default function Dashboard() {
                         </div>
                     </div>
 
-                    <div className="col-12 col-sm-4 col-md-3 bg-light p-3 border-left">
-                        <h4>FAQ</h4>
+                    <div className="col-12 col-sm-4 col-md-3 p-3 ">
+                        {/*<h4>FAQ</h4>
                         <Accordion defaultActiveKey="0">
                             <Card>
                                 <Accordion.Toggle as={Card.Header} eventKey="0" className="text-primary" role="button">
@@ -69,7 +69,7 @@ export default function Dashboard() {
                                     <Card.Body>The Lorem Ipsum text is used to fill spaces designated to host texts that have not yet been published. They use programmers, graphic designers, typographers to get a real impression of the digital / advertising / editorial product they are working on.</Card.Body>
                                 </Accordion.Collapse>
                             </Card>
-                        </Accordion>
+                        </Accordion>*/}
                     </div>
                 </div>
             </div>
