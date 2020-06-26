@@ -11,10 +11,10 @@ const options = {
   basePath: '/',
   swaggerDefinition: {
     info: {
-      swagger: '2.0',
+      openapi: '3.0.0',
       description: 'GLPG CDP portal API Documentation.',
       title: 'GLPG CDP',
-      version: '1.0.0',
+      version: '1.0.0'
     },
     servers: ["http://localhost:5050"]
   },
