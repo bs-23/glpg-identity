@@ -99,7 +99,7 @@ async function getConsents(req, res) {
         const response = { country_code, consents };
 
         res.json(response);
-    } catch(err) {
+    } catch (err) {
         res.status(500).send(err);
     }
 }
