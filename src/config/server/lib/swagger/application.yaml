@@ -1,0 +1,23 @@
+paths:
+    /api/applications/getAccessToken:
+        get:
+            tags:
+                - Application
+            summary: Get access-token for application.
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                email:
+                                    type: string
+                                password:
+                                    type: string
+            responses:
+                200:
+                    description: Get access-token for application success.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: string
