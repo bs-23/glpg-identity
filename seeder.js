@@ -10,7 +10,7 @@ async function init() {
 
     await sequelize.cdpConnector.query("CREATE SCHEMA IF NOT EXISTS ciam");
 
-    const Application = require(path.join(process.cwd(), "src/modules/core/server/application.model"));
+    const Application = require(path.join(process.cwd(), "src/modules/application/application.model"));
     const User = require(path.join(process.cwd(), "src/modules/user/server/user.model"));
     const HCP = require(path.join(process.cwd(), "src/modules/hcp/server/hcp_profile.model"));
     const Consent = require(path.join(process.cwd(), "src/modules/hcp/server/consent.model"));
@@ -40,7 +40,8 @@ async function init() {
         Application.findOrCreate({
             where: { email: "hcp-portal@glpg.com" }, defaults: {
                 name: "Authoring Experience Service Account",
-                password: "temporary-password"
+                password: "temporary-password",
+                is_active: true
             }
         }).then(function () {
             callback();

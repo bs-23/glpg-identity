@@ -11,7 +11,7 @@ module.exports = async function() {
 
     await sequelize.cdpConnector.query('CREATE SCHEMA IF NOT EXISTS ciam');
     const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
-    const Application = require(path.join(process.cwd(), 'src/modules/core/server/application.model'));
+    const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
 
     await sequelize.cdpConnector.sync();
 

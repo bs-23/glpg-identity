@@ -1,37 +1,5 @@
-const path = require('path');
-const jwt = require('jsonwebtoken');
 const Hcp = require('./hcp_profile.model');
 const Consent = require('./consent.model')
-const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
-
-function generateAccessToken(user) {
-    return jwt.sign({
-        id: user.id,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        email: user.email,
-    }, nodecache.getValue('TOKEN_SECRET'), {
-        expiresIn: '30d',
-        issuer: user.id.toString()
-    });
-}
-
-async function getAccessToken(req, res){
-    try {
-        const { email, password } = req.body;
-        const hcpUser = await Hcp.findOne({ where: { email }});
-
-        if (!hcpUser || !hcpUser.validPassword(password)) {
-            return res.status(401).send('Invalid email or password.');
-        }
-
-        const access_token = generateAccessToken(hcpUser);
-        
-        res.json({ access_token });
-    } catch (err) {
-        res.status(500).send(err);
-    }
-}
 
 async function getHcps(req, res) {
     const page = req.query.page - 1;
@@ -120,25 +88,22 @@ async function resetHcpPassword(req, res) {
 async function getConsents(req, res) {
     const { country_code } = req.body;
 
-    try{
+    try {
         const consents = await Consent.findAll({
             where: {
                 country_code
             },
             attributes: ['id', 'title', 'type', 'opt_in_type', 'category']
         })
-        
+
         const response = { country_code, consents };
 
         res.json(response);
-    }
-    catch(err){
-        console.log(err);
+    } catch(err) {
         res.status(500).send(err);
     }
 }
 
-exports.getAccessToken = getAccessToken;
 exports.getHcps = getHcps;
 exports.editHcp = editHcp;
 exports.resetHcpPassword = resetHcpPassword;
