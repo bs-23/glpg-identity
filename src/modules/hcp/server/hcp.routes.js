@@ -13,4 +13,7 @@ module.exports = app => {
 
     app.route('/api/resetHcpsPassword')
         .post(passport.authenticate('user-jwt', { session: false }), controller.resetHcpPassword);
+
+    app.route('/api/consents')
+        .post(passport.authenticate('user-jwt', { session: false }), controller.getConsents);
 };

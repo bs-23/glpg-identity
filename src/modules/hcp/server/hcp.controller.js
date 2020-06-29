@@ -1,4 +1,5 @@
 const Hcp = require('./hcp_profile.model');
+const Consent = require('./consent.model')
 
 async function getHcps(req, res) {
     const page = req.query.page - 1;
@@ -85,9 +86,30 @@ async function resetHcpPassword(req, res) {
 }
 
 
+async function getConsents(req, res) {
+    const { country_code } = req.body;
+
+    try{
+        const consents = await Consent.findAll({
+            where: {
+                country_code
+            },
+            attributes: ['id', 'title', 'type', 'opt_in_type', 'category']
+        })
+        
+        const response = { country_code, consents };
+
+        res.json(response);
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).send(err);
+    }
+}
 
 
 exports.getHcps = getHcps;
 exports.editHcp = editHcp;
 exports.resetHcpPassword = resetHcpPassword;
 exports.getHcpsById = getHcpsById;
+exports.getConsents = getConsents;
