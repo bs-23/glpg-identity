@@ -5,24 +5,31 @@ const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodeca
 
 function generateAccessToken(doc) {
     return jwt.sign({
-        id: doc._id,
+        id: doc.id,
         email: doc.email,
     }, nodecache.getValue('APPLICATION_TOKEN_SECRET'), {
         expiresIn: '30d',
-        issuer: doc._id.toString()
+        issuer: doc.id.toString()
     });
 }
 
 async function getAccessToken(req, res) {
     try {
         const { email, password } = req.body;
-        const doc = await Application.findOne({ where: { email }});
+        const application = await Application.findOne({ where: { email }});
 
-        if (!doc || !doc.validPassword(password)) {
+        if (!application || !application.validPassword(password)) {
             return res.status(401).send('Invalid email or password.');
         }
 
-        res.send(generateAccessToken(doc));
+        const response = {
+            name: application.name,
+            email: application.email,
+            access_token: generateAccessToken(application),
+            retention_period: '30 days'
+        };
+
+        res.send(response);
     } catch (err) {
         res.status(500).send(err);
     }
