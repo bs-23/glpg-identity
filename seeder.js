@@ -10,7 +10,7 @@ async function init() {
 
     await sequelize.cdpConnector.query("CREATE SCHEMA IF NOT EXISTS ciam");
 
-    const Application = require(path.join(process.cwd(), "src/modules/application/application.model"));
+    const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
     const User = require(path.join(process.cwd(), "src/modules/user/server/user.model"));
     const HCP = require(path.join(process.cwd(), "src/modules/hcp/server/hcp_profile.model"));
     const Consent = require(path.join(process.cwd(), "src/modules/hcp/server/consent.model"));
