@@ -13,6 +13,7 @@ async function init() {
     const Application = require(path.join(process.cwd(), "src/modules/core/server/application.model"));
     const User = require(path.join(process.cwd(), "src/modules/user/server/user.model"));
     const HCP = require(path.join(process.cwd(), "src/modules/hcp/server/hcp_profile.model"));
+    const Consent = require(path.join(process.cwd(), "src/modules/hcp/server/consent.model"));
 
     await sequelize.cdpConnector.sync();
 
@@ -58,7 +59,24 @@ async function init() {
         });
     }
 
-    async.waterfall([applicationSeeder, userSeeder, tempHcpsSeeder], function (err) {
+    function consentSeeder(callback) {
+        const consents = [
+            { "title": "Sharing personal data with 3rd parties", "type": "online", "opt_in_type": "single-opt", "category": "MC", "country_code": "BE" },
+            { "title": "Personal data processing for resumes (CV)", "type": "online", "opt_in_type": "single-opt", "category": "GDPR", "country_code": "BE" },
+            { "title": "Sample Request", "type": "online", "opt_in_type": "single-opt", "category": "DM", "country_code": "BE" }
+        ];
+
+        Consent.destroy({ truncate: true }).then(() => {
+            Consent.bulkCreate(consents, {
+                returning: true,
+                ignoreDuplicates: false
+            }).then(function () {
+                callback();
+            });
+        });
+    }
+
+    async.waterfall([applicationSeeder, userSeeder, tempHcpsSeeder, consentSeeder], function (err) {
         if (err) console.error(err);
         else console.info("DB seed completed!");
         process.exit();
