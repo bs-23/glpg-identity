@@ -2,7 +2,7 @@ paths:
     /api/login:
         post:
             tags:
-                - Users
+                - User
             summary: Log in as CDP user
             requestBody:
                 content:
@@ -11,17 +11,59 @@ paths:
                             $ref: "#/components/schemas/login"
             responses:
                 200:
+                    description: User login success.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/signedInUser"
+                401:
+                    description: User is not authenticated.
+    /api/logout:
+        get:
+            tags:
+                - User
+            summary: Logout CDP user
+            responses:
+                200:
+                    description: User logout success.
+                401:
+                    description: User is not authenticated.
+    /api/users:
+        get:
+            tags:
+                - User
+            summary: Get all users
+            responses:
+                200:
+                    description: Get all users
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/getUsers"
+                401:
+                    descriotion: User is not authenticated
+        post:
+            tags:
+                - User
+            summary: Create user
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/createUser"
+            responses:
+                200:
                     description: An object with user details
                     content:
                         applicaiton/json:
                             schema:
                                 $ref: "#/components/schemas/signedInUser"
                 401:
-                    description: Unauthorized users
+                    description: User is not authenticated.
     /api/users/getSignedInUserProfile:
         get:
             tags:
-                - Users
+                - User
             summary: Get signed in user
             produces:
                 - application/json
@@ -33,7 +75,37 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/signedInUser"
                 401:
-                    description: Unauthorized users
+                    description: User is not authenticated.
+    /api/users/{id}:
+        delete:
+            tags:
+                - User
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  description: the user identifier, as userId
+                  schema:
+                    type: string
+    /api/users/changePassword:
+        post:
+            tags:
+                - User
+            summary: Change user password
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/changePassword"
+            responses:
+                200:
+                    description: Change password success
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/signedInUser"
+                401:
+                    description: User is not authenticated.
 
 components:
     schemas:
@@ -55,3 +127,61 @@ components:
                     type: string
                 type:
                     type: string
+        user:
+            type: object
+            properties:
+                id:
+                    type: string
+                application_id:
+                    type: string
+                name:
+                    type: string
+                email:
+                    type: string
+                phone:
+                    type: string
+                type:
+                    type: string
+                countries:
+                    type: array
+                    items:
+                        type: string
+                permissions:
+                    type: array
+                    items:
+                        type: string
+        getUsers:
+            type: array
+            items:
+                $ref: "#/components/schemas/user"
+        createUser:
+            type: object
+            properties:
+                name:
+                    type: string
+                email:
+                    type: string
+                password:
+                    type: string
+                phone:
+                    type: string
+                countries:
+                    type: array
+                    items:
+                        type: string
+                permissions:
+                    type: array
+                    items:
+                        type: string
+                application_id:
+                    type: string
+        changePassword:
+            type: object
+            properties:
+                currentPassword:
+                    type: string
+                newPassword:
+                    type: string
+                confirmPassword:
+                    type: string
+
