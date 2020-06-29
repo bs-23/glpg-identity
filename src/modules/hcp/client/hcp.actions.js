@@ -5,7 +5,7 @@ export function getHcpProfiles(page, is_active) {
     return {
         type: Types.GET_HCPS,
         payload: axios({
-            method: 'post',
+            method: 'get',
             url: `/api/hcps?page=${page}&is_active=${is_active}`
         }),
     };

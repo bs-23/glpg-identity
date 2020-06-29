@@ -3,17 +3,17 @@ const controller = require('./hcp.controller');
 
 module.exports = app => {
     app.route('/api/hcps')
-        .post(passport.authenticate('user-jwt', { session: false }), controller.getHcps)
+        .get(passport.authenticate('user-jwt', { session: false }), controller.getHcps)
 
     app.route('/api/hcps/:id')
         .put(passport.authenticate('user-jwt', { session: false }), controller.editHcp);
 
     app.route('/api/hcpsProfile')
-        .get(passport.authenticate('user-jwt', { session: false }), controller.getHcpsById);
+        .get(passport.authenticate('application-jwt', { session: false }), controller.getHcpsById);
 
     app.route('/api/resetHcpsPassword')
-        .post(passport.authenticate('user-jwt', { session: false }), controller.resetHcpPassword);
+        .post(passport.authenticate('application-jwt', { session: false }), controller.resetHcpPassword);
 
     app.route('/api/consents')
-        .post(passport.authenticate('user-jwt', { session: false }), controller.getConsents);
+        .post(passport.authenticate('application-jwt', { session: false }), controller.getConsents);
 };

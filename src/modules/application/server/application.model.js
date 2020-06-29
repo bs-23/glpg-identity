@@ -1,9 +1,9 @@
-const path = require("path");
-const bcrypt = require("bcryptjs");
-const { DataTypes } = require("sequelize");
-const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequelize"));
+const path = require('path');
+const bcrypt = require('bcryptjs');
+const { DataTypes } = require('sequelize');
+const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 
-const Application = sequelize.cdpConnector.define("applications", {
+const Application = sequelize.cdpConnector.define('applications', {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -25,7 +25,7 @@ const Application = sequelize.cdpConnector.define("applications", {
     password: {
         type: DataTypes.STRING,
         set(value) {
-            this.setDataValue("password", bcrypt.hashSync(value, 8));
+            this.setDataValue('password', bcrypt.hashSync(value, 8));
         }
     },
     is_active: {
@@ -39,11 +39,11 @@ const Application = sequelize.cdpConnector.define("applications", {
         type: DataTypes.UUID
     }
 }, {
-    schema: "ciam",
-    tableName: "applications",
+    schema: 'ciam',
+    tableName: 'applications',
     timestamps: true,
-    createdAt: "created_at",
-    updatedAt: "updated_at"
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
 });
 
 Application.prototype.validPassword = function (password) {

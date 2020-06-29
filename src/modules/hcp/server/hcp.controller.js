@@ -85,28 +85,24 @@ async function resetHcpPassword(req, res) {
     }
 }
 
-
 async function getConsents(req, res) {
     const { country_code } = req.body;
 
-    try{
+    try {
         const consents = await Consent.findAll({
             where: {
                 country_code
             },
             attributes: ['id', 'title', 'type', 'opt_in_type', 'category']
         })
-        
+
         const response = { country_code, consents };
 
         res.json(response);
-    }
-    catch(err){
-        console.log(err);
+    } catch (err) {
         res.status(500).send(err);
     }
 }
-
 
 exports.getHcps = getHcps;
 exports.editHcp = editHcp;
