@@ -3,57 +3,57 @@ const { DataTypes } = require("sequelize");
 const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequelize"));
 
 const HcpMaster = sequelize.define("hcp_master", {
-    Individual_Id_OneKey: {
+    individual_id_oneKey: {
         allowNull: false,
         type: DataTypes.STRING
     },
-    Codbase: {
+    codbase: {
         allowNull: false,
         type: DataTypes.STRING
     },
-    UUID_1: {
+    uuid_1: {
         type: DataTypes.STRING
     },
-    UUID_2: {
+    uuid_2: {
         type: DataTypes.STRING
     },
-    FirstName: {
+    firstname: {
         type: DataTypes.STRING
     },
-    LastName: {
+    lastname: {
         type: DataTypes.STRING,
     },
-    Phone: {
+    phone: {
         type: DataTypes.STRING
     },
-    Gender_Code: {
+    gender_code: {
         type: DataTypes.STRING
     },
-    Gender_Desc: {
+    gender_desc: {
         type: DataTypes.STRING
     },
-    EMAIL_1: {
+    email_1: {
         type: DataTypes.STRING
     },
-    Adr_Long_Lbl: {
+    adr_long_lbl: {
         type: DataTypes.STRING
     },
-    Fax: {
+    fax: {
         type: DataTypes.STRING
     },
-    LgPostCode: {
+    lgpostcode: {
         type: DataTypes.STRING
     },
-    Specialty1_Code: {
+    specialty1_code: {
         type: DataTypes.STRING
     },
-    Specialty2_Code: {
+    specialty2_code: {
         type: DataTypes.STRING
     },
-    Specialty3_Code: {
+    specialty3_code: {
         type: DataTypes.STRING
     },
-    Country_ISO2: {
+    country_iso2: {
         type: DataTypes.STRING
     }
 }, {
