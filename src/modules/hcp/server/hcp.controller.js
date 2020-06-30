@@ -2,6 +2,7 @@ const path = require('path');
 const Hcp = require('./hcp_profile.model');
 const { QueryTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
+const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 
 async function getHcps(req, res) {
     const page = req.query.page - 1;
@@ -79,6 +80,21 @@ async function resetHcpPassword(req, res) {
         if(password !== confirm_password) return res.status(400).send("Password and confirm password doesn't match.");
 
         hcpUser.update({ password });
+
+        const templateUrl = path.join(
+            process.cwd(),
+            `src/config/server/lib/email-service/templates/hcp-password-reset.html`
+        );
+        const options = {
+            toAddresses: ['faisal.amin@bs-23.com'],
+            templateUrl,
+            subject: 'Your password has been reset.',
+            data: {
+                firstName: hcpUser.first_name,
+                lastName: hcpUser.last_name
+            }
+        }
+        await emailService.send(options);
 
         res.status(200).send('Password reset successfully.');
     } catch (err) {
