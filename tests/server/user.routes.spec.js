@@ -76,7 +76,7 @@ describe('User Routes', () => {
 
     it('Should not change password because current password is invalid', async () => {
         const response = await request
-            .post('/api/users/changePassword')
+            .post('/api/users/change-password')
             .set('Cookie', [`access_token=${defaultUser.access_token}`])
             .send({
                 currentPassword: faker.internet.password(8),
@@ -89,7 +89,7 @@ describe('User Routes', () => {
 
     it('Should change password', async () => {
         const response = await request
-            .post('/api/users/changePassword')
+            .post('/api/users/change-password')
             .set('Cookie', [`access_token=${defaultUser.access_token}`])
             .send({
                 currentPassword: defaultUser.password,

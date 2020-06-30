@@ -52,7 +52,7 @@ async function init() {
         User.findOrCreate({
             where: { email: "admin@glpg-cdp.com" }, defaults: {
                 name: "Admin",
-                password: "temporary-password",
+                password: "strong-password",
                 type: "admin"
             }
         }).then(function () {
@@ -144,7 +144,6 @@ async function init() {
             { "title": "Send Email about clinical trial studies", "type": "online", "opt-type": "double", "category": "MC", "country_code": "UK" },
             { "title": "Send Email about clinical trial studies", "type": "online", "opt-type": "double", "category": "MC", "country_code": "FR" },
 
-
             { "title": "That medical information is shorten for teasering content and better readability", "type": "online", "opt-type": "single", "category": "MC", "country_code": "BE" },
             { "title": "That medical information is shorten for teasering content and better readability", "type": "online", "opt-type": "double", "category": "MC", "country_code": "IT" },
             { "title": "That medical information is shorten for teasering content and better readability", "type": "online", "opt-type": "double", "category": "MC", "country_code": "NL" },
@@ -191,10 +190,7 @@ async function init() {
             { "title": "Send CLM content after RepSale visit", "type": "online", "opt-type": "double", "category": "DM", "country_code": "ES" },
             { "title": "Send CLM content after RepSale visit", "type": "online", "opt-type": "double", "category": "DM", "country_code": "DE" },
             { "title": "Send CLM content after RepSale visit", "type": "online", "opt-type": "double", "category": "DM", "country_code": "UK" },
-            { "title": "Send CLM content after RepSale visit", "type": "online", "opt-type": "double", "category": "DM", "country_code": "FR" },
-
-
-
+            { "title": "Send CLM content after RepSale visit", "type": "online", "opt-type": "double", "category": "DM", "country_code": "FR" }
         ];
 
         Consent.destroy({ truncate: true }).then(() => {

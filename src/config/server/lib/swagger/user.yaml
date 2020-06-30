@@ -87,7 +87,7 @@ paths:
                   description: the user identifier, as userId
                   schema:
                     type: string
-    /api/users/changePassword:
+    /api/users/change-password:
         post:
             tags:
                 - User

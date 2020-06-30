@@ -147,7 +147,7 @@ components:
             properties:
                 email:
                     type: string
-                uuid:
-                    type: string
                 password:
+                    type: string
+                confirm_password:
                     type: string

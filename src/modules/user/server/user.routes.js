@@ -16,5 +16,5 @@ module.exports = app => {
 
     app.get('/api/users/getSignedInUserProfile', passport.authenticate('user-jwt', { session: false }), controller.getSignedInUserProfile);
 
-    app.post('/api/users/changePassword', passport.authenticate('user-jwt', { session: false }), controller.changePassword);
+    app.post('/api/users/change-password', passport.authenticate('user-jwt', { session: false }), controller.changePassword);
 };
