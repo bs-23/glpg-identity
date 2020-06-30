@@ -10,9 +10,10 @@ async function init() {
 
     await sequelize.cdpConnector.query("CREATE SCHEMA IF NOT EXISTS ciam");
 
-    const Application = require(path.join(process.cwd(), "src/modules/core/server/application.model"));
+    const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
     const User = require(path.join(process.cwd(), "src/modules/user/server/user.model"));
     const HCP = require(path.join(process.cwd(), "src/modules/hcp/server/hcp_profile.model"));
+    const Consent = require(path.join(process.cwd(), "src/modules/consent/server/consent.model"));
 
     await sequelize.cdpConnector.sync();
 
@@ -39,7 +40,8 @@ async function init() {
         Application.findOrCreate({
             where: { email: "hcp-portal@glpg.com" }, defaults: {
                 name: "Authoring Experience Service Account",
-                password: "temporary-password"
+                password: "strong-password",
+                is_active: true
             }
         }).then(function () {
             callback();
@@ -58,7 +60,24 @@ async function init() {
         });
     }
 
-    async.waterfall([applicationSeeder, userSeeder, tempHcpsSeeder], function (err) {
+    function consentSeeder(callback) {
+        const consents = [
+            { "title": "Sharing personal data with 3rd parties", "type": "online", "opt-in_type": "single", "category": "MC", "country_code": "BE" },
+            { "title": "Personal data processing for resumes (CV)", "type": "online", "opt-in_type": "single", "category": "GDPR", "country_code": "BE" },
+            { "title": "Sample Request", "type": "online", "opt-in_type": "single", "category": "DM", "country_code": "BE" }
+        ];
+
+        Consent.destroy({ truncate: true }).then(() => {
+            Consent.bulkCreate(consents, {
+                returning: true,
+                ignoreDuplicates: false
+            }).then(function () {
+                callback();
+            });
+        });
+    }
+
+    async.waterfall([applicationSeeder, userSeeder, tempHcpsSeeder, consentSeeder], function (err) {
         if (err) console.error(err);
         else console.info("DB seed completed!");
         process.exit();

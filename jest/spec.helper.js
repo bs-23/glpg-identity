@@ -12,9 +12,17 @@ module.exports = {
         id: defaultApplicationId,
         name: faker.company.companyName(),
         email: 'hcp-portal@glpg.com',
-        password: faker.internet.password(8),
+        password: 'strong-password',
         created_by: defaultAdminId,
         updated_by: defaultAdminId,
+        access_token: jwt.sign(
+            {
+                id: defaultApplicationId,
+                email: 'hcp-portal@glpg.com',
+            },
+            process.env.APPLICATION_TOKEN_SECRET,
+            { expiresIn: '30d', issuer: defaultApplicationId }
+        ),
     },
     users: {
         defaultAdmin: {

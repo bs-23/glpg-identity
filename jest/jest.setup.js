@@ -18,13 +18,13 @@ module.exports = async function() {
         process.cwd(),
         'src/modules/user/server/user.model'
     ));
-    const Application = require(path.join(
-        process.cwd(),
-        'src/modules/core/server/application.model'
-    ));
     const Hcp_profile = require(path.join(
         process.cwd(),
         'src/modules/hcp/server/hcp_profile.model'
+    ));
+    const Application = require(path.join(
+        process.cwd(),
+        'src/modules/application/server/application.model'
     ));
 
     await sequelize.cdpConnector.sync();

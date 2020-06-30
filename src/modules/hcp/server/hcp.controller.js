@@ -55,18 +55,18 @@ async function editHcp(req, res) {
     }
 }
 
-async function getHcpsById(req, res) {
+async function verifyHcpProfile(req, res) {
     const { email, uuid } = req.body;
 
     try {
-        const hcpUser = await Hcp.findOne({
+        const profile = await Hcp.findOne({
             where: { email, uuid },
             attributes: { exclude: ['password'] },
         });
 
-        if (!hcpUser) return res.status(404).send('HCP user not found');
+        if (!profile) return res.status(404).send('HCP profile not found!');
 
-        res.json(hcpUser);
+        res.json(profile);
     } catch (err) {
         res.status(500).send(err);
     }
@@ -84,7 +84,7 @@ async function resetHcpPassword(req, res) {
 
         hcpUser.update({ password });
 
-        res.status(200).send('password reset successfully');
+        res.status(200).send('Password reset successfully');
     } catch (err) {
         res.status(500).send(err);
     }
@@ -93,4 +93,4 @@ async function resetHcpPassword(req, res) {
 exports.getHcps = getHcps;
 exports.editHcp = editHcp;
 exports.resetHcpPassword = resetHcpPassword;
-exports.getHcpsById = getHcpsById;
+exports.verifyHcpProfile = verifyHcpProfile;

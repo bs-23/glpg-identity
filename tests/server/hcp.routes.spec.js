@@ -6,7 +6,7 @@ const specHelper = require(path.join(process.cwd(), 'jest/spec.helper'));
 const app = require(path.join(process.cwd(), 'src/config/server/lib/express'));
 
 const { defaultUser } = specHelper.hcp;
-const { defaultAdmin } = specHelper.users;
+const { defaultApplication } = specHelper;
 
 let request;
 
@@ -25,8 +25,8 @@ beforeAll(async () => {
 describe('HCP Routes', () => {
     it('Should provide profile information for existing userID', async () => {
         const response = await request
-            .get('/api/hcpsProfile')
-            .set('Cookie', [`access_token=${defaultAdmin.access_token}`])
+            .post('/api/hcp-profiles/verify')
+            .set('Cookie', [`access_token=${defaultApplication.access_token}`])
             .send({
                 email: defaultUser.email,
                 uuid: defaultUser.uuid,
@@ -44,8 +44,8 @@ describe('HCP Routes', () => {
 
     it('Should get 404 when userID does not exist', async () => {
         const response = await request
-            .get('/api/hcpsProfile')
-            .set('Cookie', [`access_token=${defaultAdmin.access_token}`])
+            .post('/api/hcp-profiles/verify')
+            .set('Cookie', [`access_token=${defaultApplication.access_token}`])
             .send({
                 email: faker.internet.email(),
                 uuid: faker.random.uuid(),
@@ -56,8 +56,8 @@ describe('HCP Routes', () => {
 
     it('Should reset password of HCP user when given valid email and id', async () => {
         const response = await request
-            .post('/api/resetHcpsPassword')
-            .set('Cookie', [`access_token=${defaultAdmin.access_token}`])
+            .put('/api/hcp-profiles/reset-password')
+            .set('Cookie', [`access_token=${defaultApplication.access_token}`])
             .send({
                 email: defaultUser.email,
                 uuid: defaultUser.uuid,
@@ -69,8 +69,8 @@ describe('HCP Routes', () => {
 
     it('Should get 404 when email or ID not found in th DB', async () => {
         const response = await request
-            .post('/api/resetHcpsPassword')
-            .set('Cookie', [`access_token=${defaultAdmin.access_token}`])
+            .put('/api/hcp-profiles/reset-password')
+            .set('Cookie', [`access_token=${defaultApplication.access_token}`])
             .send({
                 email: faker.internet.email(),
                 uuid: faker.random.uuid(),
