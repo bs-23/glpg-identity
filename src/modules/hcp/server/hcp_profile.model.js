@@ -40,9 +40,13 @@ const HcpProfile = sequelize.cdpConnector.define("hcp_profiles", {
     phone: {
         type: DataTypes.STRING
     },
-    is_active: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false
+    country_iso2: {
+        type: DataTypes.STRING
+    },
+    status: {
+        type: DataTypes.ENUM,
+        values: ['Approved', 'Not Approved', 'In Progress', 'Rejected'],
+        defaultValue: 'Not Approved'
     },
     created_by: {
         type: DataTypes.UUID
