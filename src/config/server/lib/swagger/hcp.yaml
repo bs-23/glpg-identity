@@ -83,7 +83,7 @@ paths:
                             schema:
                                 type: string
     /api/hcp-profiles/reset-password:
-        post:
+        put:
             tags:
                 - HCP
             summary: Reset HCP user password.
