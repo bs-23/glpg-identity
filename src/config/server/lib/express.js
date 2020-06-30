@@ -15,7 +15,7 @@ module.exports = async function () {
     app.use(express.urlencoded({ extended: true }));
     app.use(express.static(path.join(process.cwd(), "wwwroot")));
 
-    app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swagger.specs));
+    app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swagger.specs, swagger.uiOptions));
 
     app.engine("html", hbs.express4({ extname: ".html" }));
     app.set("view engine", "html");

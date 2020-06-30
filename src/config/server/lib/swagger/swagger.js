@@ -1,4 +1,5 @@
 const swaggerJsdoc = require('swagger-jsdoc');
+
 const options = {
     definition: {
         openapi: '3.0.0',
@@ -36,4 +37,12 @@ const options = {
 };
 
 const specs = swaggerJsdoc(options);
+
+var uiOptions = {
+    swaggerOptions: {
+        docExpansion: "none"
+    }
+};
+
 exports.specs = specs;
+exports.uiOptions = uiOptions;

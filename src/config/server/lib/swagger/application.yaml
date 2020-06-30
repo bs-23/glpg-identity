@@ -1,6 +1,6 @@
 paths:
     /api/applications/getAccessToken:
-        get:
+        post:
             tags:
                 - Application
             summary: Get access-token for application.
@@ -19,5 +19,20 @@ paths:
                     description: Get access-token for application success.
                     content:
                         applicaiton/json:
+                            schema:
+                                type: object
+                                properties:
+                                    name:
+                                        type: string
+                                    email:
+                                        type: string
+                                    access_token:
+                                        type: string
+                                    retention_period:
+                                        type: string
+                401:
+                    description: Wrong email mail or password.
+                    content:
+                        applicaiton/text:
                             schema:
                                 type: string

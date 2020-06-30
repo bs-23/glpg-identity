@@ -52,11 +52,11 @@ paths:
                                 $ref: "#/components/schemas/hcpUser"
                 401:
                     description: User is not authenticated.
-    /api/hcpsProfile:
-        get:
+    /api/hcp-profiles/verify:
+        post:
             tags:
                 - HCP
-            summary: Get HCP user profile.
+            summary: Verify HCP user profile.
             requestBody:
                 content:
                     application/json:
@@ -76,7 +76,13 @@ paths:
                                 $ref: "#/components/schemas/hcpUser"
                 401:
                     description: User is not authenticated.
-    /api/resetHcpsPassword:
+                404:
+                    description: HCP user profile not found.
+                    content:
+                        applicaiton/text:
+                            schema:
+                                type: string
+    /api/hcp-profiles/reset-password:
         post:
             tags:
                 - HCP
@@ -90,33 +96,17 @@ paths:
                 200:
                     description: Reset HCP user password success.
                     content:
-                        applicaiton/json:
+                        applicaiton/text:
                             schema:
                                 type: string
                 401:
                     description: User is not authenticated.
-    /api/consents:
-        post:
-            tags:
-                - HCP
-            summary: Get consent for a country.
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            type: object
-                            properties:
-                                country_code:
-                                    type: string
-            responses:
-                200:
-                    description: Get consent for a country success.
+                404:
+                    description: HCP user profile not found.
                     content:
-                        applicaiton/json:
+                        applicaiton/text:
                             schema:
                                 type: string
-                401:
-                    description: User is not authenticated.
 
 components:
     schemas:
