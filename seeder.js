@@ -13,7 +13,7 @@ async function init() {
     const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
     const User = require(path.join(process.cwd(), "src/modules/user/server/user.model"));
     const HCP = require(path.join(process.cwd(), "src/modules/hcp/server/hcp_profile.model"));
-    const Consent = require(path.join(process.cwd(), "src/modules/hcp/server/consent.model"));
+    const Consent = require(path.join(process.cwd(), "src/modules/consent/server/consent.model"));
 
     await sequelize.cdpConnector.sync();
 
@@ -40,7 +40,7 @@ async function init() {
         Application.findOrCreate({
             where: { email: "hcp-portal@glpg.com" }, defaults: {
                 name: "Authoring Experience Service Account",
-                password: "temporary-password",
+                password: "strong-password",
                 is_active: true
             }
         }).then(function () {
@@ -62,9 +62,9 @@ async function init() {
 
     function consentSeeder(callback) {
         const consents = [
-            { "title": "Sharing personal data with 3rd parties", "type": "online", "opt_in_type": "single-opt", "category": "MC", "country_code": "BE" },
-            { "title": "Personal data processing for resumes (CV)", "type": "online", "opt_in_type": "single-opt", "category": "GDPR", "country_code": "BE" },
-            { "title": "Sample Request", "type": "online", "opt_in_type": "single-opt", "category": "DM", "country_code": "BE" }
+            { "title": "Sharing personal data with 3rd parties", "type": "online", "opt-in_type": "single", "category": "MC", "country_code": "BE" },
+            { "title": "Personal data processing for resumes (CV)", "type": "online", "opt-in_type": "single", "category": "GDPR", "country_code": "BE" },
+            { "title": "Sample Request", "type": "online", "opt-in_type": "single", "category": "DM", "country_code": "BE" }
         ];
 
         Consent.destroy({ truncate: true }).then(() => {
