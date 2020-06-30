@@ -1,9 +1,8 @@
-const path = require("path");
-const { DataTypes } = require("sequelize");
-const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequelize"));
+const path = require('path');
+const { DataTypes } = require('sequelize');
+const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 
-
-const Consents = sequelize.cdpConnector.define("consents", {
+const Consent = sequelize.cdpConnector.define('consents', {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -19,10 +18,10 @@ const Consents = sequelize.cdpConnector.define("consents", {
         type: DataTypes.ENUM,
         values: ['online', 'offline'],
     },
-    opt_in_type: {
+    'opt-in_type': {
         allowNull: false,
         type: DataTypes.ENUM,
-        values: ['single-opt', 'double-opt'],
+        values: ['single', 'double'],
     },
     category: {
         allowNull: false,
@@ -34,11 +33,11 @@ const Consents = sequelize.cdpConnector.define("consents", {
         type: DataTypes.STRING
     }
 }, {
-    schema: "ciam",
-    tableName: "consents",
+    schema: 'ciam',
+    tableName: 'consents',
     timestamps: true,
-    createdAt: "created_at",
-    updatedAt: "updated_at"
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
 });
 
-module.exports = Consents;
+module.exports = Consent;

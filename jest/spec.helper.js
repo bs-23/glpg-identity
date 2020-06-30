@@ -11,9 +11,9 @@ module.exports = {
         id: defaultApplicationId,
         name: faker.company.companyName(),
         email: "hcp-portal@glpg.com",
-        password: faker.internet.password(8),
+        password: "strong-password",
         created_by: defaultAdminId,
-        updated_by: defaultAdminId,
+        updated_by: defaultAdminId
     },
     users: {
         defaultAdmin: {

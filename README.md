@@ -14,6 +14,7 @@
 ```bash
 PORT=<express_server_port>
 TOKEN_SECRET=<auth_token_secret>
+APPLICATION_TOKEN_SECRET=<application_token_secret>
 POSTGRES_CDP_URL=<postgresql_connection_string>
 POSTGRES_CDP_DATABASE=<database_name>
 AWS_ACCESS_KEY_ID=<aws_access_key_id>

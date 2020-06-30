@@ -19,7 +19,7 @@ beforeAll(async () => {
 
 describe('Application Routes', () => {
     it('Should get 401 Unauthorized http status code with invalid credentials', async () => {
-        const response = await request.post('/api/applications/getAccessToken').send({
+        const response = await request.post('/api/applications/generate-token').send({
             email: faker.internet.email(),
             password: faker.internet.password(),
         });
@@ -28,11 +28,12 @@ describe('Application Routes', () => {
     });
 
     it('Should get access token with valid email and password', async () => {
-        const response = await request.post('/api/applications/getAccessToken').send({
+        const response = await request.post('/api/applications/generate-token').send({
             email: defaultApplication.email,
             password: defaultApplication.password,
         });
 
         expect(response.statusCode).toBe(200);
+        expect(response.res.headers['content-type']).toMatch('application/json');
     });
 });
