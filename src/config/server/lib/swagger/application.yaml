@@ -1,5 +1,5 @@
 paths:
-    /api/applications/getAccessToken:
+    /api/applications/generate-token:
         post:
             tags:
                 - Application
@@ -31,7 +31,7 @@ paths:
                                     retention_period:
                                         type: string
                 401:
-                    description: Wrong email mail or password.
+                    description: Invalid email mail or password.
                     content:
                         applicaiton/text:
                             schema:
