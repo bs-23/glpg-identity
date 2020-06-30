@@ -26,6 +26,10 @@ module.exports = async function() {
         process.cwd(),
         'src/modules/application/server/application.model'
     ));
+    const Consent = require(path.join(
+        process.cwd(),
+        'src/modules/consent/server/consent.model'
+    ));
 
     await sequelize.cdpConnector.sync();
 
@@ -33,4 +37,5 @@ module.exports = async function() {
     await User.create(specHelper.users.defaultUser);
     await User.create(specHelper.users.defaultAdmin);
     await Hcp_profile.create(specHelper.hcp.defaultUser);
+    await Consent.create(specHelper.consent.demoConsent);
 };
