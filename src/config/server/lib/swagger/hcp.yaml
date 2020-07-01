@@ -1,57 +1,57 @@
 paths:
-    /api/hcps:
-        get:
-            tags:
-                - HCP
-            summary: Get all HPCs
-            parameters:
-                - name: page
-                  in: query
-                  required: true
-                  description: Index of page to be returned
-                  schema:
-                    type: integer
-                - name: is_active
-                  in: query
-                  required: true
-                  description: HCP user's active status
-                  schema:
-                    type: boolean
-            responses:
-                200:
-                    description: HCP user get success.
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/getHcpUsers"
-                401:
-                    description: User is not authenticated.
-    /api/hcps/{id}:
-        put:
-            tags:
-                - HCP
-            summary: Update HCP user
-            parameters:
-                - name: id
-                  in: path
-                  required: true
-                  description: the user identifier, as userId
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: "#/components/schemas/updateHcp"
-            responses:
-                200:
-                    description: User login success.
-                    content:
-                        applicaiton/json:
-                            schema:
-                                $ref: "#/components/schemas/hcpUser"
-                401:
-                    description: User is not authenticated.
+    # /api/hcps:
+    #     get:
+    #         tags:
+    #             - HCP
+    #         summary: Get all HPCs
+    #         parameters:
+    #             - name: page
+    #               in: query
+    #               required: true
+    #               description: Index of page to be returned
+    #               schema:
+    #                 type: integer
+    #             - name: is_active
+    #               in: query
+    #               required: true
+    #               description: HCP user's active status
+    #               schema:
+    #                 type: boolean
+    #         responses:
+    #             200:
+    #                 description: HCP user get success.
+    #                 content:
+    #                     application/json:
+    #                         schema:
+    #                             $ref: "#/components/schemas/getHcpUsers"
+    #             401:
+    #                 description: User is not authenticated.
+    # /api/hcps/{id}:
+    #     put:
+    #         tags:
+    #             - HCP
+    #         summary: Update HCP user
+    #         parameters:
+    #             - name: id
+    #               in: path
+    #               required: true
+    #               description: the user identifier, as userId
+    #               schema:
+    #                 type: string
+    #         requestBody:
+    #             content:
+    #                 application/json:
+    #                     schema:
+    #                         $ref: "#/components/schemas/updateHcp"
+    #         responses:
+    #             200:
+    #                 description: User login success.
+    #                 content:
+    #                     applicaiton/json:
+    #                         schema:
+    #                             $ref: "#/components/schemas/hcpUser"
+    #             401:
+    #                 description: User is not authenticated.
     /api/hcp-profiles/verify:
         post:
             tags:
@@ -128,19 +128,6 @@ components:
                 phone:
                     type: string
                 is_active:
-                    type: string
-        getHcpUsers:
-            type: array
-            items:
-                $ref: "#/components/schemas/hcpUser"
-        updateHcp:
-            type: object
-            properties:
-                first_name:
-                    type: string
-                last_name:
-                    type: string
-                phone:
                     type: string
         resetHcpPassword:
             type: object
