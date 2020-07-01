@@ -55,8 +55,8 @@ paths:
     /api/hcp-profiles/master-details:
         post:
             tags:
-                - HCP
-            summary: Retrieve HCP user's master details.
+                - hcp-profiles
+            summary: Retrieve HCP user's details from master data.
             requestBody:
                 content:
                     application/json:
@@ -69,7 +69,7 @@ paths:
                                     type: string
             responses:
                 200:
-                    description: Retrieve HCP user profile success.
+                    description: The request has succeeded.
                     content:
                         applicaiton/json:
                             schema:
@@ -85,8 +85,8 @@ paths:
     /api/hcp-profiles:
         post:
             tags:
-                - HCP
-            summary: Create HCP user profile.
+                - hcp-profiles
+            summary: Create a new HCP user profile.
             requestBody:
                 content:
                     application/json:
@@ -94,7 +94,7 @@ paths:
                             $ref: "#/components/schemas/createHcpProfile"
             responses:
                 200:
-                    description: Create HCP user profile success.
+                    description: The request has succeeded.
                     content:
                         applicaiton/json:
                             schema:
@@ -105,8 +105,8 @@ paths:
     /api/hcp-profiles/{id}:
         get:
             tags:
-                - HCP
-            summary: Get HCP user profile.
+                - hcp-profiles
+            summary: Get HCP user's profile by id.
             parameters:
                 - name: id
                   in: path
@@ -116,7 +116,7 @@ paths:
                     type: string
             responses:
                 200:
-                    description: Get HCP user profile success.
+                    description: The request has succeeded.
                     content:
                         applicaiton/json:
                             schema:
@@ -130,11 +130,11 @@ paths:
                             schema:
                                 type: string
 
-    /api/hcp-profiles/reset-password/{id}:
+    /api/hcp-profiles/{id}/reset-password:
         put:
             tags:
-                - HCP
-            summary: Reset HCP user password.
+                - hcp-profiles
+            summary: Reset HCP user's password.
             parameters:
                 - name: id
                   in: path
@@ -149,7 +149,7 @@ paths:
                             $ref: "#/components/schemas/resetHcpPassword"
             responses:
                 200:
-                    description: Reset HCP user password success.
+                    description: The request has succeeded.
                     content:
                         applicaiton/text:
                             schema:

@@ -2,8 +2,8 @@ paths:
     /api/applications/generate-token:
         post:
             tags:
-                - Application
-            summary: Get access-token for application.
+                - applications
+            summary: Get access_token for accessing CDP services.
             requestBody:
                 content:
                     application/json:
@@ -16,7 +16,7 @@ paths:
                                     type: string
             responses:
                 200:
-                    description: Get access-token for application success.
+                    description: The request has succeeded.
                     content:
                         applicaiton/json:
                             schema:

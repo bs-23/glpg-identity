@@ -2,11 +2,11 @@ paths:
     /api/countries:
         get:
             tags:
-                - Country
-            summary: Get all countries
+                - countries
+            summary: Get all available countries.
             responses:
                 200:
-                    description: Get countries success
+                    description: The request has succeeded.
                     content:
                         applicaiton/json:
                             schema:
