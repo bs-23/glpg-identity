@@ -162,7 +162,10 @@ async function createHcpProfile(req, res) {
 
 async function getHcpProfile(req, res) {
     try {
-        const hcpProfile = await Hcp.findOne({ where: { id: req.params.id } });
+        const hcpProfile = await Hcp.findOne({
+            where: { id: req.params.id },
+            attributes: { exclude: ['password'] }
+        });
 
         if(!hcpProfile) return res.status(404).send('HCP profile not found!');
 
