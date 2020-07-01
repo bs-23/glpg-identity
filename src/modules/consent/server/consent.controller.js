@@ -4,10 +4,7 @@ async function getConsents(req, res) {
     const { country_code } = req.query;
 
     try {
-        const consents = await Consent.findAll({
-            where: { country_code },
-            attributes: ['id', 'title', 'type', 'opt-in_type', 'category']
-        });
+        const consents = await Consent.findAll({ where: { country_code }});
 
         const response = { country_code, consents };
 

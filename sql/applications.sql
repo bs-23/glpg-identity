@@ -1,7 +1,3 @@
--- Table: ciam.applications
-
--- DROP TABLE ciam.applications;
-
 CREATE TABLE ciam.applications
 (
     id uuid NOT NULL,
