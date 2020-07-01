@@ -72,7 +72,7 @@ async function checkHcpFromMaster(req, res) {
 
     try {
         const hcp_master = await sequelize.datasyncConnector.query(
-            `SELECT * FROM ciam.vwhcpmaster WHERE uuid_1 = ${uuid} OR uuid_2 = ${uuid} OR email_1 = ${email}`,
+            `SELECT * FROM ciam.vwhcpmaster WHERE uuid_1 = '${uuid}' OR uuid_2 = '${uuid}' OR email_1 = '${email}'`,
             { type: QueryTypes.SELECT }
         );
 
@@ -120,7 +120,7 @@ async function resetHcpPassword(req, res) {
     }
 }
 
-async function createHcpUser(req, res) {
+async function createHcpProfile(req, res) {
     const {
         first_name,
         last_name,
@@ -180,8 +180,24 @@ async function createHcpUser(req, res) {
     }
 }
 
+async function getHcpProfile(req, res) {
+    try {
+        const hcpProfile = await Hcp.findOne({
+            where: { id: req.params.id },
+            attributes: { exclude: ['password'] },
+        });
+
+        if (!hcpProfile) return res.status(404).send('HCP profile not found!');
+
+        res.json(hcpProfile);
+    } catch (err) {
+        res.status(500).send(err);
+    }
+}
+
 exports.getHcps = getHcps;
 exports.editHcp = editHcp;
 exports.resetHcpPassword = resetHcpPassword;
 exports.checkHcpFromMaster = checkHcpFromMaster;
-exports.createHcpUser = createHcpUser;
+exports.createHcpProfile = createHcpProfile;
+exports.getHcpProfile = getHcpProfile;
