@@ -13,28 +13,11 @@ async function init() {
     const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
     const User = require(path.join(process.cwd(), "src/modules/user/server/user.model"));
     const HCP = require(path.join(process.cwd(), "src/modules/hcp/server/hcp_profile.model"));
+    const HCP_Consents = require(path.join(process.cwd(), "src/modules/hcp/server/hcp_consents.model"));
     const Consent = require(path.join(process.cwd(), "src/modules/consent/server/consent.model"));
 
     await sequelize.cdpConnector.sync();
 
-    function tempHcpsSeeder(callback) {
-        const hcpUsers = [
-            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john1", "last_name": "doe", "email": "abc1@gmail.com", "password": "strong-password", "phone": "12345567", "uuid": "ABCD123451", "is_active": true },
-            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john2", "last_name": "doe", "email": "abc2@gmail.com", "password": "strong-password", "phone": "12345567", "uuid": "ABCD123452", "is_active": false },
-            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john3", "last_name": "doe", "email": "abc3@gmail.com", "password": "strong-password", "phone": "12345567", "uuid": "ABCD123453", "is_active": true },
-            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john4", "last_name": "doe", "email": "abc4@gmail.com", "password": "strong-password", "phone": "12345567", "uuid": "ABCD123454", "is_active": false },
-            { "application_id": "6f508055-a085-4c97-b0d6-f14abc9c2f7c", "first_name": "john5", "last_name": "doe", "email": "abc5@gmail.com", "password": "strong-password", "phone": "12345567", "uuid": "ABCD123455", "is_active": true }
-        ];
-
-        HCP.destroy({ truncate: true }).then(() => {
-            HCP.bulkCreate(hcpUsers, {
-                returning: true,
-                ignoreDuplicates: false
-            }).then(function () {
-                callback();
-            });
-        });
-    }
 
     function applicationSeeder(callback) {
         Application.findOrCreate({
@@ -203,7 +186,7 @@ async function init() {
         });
     }
 
-    async.waterfall([applicationSeeder, userSeeder, tempHcpsSeeder, consentSeeder], function (err) {
+    async.waterfall([applicationSeeder, userSeeder, consentSeeder], function (err) {
         if (err) console.error(err);
         else console.info("DB seed completed!");
         process.exit();

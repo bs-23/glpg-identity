@@ -21,7 +21,7 @@ const HcpConsents = sequelize.cdpConnector.define("hcp_consents", {
     },
     response: {
         allowNull: false,
-        type: DataTypes.Boolean
+        type: DataTypes.BOOLEAN
     },
     created_by: {
         type: DataTypes.UUID
@@ -36,8 +36,5 @@ const HcpConsents = sequelize.cdpConnector.define("hcp_consents", {
     createdAt: "created_at",
     updatedAt: "updated_at"
 });
-
-HCP.belongsToMany(Consents, { through: HcpConsents });
-Consents.belongsToMany(HCP, { through: HcpConsents });
 
 module.exports = HcpConsents;
