@@ -45,7 +45,7 @@ const specs = swaggerJsdoc(options);
 
 var uiOptions = {
     swaggerOptions: {
-        docExpansion: "none"
+        docExpansion: "list"
     }
 };
 

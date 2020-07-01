@@ -2,8 +2,8 @@ paths:
     /api/consents:
         get:
             tags:
-                - Consent
-            summary: Get consent for a country.
+                - consents
+            summary: Get all consents by country code.
             parameters:
                 - name: country_code
                   in: query
@@ -13,7 +13,7 @@ paths:
                     type: string
             responses:
                 200:
-                    description: Get consent for a country success.
+                    description: The request has succeeded.
                     content:
                         applicaiton/json:
                             schema:
@@ -32,7 +32,7 @@ components:
                     type: string
                 type:
                     type: string
-                opt-in_type:
+                opt_type:
                     type: string
                 category:
                     type: string
