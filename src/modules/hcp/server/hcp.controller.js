@@ -74,7 +74,12 @@ async function resetHcpPassword(req, res) {
     const { email, password, confirm_password } = req.body;
 
     try {
-        const hcpUser = await Hcp.findOne({ where: { id: req.params.id } });
+        const checkUUID = ("" + req.params.id).match('^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
+        if (checkUUID === null) {
+            return res.status(400).send("Invalid id");
+        }
+
+        const hcpUser = await Hcp.findOne({ where: { id: req.params.id, email: email } });
 
         if (!hcpUser) return res.status(404).send('HCP user not found.');
 
@@ -136,6 +141,11 @@ async function createHcpProfile(req, res) {
             return res.sendStatus(400);
         }
 
+        delete doc.dataValues.password;
+        delete doc.dataValues.created_by;
+        delete doc.dataValues.updated_by;
+
+
         const consentArr = [];
         consents.forEach(element => {
             consentArr.push({
@@ -154,7 +164,7 @@ async function createHcpProfile(req, res) {
             return res.sendStatus(400);
         }
 
-        res.send("HCP user created successfully");
+        res.json(doc);
     } catch (err) {
         res.status(500).send(err);
     }
@@ -167,10 +177,10 @@ async function getHcpProfile(req, res) {
             attributes: { exclude: ['password'] }
         });
 
-        if(!hcpProfile) return res.status(404).send('HCP profile not found!');
+        if (!hcpProfile) return res.status(404).send('HCP profile not found!');
 
         res.json(hcpProfile);
-    } catch(err) {
+    } catch (err) {
         res.status(500).send(err);
     }
 }
