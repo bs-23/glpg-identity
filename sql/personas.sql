@@ -1,7 +1,3 @@
--- Table: ciam.personas
-
--- DROP TABLE ciam.personas;
-
 CREATE TABLE ciam.personas
 (
     id uuid NOT NULL,

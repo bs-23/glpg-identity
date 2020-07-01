@@ -1,7 +1,3 @@
--- Table: ciam.hcp_profiles
-
--- DROP TABLE ciam.hcp_profiles;
-
 CREATE TABLE ciam.hcp_profiles
 (
     id uuid NOT NULL,
