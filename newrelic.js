@@ -5,7 +5,8 @@ exports.config = {
     app_name: ['Customer Data Platform'],
     license_key: nodecache.getValue('NEWRELIC_LICENSE_KEY'),
     logging: {
-        level: 'info'
+        level: 'info',
+        filepath: 'newrelic_agent.log'
     },
     utilization: {
         detect_aws: false,

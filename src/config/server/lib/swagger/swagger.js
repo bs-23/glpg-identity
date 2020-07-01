@@ -8,25 +8,30 @@ const options = {
             description: 'API documentation for the GLPG CDP portal',
             version: '1.0.0',
         },
-        components: {
-            securitySchemes: {
-                CookieAuth: {
-                    type: 'apiKey',
-                    in: 'cookie',
-                },
-            },
-        },
-        security: [
-            {
-                CookieAuth: [],
-            },
-        ],
         servers: [
             {
                 url: 'http://localhost:5050',
                 description: 'Local server',
+            },
+            {
+                url: 'http://ciam-dev-alb-2053419375.eu-central-1.elb.amazonaws.com',
+                description: 'Dev server',
             }
         ],
+        components: {
+            securitySchemes: {
+                bearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT'
+                }
+            }
+        },
+        security: [
+            {
+                bearerAuth: []
+            }
+        ]
     },
 	/**
      * List of files to be processed.
