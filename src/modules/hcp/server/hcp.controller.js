@@ -86,7 +86,7 @@ async function resetHcpPassword(req, res) {
             `src/config/server/lib/email-service/templates/hcp-password-reset.html`
         );
         const options = {
-            toAddresses: ['faisal.amin@bs-23.com'],
+            toAddresses: [email],
             templateUrl,
             subject: 'Your password has been reset.',
             data: {
