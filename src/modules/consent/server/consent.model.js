@@ -31,6 +31,9 @@ const Consent = sequelize.cdpConnector.define('consents', {
     country_code: {
         allowNull: false,
         type: DataTypes.STRING
+    },
+    purpose: {
+        type: DataTypes.STRING
     }
 }, {
     schema: 'ciam',
