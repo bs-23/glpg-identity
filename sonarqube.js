@@ -10,7 +10,8 @@ const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodeca
         serverUrl: nodecache.getValue('SONARQUBE_URL'),
         token: nodecache.getValue('SONARQUBE_TOKEN'),
         options: {
-            'sonar.sources': 'src/modules/core/server, src/modules/user/server, src/modules/hcp/server',
+            'sonar.sources': `src/modules/core/server, src/modules/user/server, src/modules/hcp/server, src/modules/consent/server, src/modules/application/server,
+                            src/modules/core/client, src/modules/user/client, src/modules/hcp/client`,
             'sonar.tests': 'tests',
             'sonar.inclusions': '**',
             'sonar.test.inclusions': 'tests/**/*.spec.js',

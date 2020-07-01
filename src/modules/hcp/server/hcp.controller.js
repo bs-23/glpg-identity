@@ -76,7 +76,7 @@ async function checkHcpFromMaster(req, res) {
             { type: QueryTypes.SELECT }
         );
 
-        if (!hcp_master) return res.status(404).send('HCP profile not found!');
+        if (hcp_master.length === 0) return res.status(404).send('HCP profile not found!');
 
         res.json(hcp_master);
     } catch (err) {
