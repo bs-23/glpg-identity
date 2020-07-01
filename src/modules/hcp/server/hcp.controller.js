@@ -59,7 +59,7 @@ async function checkHcpFromMaster(req, res) {
     const { email, uuid } = req.body;
 
     try {
-        const hcp_master = await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwhcpmaster WHERE uuid_1 = ${uuid} OR uuid_2 = ${uuid} OR email_1 = ${email}`, { type: QueryTypes.SELECT });
+        const hcp_master = await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwhcpmaster WHERE uuid_1 = '${uuid}' OR uuid_2 = '${uuid}' OR email_1 = '${email}'`, { type: QueryTypes.SELECT });
 
         if (!hcp_master) return res.status(404).send('HCP profile not found!');
 
@@ -103,7 +103,7 @@ async function resetHcpPassword(req, res) {
     }
 }
 
-async function createHcpUser(req, res) {
+async function createHcpProfile(req, res) {
     const {
         first_name,
         last_name,
@@ -116,8 +116,6 @@ async function createHcpUser(req, res) {
         consents,
         application_id
     } = req.body;
-
-
 
     try {
         const [doc, created] = await Hcp.findOrCreate({
@@ -144,7 +142,6 @@ async function createHcpUser(req, res) {
                 "user_id": doc.id,
                 "consent_id": Object.keys(element)[0],
                 "response": Object.values(element)[0]
-
             });
         });
 
@@ -163,8 +160,21 @@ async function createHcpUser(req, res) {
     }
 }
 
+async function getHcpProfile(req, res) {
+    try {
+        const hcpProfile = await Hcp.findOne({ where: { id: req.params.id } });
+
+        if(!hcpProfile) return res.status(404).send('HCP profile not found!');
+
+        res.json(hcpProfile);
+    } catch(err) {
+        res.status(500).send(err);
+    }
+}
+
 exports.getHcps = getHcps;
 exports.editHcp = editHcp;
 exports.resetHcpPassword = resetHcpPassword;
 exports.checkHcpFromMaster = checkHcpFromMaster;
-exports.createHcpUser = createHcpUser;
+exports.createHcpProfile = createHcpProfile;
+exports.getHcpProfile = getHcpProfile;
