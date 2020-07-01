@@ -1,5 +1,6 @@
 const path = require('path');
 const Hcp = require('./hcp_profile.model');
+const HcpConsents = require('./hcp_consents.model');
 const { QueryTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
@@ -77,7 +78,7 @@ async function resetHcpPassword(req, res) {
 
         if (!hcpUser) return res.status(404).send('HCP user not found.');
 
-        if(password !== confirm_password) return res.status(400).send("Password and confirm password doesn't match.");
+        if (password !== confirm_password) return res.status(400).send("Password and confirm password doesn't match.");
 
         hcpUser.update({ password });
 
@@ -102,7 +103,68 @@ async function resetHcpPassword(req, res) {
     }
 }
 
+async function createHcpUser(req, res) {
+    const {
+        first_name,
+        last_name,
+        uuid,
+        email,
+        password,
+        phone,
+        country_iso2,
+        status,
+        consents,
+        application_id
+    } = req.body;
+
+
+
+    try {
+        const [doc, created] = await Hcp.findOrCreate({
+            where: { email },
+            defaults: {
+                first_name,
+                last_name,
+                uuid,
+                password,
+                phone,
+                country_iso2,
+                status,
+                application_id
+            }
+        });
+
+        if (!created) {
+            return res.sendStatus(400);
+        }
+
+        const consentArr = [];
+        consents.forEach(element => {
+            consentArr.push({
+                "user_id": doc.id,
+                "consent_id": Object.keys(element)[0],
+                "response": Object.values(element)[0]
+
+            });
+        });
+
+        const [docConsents, createdConsents] = await HcpConsents.bulkCreate(consentArr, {
+            returning: true,
+            ignoreDuplicates: false
+        });
+
+        if (!createdConsents) {
+            return res.sendStatus(400);
+        }
+
+        res.send("HCP user created successfully");
+    } catch (err) {
+        res.status(500).send(err);
+    }
+}
+
 exports.getHcps = getHcps;
 exports.editHcp = editHcp;
 exports.resetHcpPassword = resetHcpPassword;
 exports.checkHcpFromMaster = checkHcpFromMaster;
+exports.createHcpUser = createHcpUser;
