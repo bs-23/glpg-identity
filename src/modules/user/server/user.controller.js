@@ -8,7 +8,7 @@ function generateAccessToken(user) {
         id: user.id,
         name: user.name,
         email: user.email,
-    }, nodecache.getValue('TOKEN_SECRET'), {
+    }, nodecache.getValue('CDP_TOKEN_SECRET'), {
         expiresIn: '2d',
         issuer: user.id.toString()
     });
