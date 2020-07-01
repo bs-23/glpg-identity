@@ -14,7 +14,7 @@ module.exports = function() {
     }
 
     passport.use('user-jwt', new Strategy({
-        secretOrKey: nodecache.getValue('TOKEN_SECRET'),
+        secretOrKey: nodecache.getValue('CDP_TOKEN_SECRET'),
         jwtFromRequest: cookieExtractor
     }, function(payload, done) {
         User.findOne({where: {id: payload.id}}).then(doc => {
