@@ -24,7 +24,7 @@ describe('Core Routes', () => {
 
     it('Should return all available countries', async () => {
         const response = await request
-            .get('/api/countries')
+            .get('/api/cdp/countries')
             .set('Cookie', [`access_token=${specHelper.users.defaultAdmin.access_token}`]);
 
         expect(response.statusCode).toBe(200);

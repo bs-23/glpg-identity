@@ -1,0 +1,47 @@
+paths:
+    /api/consents:
+        get:
+            tags:
+                - Consent
+            summary: Get consent for a country.
+            parameters:
+                - name: country_code
+                  in: query
+                  required: true
+                  description: Country code for which consent is to be returned.
+                  schema:
+                    type: string
+            responses:
+                200:
+                    description: Get consent for a country success.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/consentsForCountry"
+                401:
+                    description: User is not authenticated.
+
+components:
+    schemas:
+        consent:
+            type: object
+            properties:
+                id:
+                    type: string
+                title:
+                    type: string
+                type:
+                    type: string
+                opt-in_type:
+                    type: string
+                category:
+                    type: string
+        consentsForCountry:
+            type: object
+            properties:
+                country_code:
+                    type: string
+                consents:
+                    type: array
+                    items:
+                        $ref: "#/components/schemas/consent"

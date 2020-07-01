@@ -1,0 +1,38 @@
+paths:
+    /api/applications/generate-token:
+        post:
+            tags:
+                - Application
+            summary: Get access-token for application.
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                email:
+                                    type: string
+                                password:
+                                    type: string
+            responses:
+                200:
+                    description: Get access-token for application success.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: object
+                                properties:
+                                    name:
+                                        type: string
+                                    email:
+                                        type: string
+                                    access_token:
+                                        type: string
+                                    retention_period:
+                                        type: string
+                401:
+                    description: Invalid email mail or password.
+                    content:
+                        applicaiton/text:
+                            schema:
+                                type: string

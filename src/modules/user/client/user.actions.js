@@ -29,7 +29,7 @@ export function createUser(data) {
             method: 'post',
             url: '/api/users',
             data
-        }),
+        })
     };
 }
 
@@ -38,7 +38,7 @@ export function changePassword(data) {
         type: Types.CHANGE_PASSWORD,
         payload: axios({
             method: 'post',
-            url: '/api/users/changePassword',
+            url: '/api/users/change-password',
             data
         })
     };
