@@ -17,6 +17,6 @@ module.exports = app => {
     app.route('/api/hcp-profiles/:id')
         .get(passport.authenticate('application-jwt', { session: false }), controller.getHcpProfile);
 
-    app.route('/api/hcp-profiles/reset-password')
+    app.route('/api/hcp-profiles/reset-password/:id')
         .put(passport.authenticate('application-jwt', { session: false }), controller.resetHcpPassword);
 };

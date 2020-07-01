@@ -74,7 +74,7 @@ async function resetHcpPassword(req, res) {
     const { email, password, confirm_password } = req.body;
 
     try {
-        const hcpUser = await Hcp.findOne({ where: { email: email } });
+        const hcpUser = await Hcp.findOne({ where: { id: req.params.id } });
 
         if (!hcpUser) return res.status(404).send('HCP user not found.');
 
