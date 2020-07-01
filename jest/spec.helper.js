@@ -65,6 +65,7 @@ module.exports = {
     },
     hcp: {
         defaultUser: {
+            id: defaultHCPuserId,
             uuid: defaultHCPuserId,
             application_id: defaultApplicationId,
             first_name: 'Default HCP',
@@ -80,7 +81,7 @@ module.exports = {
             id: demoConsentId,
             title: 'Sharing personal data with 3rd parties',
             type: 'online',
-            'opt-in_type': 'single',
+            opt_type: 'single',
             category: 'MC',
             country_code: 'BE',
         },

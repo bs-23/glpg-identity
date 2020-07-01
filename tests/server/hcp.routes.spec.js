@@ -11,13 +11,10 @@ const { defaultApplication } = specHelper;
 let request;
 
 beforeAll(async () => {
-    const config = require(path.join(
-        process.cwd(),
-        'src/config/server/config'
-    ));
-
+    const config = require(path.join(process.cwd(),'src/config/server/config'));
+    console.log('Starting initialization')
     await config.initEnvironmentVariables();
-
+    console.log('initialzation end')
     const appInstance = await app();
     request = supertest(appInstance);
 });
@@ -25,12 +22,8 @@ beforeAll(async () => {
 describe('HCP Routes', () => {
     it('Should provide profile information for existing userID', async () => {
         const response = await request
-            .post('/api/hcp-profiles/verify')
-            .set('Cookie', [`access_token=${defaultApplication.access_token}`])
-            .send({
-                email: defaultUser.email,
-                uuid: defaultUser.uuid,
-            });
+            .get(`/api/hcp-profiles/${defaultUser.id}`)
+            .set('Authorization', 'bearer ' + defaultApplication.access_token)
 
         expect(response.statusCode).toBe(200);
         expect(response.res.headers['content-type']).toMatch(
@@ -44,37 +37,35 @@ describe('HCP Routes', () => {
 
     it('Should get 404 when userID does not exist', async () => {
         const response = await request
-            .post('/api/hcp-profiles/verify')
-            .set('Cookie', [`access_token=${defaultApplication.access_token}`])
-            .send({
-                email: faker.internet.email(),
-                uuid: faker.random.uuid(),
-            });
+            .get(`/api/hcp-profiles/${faker.random.uuid()}`)
+            .set('Authorization', 'bearer ' + defaultApplication.access_token)
 
         expect(response.statusCode).toBe(404);
     });
 
     it('Should reset password of HCP user when given valid email and id', async () => {
+        const password = faker.internet.password()
         const response = await request
             .put('/api/hcp-profiles/reset-password')
-            .set('Cookie', [`access_token=${defaultApplication.access_token}`])
+            .set('Authorization', 'bearer ' + defaultApplication.access_token)
             .send({
                 email: defaultUser.email,
-                uuid: defaultUser.uuid,
-                password: faker.internet.password(),
+                password,
+                confirm_password: password
             });
 
         expect(response.statusCode).toBe(200);
     });
 
     it('Should get 404 when email or ID not found in th DB', async () => {
+        const password = faker.internet.password()
         const response = await request
             .put('/api/hcp-profiles/reset-password')
-            .set('Cookie', [`access_token=${defaultApplication.access_token}`])
+            .set('Authorization', 'bearer ' + defaultApplication.access_token)
             .send({
                 email: faker.internet.email(),
-                uuid: faker.random.uuid(),
-                password: faker.internet.password(),
+                password,
+                confirm_password: password
             });
 
         expect(response.statusCode).toBe(404);

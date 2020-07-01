@@ -9,7 +9,6 @@ module.exports = function () {
         secretOrKey: nodecache.getValue('APPLICATION_TOKEN_SECRET'),
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()
     }, function (payload, done) {
-
         Application.findOne({ where: { id: payload.id } }).then(doc => {
             if (doc) {
                 return done(null, doc);
