@@ -130,11 +130,18 @@ paths:
                             schema:
                                 type: string
 
-    /api/hcp-profiles/reset-password:
+    /api/hcp-profiles/reset-password/{id}:
         put:
             tags:
                 - HCP
             summary: Reset HCP user password.
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  description: the user identifier, as id
+                  schema:
+                    type: string
             requestBody:
                 content:
                     application/json:
