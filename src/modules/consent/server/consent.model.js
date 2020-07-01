@@ -18,7 +18,7 @@ const Consent = sequelize.cdpConnector.define('consents', {
         type: DataTypes.ENUM,
         values: ['online', 'offline'],
     },
-    'opt-in_type': {
+    opt_type: {
         allowNull: false,
         type: DataTypes.ENUM,
         values: ['single', 'double'],

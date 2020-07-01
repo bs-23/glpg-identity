@@ -1,14 +1,3 @@
--- Type: enum_users_type
-
--- DROP TYPE ciam.enum_users_type;
-
-CREATE TYPE ciam.enum_users_type AS ENUM
-    ('admin', 'basic');
-
--- Table: ciam.users
-
--- DROP TABLE ciam.users;
-
 CREATE TABLE ciam.users
 (
     id uuid NOT NULL,
@@ -27,3 +16,6 @@ CREATE TABLE ciam.users
     CONSTRAINT users_pkey PRIMARY KEY (id),
     CONSTRAINT users_email_key UNIQUE (email)
 )
+
+CREATE TYPE ciam.enum_users_type AS ENUM
+    ('admin', 'basic');

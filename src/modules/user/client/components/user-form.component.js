@@ -19,7 +19,7 @@ export default function UserForm() {
 
     useEffect(() => {
         async function getCountries() {
-            const response = await axios.get('/api/countries');
+            const response = await axios.get('/api/cdp/countries');
             setCountries(response.data);
         }
         getCountries();

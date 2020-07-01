@@ -1,4 +1,16 @@
+const path = require('path');
+const { QueryTypes } = require('sequelize');
 const Hcp = require('./hcp_profile.model');
+const HcpConsents = require('./hcp_consents.model');
+
+const sequelize = require(path.join(
+    process.cwd(),
+    'src/config/server/lib/sequelize'
+));
+const emailService = require(path.join(
+    process.cwd(),
+    'src/config/server/lib/email-service/email.service'
+));
 
 async function getHcps(req, res) {
     const page = req.query.page - 1;
@@ -55,36 +67,114 @@ async function editHcp(req, res) {
     }
 }
 
-async function verifyHcpProfile(req, res) {
+async function checkHcpFromMaster(req, res) {
     const { email, uuid } = req.body;
 
     try {
-        const profile = await Hcp.findOne({
-            where: { email, uuid },
-            attributes: { exclude: ['password'] },
-        });
+        const hcp_master = await sequelize.datasyncConnector.query(
+            `SELECT * FROM ciam.vwhcpmaster WHERE uuid_1 = ${uuid} OR uuid_2 = ${uuid} OR email_1 = ${email}`,
+            { type: QueryTypes.SELECT }
+        );
 
-        if (!profile) return res.status(404).send('HCP profile not found!');
+        if (!hcp_master) return res.status(404).send('HCP profile not found!');
 
-        res.json(profile);
+        res.json(hcp_master);
     } catch (err) {
         res.status(500).send(err);
     }
 }
 
 async function resetHcpPassword(req, res) {
-    const { email, uuid, password } = req.body;
+    const { email, password, confirm_password } = req.body;
 
     try {
-        const hcpUser = await Hcp.findOne({
-            where: { email, uuid },
-        });
+        const hcpUser = await Hcp.findOne({ where: { email } });
 
-        if (!hcpUser) return res.status(404).send('HCP user not found');
+        if (!hcpUser) return res.status(404).send('HCP user not found.');
+
+        if (password !== confirm_password)
+            return res
+                .status(400)
+                .send("Password and confirm password doesn't match.");
 
         hcpUser.update({ password });
 
-        res.status(200).send('Password reset successfully');
+        const templateUrl = path.join(
+            process.cwd(),
+            `src/config/server/lib/email-service/templates/hcp-password-reset.html`
+        );
+        const options = {
+            toAddresses: [email],
+            templateUrl,
+            subject: 'Your password has been reset.',
+            data: {
+                firstName: hcpUser.first_name,
+                lastName: hcpUser.last_name,
+            },
+        };
+        await emailService.send(options);
+
+        res.status(200).send('Password reset successfully.');
+    } catch (err) {
+        res.status(500).send(err);
+    }
+}
+
+async function createHcpUser(req, res) {
+    const {
+        first_name,
+        last_name,
+        uuid,
+        email,
+        password,
+        phone,
+        country_iso2,
+        status,
+        consents,
+        application_id,
+    } = req.body;
+
+    try {
+        const [doc, created] = await Hcp.findOrCreate({
+            where: { email },
+            defaults: {
+                first_name,
+                last_name,
+                uuid,
+                password,
+                phone,
+                country_iso2,
+                status,
+                application_id,
+            },
+        });
+
+        if (!created) {
+            return res.sendStatus(400);
+        }
+
+        const consentArr = [];
+        consents.forEach(element => {
+            consentArr.push({
+                user_id: doc.id,
+                consent_id: Object.keys(element)[0],
+                response: Object.values(element)[0],
+            });
+        });
+
+        const [docConsents, createdConsents] = await HcpConsents.bulkCreate(
+            consentArr,
+            {
+                returning: true,
+                ignoreDuplicates: false,
+            }
+        );
+
+        if (!createdConsents) {
+            return res.sendStatus(400);
+        }
+
+        res.send('HCP user created successfully');
     } catch (err) {
         res.status(500).send(err);
     }
@@ -93,4 +183,5 @@ async function resetHcpPassword(req, res) {
 exports.getHcps = getHcps;
 exports.editHcp = editHcp;
 exports.resetHcpPassword = resetHcpPassword;
-exports.verifyHcpProfile = verifyHcpProfile;
+exports.checkHcpFromMaster = checkHcpFromMaster;
+exports.createHcpUser = createHcpUser;

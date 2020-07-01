@@ -1,0 +1,33 @@
+paths:
+    /api/countries:
+        get:
+            tags:
+                - Country
+            summary: Get all countries
+            responses:
+                200:
+                    description: Get countries success
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/getCountries"
+components:
+    schemas:
+        country:
+            type: object
+            properties:
+                codbase:
+                    type: string
+                country_iso2:
+                    type: string
+                country_iso3:
+                    type: string
+                countryid:
+                    type: string
+                countryname:
+                    type: string
+        getCountries:
+            type: array
+            items:
+                $ref: "#/components/schemas/country"
+
