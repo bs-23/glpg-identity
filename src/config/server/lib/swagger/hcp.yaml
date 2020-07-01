@@ -52,11 +52,11 @@ paths:
     #                             $ref: "#/components/schemas/hcpUser"
     #             401:
     #                 description: User is not authenticated.
-    /api/hcp-profiles/verify:
+    /api/hcp-profiles/master-details:
         post:
             tags:
                 - HCP
-            summary: Verify HCP user profile.
+            summary: Retrieve HCP user's master details.
             requestBody:
                 content:
                     application/json:
@@ -67,6 +67,53 @@ paths:
                                     type: string
                                 uuid:
                                     type: string
+            responses:
+                200:
+                    description: Retrieve HCP user profile success.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/hcpUser"
+                401:
+                    description: User is not authenticated.
+                404:
+                    description: HCP user profile not found.
+                    content:
+                        applicaiton/text:
+                            schema:
+                                type: string
+    /api/hcp-profiles:
+        post:
+            tags:
+                - HCP
+            summary: Create HCP user profile.
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/createHcpProfile"
+            responses:
+                200:
+                    description: Create HCP user profile success.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: string
+                401:
+                    description: User is not authenticated.
+
+    /api/hcp-profiles/{id}:
+        get:
+            tags:
+                - HCP
+            summary: Get HCP user profile.
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  description: the user identifier, as id
+                  schema:
+                    type: string
             responses:
                 200:
                     description: Get HCP user profile success.
@@ -82,6 +129,7 @@ paths:
                         applicaiton/text:
                             schema:
                                 type: string
+
     /api/hcp-profiles/reset-password:
         put:
             tags:
@@ -125,9 +173,15 @@ components:
                     type: string
                 email:
                     type: string
+                password:
+                    type: string
                 phone:
                     type: string
                 is_active:
+                    type: string
+                country_iso2:
+                    type: string
+                status:
                     type: string
         resetHcpPassword:
             type: object
@@ -137,4 +191,33 @@ components:
                 password:
                     type: string
                 confirm_password:
+                    type: string
+        consent:
+            type: object
+            description: Key value pair of consent-id and answer
+            example: {"consent_id":"answer"}
+        createHcpProfile:
+            type: object
+            properties:
+                first_name:
+                    type: string
+                last_name:
+                    type: string
+                uuid:
+                    type: string
+                email:
+                    type: string
+                password:
+                    type: string
+                phone:
+                    type: string
+                country_iso2:
+                    type: string
+                status:
+                    type: string
+                consents:
+                    type: array
+                    items:
+                        $ref: "#/components/schemas/consent"
+                application_id:
                     type: string
