@@ -32,7 +32,7 @@ components:
                     type: string
                 type:
                     type: string
-                opt-in_type:
+                opt_type:
                     type: string
                 category:
                     type: string

@@ -58,6 +58,7 @@ paths:
                 - hcp-profiles
             summary: Retrieve HCP user's details from master data.
             requestBody:
+                required: true
                 content:
                     application/json:
                         schema:
@@ -78,16 +79,13 @@ paths:
                     description: User is not authenticated.
                 404:
                     description: HCP user profile not found.
-                    content:
-                        applicaiton/text:
-                            schema:
-                                type: string
     /api/hcp-profiles:
         post:
             tags:
                 - hcp-profiles
             summary: Create a new HCP user profile.
             requestBody:
+                required: true
                 content:
                     application/json:
                         schema:
@@ -95,10 +93,6 @@ paths:
             responses:
                 200:
                     description: The request has succeeded.
-                    content:
-                        applicaiton/json:
-                            schema:
-                                type: string
                 401:
                     description: User is not authenticated.
 
@@ -125,10 +119,6 @@ paths:
                     description: User is not authenticated.
                 404:
                     description: HCP user profile not found.
-                    content:
-                        applicaiton/text:
-                            schema:
-                                type: string
 
     /api/hcp-profiles/{id}/reset-password:
         put:
@@ -143,6 +133,7 @@ paths:
                   schema:
                     type: string
             requestBody:
+                required: true
                 content:
                     application/json:
                         schema:
@@ -150,18 +141,10 @@ paths:
             responses:
                 200:
                     description: The request has succeeded.
-                    content:
-                        applicaiton/text:
-                            schema:
-                                type: string
                 401:
                     description: User is not authenticated.
                 404:
                     description: HCP user profile not found.
-                    content:
-                        applicaiton/text:
-                            schema:
-                                type: string
 
 components:
     schemas:
@@ -180,11 +163,7 @@ components:
                     type: string
                 email:
                     type: string
-                password:
-                    type: string
                 phone:
-                    type: string
-                is_active:
                     type: string
                 country_iso2:
                     type: string
