@@ -31,6 +31,8 @@ module.exports = async function() {
         'src/modules/consent/server/consent.model'
     ));
 
+    const HCP_Consents = require(path.join(process.cwd(), "src/modules/hcp/server/hcp_consents.model"));
+
     await sequelize.cdpConnector.sync();
 
     await Application.create(specHelper.defaultApplication);

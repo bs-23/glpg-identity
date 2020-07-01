@@ -2,7 +2,6 @@ const { Op } = require('sequelize');
 const Consent = require('./consent.model');
 
 async function getConsents(req, res) {
-    console.log('in get consent')
     try {
         const { country_code } = req.query;
         const consents = await Consent.findAll({

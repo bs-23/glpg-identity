@@ -19,6 +19,7 @@ const Test = (description, getApp) => {
     let _schema;
     let _response
     let _queue = []
+    let _headers = []
 
     const _getObjectType = obj => Object.prototype.toString.call(obj).slice(8).slice(0, -1);
 
@@ -108,6 +109,10 @@ const Test = (description, getApp) => {
             if(!_response) _queue.push(isJSON)
             else expect(_response.res.headers['content-type']).toMatch('application/json');
             return publicInterface
+        },
+        header: function header(key, value) {
+            _headers.push({key, value})
+            return publicInterface
         }
     };
 
@@ -122,6 +127,8 @@ const Test = (description, getApp) => {
                 let req = request(getApp())[method](_route)
 
                 if(_reqBody) req.send(_reqBody);
+
+                if(_headers.length) _headers.forEach(({key, value}) => req.set(key, value))
 
                 if (_cookie) req = req.set('Cookie', _cookie);
 
