@@ -1,11 +1,11 @@
+import { NavLink } from 'react-router-dom';
+import Dropdown from 'react-bootstrap/Dropdown';
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from 'react-redux';
-import { NavLink } from 'react-router-dom';
-import { getHcpProfiles, editHcpProfiles, hcpsSort } from '../hcp.actions';
-import Dropdown from 'react-bootstrap/Dropdown';
 import { LinkContainer } from 'react-router-bootstrap';
+import { getHcpProfiles, editHcpProfiles, hcpsSort } from '../hcp.actions';
 
-export default function hcps() {
+export default function hcpUsers() {
     const dispatch = useDispatch();
 
     const [state, setState] = useState({ id: '', first_name: '', last_name: '', phone: '' });
@@ -15,20 +15,14 @@ export default function hcps() {
             ...prevState,
             id: id, first_name: row.first_name, last_name: row.last_name, phone: row.phone
         }));
-
-        console.log(state);
-
-    }
+    };
 
     const removeItem = () => {
         setState(prevState => ({
             ...prevState,
             id: '', first_name: '', last_name: '', phone: ''
         }));
-
-        console.log(state);
-
-    }
+    };
 
     const handleChange = (e, id, type) => {
         const value = e.target.value;
@@ -38,38 +32,33 @@ export default function hcps() {
             [type]: value
         }));
         e.target.value = value;
-        console.log(state);
-
-    }
+    };
 
     const handleSubmit = (id) => {
         const data = {
             first_name: state.first_name,
             last_name: state.last_name,
-            phone: state._phone,
-        }
-        dispatch(editHcpProfiles(data, id))
-            .then(res => {
-                removeItem();
-            })
+            phone: state._phone
+        };
 
-    }
+        dispatch(editHcpProfiles(data, id)).then(res => {
+            removeItem();
+        });
+    };
 
     const hcps = useSelector(state => state.hcpReducer.hcps);
 
-
-
     const pageLeft = () => {
         if (hcps.page > 1) dispatch(getHcpProfiles(hcps.page - 1, hcps.is_active));
-    }
+    };
 
     const pageRight = () => {
         if (hcps.end !== hcps.total) dispatch(getHcpProfiles(hcps.page + 1, hcps.is_active));
-    }
+    };
 
     const sortHcp = (sortType, val) => {
         dispatch(hcpsSort(sortType, val));
-    }
+    };
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
@@ -144,13 +133,15 @@ export default function hcps() {
                                                             <td>{row.phone}</td>
                                                             <td>{row.uuid}</td>
                                                         </React.Fragment>
-
                                                     }
 
-                                                    <td>{row.is_active === true ?
-                                                        <span><i className="fa fa-xs fa-circle text-success pr-2"></i>Active</span> :
-                                                        <span><i className="fa fa-xs fa-circle text-danger pr-2"></i>Pending</span>
-                                                    }</td>
+                                                    <td>
+                                                        {row.is_active === true ?
+                                                            <span><i className="fa fa-xs fa-circle text-success pr-2"></i>Active</span> :
+                                                            <span><i className="fa fa-xs fa-circle text-danger pr-2"></i>Pending</span>
+                                                        }
+                                                    </td>
+
                                                     <td>
                                                         {state.id === ('id' + index) ?
                                                             <React.Fragment>
@@ -158,10 +149,8 @@ export default function hcps() {
                                                                 <i className="fa fa-times text-danger px-2" onClick={() => removeItem()}></i>
                                                             </React.Fragment> :
                                                             <span><i className="fas fa-pencil-alt px-2" onClick={() => addItem('id' + index, row)}></i></span>
-
                                                         }
                                                     </td>
-
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -178,8 +167,6 @@ export default function hcps() {
                             {hcps['users'] && hcps['users'].length === 0 &&
                                 <>No profiles found!</>
                             }
-
-
                         </div>
                     </div>
                 </div>
