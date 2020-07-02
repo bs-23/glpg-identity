@@ -37,6 +37,13 @@ describe('User Routes', () => {
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
+    it('Should logout when requesting logout with valid credential', async () => {
+        const response = await request.get('/api/logout')
+            .set('Cookie', [`access_token=${defaultUser.access_token}`]);
+
+        expect(response.res.headers['set-cookie'][0].split(';')[0].split('=')[1]).toBe('');
+    });
+
     it('Should get the signed in user profile', async () => {
         const response = await request
             .get('/api/users/getSignedInUserProfile')
