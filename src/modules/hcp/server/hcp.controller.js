@@ -1,7 +1,9 @@
 const path = require('path');
+const validator = require('validator');
 const { QueryTypes } = require('sequelize');
 const Hcp = require('./hcp_profile.model');
 const HcpConsents = require('./hcp_consents.model');
+const { version } = require('punycode');
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
@@ -89,8 +91,7 @@ async function resetHcpPassword(req, res) {
     const { email, password, confirm_password } = req.body;
 
     try {
-        const checkUUID = ("" + req.params.id).match('^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
-        if (checkUUID === null) {
+        if (!validator.isUUID(req.params.id, 'all')) {
             return res.status(400).send("Invalid id");
         }
 
@@ -137,6 +138,7 @@ async function createHcpProfile(req, res) {
     } = req.body;
 
     const application_id = req.user.id;
+    if (status === null) status = "Not Approved";
 
     try {
         const [doc, created] = await Hcp.findOrCreate({
