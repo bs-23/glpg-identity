@@ -64,15 +64,15 @@ async function editHcp(req, res) {
 async function checkHcpFromMaster(req, res) {
     const { email, uuid } = req.body;
 
-    if(!uuid || !email) return res.status(400).send('Missing required parameters.');
+    if (!uuid || !email) return res.status(400).send('Missing required parameters.');
 
     try {
         const data = await sequelize.datasyncConnector.query(
             'SELECT * FROM ciam.vwhcpmaster WHERE uuid_1 = $uuid OR uuid_2 = $uuid OR email_1 = $email', {
-                limit: 1,
-                bind: { uuid, email },
-                type: QueryTypes.SELECT
-            }
+            limit: 1,
+            bind: { uuid, email },
+            type: QueryTypes.SELECT
+        }
         );
 
         if (!data || !data.length) return res.status(404).send('HCP profile not found!');
@@ -132,8 +132,9 @@ async function createHcpProfile(req, res) {
         country_iso2,
         status,
         consents,
-        application_id
     } = req.body;
+
+    const application_id = req.user.id;
 
     try {
         const [doc, created] = await Hcp.findOrCreate({
@@ -158,19 +159,23 @@ async function createHcpProfile(req, res) {
         delete doc.dataValues.created_by;
         delete doc.dataValues.updated_by;
 
-        const consentArr = [];
-        consents.forEach(element => {
-            consentArr.push({
-                user_id: doc.id,
-                consent_id: Object.keys(element)[0],
-                response: Object.values(element)[0],
-            });
-        });
 
-        await HcpConsents.bulkCreate(consentArr, {
-            returning: true,
-            ignoreDuplicates: false
-        });
+        if (consents) {
+            const consentArr = [];
+            consents.forEach(element => {
+                consentArr.push({
+                    user_id: doc.id,
+                    consent_id: Object.keys(element)[0],
+                    response: Object.values(element)[0],
+                });
+            });
+
+            await HcpConsents.bulkCreate(consentArr, {
+                returning: true,
+                ignoreDuplicates: false
+            });
+
+        }
 
         res.json(doc);
     } catch (err) {
