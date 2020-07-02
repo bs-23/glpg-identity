@@ -92,7 +92,23 @@ describe('HCP Routes', () => {
             "application_id":"20490c6b-1dcf-40ad-9534-37c6d4585b28"
         })
 
+        it('Should create a new HCP profile without consent - Create HCP Profile', async () => {
+            const response = await request.post('/api/hcp-profiles')
+                .set('Authorization', 'bearer ' + defaultApplication.access_token)
+                .send({
+                    "first_name": faker.name.lastName(),
+                    "last_name": faker.name.firstName(),
+                    "uuid": faker.random.uuid(),
+                    "email": faker.internet.email(),
+                    "password": faker.internet.password(),
+                    "phone": faker.phone.phoneNumber(),
+                    "country_iso2":"DE",
+                    "status":"Approved",
+                    "application_id":"20490c6b-1dcf-40ad-9534-37c6d4585b28"
+                })
 
+            expect(response.statusCode).toBe(200)
+        })
 
     Test('Should get 400 when creating HCP profile with existing email - Create HCP Profile', () => appInstance)
         .header('Authorization', 'bearer ' + defaultApplication.access_token)
@@ -136,6 +152,14 @@ describe('HCP Routes', () => {
             });
 
         expect(response.statusCode).toBe(404);
+    });
+
+    it('Should get 400 when the body does not contain required parameter ', async () => {
+        const response = await request
+            .post('/api/hcp-profiles/master-details')
+            .set('Authorization', `bearer ${defaultApplication.access_token}`)
+
+        expect(response.statusCode).toBe(400);
     });
 
     Test('Should edit an HCP user - Edit HCP user', () => appInstance)
