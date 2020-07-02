@@ -1,57 +1,4 @@
 paths:
-    # /api/hcps:
-    #     get:
-    #         tags:
-    #             - HCP
-    #         summary: Get all HPCs
-    #         parameters:
-    #             - name: page
-    #               in: query
-    #               required: true
-    #               description: Index of page to be returned
-    #               schema:
-    #                 type: integer
-    #             - name: is_active
-    #               in: query
-    #               required: true
-    #               description: HCP user's active status
-    #               schema:
-    #                 type: boolean
-    #         responses:
-    #             200:
-    #                 description: HCP user get success.
-    #                 content:
-    #                     application/json:
-    #                         schema:
-    #                             $ref: "#/components/schemas/getHcpUsers"
-    #             401:
-    #                 description: User is not authenticated.
-    # /api/hcps/{id}:
-    #     put:
-    #         tags:
-    #             - HCP
-    #         summary: Update HCP user
-    #         parameters:
-    #             - name: id
-    #               in: path
-    #               required: true
-    #               description: the user identifier, as userId
-    #               schema:
-    #                 type: string
-    #         requestBody:
-    #             content:
-    #                 application/json:
-    #                     schema:
-    #                         $ref: "#/components/schemas/updateHcp"
-    #         responses:
-    #             200:
-    #                 description: User login success.
-    #                 content:
-    #                     applicaiton/json:
-    #                         schema:
-    #                             $ref: "#/components/schemas/hcpUser"
-    #             401:
-    #                 description: User is not authenticated.
     /api/hcp-profiles/master-details:
         post:
             tags:
@@ -68,7 +15,8 @@ paths:
                                     type: string
                                 uuid:
                                     type: string
-                                    required: true
+                            required:
+                              - uuid
             responses:
                 200:
                     description: The request has succeeded.
@@ -227,8 +175,6 @@ components:
             properties:
                 id:
                     type: string
-                application_id:
-                    type: string
                 uuid:
                     type: string
                 first_name:
@@ -258,6 +204,10 @@ components:
                     type: string
                 confirm_password:
                     type: string
+            required:
+              - email
+              - password
+              - confirm_password
         hcpConsent:
             type: object
             description: Key value pair of consent-id and answer
@@ -279,11 +229,15 @@ components:
                     type: string
                 country_iso2:
                     type: string
-                status:
-                    type: string
                 consents:
                     type: array
                     items:
                         $ref: "#/components/schemas/hcpConsent"
-                application_id:
-                    type: string
+            required:
+              - first_name
+              - last_name
+              - uuid
+              - email
+              - password
+              - phone
+              - country_iso2
