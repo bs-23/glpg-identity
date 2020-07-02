@@ -4,7 +4,6 @@ import { NavLink } from 'react-router-dom';
 import { getHcpProfiles, editHcpProfiles, hcpsSort } from '../hcp.actions';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { LinkContainer } from 'react-router-bootstrap';
-import "./hcp.scss";
 
 export default function hcps() {
     const dispatch = useDispatch();
