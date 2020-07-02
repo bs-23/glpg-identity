@@ -16,13 +16,13 @@ components:
         country:
             type: object
             properties:
-                codbase:
+                countryid:
                     type: string
                 country_iso2:
                     type: string
                 country_iso3:
                     type: string
-                countryid:
+                codbase:
                     type: string
                 countryname:
                     type: string
