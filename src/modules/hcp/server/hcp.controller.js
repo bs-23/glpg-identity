@@ -13,16 +13,18 @@ const emailService = require(path.join(
 ));
 
 async function getHcps(req, res) {
-    const page = req.query.page - 1;
-    const limit = 10;
-    const is_active =
-        req.query.is_active === 'null' ? null : req.query.is_active;
-    const offset = page * limit;
+
 
     try {
+        const page = req.query.page - 1;
+        const limit = 10;
+        const status =
+            req.query.is_active === 'null' ? null : req.query.is_active;
+        const offset = page * limit;
+
         const hcps = await Hcp.findAll({
             where: {
-                is_active: is_active === null ? [true, false] : is_active,
+                status: !status ? ['Approved', 'Not Approved', 'In Progress', 'Rejected'] : status,
             },
             attributes: { exclude: ['password'] },
             offset,
@@ -42,7 +44,7 @@ async function getHcps(req, res) {
             total: totalUser,
             start: limit * page + 1,
             end: offset + limit > totalUser ? totalUser : offset + limit,
-            is_active,
+            status,
         };
 
         res.json(data);

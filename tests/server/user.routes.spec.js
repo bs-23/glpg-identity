@@ -87,6 +87,19 @@ describe('User Routes', () => {
         expect(response.statusCode).toBe(400);
     });
 
+    it('Should not change password if passwords dont match', async () => {
+        const response = await request
+            .post('/api/users/change-password')
+            .set('Cookie', [`access_token=${defaultUser.access_token}`])
+            .send({
+                currentPassword: defaultUser.password,
+                newPassword: faker.internet.password(8),
+                confirmPassword: faker.internet.password(8),
+            });
+
+        expect(response.statusCode).toBe(400);
+    });
+
     it('Should change password', async () => {
         const response = await request
             .post('/api/users/change-password')

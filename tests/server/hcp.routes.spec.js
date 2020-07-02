@@ -1,5 +1,6 @@
 const path = require('path');
 const faker = require('faker');
+const supertest = require('supertest');
 
 const specHelper = require(path.join(process.cwd(), 'jest/spec.helper'));
 const app = require(path.join(process.cwd(), 'src/config/server/lib/express'));
@@ -10,11 +11,13 @@ const { defaultUser } = specHelper.hcp;
 const { defaultApplication, users: { defaultAdmin } } = specHelper;
 
 let appInstance;
+let request;
 
 beforeAll(async () => {
     const config = require(path.join(process.cwd(),'src/config/server/config'));
     await config.initEnvironmentVariables();
     appInstance = await app();
+    request = supertest(appInstance);
 });
 
 describe('HCP Routes', () => {
@@ -210,4 +213,20 @@ describe('HCP Routes', () => {
             last_name: faker.name.lastName(),
             phone: faker.phone.phoneNumber()
         })
+
+    it('Should get hcp users data', async () => {
+            const response = await request.get('/api/hcps/?page=1&is_active=Approved')
+            .set('Cookie', [`access_token=${defaultAdmin.access_token}`])
+
+            expect(response.statusCode).toBe(200);
+            expect(response.res.headers['content-type']).toMatch('application/json');
+        });
+
+    it('Should get hcp users data of all status when no is_active given', async () => {
+            const response = await request.get('/api/hcps/?page=1&is_active=null')
+            .set('Cookie', [`access_token=${defaultAdmin.access_token}`])
+
+            expect(response.statusCode).toBe(200);
+            expect(response.res.headers['content-type']).toMatch('application/json');
+        });
 });
