@@ -36,6 +36,8 @@ components:
                     type: string
                 category:
                     type: string
+                country_code:
+                    type: string
         consentsForCountry:
             type: object
             properties:

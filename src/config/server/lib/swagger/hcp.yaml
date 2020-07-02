@@ -68,13 +68,14 @@ paths:
                                     type: string
                                 uuid:
                                     type: string
+                                    required: true
             responses:
                 200:
                     description: The request has succeeded.
                     content:
                         applicaiton/json:
                             schema:
-                                $ref: "#/components/schemas/hcpUser"
+                                $ref: "#/components/schemas/hcpMasterDetails"
                 401:
                     description: User is not authenticated.
                 404:
@@ -93,6 +94,10 @@ paths:
             responses:
                 200:
                     description: The request has succeeded.
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/hcpProfile"
                 401:
                     description: User is not authenticated.
 
@@ -114,7 +119,7 @@ paths:
                     content:
                         applicaiton/json:
                             schema:
-                                $ref: "#/components/schemas/hcpUser"
+                                $ref: "#/components/schemas/hcpProfile"
                 401:
                     description: User is not authenticated.
                 404:
@@ -145,10 +150,79 @@ paths:
                     description: User is not authenticated.
                 404:
                     description: HCP user profile not found.
+                400:
+                    description: Invalid request, password mismatch or invalid ID.
 
 components:
     schemas:
-        hcpUser:
+        hcpMasterDetails:
+            type: object
+            properties:
+                individual_id_onekey:
+                    type: string
+                codbase:
+                    type: string
+                uuid_1:
+                    type: string
+                uuid_2:
+                    type: string
+                lastname:
+                    type: string
+                firstname:
+                    type: string
+                activity_id_onekey:
+                    type: string
+                workplace_id_onekey:
+                    type: string
+                phone:
+                    type: string
+                language_code:
+                    type: string
+                gender_code:
+                    type: string
+                gender_desc:
+                    type: string
+                email_1:
+                    type: string
+                adr_id_onekey:
+                    type: string
+                address_lbl:
+                    type: string
+                adr_long_lbl:
+                    type: string
+                postal_city:
+                    type: string
+                fax:
+                    type: string
+                telephone:
+                    type: string
+                telephone_2:
+                    type: string
+                lgpostcode:
+                    type: string
+                ind_type_code:
+                    type: string
+                ind_type_desc:
+                    type: string
+                status_code:
+                    type: string
+                ind_status_desc:
+                    type: string
+                country_iso2:
+                    type: string
+                donotcall:
+                    type: string
+                donotvisit:
+                    type: string
+                donotemail:
+                    type: string
+                donotmail:
+                    type: string
+                donotfax:
+                    type: string
+                ind_privacylawenabled:
+                    type: string
+        hcpProfile:
             type: object
             properties:
                 id:
@@ -169,6 +243,12 @@ components:
                     type: string
                 status:
                     type: string
+                created_at:
+                    type: string
+                    format: date-time
+                updated_at:
+                    type: string
+                    format: date-time
         resetHcpPassword:
             type: object
             properties:
@@ -178,7 +258,7 @@ components:
                     type: string
                 confirm_password:
                     type: string
-        consent:
+        hcpConsent:
             type: object
             description: Key value pair of consent-id and answer
             example: {"consent_id":"answer"}
@@ -204,6 +284,6 @@ components:
                 consents:
                     type: array
                     items:
-                        $ref: "#/components/schemas/consent"
+                        $ref: "#/components/schemas/hcpConsent"
                 application_id:
                     type: string
