@@ -1,5 +1,4 @@
 import Types from "./hcp.types";
-import hcps from "./components/hcp-users";
 
 const initialState = {
     hcps: {}
@@ -8,7 +7,6 @@ const initialState = {
 export default function reducer(state = initialState, action) {
     switch (action.type) {
         case Types.GET_HCPS_FULFILLED: {
-
             return {
                 ...state,
                 hcps: action.payload.data

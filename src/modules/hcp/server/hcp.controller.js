@@ -167,14 +167,10 @@ async function createHcpProfile(req, res) {
             });
         });
 
-        const [docConsents, createdConsents] = await HcpConsents.bulkCreate(consentArr, {
+        await HcpConsents.bulkCreate(consentArr, {
             returning: true,
-            ignoreDuplicates: false,
+            ignoreDuplicates: false
         });
-
-        if (!createdConsents) {
-            return res.sendStatus(400);
-        }
 
         res.json(doc);
     } catch (err) {
