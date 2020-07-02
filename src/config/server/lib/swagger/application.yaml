@@ -15,6 +15,9 @@ paths:
                                     type: string
                                 password:
                                     type: string
+                            required:
+                              - email
+                              - password
             responses:
                 200:
                     description: The request has succeeded.
@@ -25,7 +28,6 @@ paths:
                                 properties:
                                     name:
                                         type: string
-                                        required: true
                                     email:
                                         type: string
                                     access_token:
