@@ -153,4 +153,20 @@ describe('HCP Routes', () => {
             last_name: faker.name.lastName(),
             phone: faker.phone.phoneNumber()
         })
+
+    it('Should get hcp users data', async () => {
+            const response = await request.get('/api/hcps/?page=1&is_active=Approved')
+            .set('Cookie', [`access_token=${defaultAdmin.access_token}`])
+
+            expect(response.statusCode).toBe(200);
+            expect(response.res.headers['content-type']).toMatch('application/json');
+        });
+
+    it('Should get hcp users data of all status when no is_active given', async () => {
+            const response = await request.get('/api/hcps/?page=1&is_active=null')
+            .set('Cookie', [`access_token=${defaultAdmin.access_token}`])
+
+            expect(response.statusCode).toBe(200);
+            expect(response.res.headers['content-type']).toMatch('application/json');
+        });
 });
