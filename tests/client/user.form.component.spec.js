@@ -3,14 +3,23 @@ import { render, waitFor, fireEvent } from '@testing-library/react';
 import { configure, shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import { MemoryRouter } from 'react-router-dom';
-
+import axios from 'axios'
+import MockAdapter from 'axios-mock-adapter'
 import { Provider } from 'react-redux';
 import store from '../../src/modules/core/client/store';
 import UserForm from '../../src/modules/user/client/components/user-form.component';
 
 configure({ adapter: new Adapter() });
 
+let mockAxios;
+
+
+
 describe('UserForm component', () => {
+    beforeEach(() => {
+        mockAxios = new MockAdapter(axios);
+    });
+
     const wrapperComponent = () => (
         <Provider store={store}>
             <UserForm/>
@@ -30,6 +39,9 @@ describe('UserForm component', () => {
                 </MemoryRouter>
             </Provider>
         );
+
+        const data = [{ countryid: 1, countryname: 'England'}]
+        mockAxios.onGet('/api/cdp/countries').reply(200, data)
 
         const name = getByTestId('name');
         const email = getByTestId('email');
