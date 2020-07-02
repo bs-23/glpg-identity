@@ -30,7 +30,7 @@ $ yarn seed             # generate required database schemas
 $ yarn start            # development build
 $ yarn production       # production build
 $ yarn test             # run unit tests
-$ yarn sonarqube        # run sonarqube analysis
+$ yarn sonarqube        # generate sonarqube analysis
 ```
 
 ## API Documentation

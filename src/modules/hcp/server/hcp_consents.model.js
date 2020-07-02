@@ -1,8 +1,6 @@
 const path = require("path");
 const { DataTypes } = require("sequelize");
 const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequelize"));
-const HCP = require(path.join(process.cwd(), "src/modules/hcp/server/hcp_profile.model"));
-const Consents = require(path.join(process.cwd(), "src/modules/consent/server/consent.model.js"));
 
 const HcpConsents = sequelize.cdpConnector.define("hcp_consents", {
     id: {

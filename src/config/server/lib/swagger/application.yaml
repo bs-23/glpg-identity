@@ -34,7 +34,3 @@ paths:
                                         type: string
                 401:
                     description: Invalid email mail or password.
-                    content:
-                        applicaiton/text:
-                            schema:
-                                type: string
