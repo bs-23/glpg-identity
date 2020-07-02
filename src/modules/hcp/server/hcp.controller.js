@@ -138,6 +138,7 @@ async function createHcpProfile(req, res) {
     } = req.body;
 
     const application_id = req.user.id;
+    if (status === null) status = "Not Approved";
 
     try {
         const [doc, created] = await Hcp.findOrCreate({
