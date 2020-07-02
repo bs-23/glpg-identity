@@ -3,14 +3,8 @@ const { QueryTypes } = require('sequelize');
 const Hcp = require('./hcp_profile.model');
 const HcpConsents = require('./hcp_consents.model');
 
-const sequelize = require(path.join(
-    process.cwd(),
-    'src/config/server/lib/sequelize'
-));
-const emailService = require(path.join(
-    process.cwd(),
-    'src/config/server/lib/email-service/email.service'
-));
+const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
+const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 
 async function getHcps(req, res) {
 
@@ -72,15 +66,20 @@ async function editHcp(req, res) {
 async function checkHcpFromMaster(req, res) {
     const { email, uuid } = req.body;
 
+    if(!uuid || !email) return res.status(400).send('Missing required parameters.');
+
     try {
-        const hcp_master = await sequelize.datasyncConnector.query(
-            `SELECT * FROM ciam.vwhcpmaster WHERE uuid_1 = '${uuid}' OR uuid_2 = '${uuid}' OR email_1 = '${email}'`,
-            { type: QueryTypes.SELECT }
+        const data = await sequelize.datasyncConnector.query(
+            'SELECT * FROM ciam.vwhcpmaster WHERE uuid_1 = $uuid OR uuid_2 = $uuid OR email_1 = $email', {
+                limit: 1,
+                bind: { uuid, email },
+                type: QueryTypes.SELECT
+            }
         );
 
-        if (hcp_master.length === 0) return res.status(404).send('HCP profile not found!');
+        if (!data || !data.length) return res.status(404).send('HCP profile not found!');
 
-        res.json(hcp_master);
+        res.json(data[0]);
     } catch (err) {
         res.status(500).send(err);
     }
@@ -99,29 +98,26 @@ async function resetHcpPassword(req, res) {
 
         if (!hcpUser) return res.status(404).send('HCP user not found.');
 
-        if (password !== confirm_password)
-            return res
-                .status(400)
-                .send("Password and confirm password doesn't match.");
+        if (password !== confirm_password) {
+            return res.status(400).send("Password and confirm password doesn't match.");
+        }
 
         hcpUser.update({ password });
 
-        const templateUrl = path.join(
-            process.cwd(),
-            `src/config/server/lib/email-service/templates/hcp-password-reset.html`
-        );
+        const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/hcp-password-reset.html`);
         const options = {
             toAddresses: [email],
             templateUrl,
             subject: 'Your password has been reset.',
             data: {
                 firstName: hcpUser.first_name,
-                lastName: hcpUser.last_name,
-            },
+                lastName: hcpUser.last_name
+            }
         };
+
         await emailService.send(options);
 
-        res.status(200).send('Password reset successfully.');
+        res.send('Password reset successfully.');
     } catch (err) {
         res.status(500).send(err);
     }
@@ -138,7 +134,7 @@ async function createHcpProfile(req, res) {
         country_iso2,
         status,
         consents,
-        application_id,
+        application_id
     } = req.body;
 
     try {
@@ -153,7 +149,7 @@ async function createHcpProfile(req, res) {
                 country_iso2,
                 status,
                 application_id,
-            },
+            }
         });
 
         if (!created) {
@@ -164,7 +160,6 @@ async function createHcpProfile(req, res) {
         delete doc.dataValues.created_by;
         delete doc.dataValues.updated_by;
 
-
         const consentArr = [];
         consents.forEach(element => {
             consentArr.push({
@@ -174,17 +169,10 @@ async function createHcpProfile(req, res) {
             });
         });
 
-        const [docConsents, createdConsents] = await HcpConsents.bulkCreate(
-            consentArr,
-            {
-                returning: true,
-                ignoreDuplicates: false,
-            }
-        );
-
-        if (!createdConsents) {
-            return res.sendStatus(400);
-        }
+        await HcpConsents.bulkCreate(consentArr, {
+            returning: true,
+            ignoreDuplicates: false
+        });
 
         res.json(doc);
     } catch (err) {

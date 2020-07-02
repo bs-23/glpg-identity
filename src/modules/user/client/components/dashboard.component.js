@@ -1,7 +1,5 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import Accordion from 'react-bootstrap/Accordion';
-import Card from 'react-bootstrap/Card';
 import "./dashboard.scss";
 
 export default function Dashboard() {
@@ -30,7 +28,7 @@ export default function Dashboard() {
                                 <NavLink to="" className="p-5 border shadow-sm m-2 h4 pb-0 mb-0 text-muted text-decoration-none">
                                     Tag & Persona Management
                                 </NavLink>
-                               
+
                             </div>
                         </div>
                     </div>
