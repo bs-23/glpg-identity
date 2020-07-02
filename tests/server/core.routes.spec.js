@@ -22,6 +22,12 @@ describe('Core Routes', () => {
         expect(response.res.headers['content-type']).toMatch('text/html');
     });
 
+    it('Should respond with 404 if ajax request is made', async () => {
+        const response = await request.get('/').set('X-Requested-With', 'xmlhttprequest')
+
+        expect(response.statusCode).toBe(404);
+    });
+
     it('Should return all available countries', async () => {
         const response = await request
             .get('/api/cdp/countries')
