@@ -23,6 +23,7 @@ async function getAccessToken(req, res) {
         }
 
         const response = {
+            id: application.id,
             name: application.name,
             email: application.email,
             access_token: generateAccessToken(application),

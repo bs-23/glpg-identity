@@ -1,4 +1,5 @@
 const path = require('path');
+const validator = require('validator');
 const { QueryTypes } = require('sequelize');
 const Hcp = require('./hcp_profile.model');
 const HcpConsents = require('./hcp_consents.model');
@@ -7,24 +8,23 @@ const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequel
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 
 async function getHcps(req, res) {
-    const page = req.query.page - 1;
-    const limit = 10;
-    const is_active =
-        req.query.is_active === 'null' ? null : req.query.is_active;
-    const offset = page * limit;
-
     try {
+        const page = req.query.page - 1;
+        const limit = 10;
+        const status = req.query.is_active === 'null' ? null : req.query.is_active;
+        const offset = page * limit;
+
         const hcps = await Hcp.findAll({
             where: {
-                is_active: is_active === null ? [true, false] : is_active,
+                status: !status ? ['Approved', 'Not Approved', 'In Progress', 'Rejected'] : status,
             },
             attributes: { exclude: ['password'] },
             offset,
             limit,
             order: [
                 ['created_at', 'ASC'],
-                ['id', 'ASC'],
-            ],
+                ['id', 'ASC']
+            ]
         });
 
         const totalUser = await Hcp.count();
@@ -36,7 +36,7 @@ async function getHcps(req, res) {
             total: totalUser,
             start: limit * page + 1,
             end: offset + limit > totalUser ? totalUser : offset + limit,
-            is_active,
+            status
         };
 
         res.json(data);
@@ -64,16 +64,14 @@ async function editHcp(req, res) {
 async function checkHcpFromMaster(req, res) {
     const { email, uuid } = req.body;
 
-    if(!uuid || !email) return res.status(400).send('Missing required parameters.');
+    if (!uuid || !email) return res.status(400).send('Missing required parameters.');
 
     try {
         const data = await sequelize.datasyncConnector.query(
             'SELECT * FROM ciam.vwhcpmaster WHERE uuid_1 = $uuid OR uuid_2 = $uuid OR email_1 = $email', {
-                limit: 1,
-                bind: { uuid, email },
-                type: QueryTypes.SELECT
-            }
-        );
+            bind: { uuid, email },
+            type: QueryTypes.SELECT
+        });
 
         if (!data || !data.length) return res.status(404).send('HCP profile not found!');
 
@@ -87,8 +85,7 @@ async function resetHcpPassword(req, res) {
     const { email, password, confirm_password } = req.body;
 
     try {
-        const checkUUID = ("" + req.params.id).match('^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
-        if (checkUUID === null) {
+        if (!validator.isUUID(req.params.id, 'all')) {
             return res.status(400).send("Invalid id");
         }
 
@@ -108,8 +105,8 @@ async function resetHcpPassword(req, res) {
             templateUrl,
             subject: 'Your password has been reset.',
             data: {
-                firstName: hcpUser.first_name,
-                lastName: hcpUser.last_name
+                firstName: hcpUser.first_name || '',
+                lastName: hcpUser.last_name || ''
             }
         };
 
@@ -130,9 +127,7 @@ async function createHcpProfile(req, res) {
         password,
         phone,
         country_iso2,
-        status,
         consents,
-        application_id
     } = req.body;
 
     try {
@@ -145,8 +140,8 @@ async function createHcpProfile(req, res) {
                 password,
                 phone,
                 country_iso2,
-                status,
-                application_id,
+                status: 'Not Approved',
+                application_id: req.user.id
             }
         });
 
@@ -158,19 +153,21 @@ async function createHcpProfile(req, res) {
         delete doc.dataValues.created_by;
         delete doc.dataValues.updated_by;
 
-        const consentArr = [];
-        consents.forEach(element => {
-            consentArr.push({
-                user_id: doc.id,
-                consent_id: Object.keys(element)[0],
-                response: Object.values(element)[0],
+        if (consents) {
+            const consentArr = [];
+            consents.forEach(element => {
+                consentArr.push({
+                    user_id: doc.id,
+                    consent_id: Object.keys(element)[0],
+                    response: Object.values(element)[0]
+                });
             });
-        });
 
-        await HcpConsents.bulkCreate(consentArr, {
-            returning: true,
-            ignoreDuplicates: false
-        });
+            await HcpConsents.bulkCreate(consentArr, {
+                returning: true,
+                ignoreDuplicates: false
+            });
+        }
 
         res.json(doc);
     } catch (err) {
@@ -182,7 +179,7 @@ async function getHcpProfile(req, res) {
     try {
         const hcpProfile = await Hcp.findOne({
             where: { id: req.params.id },
-            attributes: { exclude: ['password'] },
+            attributes: { exclude: ['password'] }
         });
 
         if (!hcpProfile) return res.status(404).send('HCP profile not found!');

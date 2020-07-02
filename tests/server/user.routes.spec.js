@@ -37,6 +37,13 @@ describe('User Routes', () => {
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
+    it('Should logout when requesting logout with valid credential', async () => {
+        const response = await request.get('/api/logout')
+            .set('Cookie', [`access_token=${defaultUser.access_token}`]);
+
+        expect(response.res.headers['set-cookie'][0].split(';')[0].split('=')[1]).toBe('');
+    });
+
     it('Should get the signed in user profile', async () => {
         const response = await request
             .get('/api/users/getSignedInUserProfile')
@@ -80,6 +87,19 @@ describe('User Routes', () => {
             .set('Cookie', [`access_token=${defaultUser.access_token}`])
             .send({
                 currentPassword: faker.internet.password(8),
+                newPassword: faker.internet.password(8),
+                confirmPassword: faker.internet.password(8),
+            });
+
+        expect(response.statusCode).toBe(400);
+    });
+
+    it('Should not change password if passwords dont match', async () => {
+        const response = await request
+            .post('/api/users/change-password')
+            .set('Cookie', [`access_token=${defaultUser.access_token}`])
+            .send({
+                currentPassword: defaultUser.password,
                 newPassword: faker.internet.password(8),
                 confirmPassword: faker.internet.password(8),
             });
