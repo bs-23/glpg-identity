@@ -14,7 +14,7 @@ let appInstance;
 let request;
 
 beforeAll(async () => {
-    const config = require(path.join(process.cwd(),'src/config/server/config'));
+    const config = require(path.join(process.cwd(), 'src/config/server/config'));
     await config.initEnvironmentVariables();
     appInstance = await app();
     request = supertest(appInstance);
@@ -34,7 +34,7 @@ describe('HCP Routes', () => {
             phone: PropTypes.String,
             country_iso2: PropTypes.String,
             status: PropTypes.String,
-          })
+        })
         .get(`/api/hcp-profiles/${defaultUser.id}`, 200)
 
     Test('Should get 404 when userID does not exist - Get HCP Profile', () => appInstance)
@@ -76,39 +76,39 @@ describe('HCP Routes', () => {
     Test('Should create a new HCP profile - Create HCP Profile', () => appInstance)
         .header('Authorization', 'bearer ' + defaultApplication.access_token)
         .post('/api/hcp-profiles', 200, {
-            "first_name":"john",
-            "last_name":"doe",
-            "uuid":"ABCD123456789",
-            "email":"abcdefg@gmail.com",
-            "password":"gffhjk",
-            "phone":"9898989",
-            "country_iso2":"DE",
-            "status":"Approved",
-            "consents":[
-                {"827cc68d-a92d-4939-a9b6-d373321d23bb": true },
-                {"827cc68d-a92d-4939-a9b6-d373321d23bb": true },
-                {"827cc68d-a92d-4939-a9b6-d373321d23bb": true }
+            "first_name": "john",
+            "last_name": "doe",
+            "uuid": "ABCD123456789",
+            "email": "abcdefg@gmail.com",
+            "password": "gffhjk",
+            "phone": "9898989",
+            "country_iso2": "DE",
+            "status": "Approved",
+            "consents": [
+                { "827cc68d-a92d-4939-a9b6-d373321d23bb": true },
+                { "827cc68d-a92d-4939-a9b6-d373321d23bb": true },
+                { "827cc68d-a92d-4939-a9b6-d373321d23bb": true }
             ],
-            "application_id":"20490c6b-1dcf-40ad-9534-37c6d4585b28"
+            "application_id": "20490c6b-1dcf-40ad-9534-37c6d4585b28"
         })
 
-        it('Should create a new HCP profile without consent - Create HCP Profile', async () => {
-            const response = await request.post('/api/hcp-profiles')
-                .set('Authorization', 'bearer ' + defaultApplication.access_token)
-                .send({
-                    "first_name": faker.name.lastName(),
-                    "last_name": faker.name.firstName(),
-                    "uuid": faker.random.uuid(),
-                    "email": faker.internet.email(),
-                    "password": faker.internet.password(),
-                    "phone": faker.phone.phoneNumber(),
-                    "country_iso2":"DE",
-                    "status":"Approved",
-                    "application_id":"20490c6b-1dcf-40ad-9534-37c6d4585b28"
-                })
+    it('Should create a new HCP profile without consent - Create HCP Profile', async () => {
+        const response = await request.post('/api/hcp-profiles')
+            .set('Authorization', 'bearer ' + defaultApplication.access_token)
+            .send({
+                "first_name": faker.name.lastName(),
+                "last_name": faker.name.firstName(),
+                "uuid": faker.random.uuid(),
+                "email": faker.internet.email(),
+                "password": faker.internet.password(),
+                "phone": faker.phone.phoneNumber(),
+                "country_iso2": "DE",
+                "status": "Approved",
+                "application_id": "20490c6b-1dcf-40ad-9534-37c6d4585b28"
+            })
 
-            expect(response.statusCode).toBe(200)
-        })
+        expect(response.statusCode).toBe(200)
+    })
 
     Test('Should get 400 when creating HCP profile with existing email - Create HCP Profile', () => appInstance)
         .header('Authorization', 'bearer ' + defaultApplication.access_token)
@@ -121,15 +121,15 @@ describe('HCP Routes', () => {
             "phone": "9898989",
             "country_iso2": "DE",
             "status": "Approved",
-            "consents":[
-                {"827cc68d-a92d-4939-a9b6-d373321d23bb": true },
-                {"827cc68d-a92d-4939-a9b6-d373321d23bb": true },
-                {"827cc68d-a92d-4939-a9b6-d373321d23bb": true }
+            "consents": [
+                { "827cc68d-a92d-4939-a9b6-d373321d23bb": true },
+                { "827cc68d-a92d-4939-a9b6-d373321d23bb": true },
+                { "827cc68d-a92d-4939-a9b6-d373321d23bb": true }
             ],
             "application_id": "20490c6b-1dcf-40ad-9534-37c6d4585b28"
         })
 
-    it('Should get user details from master data with email or uuid', async () => {
+    it('Should not get user details with invalid email or uuid', async () => {
         const response = await request
             .post('/api/hcp-profiles/master-details')
             .set('Authorization', `bearer ${defaultApplication.access_token}`)
@@ -138,8 +138,7 @@ describe('HCP Routes', () => {
                 uuid: '59910379201'
             });
 
-        expect(response.statusCode).toBe(200);
-        expect(response.res.headers['content-type']).toMatch('application/json');
+        expect(response.statusCode).toBe(404);
     });
 
     it('Should not found user details from master data with invalid email or uuid', async () => {
@@ -179,18 +178,18 @@ describe('HCP Routes', () => {
         })
 
     it('Should get hcp users data', async () => {
-            const response = await request.get('/api/hcps/?page=1&is_active=Approved')
+        const response = await request.get('/api/hcps/?page=1&is_active=Approved')
             .set('Cookie', [`access_token=${defaultAdmin.access_token}`])
 
-            expect(response.statusCode).toBe(200);
-            expect(response.res.headers['content-type']).toMatch('application/json');
-        });
+        expect(response.statusCode).toBe(200);
+        expect(response.res.headers['content-type']).toMatch('application/json');
+    });
 
     it('Should get hcp users data of all status when no is_active given', async () => {
-            const response = await request.get('/api/hcps/?page=1&is_active=null')
+        const response = await request.get('/api/hcps/?page=1&is_active=null')
             .set('Cookie', [`access_token=${defaultAdmin.access_token}`])
 
-            expect(response.statusCode).toBe(200);
-            expect(response.res.headers['content-type']).toMatch('application/json');
-        });
+        expect(response.statusCode).toBe(200);
+        expect(response.res.headers['content-type']).toMatch('application/json');
+    });
 });
