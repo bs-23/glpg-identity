@@ -14,6 +14,7 @@ async function init() {
     const User = require(path.join(process.cwd(), "src/modules/user/server/user.model"));
     const Consent = require(path.join(process.cwd(), "src/modules/consent/server/consent.model"));
     const HCP = require(path.join(process.cwd(), "src/modules/hcp/server/hcp_profile.model"));
+    const HCP_Consents = require(path.join(process.cwd(), "src/modules/hcp/server/hcp_consents.model"));
 
     await sequelize.cdpConnector.sync();
 
@@ -45,7 +46,7 @@ async function init() {
         const consents = [
 
             { "title": "Sharing personal data with 3rd parties", "type": "online", "opt_type": "single", "category": "GDPR", "country_code": "BE", "purpose": "n/a" },
-            { "title": "Sharing personal data with 3rd parties", "type": "online", "opt_type": "single", "category": "GDPR", "country_code": "IT", "purpose": "n/a"},
+            { "title": "Sharing personal data with 3rd parties", "type": "online", "opt_type": "single", "category": "GDPR", "country_code": "IT", "purpose": "n/a" },
             { "title": "Sharing personal data with 3rd parties", "type": "online", "opt_type": "single", "category": "GDPR", "country_code": "NL", "purpose": "n/a" },
             { "title": "Sharing personal data with 3rd parties", "type": "online", "opt_type": "single", "category": "GDPR", "country_code": "ES", "purpose": "n/a" },
             { "title": "Sharing personal data with 3rd parties", "type": "online", "opt_type": "double", "category": "GDPR", "country_code": "DE", "purpose": "n/a" },
@@ -165,13 +166,13 @@ async function init() {
             { "title": "Manage 3rd Party Social Logins such as Docheck, TakiDex", "type": "online", "opt_type": "single", "category": "GDPR", "country_code": "UK", "purpose": "n/a" },
             { "title": "Manage 3rd Party Social Logins such as Docheck, TakiDex", "type": "online", "opt_type": "single", "category": "GDPR", "country_code": "FR", "purpose": "n/a" },
 
-            { "title": "Send CLM content after RepSale visit", "type": "online", "opt_type": "double", "category": "DM", "country_code": "BE", "purpose": "n/a"},
-            { "title": "Send CLM content after RepSale visit", "type": "online", "opt_type": "double", "category": "DM", "country_code": "IT", "purpose": "n/a"},
-            { "title": "Send CLM content after RepSale visit", "type": "online", "opt_type": "double", "category": "DM", "country_code": "NL", "purpose": "n/a"},
-            { "title": "Send CLM content after RepSale visit", "type": "online", "opt_type": "double", "category": "DM", "country_code": "ES", "purpose": "n/a"},
-            { "title": "Send CLM content after RepSale visit", "type": "online", "opt_type": "double", "category": "DM", "country_code": "DE", "purpose": "n/a"},
-            { "title": "Send CLM content after RepSale visit", "type": "online", "opt_type": "double", "category": "DM", "country_code": "UK", "purpose": "n/a"},
-            { "title": "Send CLM content after RepSale visit", "type": "online", "opt_type": "double", "category": "DM", "country_code": "FR", "purpose": "n/a"}
+            { "title": "Send CLM content after RepSale visit", "type": "online", "opt_type": "double", "category": "DM", "country_code": "BE", "purpose": "n/a" },
+            { "title": "Send CLM content after RepSale visit", "type": "online", "opt_type": "double", "category": "DM", "country_code": "IT", "purpose": "n/a" },
+            { "title": "Send CLM content after RepSale visit", "type": "online", "opt_type": "double", "category": "DM", "country_code": "NL", "purpose": "n/a" },
+            { "title": "Send CLM content after RepSale visit", "type": "online", "opt_type": "double", "category": "DM", "country_code": "ES", "purpose": "n/a" },
+            { "title": "Send CLM content after RepSale visit", "type": "online", "opt_type": "double", "category": "DM", "country_code": "DE", "purpose": "n/a" },
+            { "title": "Send CLM content after RepSale visit", "type": "online", "opt_type": "double", "category": "DM", "country_code": "UK", "purpose": "n/a" },
+            { "title": "Send CLM content after RepSale visit", "type": "online", "opt_type": "double", "category": "DM", "country_code": "FR", "purpose": "n/a" }
         ];
 
         Consent.destroy({ truncate: true }).then(() => {
