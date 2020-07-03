@@ -3,6 +3,7 @@ const validator = require('validator');
 const { QueryTypes } = require('sequelize');
 const Hcp = require('./hcp_profile.model');
 const HcpConsents = require('./hcp_consents.model');
+const Op = require('Sequelize').Op;
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
@@ -55,8 +56,6 @@ async function editHcp(req, res) {
 
         HcpUser.update({ first_name, last_name, phone });
 
-        console.log(HcpUser);
-
         delete HcpUser.dataValues.password;
         delete HcpUser.dataValues.created_by;
         delete HcpUser.dataValues.updated_by;
@@ -73,10 +72,11 @@ async function checkHcpFromMaster(req, res) {
     if (!uuid || !email) return res.status(400).send('Missing required parameters.');
 
     try {
-        const data = await sequelize.datasyncConnector.query(
-            'SELECT * FROM ciam.vwhcpmaster WHERE uuid_1 = $uuid OR uuid_2 = $uuid OR email_1 = $email', {
-            bind: { uuid, email },
-            type: QueryTypes.SELECT
+        const data = await Hcp.findAll({
+            where: {
+                [Op.or]: [{ email: email }, { uuid: uuid }]
+            },
+            attributes: { exclude: ['password', 'created_by', 'updated_by'] }
         });
 
         if (!data || !data.length) return res.status(404).send('HCP profile not found.');
@@ -90,7 +90,7 @@ async function checkHcpFromMaster(req, res) {
 async function resetHcpPassword(req, res) {
     const { email, password, confirm_password } = req.body;
 
-    if(!email && !password && !confirm_password) return res.status(400).send('Missing required parameters.');
+    if (!email && !password && !confirm_password) return res.status(400).send('Missing required parameters.');
 
     try {
         if (!validator.isUUID(req.params.id, 'all')) {
@@ -156,7 +156,7 @@ async function createHcpProfile(req, res) {
         });
 
         if (!created) {
-            return res.sendStatus(400);
+            return res.status(400).send('The user with same email or uuid already exists');
         }
 
         delete doc.dataValues.password;
