@@ -107,7 +107,7 @@ export default function hcpUsers() {
                                                 <th>Email<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'email')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'email')}></i></span></th>
                                                 <th>Lastname<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'last_name')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'last_name')}></i></span></th>
                                                 <th>Phone<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'phone')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'phone')}></i></span></th>
-                                                <th>UUID & one key ID<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'uuid')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'uuid')}></i></span></th>
+                                                <th>UUID <span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'uuid')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'uuid')}></i></span></th>
                                                 <th>Status<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'is_active')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'is_active')}></i></span></th>
                                                 <th>Action</th>
                                                 <th></th>
@@ -137,8 +137,8 @@ export default function hcpUsers() {
 
                                                     <td>
                                                         {row.is_active === true ?
-                                                            <span><i className="fa fa-xs fa-circle text-success pr-2"></i>Active</span> :
-                                                            <span><i className="fa fa-xs fa-circle text-danger pr-2"></i>Pending</span>
+                                                            <span><i className="fa fa-xs fa-circle text-success pr-2"></i>Approved</span> :
+                                                            <span><i className="fa fa-xs fa-circle text-danger pr-2"></i>Not Approved</span>
                                                         }
                                                     </td>
 
