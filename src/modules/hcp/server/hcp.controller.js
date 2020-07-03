@@ -18,7 +18,7 @@ async function getHcps(req, res) {
             where: {
                 status: !status ? ['Approved', 'Not Approved', 'In Progress', 'Rejected'] : status,
             },
-            attributes: { exclude: ['password'] },
+            attributes: { exclude: ['password', 'created_by', 'updated_by'] },
             offset,
             limit,
             order: [
@@ -49,13 +49,17 @@ async function editHcp(req, res) {
     const { first_name, last_name, phone } = req.body;
 
     try {
-        const hcpUser = await Hcp.findOne({ where: { id: req.params.id } });
+        const [doc, created] = await Hcp.findOne({ where: { id: req.params.id } });
 
-        if (!hcpUser) return res.sendStatus(404);
+        if (!created) return res.sendStatus(404);
 
-        hcpUser.update({ first_name, last_name, phone });
+        doc.update({ first_name, last_name, phone });
 
-        res.json(hcpUser);
+        delete doc.dataValues.password;
+        delete doc.dataValues.created_by;
+        delete doc.dataValues.updated_by;
+
+        res.json(doc);
     } catch (err) {
         res.status(500).send(err);
     }
@@ -141,7 +145,10 @@ async function createHcpProfile(req, res) {
                 phone,
                 country_iso2,
                 status: 'Not Approved',
-                application_id: req.user.id
+                application_id: req.user.id,
+                created_by: req.user.id,
+                updated_by: req.user.id
+
             }
         });
 
@@ -179,7 +186,7 @@ async function getHcpProfile(req, res) {
     try {
         const hcpProfile = await Hcp.findOne({
             where: { id: req.params.id },
-            attributes: { exclude: ['password'] }
+            attributes: { exclude: ['password', 'created_by', 'updated_by'] }
         });
 
         if (!hcpProfile) return res.status(404).send('HCP profile not found!');
