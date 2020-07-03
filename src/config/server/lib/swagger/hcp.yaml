@@ -211,7 +211,7 @@ components:
         hcpConsent:
             type: object
             description: Key value pair of consent-id and answer
-            example: {"consent_id":"answer"}
+            example: {"consent_id": true }
         createHcpProfile:
             type: object
             properties:
