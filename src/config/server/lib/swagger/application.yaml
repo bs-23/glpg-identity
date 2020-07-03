@@ -26,6 +26,8 @@ paths:
                             schema:
                                 type: object
                                 properties:
+                                    id:
+                                        type: string
                                     name:
                                         type: string
                                     email:
@@ -35,4 +37,4 @@ paths:
                                     retention_period:
                                         type: string
                 401:
-                    description: Invalid email mail or password.
+                    description: Invalid email or password.

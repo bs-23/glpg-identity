@@ -77,7 +77,7 @@ async function checkHcpFromMaster(req, res) {
             type: QueryTypes.SELECT
         });
 
-        if (!data || !data.length) return res.status(404).send('HCP profile not found!');
+        if (!data || !data.length) return res.status(404).send('HCP profile not found.');
 
         res.json(data[0]);
     } catch (err) {
@@ -88,14 +88,16 @@ async function checkHcpFromMaster(req, res) {
 async function resetHcpPassword(req, res) {
     const { email, password, confirm_password } = req.body;
 
+    if(!email && !password && !confirm_password) return res.status(400).send('Missing required parameters.');
+
     try {
         if (!validator.isUUID(req.params.id, 'all')) {
-            return res.status(400).send("Invalid id");
+            return res.status(400).send("Invalid parameter.");
         }
 
         const hcpUser = await Hcp.findOne({ where: { id: req.params.id, email: email } });
 
-        if (!hcpUser) return res.status(404).send('HCP user not found.');
+        if (!hcpUser) return res.status(404).send('Profile not found.');
 
         if (password !== confirm_password) {
             return res.status(400).send("Password and confirm password doesn't match.");
@@ -148,7 +150,6 @@ async function createHcpProfile(req, res) {
                 application_id: req.user.id,
                 created_by: req.user.id,
                 updated_by: req.user.id
-
             }
         });
 
@@ -189,7 +190,7 @@ async function getHcpProfile(req, res) {
             attributes: { exclude: ['password', 'created_by', 'updated_by'] }
         });
 
-        if (!hcpProfile) return res.status(404).send('HCP profile not found!');
+        if (!hcpProfile) return res.status(404).send('Profile not found.');
 
         res.json(hcpProfile);
     } catch (err) {
