@@ -33,8 +33,8 @@ describe('Hcp user component', () => {
 
         data = { 
             users: [
-                { first_name: 'a', last_name: 'a', email: 'a', phone: '1', uuid: '1' },
-                { first_name: 'b', last_name: 'b', email: 'b', phone: '2', uuid: '2' }
+                { id: '1', first_name: 'a', last_name: 'a', email: 'a', phone: '1', uuid: '1' },
+                { id: '2', first_name: 'b', last_name: 'b', email: 'b', phone: '2', uuid: '2' }
             ]
         };
         const page = 1, is_active = null;
@@ -100,25 +100,87 @@ describe('Hcp user component', () => {
         expect(first_td.textContent).toEqual('b');
     })
 
-    it('should remove a hcp user', async () => {
-        const { container, getByText } = render(wrapperComponent());
+    it('should not update firstname of hcp user', async () => {
+        const { container } = render(wrapperComponent());
         const tbody = container.querySelector('tbody');
-        const first_name = getByText('Firstname');
-        const span = first_name.querySelector('span');
-        const buttons = span.childNodes;
-        const dsc_button = buttons[1];
+        const first_row = tbody.childNodes[0];
+        const action_td = first_row.childNodes[6];
+        const span = action_td.querySelector('span');
+        const edit_btn = span.childNodes[0];
 
+        const first_name = first_row.childNodes[0];
 
         await waitFor(() => {
-            fireEvent.click(dsc_button);
+            fireEvent.click(edit_btn);
         });
 
+        const new_tbody = container.querySelector('tbody');
+        const new_first_row = new_tbody.childNodes[0];
+        const new_action_td = new_first_row.childNodes[6];
+        const cancel_btn = new_action_td.childNodes[1];
 
-        const rows = tbody.childNodes;
-        const first_row = rows[0];
-        const tds = first_row.childNodes;
-        const first_td = tds[0];
+        await waitFor(() => {
+            fireEvent.click(cancel_btn);
+        });
+        
+        const new_first_name = new_first_row.childNodes[0];
 
-        expect(first_td.textContent).toEqual('b');
+
+        expect(first_name.textContent).toEqual(new_first_name.textContent);
+    })
+
+    it('should update firstname, lastname and phone of hcp user', async () => {
+        const { container } = render(wrapperComponent());
+        const tbody = container.querySelector('tbody');
+        const first_row = tbody.childNodes[0];
+        const action_td = first_row.childNodes[6];
+        const span = action_td.querySelector('span');
+        const edit_btn = span.childNodes[0];
+
+        await waitFor(() => {
+            fireEvent.click(edit_btn);
+        });
+
+        const new_tbody = container.querySelector('tbody');
+        const new_first_row = new_tbody.childNodes[0];
+        const first_name_td = new_first_row.childNodes[0];
+        const last_name_td = new_first_row.childNodes[2];
+        const phone_td = new_first_row.childNodes[3]; 
+        const new_action_td = new_first_row.childNodes[6];
+        const update_btn = new_action_td.childNodes[0];
+
+        const first_name_input = first_name_td.childNodes[0];
+        const last_name_input = last_name_td.childNodes[0];
+        const phone_input = phone_td.childNodes[0];
+
+        await waitFor(() => {
+            fireEvent.change(first_name_input, { target: { value: 'z' } });
+            fireEvent.change(last_name_input, { target: { value: 'z' } });
+            fireEvent.change(phone_input, { target: { value: '0' } });
+        })
+
+        expect(first_name_input.value).toEqual('z');
+        expect(last_name_input.value).toEqual('z');
+        expect(phone_input.value).toEqual('0');
+
+
+        const updated_hcp_user = { id: "1", uuid: "1", first_name: "z", last_name: "z", email: "a", phone: "0" };
+        fakeAxios.onPut(`/api/hcps/${'1'}`).reply(200, updated_hcp_user);
+
+        await waitFor(() => {
+            fireEvent.click(update_btn);
+        });
+        
+        const updated_tbody = container.querySelector('tbody');
+        const updated_first_row = updated_tbody.childNodes[0];
+        const updated_first_name = updated_first_row.childNodes[0];
+        const updated_last_name = updated_first_row.childNodes[2];
+        const updated_phone = updated_first_row.childNodes[3];
+
+        // console.log("===========================>", updated_first_name.textContent, " ", updated_last_name.textContent, updated_phone.textContent);
+
+        expect(updated_first_name.textContent).toEqual('z');
+        expect(updated_last_name.textContent).toEqual('z');
+        expect(updated_phone.textContent).toEqual('0');
     })
 });

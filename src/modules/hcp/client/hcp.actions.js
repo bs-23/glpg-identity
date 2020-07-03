@@ -12,6 +12,7 @@ export function getHcpProfiles(page, is_active) {
 }
 
 export function editHcpProfiles(data, id) {
+    // console.log("=======================> clicked", data, id);
     return {
         type: Types.EDIT_HCPS,
         payload: axios({
