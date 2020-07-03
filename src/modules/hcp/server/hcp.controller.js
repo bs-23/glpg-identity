@@ -105,8 +105,8 @@ async function resetHcpPassword(req, res) {
             templateUrl,
             subject: 'Your password has been reset.',
             data: {
-                firstName: hcpUser.first_name,
-                lastName: hcpUser.last_name
+                firstName: hcpUser.first_name || '',
+                lastName: hcpUser.last_name || ''
             }
         };
 
