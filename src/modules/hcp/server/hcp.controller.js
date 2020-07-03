@@ -49,17 +49,19 @@ async function editHcp(req, res) {
     const { first_name, last_name, phone } = req.body;
 
     try {
-        const [doc, created] = await Hcp.findOne({ where: { id: req.params.id } });
+        const HcpUser = await Hcp.findOne({ where: { id: req.params.id } });
 
-        if (!created) return res.sendStatus(404);
+        if (!HcpUser) return res.sendStatus(404);
 
-        doc.update({ first_name, last_name, phone });
+        HcpUser.update({ first_name, last_name, phone });
 
-        delete doc.dataValues.password;
-        delete doc.dataValues.created_by;
-        delete doc.dataValues.updated_by;
+        console.log(HcpUser);
 
-        res.json(doc);
+        delete HcpUser.dataValues.password;
+        delete HcpUser.dataValues.created_by;
+        delete HcpUser.dataValues.updated_by;
+
+        res.json(HcpUser);
     } catch (err) {
         res.status(500).send(err);
     }
