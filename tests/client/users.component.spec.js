@@ -8,15 +8,27 @@ import MockAdapter from 'axios-mock-adapter'
 import { Provider } from 'react-redux';
 import store from '../../src/modules/core/client/store';
 import Users from '../../src/modules/user/client/components/users.component';
+import { getSignedInUserProfile } from '../../src/modules/user/client/user.actions';
 
 configure({ adapter: new Adapter() });
 
 let mockAxios;
 
+beforeAll(async () => {
+    mockAxios = new MockAdapter(axios);
+    mockAxios.onGet('/api/users/getSignedInUserProfile').reply(200, { id: '1', email: 'email@gmail.com', name: 'John Smith' })
+    await store.dispatch(getSignedInUserProfile())
+})
+
 describe('User component', () => {
     beforeEach(() => {
         mockAxios = new MockAdapter(axios);
     });
+
+    it('Should get signed in profile', () => {
+        const signedInProfile = store.getState().userReducer.loggedInUser
+        expect(signedInProfile).toBeTruthy()
+    })
 
     it('Should render user table and delete one user', async () => {
         const users = [
