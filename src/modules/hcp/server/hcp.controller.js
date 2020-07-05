@@ -79,7 +79,7 @@ async function editHcp(req, res) {
     }
 }
 
-async function checkHcpDetails(req, res) {
+async function lookupHcpProfile(req, res) {
     const { email, uuid } = req.body;
 
     if (!uuid || !email) return res.status(400).send('Missing required parameters.');
@@ -271,7 +271,7 @@ async function forgetPassword(req, res) {
 
 exports.getHcps = getHcps;
 exports.editHcp = editHcp;
-exports.checkHcpDetails = checkHcpDetails;
+exports.lookupHcpProfile = lookupHcpProfile;
 exports.createHcpProfile = createHcpProfile;
 exports.getHcpProfile = getHcpProfile;
 exports.changePassword = changePassword;

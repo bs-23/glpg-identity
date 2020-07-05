@@ -8,8 +8,8 @@ module.exports = app => {
     app.route('/api/hcps/:id')
         .put(passport.authenticate('user-jwt', { session: false }), controller.editHcp);
 
-    app.route('/api/hcp-profiles/check-details')
-        .post(passport.authenticate('application-jwt', { session: false }), controller.checkHcpDetails);
+    app.route('/api/hcp-profiles/lookup')
+        .post(passport.authenticate('application-jwt', { session: false }), controller.lookupHcpProfile);
 
     app.route('/api/hcp-profiles')
         .post(passport.authenticate('application-jwt', { session: false }), controller.createHcpProfile);

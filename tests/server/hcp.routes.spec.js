@@ -104,7 +104,7 @@ describe('HCP Routes', () => {
 
     it('Should not found user details with invalid email or uuid', async () => {
         const response = await request
-            .post('/api/hcp-profiles/check-details')
+            .post('/api/hcp-profiles/lookup')
             .set('Authorization', `bearer ${defaultApplication.access_token}`)
             .send({
                 email: faker.internet.email(),
