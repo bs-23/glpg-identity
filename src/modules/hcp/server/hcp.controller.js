@@ -1,7 +1,6 @@
 const path = require('path');
 const _ = require('lodash');
 const crypto = require('crypto');
-const validator = require('validator');
 const { QueryTypes } = require('sequelize');
 const Hcp = require('./hcp_profile.model');
 const HcpConsents = require('./hcp_consents.model');
@@ -165,14 +164,14 @@ async function createHcpProfile(req, res) {
 
 async function getHcpProfile(req, res) {
     try {
-        const hcpProfile = await Hcp.findOne({
+        const doc = await Hcp.findOne({
             where: { id: req.params.id },
-            attributes: { exclude: ['password', 'created_by', 'updated_by'] }
+            attributes: { exclude: ['password', 'created_at', 'updated_at', 'created_by', 'updated_by', 'reset_password_token', 'reset_password_expires', 'application_id'] }
         });
 
-        if (!hcpProfile) return res.status(404).send('Profile not found.');
+        if (!doc) return res.status(404).send('Profile not found.');
 
-        res.json(hcpProfile);
+        res.json(getHcpViewModel(doc.dataValues));
     } catch (err) {
         res.status(500).send(err);
     }
@@ -217,7 +216,7 @@ async function resetPassword(req, res) {
     try {
         const doc = await Hcp.findOne({ where: { reset_password_token: req.query.token } });
 
-        if(!doc) return res.status(404).send("Account doesn't exist");
+        if(!doc) return res.status(404).send("Invalid password reset token.");
 
         if(doc.reset_password_expires < Date.now()) return res.status(400).send("Password reset token has been expired. Please request again.");
 
@@ -244,7 +243,7 @@ async function resetPassword(req, res) {
     }
 }
 
-async function forgetPassword() {
+async function forgetPassword(req, res) {
     try {
         const doc = await Hcp.findOne({ where: { email: req.query.email } });
 

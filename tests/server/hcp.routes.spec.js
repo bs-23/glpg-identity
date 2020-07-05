@@ -5,7 +5,7 @@ const supertest = require('supertest');
 const specHelper = require(path.join(process.cwd(), 'jest/spec.helper'));
 const app = require(path.join(process.cwd(), 'src/config/server/lib/express'));
 
-const { Test, PropTypes } = require('./helper')
+const { Test } = require('./helper')
 
 const { defaultUser } = specHelper.hcp;
 const { defaultApplication, users: { defaultAdmin } } = specHelper;
@@ -21,21 +21,14 @@ beforeAll(async () => {
 });
 
 describe('HCP Routes', () => {
-    Test('Should provide profile information for existing userID - Get HCP Profile', () => appInstance)
-        .header('Authorization', 'bearer ' + defaultApplication.access_token)
-        .isJSON()
-        .validateBodySchema({
-            id: PropTypes.String,
-            application_id: PropTypes.String,
-            uuid: PropTypes.String,
-            first_name: PropTypes.String,
-            last_name: PropTypes.String,
-            email: PropTypes.String,
-            phone: PropTypes.String,
-            country_code: PropTypes.String,
-            status: PropTypes.String
-        })
-        .get(`/api/hcp-profiles/${defaultUser.id}`, 200)
+    it('Should get hcp user by id', async () => {
+        const response = await request
+            .get(`/api/hcp-profiles/${defaultUser.id}`)
+            .set('Authorization', 'bearer ' + defaultApplication.access_token);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.res.headers['content-type']).toMatch('application/json');
+    });
 
     Test('Should get 404 when userID does not exist - Get HCP Profile', () => appInstance)
         .header('Authorization', 'bearer ' + defaultApplication.access_token)
