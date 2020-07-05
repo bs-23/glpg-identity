@@ -109,10 +109,14 @@ async function checkHcpDetails(req, res) {
 
 async function createHcpProfile(req, res) {
     try {
-        const master_data = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwhcpmaster WHERE uuid_1 = $uuid OR uuid_2 = $uuid', {
-            bind: { uuid: req.body.uuid },
-            type: QueryTypes.SELECT
-        });
+        let master_data = null;
+
+        if(req.body.uuid) {
+            master_data = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwhcpmaster WHERE uuid_1 = $uuid OR uuid_2 = $uuid', {
+                bind: { uuid: req.body.uuid },
+                type: QueryTypes.SELECT
+            });
+        }
 
         const [doc, created] = await Hcp.findOrCreate({
             where: { email: req.body.email },
