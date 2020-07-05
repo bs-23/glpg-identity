@@ -41,19 +41,23 @@ describe('HCP Routes', () => {
         .header('Authorization', 'bearer ' + defaultApplication.access_token)
         .get(`/api/hcp-profiles/${faker.random.uuid()}`, 404)
 
-    Test('Should reset password of HCP user when given valid email and id - HCP Reset Password', () => appInstance)
-        .header('Authorization', 'bearer ' + defaultApplication.access_token)
-        .put(`/api/hcp-profiles/${defaultUser.id}/change-password`, 200, (password => ({
-            email: defaultUser.email,
-            new_password: password,
-            confirm_password: password
-        }))(faker.internet.password()))
-
-    it('Should not change password with unknown email and id', async () => {
-        const response = await request.put(`/api/hcp-profiles/${faker.random.uuid()}/change-password`)
+    it('Should change password with valid parameters', async () => {
+        const response = await request.put('/api/hcp-profiles/change-password')
             .set('Authorization', 'bearer ' + defaultApplication.access_token)
             .send({
                 email: defaultUser.email,
+                new_password: '123456789',
+                confirm_password: '123456789'
+            });
+
+        expect(response.statusCode).toBe(200);
+    });
+
+    it('Should not change password with unknown email', async () => {
+        const response = await request.put('/api/hcp-profiles/change-password')
+            .set('Authorization', 'bearer ' + defaultApplication.access_token)
+            .send({
+                email: faker.internet.email(),
                 new_password: '123456',
                 confirm_password: '123456'
             });
@@ -62,24 +66,12 @@ describe('HCP Routes', () => {
     });
 
     it('Should not change password when password and confirm password does not match', async () => {
-        const response = await request.put('/api/hcp-profiles/1/change-password')
+        const response = await request.put('/api/hcp-profiles/change-password')
             .set('Authorization', 'bearer ' + defaultApplication.access_token)
             .send({
                 email: defaultUser.email,
                 new_password: faker.internet.password(),
                 confirm_password: faker.internet.password()
-            });
-
-        expect(response.statusCode).toBe(400);
-    });
-
-    it('Should not change password with an invalid id', async () => {
-        const response = await request.put('/api/hcp-profiles/1/change-password')
-            .set('Authorization', 'bearer ' + defaultApplication.access_token)
-            .send({
-                email: defaultUser.email,
-                new_password: 'NewPassword2',
-                confirm_password: 'NewPassword2'
             });
 
         expect(response.statusCode).toBe(400);

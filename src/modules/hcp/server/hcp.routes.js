@@ -14,11 +14,14 @@ module.exports = app => {
     app.route('/api/hcp-profiles')
         .post(passport.authenticate('application-jwt', { session: false }), controller.createHcpProfile);
 
-    app.route('/api/hcp-profiles/:id/change-password')
-        .put(passport.authenticate('application-jwt', { session: false }), controller.changePassword);
+    app.route('/api/hcp-profiles/forget-password')
+        .get(passport.authenticate('application-jwt', { session: false }), controller.forgetPassword);
 
     app.route('/api/hcp-profiles/reset-password')
         .put(passport.authenticate('application-jwt', { session: false }), controller.resetPassword);
+
+    app.route('/api/hcp-profiles/change-password')
+        .put(passport.authenticate('application-jwt', { session: false }), controller.changePassword);
 
     app.route('/api/hcp-profiles/:id')
         .get(passport.authenticate('application-jwt', { session: false }), controller.getHcpProfile);

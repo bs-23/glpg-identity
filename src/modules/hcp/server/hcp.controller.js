@@ -154,8 +154,9 @@ async function createHcpProfile(req, res) {
         }
 
         res.json({
-            document: getHcpViewModel(doc.dataValues),
-            password_reset_link: `${req.baseUrl}/api/hcp-profiles/reset-password?token=${doc.dataValues.reset_password_token}`
+            ...getHcpViewModel(doc.dataValues),
+            password_reset_token: doc.dataValues.reset_password_token,
+            retention_period: '1 hour'
         });
     } catch (err) {
         res.status(500).send(err);
@@ -180,14 +181,10 @@ async function getHcpProfile(req, res) {
 async function changePassword(req, res) {
     const { email, new_password, confirm_password } = req.body;
 
-    if (!email && !new_password && !confirm_password) return res.status(400).send('Missing required parameters.');
+    if (!email || !new_password || !confirm_password) return res.status(400).send('Missing required parameters.');
 
     try {
-        if (!validator.isUUID(req.params.id, 'all')) {
-            return res.status(400).send('Invalid parameter.');
-        }
-
-        const doc = await Hcp.findOne({ where: { id: req.params.id, email: email } });
+        const doc = await Hcp.findOne({ where: { email: email } });
 
         if (!doc) return res.status(404).send('Profile not found.');
 
@@ -247,6 +244,28 @@ async function resetPassword(req, res) {
     }
 }
 
+async function forgetPassword() {
+    try {
+        const doc = await Hcp.findOne({ where: { email: req.query.email } });
+
+        if(!doc) return res.status(404).send("Account doesn't exist");
+
+        const randomToken = crypto.randomBytes(36).toString('hex');
+
+        doc.update({
+            reset_password_token: randomToken,
+            reset_password_expires: Date.now() + 3600000
+        });
+
+        res.json({
+            password_reset_token: randomToken,
+            retention_period: '1 hour'
+        });
+    } catch(err) {
+        res.status(500).send(err);
+    }
+}
+
 exports.getHcps = getHcps;
 exports.editHcp = editHcp;
 exports.checkHcpDetails = checkHcpDetails;
@@ -254,3 +273,4 @@ exports.createHcpProfile = createHcpProfile;
 exports.getHcpProfile = getHcpProfile;
 exports.changePassword = changePassword;
 exports.resetPassword = resetPassword;
+exports.forgetPassword = forgetPassword;
