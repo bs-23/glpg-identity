@@ -13,8 +13,8 @@ async function init() {
     const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
     const User = require(path.join(process.cwd(), "src/modules/user/server/user.model"));
     const Consent = require(path.join(process.cwd(), "src/modules/consent/server/consent.model"));
-    const HCP = require(path.join(process.cwd(), "src/modules/hcp/server/hcp_profile.model"));
-    const HCP_Consents = require(path.join(process.cwd(), "src/modules/hcp/server/hcp_consents.model"));
+    require(path.join(process.cwd(), "src/modules/hcp/server/hcp_profile.model"));
+    require(path.join(process.cwd(), "src/modules/hcp/server/hcp_consents.model"));
 
     await sequelize.cdpConnector.sync();
 

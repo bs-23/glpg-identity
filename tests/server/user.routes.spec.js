@@ -114,7 +114,7 @@ describe('User Routes', () => {
             .send({
                 currentPassword: defaultUser.password,
                 newPassword: '12345678',
-                confirmPassword: '12345678',
+                confirmPassword: '12345678'
             });
 
         expect(response.statusCode).toBe(200);

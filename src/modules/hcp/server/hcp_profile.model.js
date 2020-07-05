@@ -1,9 +1,9 @@
-const path = require("path");
-const bcrypt = require("bcryptjs");
-const { DataTypes } = require("sequelize");
-const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequelize"));
+const path = require('path');
+const bcrypt = require('bcryptjs');
+const { DataTypes } = require('sequelize');
+const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 
-const HcpProfile = sequelize.cdpConnector.define("hcp_profiles", {
+const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -16,6 +16,9 @@ const HcpProfile = sequelize.cdpConnector.define("hcp_profiles", {
     },
     uuid: {
         unique: true,
+        type: DataTypes.STRING
+    },
+    salutation: {
         type: DataTypes.STRING
     },
     first_name: {
@@ -34,32 +37,41 @@ const HcpProfile = sequelize.cdpConnector.define("hcp_profiles", {
     password: {
         type: DataTypes.STRING,
         set(value) {
-            this.setDataValue("password", bcrypt.hashSync(value, 8));
+            this.setDataValue('password', bcrypt.hashSync(value, 8));
         }
     },
     phone: {
         type: DataTypes.STRING
     },
-    country_iso2: {
+    country_code: {
+        type: DataTypes.STRING
+    },
+    speciality_onekey: {
         type: DataTypes.STRING
     },
     status: {
         type: DataTypes.ENUM,
-        values: ['Approved', 'Not Approved', 'In Progress', 'Rejected'],
-        defaultValue: 'Not Approved'
+        values: ['Approved', 'Pending', 'Rejected']
     },
     created_by: {
         type: DataTypes.UUID
     },
     updated_by: {
         type: DataTypes.UUID
+    },
+    reset_password_token: {
+        unique: true,
+        type: DataTypes.STRING
+    },
+    reset_password_expires: {
+        type: DataTypes.STRING
     }
 }, {
-    schema: "ciam",
-    tableName: "hcp_profiles",
+    schema: 'ciam',
+    tableName: 'hcp_profiles',
     timestamps: true,
-    createdAt: "created_at",
-    updatedAt: "updated_at"
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
 });
 
 HcpProfile.prototype.validPassword = function (password) {

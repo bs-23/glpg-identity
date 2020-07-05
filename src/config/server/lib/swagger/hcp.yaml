@@ -1,9 +1,9 @@
 paths:
-    /api/hcp-profiles/master-details:
+    /api/hcp-profiles/check-details:
         post:
             tags:
                 - hcp-profiles
-            summary: Retrieve HCP user's details from master data.
+            summary: Retrieve HCP user's details by uuid and email.
             requestBody:
                 required: true
                 content:
@@ -17,13 +17,14 @@ paths:
                                     type: string
                             required:
                               - uuid
+                              - email
             responses:
                 200:
                     description: The request has succeeded.
                     content:
                         applicaiton/json:
                             schema:
-                                $ref: "#/components/schemas/hcpMasterDetails"
+                                $ref: "#/components/schemas/hcpProfile"
                 401:
                     description: User is not authenticated.
                 404:
@@ -49,6 +50,34 @@ paths:
                 401:
                     description: User is not authenticated.
 
+    /api/hcp-profiles/reset-password:
+        put:
+            tags:
+                - hcp-profiles
+            summary: Reset HCP user's password.
+            parameters:
+                - name: token
+                  in: query
+                  required: true
+                  description: Password reset token
+                  schema:
+                    type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/resetHcpPassword"
+            responses:
+                200:
+                    description: The request has succeeded.
+                401:
+                    description: User is not authenticated.
+                404:
+                    description: HCP user profile not found.
+                400:
+                    description: Invalid request, password mismatch or invalid token.
+
     /api/hcp-profiles/{id}:
         get:
             tags:
@@ -73,11 +102,11 @@ paths:
                 404:
                     description: HCP user profile not found.
 
-    /api/hcp-profiles/{id}/reset-password:
+    /api/hcp-profiles/{id}/change-password:
         put:
             tags:
                 - hcp-profiles
-            summary: Reset HCP user's password.
+            summary: Change HCP user's password.
             parameters:
                 - name: id
                   in: path
@@ -90,7 +119,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/resetHcpPassword"
+                            $ref: "#/components/schemas/changeHcpPassword"
             responses:
                 200:
                     description: The request has succeeded.
@@ -103,73 +132,6 @@ paths:
 
 components:
     schemas:
-        hcpMasterDetails:
-            type: object
-            properties:
-                individual_id_onekey:
-                    type: string
-                codbase:
-                    type: string
-                uuid_1:
-                    type: string
-                uuid_2:
-                    type: string
-                lastname:
-                    type: string
-                firstname:
-                    type: string
-                activity_id_onekey:
-                    type: string
-                workplace_id_onekey:
-                    type: string
-                phone:
-                    type: string
-                language_code:
-                    type: string
-                gender_code:
-                    type: string
-                gender_desc:
-                    type: string
-                email_1:
-                    type: string
-                adr_id_onekey:
-                    type: string
-                address_lbl:
-                    type: string
-                adr_long_lbl:
-                    type: string
-                postal_city:
-                    type: string
-                fax:
-                    type: string
-                telephone:
-                    type: string
-                telephone_2:
-                    type: string
-                lgpostcode:
-                    type: string
-                ind_type_code:
-                    type: string
-                ind_type_desc:
-                    type: string
-                status_code:
-                    type: string
-                ind_status_desc:
-                    type: string
-                country_iso2:
-                    type: string
-                donotcall:
-                    type: string
-                donotvisit:
-                    type: string
-                donotemail:
-                    type: string
-                donotmail:
-                    type: string
-                donotfax:
-                    type: string
-                ind_privacylawenabled:
-                    type: string
         hcpProfile:
             type: object
             properties:
@@ -177,40 +139,50 @@ components:
                     type: string
                 uuid:
                     type: string
+                salutation:
+                    type: string
                 first_name:
                     type: string
                 last_name:
                     type: string
                 email:
                     type: string
-                phone:
+                country_code:
                     type: string
-                country_iso2:
+                speciality_onekey:
                     type: string
                 status:
                     type: string
-                created_at:
-                    type: string
-                    format: date-time
-                updated_at:
-                    type: string
-                    format: date-time
+            required:
+                - first_name
+                - last_name
+                - email
         resetHcpPassword:
+            type: object
+            properties:
+                new_password:
+                    type: string
+                confirm_password:
+                    type: string
+            required:
+                - new_password
+                - confirm_password
+        changeHcpPassword:
             type: object
             properties:
                 email:
                     type: string
-                password:
+                new_password:
                     type: string
                 confirm_password:
                     type: string
             required:
               - email
-              - password
+              - new_password
               - confirm_password
         hcpConsent:
             type: object
-            description: Key value pair of consent-id and answer
+            description: Key value pair of consent id and answer
             example: {"consent_id": true }
         createHcpProfile:
             type: object
@@ -223,11 +195,11 @@ components:
                     type: string
                 email:
                     type: string
-                password:
-                    type: string
                 phone:
                     type: string
-                country_iso2:
+                country_code:
+                    type: string
+                speciality_onekey:
                     type: string
                 consents:
                     type: array
@@ -238,6 +210,3 @@ components:
               - last_name
               - uuid
               - email
-              - password
-              - phone
-              - country_iso2
