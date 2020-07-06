@@ -5,8 +5,6 @@ const supertest = require('supertest');
 const specHelper = require(path.join(process.cwd(), 'jest/spec.helper'));
 const app = require(path.join(process.cwd(), 'src/config/server/lib/express'));
 
-const { Test } = require('./helper')
-
 const { defaultUser } = specHelper.hcp;
 const { defaultApplication, users: { defaultAdmin } } = specHelper;
 
@@ -30,9 +28,13 @@ describe('HCP Routes', () => {
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
-    Test('Should get 404 when userID does not exist - Get HCP Profile', () => appInstance)
-        .header('Authorization', 'bearer ' + defaultApplication.access_token)
-        .get(`/api/hcp-profiles/${faker.random.uuid()}`, 404)
+    it('Should get 404 when userID does not exist - Get HCP Profile', async () => {
+        const response = await request
+            .get(`/api/hcp-profiles/${faker.random.uuid()}`)
+            .set('Authorization', 'bearer ' + defaultApplication.access_token)
+
+        expect(response.statusCode).toBe(404);
+    });
 
     it('Should change password with valid parameters', async () => {
         const response = await request.put('/api/hcp-profiles/change-password')
@@ -114,20 +116,29 @@ describe('HCP Routes', () => {
         expect(response.statusCode).toBe(404);
     });
 
-    Test("Should edit an HCP user's profile", () => appInstance)
-        .cookie({ access_token: defaultAdmin.access_token })
-        .put(`/api/hcps/${defaultUser.id}`, 200, {
+    it('Should edit an HCP user - Edit HCP user', async () => {
+        const response = await request.put(`/api/hcps/${defaultUser.id}`)
+        .set('Cookie', [`access_token=${defaultAdmin.access_token}`])
+        .send({
             first_name: faker.name.firstName(),
             last_name: faker.name.lastName()
-        });
+        })
 
-    Test('Should get 404 when trying to edit an non existing HCP user - Edit HCP user', () => appInstance)
-        .cookie({ access_token: defaultAdmin.access_token })
-        .put(`/api/hcps/${faker.random.uuid()}`, 404, {
+        expect(response.statusCode).toBe(200);
+        expect(response.res.headers['content-type']).toMatch('application/json');
+    });
+
+    it('Should get 404 when trying to edit an non existing HCP user - Edit HCP user', async () => {
+        const response = await request.put(`/api/hcps/${faker.random.uuid()}`)
+        .set('Cookie', [`access_token=${defaultAdmin.access_token}`])
+        .send({
             first_name: faker.name.firstName(),
             last_name: faker.name.lastName(),
             phone: faker.phone.phoneNumber()
         })
+
+        expect(response.statusCode).toBe(404);
+    });
 
     it('Should get hcp users data', async () => {
         const response = await request
