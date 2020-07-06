@@ -30,7 +30,7 @@ async function getHcps(req, res) {
 
         const hcps = await Hcp.findAll({
             where: {
-                status: !status ? ['Approved', 'Not Approved', 'In Progress', 'Rejected'] : status,
+                status: !status ? ['Approved', 'Pending', 'Rejected'] : status,
             },
             attributes: { exclude: ['password', 'created_by', 'updated_by'] },
             offset,
