@@ -13,8 +13,8 @@ async function init() {
     const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
     const User = require(path.join(process.cwd(), "src/modules/user/server/user.model"));
     const Consent = require(path.join(process.cwd(), "src/modules/consent/server/consent.model"));
-    const HCP = require(path.join(process.cwd(), "src/modules/hcp/server/hcp_profile.model"));
-    const HCP_Consents = require(path.join(process.cwd(), "src/modules/hcp/server/hcp_consents.model"));
+    require(path.join(process.cwd(), "src/modules/hcp/server/hcp_profile.model"));
+    require(path.join(process.cwd(), "src/modules/hcp/server/hcp_consents.model"));
 
     await sequelize.cdpConnector.sync();
 
@@ -44,22 +44,6 @@ async function init() {
 
     function consentSeeder(callback) {
         const consents = [
-
-            { "title": "Sharing personal data with 3rd parties", "type": "online", "opt_type": "single", "category": "GDPR", "country_code": "BE", "purpose": "n/a" },
-            { "title": "Sharing personal data with 3rd parties", "type": "online", "opt_type": "single", "category": "GDPR", "country_code": "IT", "purpose": "n/a" },
-            { "title": "Sharing personal data with 3rd parties", "type": "online", "opt_type": "single", "category": "GDPR", "country_code": "NL", "purpose": "n/a" },
-            { "title": "Sharing personal data with 3rd parties", "type": "online", "opt_type": "single", "category": "GDPR", "country_code": "ES", "purpose": "n/a" },
-            { "title": "Sharing personal data with 3rd parties", "type": "online", "opt_type": "double", "category": "GDPR", "country_code": "DE", "purpose": "n/a" },
-            { "title": "Sharing personal data with 3rd parties", "type": "online", "opt_type": "single", "category": "GDPR", "country_code": "UK", "purpose": "n/a" },
-            { "title": "Sharing personal data with 3rd parties", "type": "online", "opt_type": "single", "category": "GDPR", "country_code": "FR", "purpose": "n/a" },
-
-            { "title": "Personal data processing for resumes (CV)", "type": "online", "opt_type": "single", "category": "GDPR", "country_code": "BE", "purpose": "n/a" },
-            { "title": "Personal data processing for resumes (CV)", "type": "online", "opt_type": "single", "category": "GDPR", "country_code": "IT", "purpose": "n/a" },
-            { "title": "Personal data processing for resumes (CV)", "type": "online", "opt_type": "single", "category": "GDPR", "country_code": "NL", "purpose": "n/a" },
-            { "title": "Personal data processing for resumes (CV)", "type": "online", "opt_type": "single", "category": "GDPR", "country_code": "ES", "purpose": "n/a" },
-            { "title": "Personal data processing for resumes (CV)", "type": "online", "opt_type": "double", "category": "GDPR", "country_code": "DE", "purpose": "n/a" },
-            { "title": "Personal data processing for resumes (CV)", "type": "online", "opt_type": "single", "category": "GDPR", "country_code": "UK", "purpose": "n/a" },
-            { "title": "Personal data processing for resumes (CV)", "type": "online", "opt_type": "single", "category": "GDPR", "country_code": "FR", "purpose": "n/a" },
 
             { "title": "Sample Request", "type": "online", "opt_type": "double", "category": "DM", "country_code": "BE", "purpose": "n/a" },
             { "title": "Sample Request", "type": "online", "opt_type": "double", "category": "DM", "country_code": "IT", "purpose": "n/a" },
@@ -157,14 +141,6 @@ async function init() {
             { "title": "Invite to Remote Engagement", "type": "online", "opt_type": "double", "category": "DM", "country_code": "DE", "purpose": "n/a" },
             { "title": "Invite to Remote Engagement", "type": "online", "opt_type": "double", "category": "DM", "country_code": "UK", "purpose": "n/a" },
             { "title": "Invite to Remote Engagement", "type": "online", "opt_type": "double", "category": "DM", "country_code": "FR", "purpose": "n/a" },
-
-            { "title": "Manage 3rd Party Social Logins such as Docheck, TakiDex", "type": "online", "opt_type": "single", "category": "GDPR", "country_code": "BE", "purpose": "n/a" },
-            { "title": "Manage 3rd Party Social Logins such as Docheck, TakiDex", "type": "online", "opt_type": "single", "category": "GDPR", "country_code": "IT", "purpose": "n/a" },
-            { "title": "Manage 3rd Party Social Logins such as Docheck, TakiDex", "type": "online", "opt_type": "single", "category": "GDPR", "country_code": "NL", "purpose": "n/a" },
-            { "title": "Manage 3rd Party Social Logins such as Docheck, TakiDex", "type": "online", "opt_type": "single", "category": "GDPR", "country_code": "ES", "purpose": "n/a" },
-            { "title": "Manage 3rd Party Social Logins such as Docheck, TakiDex", "type": "online", "opt_type": "double", "category": "GDPR", "country_code": "DE", "purpose": "n/a" },
-            { "title": "Manage 3rd Party Social Logins such as Docheck, TakiDex", "type": "online", "opt_type": "single", "category": "GDPR", "country_code": "UK", "purpose": "n/a" },
-            { "title": "Manage 3rd Party Social Logins such as Docheck, TakiDex", "type": "online", "opt_type": "single", "category": "GDPR", "country_code": "FR", "purpose": "n/a" },
 
             { "title": "Send CLM content after RepSale visit", "type": "online", "opt_type": "double", "category": "DM", "country_code": "BE", "purpose": "n/a" },
             { "title": "Send CLM content after RepSale visit", "type": "online", "opt_type": "double", "category": "DM", "country_code": "IT", "purpose": "n/a" },
