@@ -209,6 +209,8 @@ components:
         createHcpProfile:
             type: object
             properties:
+                salutation:
+                    type: string
                 first_name:
                     type: string
                 last_name:
