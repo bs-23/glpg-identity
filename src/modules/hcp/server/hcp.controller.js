@@ -30,7 +30,7 @@ async function getHcps(req, res) {
 
         const hcps = await Hcp.findAll({
             where: {
-                status: !status ? ['Approved', 'Not Approved', 'In Progress', 'Rejected'] : status,
+                status: !status ? ['Approved', 'Pending', 'Rejected'] : status,
             },
             attributes: { exclude: ['password', 'created_by', 'updated_by'] },
             offset,
@@ -85,15 +85,6 @@ async function lookupHcpProfile(req, res) {
     if (!uuid || !email) return res.status(400).send('Missing required parameters.');
 
     try {
-        const master_data = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwhcpmaster WHERE uuid_1 = $uuid OR uuid_2 = $uuid', {
-            bind: { uuid },
-            type: QueryTypes.SELECT
-        });
-
-        if(!master_data || !master_data.length) {
-            return res.status(404).send('Invalid UUID.');
-        }
-
         const profile = await Hcp.findOne({
             where: { email, uuid },
             attributes: { exclude: ['password', 'created_at', 'updated_at', 'created_by', 'updated_by', 'reset_password_token', 'reset_password_expires', 'application_id'] }
