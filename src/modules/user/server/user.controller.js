@@ -2,6 +2,10 @@ const path = require('path');
 const jwt = require('jsonwebtoken');
 const User = require('./user.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
+const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
+const ResetPassword = require('./reset-password.model');
+
+const EXPIRATION_TIME = 60; // in minutes
 
 function generateAccessToken(user) {
     return jwt.sign({
@@ -132,6 +136,130 @@ async function getUsers(req, res) {
     }
 }
 
+function generateUuid() {
+    let uuid = '';
+    let i;
+    let random;
+
+    for (i = 0; i < 32; i++) {
+        random = (Math.random() * 16) | 0;
+
+        if (i == 8 || i == 12 || i == 16 || i == 20) {
+            uuid += '-';
+        }
+
+        uuid += (i == 12 ? 4 : i == 16 ? (random & 3) | 8 : random).toString(
+            16
+        );
+    }
+
+    return uuid;
+}
+
+async function sendPasswordResetLink(req, res) {
+    try {
+        const { email } = req.body;
+
+        const user = await User.findOne({ where: { email } });
+
+        if (!user) {
+            return res.status(400).send('Invalid email.');
+        }
+
+        const token = generateUuid();
+        const expireAt = new Date(Date.now() + EXPIRATION_TIME * 60 * 1000);
+
+        const [doc, created] = await ResetPassword.findOrCreate({
+            where: { email },
+            defaults: {
+                email,
+                token,
+                expire_at: expireAt,
+            },
+        });
+
+        if (!created && doc) {
+            const updated = await doc.update({
+                token,
+                expire_at: expireAt,
+            });
+
+            if (!updated) {
+                return res.sendStatus(400);
+            }
+        }
+
+        const link = `${req.protocol}://${req.headers.host}/reset-password?email=${email}&token=${token}`;
+
+        const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp-password-reset-instruction.html`);
+        const options = {
+            toAddresses: [user.email],
+            templateUrl,
+            subject: 'Password Reset Instructions',
+            data: {
+                name: user.name || '',
+                link
+            }
+        };
+        await emailService.send(options);
+
+        res.json({ message: `Reset link sent to ${email}.` });
+    } catch (error) {
+        console.log(error)
+        res.status(500).send(error);
+    }
+}
+
+async function resetPassword(req, res) {
+    try {
+        const { email, token } = req.query;
+        const { newPassword } = req.body;
+
+        if (!email || !token) return res.status(400).send('Invalid Reqeust');
+
+        const user = await User.findOne({ where: { email } });
+        if (!user) return res.status(400).send('Invalid Email');
+
+        const resetRequest = await ResetPassword.findOne({ where: { email } });
+        if (!resetRequest) return res.status(400).send('Invalid Request');
+
+        const validToken = resetRequest.validToken(token);
+        if (!validToken) return res.status(401).send('Invalid Token');
+
+        const { expire_at } = resetRequest;
+        if (expire_at - Date.now() < 0) {
+            await resetRequest.destroy();
+            return res.status(401).send('Token expired');
+        }
+
+        if (user.validPassword(newPassword)) {
+            return res
+                .status(400)
+                .send('Previously used password, please choose another');
+        }
+
+        user.password = newPassword;
+        await user.save();
+
+        await resetRequest.destroy();
+
+        const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp-password-reset.html`);
+        const options = {
+            toAddresses: [user.email],
+            templateUrl,
+            subject: 'Your password has been reset',
+            data: {
+                name: user.name || ''
+            }
+        };
+        await emailService.send(options);
+
+        res.sendStatus(200);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+}
+
 exports.login = login;
 exports.logout = logout;
 exports.createUser = createUser;
@@ -139,3 +267,5 @@ exports.getSignedInUserProfile = getSignedInUserProfile;
 exports.changePassword = changePassword;
 exports.deleteUser = deleteUser;
 exports.getUsers = getUsers;
+exports.sendPasswordResetLink = sendPasswordResetLink;
+exports.resetPassword = resetPassword;
