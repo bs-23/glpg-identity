@@ -2,10 +2,12 @@ const path = require('path');
 const jwt = require('jsonwebtoken');
 const User = require('./user.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
+const auditService = require(path.join(process.cwd(), 'src/config/server/lib/audit.service'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const ResetPassword = require('./reset-password.model');
 
 const EXPIRATION_TIME = 60; // in minutes
+
 
 function generateAccessToken(user) {
     return jwt.sign({
@@ -47,6 +49,14 @@ async function login(req, res) {
             httpOnly: true
         });
 
+        const logData = {
+            action: 'login',
+            category: 'authentication',
+            message: 'User logged in',
+            userId: user.id
+       };
+       const result = await auditService.log(logData);
+
         res.json(formatProfile(user));
     } catch (err) {
         res.status(500).send(err);
@@ -54,6 +64,13 @@ async function login(req, res) {
 }
 
 async function logout(req, res) {
+    const logData = {
+        action: 'logout',
+        category: 'authentication',
+        message: 'User logged out',
+        userId: req.user.id
+   };
+   const result = await auditService.log(logData);
     res.clearCookie('access_token').redirect('/');
 }
 
@@ -201,11 +218,10 @@ async function sendPasswordResetLink(req, res) {
                 link
             }
         };
-        await emailService.send(options);
+        emailService.send(options);
 
         res.json({ message: `Reset link sent to ${email}.` });
     } catch (error) {
-        console.log(error)
         res.status(500).send(error);
     }
 }
@@ -252,7 +268,7 @@ async function resetPassword(req, res) {
                 name: user.name || ''
             }
         };
-        await emailService.send(options);
+        emailService.send(options);
 
         res.sendStatus(200);
     } catch (error) {
