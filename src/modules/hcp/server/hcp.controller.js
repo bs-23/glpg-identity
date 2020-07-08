@@ -320,6 +320,7 @@ async function forgetPassword(req, res) {
 async function getSpecialities(req, res) {
     try {
         const country = req.query.country;
+        let locale = req.query.locale;
 
         if (!country) {
             return res.status(400).send('Missing required query parameters: Country');
@@ -329,9 +330,12 @@ async function getSpecialities(req, res) {
             `SELECT Country.codbase, countryname, cod_id_onekey, cod_locale, cod_description
             FROM ciam.vwcountry as Country
             INNER JOIN ciam.vwspecialtymaster as Specialty ON Country.codbase=Specialty.codbase
-            WHERE LOWER(country_iso2) = $country_code;`,
+            WHERE LOWER(country_iso2) = $country_code AND cod_locale = $locale;`,
             {
-                bind: { country_code: country.toLowerCase() },
+                bind: {
+                    country_code: country.toLowerCase() ,
+                    locale: locale || 'e'
+                },
                 type: QueryTypes.SELECT
             });
 
