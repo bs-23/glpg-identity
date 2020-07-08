@@ -10,20 +10,25 @@ const Audit = sequelize.cdpConnector.define('audits', {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4
     },
-    action: {
+    event_name: {
         allowNull: false,
         type: DataTypes.STRING
     },
-    category: {
+    event_time: {
+        allowNull: false,
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW
+    },
+    event_type: {
         allowNull: false,
         type: DataTypes.ENUM,
-        values: ['authentication', 'user'],
+        values: ['USER_LOGIN','USER_LOGOUT', 'CREATE_USER', 'DELETE_USER', 'UPDATE_USER'],
     },
     message: {
         allowNull: false,
         type: DataTypes.STRING
     },
-    userId: {
+    object_id: {
         type: DataTypes.STRING
     },
 
@@ -40,9 +45,7 @@ const Audit = sequelize.cdpConnector.define('audits', {
 }, {
     schema: 'ciam',
     tableName: 'audits',
-    timestamps: true,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at'
+    timestamps: false,
 });
 
 

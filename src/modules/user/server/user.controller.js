@@ -50,10 +50,11 @@ async function login(req, res) {
         });
 
         const logData = {
-            action: 'login',
-            category: 'authentication',
+            event_name: 'login',
+            event_type: 'USER_LOGIN',
             message: 'User logged in',
-            userId: user.id
+            object_id: user.id,
+            created_by: user.id,
        };
        const result = await auditService.log(logData);
 
@@ -65,10 +66,11 @@ async function login(req, res) {
 
 async function logout(req, res) {
     const logData = {
-        action: 'logout',
-        category: 'authentication',
+        event_name: 'logout',
+        event_type: 'USER_LOGOUT',
         message: 'User logged out',
-        userId: req.user.id
+        object_id: req.user.id,
+        created_by: req.user.id
    };
    const result = await auditService.log(logData);
     res.clearCookie('access_token').redirect('/');
