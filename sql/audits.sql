@@ -1,7 +1,7 @@
 
 CREATE TYPE ciam.enum_audits_event_type AS ENUM
-    ('authentication', 'user', 'USER_LOGIN', 'USER_LOGOUT', 'CREATE_USER', 'DELETE_USER', 'UPDATE_USER');
-    
+    ('USER_LOGIN', 'USER_LOGOUT', 'CREATE_USER', 'DELETE_USER', 'UPDATE_USER');
+
 CREATE TABLE ciam.audits
 (
     id uuid NOT NULL,
