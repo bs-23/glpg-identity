@@ -145,9 +145,9 @@ describe('HCP Routes', () => {
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
-    it('Should get specialities for given country code', async () => {
+    it('Should get specialties for given country code', async () => {
         const response = await request
-            .get('/api/hcp-profiles/specialities?country=nl')
+            .get('/api/hcp-profiles/specialties?country=nl')
             .set('Authorization', `bearer ${defaultApplication.access_token}`);
 
         expect(response.statusCode).toBe(200);
@@ -156,7 +156,7 @@ describe('HCP Routes', () => {
 
     it('Should get "Bad Request" status for missing country code', async () => {
         const response = await request
-            .get('/api/hcp-profiles/specialities')
+            .get('/api/hcp-profiles/specialties')
             .set('Authorization', `bearer ${defaultApplication.access_token}`);
 
         expect(response.statusCode).toBe(400);
@@ -164,7 +164,7 @@ describe('HCP Routes', () => {
 
     it('Should get "Not Found" status for unknown country code', async () => {
         const response = await request
-            .get('/api/hcp-profiles/specialities?country=unknown_country_code')
+            .get('/api/hcp-profiles/specialties?country=unknown_country_code')
             .set('Authorization', `bearer ${defaultApplication.access_token}`);
 
         expect(response.statusCode).toBe(404);

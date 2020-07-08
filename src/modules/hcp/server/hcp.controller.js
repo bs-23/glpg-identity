@@ -317,7 +317,7 @@ async function forgetPassword(req, res) {
     }
 }
 
-async function getSpecialities(req, res) {
+async function getSpecialties(req, res) {
     try {
         const country = req.query.country;
         let locale = req.query.locale;
@@ -326,7 +326,7 @@ async function getSpecialities(req, res) {
             return res.status(400).send('Missing required query parameters: Country');
         }
 
-        const masterDataSpecialities = await sequelize.datasyncConnector.query(
+        const masterDataSpecialties = await sequelize.datasyncConnector.query(
             `SELECT Country.codbase, countryname, cod_id_onekey, cod_locale, cod_description
             FROM ciam.vwcountry as Country
             INNER JOIN ciam.vwspecialtymaster as Specialty ON Country.codbase=Specialty.codbase
@@ -339,11 +339,11 @@ async function getSpecialities(req, res) {
                 type: QueryTypes.SELECT
             });
 
-        if (!masterDataSpecialities || masterDataSpecialities.length === 0) {
-            return res.status(404).send(`No specialities found for Country=${country}`)
+        if (!masterDataSpecialties || masterDataSpecialties.length === 0) {
+            return res.status(404).send(`No specialties found for Country=${country}`)
         }
 
-        res.json(masterDataSpecialities);
+        res.json(masterDataSpecialties);
     } catch (err) {
         res.status(500).send(err);
     }
@@ -357,4 +357,4 @@ exports.getHcpProfile = getHcpProfile;
 exports.changePassword = changePassword;
 exports.resetPassword = resetPassword;
 exports.forgetPassword = forgetPassword;
-exports.getSpecialities = getSpecialities;
+exports.getSpecialties = getSpecialties;

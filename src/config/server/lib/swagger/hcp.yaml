@@ -149,11 +149,11 @@ paths:
                     description: User is not authenticated.
                 404:
                     description: HCP user profile not found.
-    /api/hcp-profiles/specialities:
+    /api/hcp-profiles/specialties:
         get:
             tags:
                 - hcp-profiles
-            summary: Get specialities by country code.
+            summary: Get specialties by country code.
             parameters:
                 - name: country
                   in: query
@@ -173,7 +173,7 @@ paths:
                     content:
                         applicaiton/json:
                             schema:
-                                $ref: "#/components/schemas/specialitiesByCountry"
+                                $ref: "#/components/schemas/specialtiesByCountry"
                 401:
                     description: User is not authenticated.
                 404:
@@ -274,7 +274,7 @@ components:
                     type: string
                 cod_description:
                     type: string
-        specialitiesByCountry:
+        specialtiesByCountry:
             type: array
             items:
                 $ref: "#/components/schemas/specialty"

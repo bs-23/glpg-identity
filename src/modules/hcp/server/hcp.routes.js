@@ -23,8 +23,8 @@ module.exports = app => {
     app.route('/api/hcp-profiles/change-password')
         .put(passport.authenticate('application-jwt', { session: false }), controller.changePassword);
 
-    app.route('/api/hcp-profiles/specialities')
-        .get(passport.authenticate('application-jwt', { session: false }), controller.getSpecialities);
+    app.route('/api/hcp-profiles/specialties')
+        .get(passport.authenticate('application-jwt', { session: false }), controller.getSpecialties);
 
     app.route('/api/hcp-profiles/:id')
         .get(passport.authenticate('application-jwt', { session: false }), controller.getHcpProfile);
