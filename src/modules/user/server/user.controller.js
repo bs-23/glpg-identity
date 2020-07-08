@@ -2,6 +2,7 @@ const path = require('path');
 const jwt = require('jsonwebtoken');
 const User = require('./user.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
+const auditService = require(path.join(process.cwd(), 'src/config/server/lib/audit.service'));
 
 function generateAccessToken(user) {
     return jwt.sign({
@@ -43,6 +44,14 @@ async function login(req, res) {
             httpOnly: true
         });
 
+        const logData = {
+            action: 'login',
+            category: 'authentication',
+            message: 'User logged in',
+            userId: user.id
+       };
+       const result = await auditService.log(logData);
+
         res.json(formatProfile(user));
     } catch (err) {
         res.status(500).send(err);
@@ -50,6 +59,13 @@ async function login(req, res) {
 }
 
 async function logout(req, res) {
+    const logData = {
+        action: 'logout',
+        category: 'authentication',
+        message: 'User logged out',
+        userId: req.user.id
+   };
+   const result = await auditService.log(logData);
     res.clearCookie('access_token').redirect('/');
 }
 
