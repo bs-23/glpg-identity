@@ -153,6 +153,22 @@ async function getUsers(req, res) {
     }
 }
 
+async function getUser(req, res){
+    try{
+        const user = await User.findOne({ 
+            where: { 
+                id: req.params.id
+            },
+            attributes: [id, name, email, phone, type]
+        })
+
+        res.json(user);
+    }
+    catch(err){
+        res.status(500).send(err);
+    }
+}
+
 function generateUuid() {
     let uuid = '';
     let i;
@@ -283,5 +299,6 @@ exports.getSignedInUserProfile = getSignedInUserProfile;
 exports.changePassword = changePassword;
 exports.deleteUser = deleteUser;
 exports.getUsers = getUsers;
+exports.getUser = getUser;
 exports.sendPasswordResetLink = sendPasswordResetLink;
 exports.resetPassword = resetPassword;
