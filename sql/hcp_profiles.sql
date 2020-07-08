@@ -11,7 +11,7 @@ CREATE TABLE ciam.hcp_profiles
     password character varying(255) COLLATE pg_catalog."default",
     telephone character varying(255) COLLATE pg_catalog."default",
     country_iso2 character varying(255) COLLATE pg_catalog."default",
-    speciality_onekey character varying(255) COLLATE pg_catalog."default",
+    specialty_onekey character varying(255) COLLATE pg_catalog."default",
     status ciam.enum_hcp_profiles_status,
     created_by uuid,
     updated_by uuid,
@@ -21,6 +21,7 @@ CREATE TABLE ciam.hcp_profiles
     updated_at timestamp with time zone NOT NULL,
     CONSTRAINT hcp_profiles_pkey PRIMARY KEY (id),
     CONSTRAINT hcp_profiles_email_key UNIQUE (email),
+    CONSTRAINT hcp_profiles_individual_id_onekey_key UNIQUE (individual_id_onekey),
     CONSTRAINT hcp_profiles_reset_password_token_key UNIQUE (reset_password_token),
     CONSTRAINT hcp_profiles_uuid_key UNIQUE (uuid)
 )

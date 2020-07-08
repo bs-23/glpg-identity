@@ -31,10 +31,10 @@ describe('Hcp user component', () => {
             password: 'test'
         }));
 
-        data = { 
+        data = {
             users: [
-                { id: '1', first_name: 'a', last_name: 'a', email: 'a', phone: '1', uuid: '1' },
-                { id: '2', first_name: 'b', last_name: 'b', email: 'b', phone: '2', uuid: '2' }
+                { id: '1', first_name: 'a', last_name: 'a', email: 'a', telephone: '1', uuid: '1' },
+                { id: '2', first_name: 'b', last_name: 'b', email: 'b', telephone: '2', uuid: '2' }
             ]
         };
         const page = 1, is_active = null;
@@ -122,7 +122,7 @@ describe('Hcp user component', () => {
         await waitFor(() => {
             fireEvent.click(cancel_btn);
         });
-        
+
         const new_first_name = new_first_row.childNodes[0];
 
 
@@ -145,7 +145,7 @@ describe('Hcp user component', () => {
         const new_first_row = new_tbody.childNodes[0];
         const first_name_td = new_first_row.childNodes[0];
         const last_name_td = new_first_row.childNodes[2];
-        const phone_td = new_first_row.childNodes[3]; 
+        const phone_td = new_first_row.childNodes[3];
         const new_action_td = new_first_row.childNodes[6];
         const update_btn = new_action_td.childNodes[0];
 
@@ -164,13 +164,13 @@ describe('Hcp user component', () => {
         expect(phone_input.value).toEqual('0');
 
 
-        const updated_hcp_user = { id: "1", uuid: "1", first_name: "z", last_name: "z", email: "a", phone: "0" };
+        const updated_hcp_user = { id: "1", uuid: "1", first_name: "z", last_name: "z", email: "a", telephone: "0" };
         fakeAxios.onPut(`/api/hcps/${'1'}`).reply(200, updated_hcp_user);
 
         await waitFor(() => {
             fireEvent.click(update_btn);
         });
-        
+
         const updated_tbody = container.querySelector('tbody');
         const updated_first_row = updated_tbody.childNodes[0];
         const updated_first_name = updated_first_row.childNodes[0];

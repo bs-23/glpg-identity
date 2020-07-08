@@ -30,7 +30,7 @@ function mapMasterDataToHcpProfile(masterData) {
     model.last_name = masterData.lastname;
     model.country_iso2 = masterData.country_iso2;
     model.telephone = masterData.telephone;
-    mode.specialty_code = masterData.specialty_code;
+    model.specialty_onekey = masterData.specialty_code;
 
     return model;
 }
@@ -74,14 +74,14 @@ async function getHcps(req, res) {
 }
 
 async function editHcp(req, res) {
-    const { first_name, last_name, phone } = req.body;
+    const { first_name, last_name, telephone } = req.body;
 
     try {
         const HcpUser = await Hcp.findOne({ where: { id: req.params.id } });
 
         if (!HcpUser) return res.sendStatus(404);
 
-        HcpUser.update({ first_name, last_name, phone });
+        HcpUser.update({ first_name, last_name, telephone });
 
         delete HcpUser.dataValues.password;
         delete HcpUser.dataValues.created_by;
@@ -173,8 +173,8 @@ async function createHcpProfile(req, res) {
                 first_name: req.body.first_name,
                 last_name: req.body.last_name,
                 uuid: req.body.uuid,
-                country_code: req.body.country_code,
-                speciality_onekey: req.body.speciality_onekey,
+                country_iso2: req.body.country_iso2,
+                specialty_onekey: req.body.specialty_onekey,
                 application_id: req.user.id,
                 created_by: req.user.id,
                 updated_by: req.user.id,

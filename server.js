@@ -3,6 +3,7 @@
     const config = require(path.join(process.cwd(), 'src/config/server/config'));
 
     await config.initEnvironmentVariables();
+
     if(process.env.NODE_ENV === 'production') {
         require('newrelic');
     }

@@ -50,7 +50,7 @@ const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
     country_iso2: {
         type: DataTypes.STRING
     },
-    specialty_code: {
+    specialty_onekey: {
         type: DataTypes.STRING
     },
     status: {

@@ -104,25 +104,21 @@ describe('HCP Routes', () => {
         expect(response.statusCode).toBe(400);
     });
 
-    it('Should not found user details with invalid email or uuid', async () => {
+    it('Should get bad request without email or uuid in registration lookup', async () => {
         const response = await request
-            .post('/api/hcp-profiles/lookup')
-            .set('Authorization', `bearer ${defaultApplication.access_token}`)
-            .send({
-                email: faker.internet.email(),
-                uuid: faker.random.uuid()
-            });
+            .post('/api/hcp-profiles/registration-lookup')
+            .set('Authorization', `bearer ${defaultApplication.access_token}`);
 
-        expect(response.statusCode).toBe(404);
+        expect(response.statusCode).toBe(400);
     });
 
     it('Should edit an HCP user - Edit HCP user', async () => {
         const response = await request.put(`/api/hcps/${defaultUser.id}`)
-        .set('Cookie', [`access_token=${defaultAdmin.access_token}`])
-        .send({
-            first_name: faker.name.firstName(),
-            last_name: faker.name.lastName()
-        })
+            .set('Cookie', [`access_token=${defaultAdmin.access_token}`])
+            .send({
+                first_name: faker.name.firstName(),
+                last_name: faker.name.lastName()
+            });
 
         expect(response.statusCode).toBe(200);
         expect(response.res.headers['content-type']).toMatch('application/json');
@@ -130,12 +126,12 @@ describe('HCP Routes', () => {
 
     it('Should get 404 when trying to edit an non existing HCP user - Edit HCP user', async () => {
         const response = await request.put(`/api/hcps/${faker.random.uuid()}`)
-        .set('Cookie', [`access_token=${defaultAdmin.access_token}`])
-        .send({
-            first_name: faker.name.firstName(),
-            last_name: faker.name.lastName(),
-            phone: faker.phone.phoneNumber()
-        })
+            .set('Cookie', [`access_token=${defaultAdmin.access_token}`])
+            .send({
+                first_name: faker.name.firstName(),
+                last_name: faker.name.lastName(),
+                telephone: faker.phone.phoneNumber()
+            });
 
         expect(response.statusCode).toBe(404);
     });
