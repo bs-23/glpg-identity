@@ -32,3 +32,18 @@ export const changePasswordSchema = object().shape({
         .required('This field must not be empty.')
         .oneOf([ref('newPassword'), null], 'Passwords must match'),
 });
+
+export const resetPasswordSchema = object().shape({
+    newPassword: string()
+        .min(8, 'This field must be at least 8 characters long.')
+        .required('This field must not be empty.'),
+    confirmPassword: string()
+        .required('This field must not be empty.')
+        .oneOf([ref('newPassword'), null], 'Passwords must match'),
+});
+
+export const forgotPasswordSchema = object().shape({
+    email: string()
+        .email('This field should be an valid email address.')
+        .required('This field must not be empty.'),
+});

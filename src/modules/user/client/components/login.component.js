@@ -1,6 +1,7 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import { Form, Formik, Field, ErrorMessage } from "formik";
+import { Link } from 'react-router-dom';
 
 import { login } from "../user.actions";
 import { loginSchema } from "../user.schema";
@@ -51,6 +52,15 @@ export default function Login() {
                                         </Form>
                                     )}
                                 </Formik>
+                                <div className="mt-2 text-center">
+                                    <Link
+                                        to="/forgot-password"
+                                        style={{ textDecoration: 'none' }}
+                                        className="text-secondary"
+                                    >
+                                        Forgot your password?
+                                    </Link>
+                                </div>
                             </div>
                         </div>
                     </div>
