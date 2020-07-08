@@ -11,17 +11,13 @@ const Permission = sequelize.cdpConnector.define('permissions', {
         defaultValue: DataTypes.UUIDV4
 
     },
-    identifier: {
+    action: {
         allowNull: false,
         type: DataTypes.STRING
     },
 
     status: {
         type: DataTypes.STRING
-    },
-
-    methods: {
-        type: DataTypes.ARRAY(DataTypes.STRING)
     },
     created_by: {
         type: DataTypes.UUID,

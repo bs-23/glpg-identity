@@ -13,6 +13,8 @@ async function init() {
     const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
     const User = require(path.join(process.cwd(), "src/modules/user/server/user.model"));
     const Consent = require(path.join(process.cwd(), "src/modules/consent/server/consent.model"));
+    const Permission = require(path.join(process.cwd(), "src/modules/permission/permission.model"));
+    const ActionConstants         = require(path.join(process.cwd(), "src/modules/permission/permission.model"));
     require(path.join(process.cwd(), "src/modules/hcp/server/hcp_profile.model"));
     require(path.join(process.cwd(), "src/modules/hcp/server/hcp_consents.model"));
     require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'))
@@ -41,6 +43,12 @@ async function init() {
         }).then(function () {
             callback();
         });
+    }
+    function permissionSeeder(callback) {
+        const permissions = [
+
+            { "action": "Sample Request", "status": "created_by", "opt_type": "updated_by", "updated_by": "DM"},
+        ]
     }
 
     function consentSeeder(callback) {
