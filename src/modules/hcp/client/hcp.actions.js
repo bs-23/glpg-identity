@@ -12,7 +12,8 @@ export function getHcpProfiles(page, is_active) {
 }
 
 export function editHcpProfiles(data, id) {
-    // console.log("=======================> clicked", data, id);
+    console.log("=======================> clicked", data, id);
+    alert("habbi")
     return {
         type: Types.EDIT_HCPS,
         payload: axios({

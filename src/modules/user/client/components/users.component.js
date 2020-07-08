@@ -27,7 +27,8 @@ export default function Users() {
                         <nav aria-label="breadcrumb">
                             <ol className="breadcrumb rounded-0">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
-                                <li className="breadcrumb-item active">Users</li>
+                                <li className="breadcrumb-item"><NavLink to="/users">User Management</NavLink></li>
+                                <li className="breadcrumb-item active">CDP user list</li>
                             </ol>
                         </nav>
                     </div>
@@ -35,7 +36,7 @@ export default function Users() {
                 <div className="row">
                     <div className="col-12">
                         <div className="d-flex justify-content-between align-items-center">
-                            <h2>User list</h2>
+                            <h2>CDP user list</h2>
 
                             <NavLink to="/users/create" className="btn btn-primary ml-auto">
                                 Create new user
