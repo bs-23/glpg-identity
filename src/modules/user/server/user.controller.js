@@ -218,7 +218,7 @@ async function sendPasswordResetLink(req, res) {
                 link
             }
         };
-        await emailService.send(options);
+        emailService.send(options);
 
         res.json({ message: `Reset link sent to ${email}.` });
     } catch (error) {
@@ -268,7 +268,7 @@ async function resetPassword(req, res) {
                 name: user.name || ''
             }
         };
-        await emailService.send(options);
+        emailService.send(options);
 
         res.sendStatus(200);
     } catch (error) {

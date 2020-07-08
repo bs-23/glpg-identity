@@ -177,7 +177,7 @@ describe('User Routes', () => {
         const token = faker.random.uuid();
 
         const response = await request
-            .post(
+            .put(
                 `/api/users/password/resetPassword/?email=${defaultUser.email}&token=${token}`
             )
             .send({
@@ -204,7 +204,7 @@ describe('User Routes', () => {
         if (!created && doc) await doc.update({ token, expire_at: expireAt });
 
         const response = await request
-            .post(
+            .put(
                 `/api/users/password/resetPassword/?email=${defaultUser.email}&token=${token}`
             )
             .send({
@@ -229,7 +229,7 @@ describe('User Routes', () => {
         if (!created && doc) await doc.update({ token, expire_at: expireAt });
 
         const response = await request
-            .post(
+            .put(
                 `/api/users/password/resetPassword/?email=${defaultUser.email}&token=${token}`
             )
             .send({

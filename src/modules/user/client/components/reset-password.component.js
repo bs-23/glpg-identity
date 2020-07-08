@@ -37,7 +37,7 @@ export default function ResetPasswordForm() {
                                     displayName="ResetPasswordForm"
                                     validationSchema={resetPasswordSchema}
                                     onSubmit={(values, actions) => {
-                                        Axios.post(
+                                        Axios.put(
                                             `/api/users/password/resetPassword/?email=${email}&token=${token}`,
                                             values
                                         )
