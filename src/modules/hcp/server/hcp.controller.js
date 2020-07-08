@@ -21,6 +21,20 @@ function getHcpViewModel(hcp) {
     return model;
 }
 
+function mapMasterDataToHcpProfile(masterData) {
+    const model = {};
+
+    model.individual_id_onekey = masterData.individual_id_onekey;
+    model.uuid = masterData.uuid_1 || masterData.uuid_2;
+    model.first_name = masterData.firstname;
+    model.last_name = masterData.lastname;
+    model.country_iso2 = masterData.country_iso2;
+    model.telephone = masterData.telephone;
+    mode.specialty_code = masterData.specialty_code;
+
+    return model;
+}
+
 async function getHcps(req, res) {
     try {
         const page = req.query.page - 1;
@@ -79,20 +93,63 @@ async function editHcp(req, res) {
     }
 }
 
-async function lookupHcpProfile(req, res) {
+async function registrationLookup(req, res) {
     const { email, uuid } = req.body;
 
-    if (!uuid || !email) return res.status(400).send('Missing required parameters.');
+    const response = {
+        data: {},
+        errors: []
+    };
+
+    if (!email) {
+        response.errors.push({
+            field: 'email',
+            message: 'Email address is missing.'
+        });
+    }
+
+    if (!uuid) {
+        response.errors.push({
+            field: 'uuid',
+            message: 'UUID is missing.'
+        });
+    }
+
+    if (!uuid || !email) {
+        return res.status(400).json(response);
+    }
 
     try {
-        const profile = await Hcp.findOne({
-            where: { email, uuid },
-            attributes: { exclude: ['password', 'created_at', 'updated_at', 'created_by', 'updated_by', 'reset_password_token', 'reset_password_expires', 'application_id'] }
-        });
+        const profile = await Hcp.findOne({ where: { email }});
 
-        if (!profile) return res.status(404).send('HCP profile not found.');
+        if(profile) {
+            response.errors.push({
+                field: 'email',
+                message: 'Email address is already registered.'
+            });
+        } else {
+            master_data = await sequelize.datasyncConnector.query(`
+                SELECT h.*, s.specialty_code
+                FROM ciam.vwhcpmaster AS h
+                INNER JOIN ciam.vwmaphcpspecialty AS s
+                ON s.individual_id_onekey = h.individual_id_onekey
+                WHERE h.uuid_1 = $uuid OR h.uuid_2 = $uuid
+            `, {
+                bind: { uuid },
+                type: QueryTypes.SELECT
+            });
 
-        res.json(getHcpViewModel(profile.dataValues));
+            if(master_data && master_data.length) {
+                response.data = mapMasterDataToHcpProfile(master_data[0]);
+            } else {
+                response.errors.push({
+                    field: 'uuid',
+                    message: 'Invalid UUID.'
+                });
+            }
+        }
+
+        res.json(response);
     } catch (err) {
         res.status(500).send(err);
     }
@@ -290,7 +347,7 @@ async function getSpecialities(req, res) {
 
 exports.getHcps = getHcps;
 exports.editHcp = editHcp;
-exports.lookupHcpProfile = lookupHcpProfile;
+exports.registrationLookup = registrationLookup;
 exports.createHcpProfile = createHcpProfile;
 exports.getHcpProfile = getHcpProfile;
 exports.changePassword = changePassword;

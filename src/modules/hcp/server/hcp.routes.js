@@ -3,13 +3,13 @@ const controller = require('./hcp.controller');
 
 module.exports = app => {
     app.route('/api/hcps')
-        .get(passport.authenticate('user-jwt', { session: false }), controller.getHcps)
+        .get(passport.authenticate('user-jwt', { session: false }), controller.getHcps);
 
     app.route('/api/hcps/:id')
         .put(passport.authenticate('user-jwt', { session: false }), controller.editHcp);
 
-    app.route('/api/hcp-profiles/lookup')
-        .post(passport.authenticate('application-jwt', { session: false }), controller.lookupHcpProfile);
+    app.route('/api/hcp-profiles/registration-lookup')
+        .post(passport.authenticate('application-jwt', { session: false }), controller.registrationLookup);
 
     app.route('/api/hcp-profiles')
         .post(passport.authenticate('application-jwt', { session: false }), controller.createHcpProfile);

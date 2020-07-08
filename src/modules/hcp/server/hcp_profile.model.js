@@ -18,6 +18,10 @@ const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
         unique: true,
         type: DataTypes.STRING
     },
+    individual_id_onekey: {
+        unique: true,
+        type: DataTypes.STRING
+    },
     salutation: {
         type: DataTypes.STRING
     },
@@ -40,13 +44,13 @@ const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
             this.setDataValue('password', bcrypt.hashSync(value, 8));
         }
     },
-    phone: {
+    telephone: {
         type: DataTypes.STRING
     },
-    country_code: {
+    country_iso2: {
         type: DataTypes.STRING
     },
-    speciality_onekey: {
+    specialty_code: {
         type: DataTypes.STRING
     },
     status: {
