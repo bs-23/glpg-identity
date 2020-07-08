@@ -8,19 +8,19 @@ import { getHcpProfiles, editHcpProfiles, hcpsSort } from '../hcp.actions';
 export default function hcpUsers() {
     const dispatch = useDispatch();
 
-    const [state, setState] = useState({ id: '', first_name: '', last_name: '', phone: '' });
+    const [state, setState] = useState({ id: '', first_name: '', last_name: '', telephone: '' });
 
     const addItem = (id, row) => {
         setState(prevState => ({
             ...prevState,
-            id: id, first_name: row.first_name, last_name: row.last_name, phone: row.phone
+            id: id, first_name: row.first_name, last_name: row.last_name, telephone: row.telephone
         }));
     };
 
     const removeItem = () => {
         setState(prevState => ({
             ...prevState,
-            id: '', first_name: '', last_name: '', phone: ''
+            id: '', first_name: '', last_name: '', telephone: ''
         }));
     };
 
@@ -38,7 +38,7 @@ export default function hcpUsers() {
         const data = {
             first_name: state.first_name,
             last_name: state.last_name,
-            phone: state._phone
+            telephone: state.telephone
         };
 
         dispatch(editHcpProfiles(data, id)).then(res => {
@@ -106,7 +106,7 @@ export default function hcpUsers() {
                                                 <th>Firstname<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'first_name')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'first_name')}></i></span></th>
                                                 <th>Email<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'email')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'email')}></i></span></th>
                                                 <th>Lastname<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'last_name')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'last_name')}></i></span></th>
-                                                <th>Phone<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'phone')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'phone')}></i></span></th>
+                                                <th>Telephone<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'telephone')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'telephone')}></i></span></th>
                                                 <th>UUID <span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'uuid')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'uuid')}></i></span></th>
                                                 <th>Status<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'is_active')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'is_active')}></i></span></th>
                                                 <th>Action</th>
@@ -121,7 +121,7 @@ export default function hcpUsers() {
                                                             <td><input type="text" value={state.first_name} onChange={e => handleChange(e, index, 'first_name')} /></td>
                                                             <td><input type="text" className="bg-secondary" value={row.email} readOnly /></td>
                                                             <td><input type="text" value={state.last_name} onChange={e => handleChange(e, index, 'last_name')} /></td>
-                                                            <td><input type="text" value={state.phone} onChange={e => handleChange(e, index, 'phone')} /></td>
+                                                            <td><input type="text" value={state.telephone} onChange={e => handleChange(e, index, 'telephone')} /></td>
                                                             <td><input type="text" className="bg-secondary" value={row.uuid} readOnly /></td>
                                                         </React.Fragment>
                                                         :
@@ -130,7 +130,7 @@ export default function hcpUsers() {
                                                             <td>{row.first_name}</td>
                                                             <td>{row.email}</td>
                                                             <td>{row.last_name}</td>
-                                                            <td>{row.phone}</td>
+                                                            <td>{row.telephone}</td>
                                                             <td>{row.uuid}</td>
                                                         </React.Fragment>
                                                     }
