@@ -163,6 +163,12 @@ paths:
                   description: The ISO2 country code (case-insensitive)
                   schema:
                     type: string
+                - name: locale
+                  in: query
+                  required: false
+                  description: Cod Locale code. Default is 'e'
+                  schema:
+                    type: string
             responses:
                 200:
                     description: The request has succeeded.
