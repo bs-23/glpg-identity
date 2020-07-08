@@ -1,6 +1,6 @@
 CREATE TABLE ciam.audits
 (
-    id integer NOT NULL DEFAULT nextval('ciam.audits_id_seq'::regclass),
+    id uuid NOT NULL,
     action character varying(255) COLLATE pg_catalog."default" NOT NULL,
     category ciam.enum_audits_category NOT NULL,
     message character varying(255) COLLATE pg_catalog."default" NOT NULL,

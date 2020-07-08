@@ -151,6 +151,29 @@ paths:
                     description: User is not authenticated.
                 404:
                     description: HCP user profile not found.
+    /api/hcp-profiles/specialities:
+        get:
+            tags:
+                - hcp-profiles
+            summary: Get specialities by country code.
+            parameters:
+                - name: country
+                  in: query
+                  required: true
+                  description: The ISO2 country code (case-insensitive)
+                  schema:
+                    type: string
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/specialitiesByCountry"
+                401:
+                    description: User is not authenticated.
+                404:
+                    description: Specialty not found for country.
 
 components:
     schemas:
@@ -234,3 +257,20 @@ components:
               - last_name
               - uuid
               - email
+        specialty:
+            type: object
+            properties:
+                codbase:
+                    type: string
+                countryname:
+                    type: string
+                cod_id_onekey:
+                    type: string
+                cod_locale:
+                    type: string
+                cod_description:
+                    type: string
+        specialitiesByCountry:
+            type: array
+            items:
+                $ref: "#/components/schemas/specialty"

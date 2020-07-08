@@ -148,4 +148,29 @@ describe('HCP Routes', () => {
         expect(response.statusCode).toBe(200);
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
+
+    it('Should get specialities for given country code', async () => {
+        const response = await request
+            .get('/api/hcp-profiles/specialities?country=nl')
+            .set('Authorization', `bearer ${defaultApplication.access_token}`);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.res.headers['content-type']).toMatch('application/json');
+    });
+
+    it('Should get "Bad Request" status for missing country code', async () => {
+        const response = await request
+            .get('/api/hcp-profiles/specialities')
+            .set('Authorization', `bearer ${defaultApplication.access_token}`);
+
+        expect(response.statusCode).toBe(400);
+    });
+
+    it('Should get "Not Found" status for unknown country code', async () => {
+        const response = await request
+            .get('/api/hcp-profiles/specialities?country=unknown_country_code')
+            .set('Authorization', `bearer ${defaultApplication.access_token}`);
+
+        expect(response.statusCode).toBe(404);
+    });
 });

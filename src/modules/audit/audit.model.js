@@ -7,8 +7,8 @@ const Audit = sequelize.cdpConnector.define('audits', {
     id: {
         allowNull: false,
         primaryKey: true,
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
     },
     action: {
         allowNull: false,

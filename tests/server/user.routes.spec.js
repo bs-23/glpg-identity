@@ -4,6 +4,7 @@ const supertest = require('supertest');
 
 const specHelper = require(path.join(process.cwd(), 'jest/spec.helper'));
 const app = require(path.join(process.cwd(), 'src/config/server/lib/express'));
+const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 
 const { defaultAdmin, defaultUser } = specHelper.users;
 
@@ -147,5 +148,95 @@ describe('User Routes', () => {
             .set('Cookie', [`access_token=${defaultUser.access_token}`]);
 
         expect(response.statusCode).toBe(200);
+    });
+
+    it('Should return status code 200 after submitting an existing email in password reset endpoint', async () => {
+        jest.spyOn(emailService, 'send').mockImplementation(() => Promise.resolve())
+
+        const response = await request
+            .post('/api/users/password/send-reset-link')
+            .send({
+                email: defaultUser.email,
+            });
+
+        expect(response.statusCode).toBe(200);
+    });
+
+    it('Should return status code 400 after submitting an email that does not exists, in password reset endpoint', async () => {
+        const response = await request
+            .post('/api/users/password/send-reset-link')
+            .send({
+                email: faker.internet.email(),
+            });
+
+        expect(response.statusCode).toBe(400);
+    });
+
+    it('Should return status code 401 when trying to reset password with invalid token for a valid email', async () => {
+        const password = faker.internet.password();
+        const token = faker.random.uuid();
+
+        const response = await request
+            .post(
+                `/api/users/password/resetPassword/?email=${defaultUser.email}&token=${token}`
+            )
+            .send({
+                newPassword: password,
+                confirmPassword: password,
+            });
+
+        expect(response.statusCode).toBe(401);
+    });
+
+    it('Should return status code 200 when trying to reset password with valid token for a valid email', async () => {
+        const password = faker.internet.password();
+        const token = faker.random.uuid();
+        const { email } = defaultUser;
+        const expireAt = new Date(Date.now() + 60 * 60 * 1000);
+
+        jest.spyOn(emailService, 'send').mockImplementation(() => Promise.resolve())
+
+        const ResetPassword = require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
+        const [doc, created] = await ResetPassword.findOrCreate({
+            where: { email },
+            defaults: { email, token, expire_at: expireAt },
+        });
+        if (!created && doc) await doc.update({ token, expire_at: expireAt });
+
+        const response = await request
+            .post(
+                `/api/users/password/resetPassword/?email=${defaultUser.email}&token=${token}`
+            )
+            .send({
+                newPassword: password,
+                confirmPassword: password,
+            });
+
+        expect(response.statusCode).toBe(200);
+    });
+
+    it('Should return status code 401 when trying to reset password with expired token for a valid email', async () => {
+        const password = faker.internet.password();
+        const token = faker.random.uuid();
+        const { email } = defaultUser;
+        const expireAt = new Date(Date.now() - 10);
+
+        const ResetPassword = require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
+        const [doc, created] = await ResetPassword.findOrCreate({
+            where: { email },
+            defaults: { email, token, expire_at: expireAt },
+        });
+        if (!created && doc) await doc.update({ token, expire_at: expireAt });
+
+        const response = await request
+            .post(
+                `/api/users/password/resetPassword/?email=${defaultUser.email}&token=${token}`
+            )
+            .send({
+                newPassword: password,
+                confirmPassword: password,
+            });
+
+        expect(response.statusCode).toBe(401);
     });
 });

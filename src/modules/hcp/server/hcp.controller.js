@@ -260,6 +260,34 @@ async function forgetPassword(req, res) {
     }
 }
 
+async function getSpecialities(req, res) {
+    try {
+        const country = req.query.country;
+
+        if (!country) {
+            return res.status(400).send('Missing required query parameters: Country');
+        }
+
+        const masterDataSpecialities = await sequelize.datasyncConnector.query(
+            `SELECT Country.codbase, countryname, cod_id_onekey, cod_locale, cod_description
+            FROM ciam.vwcountry as Country
+            INNER JOIN ciam.vwspecialtymaster as Specialty ON Country.codbase=Specialty.codbase
+            WHERE LOWER(country_iso2) = $country_code;`,
+            {
+                bind: { country_code: country.toLowerCase() },
+                type: QueryTypes.SELECT
+            });
+
+        if (!masterDataSpecialities || masterDataSpecialities.length === 0) {
+            return res.status(404).send(`No specialities found for Country=${country}`)
+        }
+
+        res.json(masterDataSpecialities);
+    } catch (err) {
+        res.status(500).send(err);
+    }
+}
+
 exports.getHcps = getHcps;
 exports.editHcp = editHcp;
 exports.lookupHcpProfile = lookupHcpProfile;
@@ -268,3 +296,4 @@ exports.getHcpProfile = getHcpProfile;
 exports.changePassword = changePassword;
 exports.resetPassword = resetPassword;
 exports.forgetPassword = forgetPassword;
+exports.getSpecialities = getSpecialities;
