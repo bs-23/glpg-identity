@@ -118,6 +118,10 @@ describe('User Routes', () => {
                 confirmPassword: '12345678'
             });
 
+        const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
+        const user = await User.findOne({ where: { email: defaultUser.email }})
+        user.update({ password: defaultUser.password })
+
         expect(response.statusCode).toBe(200);
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
@@ -150,7 +154,7 @@ describe('User Routes', () => {
         expect(response.statusCode).toBe(200);
     });
 
-    it('Should return status code 200 after submitting an existing email in password reset endpoint', async () => {
+    it('Should generate password reset token submitting an existing email in password reset endpoint', async () => {
         jest.spyOn(emailService, 'send').mockImplementation(() => Promise.resolve())
 
         const response = await request
@@ -162,7 +166,19 @@ describe('User Routes', () => {
         expect(response.statusCode).toBe(200);
     });
 
-    it('Should return status code 400 after submitting an email that does not exists, in password reset endpoint', async () => {
+    it('Should request for password reset even if requested before', async () => {
+        jest.spyOn(emailService, 'send').mockImplementation(() => Promise.resolve())
+
+        const response = await request
+            .post('/api/users/password/send-reset-link')
+            .send({
+                email: defaultUser.email,
+            });
+
+        expect(response.statusCode).toBe(200);
+    });
+
+    it('Should get "Bad request" after submitting an email that does not exists, in password reset endpoint', async () => {
         const response = await request
             .post('/api/users/password/send-reset-link')
             .send({
@@ -172,14 +188,12 @@ describe('User Routes', () => {
         expect(response.statusCode).toBe(400);
     });
 
-    it('Should return status code 401 when trying to reset password with invalid token for a valid email', async () => {
+    it('Should get "Unauthorized" when trying to reset password with invalid token for a valid email', async () => {
         const password = faker.internet.password();
         const token = faker.random.uuid();
 
         const response = await request
-            .put(
-                `/api/users/password/resetPassword/?email=${defaultUser.email}&token=${token}`
-            )
+            .put(`/api/users/password/resetPassword/?email=${defaultUser.email}&token=${token}`)
             .send({
                 newPassword: password,
                 confirmPassword: password,
@@ -188,7 +202,72 @@ describe('User Routes', () => {
         expect(response.statusCode).toBe(401);
     });
 
-    it('Should return status code 200 when trying to reset password with valid token for a valid email', async () => {
+    it('Should get "Bad request" when trying to reset password with non existing email', async () => {
+        const password = faker.internet.password();
+        const token = faker.random.uuid();
+        const email = faker.internet.email()
+
+        const response = await request
+            .put(`/api/users/password/resetPassword/?email=${email}&token=${token}`)
+            .send({
+                newPassword: password,
+                confirmPassword: password,
+            });
+
+        expect(response.statusCode).toBe(400);
+    });
+
+    it('Should get "Bad request" when no query parameters were given', async () => {
+        const password = faker.internet.password();
+
+        const response = await request
+            .put(`/api/users/password/resetPassword/`)
+            .send({
+                newPassword: password,
+                confirmPassword: password,
+            });
+
+        expect(response.statusCode).toBe(400);
+    });
+
+    it('Should get "Bad request" when trying to reset password when no password reset request was found', async () => {
+        const password = faker.internet.password();
+        const { email } = defaultAdmin;
+        const token = faker.random.uuid()
+
+        const response = await request
+            .put(`/api/users/password/resetPassword/?email=${email}&token=${token}`)
+            .send({
+                newPassword: password,
+                confirmPassword: password,
+            });
+
+        expect(response.statusCode).toBe(400);
+    });
+
+    it('Should get "Bad request" when the new password is same as the current one', async () => {
+        const { email, password } = defaultUser;
+        const token = faker.random.uuid();
+        const expireAt = new Date(Date.now() + 60 * 60 * 1000);
+
+        const ResetPassword = require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
+        const [doc, created] = await ResetPassword.findOrCreate({
+            where: { email },
+            defaults: { email, token, expire_at: expireAt },
+        });
+        if (!created && doc) await doc.update({ token, expire_at: expireAt });
+
+        const response = await request
+            .put(`/api/users/password/resetPassword/?email=${email}&token=${token}`)
+            .send({
+                newPassword: password,
+                confirmPassword: password,
+            });
+
+        expect(response.statusCode).toBe(400);
+    });
+
+    it('Should reset password with valid token for a valid email', async () => {
         const password = faker.internet.password();
         const token = faker.random.uuid();
         const { email } = defaultUser;
@@ -215,7 +294,7 @@ describe('User Routes', () => {
         expect(response.statusCode).toBe(200);
     });
 
-    it('Should return status code 401 when trying to reset password with expired token for a valid email', async () => {
+    it('Should get "unauthorized" when trying to reset password with expired token for a valid email', async () => {
         const password = faker.internet.password();
         const token = faker.random.uuid();
         const { email } = defaultUser;
