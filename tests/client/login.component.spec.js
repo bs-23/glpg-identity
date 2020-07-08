@@ -4,6 +4,7 @@ import { configure, shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import { Provider } from 'react-redux';
 import axios from 'axios'
+import { BrowserRouter } from 'react-router-dom';
 import MockAdapter from 'axios-mock-adapter'
 import store from '../../src/modules/core/client/store.js';
 import Login from '../../src/modules/user/client/components/login.component';
@@ -21,9 +22,11 @@ describe('Login component', () => {
     const userSlice = () => store.getState().userReducer;
 
     const wrapperComponent = () => (
-        <Provider store={store}>
-            <Login/>
-        </Provider>
+        <BrowserRouter>
+            <Provider store={store}>
+                <Login />
+            </Provider>
+        </BrowserRouter>
     );
 
     it('Should render the login component', () => {
@@ -47,7 +50,7 @@ describe('Login component', () => {
 
     it('Should not login successfully if response is 500', async () => {
         const { container } = render(wrapperComponent());
-        const email = container.querySelector('input[name="email"]'); 
+        const email = container.querySelector('input[name="email"]');
         const password = container.querySelector('input[name="password"]');
         const submit = container.querySelector('button[type="submit"]');
         fakeAxios.onPost('/api/login').reply(500);

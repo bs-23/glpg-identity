@@ -30,8 +30,8 @@ module.exports = async function() {
         process.cwd(),
         'src/modules/consent/server/consent.model'
     ));
-
     const HCP_Consents = require(path.join(process.cwd(), "src/modules/hcp/server/hcp_consents.model"));
+    require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
 
     await sequelize.cdpConnector.sync();
 
