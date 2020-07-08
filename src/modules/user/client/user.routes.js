@@ -10,10 +10,9 @@ export default function UserRoutes() {
 
     return (
         <Switch>
-            <PrivateRoute exact path={path} component={Users} />
+            <PrivateRoute exact path={path} component={UserManagement} />
             <PrivateRoute path={`${path}/create`} component={UserForm} />
-            <PrivateRoute path={`${path}/user-management`} component={UserManagement} />
-           
+            <PrivateRoute path={`${path}/list`} component={Users} />
         </Switch>
     );
 }
