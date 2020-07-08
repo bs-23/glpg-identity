@@ -205,7 +205,6 @@ async function sendPasswordResetLink(req, res) {
 
         res.json({ message: `Reset link sent to ${email}.` });
     } catch (error) {
-        console.log(error)
         res.status(500).send(error);
     }
 }
