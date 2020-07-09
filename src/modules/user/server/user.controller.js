@@ -1,11 +1,10 @@
 const path = require('path');
+const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const User = require('./user.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const ResetPassword = require('./reset-password.model');
-
-const EXPIRATION_TIME = 60; // in minutes
 
 function validatePassword(password){
     var validPasswordPattern = new RegExp("^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})");
@@ -168,26 +167,6 @@ async function getUser(req, res){
     }
 }
 
-function generateUuid() {
-    let uuid = '';
-    let i;
-    let random;
-
-    for (i = 0; i < 32; i++) {
-        random = (Math.random() * 16) | 0;
-
-        if (i == 8 || i == 12 || i == 16 || i == 20) {
-            uuid += '-';
-        }
-
-        uuid += (i == 12 ? 4 : i == 16 ? (random & 3) | 8 : random).toString(
-            16
-        );
-    }
-
-    return uuid;
-}
-
 async function sendPasswordResetLink(req, res) {
     try {
         const { email } = req.body;
@@ -195,33 +174,28 @@ async function sendPasswordResetLink(req, res) {
         const user = await User.findOne({ where: { email } });
 
         if (!user) {
-            return res.status(400).send('Invalid email.');
+            return res.status(400).send('Email does not exist.');
         }
 
-        const token = generateUuid();
-        const expireAt = new Date(Date.now() + EXPIRATION_TIME * 60 * 1000);
+        const token = crypto.randomBytes(36).toString('hex');
+        const expireAt = Date.now() + 3600000;
 
         const [doc, created] = await ResetPassword.findOrCreate({
-            where: { email },
+            where: { user_id: user.id },
             defaults: {
-                email,
                 token,
-                expire_at: expireAt,
-            },
+                expires_at: expireAt
+            }
         });
 
         if (!created && doc) {
-            const updated = await doc.update({
+            await doc.update({
                 token,
-                expire_at: expireAt,
+                expires_at: expireAt
             });
-
-            if (!updated) {
-                return res.sendStatus(400);
-            }
         }
 
-        const link = `${req.protocol}://${req.headers.host}/reset-password?email=${email}&token=${token}`;
+        const link = `${req.protocol}://${req.headers.host}/reset-password?token=${token}`;
 
         const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp-password-reset-instruction.html`);
         const options = {
@@ -233,9 +207,10 @@ async function sendPasswordResetLink(req, res) {
                 link
             }
         };
+
         emailService.send(options);
 
-        res.json({ message: `Reset link sent to ${email}.` });
+        res.json({ message: `Password reset link sent to ${email}.` });
     } catch (error) {
         res.status(500).send(error);
     }
@@ -243,36 +218,24 @@ async function sendPasswordResetLink(req, res) {
 
 async function resetPassword(req, res) {
     try {
-        const { email, token } = req.query;
-        const { newPassword } = req.body;
+        const { token } = req.query;
 
-        if (!email || !token) return res.status(400).send('Invalid Reqeust');
+        if (!token) return res.status(400).send('Invalid password reset token');
 
-        const user = await User.findOne({ where: { email } });
-        if (!user) return res.status(400).send('Invalid Email');
+        const resetRequest = await ResetPassword.findOne({ where: { token } });
 
-        const resetRequest = await ResetPassword.findOne({ where: { email } });
-        if (!resetRequest) return res.status(400).send('Invalid Request');
+        if(!resetRequest) return res.status(400).send("Invalid password reset token.");
 
-        const validToken = resetRequest.validToken(token);
-        if (!validToken) return res.status(401).send('Invalid Token');
-
-        const { expire_at } = resetRequest;
-        if (expire_at - Date.now() < 0) {
+        if(resetRequest.expires_at < Date.now()) {
             await resetRequest.destroy();
-            return res.status(401).send('Token expired');
+            return res.status(400).send("Password reset token has been expired. Please request again.");
         }
 
-        if(!validatePassword(newPassword)) return res.status(400).send('Invalid password')
+        if(req.body.newPassword !== req.body.confirmPassword) return res.status(400).send("Password and confirm password doesn't match.");
 
-        if (user.validPassword(newPassword)) {
-            return res
-                .status(400)
-                .send('Previously used password, please choose another');
-        }
+        const user = await User.findOne({ where: { id: resetRequest.user_id } });
 
-        user.password = newPassword;
-        await user.save();
+        user.update({ password: req.body.newPassword });
 
         await resetRequest.destroy();
 
@@ -285,6 +248,7 @@ async function resetPassword(req, res) {
                 name: user.name || ''
             }
         };
+
         emailService.send(options);
 
         res.sendStatus(200);

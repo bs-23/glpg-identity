@@ -19,7 +19,7 @@ module.exports = app => {
 
     app.post('/api/users/change-password', passport.authenticate('user-jwt', { session: false }), controller.changePassword);
 
-    app.post('/api/users/password/send-reset-link', controller.sendPasswordResetLink);
+    app.post('/api/users/forgot-password', controller.sendPasswordResetLink);
 
-    app.put('/api/users/password/resetPassword', controller.resetPassword);
+    app.put('/api/users/reset-password', controller.resetPassword);
 };

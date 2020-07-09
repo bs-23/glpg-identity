@@ -177,8 +177,6 @@ describe('Hcp user component', () => {
         const updated_last_name = updated_first_row.childNodes[2];
         const updated_phone = updated_first_row.childNodes[3];
 
-        // console.log("===========================>", updated_first_name.textContent, " ", updated_last_name.textContent, updated_phone.textContent);
-
         expect(updated_first_name.textContent).toEqual('z');
         expect(updated_last_name.textContent).toEqual('z');
         expect(updated_phone.textContent).toEqual('0');

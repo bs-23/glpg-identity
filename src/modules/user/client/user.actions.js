@@ -6,7 +6,7 @@ export function getSignedInUserProfile() {
         type: Types.GET_PROFILE,
         payload: axios({
             method: 'get',
-            url: '/api/users/getSignedInUserProfile'
+            url: '/api/users/profile'
         })
     };
 }

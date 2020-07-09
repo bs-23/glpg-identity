@@ -16,9 +16,9 @@ let mockAxios;
 
 beforeAll(async () => {
     mockAxios = new MockAdapter(axios);
-    mockAxios.onGet('/api/users/getSignedInUserProfile').reply(200, { id: '1', email: 'email@gmail.com', name: 'John Smith' })
+    mockAxios.onGet('/api/users/profile').reply(200, { id: '1', email: 'email@gmail.com', name: 'John Smith' })
     await store.dispatch(getSignedInUserProfile())
-})
+});
 
 describe('User component', () => {
     beforeEach(() => {

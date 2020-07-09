@@ -7,20 +7,18 @@ export function getHcpProfiles(page, is_active) {
         payload: axios({
             method: 'get',
             url: `/api/hcps?page=${page}&is_active=${is_active}`
-        }),
+        })
     };
 }
 
 export function editHcpProfiles(data, id) {
-    console.log("=======================> clicked", data, id);
-    alert("habbi")
     return {
         type: Types.EDIT_HCPS,
         payload: axios({
             method: 'put',
             url: '/api/hcps/' + id,
             data
-        }),
+        })
     };
 }
 

@@ -23,7 +23,7 @@ describe('Forgot password component', () => {
         const submit = container.querySelector('button[type="submit"]');
 
         const mockAxios = new MockAdapter(axios);
-        mockAxios.onPost('/api/users/password/send-reset-link').reply(200)
+        mockAxios.onPost('/api/users/forgot-password').reply(200)
 
         fireEvent.change(email, { target: { value: 'email@gmail.com' } });
 
@@ -42,7 +42,7 @@ describe('Forgot password component', () => {
         const submit = container.querySelector('button[type="submit"]');
 
         const mockAxios = new MockAdapter(axios);
-        mockAxios.onPost('/api/users/password/send-reset-link').reply(400, 'Email does not exist')
+        mockAxios.onPost('/api/users/forgot-password').reply(400, 'Email does not exist')
 
         fireEvent.change(email, { target: { value: 'email@gmail.com' } });
 
