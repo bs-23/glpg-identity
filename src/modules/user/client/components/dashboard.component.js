@@ -1,6 +1,5 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import "./dashboard.scss";
 import Faq from '../../../shared/client/components/faq.component';
 
 export default function Dashboard() {

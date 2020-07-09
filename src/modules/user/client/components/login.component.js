@@ -6,7 +6,6 @@ import { Link } from 'react-router-dom';
 import { login } from "../user.actions";
 import { loginSchema } from "../user.schema";
 
-import "./login.scss";
 
 export default function Login() {
     const dispatch = useDispatch();

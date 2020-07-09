@@ -6,6 +6,11 @@ const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodeca
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const ResetPassword = require('./reset-password.model');
 
+function validatePassword(password){
+    var validPasswordPattern = new RegExp("^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})");
+    return validPasswordPattern.test(password)
+}
+
 function generateAccessToken(user) {
     return jwt.sign({
         id: user.id,
@@ -69,6 +74,8 @@ async function createUser(req, res) {
     } = req.body;
 
     try {
+        if(!validatePassword(password)) return res.status(400).send('Invalid password')
+
         const [doc, created] = await User.findOrCreate({
             where: { email },
             defaults: {
@@ -103,6 +110,8 @@ async function changePassword(req, res) {
         if (!user || !user.validPassword(currentPassword)) {
             return res.status(400).send('Current Password not valid');
         }
+
+        if(!validatePassword(newPassword)) return res.status(400).send('Invalid password')
 
         if (newPassword !== confirmPassword) {
             return res.status(400).send('Passwords should match');
