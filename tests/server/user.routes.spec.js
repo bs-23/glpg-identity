@@ -61,7 +61,7 @@ describe('User Routes', () => {
             .send({
                 name: faker.name.firstName(),
                 email: faker.internet.email(),
-                password: faker.internet.password(8),
+                password: 'Abcdef2!',
                 application_id: specHelper.defaultApplication.id,
             });
 
@@ -114,8 +114,8 @@ describe('User Routes', () => {
             .set('Cookie', [`access_token=${defaultUser.access_token}`])
             .send({
                 currentPassword: defaultUser.password,
-                newPassword: '12345678',
-                confirmPassword: '12345678'
+                newPassword: 'Abcdef2!',
+                confirmPassword: 'Abcdef2!'
             });
 
         const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
