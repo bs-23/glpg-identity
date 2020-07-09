@@ -11,7 +11,7 @@ module.exports = app => {
         .get(passport.authenticate('user-jwt', { session: false }), controller.getUsers)
         .post(passport.authenticate('user-jwt', { session: false }), controller.createUser);
 
-    app.get('/api/users/getSignedInUserProfile', passport.authenticate('user-jwt', { session: false }), controller.getSignedInUserProfile);
+    app.get('/api/users/profile', passport.authenticate('user-jwt', { session: false }), controller.getSignedInUserProfile);
 
     app.route('/api/users/:id')
         .get(passport.authenticate("user-jwt", { session: false }), controller.getUser)
