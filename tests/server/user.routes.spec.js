@@ -45,9 +45,9 @@ describe('User Routes', () => {
         expect(response.res.headers['set-cookie'][0].split(';')[0].split('=')[1]).toBe('');
     });
 
-    it('Should get the signed in user profile', async () => {
+    it("Should get the signed in user's profile", async () => {
         const response = await request
-            .get('/api/users/getSignedInUserProfile')
+            .get('/api/users/profile')
             .set('Cookie', [`access_token=${defaultUser.access_token}`]);
 
         expect(response.statusCode).toBe(200);
@@ -154,168 +154,70 @@ describe('User Routes', () => {
         expect(response.statusCode).toBe(200);
     });
 
-    it('Should generate password reset token submitting an existing email in password reset endpoint', async () => {
+    it('Should get password reset token with valid email', async () => {
         jest.spyOn(emailService, 'send').mockImplementation(() => Promise.resolve())
 
         const response = await request
-            .post('/api/users/password/send-reset-link')
+            .post('/api/users/forgot-password')
             .send({
-                email: defaultUser.email,
+                email: defaultUser.email
             });
 
         expect(response.statusCode).toBe(200);
     });
 
-    it('Should request for password reset even if requested before', async () => {
-        jest.spyOn(emailService, 'send').mockImplementation(() => Promise.resolve())
-
+    it('Should get "Bad request" with an invalid email in forget-password api', async () => {
         const response = await request
-            .post('/api/users/password/send-reset-link')
+            .post('/api/users/forgot-password')
             .send({
-                email: defaultUser.email,
-            });
-
-        expect(response.statusCode).toBe(200);
-    });
-
-    it('Should get "Bad request" after submitting an email that does not exists, in password reset endpoint', async () => {
-        const response = await request
-            .post('/api/users/password/send-reset-link')
-            .send({
-                email: faker.internet.email(),
+                email: faker.internet.email()
             });
 
         expect(response.statusCode).toBe(400);
     });
 
-    it('Should get "Unauthorized" when trying to reset password with invalid token for a valid email', async () => {
-        const password = faker.internet.password();
-        const token = faker.random.uuid();
-
-        const response = await request
-            .put(`/api/users/password/resetPassword/?email=${defaultUser.email}&token=${token}`)
-            .send({
-                newPassword: password,
-                confirmPassword: password,
-            });
-
-        expect(response.statusCode).toBe(401);
-    });
-
-    it('Should get "Bad request" when trying to reset password with non existing email', async () => {
-        const password = faker.internet.password();
-        const token = faker.random.uuid();
-        const email = faker.internet.email()
-
-        const response = await request
-            .put(`/api/users/password/resetPassword/?email=${email}&token=${token}`)
-            .send({
-                newPassword: password,
-                confirmPassword: password,
-            });
-
-        expect(response.statusCode).toBe(400);
-    });
-
-    it('Should get "Bad request" when no query parameters were given', async () => {
+    it('Should get "Bad request" without password reset token', async () => {
         const password = faker.internet.password();
 
         const response = await request
-            .put(`/api/users/password/resetPassword/`)
+            .put(`/api/users/reset-password`)
             .send({
                 newPassword: password,
-                confirmPassword: password,
+                confirmPassword: password
             });
 
         expect(response.statusCode).toBe(400);
     });
 
-    it('Should get "Bad request" when trying to reset password when no password reset request was found', async () => {
-        const password = faker.internet.password();
-        const { email } = defaultAdmin;
-        const token = faker.random.uuid()
-
-        const response = await request
-            .put(`/api/users/password/resetPassword/?email=${email}&token=${token}`)
-            .send({
-                newPassword: password,
-                confirmPassword: password,
-            });
-
-        expect(response.statusCode).toBe(400);
-    });
-
-    it('Should get "Bad request" when the new password is same as the current one', async () => {
-        const { email, password } = defaultUser;
-        const token = faker.random.uuid();
-        const expireAt = new Date(Date.now() + 60 * 60 * 1000);
-
-        const ResetPassword = require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
-        const [doc, created] = await ResetPassword.findOrCreate({
-            where: { email },
-            defaults: { email, token, expire_at: expireAt },
-        });
-        if (!created && doc) await doc.update({ token, expire_at: expireAt });
-
-        const response = await request
-            .put(`/api/users/password/resetPassword/?email=${email}&token=${token}`)
-            .send({
-                newPassword: password,
-                confirmPassword: password,
-            });
-
-        expect(response.statusCode).toBe(400);
-    });
-
-    it('Should reset password with valid token for a valid email', async () => {
+    it('Should reset password with valid token', async () => {
         const password = faker.internet.password();
         const token = faker.random.uuid();
         const { email } = defaultUser;
         const expireAt = new Date(Date.now() + 60 * 60 * 1000);
 
-        jest.spyOn(emailService, 'send').mockImplementation(() => Promise.resolve())
+        jest.spyOn(emailService, 'send').mockImplementation(() => Promise.resolve());
 
+        const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
         const ResetPassword = require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
+
+        const user = await User.findOne({ where: { email } });
         const [doc, created] = await ResetPassword.findOrCreate({
-            where: { email },
-            defaults: { email, token, expire_at: expireAt },
+            where: { user_id: user.id },
+            defaults: {
+                token,
+                expires_at: expireAt
+            }
         });
-        if (!created && doc) await doc.update({ token, expire_at: expireAt });
+
+        if (!created && doc) await doc.update({ token, expires_at: expireAt });
 
         const response = await request
-            .put(
-                `/api/users/password/resetPassword/?email=${defaultUser.email}&token=${token}`
-            )
+            .put(`/api/users/reset-password?token=${token}`)
             .send({
                 newPassword: password,
-                confirmPassword: password,
+                confirmPassword: password
             });
 
         expect(response.statusCode).toBe(200);
-    });
-
-    it('Should get "unauthorized" when trying to reset password with expired token for a valid email', async () => {
-        const password = faker.internet.password();
-        const token = faker.random.uuid();
-        const { email } = defaultUser;
-        const expireAt = new Date(Date.now() - 10);
-
-        const ResetPassword = require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
-        const [doc, created] = await ResetPassword.findOrCreate({
-            where: { email },
-            defaults: { email, token, expire_at: expireAt },
-        });
-        if (!created && doc) await doc.update({ token, expire_at: expireAt });
-
-        const response = await request
-            .put(
-                `/api/users/password/resetPassword/?email=${defaultUser.email}&token=${token}`
-            )
-            .send({
-                newPassword: password,
-                confirmPassword: password,
-            });
-
-        expect(response.statusCode).toBe(401);
     });
 });
