@@ -55,8 +55,10 @@ async function login(req, res) {
             category: 'authentication',
             message: 'User logged in',
             userId: user.id
-       };
-       const result = await auditService.log(logData);
+        };
+
+        await auditService.log(logData);
+        await user.update({ last_login: Date.now() })
 
         res.json(formatProfile(user));
     } catch (err) {
@@ -83,7 +85,8 @@ async function createUser(req, res) {
         phone,
         countries,
         permissions,
-        application_id
+        application_id,
+        expiary_date
     } = req.body;
 
     try {
@@ -97,7 +100,8 @@ async function createUser(req, res) {
                 permissions,
                 application_id,
                 created_by: req.user.id,
-                updated_by: req.user.id
+                updated_by: req.user.id,
+                expiary_date
             }
         });
 
@@ -156,8 +160,8 @@ async function getUsers(req, res) {
 
 async function getUser(req, res){
     try{
-        const user = await User.findOne({ 
-            where: { 
+        const user = await User.findOne({
+            where: {
                 id: req.params.id
             },
             attributes: ['id', 'name', 'email', 'phone', 'type']
@@ -173,7 +177,7 @@ async function getUser(req, res){
             order: [ ['created_at', 'DESC'] ],
             attributes: ["created_at"]
         });
-        
+
         if(last_login) user.dataValues.last_login = last_login.created_at;
         else user.dataValues.last_login = null;
 
