@@ -15,7 +15,7 @@ const Alert = ({ type, message }) => (
 export default function ResetPasswordForm() {
     const history = useHistory();
     const location = useLocation();
-    const { email, token } = QueryString.parse(location.search);
+    const { token } = QueryString.parse(location.search);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
@@ -35,7 +35,7 @@ export default function ResetPasswordForm() {
                                     displayName="ResetPasswordForm"
                                     validationSchema={resetPasswordSchema}
                                     onSubmit={(values, actions) => {
-                                        Axios.put(`/api/users/password/resetPassword/?email=${email}&token=${token}`, values)
+                                        Axios.put(`/api/users/reset-password?token=${token}`, values)
                                             .then(() => {
                                                 setSuccess('Your password has been reset successfully. Redirecting...');
                                                 setError('');
