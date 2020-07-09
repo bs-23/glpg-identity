@@ -3,8 +3,10 @@ const jwt = require('jsonwebtoken');
 const User = require('./user.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const auditService = require(path.join(process.cwd(), 'src/config/server/lib/audit.service'));
+const Audit = require(path.join(process.cwd(), 'src/modules/audit/audit.model'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const ResetPassword = require('./reset-password.model');
+const { last } = require('lodash');
 
 const EXPIRATION_TIME = 60; // in minutes
 
@@ -159,8 +161,22 @@ async function getUser(req, res){
             where: { 
                 id: req.params.id
             },
-            attributes: [id, name, email, phone, type]
-        })
+            attributes: ['id', 'name', 'email', 'phone', 'type']
+        });
+
+        if(!user) return res.status(404).send("User is not found or may be removed");
+
+        const last_login = await Audit.findOne({
+            where: {
+                userId: req.params.id,
+                action: 'login'
+            },
+            order: [ ['created_at', 'DESC'] ],
+            attributes: ["created_at"]
+        });
+        
+        if(last_login) user.dataValues.last_login = last_login.created_at;
+        else user.dataValues.last_login = null;
 
         res.json(user);
     }
