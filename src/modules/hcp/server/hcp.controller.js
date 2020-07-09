@@ -134,7 +134,7 @@ async function registrationLookup(req, res) {
                 message: 'UUID is already registered.'
             });
         } else {
-            master_data = await sequelize.datasyncConnector.query(`
+            const master_data = await sequelize.datasyncConnector.query(`
                 SELECT h.*, s.specialty_code
                 FROM ciam.vwhcpmaster AS h
                 INNER JOIN ciam.vwmaphcpspecialty AS s
@@ -162,7 +162,33 @@ async function registrationLookup(req, res) {
 }
 
 async function createHcpProfile(req, res) {
+    const response = {
+        data: {},
+        errors: []
+    };
+
     try {
+        const isEmailExists =  await Hcp.findOne({ where: { email: req.body.email }});
+        const isUUIDExists =  await Hcp.findOne({ where: { uuid: req.body.uuid }});
+
+        if (isEmailExists) {
+            response.errors.push({
+                field: 'email',
+                message: 'Email already exists.'
+            });
+        }
+
+        if (isUUIDExists) {
+            response.errors.push({
+                field: 'uuid',
+                message: 'UUID already exists.'
+            });
+        }
+
+        if (isEmailExists || isUUIDExists) {
+            return res.json(response);
+        }
+
         let master_data = null;
 
         if(req.body.uuid) {
@@ -172,26 +198,21 @@ async function createHcpProfile(req, res) {
             });
         }
 
-        const [doc, created] = await Hcp.findOrCreate({
-            where: { [Op.or]: [{ email: req.body.email }, { uuid: req.body.uuid }] },
-            defaults: {
-                salutation: req.body.salutation,
-                first_name: req.body.first_name,
-                last_name: req.body.last_name,
-                country_iso2: req.body.country_iso2,
-                specialty_onekey: req.body.specialty_onekey,
-                application_id: req.user.id,
-                created_by: req.user.id,
-                updated_by: req.user.id,
-                status: master_data && master_data.length ? 'Approved' : 'Pending',
-                reset_password_token: crypto.randomBytes(36).toString('hex'),
-                reset_password_expires: Date.now() + 3600000
-            }
+        const doc = await Hcp.create({
+            email: req.body.email,
+            uuid: req.body.uuid,
+            salutation: req.body.salutation,
+            first_name: req.body.first_name,
+            last_name: req.body.last_name,
+            country_iso2: req.body.country_iso2,
+            specialty_onekey: req.body.specialty_onekey,
+            application_id: req.user.id,
+            created_by: req.user.id,
+            updated_by: req.user.id,
+            status: master_data && master_data.length ? 'Approved' : 'Pending',
+            reset_password_token: crypto.randomBytes(36).toString('hex'),
+            reset_password_expires: Date.now() + 3600000
         });
-
-        if (!created) {
-            return res.status(400).send('Email or UUID already exists.');
-        }
 
         if (req.body.consents) {
             const consentArr = [];
@@ -209,11 +230,13 @@ async function createHcpProfile(req, res) {
             });
         }
 
-        res.json({
+        response.data = {
             ...getHcpViewModel(doc.dataValues),
             password_reset_token: doc.dataValues.reset_password_token,
             retention_period: '1 hour'
-        });
+        };
+
+        res.json(response);
     } catch (err) {
         res.status(500).send(err);
     }

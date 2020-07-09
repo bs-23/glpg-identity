@@ -36,40 +36,43 @@ describe('HCP Routes', () => {
         expect(response.statusCode).toBe(404);
     });
 
-    it('Should change password with valid parameters', async () => {
-        const response = await request.put('/api/hcp-profiles/change-password')
-            .set('Authorization', 'bearer ' + defaultApplication.access_token)
-            .send({
-                email: defaultUser.email,
-                new_password: '123456789',
-                confirm_password: '123456789'
-            });
-
-        expect(response.statusCode).toBe(200);
-    });
-
-    it('Should not change password with unknown email', async () => {
+    it('Should not change password with invalid credentials', async () => {
         const response = await request.put('/api/hcp-profiles/change-password')
             .set('Authorization', 'bearer ' + defaultApplication.access_token)
             .send({
                 email: faker.internet.email(),
+                current_password: faker.internet.password(),
                 new_password: '123456',
                 confirm_password: '123456'
             });
 
-        expect(response.statusCode).toBe(404);
+        expect(response.statusCode).toBe(401);
     });
 
-    it('Should not change password when password and confirm password does not match', async () => {
+    it('Should not change password if password and confirm password does not match', async () => {
         const response = await request.put('/api/hcp-profiles/change-password')
             .set('Authorization', 'bearer ' + defaultApplication.access_token)
             .send({
                 email: defaultUser.email,
+                current_password: defaultUser.password,
                 new_password: faker.internet.password(),
                 confirm_password: faker.internet.password()
             });
 
         expect(response.statusCode).toBe(400);
+    });
+
+    it('Should change password with valid parameters', async () => {
+        const response = await request.put('/api/hcp-profiles/change-password')
+            .set('Authorization', 'bearer ' + defaultApplication.access_token)
+            .send({
+                email: defaultUser.email,
+                current_password: defaultUser.password,
+                new_password: '123456789',
+                confirm_password: '123456789'
+            });
+
+        expect(response.statusCode).toBe(200);
     });
 
     it('Should create a new HCP profile', async () => {
@@ -101,15 +104,25 @@ describe('HCP Routes', () => {
                 email: defaultUser.email
             });
 
-        expect(response.statusCode).toBe(400);
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('errors');
+        expect(response.body.errors).toHaveLength(1);
+        expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
-    it('Should get bad request without email or uuid in registration lookup', async () => {
+    it('Should not get user details without a valid uuid in registration lookup', async () => {
         const response = await request
             .post('/api/hcp-profiles/registration-lookup')
-            .set('Authorization', `bearer ${defaultApplication.access_token}`);
+            .set('Authorization', `bearer ${defaultApplication.access_token}`)
+            .send({
+                email: faker.internet.email(),
+                uuid: faker.random.uuid()
+            });
 
-        expect(response.statusCode).toBe(400);
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('errors');
+        expect(response.body.errors).toHaveLength(1);
+        expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
     it('Should edit an HCP user - Edit HCP user', async () => {
