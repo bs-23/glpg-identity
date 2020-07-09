@@ -1,5 +1,7 @@
 import { string, object, ref, date } from 'yup';
 
+const passwordPattern = new RegExp("^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})")
+
 export const loginSchema = object().shape({
     email: string()
         .email('This field should be an valid email address.')
@@ -17,7 +19,8 @@ export const registerSchema = object().shape({
         .required('This field must not be empty.'),
     password: string()
         .min(8, 'This field must be at least 8 characters long.')
-        .required('This field must not be empty.'),
+        .required('This field must not be empty.')
+        .matches(passwordPattern, 'Password must contain at least a digit, an uppercase and a special character'),
     phone: string().matches(/^[0-9]/, 'This field only contains numbers'),
     expiary_date: date()
         .min(Date(), 'Must be a future date')
@@ -30,7 +33,8 @@ export const changePasswordSchema = object().shape({
         .required('This field must not be empty.'),
     newPassword: string()
         .min(8, 'This field must be at least 8 characters long.')
-        .required('This field must not be empty.'),
+        .required('This field must not be empty.')
+        .matches(passwordPattern, 'Password must contain at least a digit, an uppercase and a special character'),
     confirmPassword: string()
         .required('This field must not be empty.')
         .oneOf([ref('newPassword'), null], 'Passwords must match'),
@@ -39,7 +43,8 @@ export const changePasswordSchema = object().shape({
 export const resetPasswordSchema = object().shape({
     newPassword: string()
         .min(8, 'This field must be at least 8 characters long.')
-        .required('This field must not be empty.'),
+        .required('This field must not be empty.')
+        .matches(passwordPattern, 'Password must contain at least a digit, an uppercase and a special character'),
     confirmPassword: string()
         .required('This field must not be empty.')
         .oneOf([ref('newPassword'), null], 'Passwords must match'),

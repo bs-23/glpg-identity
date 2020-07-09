@@ -9,6 +9,10 @@ const ResetPassword = require('./reset-password.model');
 
 const EXPIRATION_TIME = 60; // in minutes
 
+function validatePassword(password){
+    var validPasswordPattern = new RegExp("^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})");
+    return validPasswordPattern.test(password)
+}
 
 function generateAccessToken(user) {
     return jwt.sign({
@@ -90,6 +94,8 @@ async function createUser(req, res) {
     } = req.body;
 
     try {
+        if(!validatePassword(password)) return res.status(400).send('Invalid password')
+
         const [doc, created] = await User.findOrCreate({
             where: { email },
             defaults: {
@@ -124,6 +130,8 @@ async function changePassword(req, res) {
         if (!user || !user.validPassword(currentPassword)) {
             return res.status(400).send('Current Password not valid');
         }
+
+        if(!validatePassword(newPassword)) return res.status(400).send('Invalid password')
 
         if (newPassword !== confirmPassword) {
             return res.status(400).send('Passwords should match');
@@ -282,6 +290,8 @@ async function resetPassword(req, res) {
             await resetRequest.destroy();
             return res.status(401).send('Token expired');
         }
+
+        if(!validatePassword(newPassword)) return res.status(400).send('Invalid password')
 
         if (user.validPassword(newPassword)) {
             return res
