@@ -1,7 +1,7 @@
 const path = require('path');
 const _ = require('lodash');
 const crypto = require('crypto');
-const { QueryTypes } = require('sequelize');
+const { Op, QueryTypes } = require('sequelize');
 const Hcp = require('./hcp_profile.model');
 const HcpConsents = require('./hcp_consents.model');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
@@ -116,16 +116,22 @@ async function registrationLookup(req, res) {
     }
 
     if (!uuid || !email) {
-        return res.status(400).json(response);
+        return res.json(response);
     }
 
     try {
-        const profile = await Hcp.findOne({ where: { email }});
+        const profileByEmail = await Hcp.findOne({ where: { email }});
+        const profileByUUID = await Hcp.findOne({ where: { uuid }});
 
-        if(profile) {
+        if(profileByEmail) {
             response.errors.push({
                 field: 'email',
                 message: 'Email address is already registered.'
+            });
+        } else if(profileByUUID) {
+            response.errors.push({
+                field: 'uuid',
+                message: 'UUID is already registered.'
             });
         } else {
             master_data = await sequelize.datasyncConnector.query(`
@@ -167,12 +173,11 @@ async function createHcpProfile(req, res) {
         }
 
         const [doc, created] = await Hcp.findOrCreate({
-            where: { email: req.body.email },
+            where: { [Op.or]: [{ email: req.body.email }, { uuid: req.body.uuid }] },
             defaults: {
                 salutation: req.body.salutation,
                 first_name: req.body.first_name,
                 last_name: req.body.last_name,
-                uuid: req.body.uuid,
                 country_iso2: req.body.country_iso2,
                 specialty_onekey: req.body.specialty_onekey,
                 application_id: req.user.id,
@@ -230,14 +235,16 @@ async function getHcpProfile(req, res) {
 }
 
 async function changePassword(req, res) {
-    const { email, new_password, confirm_password } = req.body;
+    const { email, current_password, new_password, confirm_password } = req.body;
 
-    if (!email || !new_password || !confirm_password) return res.status(400).send('Missing required parameters.');
+    if (!email || !current_password || !new_password || !confirm_password) return res.status(400).send('Missing required parameters.');
 
     try {
         const doc = await Hcp.findOne({ where: { email: email } });
 
-        if (!doc) return res.status(404).send('Profile not found.');
+        if (!doc || !doc.validPassword(current_password)) {
+            return res.status(401).send('Invalid credentials.');
+        }
 
         if (new_password !== confirm_password) {
             return res.status(400).send("Password and confirm password doesn't match.");

@@ -221,6 +221,8 @@ components:
             properties:
                 email:
                     type: string
+                current_password:
+                    type: string
                 new_password:
                     type: string
                 confirm_password:
