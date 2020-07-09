@@ -8,7 +8,7 @@ module.exports = app => {
     app.get('/api/logout', passport.authenticate('user-jwt', { session: false }), controller.logout);
 
     app.route('/api/users')
-        .get(passport.authenticate('user-jwt', { session: false }), controller.getUsers)
+        .get(passport.authenticate('user-jwt', { session: false }), ModuleGuard('asasas'), controller.getUsers)
         .post(passport.authenticate('user-jwt', { session: false }), controller.createUser);
 
     app.route('/api/users/:id')
