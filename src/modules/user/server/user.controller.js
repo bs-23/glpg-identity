@@ -6,7 +6,6 @@ const auditService = require(path.join(process.cwd(), 'src/config/server/lib/aud
 const Audit = require(path.join(process.cwd(), 'src/modules/audit/audit.model'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const ResetPassword = require('./reset-password.model');
-const { last } = require('lodash');
 
 const EXPIRATION_TIME = 60; // in minutes
 
