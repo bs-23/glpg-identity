@@ -15,7 +15,7 @@ async function init() {
     const Consent = require(path.join(process.cwd(), "src/modules/consent/server/consent.model"));
     require(path.join(process.cwd(), "src/modules/hcp/server/hcp_profile.model"));
     require(path.join(process.cwd(), "src/modules/hcp/server/hcp_consents.model"));
-    require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'))
+    require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
 
     await sequelize.cdpConnector.sync();
 
