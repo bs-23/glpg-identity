@@ -1,3 +1,4 @@
+const path = require("path");
 const passport = require('passport');
 const User = require(path.join(process.cwd(), "src/modules/user/server/user.model"));
 const Userpermission = require(path.join(process.cwd(), "src/modules/user/server/user-permission.model"));
@@ -12,11 +13,10 @@ const AdminGuard = (req, res, next) => {
 
 const AuthGuard = passport.authenticate('user-jwt', { session: false });
 
-const isPermitted = (url, userPermission) => {
-    const module = url.split('/')[2];
+const isPermitted = (action, userPermission) => {
 
     if(userPermission.some(element =>
-       element.permission.route === module
+       element.permission.action === action
     )) {
         return true;
     } else {
