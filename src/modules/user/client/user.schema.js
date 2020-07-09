@@ -1,4 +1,4 @@
-import { string, object, ref } from 'yup';
+import { string, object, ref, date } from 'yup';
 
 export const loginSchema = object().shape({
     email: string()
@@ -19,6 +19,9 @@ export const registerSchema = object().shape({
         .min(8, 'This field must be at least 8 characters long.')
         .required('This field must not be empty.'),
     phone: string().matches(/^[0-9]/, 'This field only contains numbers'),
+    expiary_date: date()
+        .min(Date(), 'Must be a future date')
+        .required('This field must not be empty')
 });
 
 export const changePasswordSchema = object().shape({

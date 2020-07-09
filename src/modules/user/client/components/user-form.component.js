@@ -55,13 +55,16 @@ export default function UserForm() {
                                             password: "",
                                             countries: [],
                                             permissions: [],
-                                            phone: ""
+                                            phone: "",
+                                            expiary_date: ""
                                         }}
                                         displayName="UserForm"
                                         validationSchema={registerSchema}
                                         onSubmit={(values, actions) => {
-                                            dispatch(createUser(values));
-                                            actions.resetForm();
+                                            dispatch(createUser(values))
+                                                .then(() => {
+                                                    actions.resetForm();
+                                                });
                                             actions.setSubmitting(false);
                                         }}
                                     >
@@ -95,6 +98,13 @@ export default function UserForm() {
                                                     <Field data-testid="phone" className="form-control" type="text" name="phone" placeholder="Phone" />
                                                     <div className="invalid-feedback">
                                                         <ErrorMessage name="phone" data-testid="phoneError" />
+                                                    </div>
+                                                </div>
+                                                <div className="form-group">
+                                                    <label htmlFor="expiary_date">Expiary Date:</label>
+                                                    <Field className="form-control" type="date" name="expiary_date"/>
+                                                    <div className="invalid-feedback">
+                                                        <ErrorMessage name="expiary_date" />
                                                     </div>
                                                 </div>
                                                 <button type="submit" className="btn btn-info btn-block" disabled={formikProps.isSubmitting}>Submit</button>

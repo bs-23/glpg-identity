@@ -65,7 +65,8 @@ async function createUser(req, res) {
         phone,
         countries,
         permissions,
-        application_id
+        application_id,
+        expiary_date
     } = req.body;
 
     try {
@@ -79,7 +80,8 @@ async function createUser(req, res) {
                 permissions,
                 application_id,
                 created_by: req.user.id,
-                updated_by: req.user.id
+                updated_by: req.user.id,
+                expiary_date
             }
         });
 
@@ -132,6 +134,36 @@ async function getUsers(req, res) {
 
         res.json(users);
     } catch(err) {
+        res.status(500).send(err);
+    }
+}
+
+async function getUser(req, res){
+    try{
+        const user = await User.findOne({
+            where: {
+                id: req.params.id
+            },
+            attributes: ['id', 'name', 'email', 'phone', 'type']
+        });
+
+        if(!user) return res.status(404).send("User is not found or may be removed");
+
+        const last_login = await Audit.findOne({
+            where: {
+                userId: req.params.id,
+                action: 'login'
+            },
+            order: [ ['created_at', 'DESC'] ],
+            attributes: ["created_at"]
+        });
+
+        if(last_login) user.dataValues.last_login = last_login.created_at;
+        else user.dataValues.last_login = null;
+
+        res.json(user);
+    }
+    catch(err){
         res.status(500).send(err);
     }
 }
@@ -266,5 +298,6 @@ exports.getSignedInUserProfile = getSignedInUserProfile;
 exports.changePassword = changePassword;
 exports.deleteUser = deleteUser;
 exports.getUsers = getUsers;
+exports.getUser = getUser;
 exports.sendPasswordResetLink = sendPasswordResetLink;
 exports.resetPassword = resetPassword;
