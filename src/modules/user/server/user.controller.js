@@ -52,6 +52,8 @@ async function login(req, res) {
             httpOnly: true
         });
 
+        await user.update({ last_login: Date() })
+
         res.json(formatProfile(user));
     } catch (err) {
         res.status(500).send(err);
@@ -153,26 +155,15 @@ async function getUser(req, res){
             where: {
                 id: req.params.id
             },
-            attributes: ['id', 'name', 'email', 'phone', 'type']
+            attributes: ['id', 'name', 'email', 'phone', 'type', 'last_login']
         });
 
         if(!user) return res.status(404).send("User is not found or may be removed");
 
-        const last_login = await Audit.findOne({
-            where: {
-                userId: req.params.id,
-                action: 'login'
-            },
-            order: [ ['created_at', 'DESC'] ],
-            attributes: ["created_at"]
-        });
-
-        if(last_login) user.dataValues.last_login = last_login.created_at;
-        else user.dataValues.last_login = null;
-
         res.json(user);
     }
     catch(err){
+        console.log(err)
         res.status(500).send(err);
     }
 }
