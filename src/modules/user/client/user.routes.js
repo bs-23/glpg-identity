@@ -13,6 +13,7 @@ export default function UserRoutes() {
             <PrivateRoute exact path={path} component={UserManagement} />
             <PrivateRoute path={`${path}/create`} component={UserForm} />
             <PrivateRoute path={`${path}/list`} component={Users} />
+            <PrivateRoute path={`${path}/:id`} component={UserDetails}/>
         </Switch>
     );
 }
