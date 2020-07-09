@@ -13,8 +13,10 @@ async function init() {
     const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
     const User = require(path.join(process.cwd(), "src/modules/user/server/user.model"));
     const Consent = require(path.join(process.cwd(), "src/modules/consent/server/consent.model"));
+    const UserPermission = require(path.join(process.cwd(), "src/modules/user/server/user-permission.model"));
     const Permission = require(path.join(process.cwd(), "src/modules/permission/permission.model"));
-    const ActionConstants         = require(path.join(process.cwd(), "src/modules/permission/permission.model"));
+
+    const { Actions } = require(path.join(process.cwd(), 'src/config/server/lib/actions.constant'));
     require(path.join(process.cwd(), "src/modules/hcp/server/hcp_profile.model"));
     require(path.join(process.cwd(), "src/modules/hcp/server/hcp_consents.model"));
     require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'))
@@ -44,12 +46,46 @@ async function init() {
             callback();
         });
     }
+    function userpermissionSeeder(callback) {
+        const userpermissions = [
+
+            { "permissionId": "dfc05285-cd84-42fc-afb8-620a5229248c", "userId": "1fd75693-ce87-4bf7-801a-61b1d7275c4f", "created_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f", "updated_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f" },
+
+        ];
+
+        UserPermission.destroy({ truncate: true }).then(() => {
+            UserPermission.bulkCreate(userpermissions, {
+                returning: true,
+                ignoreDuplicates: false
+            }).then(function () {
+                callback();
+            });
+        });
+    }
     function permissionSeeder(callback) {
         const permissions = [
 
-            { "action": "Sample Request", "status": "created_by", "opt_type": "updated_by", "updated_by": "DM"},
-        ]
+            { "action": Actions.USER_GET_LIST, "status": "active", "created_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f", "updated_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f" },
+            { "action": Actions.USER_POST, "status": "active", "created_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f", "updated_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f" },
+            { "action": Actions.USER_GET, "status": "active", "created_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f", "updated_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f" },
+            { "action": Actions.USER_GET_PROFILE, "status": "active", "created_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f", "updated_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f" },
+            { "action": Actions.USER_POST_CHANGE_PASSWORD, "status": "active", "created_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f", "updated_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f" },
+            { "action": Actions.USER_POST_SEND_PASSWORD_RESET_LINK, "status": "active", "created_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f", "updated_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f" },
+            { "action": Actions.USER_PUT_SEND_PASSWORD_RESET, "status": "active", "created_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f", "updated_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f" },
+        ];
+
+
+        Permission.destroy({ truncate:  { cascade: true } }).then(() => {
+            Permission.bulkCreate(permissions, {
+                returning: true,
+                ignoreDuplicates: false
+            }).then(function () {
+                callback();
+            });
+        });
     }
+
+
 
     function consentSeeder(callback) {
         const consents = [
@@ -170,7 +206,7 @@ async function init() {
         });
     }
 
-    async.waterfall([applicationSeeder, userSeeder, consentSeeder], function (err) {
+    async.waterfall([applicationSeeder, userSeeder, consentSeeder, userpermissionSeeder], function (err) {
         if (err) console.error(err);
         else console.info("DB seed completed!");
         process.exit();
