@@ -1,18 +1,17 @@
-
 CREATE TYPE ciam.enum_audits_event_type AS ENUM
-    ('USER_LOGIN', 'USER_LOGOUT', 'CREATE_USER', 'DELETE_USER', 'UPDATE_USER');
+    ('CREATE', 'DELETE', 'UPDATE');
+
+CREATE TYPE ciam.enum_audits_table_name AS ENUM
+    ('users', 'hcp_profiles', 'consents', 'applications', 'personas');
 
 CREATE TABLE ciam.audits
 (
     id uuid NOT NULL,
-    event_name character varying(255) COLLATE pg_catalog."default" NOT NULL,
     event_time timestamp with time zone NOT NULL,
     event_type ciam.enum_audits_event_type NOT NULL,
-    message character varying(255) COLLATE pg_catalog."default" NOT NULL,
     object_id character varying(255) COLLATE pg_catalog."default",
-    created_by uuid,
+    table_name ciam.enum_audits_table_name,
+    created_by uuid NOT NULL,
+    description character varying(255) COLLATE pg_catalog."default",
     CONSTRAINT audits_pkey PRIMARY KEY (id)
 )
-
-
-

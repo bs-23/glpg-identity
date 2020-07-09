@@ -10,10 +10,6 @@ const Audit = sequelize.cdpConnector.define('audits', {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4
     },
-    event_name: {
-        allowNull: false,
-        type: DataTypes.STRING
-    },
     event_time: {
         allowNull: false,
         type: DataTypes.DATE,
@@ -22,31 +18,26 @@ const Audit = sequelize.cdpConnector.define('audits', {
     event_type: {
         allowNull: false,
         type: DataTypes.ENUM,
-        values: ['USER_LOGIN','USER_LOGOUT', 'CREATE_USER', 'DELETE_USER', 'UPDATE_USER'],
-    },
-    message: {
-        allowNull: false,
-        type: DataTypes.STRING
+        values: ['CREATE', 'DELETE', 'UPDATE']
     },
     object_id: {
         type: DataTypes.STRING
     },
-
+    table_name: {
+        type: DataTypes.ENUM,
+        values: ['users', 'hcp_profiles', 'consents', 'applications', 'personas']
+    },
     created_by: {
-        type: DataTypes.UUID,
-        validate: {
-            customValidator(value) {
-                if (value === null && this.type !== 'admin') {
-                    throw new Error("created_by is required for basic user");
-                }
-            }
-        }
+        allowNull: false,
+        type: DataTypes.UUID
+    },
+    description: {
+        type: DataTypes.STRING
     }
 }, {
     schema: 'ciam',
     tableName: 'audits',
-    timestamps: false,
+    timestamps: false
 });
-
 
 module.exports = Audit;

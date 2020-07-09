@@ -2,12 +2,10 @@ const path = require('path');
 const jwt = require('jsonwebtoken');
 const User = require('./user.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
-const auditService = require(path.join(process.cwd(), 'src/config/server/lib/audit.service'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const ResetPassword = require('./reset-password.model');
 
 const EXPIRATION_TIME = 60; // in minutes
-
 
 function generateAccessToken(user) {
     return jwt.sign({
@@ -49,15 +47,6 @@ async function login(req, res) {
             httpOnly: true
         });
 
-        const logData = {
-            event_name: 'login',
-            event_type: 'USER_LOGIN',
-            message: 'User logged in',
-            object_id: user.id,
-            created_by: user.id,
-       };
-       const result = await auditService.log(logData);
-
         res.json(formatProfile(user));
     } catch (err) {
         res.status(500).send(err);
@@ -65,14 +54,6 @@ async function login(req, res) {
 }
 
 async function logout(req, res) {
-    const logData = {
-        event_name: 'logout',
-        event_type: 'USER_LOGOUT',
-        message: 'User logged out',
-        object_id: req.user.id,
-        created_by: req.user.id
-   };
-   const result = await auditService.log(logData);
     res.clearCookie('access_token').redirect('/');
 }
 
