@@ -9,38 +9,30 @@ const Faq = () => {
             <Accordion defaultActiveKey="0">
                 <Card>
                     <Accordion.Toggle as={Card.Header} eventKey="0" className="text-primary d-flex align-items-baseline justify-content-between" role="button">
-                        What is the meaning of Lorem ipsum?
+                        What is a Customer Data Platform?
                         <i className="fas fa-caret-down ml-2"></i>    
                     </Accordion.Toggle>
                     <Accordion.Collapse eventKey="0">
-                        <Card.Body>Literally it does not mean anything. It is a sequence of words without a sense of Latin derivation that make up a text also known as filler text, fictitious, blind or placeholder</Card.Body>
+                        <Card.Body>A Customer Data Platform (CDP) is a software that aggregates and organizes customer data across a variety of touchpoints and is used by other software, systems, and marketing efforts. CDPs collect and structure real-time data into individual, centralized customer profiles.</Card.Body>
                     </Accordion.Collapse>
                 </Card>
                 <Card>
                     <Accordion.Toggle as={Card.Header} eventKey="1" className="text-primary d-flex align-items-baseline justify-content-between" role="button">
-                        Why is Lorem Ipsum Dolor used?
+                        What is customer data?
                         <i className="fas fa-caret-down ml-2"></i>        
                     </Accordion.Toggle>
                     <Accordion.Collapse eventKey="1">
-                        <Card.Body>The Lorem Ipsum text is used to fill spaces designated to host texts that have not yet been published. They use programmers, graphic designers, typographers to get a real impression of the digital / advertising / editorial product they are working on.</Card.Body>
+                        <Card.Body>CDPs exist because customer data has become crucial to both business and marketing operations. So, what is customer data exactly? <br />
+Customer data is information consumers leave behind as they use the internet and interact with companies online and offline: through websites, blogs, e-commerce portals, and in-store interactions. (We dive into some examples below.) It’s highly valuable to businesses, although recent legal dialogue (such as the GDPR) has changed how organizations collect and manage this data.</Card.Body>
                     </Accordion.Collapse>
                 </Card>
                 <Card>
                     <Accordion.Toggle as={Card.Header} eventKey="2" className="text-primary d-flex align-items-baseline justify-content-between" role="button">
-                        What is the most used version?
+                        Key Benefits of a CDP
                         <i className="fas fa-caret-down ml-2"></i>    
                     </Accordion.Toggle>
                     <Accordion.Collapse eventKey="2">
-                        <Card.Body>The Lorem Ipsum text is used to fill spaces designated to host texts that have not yet been published. They use programmers, graphic designers, typographers to get a real impression of the digital / advertising / editorial product they are working on.</Card.Body>
-                    </Accordion.Collapse>
-                </Card>
-                <Card>
-                    <Accordion.Toggle as={Card.Header} eventKey="3" className="text-primary d-flex align-items-baseline justify-content-between" role="button">
-                        What are the origins of Lorem Ipsum Dolor Sit?
-                        <i className="fas fa-caret-down ml-2"></i>    
-                    </Accordion.Toggle>
-                    <Accordion.Collapse eventKey="3">
-                        <Card.Body>The Lorem Ipsum text is used to fill spaces designated to host texts that have not yet been published. They use programmers, graphic designers, typographers to get a real impression of the digital / advertising / editorial product they are working on.</Card.Body>
+                        <Card.Body>CDPs improve your organization, better your customer relationships, and complement your current software and marketing efforts. Here are a handful of key benefits of having a CDP.</Card.Body>
                     </Accordion.Collapse>
                 </Card>
             </Accordion> 
