@@ -25,9 +25,7 @@ export default function ResetPasswordForm() {
                 <div className="container">
                     <div className="row">
                         <div className="col-lg-5 col-md-8 col-12 mx-auto p-0 shadow border bg-white">
-                            <div className="p-3 bg-light h5 rounded-top">
-                                Reset Password
-                            </div>
+                            <div className="p-3 bg-light h5 rounded-top"> Reset Password </div>
                             <div className="card-body">
                                 <Formik
                                     initialValues={{
@@ -37,14 +35,9 @@ export default function ResetPasswordForm() {
                                     displayName="ResetPasswordForm"
                                     validationSchema={resetPasswordSchema}
                                     onSubmit={(values, actions) => {
-                                        Axios.put(
-                                            `/api/users/password/resetPassword/?email=${email}&token=${token}`,
-                                            values
-                                        )
+                                        Axios.put(`/api/users/password/resetPassword/?email=${email}&token=${token}`, values)
                                             .then(() => {
-                                                setSuccess(
-                                                    'Your password has been reset successfully. Redirecting...'
-                                                );
+                                                setSuccess('Your password has been reset successfully. Redirecting...');
                                                 setError('');
                                                 setTimeout(() => {
                                                     history.replace('/login');
@@ -59,16 +52,8 @@ export default function ResetPasswordForm() {
                                     }}
                                 >
                                     {formikProps => (
-                                        <Form
-                                            onSubmit={formikProps.handleSubmit}
-                                        >
-                                            <Field
-                                                type="text"
-                                                name="username"
-                                                autoComplete="username"
-                                                hidden
-                                            />
-
+                                        <Form onSubmit={formikProps.handleSubmit}>
+                                            <Field type="text" name="username" autoComplete="username" hidden />
                                             <div className="form-group">
                                                 <Field
                                                     className="form-control"
@@ -78,10 +63,7 @@ export default function ResetPasswordForm() {
                                                     data-testid="newPassword"
                                                     autoComplete="new-password"
                                                 />
-                                                <div
-                                                    className="invalid-feedback"
-                                                    data-testid="newPasswordError"
-                                                >
+                                                <div className="invalid-feedback" data-testid="newPasswordError">
                                                     <ErrorMessage name="newPassword" />
                                                 </div>
                                             </div>
@@ -96,32 +78,15 @@ export default function ResetPasswordForm() {
                                                     data-testid="confirmPassword"
                                                     autoComplete="new-password"
                                                 />
-                                                <div
-                                                    className="invalid-feedback"
-                                                    data-testid="confirmPasswordError"
-                                                >
+                                                <div className="invalid-feedback" data-testid="confirmPasswordError" >
                                                     <ErrorMessage name="confirmPassword" />
                                                 </div>
                                             </div>
-                                            {error && (
-                                                <Alert
-                                                    type="danger"
-                                                    message={error}
-                                                />
-                                            )}
-                                            {success && (
-                                                <Alert
-                                                    type="success"
-                                                    message={success}
-                                                />
-                                            )}
-                                            <button
-                                                type="submit"
-                                                className="btn btn-info btn-block"
-                                                disabled={
-                                                    formikProps.isSubmitting
-                                                }
-                                            >
+
+                                            {error && <Alert type="danger" message={error} /> }
+                                            {success && <Alert type="success" message={success} />}
+
+                                            <button type="submit" className="btn btn-info btn-block" disabled={formikProps.isSubmitting} >
                                                 Submit
                                             </button>
                                         </Form>
