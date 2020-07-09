@@ -57,7 +57,7 @@ export default function Users() {
                                 <tbody>
                                     {users.map(row => (
                                         <tr key={row.id}>
-                                            <td>{row.name}</td>
+                                            <td><NavLink to={`/users/${row.id}`}>{row.name}</NavLink></td>
                                             <td>{row.email}</td>
                                             <td>{row.phone}</td>
                                             <td>{row.application_id}</td>

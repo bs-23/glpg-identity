@@ -1,10 +1,18 @@
 import React, { useEffect, useState } from 'react';
 
 const UserDetails = (props) => {
-    const [userId, setUserId] = useState(null);
+    const [userInfo, setUserInfo] = useState(null);
 
     useEffect(() => {
-        setUserId(props.match.params.id);
+        const { id } = props.match.params
+
+        async function getInfo() {
+            const response = await axios.get(`/api/users/${id}`);
+            alert(response);
+            setUserInfo(response.data);
+        }
+
+        getInfo();
     });
 
     return (
