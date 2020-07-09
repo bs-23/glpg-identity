@@ -21,6 +21,20 @@ function getHcpViewModel(hcp) {
     return model;
 }
 
+function mapMasterDataToHcpProfile(masterData) {
+    const model = {};
+
+    model.individual_id_onekey = masterData.individual_id_onekey;
+    model.uuid = masterData.uuid_1 || masterData.uuid_2;
+    model.first_name = masterData.firstname;
+    model.last_name = masterData.lastname;
+    model.country_iso2 = masterData.country_iso2;
+    model.telephone = masterData.telephone;
+    model.specialty_onekey = masterData.specialty_code;
+
+    return model;
+}
+
 async function getHcps(req, res) {
     try {
         const page = req.query.page - 1;
@@ -60,14 +74,14 @@ async function getHcps(req, res) {
 }
 
 async function editHcp(req, res) {
-    const { first_name, last_name, phone } = req.body;
+    const { first_name, last_name, telephone } = req.body;
 
     try {
         const HcpUser = await Hcp.findOne({ where: { id: req.params.id } });
 
         if (!HcpUser) return res.sendStatus(404);
 
-        HcpUser.update({ first_name, last_name, phone });
+        HcpUser.update({ first_name, last_name, telephone });
 
         delete HcpUser.dataValues.password;
         delete HcpUser.dataValues.created_by;
@@ -79,20 +93,63 @@ async function editHcp(req, res) {
     }
 }
 
-async function lookupHcpProfile(req, res) {
+async function registrationLookup(req, res) {
     const { email, uuid } = req.body;
 
-    if (!uuid || !email) return res.status(400).send('Missing required parameters.');
+    const response = {
+        data: {},
+        errors: []
+    };
+
+    if (!email) {
+        response.errors.push({
+            field: 'email',
+            message: 'Email address is missing.'
+        });
+    }
+
+    if (!uuid) {
+        response.errors.push({
+            field: 'uuid',
+            message: 'UUID is missing.'
+        });
+    }
+
+    if (!uuid || !email) {
+        return res.status(400).json(response);
+    }
 
     try {
-        const profile = await Hcp.findOne({
-            where: { email, uuid },
-            attributes: { exclude: ['password', 'created_at', 'updated_at', 'created_by', 'updated_by', 'reset_password_token', 'reset_password_expires', 'application_id'] }
-        });
+        const profile = await Hcp.findOne({ where: { email }});
 
-        if (!profile) return res.status(404).send('HCP profile not found.');
+        if(profile) {
+            response.errors.push({
+                field: 'email',
+                message: 'Email address is already registered.'
+            });
+        } else {
+            master_data = await sequelize.datasyncConnector.query(`
+                SELECT h.*, s.specialty_code
+                FROM ciam.vwhcpmaster AS h
+                INNER JOIN ciam.vwmaphcpspecialty AS s
+                ON s.individual_id_onekey = h.individual_id_onekey
+                WHERE h.uuid_1 = $uuid OR h.uuid_2 = $uuid
+            `, {
+                bind: { uuid },
+                type: QueryTypes.SELECT
+            });
 
-        res.json(getHcpViewModel(profile.dataValues));
+            if(master_data && master_data.length) {
+                response.data = mapMasterDataToHcpProfile(master_data[0]);
+            } else {
+                response.errors.push({
+                    field: 'uuid',
+                    message: 'Invalid UUID.'
+                });
+            }
+        }
+
+        res.json(response);
     } catch (err) {
         res.status(500).send(err);
     }
@@ -116,8 +173,8 @@ async function createHcpProfile(req, res) {
                 first_name: req.body.first_name,
                 last_name: req.body.last_name,
                 uuid: req.body.uuid,
-                country_code: req.body.country_code,
-                speciality_onekey: req.body.speciality_onekey,
+                country_iso2: req.body.country_iso2,
+                specialty_onekey: req.body.specialty_onekey,
                 application_id: req.user.id,
                 created_by: req.user.id,
                 updated_by: req.user.id,
@@ -260,7 +317,7 @@ async function forgetPassword(req, res) {
     }
 }
 
-async function getSpecialities(req, res) {
+async function getSpecialties(req, res) {
     try {
         const country = req.query.country;
         let locale = req.query.locale;
@@ -269,7 +326,7 @@ async function getSpecialities(req, res) {
             return res.status(400).send('Missing required query parameters: Country');
         }
 
-        const masterDataSpecialities = await sequelize.datasyncConnector.query(
+        const masterDataSpecialties = await sequelize.datasyncConnector.query(
             `SELECT Country.codbase, countryname, cod_id_onekey, cod_locale, cod_description
             FROM ciam.vwcountry as Country
             INNER JOIN ciam.vwspecialtymaster as Specialty ON Country.codbase=Specialty.codbase
@@ -282,11 +339,11 @@ async function getSpecialities(req, res) {
                 type: QueryTypes.SELECT
             });
 
-        if (!masterDataSpecialities || masterDataSpecialities.length === 0) {
-            return res.status(404).send(`No specialities found for Country=${country}`)
+        if (!masterDataSpecialties || masterDataSpecialties.length === 0) {
+            return res.status(404).send(`No specialties found for Country=${country}`)
         }
 
-        res.json(masterDataSpecialities);
+        res.json(masterDataSpecialties);
     } catch (err) {
         res.status(500).send(err);
     }
@@ -294,10 +351,10 @@ async function getSpecialities(req, res) {
 
 exports.getHcps = getHcps;
 exports.editHcp = editHcp;
-exports.lookupHcpProfile = lookupHcpProfile;
+exports.registrationLookup = registrationLookup;
 exports.createHcpProfile = createHcpProfile;
 exports.getHcpProfile = getHcpProfile;
 exports.changePassword = changePassword;
 exports.resetPassword = resetPassword;
 exports.forgetPassword = forgetPassword;
-exports.getSpecialities = getSpecialities;
+exports.getSpecialties = getSpecialties;
