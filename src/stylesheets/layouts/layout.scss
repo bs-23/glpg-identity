@@ -1,0 +1,31 @@
+#app {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    margin: 0;
+}
+
+.invalid-feedback {
+    display: block;
+}
+
+.bg-success {
+    background: #144D44 !important;
+}
+
+.fa-xs {
+    font-size: .65em;
+}
+
+.app__content {
+    flex: 1;
+    display: flex;
+    position: relative;
+}
+
+.app-login {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
