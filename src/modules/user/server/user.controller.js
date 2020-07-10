@@ -7,8 +7,24 @@ const emailService = require(path.join(process.cwd(), 'src/config/server/lib/ema
 const ResetPassword = require('./reset-password.model');
 
 function validatePassword(password){
-    var validPasswordPattern = new RegExp("^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})");
-    return validPasswordPattern.test(password)
+    const minimumPasswordLength = 8
+    if(password.length < minimumPasswordLength) return false
+
+    const hasUppercase = new RegExp("^(?=.*[A-Z])").test(password);
+    if(!hasUppercase) return false
+
+    const hasDigit = new RegExp("^(?=.*[0-9])").test(password);
+    if(!hasDigit) return false
+
+    const specialCharacters = "!@#$%^&*"
+    let hasSpecialCharacter = false
+    for(const c of password) {
+        if(specialCharacters.includes(c)) {
+            hasSpecialCharacter = true
+            break
+        }
+    }
+    return hasSpecialCharacter
 }
 
 function generateAccessToken(user) {
