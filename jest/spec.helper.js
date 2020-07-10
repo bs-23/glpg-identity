@@ -71,7 +71,7 @@ module.exports = {
             first_name: 'Default HCP',
             last_name: 'User',
             email: 'default-hcp-user@cdp.com',
-            password: faker.internet.password(8),
+            password: 'strong-password',
             created_by: defaultAdminId,
             updated_by: defaultAdminId,
         },

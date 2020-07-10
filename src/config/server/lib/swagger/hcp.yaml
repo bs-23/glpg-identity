@@ -1,5 +1,5 @@
 paths:
-    /api/hcp-profiles/lookup:
+    /api/hcp-profiles/registration-lookup:
         post:
             tags:
                 - hcp-profiles
@@ -27,8 +27,6 @@ paths:
                                 $ref: "#/components/schemas/hcpProfile"
                 401:
                     description: User is not authenticated.
-                404:
-                    description: HCP user profile not found.
 
     /api/hcp-profiles:
         post:
@@ -151,11 +149,11 @@ paths:
                     description: User is not authenticated.
                 404:
                     description: HCP user profile not found.
-    /api/hcp-profiles/specialities:
+    /api/hcp-profiles/specialties:
         get:
             tags:
                 - hcp-profiles
-            summary: Get specialities by country code.
+            summary: Get specialties by country code.
             parameters:
                 - name: country
                   in: query
@@ -175,7 +173,7 @@ paths:
                     content:
                         applicaiton/json:
                             schema:
-                                $ref: "#/components/schemas/specialitiesByCountry"
+                                $ref: "#/components/schemas/specialtiesByCountry"
                 401:
                     description: User is not authenticated.
                 404:
@@ -198,9 +196,9 @@ components:
                     type: string
                 email:
                     type: string
-                country_code:
+                country_iso2:
                     type: string
-                speciality_onekey:
+                specialty_onekey:
                     type: string
                 status:
                     type: string
@@ -222,6 +220,8 @@ components:
             type: object
             properties:
                 email:
+                    type: string
+                current_password:
                     type: string
                 new_password:
                     type: string
@@ -248,11 +248,11 @@ components:
                     type: string
                 email:
                     type: string
-                phone:
+                telephone:
                     type: string
-                country_code:
+                country_iso2:
                     type: string
-                speciality_onekey:
+                specialty_onekey:
                     type: string
                 consents:
                     type: array
@@ -276,7 +276,7 @@ components:
                     type: string
                 cod_description:
                     type: string
-        specialitiesByCountry:
+        specialtiesByCountry:
             type: array
             items:
                 $ref: "#/components/schemas/specialty"

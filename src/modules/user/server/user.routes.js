@@ -11,14 +11,15 @@ module.exports = app => {
         .get(passport.authenticate('user-jwt', { session: false }), controller.getUsers)
         .post(passport.authenticate('user-jwt', { session: false }), controller.createUser);
 
-    app.route('/api/users/:id')
-        .delete(passport.authenticate("user-jwt", { session: false }), controller.deleteUser);
+    app.get('/api/users/profile', passport.authenticate('user-jwt', { session: false }), controller.getSignedInUserProfile);
 
-    app.get('/api/users/getSignedInUserProfile', passport.authenticate('user-jwt', { session: false }), controller.getSignedInUserProfile);
+    app.route('/api/users/:id')
+        .get(passport.authenticate("user-jwt", { session: false }), controller.getUser)
+        .delete(passport.authenticate("user-jwt", { session: false }), controller.deleteUser);
 
     app.post('/api/users/change-password', passport.authenticate('user-jwt', { session: false }), controller.changePassword);
 
-    app.post('/api/users/password/send-reset-link', controller.sendPasswordResetLink);
+    app.post('/api/users/forgot-password', controller.sendPasswordResetLink);
 
-    app.put('/api/users/password/resetPassword', controller.resetPassword);
+    app.put('/api/users/reset-password', controller.resetPassword);
 };

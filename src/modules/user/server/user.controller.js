@@ -1,13 +1,31 @@
 const path = require('path');
+const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const User = require('./user.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
-const auditService = require(path.join(process.cwd(), 'src/config/server/lib/audit.service'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const ResetPassword = require('./reset-password.model');
 
-const EXPIRATION_TIME = 60; // in minutes
+function validatePassword(password){
+    const minimumPasswordLength = 8
+    if(password.length < minimumPasswordLength) return false
 
+    const hasUppercase = new RegExp("^(?=.*[A-Z])").test(password);
+    if(!hasUppercase) return false
+
+    const hasDigit = new RegExp("^(?=.*[0-9])").test(password);
+    if(!hasDigit) return false
+
+    const specialCharacters = "!@#$%^&*"
+    let hasSpecialCharacter = false
+    for(const c of password) {
+        if(specialCharacters.includes(c)) {
+            hasSpecialCharacter = true
+            break
+        }
+    }
+    return hasSpecialCharacter
+}
 
 function generateAccessToken(user) {
     return jwt.sign({
@@ -49,13 +67,7 @@ async function login(req, res) {
             httpOnly: true
         });
 
-        const logData = {
-            action: 'login',
-            category: 'authentication',
-            message: 'User logged in',
-            userId: user.id
-       };
-       const result = await auditService.log(logData);
+        await user.update({ last_login: Date() })
 
         res.json(formatProfile(user));
     } catch (err) {
@@ -64,13 +76,6 @@ async function login(req, res) {
 }
 
 async function logout(req, res) {
-    const logData = {
-        action: 'logout',
-        category: 'authentication',
-        message: 'User logged out',
-        userId: req.user.id
-   };
-   const result = await auditService.log(logData);
     res.clearCookie('access_token').redirect('/');
 }
 
@@ -82,10 +87,13 @@ async function createUser(req, res) {
         phone,
         countries,
         permissions,
-        application_id
+        application_id,
+        expiary_date
     } = req.body;
 
     try {
+        if(!validatePassword(password)) return res.status(400).send('Invalid password')
+
         const [doc, created] = await User.findOrCreate({
             where: { email },
             defaults: {
@@ -96,7 +104,8 @@ async function createUser(req, res) {
                 permissions,
                 application_id,
                 created_by: req.user.id,
-                updated_by: req.user.id
+                updated_by: req.user.id,
+                expiary_date
             }
         });
 
@@ -119,6 +128,8 @@ async function changePassword(req, res) {
         if (!user || !user.validPassword(currentPassword)) {
             return res.status(400).send('Current Password not valid');
         }
+
+        if(!validatePassword(newPassword)) return res.status(400).send('Invalid password')
 
         if (newPassword !== confirmPassword) {
             return res.status(400).send('Passwords should match');
@@ -153,24 +164,23 @@ async function getUsers(req, res) {
     }
 }
 
-function generateUuid() {
-    let uuid = '';
-    let i;
-    let random;
+async function getUser(req, res){
+    try{
+        const user = await User.findOne({
+            where: {
+                id: req.params.id
+            },
+            attributes: ['id', 'name', 'email', 'phone', 'type', 'last_login']
+        });
 
-    for (i = 0; i < 32; i++) {
-        random = (Math.random() * 16) | 0;
+        if(!user) return res.status(404).send("User is not found or may be removed");
 
-        if (i == 8 || i == 12 || i == 16 || i == 20) {
-            uuid += '-';
-        }
-
-        uuid += (i == 12 ? 4 : i == 16 ? (random & 3) | 8 : random).toString(
-            16
-        );
+        res.json(user);
     }
-
-    return uuid;
+    catch(err){
+        console.log(err)
+        res.status(500).send(err);
+    }
 }
 
 async function sendPasswordResetLink(req, res) {
@@ -180,33 +190,28 @@ async function sendPasswordResetLink(req, res) {
         const user = await User.findOne({ where: { email } });
 
         if (!user) {
-            return res.status(400).send('Invalid email.');
+            return res.status(400).send('Email does not exist.');
         }
 
-        const token = generateUuid();
-        const expireAt = new Date(Date.now() + EXPIRATION_TIME * 60 * 1000);
+        const token = crypto.randomBytes(36).toString('hex');
+        const expireAt = Date.now() + 3600000;
 
         const [doc, created] = await ResetPassword.findOrCreate({
-            where: { email },
+            where: { user_id: user.id },
             defaults: {
-                email,
                 token,
-                expire_at: expireAt,
-            },
+                expires_at: expireAt
+            }
         });
 
         if (!created && doc) {
-            const updated = await doc.update({
+            await doc.update({
                 token,
-                expire_at: expireAt,
+                expires_at: expireAt
             });
-
-            if (!updated) {
-                return res.sendStatus(400);
-            }
         }
 
-        const link = `${req.protocol}://${req.headers.host}/reset-password?email=${email}&token=${token}`;
+        const link = `${req.protocol}://${req.headers.host}/reset-password?token=${token}`;
 
         const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp-password-reset-instruction.html`);
         const options = {
@@ -218,9 +223,10 @@ async function sendPasswordResetLink(req, res) {
                 link
             }
         };
+
         emailService.send(options);
 
-        res.json({ message: `Reset link sent to ${email}.` });
+        res.json({ message: `Password reset link sent to ${email}.` });
     } catch (error) {
         res.status(500).send(error);
     }
@@ -228,34 +234,24 @@ async function sendPasswordResetLink(req, res) {
 
 async function resetPassword(req, res) {
     try {
-        const { email, token } = req.query;
-        const { newPassword } = req.body;
+        const { token } = req.query;
 
-        if (!email || !token) return res.status(400).send('Invalid Reqeust');
+        if (!token) return res.status(400).send('Invalid password reset token');
 
-        const user = await User.findOne({ where: { email } });
-        if (!user) return res.status(400).send('Invalid Email');
+        const resetRequest = await ResetPassword.findOne({ where: { token } });
 
-        const resetRequest = await ResetPassword.findOne({ where: { email } });
-        if (!resetRequest) return res.status(400).send('Invalid Request');
+        if(!resetRequest) return res.status(400).send("Invalid password reset token.");
 
-        const validToken = resetRequest.validToken(token);
-        if (!validToken) return res.status(401).send('Invalid Token');
-
-        const { expire_at } = resetRequest;
-        if (expire_at - Date.now() < 0) {
+        if(resetRequest.expires_at < Date.now()) {
             await resetRequest.destroy();
-            return res.status(401).send('Token expired');
+            return res.status(400).send("Password reset token has been expired. Please request again.");
         }
 
-        if (user.validPassword(newPassword)) {
-            return res
-                .status(400)
-                .send('Previously used password, please choose another');
-        }
+        if(req.body.newPassword !== req.body.confirmPassword) return res.status(400).send("Password and confirm password doesn't match.");
 
-        user.password = newPassword;
-        await user.save();
+        const user = await User.findOne({ where: { id: resetRequest.user_id } });
+
+        user.update({ password: req.body.newPassword });
 
         await resetRequest.destroy();
 
@@ -268,6 +264,7 @@ async function resetPassword(req, res) {
                 name: user.name || ''
             }
         };
+
         emailService.send(options);
 
         res.sendStatus(200);
@@ -283,5 +280,6 @@ exports.getSignedInUserProfile = getSignedInUserProfile;
 exports.changePassword = changePassword;
 exports.deleteUser = deleteUser;
 exports.getUsers = getUsers;
+exports.getUser = getUser;
 exports.sendPasswordResetLink = sendPasswordResetLink;
 exports.resetPassword = resetPassword;
