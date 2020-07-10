@@ -85,7 +85,7 @@ export default function UserForm() {
                                                 <div className="form-group">
                                                     <label htmlFor="country">Select Countries:</label>
                                                     <Field data-testid="country" as="select" name="countries" className="form-control" multiple>
-                                                        {countries.map(item => <option key={item.countryid} value={item.countryid}>{item.countryname}</option>)}
+                                                        {countries.map(item => <option key={item.countryid} value={item.countryname}>{item.countryname}</option>)}
                                                     </Field>
                                                 </div>
                                                 <div className="form-group">
