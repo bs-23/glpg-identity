@@ -89,7 +89,7 @@ export default function ResetPasswordForm() {
                                             {error && <Alert type="danger" message={error} /> }
                                             {success && <Alert type="success" message={success} />}
 
-                                            <button type="submit" className="btn btn-info btn-block text-white app-login__btn mt-4 rounded-0" disabled={formikProps.isSubmitting} >
+                                            <button type="submit" className="btn btn-block text-white app-login__btn mt-4 p-2" disabled={formikProps.isSubmitting} >
                                                 Submit
                                             </button>
                                         </Form>

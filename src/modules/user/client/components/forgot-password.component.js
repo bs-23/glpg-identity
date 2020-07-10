@@ -64,7 +64,7 @@ export default function ForgotPassword() {
                                             </div>
                                             {success && <Alert type="success" message={success} />}
                                             {error && <Alert type="danger" message={error} />}
-                                            <button type="submit" className="btn btn-info btn-block text-white app-login__btn mt-4 rounded-0" > Reset Password </button>
+                                            <button type="submit" className="btn btn-block text-white app-login__btn mt-4 p-2" > Reset Password </button>
                                         </Form>
                                     )}
                                 </Formik>

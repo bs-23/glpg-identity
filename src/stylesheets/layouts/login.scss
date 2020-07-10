@@ -11,13 +11,14 @@
     }
 
     &__btn {
-        background-color: #144D44;
+        background-color: #F58800;
+        font-weight: 500;
 
         &:hover,
         &:active,
         &:focus {
-            background-color: #F58800 !important;
-            border-color: #F58800 !important;
+            background-color: #F7A033 !important;
+            border-color: #F7A033 !important;
         }
     }
 }

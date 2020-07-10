@@ -52,7 +52,7 @@ export default function Login() {
                                                 <Field className="form-control" data-testid="password" type="password" name="password" autoComplete="current-password" />
                                                 <div className="invalid-feedback" data-testid="password-error"><ErrorMessage name="password" /></div>
                                             </div>
-                                            <button type="submit" className="btn btn-block text-white app-login__btn mt-4 rounded-0">Sign In</button>
+                                            <button type="submit" className="btn btn-block text-white app-login__btn mt-4 p-2">Sign In</button>
                                         </Form>
                                     )}
                                 </Formik>
