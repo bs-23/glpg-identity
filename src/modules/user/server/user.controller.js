@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('./user.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
+const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const ResetPassword = require('./reset-password.model');
 
 function validatePassword(password){
@@ -112,6 +113,16 @@ async function createUser(req, res) {
         if (!created) {
             return res.sendStatus(400);
         }
+
+        const logData = {
+            event_time: Date(),
+            event_type: 'CREATE',
+            object_id: doc.id,
+            table_name: 'users',
+            created_by: req.user.id,
+            description: 'Created new CDP user',
+        }
+        await logService.log(logData)
 
         res.json(doc);
     } catch (err) {
