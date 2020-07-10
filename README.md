@@ -21,9 +21,6 @@ AWS_ACCESS_KEY_ID=<aws_access_key_id>
 AWS_SECRET_ACCESS_KEY=<aws_secret_access_key>
 AWS_REGION=<aws_region>
 AWS_SECRET_NAME=<aws_secret_name>
-NEW_RELIC_ENABLED=<true/false>
-NEW_RELIC_APP_NAME=<newrelic_app_name>
-NEW_RELIC_LICENSE_KEY=<newrelic_license_key>
 ```
 
 ## Available npm scripts
