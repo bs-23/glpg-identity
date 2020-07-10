@@ -57,6 +57,12 @@ const User = sequelize.cdpConnector.define('users', {
     permissions: {
         type: DataTypes.ARRAY(DataTypes.STRING)
     },
+    last_login: {
+        type: DataTypes.DATE
+    },
+    expiary_date: {
+        type: DataTypes.DATE
+    },
     created_by: {
         type: DataTypes.UUID,
         validate: {

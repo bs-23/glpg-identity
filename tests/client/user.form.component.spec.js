@@ -41,7 +41,7 @@ describe('UserForm component', () => {
         );
 
         const data = [{ countryid: 1, countryname: 'England'}]
-        mockAxios.onGet('/api/cdp/countries').reply(200, data)
+        mockAxios.onGet('/api/countries').reply(200, data)
 
         const name = getByTestId('name');
         const email = getByTestId('email');

@@ -35,16 +35,16 @@ export default function ForgotPassword() {
                                     displayName="ForgotPassword"
                                     validationSchema={forgotPasswordSchema}
                                     onSubmit={(values, actions) => {
-                                        Axios.post('/api/users/password/send-reset-link', values)
+                                        Axios.post('/api/users/forgot-password', values)
                                             .then(() => {
                                                 setError('');
                                                 setSuccess('An email has been sent with further information.');
                                                 actions.resetForm();
                                             })
-                                            .catch(error => {
+                                            .catch(err => {
                                                 setSuccess('');
-                                                setError(typeof error.response.data === 'string' ?
-                                                    error.response.data : error.response.statusText);
+                                                setError(typeof err.response.data === 'string' ?
+                                                    err.response.data : err.response.statusText);
                                             })
                                             .finally(() => {
                                                 actions.setSubmitting(false);

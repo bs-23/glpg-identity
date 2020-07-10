@@ -1,5 +1,5 @@
-const path = require("path");
-const async = require("async");
+const path = require('path');
+const async = require('async');
 
 async function init() {
     const config = require(path.join(process.cwd(), 'src/config/server/config'));
@@ -8,18 +8,19 @@ async function init() {
 
     const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 
-    await sequelize.cdpConnector.query("CREATE SCHEMA IF NOT EXISTS ciam");
+    await sequelize.cdpConnector.query('CREATE SCHEMA IF NOT EXISTS ciam');
 
-    const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
-    const User = require(path.join(process.cwd(), "src/modules/user/server/user.model"));
-    const Consent = require(path.join(process.cwd(), "src/modules/consent/server/consent.model"));
+
+    const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
+    const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
+    const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
     const UserPermission = require(path.join(process.cwd(), "src/modules/user/server/user-permission.model"));
     const Permission = require(path.join(process.cwd(), "src/modules/permission/permission.model"));
+    require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model'));
+    require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_profile.model'));
+    require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
+    require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
 
-    const { Modules } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/modules.constant'));
-    require(path.join(process.cwd(), "src/modules/hcp/server/hcp_profile.model"));
-    require(path.join(process.cwd(), "src/modules/hcp/server/hcp_consents.model"));
-    require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'))
 
     await sequelize.cdpConnector.sync();
 

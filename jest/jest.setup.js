@@ -8,29 +8,15 @@ module.exports = async function() {
     process.env.POSTGRES_CDP_DATABASE = 'ciam_test';
 
     const specHelper = require(path.join(process.cwd(), 'jest/spec.helper'));
-    const sequelize = require(path.join(
-        process.cwd(),
-        'src/config/server/lib/sequelize'
-    ));
+    const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 
     await sequelize.cdpConnector.query('CREATE SCHEMA IF NOT EXISTS ciam');
-    const User = require(path.join(
-        process.cwd(),
-        'src/modules/user/server/user.model'
-    ));
-    const Hcp_profile = require(path.join(
-        process.cwd(),
-        'src/modules/hcp/server/hcp_profile.model'
-    ));
-    const Application = require(path.join(
-        process.cwd(),
-        'src/modules/application/server/application.model'
-    ));
-    const Consent = require(path.join(
-        process.cwd(),
-        'src/modules/consent/server/consent.model'
-    ));
-    const HCP_Consents = require(path.join(process.cwd(), "src/modules/hcp/server/hcp_consents.model"));
+
+    const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
+    const Hcp_profile = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_profile.model'));
+    const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
+    const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
+    require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
     require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
 
     await sequelize.cdpConnector.sync();
