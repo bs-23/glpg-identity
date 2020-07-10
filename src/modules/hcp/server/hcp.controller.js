@@ -1,7 +1,7 @@
 const path = require('path');
 const _ = require('lodash');
 const crypto = require('crypto');
-const { Op, QueryTypes } = require('sequelize');
+const { QueryTypes } = require('sequelize');
 const Hcp = require('./hcp_profile.model');
 const HcpConsents = require('./hcp_consents.model');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
@@ -25,6 +25,7 @@ function getHcpViewModel(hcp) {
 function mapMasterDataToHcpProfile(masterData) {
     const model = {};
 
+    model.salutation = masterData.ind_prefixname_desc;
     model.individual_id_onekey = masterData.individual_id_onekey;
     model.uuid = masterData.uuid_1 || masterData.uuid_2;
     model.first_name = masterData.firstname;
