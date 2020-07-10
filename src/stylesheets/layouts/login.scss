@@ -1,24 +1,23 @@
-
 .app-login {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #F1F1F1;
+    background: $login-bg-color;
 
     &__header {
-        color: #144D44;
+        color: $primary-color;
     }
 
     &__btn {
-        background-color: #F58800;
+        background-color: $secondary-color;
         font-weight: 500;
 
         &:hover,
         &:active,
         &:focus {
-            background-color: #F7A033 !important;
-            border-color: #F7A033 !important;
+            background-color: $secondary-color-light !important;
+            border-color: $secondary-color-light !important;
         }
     }
 }
