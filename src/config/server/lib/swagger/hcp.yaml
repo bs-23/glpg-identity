@@ -214,6 +214,16 @@ paths:
                     description: User is not authenticated.
                 404:
                     description: Specialty not found for country.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+                400:
+                    description: Invalid request.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
 
 components:
     schemas:
@@ -313,6 +323,12 @@ components:
                 cod_description:
                     type: string
         specialtiesByCountry:
-            type: array
-            items:
-                $ref: "#/components/schemas/specialty"
+            type: object
+            properties:
+                data:
+                    type: array
+                    items:
+                        $ref: "#/components/schemas/specialty"
+                errors:
+                    type: array
+                    example: []
