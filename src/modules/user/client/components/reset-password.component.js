@@ -24,9 +24,12 @@ export default function ResetPasswordForm() {
             <div className="w-100">
                 <div className="container">
                     <div className="row">
-                        <div className="col-lg-5 col-md-8 col-12 mx-auto p-0 shadow border bg-white">
-                            <div className="p-3 bg-light h5 rounded-top"> Reset Password </div>
-                            <div className="card-body">
+                        <div className="col-lg-5 col-md-8 col-12 mx-auto">
+                            <h1 className="text-center">
+                                <a href="/login"><img alt="CIAM logo" src="/assets/CIAM-LOGO.png" height="102" /></a>
+                            </h1>
+                            <h4 className="app-login__header text-center py-3">Reset Password</h4>
+                            <div className="card-body p-4 p-sm-5 border bg-white">
                                 <Formik
                                     initialValues={{
                                         newPassword: '',
@@ -55,11 +58,11 @@ export default function ResetPasswordForm() {
                                         <Form onSubmit={formikProps.handleSubmit}>
                                             <Field type="text" name="username" autoComplete="username" hidden />
                                             <div className="form-group">
+                                                <label className="">New Password</label>
                                                 <Field
                                                     className="form-control"
                                                     type="password"
                                                     name="newPassword"
-                                                    placeholder="New Password"
                                                     data-testid="newPassword"
                                                     autoComplete="new-password"
                                                 />
@@ -69,11 +72,11 @@ export default function ResetPasswordForm() {
                                             </div>
 
                                             <div className="form-group">
+                                                <label className="">Confirm New Password</label>
                                                 <Field
                                                     className="form-control"
                                                     type="password"
                                                     name="confirmPassword"
-                                                    placeholder="Confirm New Password"
                                                     autoComplete="current-password"
                                                     data-testid="confirmPassword"
                                                     autoComplete="new-password"
@@ -86,7 +89,7 @@ export default function ResetPasswordForm() {
                                             {error && <Alert type="danger" message={error} /> }
                                             {success && <Alert type="success" message={success} />}
 
-                                            <button type="submit" className="btn btn-info btn-block" disabled={formikProps.isSubmitting} >
+                                            <button type="submit" className="btn btn-info btn-block text-white app-login__btn mt-4 rounded-0" disabled={formikProps.isSubmitting} >
                                                 Submit
                                             </button>
                                         </Form>

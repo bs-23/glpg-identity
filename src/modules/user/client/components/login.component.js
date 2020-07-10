@@ -15,9 +15,12 @@ export default function Login() {
             <div className="w-100">
                 <div className="container">
                     <div className="row">
-                        <div className="col-lg-5 col-md-8 col-12 mx-auto p-0 shadow border bg-white">
-                            <div className="p-3 bg-light h5 rounded-top">Log-in to your account</div>
-                            <div className="card-body">
+                        <div className="col-lg-6 col-md-8 col-12 mx-auto">
+                            <h1 className="text-center">
+                                <img alt="CIAM logo" src="/assets/CIAM-LOGO.png" height="102" />
+                            </h1>
+                            <h4 className="app-login__header text-center py-3">Welcome to CIAM</h4>
+                            <div className="card-body p-4 p-sm-5 border bg-white">
                                 <Formik
                                     initialValues={{
                                         email: "",
@@ -40,24 +43,26 @@ export default function Login() {
                                     {formikProps => (
                                         <Form onSubmit={formikProps.handleSubmit}>
                                             <div className="form-group">
-                                                <Field className="form-control" data-testid="email" type="email" name="email" placeholder="Email address" autoComplete="username" />
+                                                <label className="">Email</label>
+                                                <Field className="form-control" data-testid="email" type="email" name="email" autoComplete="username" />
                                                 <div className="invalid-feedback" data-testid="email-error"><ErrorMessage id="email-error" name="email" /></div>
                                             </div>
                                             <div className="form-group">
-                                                <Field className="form-control" data-testid="password" type="password" name="password" placeholder="Password" autoComplete="current-password" />
+                                                <label className="">Password</label>
+                                                <Field className="form-control" data-testid="password" type="password" name="password" autoComplete="current-password" />
                                                 <div className="invalid-feedback" data-testid="password-error"><ErrorMessage name="password" /></div>
                                             </div>
-                                            <button type="submit" className="btn btn-info btn-block">Submit</button>
+                                            <button type="submit" className="btn btn-block text-white app-login__btn mt-4 rounded-0">Sign In</button>
                                         </Form>
                                     )}
                                 </Formik>
-                                <div className="mt-2 text-center">
+                                <div className="mt-4 text-center">
                                     <Link
                                         to="/forgot-password"
                                         style={{ textDecoration: 'none' }}
                                         className="text-secondary"
                                     >
-                                        Forgot your password?
+                                        Forgot Password?
                                     </Link>
                                 </div>
                             </div>

@@ -1,0 +1,23 @@
+
+.app-login {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #F1F1F1;
+
+    &__header {
+        color: #144D44;
+    }
+
+    &__btn {
+        background-color: #144D44;
+
+        &:hover,
+        &:active,
+        &:focus {
+            background-color: #F58800 !important;
+            border-color: #F58800 !important;
+        }
+    }
+}
