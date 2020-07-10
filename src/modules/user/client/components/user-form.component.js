@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { NavLink } from 'react-router-dom';
+import { NavLink, useHistory } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { Form, Formik, Field, ErrorMessage } from "formik";
 import { createUser } from "../user.actions";
@@ -16,6 +16,7 @@ export default function UserForm() {
 
     const dispatch = useDispatch();
     const [countries, setCountries] = useState([]);
+    const history = useHistory()
 
     useEffect(() => {
         async function getCountries() {
@@ -62,8 +63,9 @@ export default function UserForm() {
                                         validationSchema={registerSchema}
                                         onSubmit={(values, actions) => {
                                             dispatch(createUser(values))
-                                                .then(() => {
+                                                .then(res => {
                                                     actions.resetForm();
+                                                    history.push(`/users/${res.value.data.id}`)
                                                 });
                                             actions.setSubmitting(false);
                                         }}
