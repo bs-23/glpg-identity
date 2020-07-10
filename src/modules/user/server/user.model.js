@@ -50,6 +50,11 @@ const User = sequelize.cdpConnector.define('users', {
         values: ['admin', 'basic'],
         defaultValue: 'basic'
     },
+    status: {
+        type: DataTypes.ENUM,
+        values: ['active', 'inactive'],
+        defaultValue: 'active'
+    },
     countries: {
         type: DataTypes.ARRAY(DataTypes.STRING)
     },

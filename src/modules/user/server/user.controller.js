@@ -64,6 +64,11 @@ async function login(req, res) {
             return res.status(401).send('Invalid email or password.');
         }
 
+        if(user.type === 'basic' && user.expiary_date <= new Date()){
+            await user.update({ status: 'inactive' })
+            return res.status(401).send('Expired')
+        }
+
         res.cookie('access_token', generateAccessToken(user), {
             expires: new Date(Date.now() + 8.64e7),
             httpOnly: true
@@ -92,8 +97,6 @@ async function createUser(req, res) {
         application_id,
         expiary_date
     } = req.body;
-
-    console.log(req.body);
 
     try {
         if (!validatePassword(password)) return res.status(400).send('Invalid password')
