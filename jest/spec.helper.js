@@ -51,6 +51,7 @@ module.exports = {
             name: 'Default User',
             email: 'default-user@cdp.com',
             password: 'strong-password',
+            expiary_date: new Date(Date.now() + 24 * 60 * 60 * 1000),
             created_by: defaultAdminId,
             updated_by: defaultAdminId,
             access_token: jwt.sign(

@@ -362,7 +362,7 @@ async function getSpecialties(req, res) {
         const masterDataSpecialties = await sequelize.datasyncConnector.query(`
             SELECT Country.codbase, countryname, cod_id_onekey, cod_locale, cod_description
             FROM ciam.vwcountry as Country
-            INNER JOIN ciam.lvwspecialtymaster as Specialty ON Country.codbase=Specialty.codbase
+            INNER JOIN ciam.vwspecialtymaster as Specialty ON Country.codbase=Specialty.codbase
             WHERE LOWER(country_iso2) = $country_code AND cod_locale = $locale;
             `, {
             bind: {
