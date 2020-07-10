@@ -16,6 +16,7 @@ async function init() {
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
     const UserPermission = require(path.join(process.cwd(), "src/modules/user/server/user-permission.model"));
     const Permission = require(path.join(process.cwd(), "src/modules/permission/permission.model"));
+    const { Modules } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/modules.constant'));
     require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model'));
     require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_profile.model'));
     require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
@@ -50,7 +51,7 @@ async function init() {
     function userpermissionSeeder(callback) {
         const userpermissions = [
 
-            { "permissionId": "11daccbf-c623-419e-938f-b85ba93387e4", "userId": "d0969605-974d-4ae5-9fb6-ac2db2cd4280", "created_by": "d0969605-974d-4ae5-9fb6-ac2db2cd4280", "updated_by": "d0969605-974d-4ae5-9fb6-ac2db2cd4280" },
+            { "permissionId": "0cdb4935-5811-4bf2-a080-b963b3570618", "userId": "7a6492f0-022a-40ab-9b51-d1faf5d74385", "created_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385", "updated_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385" },
 
         ];
 
@@ -66,8 +67,8 @@ async function init() {
     function permissionSeeder(callback) {
         const permissions = [
 
-            { "module": Modules.USER, "status": "active", "created_by": "d0969605-974d-4ae5-9fb6-ac2db2cd4280", "updated_by": "d0969605-974d-4ae5-9fb6-ac2db2cd4280" },
-            { "module": Modules.HCP, "status": "active", "created_by": "d0969605-974d-4ae5-9fb6-ac2db2cd4280", "updated_by": "d0969605-974d-4ae5-9fb6-ac2db2cd4280" }
+            { "module": Modules.USER, "status": "active", "created_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385", "updated_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385" },
+            { "module": Modules.HCP, "status": "active", "created_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385", "updated_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
         ];
 
 
@@ -202,7 +203,7 @@ async function init() {
         });
     }
 
-    async.waterfall([applicationSeeder, userSeeder, consentSeeder, permissionSeeder], function (err) {
+    async.waterfall([applicationSeeder, userSeeder, consentSeeder, userpermissionSeeder], function (err) {
         if (err) console.error(err);
         else console.info("DB seed completed!");
         process.exit();
