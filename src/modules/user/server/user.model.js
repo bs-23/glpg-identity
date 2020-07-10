@@ -54,9 +54,6 @@ const User = sequelize.cdpConnector.define('users', {
     countries: {
         type: DataTypes.ARRAY(DataTypes.STRING)
     },
-    permissions: {
-        type: DataTypes.ARRAY(DataTypes.STRING)
-    },
     last_login: {
         type: DataTypes.DATE
     },

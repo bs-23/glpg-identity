@@ -16,13 +16,19 @@ export default function UserForm() {
 
     const dispatch = useDispatch();
     const [countries, setCountries] = useState([]);
+    const [permissions, setPermissions] = useState([]);
 
     useEffect(() => {
         async function getCountries() {
             const response = await axios.get('/api/countries');
             setCountries(response.data);
         }
+        async function getPermissions() {
+            const response = await axios.get('/api/permissions');
+            setPermissions(response.data);
+        }
         getCountries();
+        getPermissions();
     }, []);
 
     return (
@@ -91,7 +97,7 @@ export default function UserForm() {
                                                 <div className="form-group">
                                                     <label htmlFor="permissions">Grant Permissions:</label>
                                                     <Field data-testid="permission" as="select" name="permissions" className="form-control" multiple>
-                                                        {permissionList.map(item => <option key={item.id} value={item.value}>{item.value}</option>)}
+                                                        {permissions.map(item => <option key={item.id} value={item.id}>{item.module}</option>)}
                                                     </Field>
                                                 </div>
                                                 <div className="form-group">

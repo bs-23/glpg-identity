@@ -1,11 +1,8 @@
  const path = require("path");
 const passport = require('passport');
 const controller = require('./user.controller');
-const { Modules } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/modules.constant'));
-const { adminPipeline, AuthGuard, ModuleGuard } = require(path.join(
-    process.cwd(),
-    'src/modules/core/server/authorization/authorization.middleware'
-));
+const { Modules } = require('./authorization/modules.constant');
+const { adminPipeline, AuthGuard, ModuleGuard } = require('./authorization/authorization.middleware');
 
 
 module.exports = app => {

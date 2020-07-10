@@ -2,7 +2,8 @@ const path = require("path");
 const passport = require('passport');
 const User = require(path.join(process.cwd(), "src/modules/user/server/user.model"));
 const Userpermission = require(path.join(process.cwd(), "src/modules/user/server/user-permission.model"));
-const Permission = require(path.join(process.cwd(), "src/modules/permission/permission.model"));
+const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
+const { Modules } = require(path.join(process.cwd(), "src/modules/user/server/authorization/modules.constant"));
 
 const AdminGuard = (req, res, next) => {
     if (!req.user) return res.status(401).send('unauthorized');
@@ -13,11 +14,10 @@ const AdminGuard = (req, res, next) => {
 
 const AuthGuard = passport.authenticate('user-jwt', { session: false });
 
-const isPermitted = (action, userPermission) => {
+const isPermitted = (module, userPermission) => {
 
-    if(userPermission.some(element =>
-       element.permission.action === action
-    )) {
+
+    if(userPermission.some(element =>element.permission.module === module || element.permission.module === Modules.ALL_Permissions )) {
         return true;
     } else {
         return false;
@@ -43,26 +43,16 @@ async function getUserWithPermissions(id) {
 
 }
 
-const ModuleGuard = (actionName) => {
-    return function (req, res, next) {
-        passport.authenticate('user-jwt', { session: false }, async (err, user, info) => {
+const ModuleGuard = (moduleName) => {
+    return async function (req, res, next) {
+            const user = await  getUserWithPermissions(req.user.id);
 
-            if (err) return res.status(500).send(err);
-            if (!user) return res.status(401).send('Authenticaton Failed');
-
-            req.user = await  getUserWithPermissions(user.id);
-
-
-            if (user.type.toLowerCase() === 'admin') return next();
-
-            if (!isPermitted(actionName, req.user.userpermission)) {
+            if (!isPermitted(moduleName, user.userpermission)) {
                 return res
                     .status(403)
-                    .send('Forbidden! Request Module Permissions.');
+                    .send('Forbidden! You Have No Permission to View This.');
             }
-
             next();
-        })(req, res, next);
     }
   }
 
