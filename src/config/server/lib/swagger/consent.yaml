@@ -30,6 +30,8 @@ components:
                     type: string
                 title:
                     type: string
+                slug:
+                    type: string
                 type:
                     type: string
                 opt_type:
