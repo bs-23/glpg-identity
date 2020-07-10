@@ -17,7 +17,7 @@ const UserPermission = sequelize.cdpConnector.define('user-permissions', {
     },
     userId: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.UUID
     },
 
     created_by: {

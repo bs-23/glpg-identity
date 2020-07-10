@@ -1,10 +1,10 @@
  const path = require("path");
 const passport = require('passport');
 const controller = require('./user.controller');
-const { Actions } = require(path.join(process.cwd(), 'src/config/server/lib/actions.constant'));
+const { Modules } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/modules.constant'));
 const { adminPipeline, AuthGuard, ModuleGuard } = require(path.join(
     process.cwd(),
-    'src/modules/core/server/routeGuard/authorization.middleware'
+    'src/modules/core/server/authorization/authorization.middleware'
 ));
 
 
@@ -15,7 +15,7 @@ module.exports = app => {
     app.get('/api/logout', passport.authenticate('user-jwt', { session: false }), controller.logout);
 
     app.route('/api/users')
-        .get(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Actions.USER_GET_LIST), controller.getUsers)
+        .get(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.USER), controller.getUsers)
         .post(passport.authenticate('user-jwt', { session: false }), controller.createUser);
 
     app.route('/api/users/:id')

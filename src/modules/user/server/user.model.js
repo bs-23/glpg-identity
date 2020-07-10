@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const { DataTypes } = require('sequelize');
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
+const Userpermission = require('./user-permission.model');
 
 const User = sequelize.cdpConnector.define('users', {
     id: {
@@ -87,5 +88,7 @@ const User = sequelize.cdpConnector.define('users', {
 User.prototype.validPassword = function(password) {
     return bcrypt.compareSync(password, this.password);
 };
+
+User.hasMany(Userpermission, {as: 'userpermission', foreignKey: 'userId',sourceKey: 'id'});
 
 module.exports = User;

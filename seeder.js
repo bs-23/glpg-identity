@@ -16,7 +16,7 @@ async function init() {
     const UserPermission = require(path.join(process.cwd(), "src/modules/user/server/user-permission.model"));
     const Permission = require(path.join(process.cwd(), "src/modules/permission/permission.model"));
 
-    const { Actions } = require(path.join(process.cwd(), 'src/config/server/lib/actions.constant'));
+    const { Modules } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/modules.constant'));
     require(path.join(process.cwd(), "src/modules/hcp/server/hcp_profile.model"));
     require(path.join(process.cwd(), "src/modules/hcp/server/hcp_consents.model"));
     require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'))
@@ -49,7 +49,7 @@ async function init() {
     function userpermissionSeeder(callback) {
         const userpermissions = [
 
-            { "permissionId": "dfc05285-cd84-42fc-afb8-620a5229248c", "userId": "1fd75693-ce87-4bf7-801a-61b1d7275c4f", "created_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f", "updated_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f" },
+            { "permissionId": "11daccbf-c623-419e-938f-b85ba93387e4", "userId": "d0969605-974d-4ae5-9fb6-ac2db2cd4280", "created_by": "d0969605-974d-4ae5-9fb6-ac2db2cd4280", "updated_by": "d0969605-974d-4ae5-9fb6-ac2db2cd4280" },
 
         ];
 
@@ -65,13 +65,8 @@ async function init() {
     function permissionSeeder(callback) {
         const permissions = [
 
-            { "action": Actions.USER_GET_LIST, "status": "active", "created_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f", "updated_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f" },
-            { "action": Actions.USER_POST, "status": "active", "created_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f", "updated_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f" },
-            { "action": Actions.USER_GET, "status": "active", "created_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f", "updated_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f" },
-            { "action": Actions.USER_GET_PROFILE, "status": "active", "created_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f", "updated_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f" },
-            { "action": Actions.USER_POST_CHANGE_PASSWORD, "status": "active", "created_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f", "updated_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f" },
-            { "action": Actions.USER_POST_SEND_PASSWORD_RESET_LINK, "status": "active", "created_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f", "updated_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f" },
-            { "action": Actions.USER_PUT_SEND_PASSWORD_RESET, "status": "active", "created_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f", "updated_by": "1fd75693-ce87-4bf7-801a-61b1d7275c4f" },
+            { "module": Modules.USER, "status": "active", "created_by": "d0969605-974d-4ae5-9fb6-ac2db2cd4280", "updated_by": "d0969605-974d-4ae5-9fb6-ac2db2cd4280" },
+            { "module": Modules.HCP, "status": "active", "created_by": "d0969605-974d-4ae5-9fb6-ac2db2cd4280", "updated_by": "d0969605-974d-4ae5-9fb6-ac2db2cd4280" }
         ];
 
 
@@ -206,7 +201,7 @@ async function init() {
         });
     }
 
-    async.waterfall([applicationSeeder, userSeeder, consentSeeder, userpermissionSeeder], function (err) {
+    async.waterfall([applicationSeeder, userSeeder, consentSeeder, permissionSeeder], function (err) {
         if (err) console.error(err);
         else console.info("DB seed completed!");
         process.exit();

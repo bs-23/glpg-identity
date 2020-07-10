@@ -25,7 +25,7 @@ const isPermitted = (action, userPermission) => {
 };
 
 async function getUserWithPermissions(id) {
-    const userWithPermissions =  await User.findOne({ where: { id: id },
+    const userWithPermissions =   await User.findOne({ where: { id: id },
         include: [
             {
               model: Userpermission,
@@ -65,27 +65,6 @@ const ModuleGuard = (actionName) => {
         })(req, res, next);
     }
   }
-
-// const ModuleGuard =  (req, res, next) => {
-//     passport.authenticate('user-jwt', { session: false }, async (err, user, info) => {
-
-//         if (err) return res.status(500).send(err);
-//         if (!user) return res.status(401).send('Authenticaton Failed');
-
-//         req.user = await  getUserWithPermissions(user.id);
-
-
-//         if (user.type.toLowerCase() === 'admin') return next();
-
-//         if (!isPermitted(req.url, req.user.userpermission)) {
-//             return res
-//                 .status(403)
-//                 .send('Forbidden! Request Module Permissions.');
-//         }
-
-//         next();
-//     })(req, res, next);
-// };
 
 const adminPipeline = [AuthGuard, AdminGuard];
 

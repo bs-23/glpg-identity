@@ -11,7 +11,7 @@ const Permission = sequelize.cdpConnector.define('permissions', {
         defaultValue: DataTypes.UUIDV4
 
     },
-    action: {
+    module: {
         allowNull: false,
         type: DataTypes.STRING
     },
