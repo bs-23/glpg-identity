@@ -364,7 +364,7 @@ async function getSpecialties(req, res) {
             {
                 bind: {
                     country_code: country.toLowerCase() ,
-                    locale: locale || 'e'
+                    locale: locale || 'en'
                 },
                 type: QueryTypes.SELECT
             });

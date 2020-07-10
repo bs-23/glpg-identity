@@ -158,7 +158,7 @@ paths:
                   in: path
                   required: true
                   description: the user identifier, as id
-                  schema: 
+                  schema:
                     type: string
             requestBody:
                 required: false
@@ -184,7 +184,7 @@ paths:
                     description: User is not authenticated.
                 404:
                     description: Hcp user profile not found.
-            
+
     /api/hcp-profiles/specialties:
         get:
             tags:
@@ -200,7 +200,7 @@ paths:
                 - name: locale
                   in: query
                   required: false
-                  description: Cod Locale code. Default is 'e'
+                  description: Cod Locale code. Default is 'en'
                   schema:
                     type: string
             responses:
