@@ -10,8 +10,14 @@ const Consent = sequelize.cdpConnector.define('consents', {
         defaultValue: DataTypes.UUIDV4
     },
     title: {
+        unique: true,
         allowNull: false,
         type: DataTypes.STRING
+    },
+    slug: {
+        unique: true,
+        allowNull: false,
+        type: DataTypes.STRING,
     },
     type: {
         allowNull: false,

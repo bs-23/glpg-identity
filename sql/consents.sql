@@ -2,6 +2,7 @@ CREATE TABLE ciam.consents
 (
     id uuid NOT NULL,
     title character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    slug character varying(255) COLLATE pg_catalog."default" NOT NULL,
     type ciam.enum_consents_type NOT NULL,
     opt_type ciam.enum_consents_opt_type NOT NULL,
     category ciam.enum_consents_category NOT NULL,

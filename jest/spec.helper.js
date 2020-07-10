@@ -1,5 +1,6 @@
 const faker = require('faker');
 const jwt = require('jsonwebtoken');
+const uniqueSlug = require('unique-slug');
 
 process.env.CDP_TOKEN_SECRET = 'super-secret-private-key';
 process.env.APPLICATION_TOKEN_SECRET = 'application-token-secret-key';
@@ -80,6 +81,7 @@ module.exports = {
         demoConsent: {
             id: demoConsentId,
             title: 'Sharing personal data with 3rd parties',
+            slug: uniqueSlug('Sharing personal data with 3rd parties'),
             type: 'online',
             opt_type: 'single',
             category: 'MC',
