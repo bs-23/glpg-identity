@@ -6,6 +6,7 @@ const Hcp = require('./hcp_profile.model');
 const HcpConsents = require('./hcp_consents.model');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
+const { StandardResponse, CustomError } = require(path.join(process.cwd(), 'src/config/server/lib/standard-response'));
 
 function getHcpViewModel(hcp) {
     const model = _.pickBy(hcp);
@@ -348,32 +349,36 @@ async function forgetPassword(req, res) {
 }
 
 async function getSpecialties(req, res) {
+    const response = new StandardResponse([], []);
     try {
         const country = req.query.country;
         let locale = req.query.locale;
 
         if (!country) {
-            return res.status(400).send('Missing required query parameters: Country');
+            response.errors.push(new CustomError(`Missing required query parameter`, 'country'));
+            return res.status(400).send(response);
         }
 
-        const masterDataSpecialties = await sequelize.datasyncConnector.query(
-            `SELECT Country.codbase, countryname, cod_id_onekey, cod_locale, cod_description
+        const masterDataSpecialties = await sequelize.datasyncConnector.query(`
+            SELECT Country.codbase, countryname, cod_id_onekey, cod_locale, cod_description
             FROM ciam.vwcountry as Country
-            INNER JOIN ciam.vwspecialtymaster as Specialty ON Country.codbase=Specialty.codbase
-            WHERE LOWER(country_iso2) = $country_code AND cod_locale = $locale;`,
-            {
-                bind: {
-                    country_code: country.toLowerCase() ,
-                    locale: locale || 'en'
-                },
-                type: QueryTypes.SELECT
-            });
+            INNER JOIN ciam.lvwspecialtymaster as Specialty ON Country.codbase=Specialty.codbase
+            WHERE LOWER(country_iso2) = $country_code AND cod_locale = $locale;
+            `, {
+            bind: {
+                country_code: country.toLowerCase(),
+                locale: locale || 'en'
+            },
+            type: QueryTypes.SELECT
+        });
 
         if (!masterDataSpecialties || masterDataSpecialties.length === 0) {
-            return res.status(404).send(`No specialties found for Country=${country}`)
+            response.errors.push(new CustomError(`No specialties found for Country=${country}`));
+            return res.status(404).send(response);
         }
 
-        res.json(masterDataSpecialties);
+        response.data = masterDataSpecialties;
+        res.json(response);
     } catch (err) {
         res.status(500).send(err);
     }
