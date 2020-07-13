@@ -7,8 +7,8 @@ export default function Dashboard() {
         <main className="app__content">
             <div className="container-fluid">
                 <div className="row h-100">
-                    <div className="col-12 col-sm-8 col-md-9">
-                        <h2 className="mt-5">
+                    <div className="col-12 col-sm-8 col-md-8 py-3">
+                        <h2 className="">
                            Category of Services
                         </h2>
                         <div>
@@ -33,7 +33,7 @@ export default function Dashboard() {
                         </div>
                     </div>
 
-                    <div className="col-12 col-sm-4 col-md-3 p-3 ">
+                    <div className="col-12 col-sm-4 col-md-4 py-3">
                         <Faq/>
                     </div>
                 </div>
