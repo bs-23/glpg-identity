@@ -1,12 +1,24 @@
 const path = require('path');
 const _ = require('lodash');
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 const { QueryTypes } = require('sequelize');
 const Hcp = require('./hcp_profile.model');
 const HcpConsents = require('./hcp_consents.model');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const { StandardResponse, CustomError } = require(path.join(process.cwd(), 'src/config/server/lib/standard-response'));
+
+function generateAccessToken(doc) {
+    return jwt.sign({
+        id: doc.id,
+        uuid: doc.uuid,
+        email: doc.email,
+    }, nodecache.getValue('HCP_TOKEN_SECRET'), {
+        expiresIn: '2d',
+        issuer: doc.id.toString()
+    });
+}
 
 function getHcpViewModel(hcp) {
     const model = _.pickBy(hcp);
@@ -385,6 +397,55 @@ async function getSpecialties(req, res) {
     }
 }
 
+async function getAccessToken(req, res) {
+    const response = {
+        data: {},
+        errors: []
+    };
+
+    try {
+        const { email, password } = req.body;
+
+        if(!email) {
+            response.errors.push({
+                field: 'email',
+                message: 'Email is required.'
+            });
+        }
+
+        if(!password) {
+            response.errors.push({
+                field: 'password',
+                message: 'Password is required.'
+            });
+        }
+
+        if (!email || !password) {
+            return res.status(400).json(response);
+        }
+
+        const doc = await Hcp.findOne({ where: { email } });
+
+        if (!doc || !doc.validPassword(password)) {
+            response.errors.push({
+                message: 'Invalid email or password.'
+            });
+
+            return res.status(401).json(response);
+        }
+
+        response.data = {
+            uuid: doc.uuid,
+            email: doc.email,
+            access_token: generateAccessToken(doc)
+        }
+
+        res.json(response);
+    } catch (err) {
+        res.status(500).send(err);
+    }
+}
+
 exports.getHcps = getHcps;
 exports.editHcp = editHcp;
 exports.registrationLookup = registrationLookup;
@@ -394,3 +455,4 @@ exports.changePassword = changePassword;
 exports.resetPassword = resetPassword;
 exports.forgetPassword = forgetPassword;
 exports.getSpecialties = getSpecialties;
+exports.getAccessToken = getAccessToken;
