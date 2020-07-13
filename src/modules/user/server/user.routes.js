@@ -17,6 +17,9 @@ module.exports = app => {
 
     app.get('/api/users/profile', passport.authenticate('user-jwt', { session: false }), controller.getSignedInUserProfile);
 
+    app.route('/api/filter-users')
+        .get(passport.authenticate('user-jwt', { session: false }), controller.filterUsersByCountry);
+
     app.route('/api/users/:id')
         .get(passport.authenticate("user-jwt", { session: false }), controller.getUser)
         .delete(passport.authenticate("user-jwt", { session: false }), controller.deleteUser);

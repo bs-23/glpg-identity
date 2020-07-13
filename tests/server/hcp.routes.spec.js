@@ -149,6 +149,18 @@ describe('HCP Routes', () => {
         expect(response.statusCode).toBe(404);
     });
 
+    it('Should edit an HCP user profile for hcp-portal - Edit HCP profile', async () => {
+        const response = await request.put(`/api/hcp-profiles/${defaultUser.id}`)
+            .set('Authorization', `bearer ${defaultApplication.access_token}`)
+            .send({
+                first_name: faker.name.firstName(),
+                last_name: faker.name.lastName()
+            });
+
+        expect(response.statusCode).toBe(200);
+        expect(response.res.headers['content-type']).toMatch('application/json');
+    });
+
     it('Should get hcp users data', async () => {
         const response = await request
             .get('/api/hcps/?page=1&is_active=Approved')

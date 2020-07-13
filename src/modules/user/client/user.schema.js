@@ -1,6 +1,27 @@
 import { string, object, ref, date } from 'yup';
 
-const passwordPattern = new RegExp("^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})")
+function validatePassword(password){
+    const minimumPasswordLength = 8
+
+    if(!password) return false
+    if(password.length < minimumPasswordLength) return false
+
+    const hasUppercase = new RegExp("^(?=.*[A-Z])").test(password);
+    if(!hasUppercase) return false
+
+    const hasDigit = new RegExp("^(?=.*[0-9])").test(password);
+    if(!hasDigit) return false
+
+    const specialCharacters = "!@#$%^&*"
+    let hasSpecialCharacter = false
+    for(const c of password) {
+        if(specialCharacters.includes(c)) {
+            hasSpecialCharacter = true
+            break
+        }
+    }
+    return hasSpecialCharacter
+}
 
 export const loginSchema = object().shape({
     email: string()
@@ -20,7 +41,8 @@ export const registerSchema = object().shape({
     password: string()
         .min(8, 'This field must be at least 8 characters long.')
         .required('This field must not be empty.')
-        .matches(passwordPattern, 'Password must contain at least a digit, an uppercase and a special character'),
+        .test('is-valid-password', 'Password must contain at least a digit, an uppercase and a special character',
+            password => validatePassword(password)),
     phone: string().matches(/^[0-9]/, 'This field only contains numbers'),
     expiary_date: date()
         .min(Date(), 'Must be a future date')
@@ -34,7 +56,8 @@ export const changePasswordSchema = object().shape({
     newPassword: string()
         .min(8, 'This field must be at least 8 characters long.')
         .required('This field must not be empty.')
-        .matches(passwordPattern, 'Password must contain at least a digit, an uppercase and a special character'),
+        .test('is-valid-password', 'Password must contain at least a digit, an uppercase and a special character',
+            password => validatePassword(password)),
     confirmPassword: string()
         .required('This field must not be empty.')
         .oneOf([ref('newPassword'), null], 'Passwords must match'),
@@ -44,7 +67,8 @@ export const resetPasswordSchema = object().shape({
     newPassword: string()
         .min(8, 'This field must be at least 8 characters long.')
         .required('This field must not be empty.')
-        .matches(passwordPattern, 'Password must contain at least a digit, an uppercase and a special character'),
+        .test('is-valid-password', 'Password must contain at least a digit, an uppercase and a special character',
+            password => validatePassword(password)),
     confirmPassword: string()
         .required('This field must not be empty.')
         .oneOf([ref('newPassword'), null], 'Passwords must match'),

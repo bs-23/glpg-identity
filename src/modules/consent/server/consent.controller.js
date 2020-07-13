@@ -3,19 +3,19 @@ const Consent = require('./consent.model');
 
 async function getConsents(req, res) {
     try {
-        const { country_code } = req.query;
+        const { country_iso2 } = req.query;
         const consents = await Consent.findAll({
             where: {
-                country_code: {
+                country_iso2: {
                     [Op.or]: [
-                        country_code.toUpperCase(),
-                        country_code.toLowerCase(),
+                        country_iso2.toUpperCase(),
+                        country_iso2.toLowerCase(),
                     ],
                 },
             },
         });
 
-        const response = { country_code: country_code.toUpperCase(), consents };
+        const response = { country_iso2: country_iso2.toUpperCase(), consents };
 
         res.json(response);
     } catch (err) {

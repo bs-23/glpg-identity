@@ -10,8 +10,14 @@ const Consent = sequelize.cdpConnector.define('consents', {
         defaultValue: DataTypes.UUIDV4
     },
     title: {
+        unique: true,
         allowNull: false,
         type: DataTypes.STRING
+    },
+    slug: {
+        unique: true,
+        allowNull: false,
+        type: DataTypes.STRING,
     },
     type: {
         allowNull: false,
@@ -26,9 +32,13 @@ const Consent = sequelize.cdpConnector.define('consents', {
     category: {
         allowNull: false,
         type: DataTypes.ENUM,
-        values: ['DM', 'MC', 'GDPR']
+        values: ['dm', 'mc']
     },
-    country_code: {
+    category_title: {
+        allowNull: false,
+        type: DataTypes.STRING
+    },
+    country_iso2: {
         allowNull: false,
         type: DataTypes.STRING
     },

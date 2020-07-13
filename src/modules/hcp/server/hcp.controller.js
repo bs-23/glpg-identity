@@ -1,11 +1,24 @@
 const path = require('path');
 const _ = require('lodash');
 const crypto = require('crypto');
-const { Op, QueryTypes } = require('sequelize');
+const jwt = require('jsonwebtoken');
+const { QueryTypes } = require('sequelize');
 const Hcp = require('./hcp_profile.model');
 const HcpConsents = require('./hcp_consents.model');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
+const { StandardResponse, CustomError } = require(path.join(process.cwd(), 'src/config/server/lib/standard-response'));
+
+function generateAccessToken(doc) {
+    return jwt.sign({
+        id: doc.id,
+        uuid: doc.uuid,
+        email: doc.email,
+    }, nodecache.getValue('HCP_TOKEN_SECRET'), {
+        expiresIn: '2d',
+        issuer: doc.id.toString()
+    });
+}
 
 function getHcpViewModel(hcp) {
     const model = _.pickBy(hcp);
@@ -24,6 +37,7 @@ function getHcpViewModel(hcp) {
 function mapMasterDataToHcpProfile(masterData) {
     const model = {};
 
+    model.salutation = masterData.ind_prefixname_desc;
     model.individual_id_onekey = masterData.individual_id_onekey;
     model.uuid = masterData.uuid_1 || masterData.uuid_2;
     model.first_name = masterData.firstname;
@@ -348,32 +362,86 @@ async function forgetPassword(req, res) {
 }
 
 async function getSpecialties(req, res) {
+    const response = new StandardResponse([], []);
     try {
         const country = req.query.country;
         let locale = req.query.locale;
 
         if (!country) {
-            return res.status(400).send('Missing required query parameters: Country');
+            response.errors.push(new CustomError(`Missing required query parameter`, 'country'));
+            return res.status(400).send(response);
         }
 
-        const masterDataSpecialties = await sequelize.datasyncConnector.query(
-            `SELECT Country.codbase, countryname, cod_id_onekey, cod_locale, cod_description
+        const masterDataSpecialties = await sequelize.datasyncConnector.query(`
+            SELECT Country.codbase, countryname, cod_id_onekey, cod_locale, cod_description
             FROM ciam.vwcountry as Country
             INNER JOIN ciam.vwspecialtymaster as Specialty ON Country.codbase=Specialty.codbase
-            WHERE LOWER(country_iso2) = $country_code AND cod_locale = $locale;`,
-            {
-                bind: {
-                    country_code: country.toLowerCase() ,
-                    locale: locale || 'e'
-                },
-                type: QueryTypes.SELECT
-            });
+            WHERE LOWER(country_iso2) = $country_code AND cod_locale = $locale;
+            `, {
+            bind: {
+                country_code: country.toLowerCase(),
+                locale: locale || 'en'
+            },
+            type: QueryTypes.SELECT
+        });
 
         if (!masterDataSpecialties || masterDataSpecialties.length === 0) {
-            return res.status(404).send(`No specialties found for Country=${country}`)
+            response.errors.push(new CustomError(`No specialties found for Country=${country}`));
+            return res.status(404).send(response);
         }
 
-        res.json(masterDataSpecialties);
+        response.data = masterDataSpecialties;
+        res.json(response);
+    } catch (err) {
+        res.status(500).send(err);
+    }
+}
+
+async function getAccessToken(req, res) {
+    const response = {
+        data: {},
+        errors: []
+    };
+
+    try {
+        const { email, password } = req.body;
+
+        if(!email) {
+            response.errors.push({
+                field: 'email',
+                message: 'Email is required.'
+            });
+        }
+
+        if(!password) {
+            response.errors.push({
+                field: 'password',
+                message: 'Password is required.'
+            });
+        }
+
+        if (!email || !password) {
+            return res.status(400).json(response);
+        }
+
+        const doc = await Hcp.findOne({ where: { email } });
+
+        if (!doc || !doc.validPassword(password)) {
+            response.errors.push({
+                message: 'Invalid email or password.'
+            });
+
+            return res.status(401).json(response);
+        }
+
+        response.data = {
+            uuid: doc.uuid,
+            email: doc.email,
+            access_token: generateAccessToken(doc),
+            retention_period: '48 hours'
+        }
+
+        res.json(response);
     } catch (err) {
         res.status(500).send(err);
     }
@@ -388,3 +456,4 @@ exports.changePassword = changePassword;
 exports.resetPassword = resetPassword;
 exports.forgetPassword = forgetPassword;
 exports.getSpecialties = getSpecialties;
+exports.getAccessToken = getAccessToken;

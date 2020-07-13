@@ -149,6 +149,42 @@ paths:
                     description: User is not authenticated.
                 404:
                     description: HCP user profile not found.
+        put:
+            tags:
+                - hcp-profiles
+            summary: Update HCP user's profile by id.
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  description: the user identifier, as id
+                  schema:
+                    type: string
+            requestBody:
+                required: false
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                first_name:
+                                    type: string
+                                last_name:
+                                    type: string
+                                telephone:
+                                    type: string
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/hcpProfile"
+                401:
+                    description: User is not authenticated.
+                404:
+                    description: Hcp user profile not found.
+
     /api/hcp-profiles/specialties:
         get:
             tags:
@@ -164,7 +200,7 @@ paths:
                 - name: locale
                   in: query
                   required: false
-                  description: Cod Locale code. Default is 'e'
+                  description: Cod Locale code. Default is 'en'
                   schema:
                     type: string
             responses:
@@ -178,6 +214,53 @@ paths:
                     description: User is not authenticated.
                 404:
                     description: Specialty not found for country.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+                400:
+                    description: Invalid request.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+    /api/hcp-profiles/generate-token:
+        post:
+            tags:
+                - hcp-profiles
+            summary: Generate access token for hcp users on hcp portal.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                email:
+                                    type: string
+                                password:
+                                    type: string
+            responses:
+                200:
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        type: object
+                                        properties:
+                                            uuid:
+                                                type: string
+                                            email:
+                                                type: string
+                                            access_token:
+                                                type: string
+                                            retention_period:
+                                                type: string
+                                    errors:
+                                        type: array
+                                        example: []
 
 components:
     schemas:
@@ -277,6 +360,12 @@ components:
                 cod_description:
                     type: string
         specialtiesByCountry:
-            type: array
-            items:
-                $ref: "#/components/schemas/specialty"
+            type: object
+            properties:
+                data:
+                    type: array
+                    items:
+                        $ref: "#/components/schemas/specialty"
+                errors:
+                    type: array
+                    example: []

@@ -50,6 +50,7 @@ module.exports = {
             name: 'Default User',
             email: 'default-user@cdp.com',
             password: 'strong-password',
+            expiary_date: new Date(Date.now() + 24 * 60 * 60 * 1000),
             created_by: defaultAdminId,
             updated_by: defaultAdminId,
             access_token: jwt.sign(
@@ -80,10 +81,12 @@ module.exports = {
         demoConsent: {
             id: demoConsentId,
             title: 'Sharing personal data with 3rd parties',
+            slug: 'Sharing_personal_data_with_3rd_parties',
             type: 'online',
             opt_type: 'single',
-            category: 'MC',
-            country_code: 'BE',
+            category: 'mc',
+            category_title: "Medical Consent",
+            country_iso2: 'NL',
         },
     },
 };

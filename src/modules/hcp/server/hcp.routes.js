@@ -11,6 +11,9 @@ module.exports = app => {
     app.route('/api/hcp-profiles/registration-lookup')
         .post(passport.authenticate('application-jwt', { session: false }), controller.registrationLookup);
 
+    app.route('/api/hcp-profiles/generate-token')
+        .post(passport.authenticate('application-jwt', { session: false }), controller.getAccessToken);
+
     app.route('/api/hcp-profiles')
         .post(passport.authenticate('application-jwt', { session: false }), controller.createHcpProfile);
 
@@ -27,5 +30,6 @@ module.exports = app => {
         .get(passport.authenticate('application-jwt', { session: false }), controller.getSpecialties);
 
     app.route('/api/hcp-profiles/:id')
-        .get(passport.authenticate('application-jwt', { session: false }), controller.getHcpProfile);
+        .get(passport.authenticate('application-jwt', { session: false }), controller.getHcpProfile)
+        .put(passport.authenticate('application-jwt', { session: false }), controller.editHcp);
 };

@@ -3,12 +3,12 @@ paths:
         get:
             tags:
                 - consents
-            summary: Get all consents by country code.
+            summary: Get all consents by country iso2.
             parameters:
-                - name: country_code
+                - name: country_iso2
                   in: query
                   required: true
-                  description: Country code for which consent is to be returned.
+                  description: Country iso2 for which consent is to be returned.
                   schema:
                     type: string
             responses:
@@ -30,18 +30,22 @@ components:
                     type: string
                 title:
                     type: string
+                slug:
+                    type: string
                 type:
                     type: string
                 opt_type:
                     type: string
                 category:
                     type: string
-                country_code:
+                category_title:
+                    type: string
+                country_iso2:
                     type: string
         consentsForCountry:
             type: object
             properties:
-                country_code:
+                country_iso2:
                     type: string
                 consents:
                     type: array
