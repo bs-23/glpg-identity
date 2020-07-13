@@ -1,0 +1,30 @@
+.faq {
+    background: $login-bg-color;
+
+    &__header {
+        color: $primary-color;
+    }
+
+    &__icon {
+        &-down {
+            color: $secondary-color;
+        }
+    }
+
+    .card {
+        border-radius: 0px;
+        border: 0px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.125) !important;
+        background: $login-bg-color;
+
+        &-header {
+            background: $login-bg-color;
+            font-weight: bold;
+        }
+
+        &-body {
+            background: $login-bg-color;
+            padding-top: 0px;
+        }
+    }
+}
