@@ -50,11 +50,12 @@ async function init() {
     }
 
     function permissionSeeder(callback) {
+        console.log(Modules.USER);
         const permissions = [
 
             { "module": Modules.USER, "status": "active", "created_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385", "updated_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385" },
             { "module": Modules.HCP, "status": "active", "created_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385", "updated_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385" },
-            { "module": Modules.ALL_Permission, "status": "active", "created_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385", "updated_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
+            { "module": Modules.ALL_Permissions, "status": "active", "created_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385", "updated_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
         ];
 
 
@@ -87,7 +88,7 @@ async function init() {
         ];
 
         const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, "").replace(/ +/g, "-");
-        
+
         const all_consents = consents.map( consent => {
             const slug = convertToSlug(consent.title);
             return { ...consent, slug };
