@@ -8,6 +8,7 @@ const HcpConsents = require('./hcp_consents.model');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const { StandardResponse, CustomError } = require(path.join(process.cwd(), 'src/config/server/lib/standard-response'));
+const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
 function generateAccessToken(doc) {
     return jwt.sign({
