@@ -46,120 +46,22 @@ async function init() {
 
     function consentSeeder(callback) {
         const consents = [
-
-            { "title": "Sample Request", "type": "online", "opt_type": "double", "category": "DM", "country_code": "BE", "purpose": "n/a" },
-            // { "title": "Sample Request", "type": "online", "opt_type": "double", "category": "DM", "country_code": "IT", "purpose": "n/a" },
-            // { "title": "Sample Request", "type": "online", "opt_type": "double", "category": "DM", "country_code": "NL", "purpose": "n/a" },
-            // { "title": "Sample Request", "type": "online", "opt_type": "double", "category": "DM", "country_code": "ES", "purpose": "n/a" },
-            // { "title": "Sample Request", "type": "online", "opt_type": "double", "category": "DM", "country_code": "DE", "purpose": "n/a" },
-            // { "title": "Sample Request", "type": "online", "opt_type": "double", "category": "DM", "country_code": "UK", "purpose": "n/a" },
-            // { "title": "Sample Request", "type": "online", "opt_type": "double", "category": "DM", "country_code": "FR", "purpose": "n/a" },
-
-            { "title": "Invite to KOL Webminar", "type": "online", "opt_type": "single", "category": "MC", "country_code": "BE", "purpose": "n/a" },
-            // { "title": "Invite to KOL Webminar", "type": "online", "opt_type": "double", "category": "MC", "country_code": "IT", "purpose": "n/a" },
-            // { "title": "Invite to KOL Webminar", "type": "online", "opt_type": "double", "category": "MC", "country_code": "NL", "purpose": "n/a" },
-            // { "title": "Invite to KOL Webminar", "type": "online", "opt_type": "double", "category": "MC", "country_code": "ES", "purpose": "n/a" },
-            // { "title": "Invite to KOL Webminar", "type": "online", "opt_type": "double", "category": "MC", "country_code": "DE", "purpose": "n/a" },
-            // { "title": "Invite to KOL Webminar", "type": "online", "opt_type": "double", "category": "MC", "country_code": "UK", "purpose": "n/a" },
-            // { "title": "Invite to KOL Webminar", "type": "online", "opt_type": "double", "category": "MC", "country_code": "FR", "purpose": "n/a" },
-
-            { "title": "Create credentials for gated HCP area", "type": "online", "opt_type": "single", "category": "MC", "country_code": "BE", "purpose": "n/a" },
-            // { "title": "Create credentials for gated HCP area", "type": "online", "opt_type": "double", "category": "MC", "country_code": "IT", "purpose": "n/a" },
-            // { "title": "Create credentials for gated HCP area", "type": "online", "opt_type": "double", "category": "MC", "country_code": "NL", "purpose": "n/a" },
-            // { "title": "Create credentials for gated HCP area", "type": "online", "opt_type": "double", "category": "MC", "country_code": "ES", "purpose": "n/a" },
-            // { "title": "Create credentials for gated HCP area", "type": "online", "opt_type": "double", "category": "MC", "country_code": "DE", "purpose": "n/a" },
-            // { "title": "Create credentials for gated HCP area", "type": "online", "opt_type": "double", "category": "MC", "country_code": "UK", "purpose": "n/a" },
-            // { "title": "Create credentials for gated HCP area", "type": "online", "opt_type": "double", "category": "MC", "country_code": "FR", "purpose": "n/a" },
-
-            // { "title": "Create credentials for gated HCP area", "type": "online", "opt_type": "double", "category": "DM", "country_code": "BE", "purpose": "n/a" },
-            // { "title": "Create credentials for gated HCP area", "type": "online", "opt_type": "double", "category": "DM", "country_code": "IT", "purpose": "n/a" },
-            // { "title": "Create credentials for gated HCP area", "type": "online", "opt_type": "double", "category": "DM", "country_code": "NL", "purpose": "n/a" },
-            // { "title": "Create credentials for gated HCP area", "type": "online", "opt_type": "double", "category": "DM", "country_code": "ES", "purpose": "n/a" },
-            // { "title": "Create credentials for gated HCP area", "type": "online", "opt_type": "double", "category": "DM", "country_code": "DE", "purpose": "n/a" },
-            // { "title": "Create credentials for gated HCP area", "type": "online", "opt_type": "double", "category": "DM", "country_code": "UK", "purpose": "n/a" },
-            // { "title": "Create credentials for gated HCP area", "type": "online", "opt_type": "double", "category": "DM", "country_code": "FR", "purpose": "n/a" },
-
-            { "title": "Register to E-mail Newsletter (Mass email)", "type": "online", "opt_type": "double", "category": "DM", "country_code": "BE", "purpose": "n/a" },
-            // { "title": "Register to E-mail Newsletter (Mass email)", "type": "online", "opt_type": "double", "category": "DM", "country_code": "IT", "purpose": "n/a" },
-            // { "title": "Register to E-mail Newsletter (Mass email)", "type": "online", "opt_type": "double", "category": "DM", "country_code": "NL", "purpose": "n/a" },
-            // { "title": "Register to E-mail Newsletter (Mass email)", "type": "online", "opt_type": "double", "category": "DM", "country_code": "ES", "purpose": "n/a" },
-            // { "title": "Register to E-mail Newsletter (Mass email)", "type": "online", "opt_type": "double", "category": "DM", "country_code": "DE", "purpose": "n/a" },
-            // { "title": "Register to E-mail Newsletter (Mass email)", "type": "online", "opt_type": "double", "category": "DM", "country_code": "UK", "purpose": "n/a" },
-            // { "title": "Register to E-mail Newsletter (Mass email)", "type": "online", "opt_type": "double", "category": "DM", "country_code": "FR", "purpose": "n/a" },
-
-
-            { "title": "Send congress Agenda via email", "type": "online", "opt_type": "single", "category": "MC", "country_code": "BE", "purpose": "n/a" },
-            // { "title": "Send congress Agenda via email", "type": "online", "opt_type": "double", "category": "MC", "country_code": "IT", "purpose": "n/a" },
-            // { "title": "Send congress Agenda via email", "type": "online", "opt_type": "double", "category": "MC", "country_code": "NL", "purpose": "n/a" },
-            // { "title": "Send congress Agenda via email", "type": "online", "opt_type": "double", "category": "MC", "country_code": "ES", "purpose": "n/a" },
-            // { "title": "Send congress Agenda via email", "type": "online", "opt_type": "double", "category": "MC", "country_code": "DE", "purpose": "n/a" },
-            // { "title": "Send congress Agenda via email", "type": "online", "opt_type": "double", "category": "MC", "country_code": "UK", "purpose": "n/a" },
-            // { "title": "Send congress Agenda via email", "type": "online", "opt_type": "double", "category": "MC", "country_code": "FR", "purpose": "n/a" },
-
-            { "title": "Congress Newsletter", "type": "online", "opt_type": "single", "category": "MC", "country_code": "BE", "purpose": "n/a" },
-            // { "title": "Congress Newsletter", "type": "online", "opt_type": "double", "category": "MC", "country_code": "IT", "purpose": "n/a" },
-            // { "title": "Congress Newsletter", "type": "online", "opt_type": "double", "category": "MC", "country_code": "NL", "purpose": "n/a" },
-            // { "title": "Congress Newsletter", "type": "online", "opt_type": "double", "category": "MC", "country_code": "ES", "purpose": "n/a" },
-            // { "title": "Congress Newsletter", "type": "online", "opt_type": "double", "category": "MC", "country_code": "DE", "purpose": "n/a" },
-            // { "title": "Congress Newsletter", "type": "online", "opt_type": "double", "category": "MC", "country_code": "UK", "purpose": "n/a" },
-            // { "title": "Congress Newsletter", "type": "online", "opt_type": "double", "category": "MC", "country_code": "FR", "purpose": "n/a" },
-
-            { "title": "Send Email about clinical trial studies", "type": "online", "opt_type": "single", "category": "MC", "country_code": "BE", "purpose": "n/a" },
-            // { "title": "Send Email about clinical trial studies", "type": "online", "opt_type": "double", "category": "MC", "country_code": "IT", "purpose": "n/a" },
-            // { "title": "Send Email about clinical trial studies", "type": "online", "opt_type": "double", "category": "MC", "country_code": "NL", "purpose": "n/a" },
-            // { "title": "Send Email about clinical trial studies", "type": "online", "opt_type": "double", "category": "MC", "country_code": "ES", "purpose": "n/a" },
-            // { "title": "Send Email about clinical trial studies", "type": "online", "opt_type": "double", "category": "MC", "country_code": "DE", "purpose": "n/a" },
-            // { "title": "Send Email about clinical trial studies", "type": "online", "opt_type": "double", "category": "MC", "country_code": "UK", "purpose": "n/a" },
-            // { "title": "Send Email about clinical trial studies", "type": "online", "opt_type": "double", "category": "MC", "country_code": "FR", "purpose": "n/a" },
-
-            { "title": "That medical information is shorten for teasering content and better readability", "type": "online", "opt_type": "single", "category": "MC", "country_code": "BE", "purpose": "n/a" },
-            // { "title": "That medical information is shorten for teasering content and better readability", "type": "online", "opt_type": "double", "category": "MC", "country_code": "IT", "purpose": "n/a" },
-            // { "title": "That medical information is shorten for teasering content and better readability", "type": "online", "opt_type": "double", "category": "MC", "country_code": "NL", "purpose": "n/a" },
-            // { "title": "That medical information is shorten for teasering content and better readability", "type": "online", "opt_type": "double", "category": "MC", "country_code": "ES", "purpose": "n/a" },
-            // { "title": "That medical information is shorten for teasering content and better readability", "type": "online", "opt_type": "double", "category": "MC", "country_code": "DE", "purpose": "n/a" },
-            // { "title": "That medical information is shorten for teasering content and better readability", "type": "online", "opt_type": "double", "category": "MC", "country_code": "UK", "purpose": "n/a" },
-            // { "title": "That medical information is shorten for teasering content and better readability", "type": "online", "opt_type": "double", "category": "MC", "country_code": "FR", "purpose": "n/a" },
-
-            { "title": "Send Mode of Action rich media content", "type": "online", "opt_type": "single", "category": "MC", "country_code": "BE", "purpose": "n/a" },
-            // { "title": "Send Mode of Action rich media content", "type": "online", "opt_type": "double", "category": "MC", "country_code": "IT", "purpose": "n/a" },
-            // { "title": "Send Mode of Action rich media content", "type": "online", "opt_type": "double", "category": "MC", "country_code": "NL", "purpose": "n/a" },
-            // { "title": "Send Mode of Action rich media content", "type": "online", "opt_type": "double", "category": "MC", "country_code": "ES", "purpose": "n/a" },
-            // { "title": "Send Mode of Action rich media content", "type": "online", "opt_type": "double", "category": "MC", "country_code": "DE", "purpose": "n/a" },
-            // { "title": "Send Mode of Action rich media content", "type": "online", "opt_type": "double", "category": "MC", "country_code": "UK", "purpose": "n/a" },
-            // { "title": "Send Mode of Action rich media content", "type": "online", "opt_type": "double", "category": "MC", "country_code": "FR", "purpose": "n/a" },
-
-            { "title": "Send e-Detailing aid", "type": "online", "opt_type": "double", "category": "DM", "country_code": "BE", "purpose": "n/a" },
-            // { "title": "Send e-Detailing aid", "type": "online", "opt_type": "double", "category": "DM", "country_code": "IT", "purpose": "n/a" },
-            // { "title": "Send e-Detailing aid", "type": "online", "opt_type": "double", "category": "DM", "country_code": "NL", "purpose": "n/a" },
-            // { "title": "Send e-Detailing aid", "type": "online", "opt_type": "double", "category": "DM", "country_code": "ES", "purpose": "n/a" },
-            // { "title": "Send e-Detailing aid", "type": "online", "opt_type": "double", "category": "DM", "country_code": "DE", "purpose": "n/a" },
-            // { "title": "Send e-Detailing aid", "type": "online", "opt_type": "double", "category": "DM", "country_code": "UK", "purpose": "n/a" },
-            // { "title": "Send e-Detailing aid", "type": "online", "opt_type": "double", "category": "DM", "country_code": "FR", "purpose": "n/a" },
-
-            { "title": "Invite to Remote Engagement", "type": "online", "opt_type": "double", "category": "DM", "country_code": "BE", "purpose": "n/a" },
-            // { "title": "Invite to Remote Engagement", "type": "online", "opt_type": "double", "category": "DM", "country_code": "IT", "purpose": "n/a" },
-            // { "title": "Invite to Remote Engagement", "type": "online", "opt_type": "double", "category": "DM", "country_code": "NL", "purpose": "n/a" },
-            // { "title": "Invite to Remote Engagement", "type": "online", "opt_type": "double", "category": "DM", "country_code": "ES", "purpose": "n/a" },
-            // { "title": "Invite to Remote Engagement", "type": "online", "opt_type": "double", "category": "DM", "country_code": "DE", "purpose": "n/a" },
-            // { "title": "Invite to Remote Engagement", "type": "online", "opt_type": "double", "category": "DM", "country_code": "UK", "purpose": "n/a" },
-            // { "title": "Invite to Remote Engagement", "type": "online", "opt_type": "double", "category": "DM", "country_code": "FR", "purpose": "n/a" },
-
-            { "title": "Send CLM content after RepSale visit", "type": "online", "opt_type": "double", "category": "DM", "country_code": "BE", "purpose": "n/a" },
-            // { "title": "Send CLM content after RepSale visit", "type": "online", "opt_type": "double", "category": "DM", "country_code": "IT", "purpose": "n/a" },
-            // { "title": "Send CLM content after RepSale visit", "type": "online", "opt_type": "double", "category": "DM", "country_code": "NL", "purpose": "n/a" },
-            // { "title": "Send CLM content after RepSale visit", "type": "online", "opt_type": "double", "category": "DM", "country_code": "ES", "purpose": "n/a" },
-            // { "title": "Send CLM content after RepSale visit", "type": "online", "opt_type": "double", "category": "DM", "country_code": "DE", "purpose": "n/a" },
-            // { "title": "Send CLM content after RepSale visit", "type": "online", "opt_type": "double", "category": "DM", "country_code": "UK", "purpose": "n/a" },
-            // { "title": "Send CLM content after RepSale visit", "type": "online", "opt_type": "double", "category": "DM", "country_code": "FR", "purpose": "n/a" }
+            { "title": "Sample Request", "slug": "Sample_Request", "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "BE", "purpose": "n/a" },
+            { "title": "Invite to KOL Webminar", "slug": "Invite_to_KOL_Webminar", "type": "online", "opt_type": "single", "category": "mc", "category_title": "Medical Consent", "country_iso2": "BE", "purpose": "n/a" },
+            { "title": "Create credentials for gated HCP area", "slug": "Create_credentials_for_gated_HCP_area", "type": "online", "opt_type": "single", "category": "mc", "category_title": "Medical Consent", "country_iso2": "BE", "purpose": "n/a" },
+            { "title": "Register to E-mail Newsletter (Mass email)", "slug": "Register_to_E-mail_Newsletter_(Mass_email)", "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "BE", "purpose": "n/a" },
+            { "title": "Send congress Agenda via email", "slug": "Send_congress_Agenda_via_email", "type": "online", "opt_type": "single", "category": "mc", "category_title": "Medical Consent", "country_iso2": "BE", "purpose": "n/a" },
+            { "title": "Congress Newsletter", "slug": "Congress_Newsletter", "type": "online", "opt_type": "single", "category": "mc", "category_title": "Medical Consent", "country_iso2": "BE", "purpose": "n/a" },
+            { "title": "Send Email about clinical trial studies", "slug": "Send_Email_about_clinical_trial_studies", "type": "online", "opt_type": "single", "category": "mc", "category_title": "Medical Consent", "country_iso2": "BE", "purpose": "n/a" },
+            { "title": "That medical information is shorten for teasering content and better readability", "slug": "That_medical_information_is_shorten_for_teasering_content_and_better_readability", "type": "online", "opt_type": "single", "category": "mc", "category_title": "Medical Consent", "country_iso2": "BE", "purpose": "n/a" },
+            { "title": "Send Mode of Action rich media content", "slug": "Send_Mode_of_Action_rich_media_content", "type": "online", "opt_type": "single", "category": "mc", "category_title": "Medical Consent", "country_iso2": "BE", "purpose": "n/a" },
+            { "title": "Send e-Detailing aid", "slug": "Send_e-Detailing_aid", "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "BE", "purpose": "n/a" },
+            { "title": "Invite to Remote Engagement", "slug": "Invite_to_Remote_Engagement", "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "BE", "purpose": "n/a" },
+            { "title": "Send CLM content after RepSale visit", "slug": "Send_CLM_content_after_RepSale_visit", "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "BE", "purpose": "n/a" },
         ];
 
-        const all_consents = consents.map(consent => {
-            const slug = consent.title.split(' ').join('_');
-            return { ...consent, slug }
-        });
-
         Consent.destroy({ truncate: true }).then(() => {
-            Consent.bulkCreate(all_consents, {
+            Consent.bulkCreate(consents, {
                 returning: true,
                 ignoreDuplicates: false
             }).then(function () {
