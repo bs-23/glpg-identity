@@ -437,7 +437,8 @@ async function getAccessToken(req, res) {
         response.data = {
             uuid: doc.uuid,
             email: doc.email,
-            access_token: generateAccessToken(doc)
+            access_token: generateAccessToken(doc),
+            retention_period: '48 hours'
         }
 
         res.json(response);
