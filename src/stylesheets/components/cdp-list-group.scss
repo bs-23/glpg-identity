@@ -1,0 +1,30 @@
+.cdp-list-group {
+    $this: cdp-list-group;
+
+    &__link {
+        text-decoration: none !important;
+
+        &:hover {
+            background-color: #ddd;
+
+            .cdp-list-group__link-title {
+                text-decoration: underline;
+            }
+        }
+    }
+
+    &__icon {
+        color: $secondary-color;
+    }
+
+    &__link-title {
+        color: $primary-color;
+        font-weight: bold;
+    }
+
+    &__link-description {
+    }
+
+    &__link-timing {
+    }
+}
