@@ -1,6 +1,5 @@
 const path = require('path');
 const async = require('async');
-const uniqueSlug = require('unique-slug');
 
 async function init() {
     const config = require(path.join(process.cwd(), 'src/config/server/config'));
@@ -155,7 +154,7 @@ async function init() {
         ];
 
         const all_consents = consents.map(consent => {
-            const slug = uniqueSlug(consent.title);
+            const slug = consent.title.split(' ').join('_');
             return { ...consent, slug }
         });
 
