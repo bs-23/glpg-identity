@@ -1,5 +1,5 @@
 .faq {
-    background: $login-bg-color;
+    background: $light-bg-color;
 
     &__header {
         color: $primary-color;
@@ -15,15 +15,15 @@
         border-radius: 0px;
         border: 0px;
         border-bottom: 1px solid rgba(0, 0, 0, 0.125) !important;
-        background: $login-bg-color;
+        background: $light-bg-color;
 
         &-header {
-            background: $login-bg-color;
+            background: $light-bg-color;
             font-weight: bold;
         }
 
         &-body {
-            background: $login-bg-color;
+            background: $light-bg-color;
             padding-top: 0px;
         }
     }

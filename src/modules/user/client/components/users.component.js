@@ -54,9 +54,9 @@ export default function Users() {
                             </NavLink>
                         </div>
 
-                        {users.length > 0 &&
-                            <table className="table">
-                                <thead className="table-secondary">
+                        { users.length > 0 &&
+                            <table className="table table-sm">
+                                <thead className="bg-light">
                                     <tr>
                                         <th>Name</th>
                                         <th>Email</th>
