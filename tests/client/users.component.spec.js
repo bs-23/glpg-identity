@@ -114,8 +114,8 @@ describe('User component', () => {
         const filter_button = getByText('Filter')
         fireEvent.click(filter_button)
 
-        const ireland = getByText('Luxembourg')
-        fireEvent.click(ireland)
+        const selected_country = getByText('Luxembourg')
+        fireEvent.click(selected_country)
 
         await waitFor(() => {
             expect(tbody.childNodes.length).toBe(2)
