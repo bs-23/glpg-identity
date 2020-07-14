@@ -1,7 +1,10 @@
+const path = require('path');
 const { Op } = require('sequelize');
 const Consent = require('./consent.model');
+const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 
 async function getConsents(req, res) {
+    const response = new Response({}, []);
     try {
         const { country_lang } = req.query;
         let [country_iso2, language_code] = country_lang.split('_');
@@ -24,11 +27,12 @@ async function getConsents(req, res) {
             },
         });
 
-        const response = { country_iso2: country_iso2.toUpperCase(), consents };
+        response.data = { country_iso2: country_iso2.toUpperCase(), consents };
 
         res.json(response);
     } catch (err) {
-        res.status(500).send(err);
+        response.errors.push(new CustomError(err.message, '', '', err));
+        res.status(500).send(response);
     }
 }
 
