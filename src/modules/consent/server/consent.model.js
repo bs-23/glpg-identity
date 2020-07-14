@@ -42,6 +42,9 @@ const Consent = sequelize.cdpConnector.define('consents', {
         allowNull: false,
         type: DataTypes.STRING
     },
+    language_code: {
+        type: DataTypes.STRING
+    },
     purpose: {
         type: DataTypes.STRING
     }
