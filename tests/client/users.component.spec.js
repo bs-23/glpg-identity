@@ -6,6 +6,7 @@ import { MemoryRouter } from 'react-router-dom';
 import axios from 'axios'
 import MockAdapter from 'axios-mock-adapter'
 import { Provider } from 'react-redux';
+import { ToastProvider } from 'react-toast-notifications';
 import store from '../../src/modules/core/client/store';
 import Users from '../../src/modules/user/client/components/users.component';
 import { getSignedInUserProfile } from '../../src/modules/user/client/user.actions';
@@ -44,7 +45,9 @@ describe('User component', () => {
         const { container } = render(
             <Provider store={store}>
                 <MemoryRouter>
-                    <Users />
+                    <ToastProvider>
+                        <Users />
+                    </ToastProvider>
                 </MemoryRouter>
             </Provider>
         );
