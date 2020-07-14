@@ -31,12 +31,14 @@ describe('User component', () => {
     })
 
     it('Should render user table and delete one user', async () => {
-        const users = [
-            { id: '1', name: 'John', email: 'email@gmail.com' },
-            { id: '2', name: 'Smith', email: 'anothermail@gmail.com' }
-        ]
+        const users = {
+            users: [
+                { id: '1', name: 'John', email: 'email@gmail.com' },
+                { id: '2', name: 'Smith', email: 'anothermail@gmail.com' }
+            ]
+        }
 
-        mockAxios.onGet('/api/users').reply(200, users)
+        mockAxios.onGet(`/api/users?page=${1}&country=${null}`).reply(200, users)
         mockAxios.onDelete(`/api/users/1`).reply(200, { id: '1' })
 
         const { container } = render(
@@ -50,19 +52,21 @@ describe('User component', () => {
         let table
         await waitFor(() => {
             table = container.querySelector('table')
+            expect(table).toBeTruthy()
         })
-        expect(table).toBeTruthy()
+
 
         const tbody = container.querySelector('tbody')
-        const row1 = tbody.childNodes[0]
-        const row1Delete = row1.childNodes[4].firstChild
+        const row1 = tbody.firstChild
+        const row1Delete = row1.lastChild.firstChild
 
         window.confirm = jest.fn(() => true)
 
-        await waitFor(() => {
-            fireEvent.click(row1Delete)
-        })
+        users.users  = users.users.filter(e => e.id === '1')
+        fireEvent.click(row1Delete)
 
-        expect(tbody.childNodes.length).toBe(1)
+        await waitFor(() => {
+            expect(tbody.childNodes.length).toBe(1)
+        })
     });
 });
