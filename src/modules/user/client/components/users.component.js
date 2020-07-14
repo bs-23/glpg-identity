@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { LinkContainer } from 'react-router-bootstrap';
 import { getUsers, deleteUser } from '../user.actions';
+import { useToasts } from 'react-toast-notifications';
 
 export default function Users() {
     const dispatch = useDispatch();
@@ -17,6 +18,8 @@ export default function Users() {
         dispatch(getUsers(page, country));
     }
 
+    const { addToast } = useToasts();
+
     useEffect(() => {
         getUserList();
     }, []);
@@ -24,6 +27,11 @@ export default function Users() {
     const onDeleteUser = id => {
         if (confirm("Are you sure?")) {
             dispatch(deleteUser(id)).then(res => {
+                addToast("User deleted successfully", {
+                    appearance: 'error',
+                    autoDismiss: true
+                });
+
                 getUserList();
             });
         }
@@ -120,6 +128,7 @@ export default function Users() {
                         {userdata['users'] && userdata['users'].length === 0 &&
                             <>No users found!</>
                         }
+
                     </div>
                 </div>
             </div>

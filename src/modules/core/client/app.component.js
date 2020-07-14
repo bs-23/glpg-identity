@@ -17,6 +17,8 @@ import HcpRoutes from "../../hcp/client/hcp.routes";
 import ForgotPassword from '../../user/client/components/forgot-password.component';
 import ResetPasswordForm from '../../user/client/components/reset-password.component';
 
+import { ToastProvider, useToasts } from 'react-toast-notifications';
+
 export default function App() {
     const dispatch = useDispatch();
 
@@ -25,20 +27,24 @@ export default function App() {
     }, []);
 
     return (
-        <Switch>
-            <PublicRoute path="/login" component={Login} />
+        <ToastProvider>
+            <Switch>
 
-            <PrivateRoute exact path="/" component={Dashboard} />
+                <PublicRoute path="/login" component={Login} />
 
-            <Route path="/users" component={UserRoutes} />
+                <PrivateRoute exact path="/" component={Dashboard} />
 
-            <Route path="/hcps" component={HcpRoutes} />
+                <Route path="/users" component={UserRoutes} />
 
-            <Route path="/reset-password" component={ResetPasswordForm} />
+                <Route path="/hcps" component={HcpRoutes} />
 
-            <Route path="/forgot-password" component={ForgotPassword} />
+                <Route path="/reset-password" component={ResetPasswordForm} />
 
-            <Route component={NoMatch} />
-        </Switch>
+                <Route path="/forgot-password" component={ForgotPassword} />
+
+                <Route component={NoMatch} />
+
+            </Switch>
+        </ToastProvider>
     );
 }
