@@ -1,5 +1,6 @@
 const path = require('path');
 const async = require('async');
+const uniqueSlug = require('unique-slug');
 
 async function init() {
     const config = require(path.join(process.cwd(), 'src/config/server/config'));
@@ -63,9 +64,19 @@ async function init() {
         const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, "").replace(/ +/g, "-");
         
         const all_consents = consents.map( consent => {
+            if(consent.title.length > 50){
+                const code = uniqueSlug(consent.title);
+                let new_title = consent.title.substring(0, 50);
+                new_title += ` ${code}`;
+                const slug = convertToSlug(new_title);
+                return { ...consent, slug };
+            }
+
             const slug = convertToSlug(consent.title);
             return { ...consent, slug };
         });
+
+        // console.log("======================>", all_consents);
 
         Consent.destroy({ truncate: true }).then(() => {
             Consent.bulkCreate(all_consents, {
