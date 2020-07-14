@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { NavLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import { useToasts } from 'react-toast-notifications';
 
 import { getUsers, deleteUser } from '../user.actions';
 
@@ -8,13 +9,23 @@ export default function Users() {
     const dispatch = useDispatch();
 
     const users = useSelector(state => state.userReducer.users);
+    const hasError= useSelector(state => state.userReducer.hasError);;
+    const { addToast } = useToasts();
 
     useEffect(() => {
-        dispatch(getUsers());
+        dispatch(getUsers())
+        .catch(error => {
+             if(error.response.status === 403) {
+                addToast("You are not authorized to view this content", {
+                    appearance: 'error',
+                    autoDismiss: true
+                });
+             }
+        });
     }, []);
 
     const onDeleteUser = id => {
-        if(confirm("Are you sure?")) {
+        if (confirm("Are you sure?")) {
             dispatch(deleteUser(id));
         }
     };
@@ -48,7 +59,7 @@ export default function Users() {
                                 <thead className="bg-light">
                                     <tr>
                                         <th>Name</th>
-                                        <th>Email</th>
+                                        <th>Email</th>    
                                         <th>Phone</th>
                                         <th>Application</th>
                                         <th>Action</th>
@@ -68,7 +79,7 @@ export default function Users() {
                             </table>
                         }
 
-                        { users.length === 0 &&
+                        {users.length === 0 && !hasError &&
                             <>No users found!</>
                         }
                     </div>

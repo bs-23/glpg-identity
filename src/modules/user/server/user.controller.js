@@ -2,6 +2,7 @@ const path = require('path');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const User = require('./user.model');
+const UserPermission = require('./user-permission.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
@@ -108,7 +109,6 @@ async function createUser(req, res) {
                 password,
                 phone,
                 countries,
-                permissions,
                 application_id,
                 created_by: req.user.id,
                 updated_by: req.user.id,
@@ -120,6 +120,16 @@ async function createUser(req, res) {
             return res.sendStatus(400);
         }
 
+        permissions.forEach(async function(permissionId){
+
+            await UserPermission.create({
+                permissionId: permissionId,
+                userId: doc.id,
+                created_by: req.user.id,
+                updated_by: req.user.id,
+            });
+
+        });
         const logData = {
             event_time: Date(),
             event_type: 'CREATE',

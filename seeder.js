@@ -11,13 +11,18 @@ async function init() {
 
     await sequelize.cdpConnector.query('CREATE SCHEMA IF NOT EXISTS ciam');
 
+
     const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
     const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
+    const UserPermission = require(path.join(process.cwd(), "src/modules/user/server/user-permission.model"));
+    const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
+    const { Modules } = require(path.join(process.cwd(), 'src/modules/user/server/authorization/modules.constant'));
     require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model'));
     require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_profile.model'));
     require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
     require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
+
 
     await sequelize.cdpConnector.sync();
 
@@ -33,6 +38,8 @@ async function init() {
         });
     }
 
+
+
     function userSeeder(callback) {
         User.findOrCreate({
             where: { email: "admin@glpg-cdp.com" }, defaults: {
@@ -44,6 +51,47 @@ async function init() {
             callback();
         });
     }
+
+    function permissionSeeder(callback) {
+        const permissions = [
+
+            { "module": Modules.USER.value, "status": "active", "title": Modules.USER.title, "created_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385", "updated_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385" },
+            { "module": Modules.HCP.value, "status": "active", "title": Modules.HCP.title, "created_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385", "updated_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
+        ];
+
+
+        Permission.destroy({ truncate:  { cascade: true } }).then(() => {
+            Permission.bulkCreate(permissions, {
+                returning: true,
+                ignoreDuplicates: false
+            }).then(function () {
+                callback();
+            });
+        });
+    }
+    function userPermissionSeeder(callback) {
+        const admin = User.findOne({ where: { email: "admin@glpg-cdp.com" } });
+        const userPermission = Permission.findOne({ where: { module: "user" } });
+        const hcpPermission = Permission.findOne({ where: { module: "hcp" } });
+        Promise.all([admin, userPermission, hcpPermission]).then((values) => {
+            const userPermissions = [
+
+                { "userId": values[0].id, "permissionId": values[1].id, "created_by": values[0].id, "updated_by": values[0].id },
+                { "userId": values[0].id, "permissionId": values[2].id,  "created_by": values[0].id, "updated_by": values[0].id }
+            ];
+
+            UserPermission.destroy({ truncate: true }).then(() => {
+                UserPermission.bulkCreate(userPermissions, {
+                    returning: true,
+                    ignoreDuplicates: false
+                }).then(function () {
+                    callback();
+                });
+            });
+        });
+
+    }
+
 
     function consentSeeder(callback) {
         const consents = [
@@ -62,7 +110,7 @@ async function init() {
         ];
 
         const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, "").replace(/ +/g, "-");
-        
+
         const all_consents = consents.map( consent => {
             if(consent.title.length > 50){
                 const code = uniqueSlug(consent.title);
@@ -88,7 +136,7 @@ async function init() {
         });
     }
 
-    async.waterfall([applicationSeeder, userSeeder, consentSeeder], function (err) {
+    async.waterfall([applicationSeeder, userSeeder, consentSeeder, permissionSeeder,userPermissionSeeder], function (err) {
         if (err) console.error(err);
         else console.info("DB seed completed!");
         process.exit();

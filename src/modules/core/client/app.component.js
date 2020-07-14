@@ -16,6 +16,7 @@ import UserRoutes from "../../user/client/user.routes";
 import HcpRoutes from "../../hcp/client/hcp.routes";
 import ForgotPassword from '../../user/client/components/forgot-password.component';
 import ResetPasswordForm from '../../user/client/components/reset-password.component';
+import { ToastProvider} from 'react-toast-notifications';
 
 export default function App() {
     const dispatch = useDispatch();
@@ -25,6 +26,7 @@ export default function App() {
     }, []);
 
     return (
+        <ToastProvider>
         <Switch>
             <PublicRoute path="/login" component={Login} />
 
@@ -40,5 +42,6 @@ export default function App() {
 
             <Route component={NoMatch} />
         </Switch>
+        </ToastProvider>
     );
 }
