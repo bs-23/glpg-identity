@@ -17,7 +17,7 @@ import HcpRoutes from "../../hcp/client/hcp.routes";
 import ForgotPassword from '../../user/client/components/forgot-password.component';
 import ResetPasswordForm from '../../user/client/components/reset-password.component';
 
-import { ToastProvider, useToasts } from 'react-toast-notifications';
+import { ToastProvider } from 'react-toast-notifications';
 
 export default function App() {
     const dispatch = useDispatch();
