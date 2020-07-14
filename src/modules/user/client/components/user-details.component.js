@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from 'react';
+import { NavLink, useHistory } from 'react-router-dom';
 
 const UserDetails = (props) => {
     const [userInfo, setUserInfo] = useState({});
@@ -16,40 +17,39 @@ const UserDetails = (props) => {
     }, [props]);
 
     return (
-        <div>
-            <h4 style={{margin: '5%'}}>Profile Details</h4>
-            
-            <div style={{marginLeft: '15%'}}>
-                <h4>{userInfo.name}</h4>
-                <p>{userInfo.email}</p>
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-                <div>
-                    <h5>Name</h5>
-                    <p>{userInfo.name}</p>
-
-                    <h5>Email</h5>
-                    <p>{userInfo.email}</p>
+        <main className="app__content">
+            <div className="container-fluid">
+                <div className="row">
+                    <div className="col-12 px-0">
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb rounded-0">
+                                <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
+                                <li className="breadcrumb-item"><NavLink to="/users">User Management</NavLink></li>
+                                <li className="breadcrumb-item"><NavLink to="/users/list">User List</NavLink></li>
+                                <li className="breadcrumb-item active">Profile Details</li>
+                            </ol>
+                        </nav>
+                    </div>
                 </div>
-
-                <div>
-                    <h5>Phone Number</h5>
-                    <p>{userInfo.phone}</p>
-
-                    <h5>Land Number</h5>
-                    <p> NaN</p>
-                </div>
-
-                <div>
-                    <h5>Last Login</h5>
-                    <p>{userInfo.last_login}</p>
-
-                    <h5>Status</h5>
-                    <p>Active</p>
+                <div className="row">
+                    <div className="col-12 col-sm-6">
+                        <h4>Profile Details</h4>
+                        <div className="profile-detail p-3">
+                            <h3>{userInfo.name}</h3>
+                            <ul className="list-group list-group-flush">
+                                <li className="list-group-item bg-transparent px-0"><strong className="mr-2">Email</strong><span>{userInfo.email}</span></li>
+                                <li className="list-group-item bg-transparent px-0"><strong className="mr-2">Phone Number</strong><span>{userInfo.phone}</span></li>
+                                <li className="list-group-item bg-transparent px-0"><strong className="mr-2">Land Number</strong><span>NaN</span></li>
+                                <li className="list-group-item bg-transparent px-0"><strong className="mr-2">Last Login</strong><span>{userInfo.last_login}</span></li>
+                                <li className="list-group-item bg-transparent px-0"><strong className="mr-2">Status</strong><span>Active</span></li>
+                            </ul>
+                            
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </main>
+        
     );
 }
  
