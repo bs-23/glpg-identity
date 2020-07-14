@@ -420,15 +420,13 @@ async function getSpecialties(req, res) {
 }
 
 async function getAccessToken(req, res) {
-    const response = {
-        data: {},
-        errors: []
-    };
+    const response = new Response({}, []);
 
     try {
         const { email, password } = req.body;
 
         if(!email) {
+            response.errors.push(new CustomError('Email is required.', 'email'));
             response.errors.push({
                 field: 'email',
                 message: 'Email is required.'
@@ -436,10 +434,7 @@ async function getAccessToken(req, res) {
         }
 
         if(!password) {
-            response.errors.push({
-                field: 'password',
-                message: 'Password is required.'
-            });
+            response.errors.push(new CustomError('Password is required.', 'password'));
         }
 
         if (!email || !password) {
@@ -449,10 +444,7 @@ async function getAccessToken(req, res) {
         const doc = await Hcp.findOne({ where: { email } });
 
         if (!doc || !doc.validPassword(password)) {
-            response.errors.push({
-                message: 'Invalid email or password.'
-            });
-
+            response.errors.push(new CustomError('Invalid email or password.'));
             return res.status(401).json(response);
         }
 
@@ -465,7 +457,8 @@ async function getAccessToken(req, res) {
 
         res.json(response);
     } catch (err) {
-        res.status(500).send(err);
+        response.errors.push(new CustomError(err.message, '', '', err));
+        res.status(500).send(response);
     }
 }
 

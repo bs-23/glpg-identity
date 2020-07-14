@@ -325,6 +325,7 @@ paths:
                                     type: string
             responses:
                 200:
+                    description: The request has succeeded.
                     content:
                         applicaiton/json:
                             schema:
@@ -344,6 +345,18 @@ paths:
                                     errors:
                                         type: array
                                         example: []
+                400:
+                    description: Invalid request.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+                401:
+                    description: Invalid email or password.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
 
 components:
     schemas:
