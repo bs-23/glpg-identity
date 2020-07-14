@@ -1,0 +1,31 @@
+.cdp {
+    &-btn {
+        &-primary {
+            background-color: $primary-color;
+            font-weight: 500;
+
+            &:hover,
+            &:active,
+            &:focus {
+                background-color: $primary-color-light !important;
+                border-color: $primary-color-light !important;
+            }
+        }
+
+        &-secondary {
+            background-color: $secondary-color;
+            font-weight: 500;
+
+            &:hover,
+            &:active,
+            &:focus {
+                background-color: $secondary-color-light !important;
+                border-color: $secondary-color-light !important;
+            }
+        }
+    }
+
+    &-light-bg {
+        background: $light-bg-color;
+    }
+}
