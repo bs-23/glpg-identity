@@ -72,4 +72,53 @@ describe('User component', () => {
             expect(tbody.childNodes.length).toBe(1)
         })
     });
+
+    it('Should filter users based on country', async () => {
+        const conuntries = ["null", "Ireland","Netherlands","Luxembourg"]
+
+        const data = {
+            users: [
+                { id: '1', name: 'John', email: 'email@gmail.com', country: 'Ireland' },
+                { id: '2', name: 'Smith', email: 'email2@gmail.com', country: 'Netherlands' },
+                { id: '3', name: 'Carl', email: 'email3@gmail.com', country: 'Luxembourg' },
+                { id: '4', name: 'Johnson', email: 'email4@gmail.com', country: 'Luxembourg' }
+            ]
+        }
+
+        conuntries.forEach(country => {
+            const response = {...data}
+            const { users: allUsers } = response
+            if(country !== 'null') response.users = allUsers.filter(user => user.country === country)
+            mockAxios.onGet(`/api/users?page=${1}&country=${country}`).reply(200, response)
+        })
+
+        const { container, getByText } = render(
+            <Provider store={store}>
+                <MemoryRouter>
+                    <ToastProvider>
+                        <Users />
+                    </ToastProvider>
+                </MemoryRouter>
+            </Provider>
+        );
+
+        let table
+        await waitFor(() => {
+            table = container.querySelector('table')
+            expect(table).toBeTruthy()
+        })
+
+        const tbody = container.querySelector('tbody')
+        expect(tbody.childNodes.length).toBe(4)
+
+        const filter_button = getByText('Filter')
+        fireEvent.click(filter_button)
+
+        const ireland = getByText('Luxembourg')
+        fireEvent.click(ireland)
+
+        await waitFor(() => {
+            expect(tbody.childNodes.length).toBe(2)
+        })
+    });
 });
