@@ -1,6 +1,8 @@
 .cdp-list-group {
     $this: cdp-list-group;
 
+    background: $light-bg-color;
+
     &__link {
         text-decoration: none !important;
 
@@ -8,7 +10,7 @@
             background-color: #ddd;
 
             .cdp-list-group__link-title {
-                text-decoration: underline;
+                text-decoration: none;
             }
         }
     }
@@ -20,6 +22,7 @@
     &__link-title {
         color: $primary-color;
         font-weight: bold;
+        text-decoration: underline;
     }
 
     &__link-description {

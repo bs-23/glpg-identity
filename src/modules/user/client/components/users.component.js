@@ -44,8 +44,8 @@ export default function Users() {
                         </div>
 
                         { users.length > 0 &&
-                            <table className="table">
-                                <thead className="table-secondary">
+                            <table className="table table-sm">
+                                <thead className="bg-light">
                                     <tr>
                                         <th>Name</th>
                                         <th>Email</th>
