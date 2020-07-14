@@ -9,6 +9,8 @@ components:
                     type: string
                 errorCode:
                     type: string
+                stackTrace:
+                    type: object
         errorResponse:
             type: object
             properties:
@@ -18,3 +20,6 @@ components:
                     type: array
                     items:
                         $ref: "#/components/schemas/error"
+        errorBodyInSuccess:
+            type: array
+            example: []

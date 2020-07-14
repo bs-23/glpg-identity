@@ -24,6 +24,8 @@ describe('Consent Routes', () => {
             .set('Authorization', `bearer ${defaultApplication.access_token}`)
 
         expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('data');
+        expect(response.body.errors).toHaveLength(0);
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
 });
