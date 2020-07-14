@@ -18,9 +18,9 @@ beforeAll(async () => {
 });
 
 describe('Consent Routes', () => {
-    it('Should get all consents by country iso2', async () => {
+    it('Should get all consents by country code with language code', async () => {
         const response = await request
-            .get(`/api/consents?country_iso2=${demoConsent.country_iso2}`)
+            .get(`/api/consents?country_lang=${demoConsent.country_iso2}_${demoConsent.language_code}`)
             .set('Authorization', `bearer ${defaultApplication.access_token}`)
 
         expect(response.statusCode).toBe(200);

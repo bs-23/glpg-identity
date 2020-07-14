@@ -87,6 +87,7 @@ module.exports = {
             category: 'mc',
             category_title: "Medical Consent",
             country_iso2: 'NL',
+            language_code: 'en',
         },
     },
 };
