@@ -427,7 +427,7 @@ async function getAccessToken(req, res) {
 
         const doc = await Hcp.findOne({ where: { email } });
 
-        if (!doc || !doc.validPassword(password)) {
+        if (!doc || !doc.password || !doc.validPassword(password)) {
             response.errors.push({
                 message: 'Invalid email or password.'
             });
