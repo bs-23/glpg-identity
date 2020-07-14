@@ -17,7 +17,12 @@ paths:
                     content:
                         applicaiton/json:
                             schema:
-                                $ref: "#/components/schemas/consentsForCountry"
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/consentsForCountry"
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
                 401:
                     description: User is not authenticated.
 
@@ -41,6 +46,8 @@ components:
                 category_title:
                     type: string
                 country_iso2:
+                    type: string
+                purpose:
                     type: string
         consentsForCountry:
             type: object
