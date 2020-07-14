@@ -102,7 +102,7 @@ export default function UserForm() {
                                                 <div className="form-group">
                                                     <label htmlFor="permissions">Grant Permissions:</label>
                                                     <Field data-testid="permission" as="select" name="permissions" className="form-control" multiple>
-                                                        {permissions.map(item => <option key={item.id} value={item.id}>{item.module}</option>)}
+                                                        {permissions.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
                                                     </Field>
                                                 </div>
                                                 <div className="form-group">

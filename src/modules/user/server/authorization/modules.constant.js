@@ -1,6 +1,12 @@
 const Modules = {
-    USER: 'User Management',
-    HCP: 'Information Management'
+    USER: {
+        value: 'user',
+        title: 'User Management',
+    },
+    HCP: {
+        value: 'hcp',
+        title: 'Information Management',
+    }
   }
 
   module.exports = {

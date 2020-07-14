@@ -59,7 +59,7 @@ export default function Users() {
                                 <thead className="bg-light">
                                     <tr>
                                         <th>Name</th>
-                                        <th>Email</th>
+                                        <th>Email</th>    
                                         <th>Phone</th>
                                         <th>Application</th>
                                         <th>Action</th>
