@@ -64,7 +64,7 @@ async function login(req, res) {
             return res.status(401).send('Invalid email or password.');
         }
 
-        if(user.type === 'basic' && user.expiary_date <= new Date()){
+        if (user.type === 'basic' && user.expiary_date <= new Date()) {
             await user.update({ status: 'inactive' })
             return res.status(401).send('Expired')
         }
@@ -172,10 +172,50 @@ async function deleteUser(req, res) {
 }
 
 async function getUsers(req, res) {
-    try {
-        const users = await User.findAll({ where: { type: 'basic' } });
 
-        res.json(users);
+    const page = req.query.page ? req.query.page - 1 : 0;
+    if (page < 0) return res.status(404).send("page must be greater or equal 1");
+
+    const limit = 2;
+    const country = req.query.country === 'null' ? null : req.query.country;
+    const offset = page * limit;
+
+    try {
+
+        const users = await User.findAll(
+            {
+                where: {
+                    type: 'basic',
+                    countries: country ? { [Op.contains]: [country] } : { [Op.ne]: ["undefined"] }
+                },
+                offset,
+                limit,
+                order: [
+                    ['created_at', 'ASC'],
+                    ['id', 'ASC']
+                ]
+            });
+
+        const totalUser = await User.count({
+            where: {
+                type: 'basic',
+                countries: country ? { [Op.contains]: [country] } : { [Op.ne]: ["undefined"] }
+            },
+        });
+
+        const data = {
+            users: users,
+            page: page + 1,
+            limit: limit,
+            total: totalUser,
+            start: limit * page + 1,
+            end: offset + limit > totalUser ? totalUser : offset + limit,
+            country: country ? country : null
+        };
+
+
+        res.json(data);
+
     } catch (err) {
         res.status(500).send(err);
     }
@@ -199,6 +239,7 @@ async function getUser(req, res) {
         res.status(500).send(err);
     }
 }
+
 
 async function sendPasswordResetLink(req, res) {
     try {
@@ -290,20 +331,6 @@ async function resetPassword(req, res) {
     }
 }
 
-async function filterUsersByCountry(req, res) {
-    const { country } = req.query;
-    try {
-        const users = await User.findAll({
-            where: { countries: { [Op.contains]: [country] } },
-            attributes: { exclude: ['password', 'created_by', 'updated_by'] },
-        });
-
-        res.json(users);
-
-    } catch (err) {
-        res.status(500).send(err);
-    }
-}
 
 exports.login = login;
 exports.logout = logout;
@@ -315,4 +342,3 @@ exports.getUsers = getUsers;
 exports.getUser = getUser;
 exports.sendPasswordResetLink = sendPasswordResetLink;
 exports.resetPassword = resetPassword;
-exports.filterUsersByCountry = filterUsersByCountry;
