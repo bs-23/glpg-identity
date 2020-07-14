@@ -24,9 +24,18 @@ paths:
                     content:
                         applicaiton/json:
                             schema:
-                                $ref: "#/components/schemas/hcpProfile"
-                401:
-                    description: User is not authenticated.
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/hcpProfile"
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+                400:
+                    description: Bad request.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
 
     /api/hcp-profiles:
         post:
@@ -45,9 +54,21 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/hcpProfile"
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/hcpProfile"
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+
                 401:
                     description: User is not authenticated.
+                400:
+                    description: Bad request
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
 
     /api/hcp-profiles/reset-password:
         put:
@@ -70,12 +91,29 @@ paths:
             responses:
                 200:
                     description: The request has succeeded.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        type: string
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
                 401:
                     description: User is not authenticated.
                 404:
                     description: HCP user profile not found.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
                 400:
                     description: Invalid request, password mismatch or invalid token.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
 
     /api/hcp-profiles/forget-password:
         get:
@@ -96,14 +134,23 @@ paths:
                             schema:
                                 type: object
                                 properties:
-                                    password_reset_token:
-                                        type: string
-                                    retention_period:
-                                        type: string
+                                    data:
+                                        type: object
+                                        properties:
+                                            password_reset_token:
+                                                type: string
+                                            retention_period:
+                                                type: string
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
                 401:
                     description: User is not authenticated.
                 404:
                     description: HCP user profile not found.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
 
     /api/hcp-profiles/change-password:
         put:
@@ -119,12 +166,27 @@ paths:
             responses:
                 200:
                     description: The request has succeeded.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        type: string
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
                 401:
-                    description: User is not authenticated.
-                404:
-                    description: HCP user profile not found.
+                    description: Invalid credential.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
                 400:
                     description: Invalid request parameters or password mismatch.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
 
     /api/hcp-profiles/{id}:
         get:
@@ -142,13 +204,22 @@ paths:
                 200:
                     description: The request has succeeded.
                     content:
-                        applicaiton/json:
+                        application/json:
                             schema:
-                                $ref: "#/components/schemas/hcpProfile"
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/hcpProfile"
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
                 401:
                     description: User is not authenticated.
                 404:
                     description: HCP user profile not found.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
         put:
             tags:
                 - hcp-profiles
@@ -179,11 +250,20 @@ paths:
                     content:
                         applicaiton/json:
                             schema:
-                                $ref: "#/components/schemas/hcpProfile"
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/hcpProfile"
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
                 401:
                     description: User is not authenticated.
                 404:
                     description: Hcp user profile not found.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
 
     /api/hcp-profiles/specialties:
         get:
@@ -209,9 +289,12 @@ paths:
                     content:
                         applicaiton/json:
                             schema:
-                                $ref: "#/components/schemas/specialtiesByCountry"
-                401:
-                    description: User is not authenticated.
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/specialtiesByCountry"
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
                 404:
                     description: Specialty not found for country.
                     content:
@@ -242,6 +325,7 @@ paths:
                                     type: string
             responses:
                 200:
+                    description: The request has succeeded.
                     content:
                         applicaiton/json:
                             schema:
@@ -261,6 +345,18 @@ paths:
                                     errors:
                                         type: array
                                         example: []
+                400:
+                    description: Invalid request.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+                401:
+                    description: Invalid email or password.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
 
 components:
     schemas:
@@ -285,10 +381,6 @@ components:
                     type: string
                 status:
                     type: string
-            required:
-                - first_name
-                - last_name
-                - email
         resetHcpPassword:
             type: object
             properties:
@@ -360,12 +452,6 @@ components:
                 cod_description:
                     type: string
         specialtiesByCountry:
-            type: object
-            properties:
-                data:
-                    type: array
-                    items:
-                        $ref: "#/components/schemas/specialty"
-                errors:
-                    type: array
-                    example: []
+            type: array
+            items:
+                $ref: "#/components/schemas/specialty"

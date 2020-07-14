@@ -25,6 +25,7 @@ describe('HCP Routes', () => {
             .set('Authorization', 'bearer ' + defaultApplication.access_token);
 
         expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('data');
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
@@ -34,6 +35,8 @@ describe('HCP Routes', () => {
             .set('Authorization', 'bearer ' + defaultApplication.access_token)
 
         expect(response.statusCode).toBe(404);
+        expect(response.body).toHaveProperty('errors');
+        expect(response.body.errors).toHaveLength(1);
     });
 
     it('Should not change password with invalid credentials', async () => {
@@ -47,6 +50,8 @@ describe('HCP Routes', () => {
             });
 
         expect(response.statusCode).toBe(401);
+        expect(response.body).toHaveProperty('errors');
+        expect(response.body.errors).toHaveLength(1);
     });
 
     it('Should not change password if password and confirm password does not match', async () => {
@@ -60,6 +65,8 @@ describe('HCP Routes', () => {
             });
 
         expect(response.statusCode).toBe(400);
+        expect(response.body).toHaveProperty('errors');
+        expect(response.body.errors).toHaveLength(1);
     });
 
     it('Should change password with valid parameters', async () => {
@@ -73,6 +80,7 @@ describe('HCP Routes', () => {
             });
 
         expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('data');
     });
 
     it('Should create a new HCP profile', async () => {
@@ -91,6 +99,7 @@ describe('HCP Routes', () => {
             });
 
         expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('data');
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
@@ -104,7 +113,7 @@ describe('HCP Routes', () => {
                 email: defaultUser.email
             });
 
-        expect(response.statusCode).toBe(200);
+        expect(response.statusCode).toBe(400);
         expect(response.body).toHaveProperty('errors');
         expect(response.body.errors).toHaveLength(1);
         expect(response.res.headers['content-type']).toMatch('application/json');
@@ -119,7 +128,7 @@ describe('HCP Routes', () => {
                 uuid: faker.random.uuid()
             });
 
-        expect(response.statusCode).toBe(200);
+        expect(response.statusCode).toBe(400);
         expect(response.body).toHaveProperty('errors');
         expect(response.body.errors).toHaveLength(1);
         expect(response.res.headers['content-type']).toMatch('application/json');
@@ -134,6 +143,7 @@ describe('HCP Routes', () => {
             });
 
         expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('data');
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
@@ -147,6 +157,8 @@ describe('HCP Routes', () => {
             });
 
         expect(response.statusCode).toBe(404);
+        expect(response.body).toHaveProperty('errors');
+        expect(response.body.errors).toHaveLength(1);
     });
 
     it('Should edit an HCP user profile for hcp-portal - Edit HCP profile', async () => {
@@ -158,6 +170,7 @@ describe('HCP Routes', () => {
             });
 
         expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('data');
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
@@ -167,6 +180,7 @@ describe('HCP Routes', () => {
             .set('Cookie', [`access_token=${defaultAdmin.access_token}`]);
 
         expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('data');
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
@@ -176,6 +190,7 @@ describe('HCP Routes', () => {
             .set('Authorization', `bearer ${defaultApplication.access_token}`);
 
         expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('data');
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
@@ -185,6 +200,8 @@ describe('HCP Routes', () => {
             .set('Authorization', `bearer ${defaultApplication.access_token}`);
 
         expect(response.statusCode).toBe(400);
+        expect(response.body).toHaveProperty('errors');
+        expect(response.body.errors).toHaveLength(1);
     });
 
     it('Should get "Not Found" status for unknown country code', async () => {
@@ -193,5 +210,7 @@ describe('HCP Routes', () => {
             .set('Authorization', `bearer ${defaultApplication.access_token}`);
 
         expect(response.statusCode).toBe(404);
+        expect(response.body).toHaveProperty('errors');
+        expect(response.body.errors).toHaveLength(1);
     });
 });

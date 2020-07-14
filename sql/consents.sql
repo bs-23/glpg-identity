@@ -8,6 +8,7 @@ CREATE TABLE ciam.consents
     category ciam.enum_consents_category NOT NULL,
     category_title character varying(255) COLLATE pg_catalog."default" NOT NULL,
     country_iso2 character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    language_code character varying(255) COLLATE pg_catalog."default",
     purpose character varying(255) COLLATE pg_catalog."default",
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,

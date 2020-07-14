@@ -3,12 +3,12 @@ paths:
         get:
             tags:
                 - consents
-            summary: Get all consents by country iso2.
+            summary: Get all consents by country code and language code.
             parameters:
-                - name: country_iso2
+                - name: country_lang
                   in: query
                   required: true
-                  description: Country iso2 for which consent is to be returned.
+                  description: Country code and Language code for which consent is to be returned.
                   schema:
                     type: string
             responses:
@@ -17,7 +17,12 @@ paths:
                     content:
                         applicaiton/json:
                             schema:
-                                $ref: "#/components/schemas/consentsForCountry"
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/consentsForCountry"
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
                 401:
                     description: User is not authenticated.
 
@@ -41,6 +46,10 @@ components:
                 category_title:
                     type: string
                 country_iso2:
+                    type: string
+                purpose:
+                    type: string
+                language_code:
                     type: string
         consentsForCountry:
             type: object
