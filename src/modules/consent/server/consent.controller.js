@@ -3,8 +3,8 @@ const Consent = require('./consent.model');
 
 async function getConsents(req, res) {
     try {
-        const { code } = req.query;
-        let [country_iso2, language_code] = code.split('_');
+        const { country_lang } = req.query;
+        let [country_iso2, language_code] = country_lang.split('_');
         language_code = language_code || 'en';
 
         const consents = await Consent.findAll({
@@ -24,7 +24,7 @@ async function getConsents(req, res) {
             },
         });
 
-        const response = { country_iso2: country_iso2.toUpperCase(), language_code: language_code.toUpperCase(), consents };
+        const response = { country_iso2: country_iso2.toUpperCase(), consents };
 
         res.json(response);
     } catch (err) {
