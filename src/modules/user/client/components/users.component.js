@@ -46,7 +46,7 @@ export default function Users() {
                             <ol className="breadcrumb rounded-0">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/users">User Management</NavLink></li>
-                                <li className="breadcrumb-item active">CDP user list</li>
+                                <li className="breadcrumb-item active">User List</li>
                             </ol>
                         </nav>
                     </div>
@@ -54,9 +54,9 @@ export default function Users() {
                 <div className="row">
                     <div className="col-12">
                         <div className="d-flex justify-content-between align-items-center">
-                            <h2>CDP user list</h2>
+                            <h2>CDP User List</h2>
                             <Dropdown className="ml-auto mr-2">
-                                <Dropdown.Toggle variant="secondary" className="mt-2">
+                                <Dropdown.Toggle variant="" className="cdp-btn-secondary text-white btn-sm">
                                     Filter
                             </Dropdown.Toggle>
                                 <Dropdown.Menu>
@@ -75,21 +75,21 @@ export default function Users() {
                                 </Dropdown.Menu>
                             </Dropdown>
 
-                            <NavLink to="/users/create" className="btn btn-primary">
+                            <NavLink to="/users/create" className="btn cdp-btn-primary btn-sm text-white">
                                 Create new user
                             </NavLink>
                         </div>
 
                         {userdata['users'] && userdata['users'].length > 0 &&
                             <React.Fragment>
-                                <table className="table">
-                                    <thead className="table-secondary">
+                            <table className="table table-hover table-sm mb-0">
+                                    <thead className="cdp-light-bg">
                                         <tr>
-                                            <th>Name</th>
-                                            <th>Email</th>
-                                            <th>Account Expiry Date</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
+                                            <th className="py-2">Name</th>
+                                            <th className="py-2">Email</th>
+                                            <th className="py-2">Account Expiry Date</th>
+                                            <th className="py-2">Status</th>
+                                            <th className="py-2">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -104,15 +104,15 @@ export default function Users() {
                                                         <span><i className="fa fa-xs fa-circle text-danger pr-2"></i>Inactive</span>
                                                     }
                                                 </td>
-                                                <td><button onClick={() => onDeleteUser(row.id)} className="btn btn-primary">Delete</button></td>
+                                                <td><button onClick={() => onDeleteUser(row.id)} className="btn btn-outline-danger btn-sm"><i class="far fa-trash-alt mr-2"></i> Delete</button></td>
                                             </tr>
                                         ))}
                                     </tbody>
                                 </table>
-                                <div className="pagination justify-content-end mb-4">
+                            <div className="pagination justify-content-end align-items-center mb-4 border-top pt-3">
                                     {userdata.start + '-' + userdata.end + ' of ' + userdata.total}
-                                    <LinkContainer to={`list?page=${userdata.page - 1}&country=${userdata.country}`}><button className="btn btn-secondary mx-2" onClick={() => pageLeft()} disabled={userdata.page <= 1}>Prev</button></LinkContainer>
-                                    <LinkContainer to={`list?page=${userdata.page + 1}&country=${userdata.country}`}><button className="btn btn-secondary" onClick={() => pageRight()} disabled={userdata.end === userdata.total}>Next</button></LinkContainer>
+                                <LinkContainer to={`list?page=${userdata.page - 1}&country=${userdata.country}`}><button className="btn btn-sm cdp-btn-secondary text-white mx-2" onClick={() => pageLeft()} disabled={userdata.page <= 1}>Prev</button></LinkContainer>
+                                <LinkContainer to={`list?page=${userdata.page + 1}&country=${userdata.country}`}><button className="btn btn-sm cdp-btn-secondary text-white" onClick={() => pageRight()} disabled={userdata.end === userdata.total}>Next</button></LinkContainer>
                                 </div>
                             </React.Fragment>
                         }
