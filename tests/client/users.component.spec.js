@@ -121,4 +121,57 @@ describe('User component', () => {
             expect(tbody.childNodes.length).toBe(2)
         })
     });
+
+    it('Should filter users based on country', async () => {
+        const limit = 2
+        const data = {
+            users: [
+                { id: '1', name: 'John', email: 'email@gmail.com', country: 'Ireland' },
+                { id: '2', name: 'Smith', email: 'email2@gmail.com', country: 'Netherlands' },
+                { id: '3', name: 'Carl', email: 'email3@gmail.com', country: 'Luxembourg' },
+            ],
+            total: 3
+        }
+        const { users } = data
+
+        mockAxios.onGet(`/api/users?page=${1}&country=null`).reply(200, { users: users.slice(0, limit), page: 1,  end: 2 })
+        mockAxios.onGet(`/api/users?page=${2}&country=null`).reply(200, { users: users.slice(limit), page: 2,  end: 3 })
+
+        const { container, getByText, queryByText } = render(
+            <Provider store={store}>
+                <MemoryRouter>
+                    <ToastProvider>
+                        <Users />
+                    </ToastProvider>
+                </MemoryRouter>
+            </Provider>
+        );
+
+        let table
+        await waitFor(() => {
+            table = container.querySelector('table')
+            expect(table).toBeTruthy()
+        })
+
+        const tbody = container.querySelector('tbody')
+        expect(tbody.childNodes.length).toBe(2)
+
+        const next_button = getByText('Next')
+        fireEvent.click(next_button)
+
+        await waitFor(() => {
+            expect(queryByText('Carl')).toBeTruthy()
+            expect(queryByText('John')).toBeFalsy()
+            expect(tbody.childNodes.length).toBe(1)
+        })
+
+        const prev_button = getByText('Prev')
+        fireEvent.click(prev_button)
+
+        await waitFor(() => {
+            expect(queryByText('Carl')).toBeFalsy()
+            expect(queryByText('John')).toBeTruthy()
+            expect(tbody.childNodes.length).toBe(2)
+        })
+    });
 });
