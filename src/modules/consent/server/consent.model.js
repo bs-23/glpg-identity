@@ -32,9 +32,13 @@ const Consent = sequelize.cdpConnector.define('consents', {
     category: {
         allowNull: false,
         type: DataTypes.ENUM,
-        values: ['DM', 'MC', 'GDPR']
+        values: ['dm', 'mc']
     },
-    country_code: {
+    category_title: {
+        allowNull: false,
+        type: DataTypes.STRING
+    },
+    country_iso2: {
         allowNull: false,
         type: DataTypes.STRING
     },

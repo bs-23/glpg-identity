@@ -84,8 +84,9 @@ module.exports = {
             slug: 'Sharing_personal_data_with_3rd_parties',
             type: 'online',
             opt_type: 'single',
-            category: 'MC',
-            country_code: 'BE',
+            category: 'mc',
+            category_title: "Medical Consent",
+            country_iso2: 'NL',
         },
     },
 };

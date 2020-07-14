@@ -6,19 +6,19 @@ const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/
 async function getConsents(req, res) {
     const response = new Response({}, []);
     try {
-        const { country_code } = req.query;
+        const { country_iso2 } = req.query;
         const consents = await Consent.findAll({
             where: {
-                country_code: {
+                country_iso2: {
                     [Op.or]: [
-                        country_code.toUpperCase(),
-                        country_code.toLowerCase(),
+                        country_iso2.toUpperCase(),
+                        country_iso2.toLowerCase(),
                     ],
                 },
             },
         });
 
-        response.data = { country_code: country_code.toUpperCase(), consents };
+        response.data = { country_iso2: country_iso2.toUpperCase(), consents };
 
         res.json(response);
     } catch (err) {
