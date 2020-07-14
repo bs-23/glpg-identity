@@ -37,6 +37,8 @@ async function init() {
         });
     }
 
+
+
     function userSeeder(callback) {
         User.findOrCreate({
             where: { email: "admin@glpg-cdp.com" }, defaults: {
@@ -50,12 +52,10 @@ async function init() {
     }
 
     function permissionSeeder(callback) {
-        console.log(Modules.USER);
         const permissions = [
 
-            { "module": Modules.USER, "status": "active", "created_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385", "updated_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385" },
-            { "module": Modules.HCP, "status": "active", "created_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385", "updated_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385" },
-            { "module": Modules.ALL_Permissions, "status": "active", "created_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385", "updated_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
+            { "module": Modules.USER.value, "status": "active", "title": Modules.USER.title, "created_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385", "updated_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385" },
+            { "module": Modules.HCP.value, "status": "active", "title": Modules.HCP.title, "created_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385", "updated_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
         ];
 
 
@@ -68,7 +68,28 @@ async function init() {
             });
         });
     }
+    function userPermissionSeeder(callback) {
+        const admin = User.findOne({ where: { email: "admin@glpg-cdp.com" } });
+        const userPermission = Permission.findOne({ where: { module: "user" } });
+        const hcpPermission = Permission.findOne({ where: { module: "hcp" } });
+        Promise.all([admin, userPermission, hcpPermission]).then((values) => {
+            const userPermissions = [
 
+                { "userId": values[0].id, "permissionId": values[1].id, "created_by": values[0].id, "updated_by": values[0].id },
+                { "userId": values[0].id, "permissionId": values[2].id,  "created_by": values[0].id, "updated_by": values[0].id }
+            ];
+
+            UserPermission.destroy({ truncate: true }).then(() => {
+                UserPermission.bulkCreate(userPermissions, {
+                    returning: true,
+                    ignoreDuplicates: false
+                }).then(function () {
+                    callback();
+                });
+            });
+        });
+
+    }
 
 
     function consentSeeder(callback) {
@@ -104,7 +125,7 @@ async function init() {
         });
     }
 
-    async.waterfall([applicationSeeder, userSeeder, consentSeeder, permissionSeeder], function (err) {
+    async.waterfall([applicationSeeder, userSeeder, consentSeeder, permissionSeeder,userPermissionSeeder], function (err) {
         if (err) console.error(err);
         else console.info("DB seed completed!");
         process.exit();

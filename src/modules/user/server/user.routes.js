@@ -2,7 +2,7 @@
 const passport = require('passport');
 const controller = require('./user.controller');
 const { Modules } = require('./authorization/modules.constant');
-const { adminPipeline, AuthGuard, ModuleGuard } = require('./authorization/authorization.middleware');
+const {ModuleGuard } = require('./authorization/authorization.middleware');
 
 
 module.exports = app => {
@@ -12,8 +12,8 @@ module.exports = app => {
     app.get('/api/logout', passport.authenticate('user-jwt', { session: false }), controller.logout);
 
     app.route('/api/users')
-        .get(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.USER), controller.getUsers)
-        .post(passport.authenticate('user-jwt', { session: false }), controller.createUser);
+        .get(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.USER.value), controller.getUsers)
+        .post(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.USER.value), controller.createUser);
 
     app.get('/api/users/profile', passport.authenticate('user-jwt', { session: false }), controller.getSignedInUserProfile);
 

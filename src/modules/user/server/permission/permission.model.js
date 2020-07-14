@@ -15,6 +15,9 @@ const Permission = sequelize.cdpConnector.define('permissions', {
         allowNull: false,
         type: DataTypes.STRING
     },
+    title: {
+        type: DataTypes.STRING
+    },
 
     status: {
         type: DataTypes.STRING
