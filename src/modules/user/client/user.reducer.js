@@ -20,6 +20,12 @@ export default function reducer(state = initialState, action) {
                 users: action.payload.data
             };
         }
+        case Types.GET_USERS_REJECTED: {
+            return {
+                ...state,
+                hasError: true
+            };
+        }
         case Types.DELETE_USER_FULFILLED: {
             return {
                 ...state,

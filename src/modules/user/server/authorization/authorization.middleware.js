@@ -17,7 +17,7 @@ const AuthGuard = passport.authenticate('user-jwt', { session: false });
 const isPermitted = (module, userPermission) => {
 
 
-    if(userPermission.some(element =>element.permission.module === module || element.permission.module === Modules.ALL_Permissions )) {
+    if(userPermission.some(element =>element.permission.module === module )) {
         return true;
     } else {
         return false;

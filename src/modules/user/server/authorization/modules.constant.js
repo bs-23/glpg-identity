@@ -1,7 +1,6 @@
 const Modules = {
-    USER: 'user',
-    HCP: 'hcp',
-    ALL_Permissions: 'all_permission'
+    USER: 'User Management',
+    HCP: 'Information Management'
   }
 
   module.exports = {

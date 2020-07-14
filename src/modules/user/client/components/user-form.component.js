@@ -5,14 +5,10 @@ import React, { useState, useEffect } from 'react';
 import { Form, Formik, Field, ErrorMessage } from "formik";
 import { createUser } from "../user.actions";
 import { registerSchema } from "../user.schema";
+import { useToasts } from 'react-toast-notifications';
 
 export default function UserForm() {
-    const permissionList = [
-        { id: 0, value: 'User Management' },
-        { id: 1, value: 'HCP Management' },
-        { id: 2, value: 'Persona Management' },
-        { id: 4, value: 'Email Campaign' }
-    ];
+    const { addToast } = useToasts();
 
     const dispatch = useDispatch();
     const [countries, setCountries] = useState([]);
@@ -72,7 +68,14 @@ export default function UserForm() {
                                                 .then(res => {
                                                     actions.resetForm();
                                                     history.push(`/users/${res.value.data.id}`)
-                                                });
+                                                }) .catch(error => {
+                                                    if(error.response.status === 403) {
+                                                       addToast("You are not authorized to view this content", {
+                                                           appearance: 'error',
+                                                           autoDismiss: true
+                                                       });
+                                                    }
+                                               });
                                             actions.setSubmitting(false);
                                         }}
                                     >
