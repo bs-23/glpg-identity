@@ -27,7 +27,7 @@ async function getConsents(req, res) {
             },
         });
 
-        response.data = { country_iso2: country_iso2.toUpperCase(), consents };
+        response.data = { consents };
 
         res.json(response);
     } catch (err) {

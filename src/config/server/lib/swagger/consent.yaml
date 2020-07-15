@@ -54,8 +54,6 @@ components:
         consentsForCountry:
             type: object
             properties:
-                country_iso2:
-                    type: string
                 consents:
                     type: array
                     items:
