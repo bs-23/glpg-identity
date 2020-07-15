@@ -56,7 +56,7 @@ async function getHcps(req, res) {
 
     try {
         const page = req.query.page ? req.query.page - 1 : 0;
-        const limit = 10;
+        const limit = 20;
         const status = req.query.status === 'null' ? null : req.query.status;
         const offset = page * limit;
 
@@ -450,9 +450,8 @@ async function getAccessToken(req, res) {
         }
 
         response.data = {
-            uuid: doc.uuid,
-            email: doc.email,
-            access_token: generateAccessToken(doc),
+            ...getHcpViewModel(doc.dataValues),
+            access_token: generateAccessToken(doc.dataValues),
             retention_period: '48 hours'
         }
 

@@ -7,7 +7,7 @@ components:
                     type: string
                 field:
                     type: string
-                errorCode:
+                code:
                     type: string
                 stackTrace:
                     type: object

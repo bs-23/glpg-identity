@@ -6,7 +6,7 @@ const Faq = () => {
     return (
         <React.Fragment>
             <div className="faq h-100 shadow-sm bg-white">
-                <h4 className="faq__header p-3 font-weight-bold mb-0 d-flex justify-content-between">FAQ Hints <i className="far fa-comments"></i></h4>
+                <h4 className="faq__header p-3 font-weight-bold mb-0 d-flex justify-content-between">FAQ Hints <i className="icon icon-help faq__icon-help"></i></h4>
                 <Accordion defaultActiveKey="0">
                     <Card>
                         <Accordion.Toggle as={Card.Header} eventKey="0" className="p-3 d-flex align-items-baseline justify-content-between" role="button">

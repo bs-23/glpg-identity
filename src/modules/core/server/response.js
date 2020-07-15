@@ -6,9 +6,9 @@ class Response {
 }
 
 class CustomError {
-    constructor(message, field, errorCode, stackTrace) {
+    constructor(message, field, code, stackTrace) {
         this.message = message;
-        this.errorCode = errorCode;
+        this.code = code;
         this.field = field;
         this.stackTrace = stackTrace;
     }
