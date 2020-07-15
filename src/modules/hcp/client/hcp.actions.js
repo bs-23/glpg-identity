@@ -1,12 +1,12 @@
 import axios from 'axios';
 import Types from './hcp.types';
 
-export function getHcpProfiles(page, is_active) {
+export function getHcpProfiles(page, status) {
     return {
         type: Types.GET_HCPS,
         payload: axios({
             method: 'get',
-            url: `/api/hcps?page=${page}&is_active=${is_active}`
+            url: `/api/hcps?page=${page}&status=${status}`
         })
     };
 }
