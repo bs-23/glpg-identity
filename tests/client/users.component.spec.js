@@ -55,40 +55,6 @@ describe('Users component', () => {
         expect(signedInProfile).toBeTruthy()
     })
 
-    it('Should render user table and delete one user', async () => {
-        const { container, queryByText } = render(
-            <Provider store={store}>
-                <MemoryRouter>
-                    <ToastProvider>
-                        <Users />
-                    </ToastProvider>
-                </MemoryRouter>
-            </Provider>
-        );
-
-        let table
-        await waitFor(() => {
-            table = container.querySelector('table')
-            expect(table).toBeTruthy()
-            expect(queryByText('John')).toBeTruthy()
-        })
-
-        const tbody = container.querySelector('tbody')
-        const row1 = tbody.firstChild
-        const row1Delete = row1.lastChild.firstChild
-
-        window.confirm = jest.fn(() => true)
-
-        data.users = data.users.filter(user => user.name !== 'John')
-        mockAxios.onGet(`/api/users?page=${1}&country=null`).reply(200, data)
-
-        fireEvent.click(row1Delete)
-
-        await waitFor(() => {
-            expect(queryByText('John')).toBeFalsy()
-        })
-    });
-
     it('Should filter users based on country', async () => {
         const { container, getByText } = render(
             <Provider store={store}>
