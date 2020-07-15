@@ -3,21 +3,16 @@ import { Form, Formik, Field, ErrorMessage } from 'formik';
 import Axios from 'axios';
 import { useHistory, useLocation } from 'react-router-dom';
 import QueryString from 'query-string';
+import { useToasts } from 'react-toast-notifications';
 
 import { resetPasswordSchema } from '../user.schema';
 
-const Alert = ({ type, message }) => (
-    <div className={`alert alert-${type}`} role="alert">
-        {message}
-    </div>
-);
 
 export default function ResetPasswordForm() {
     const history = useHistory();
     const location = useLocation();
     const { token } = QueryString.parse(location.search);
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
+    const { addToast } = useToasts();
 
     return (
         <div className="app-login">
@@ -40,16 +35,21 @@ export default function ResetPasswordForm() {
                                     onSubmit={(values, actions) => {
                                         Axios.put(`/api/users/reset-password?token=${token}`, values)
                                             .then(() => {
-                                                setSuccess('Your password has been reset successfully. Redirecting...');
-                                                setError('');
+                                                addToast('Your password has been reset successfully. Redirecting...', {
+                                                    appearance: 'success',
+                                                    autoDismiss: true
+                                                });
                                                 setTimeout(() => {
                                                     history.replace('/login');
                                                 }, 2000);
                                                 actions.setSubmitting(false);
                                             })
                                             .catch(err => {
-                                                setSuccess('');
-                                                setError(err.response.data);
+                                                const errorMessage = typeof err.response.data === 'string' ? err.response.data : err.response.statusText
+                                                addToast(errorMessage, {
+                                                    appearance: 'error',
+                                                    autoDismiss: true
+                                                });
                                                 actions.setSubmitting(false);
                                             });
                                     }}
@@ -85,9 +85,6 @@ export default function ResetPasswordForm() {
                                                     <ErrorMessage name="confirmPassword" />
                                                 </div>
                                             </div>
-
-                                            {error && <Alert type="danger" message={error} /> }
-                                            {success && <Alert type="success" message={success} />}
 
                                             <button type="submit" className="btn btn-block text-white app-login__btn mt-4 p-2" disabled={formikProps.isSubmitting} >
                                                 Submit

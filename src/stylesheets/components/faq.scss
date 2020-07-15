@@ -1,5 +1,4 @@
 .faq {
-    background: $light-bg-color;
 
     &__header {
         color: $primary-color;
@@ -15,16 +14,31 @@
         border-radius: 0px;
         border: 0px;
         border-bottom: 1px solid rgba(0, 0, 0, 0.125) !important;
-        background: $light-bg-color;
+        position: relative;
+        overflow: hidden;
 
         &-header {
-            background: $light-bg-color;
-            font-weight: bold;
+            font-weight: 600;
+            color: $primary-color;
+            background: inherit;
         }
 
         &-body {
-            background: $light-bg-color;
-            padding-top: 0px;
+            background: #F8F8F8;
+            color: #5F5F5F;
         }
+        /*.collapse {
+            &.show {
+                &:before {
+                    content: " ";
+                    height: 100%;
+                    width: 100%;
+                    position: absolute;
+                    top: 0px;
+                    left: 0px;
+                    background: #F8F8F8;
+                }
+            }
+        }*/
     }
 }

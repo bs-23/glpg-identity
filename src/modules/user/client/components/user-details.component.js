@@ -33,15 +33,15 @@ const UserDetails = (props) => {
                 </div>
                 <div className="row">
                     <div className="col-12 col-sm-6">
-                        <h4>Profile Details</h4>
+                        <h3 className="mb-3">Profile Details</h3>
                         <div className="profile-detail p-3">
-                            <h3>{userInfo.name}</h3>
+                            <h2>{userInfo.name}</h2>
                             <ul className="list-group list-group-flush">
-                                <li className="list-group-item bg-transparent px-0"><strong className="mr-2">Email</strong><span>{userInfo.email}</span></li>
-                                <li className="list-group-item bg-transparent px-0"><strong className="mr-2">Phone Number</strong><span>{userInfo.phone}</span></li>
-                                <li className="list-group-item bg-transparent px-0"><strong className="mr-2">Land Number</strong><span>NaN</span></li>
-                                <li className="list-group-item bg-transparent px-0"><strong className="mr-2">Last Login</strong><span>{userInfo.last_login}</span></li>
-                                <li className="list-group-item bg-transparent px-0"><strong className="mr-2">Status</strong><span>Active</span></li>
+                                <li className="list-group-item bg-transparent px-0"><span className="mr-2">Email:</span><span>{userInfo.email}</span></li>
+                                <li className="list-group-item bg-transparent px-0"><span className="mr-2">Phone Number:</span><span>{userInfo.phone}</span></li>
+                                <li className="list-group-item bg-transparent px-0"><span className="mr-2">Land Number:</span><span>NaN</span></li>
+                                <li className="list-group-item bg-transparent px-0"><span className="mr-2">Last Login:</span><span>{userInfo.last_login}</span></li>
+                                <li className="list-group-item bg-transparent px-0"><span className="mr-2">Status:</span><span>Active</span></li>
                             </ul>
                             
                         </div>
