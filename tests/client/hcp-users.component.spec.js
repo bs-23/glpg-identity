@@ -37,9 +37,9 @@ describe('Hcp user component', () => {
                 { id: '2', first_name: 'b', last_name: 'b', email: 'b', telephone: '2', uuid: '2' }
             ]
         };
-        const page = 1, is_active = null;
-        fakeAxios.onGet(`/api/hcps?page=${page}&is_active=${is_active}`).reply(200, data);
-        await store.dispatch(getHcpProfiles(page, is_active));
+        const page = 1, status = null;
+        fakeAxios.onGet(`/api/hcps?page=${page}&status=${status}`).reply(200, data);
+        await store.dispatch(getHcpProfiles(page, status));
     });
 
     const userSlice = () => store.getState().userReducer;
