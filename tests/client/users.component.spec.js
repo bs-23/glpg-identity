@@ -39,14 +39,14 @@ beforeEach(() => {
     mockAxios.onGet('/api/countries').reply(200, countries)
     mockAxios.onDelete(`/api/users/1`).reply(200, { id: '1' })
     countries.forEach(country => {
-        if(country.countryname === 'null') return
-        const response = {...data}
+        if (country.countryname === 'null') return
+        const response = { ...data }
         const { users: allUsers } = response
         response.users = allUsers.filter(user => user.country === country.countryname)
         mockAxios.onGet(`/api/users?page=${1}&country=${country.countryname}`).reply(200, response)
     })
-    mockAxios.onGet(`/api/users?page=${1}&country=null`).reply(200, { users: data.users.slice(0, limit), page: 1,  end: 3 })
-    mockAxios.onGet(`/api/users?page=${2}&country=null`).reply(200, { users: data.users.slice(limit), page: 2,  end: 5 })
+    mockAxios.onGet(`/api/users?page=${1}&country=null`).reply(200, { users: data.users.slice(0, limit), page: 1, end: 3 })
+    mockAxios.onGet(`/api/users?page=${2}&country=null`).reply(200, { users: data.users.slice(limit), page: 2, end: 5 })
 })
 
 describe('Users component', () => {

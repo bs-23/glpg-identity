@@ -108,7 +108,7 @@ export default function Users() {
                                     <tbody>
                                         {userdata.users.map(row => (
                                             <tr key={row.id}>
-                                                <td><NavLink to={`/users/${row.id}`}>{row.name}</NavLink></td>
+                                                <td>{row.name}</td>
                                                 <td>{row.email}</td>
                                                 <td>{(new Date(row.expiary_date)).toLocaleDateString().replace(/\//g, '-')}</td>
                                                 <td>
@@ -117,7 +117,10 @@ export default function Users() {
                                                         <span><i className="fa fa-xs fa-circle text-danger pr-2"></i>Inactive</span>
                                                     }
                                                 </td>
-                                                <td><button onClick={() => onDeleteUser(row.id)} className="btn btn-outline-danger btn-sm"><i class="far fa-trash-alt mr-2"></i> Delete</button></td>
+                                                <td>
+                                                    <NavLink to={`/users/${row.id}`} className="btn btn-outline-primary btn-sm">Profile Details</NavLink>
+                                                    {/* <button onClick={() => onDeleteUser(row.id)} className="btn btn-outline-danger btn-sm"><i class="far fa-trash-alt mr-2"></i> Delete</button> */}
+                                                </td>
                                             </tr>
                                         ))}
                                     </tbody>

@@ -65,7 +65,7 @@ export default function hcpUsers() {
 
         dispatch(getHcpProfiles(
             params.get('page') ? params.get('page') : 1,
-            params.get('is_active') ? params.get('is_active') : null));
+            params.get('status') ? params.get('status') : null));
     }, []);
 
     return (
