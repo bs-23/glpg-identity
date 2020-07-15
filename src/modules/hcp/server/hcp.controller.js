@@ -450,8 +450,8 @@ async function getAccessToken(req, res) {
         }
 
         response.data = {
-            ...getHcpViewModel(doc),
-            access_token: generateAccessToken(doc),
+            ...getHcpViewModel(doc.dataValues),
+            access_token: generateAccessToken(doc.dataValues),
             retention_period: '48 hours'
         }
 
