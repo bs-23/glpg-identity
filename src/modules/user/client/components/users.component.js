@@ -75,7 +75,7 @@ export default function Users() {
                             <h2>CDP User List</h2>
                             <Dropdown className="ml-auto mr-2">
                                 <Dropdown.Toggle variant="" className="cdp-btn-secondary text-white btn-sm">
-                                    Filter
+                                    Filter by Country
                             </Dropdown.Toggle>
                                 <Dropdown.Menu>
                                     <LinkContainer to="list?page=1"><Dropdown.Item onClick={() => getUserList(1, null)}>None</Dropdown.Item></LinkContainer>
@@ -118,18 +118,22 @@ export default function Users() {
                                                     }
                                                 </td>
                                                 <td>
-                                                    <NavLink to={`/users/${row.id}`} className="btn btn-outline-primary btn-sm">Profile Details</NavLink>
+                                                    <NavLink to={`/users/${row.id}`} className="btn btn-outline-primary btn-sm"><i className="far fa-user-circle pr-1"></i>Profile Details</NavLink>
                                                     {/* <button onClick={() => onDeleteUser(row.id)} className="btn btn-outline-danger btn-sm"><i class="far fa-trash-alt mr-2"></i> Delete</button> */}
                                                 </td>
                                             </tr>
                                         ))}
                                     </tbody>
                                 </table>
-                                <div className="pagination justify-content-end align-items-center mb-4 border-top pt-3">
-                                    {userdata.start + '-' + userdata.end + ' of ' + userdata.total}
-                                    <LinkContainer to={`list?page=${userdata.page - 1}&country=${userdata.country}`}><button className="btn btn-sm cdp-btn-secondary text-white mx-2" onClick={() => pageLeft()} disabled={userdata.page <= 1}>Prev</button></LinkContainer>
-                                    <LinkContainer to={`list?page=${userdata.page + 1}&country=${userdata.country}`}><button className="btn btn-sm cdp-btn-secondary text-white" onClick={() => pageRight()} disabled={userdata.end === userdata.total}>Next</button></LinkContainer>
-                                </div>
+                                {((userdata.page === 1 && userdata['users'] && userdata['users'].length > 19) ||
+                                    (userdata.page > 1 && userdata['users']))
+                                    &&
+                                    < div className="pagination justify-content-end align-items-center mb-4 border-top pt-3">
+                                        {userdata.start + '-' + userdata.end + ' of ' + userdata.total}
+                                        <LinkContainer to={`list?page=${userdata.page - 1}&country=${userdata.country}`}><button className="btn btn-sm cdp-btn-secondary text-white mx-2" onClick={() => pageLeft()} disabled={userdata.page <= 1}>Prev</button></LinkContainer>
+                                        <LinkContainer to={`list?page=${userdata.page + 1}&country=${userdata.country}`}><button className="btn btn-sm cdp-btn-secondary text-white" onClick={() => pageRight()} disabled={userdata.end === userdata.total}>Next</button></LinkContainer>
+                                    </div>
+                                }
                             </React.Fragment>
                         }
 
@@ -140,7 +144,7 @@ export default function Users() {
                     </div>
                 </div>
             </div>
-        </main>
+        </main >
 
     );
 }
