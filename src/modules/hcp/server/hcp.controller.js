@@ -449,8 +449,7 @@ async function getAccessToken(req, res) {
         }
 
         response.data = {
-            uuid: doc.uuid,
-            email: doc.email,
+            ...getHcpViewModel(doc),
             access_token: generateAccessToken(doc),
             retention_period: '48 hours'
         }
