@@ -1,10 +1,12 @@
 const passport = require('passport');
 const controller = require('./hcp.controller');
+const { Modules } = require('../../core/server/authorization/authorization.constants');
+const {ModuleGuard } = require('../../core/server/authorization/authorization.middleware');
 
 
 module.exports = app => {
     app.route('/api/hcps')
-        .get(passport.authenticate('user-jwt', { session: false }), controller.getHcps);
+        .get(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.HCP.value), controller.getHcps);
 
     app.route('/api/hcps/:id')
         .put(passport.authenticate('user-jwt', { session: false }), controller.editHcp);
