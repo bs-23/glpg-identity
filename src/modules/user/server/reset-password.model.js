@@ -21,6 +21,11 @@ const ResetPassword = sequelize.cdpConnector.define('reset_password', {
             isUUID: 4
         }
     },
+    type: {
+        type: DataTypes.ENUM,
+        values: ['set', 'reset'],
+        defaultValue: 'reset'
+    },
     token: {
         unique: true,
         type: DataTypes.STRING

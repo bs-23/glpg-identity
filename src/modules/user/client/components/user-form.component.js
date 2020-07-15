@@ -49,7 +49,6 @@ export default function UserForm() {
                                 initialValues={{
                                     name: "",
                                     email: "",
-                                    password: "",
                                     countries: [],
                                     permissions: [],
                                     phone: "",
@@ -92,13 +91,6 @@ export default function UserForm() {
                                             </div>
                                         </div>
                                         <div className="row">
-                                            <div className="col-12 col-sm-6">
-                                                <div className="form-group">
-                                                    <label htmlFor="password">Password:</label>
-                                                    <Field data-testid="password" className="form-control" type="password" name="password" autoComplete="current-password" />
-                                                    <div className="invalid-feedback" data-testid="passwordError"><ErrorMessage name="password" /></div>
-                                                </div>
-                                            </div>
                                             <div className="col-12 col-sm-6">
                                                 <div className="form-group">
                                                     <label htmlFor="expiary_date">Expiary Date:</label>

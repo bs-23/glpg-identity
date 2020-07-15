@@ -60,7 +60,7 @@ async function login(req, res) {
         const { email, password } = req.body;
         const user = await User.findOne({ where: { email } });
 
-        if (!user || !user.validPassword(password)) {
+        if (!user || !user.password || !user.validPassword(password)) {
             return res.status(401).send('Invalid email or password.');
         }
 
@@ -90,7 +90,6 @@ async function createUser(req, res) {
     const {
         name,
         email,
-        password,
         phone,
         countries,
         permissions,
@@ -99,13 +98,10 @@ async function createUser(req, res) {
     } = req.body;
 
     try {
-        if (!validatePassword(password)) return res.status(400).send('Invalid password')
-
         const [doc, created] = await User.findOrCreate({
             where: { email },
             defaults: {
                 name,
-                password,
                 phone,
                 countries,
                 permissions,
@@ -121,7 +117,6 @@ async function createUser(req, res) {
         }
 
         const logData = {
-            event_time: Date(),
             event_type: 'CREATE',
             object_id: doc.id,
             table_name: 'users',
@@ -129,6 +124,41 @@ async function createUser(req, res) {
             description: 'Created new CDP user',
         }
         await logService.log(logData)
+
+        const token = crypto.randomBytes(36).toString('hex');
+        const expireAt = Date.now() + 3600000;
+
+        const [resetRequest, reqCreated] = await ResetPassword.findOrCreate({
+            where: { user_id: doc.id },
+            defaults: {
+                token,
+                expires_at: expireAt,
+                type: 'set'
+            }
+        });
+
+        if (!reqCreated && resetRequest) {
+            await resetRequest.update({
+                token,
+                expires_at: expireAt,
+                type: 'set'
+            });
+        }
+
+        const link = `${req.protocol}://${req.headers.host}/reset-password?token=${token}`;
+
+        const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp-password-set.html`);
+        const options = {
+            toAddresses: [doc.email],
+            templateUrl,
+            subject: 'Set a password for your new account on GLPG CDP',
+            data: {
+                name: doc.name || '',
+                link
+            }
+        };
+
+        emailService.send(options);
 
         res.json(doc);
     } catch (err) {
@@ -235,7 +265,6 @@ async function getUser(req, res) {
         res.json(user);
     }
     catch (err) {
-        console.log(err)
         res.status(500).send(err);
     }
 }
@@ -311,19 +340,26 @@ async function resetPassword(req, res) {
 
         user.update({ password: req.body.newPassword });
 
-        await resetRequest.destroy();
-
-        const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp-password-reset.html`);
         const options = {
             toAddresses: [user.email],
-            templateUrl,
-            subject: 'Your password has been reset',
             data: {
                 name: user.name || ''
             }
         };
 
+        if(resetRequest.type === 'set'){
+            options.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp-registration-success.html`);
+            options.subject = 'You have successfully set a password for your Galapagos CDP account'
+            options.data.link = `${req.protocol}://${req.headers.host}/login`
+        }
+        else{
+            options.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp-password-reset.html`);
+            options.subject = 'Your password has been reset'
+        }
+
         emailService.send(options);
+
+        await resetRequest.destroy();
 
         res.sendStatus(200);
     } catch (error) {
