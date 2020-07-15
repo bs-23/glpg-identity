@@ -32,11 +32,12 @@ describe('Hcp user component', () => {
         }));
 
         data = {
-            users: [
-                { id: '1', first_name: 'a', last_name: 'a', email: 'a', telephone: '1', uuid: '1' },
-                { id: '2', first_name: 'b', last_name: 'b', email: 'b', telephone: '2', uuid: '2' }
-            ]
-        };
+            data : {
+                users: [
+                    { id: '1', first_name: 'a', last_name: 'a', email: 'a', telephone: '1', uuid: '1' },
+                    { id: '2', first_name: 'b', last_name: 'b', email: 'b', telephone: '2', uuid: '2' }
+                ]
+        }};
         const page = 1, status = null;
         fakeAxios.onGet(`/api/hcps?page=${page}&status=${status}`).reply(200, data);
         await store.dispatch(getHcpProfiles(page, status));
@@ -63,7 +64,7 @@ describe('Hcp user component', () => {
     })
 
     it('should set hcp users', async () => {
-        expect(hcpUserSlice().hcps).toEqual(data);
+        expect(hcpUserSlice().hcps).toEqual(data.data);
     })
 
     it('should render table', () => {
