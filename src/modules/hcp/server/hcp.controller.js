@@ -60,8 +60,6 @@ async function getHcps(req, res) {
         const status = req.query.status === 'null' ? null : req.query.status;
         const offset = page * limit;
 
-        console.log(Op);
-
         const hcps = await Hcp.findAll({
             where: {
                 status: status === null ? { [Op.or]: ['Approved', 'Pending', 'Rejected', null] } : status
@@ -74,8 +72,6 @@ async function getHcps(req, res) {
                 ['id', 'ASC']
             ]
         });
-
-        console.log(hcps);
 
         const totalUser = await Hcp.count();
 
@@ -90,7 +86,6 @@ async function getHcps(req, res) {
         };
 
         response.data = data;
-        console.log(data);
         res.json(response);
     } catch (err) {
         response.errors.push(new CustomError(err.message, '', '', err));
@@ -455,9 +450,8 @@ async function getAccessToken(req, res) {
         }
 
         response.data = {
-            uuid: doc.uuid,
-            email: doc.email,
-            access_token: generateAccessToken(doc),
+            ...getHcpViewModel(doc.dataValues),
+            access_token: generateAccessToken(doc.dataValues),
             retention_period: '48 hours'
         }
 

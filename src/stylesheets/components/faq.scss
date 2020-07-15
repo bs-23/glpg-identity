@@ -5,8 +5,13 @@
     }
 
     &__icon {
+
         &-down {
             color: $secondary-color;
+        }
+
+        &-help {
+            font-size: 32px;
         }
     }
 
@@ -27,18 +32,5 @@
             background: #F8F8F8;
             color: #5F5F5F;
         }
-        /*.collapse {
-            &.show {
-                &:before {
-                    content: " ";
-                    height: 100%;
-                    width: 100%;
-                    position: absolute;
-                    top: 0px;
-                    left: 0px;
-                    background: #F8F8F8;
-                }
-            }
-        }*/
     }
 }
