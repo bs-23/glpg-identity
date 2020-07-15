@@ -2,7 +2,8 @@ import Types from "./user.types";
 
 const initialState = {
     loggedInUser: null,
-    users: []
+    users: {},
+    deletedUserInfo: {}
 };
 
 export default function reducer(state = initialState, action) {
@@ -29,7 +30,8 @@ export default function reducer(state = initialState, action) {
         case Types.DELETE_USER_FULFILLED: {
             return {
                 ...state,
-                users: state.users.filter(u => u.id !== action.payload.data.id)
+                deletedUserInfo: action.payload.data
+
             }
         }
     }

@@ -1,10 +1,11 @@
 import React from 'react';
-import { render, waitFor, fireEvent } from '@testing-library/react';
+import { render, waitFor, fireEvent, queryByText } from '@testing-library/react';
 import { configure, shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import { Provider } from 'react-redux';
 import axios from 'axios'
 import MockAdapter from 'axios-mock-adapter'
+import { ToastProvider } from 'react-toast-notifications';
 import store from '../../src/modules/core/client/store.js';
 import ForgotPassword from '../../src/modules/user/client/components/forgot-password.component';
 
@@ -13,7 +14,9 @@ configure({ adapter: new Adapter() });
 describe('Forgot password component', () => {
     const wrapperComponent = () => (
             <Provider store={store}>
-                <ForgotPassword />
+                <ToastProvider>
+                    <ForgotPassword />
+                </ToastProvider>
             </Provider>
     );
 
@@ -29,15 +32,15 @@ describe('Forgot password component', () => {
 
         expect(email.value).toEqual('email@gmail.com');
 
-        await waitFor(() => {
-            fireEvent.click(submit);
-        })
+        fireEvent.click(submit);
 
-        expect(email.value).toEqual('');
+        await waitFor(() => {
+            expect(email.value).toEqual('');
+        })
     });
 
     it('Should fill out email, submit and get error response', async () => {
-        const { container, getByText } = render(wrapperComponent());
+        const { container, queryByText } = render(wrapperComponent());
         const email = container.querySelector('input[name="email"]');
         const submit = container.querySelector('button[type="submit"]');
 
@@ -48,10 +51,10 @@ describe('Forgot password component', () => {
 
         expect(email.value).toEqual('email@gmail.com');
 
-        await waitFor(() => {
-            fireEvent.click(submit);
-        })
+        fireEvent.click(submit);
 
-        getByText('Email does not exist')
+        await waitFor(() => {
+            expect(queryByText('Email does not exist')).toBeTruthy()
+        })
     });
 });

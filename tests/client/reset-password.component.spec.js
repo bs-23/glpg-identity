@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import axios from 'axios'
 import MockAdapter from 'axios-mock-adapter'
+import { ToastProvider } from 'react-toast-notifications';
 import store from '../../src/modules/core/client/store.js';
 import ResetPassword from '../../src/modules/user/client/components/reset-password.component';
 
@@ -12,7 +13,9 @@ describe('Reset password component', () => {
     const wrapperComponent = () => (
         <BrowserRouter>
             <Provider store={store}>
-                <ResetPassword />
+                <ToastProvider>
+                    <ResetPassword />
+                </ToastProvider>
             </Provider>
         </BrowserRouter>
     );

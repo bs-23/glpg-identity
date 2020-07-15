@@ -27,21 +27,23 @@ export default function App() {
 
     return (
         <ToastProvider>
-        <Switch>
-            <PublicRoute path="/login" component={Login} />
+            <Switch>
 
-            <PrivateRoute exact path="/" component={Dashboard} />
+                <PublicRoute path="/login" component={Login} />
 
-            <Route path="/users" component={UserRoutes} />
+                <PrivateRoute exact path="/" component={Dashboard} />
 
-            <Route path="/hcps" component={HcpRoutes} />
+                <Route path="/users" component={UserRoutes} />
 
-            <Route path="/reset-password" component={ResetPasswordForm} />
+                <Route path="/hcps" component={HcpRoutes} />
 
-            <Route path="/forgot-password" component={ForgotPassword} />
+                <Route path="/reset-password" component={ResetPasswordForm} />
 
-            <Route component={NoMatch} />
-        </Switch>
+                <Route path="/forgot-password" component={ForgotPassword} />
+
+                <Route component={NoMatch} />
+
+            </Switch>
         </ToastProvider>
     );
 }

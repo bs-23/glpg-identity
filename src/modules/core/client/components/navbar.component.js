@@ -7,13 +7,15 @@ export default function Navbar() {
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
 
     return (
-        <header className="app__header bg-success py-2 shadow-sm">
+        <header className="app__header py-1 shadow-sm">
             <div className="container-fluid">
                 <div className="row align-items-center">
                     <div className="col-12 col-sm-6">
                         <div className="d-flex">
-                            <h1 className="mb-0 text-white mr-5">CDP</h1>
-                            <Dropdown>
+                            <h1 className="text-center">
+                                <a href="/"> <img alt="CIAM logo" src="/assets/CIAM-LOGO.png" height="64" /></a>
+                            </h1>
+                            {/*<Dropdown>
                                 <Dropdown.Toggle variant="secondary" className="mt-2">
                                     Service
                                 </Dropdown.Toggle>
@@ -24,11 +26,12 @@ export default function Navbar() {
                                     <LinkContainer to="#"><Dropdown.Item>Sample Request Management</Dropdown.Item></LinkContainer>
                                     <LinkContainer to="#"><Dropdown.Item>Tag & Persona Management</Dropdown.Item></LinkContainer>
                                 </Dropdown.Menu>
-                            </Dropdown>
+                            </Dropdown>*/}
                         </div>
                     </div>
                     <div className="col-12 col-sm-6 text-right">
-                        <h6 className="mr-3 mb-0 text-white d-inline-block">{loggedInUser.name}</h6><a className="btn btn-danger" href="/api/logout">Logout</a>
+                        <button className="mr-2 btn cdp-btn-secondary text-white"><i class="far fa-user-circle mr-2"></i> {loggedInUser.name}</button>
+                        <a className="btn cdp-btn-outline-primary" href="/api/logout"><i className="fas fa-sign-out-alt mr-2"></i>Logout</a>
                     </div>
                 </div>
             </div>

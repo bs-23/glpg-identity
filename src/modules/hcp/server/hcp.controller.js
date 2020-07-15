@@ -9,6 +9,7 @@ const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequel
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
+const { Op } = require('sequelize');
 
 function generateAccessToken(doc) {
     return jwt.sign({
@@ -54,14 +55,14 @@ async function getHcps(req, res) {
     const response = new Response({}, []);
 
     try {
-        const page = req.query.page - 1;
-        const limit = 10;
-        const status = req.query.is_active === 'null' ? null : req.query.is_active;
+        const page = req.query.page ? req.query.page - 1 : 0;
+        const limit = 20;
+        const status = req.query.status === 'null' ? null : req.query.status;
         const offset = page * limit;
 
         const hcps = await Hcp.findAll({
             where: {
-                status: !status ? ['Approved', 'Pending', 'Rejected'] : status,
+                status: status === null ? { [Op.or]: ['Approved', 'Pending', 'Rejected', null] } : status
             },
             attributes: { exclude: ['password', 'created_by', 'updated_by'] },
             offset,
@@ -176,8 +177,8 @@ async function createHcpProfile(req, res) {
     const response = new Response({}, []);
 
     try {
-        const isEmailExists =  await Hcp.findOne({ where: { email: req.body.email }});
-        const isUUIDExists =  await Hcp.findOne({ where: { uuid: req.body.uuid }});
+        const isEmailExists = await Hcp.findOne({ where: { email: req.body.email } });
+        const isUUIDExists = await Hcp.findOne({ where: { uuid: req.body.uuid } });
 
         if (isEmailExists) {
             response.errors.push(new CustomError('Email already exists.', 'email'));
@@ -193,7 +194,7 @@ async function createHcpProfile(req, res) {
 
         let master_data = null;
 
-        if(req.body.uuid) {
+        if (req.body.uuid) {
             master_data = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwhcpmaster WHERE uuid_1 = $uuid OR uuid_2 = $uuid', {
                 bind: { uuid: req.body.uuid },
                 type: QueryTypes.SELECT
@@ -269,12 +270,13 @@ async function getHcpProfile(req, res) {
 async function changePassword(req, res) {
     const { email, current_password, new_password, confirm_password } = req.body;
 
+    const response = new Response({}, []);
+
     if (!email || !current_password || !new_password || !confirm_password) {
         response.errors.push(new CustomError('Missing required parameters.'));
         return res.status(400).send(response);
     }
 
-    const response = new Response({}, []);
     try {
         const doc = await Hcp.findOne({ where: { email: email } });
 
@@ -316,7 +318,7 @@ async function resetPassword(req, res) {
     try {
         const doc = await Hcp.findOne({ where: { reset_password_token: req.query.token } });
 
-        if(!doc) {
+        if (!doc) {
             response.errors.push(new CustomError('Invalid password reset token.'));
             return res.status(404).send(response);
         }
@@ -348,7 +350,7 @@ async function resetPassword(req, res) {
 
         response.data = 'Password reset successfully.';
         res.send(response);
-    } catch(err) {
+    } catch (err) {
         response.errors.push(new CustomError(err.message, '', '', err));
         res.status(500).send(response);
     }
@@ -359,7 +361,7 @@ async function forgetPassword(req, res) {
     try {
         const doc = await Hcp.findOne({ where: { email: req.query.email } });
 
-        if(!doc) {
+        if (!doc) {
             response.errors.push(new CustomError(`Account doesn't exist`));
             return res.status(404).send(response);
         }
@@ -376,7 +378,7 @@ async function forgetPassword(req, res) {
             retention_period: '1 hour'
         };
         res.json(response);
-    } catch(err) {
+    } catch (err) {
         response.errors.push(new CustomError(err.message, '', '', err));
         res.status(500).send(response);
     }
@@ -425,7 +427,7 @@ async function getAccessToken(req, res) {
     try {
         const { email, password } = req.body;
 
-        if(!email) {
+        if (!email) {
             response.errors.push(new CustomError('Email is required.', 'email'));
             response.errors.push({
                 field: 'email',
@@ -433,7 +435,7 @@ async function getAccessToken(req, res) {
             });
         }
 
-        if(!password) {
+        if (!password) {
             response.errors.push(new CustomError('Password is required.', 'password'));
         }
 
@@ -449,9 +451,8 @@ async function getAccessToken(req, res) {
         }
 
         response.data = {
-            uuid: doc.uuid,
-            email: doc.email,
-            access_token: generateAccessToken(doc),
+            ...getHcpViewModel(doc.dataValues),
+            access_token: generateAccessToken(doc.dataValues),
             retention_period: '48 hours'
         }
 

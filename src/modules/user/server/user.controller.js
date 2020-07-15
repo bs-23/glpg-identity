@@ -85,11 +85,11 @@ async function login(req, res) {
         ]
     });
 
-        if (!user || !user.validPassword(password)) {
+        if (!user || !user.password || !user.validPassword(password)) {
             return res.status(401).send('Invalid email or password.');
         }
 
-        if(user.type === 'basic' && user.expiary_date <= new Date()){
+        if (user.type === 'basic' && user.expiary_date <= new Date()) {
             await user.update({ status: 'inactive' })
             return res.status(401).send('Expired')
         }
@@ -116,7 +116,6 @@ async function createUser(req, res) {
     const {
         name,
         email,
-        password,
         phone,
         countries,
         permissions,
@@ -125,13 +124,10 @@ async function createUser(req, res) {
     } = req.body;
 
     try {
-        if (!validatePassword(password)) return res.status(400).send('Invalid password')
-
         const [doc, created] = await User.findOrCreate({
             where: { email },
             defaults: {
                 name,
-                password,
                 phone,
                 countries,
                 application_id,
@@ -156,7 +152,6 @@ async function createUser(req, res) {
 
         });
         const logData = {
-            event_time: Date(),
             event_type: 'CREATE',
             object_id: doc.id,
             table_name: 'users',
@@ -164,6 +159,41 @@ async function createUser(req, res) {
             description: 'Created new CDP user',
         }
         await logService.log(logData)
+
+        const token = crypto.randomBytes(36).toString('hex');
+        const expireAt = Date.now() + 3600000;
+
+        const [resetRequest, reqCreated] = await ResetPassword.findOrCreate({
+            where: { user_id: doc.id },
+            defaults: {
+                token,
+                expires_at: expireAt,
+                type: 'set'
+            }
+        });
+
+        if (!reqCreated && resetRequest) {
+            await resetRequest.update({
+                token,
+                expires_at: expireAt,
+                type: 'set'
+            });
+        }
+
+        const link = `${req.protocol}://${req.headers.host}/reset-password?token=${token}`;
+
+        const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp-password-set.html`);
+        const options = {
+            toAddresses: [doc.email],
+            templateUrl,
+            subject: 'Set a password for your new account on GLPG CDP',
+            data: {
+                name: doc.name || '',
+                link
+            }
+        };
+
+        emailService.send(options);
 
         res.json(doc);
     } catch (err) {
@@ -207,10 +237,50 @@ async function deleteUser(req, res) {
 }
 
 async function getUsers(req, res) {
-    try {
-        const users = await User.findAll({ where: { type: 'basic' } });
 
-        res.json(users);
+    const page = req.query.page ? req.query.page - 1 : 0;
+    if (page < 0) return res.status(404).send("page must be greater or equal 1");
+
+    const limit = 20;
+    const country = req.query.country === 'null' ? null : req.query.country;
+    const offset = page * limit;
+
+    try {
+
+        const users = await User.findAll(
+            {
+                where: {
+                    type: 'basic',
+                    countries: country ? { [Op.contains]: [country] } : { [Op.ne]: ["undefined"] }
+                },
+                offset,
+                limit,
+                order: [
+                    ['created_at', 'ASC'],
+                    ['id', 'ASC']
+                ]
+            });
+
+        const totalUser = await User.count({
+            where: {
+                type: 'basic',
+                countries: country ? { [Op.contains]: [country] } : { [Op.ne]: ["undefined"] }
+            },
+        });
+
+        const data = {
+            users: users,
+            page: page + 1,
+            limit: limit,
+            total: totalUser,
+            start: limit * page + 1,
+            end: offset + limit > totalUser ? totalUser : offset + limit,
+            country: country ? country : null
+        };
+
+
+        res.json(data);
+
     } catch (err) {
         res.status(500).send(err);
     }
@@ -230,10 +300,10 @@ async function getUser(req, res) {
         res.json(user);
     }
     catch (err) {
-        console.log(err)
         res.status(500).send(err);
     }
 }
+
 
 async function sendPasswordResetLink(req, res) {
     try {
@@ -305,19 +375,26 @@ async function resetPassword(req, res) {
 
         user.update({ password: req.body.newPassword });
 
-        await resetRequest.destroy();
-
-        const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp-password-reset.html`);
         const options = {
             toAddresses: [user.email],
-            templateUrl,
-            subject: 'Your password has been reset',
             data: {
                 name: user.name || ''
             }
         };
 
+        if(resetRequest.type === 'set'){
+            options.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp-registration-success.html`);
+            options.subject = 'You have successfully set a password for your Galapagos CDP account'
+            options.data.link = `${req.protocol}://${req.headers.host}/login`
+        }
+        else{
+            options.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp-password-reset.html`);
+            options.subject = 'Your password has been reset'
+        }
+
         emailService.send(options);
+
+        await resetRequest.destroy();
 
         res.sendStatus(200);
     } catch (error) {
@@ -325,20 +402,6 @@ async function resetPassword(req, res) {
     }
 }
 
-async function filterUsersByCountry(req, res) {
-    const { country } = req.query;
-    try {
-        const users = await User.findAll({
-            where: { countries: { [Op.contains]: [country] } },
-            attributes: { exclude: ['password', 'created_by', 'updated_by'] },
-        });
-
-        res.json(users);
-
-    } catch (err) {
-        res.status(500).send(err);
-    }
-}
 
 exports.login = login;
 exports.logout = logout;
@@ -350,4 +413,3 @@ exports.getUsers = getUsers;
 exports.getUser = getUser;
 exports.sendPasswordResetLink = sendPasswordResetLink;
 exports.resetPassword = resetPassword;
-exports.filterUsersByCountry = filterUsersByCountry;

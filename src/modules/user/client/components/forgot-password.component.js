@@ -1,19 +1,14 @@
 import React, { useState } from 'react';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
+import { useToasts } from 'react-toast-notifications';
 
 import { forgotPasswordSchema } from '../user.schema';
 
 import Axios from 'axios';
 
-const Alert = ({ type, message }) => (
-    <div className={`alert alert-${type}`} role="alert">
-        {message}
-    </div>
-);
 
 export default function ForgotPassword() {
-    const [success, setSuccess] = useState('');
-    const [error, setError] = useState('');
+    const { addToast } = useToasts();
 
     return (
         <div className="app-login">
@@ -25,13 +20,11 @@ export default function ForgotPassword() {
                                 <a href="/login"><img alt="CIAM logo" src="/assets/CIAM-LOGO.png" height="102" /></a>
                             </h1>
                             <h4 className="app-login__header text-center py-3">Forgot Password</h4>
-                           
+
                             <div className="card-body p-4 p-sm-5 border bg-white">
                                 <p className="text-muted">
-                                    Please enter the email you used at the time of
-                                    registration to get the password reset
-                                    instruction
-                            </p>
+                                    Please enter your email address and we will send you a link to reset your password
+                                </p>
                                 <Formik
                                     initialValues={{ email: '' }}
                                     displayName="ForgotPassword"
@@ -39,14 +32,18 @@ export default function ForgotPassword() {
                                     onSubmit={(values, actions) => {
                                         Axios.post('/api/users/forgot-password', values)
                                             .then(() => {
-                                                setError('');
-                                                setSuccess('An email has been sent with further information.');
+                                                addToast('An email has been sent with further information.', {
+                                                    appearance: 'success',
+                                                    autoDismiss: true
+                                                });
                                                 actions.resetForm();
                                             })
                                             .catch(err => {
-                                                setSuccess('');
-                                                setError(typeof err.response.data === 'string' ?
-                                                    err.response.data : err.response.statusText);
+                                                const errorMessage = typeof err.response.data === 'string' ? err.response.data : err.response.statusText
+                                                addToast(errorMessage, {
+                                                    appearance: 'error',
+                                                    autoDismiss: true
+                                                });
                                             })
                                             .finally(() => {
                                                 actions.setSubmitting(false);
@@ -62,9 +59,7 @@ export default function ForgotPassword() {
                                                     <ErrorMessage id="email-error" name="email" />
                                                 </div>
                                             </div>
-                                            {success && <Alert type="success" message={success} />}
-                                            {error && <Alert type="danger" message={error} />}
-                                            <button type="submit" className="btn btn-block text-white app-login__btn mt-4 p-2" > Reset Password </button>
+                                            <button type="submit" className="btn btn-block text-white app-login__btn mt-4 p-2" > Send password reset email </button>
                                         </Form>
                                     )}
                                 </Formik>

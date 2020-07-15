@@ -1,0 +1,30 @@
+@mixin default-space-remove($margin: 0px, $padding: 0px) {
+    margin: $margin;
+    padding: $padding;
+}
+
+@mixin media-check($media-size: $screen-phone, $font-size: inherit) {
+    @media screen and (max-width: $media-size) {
+        font-size: $font-size;
+    }
+}
+
+@mixin debug ($child: false, $debug-color: $danger-color) {
+    border: 1px solid $debug-color;
+
+    @if $child == true {
+        * {
+            border: 1px solid $debug-color;
+        }
+    }
+}
+
+@mixin HEX-to-RGBA ($property, $color, $opacity: 0.3) {
+    #{$property}: rgba($color, $opacity) !important;
+}
+
+@mixin sameValueToMultipleProperties($properties, $value) {
+    @each $property in $properties {
+        #{$property}: $value
+    }
+}
