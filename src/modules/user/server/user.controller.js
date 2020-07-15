@@ -44,8 +44,11 @@ function generateAccessToken(user) {
 }
 
 function getPermissions(userPermission) {
-    const permissions = userPermission.map(up => up.permission.module);
-    return permissions;
+    if(userPermission) {
+        const permissions = userPermission.map(up => up.permission.module);
+        return permissions;
+    }
+
 }
 
 function formatProfile(user) {
