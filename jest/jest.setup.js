@@ -18,6 +18,8 @@ module.exports = async function() {
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
     require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
     require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
+    const Userpermission = require(path.join(process.cwd(), "src/modules/user/server/user-permission.model"));
+    const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
 
     await sequelize.cdpConnector.sync();
 
@@ -26,4 +28,7 @@ module.exports = async function() {
     await User.create(specHelper.users.defaultAdmin);
     await Hcp_profile.create(specHelper.hcp.defaultUser);
     await Consent.create(specHelper.consent.demoConsent);
+    await Permission.bulkCreate(specHelper.permissions, { returning: true, ignoreDuplicates: false })
+    await Userpermission.bulkCreate(specHelper.userPermissions.defaultAdmin, { returning: true, ignoreDuplicates: false })
+    await Userpermission.bulkCreate(specHelper.userPermissions.defaultUser, { returning: true, ignoreDuplicates: false })
 };

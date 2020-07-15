@@ -6,6 +6,7 @@ import { MemoryRouter } from 'react-router-dom';
 import axios from 'axios'
 import MockAdapter from 'axios-mock-adapter'
 import { Provider } from 'react-redux';
+import { ToastProvider } from 'react-toast-notifications';
 import store from '../../src/modules/core/client/store';
 import UserForm from '../../src/modules/user/client/components/user-form.component';
 
@@ -22,7 +23,9 @@ describe('UserForm component', () => {
 
     const wrapperComponent = () => (
         <Provider store={store}>
-            <UserForm/>
+            <ToastProvider>
+                <UserForm />
+            </ToastProvider>
         </Provider>
     );
 
@@ -35,13 +38,17 @@ describe('UserForm component', () => {
         const { getByTestId, getByText, container } = render(
             <Provider store={store}>
                 <MemoryRouter>
-                    <UserForm />
+                    <ToastProvider>
+                        <UserForm />
+                    </ToastProvider>
                 </MemoryRouter>
             </Provider>
         );
 
-        const data = [{ countryid: 1, countryname: 'England'}]
-        mockAxios.onGet('/api/countries').reply(200, data)
+        const countries = [{ countryid: 1, countryname: 'England'}]
+        const permissions = [{ id: 1, title: 'Demo Permission'}]
+        mockAxios.onGet('/api/countries').reply(200, countries)
+        mockAxios.onGet('/api/permissions').reply(200, permissions)
 
         const name = getByTestId('name');
         const email = getByTestId('email');

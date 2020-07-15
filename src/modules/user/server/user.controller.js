@@ -136,7 +136,7 @@ async function createUser(req, res) {
             return res.sendStatus(400);
         }
 
-        permissions.forEach(async function(permissionId){
+        permissions && permissions.forEach(async function(permissionId){
 
             await UserPermission.create({
                 permissionId: permissionId,

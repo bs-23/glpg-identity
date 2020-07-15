@@ -1,6 +1,9 @@
 const faker = require('faker');
 const jwt = require('jsonwebtoken');
 
+const path = require('path')
+const { Modules } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
+
 process.env.CDP_TOKEN_SECRET = 'super-secret-private-key';
 process.env.APPLICATION_TOKEN_SECRET = 'application-token-secret-key';
 const defaultUserId = 'ce2f07f9-c40b-43b8-8200-124de9fc2e46';
@@ -90,4 +93,18 @@ module.exports = {
             language_code: 'en',
         },
     },
+    permissions: [
+        { id: 'c26ec864-c873-4d8b-8cf0-4221b0598780', "module": Modules.USER.value, "status": "active", "title": Modules.USER.title, "created_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385", "updated_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385" },
+        { id: 'ed220478-12ae-45b4-be6a-5e75863ea693', "module": Modules.HCP.value, "status": "active", "title": Modules.HCP.title, "created_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385", "updated_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
+    ],
+    userPermissions: {
+        defaultAdmin: [
+            { "userId": defaultAdminId, "permissionId": 'c26ec864-c873-4d8b-8cf0-4221b0598780', "created_by": defaultAdminId, "updated_by": defaultAdminId },
+            { "userId": defaultAdminId, "permissionId": 'ed220478-12ae-45b4-be6a-5e75863ea693',  "created_by": defaultAdminId, "updated_by": defaultAdminId }
+        ],
+        defaultUser: [
+            { "userId": defaultUserId, "permissionId": 'c26ec864-c873-4d8b-8cf0-4221b0598780', "created_by": defaultAdminId, "updated_by": defaultAdminId },
+            { "userId": defaultUserId, "permissionId": 'ed220478-12ae-45b4-be6a-5e75863ea693',  "created_by": defaultAdminId, "updated_by": defaultAdminId }
+        ]
+    }
 };
