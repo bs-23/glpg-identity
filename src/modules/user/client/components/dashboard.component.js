@@ -23,7 +23,7 @@ export default function Dashboard() {
                                     <li className="col-12 col-sm-4 col-md-2 service__item">
                                         <NavLink to="" className="d-block py-5 px-3 service__link disabled">
                                             <i className="icon icon-marketing-promotion-management d-block service__icon"></i>
-                                            Marketing & Promotion Management
+                                            Consent Management
                                         </NavLink>
                                     </li>
                                     <li className="col-12 col-sm-4 col-md-2 service__item">
