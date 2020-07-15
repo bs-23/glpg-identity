@@ -1,0 +1,38 @@
+.service {
+    &__header {
+        color: $primary-color;
+    }
+
+    &__list {
+    }
+
+    &__item {
+    }
+
+    &__link {
+        background: $white-color;
+        color: $primary-color;
+        font-weight: 600;
+        text-align: center;
+        height: 100%;
+
+        &.disabled {
+            box-shadow: none !important;
+            color: #999 !important;
+            @include HEX-to-RGBA(background-color, $white-color, .5);
+        }
+
+        &:hover {
+            background: $secondary-color;
+            color: $white-color;
+            box-shadow: 0 11px 23px -9px #F69223;
+            text-decoration: none;
+        }
+    }
+
+    &__icon {
+    }
+
+    &__list {
+    }
+}
