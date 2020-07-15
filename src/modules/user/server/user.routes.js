@@ -1,12 +1,9 @@
- const path = require("path");
 const passport = require('passport');
 const controller = require('./user.controller');
 const { Modules } = require('../../core/server/authorization/authorization.constants');
-const {ModuleGuard } = require('../../core/server/authorization/authorization.middleware');
-
+const { ModuleGuard } = require('../../core/server/authorization/authorization.middleware');
 
 module.exports = app => {
-
     app.post('/api/login', controller.login);
 
     app.get('/api/logout', passport.authenticate('user-jwt', { session: false }), controller.logout);

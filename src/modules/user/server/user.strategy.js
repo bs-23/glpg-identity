@@ -2,6 +2,8 @@ const path = require('path');
 const passport = require('passport');
 const { Strategy } = require('passport-jwt');
 const User = require('./user.model');
+const Userpermission = require(path.join(process.cwd(), "src/modules/user/server/user-permission.model"));
+const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
 module.exports = function() {
@@ -17,7 +19,14 @@ module.exports = function() {
         secretOrKey: nodecache.getValue('CDP_TOKEN_SECRET'),
         jwtFromRequest: cookieExtractor
     }, function(payload, done) {
-        User.findOne({where: {id: payload.id}}).then(doc => {
+        User.findOne({where: {id: payload.id}, include: [{
+            model: Userpermission,
+            as: 'userpermission',
+            include: [{
+                model: Permission,
+                as: 'permission'
+            }]
+        }]}).then(doc => {
             if(doc) {
                 return done(null, doc);
             }

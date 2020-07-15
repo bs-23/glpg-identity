@@ -1,5 +1,6 @@
 const path = require('path');
 const crypto = require('crypto');
+const { Op } = require('sequelize');
 const jwt = require('jsonwebtoken');
 const User = require('./user.model');
 const UserPermission = require('./user-permission.model');
@@ -7,29 +8,29 @@ const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodeca
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const ResetPassword = require('./reset-password.model');
-const { Op } = require('sequelize');
 const Userpermission = require(path.join(process.cwd(), "src/modules/user/server/user-permission.model"));
 const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
 
 function validatePassword(password) {
-    const minimumPasswordLength = 8
-    if (password.length < minimumPasswordLength) return false
+    const minimumPasswordLength = 8;
+    if (password.length < minimumPasswordLength) return false;
 
     const hasUppercase = new RegExp("^(?=.*[A-Z])").test(password);
-    if (!hasUppercase) return false
+    if (!hasUppercase) return false;
 
     const hasDigit = new RegExp("^(?=.*[0-9])").test(password);
-    if (!hasDigit) return false
+    if (!hasDigit) return false;
 
     const specialCharacters = "!@#$%^&*"
-    let hasSpecialCharacter = false
+    let hasSpecialCharacter = false;
+
     for (const c of password) {
         if (specialCharacters.includes(c)) {
             hasSpecialCharacter = true
-            break
+            break;
         }
     }
-    return hasSpecialCharacter
+    return hasSpecialCharacter;
 }
 
 function generateAccessToken(user) {
@@ -48,7 +49,6 @@ function getPermissions(userPermission) {
         const permissions = userPermission.map(up => up.permission.module);
         return permissions;
     }
-
 }
 
 function formatProfile(user) {
@@ -70,20 +70,16 @@ async function getSignedInUserProfile(req, res) {
 async function login(req, res) {
     try {
         const { email, password } = req.body;
-        const user = await User.findOne({ where: { email } ,
-        include: [
-            {
-              model: Userpermission,
-              as: 'userpermission',
-              include: [
-                {
-                  model: Permission,
-                  as: 'permission'
-                }
-            ]
-            }
-        ]
-    });
+        const user = await User.findOne({ where: { email },
+            include: [{
+                model: Userpermission,
+                as: 'userpermission',
+                include: [{
+                    model: Permission,
+                    as: 'permission'
+                }]
+            }]
+        });
 
         if (!user || !user.password || !user.validPassword(password)) {
             return res.status(401).send('Invalid email or password.');
@@ -106,7 +102,6 @@ async function login(req, res) {
         res.status(500).send(err);
     }
 }
-
 
 async function logout(req, res) {
     res.clearCookie('access_token').redirect('/');
@@ -278,7 +273,6 @@ async function getUsers(req, res) {
             country: country ? country : null
         };
 
-
         res.json(data);
 
     } catch (err) {
@@ -303,7 +297,6 @@ async function getUser(req, res) {
         res.status(500).send(err);
     }
 }
-
 
 async function sendPasswordResetLink(req, res) {
     try {
@@ -401,7 +394,6 @@ async function resetPassword(req, res) {
         res.status(500).send(error);
     }
 }
-
 
 exports.login = login;
 exports.logout = logout;
