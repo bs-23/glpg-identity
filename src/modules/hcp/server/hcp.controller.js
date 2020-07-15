@@ -7,7 +7,7 @@ const Hcp = require('./hcp_profile.model');
 const HcpConsents = require('./hcp_consents.model');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
-const { StandardResponse, CustomError } = require(path.join(process.cwd(), 'src/config/server/lib/standard-response'));
+const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
 function generateAccessToken(doc) {
@@ -51,6 +51,8 @@ function mapMasterDataToHcpProfile(masterData) {
 }
 
 async function getHcps(req, res) {
+    const response = new Response({}, []);
+
     try {
         const page = req.query.page - 1;
         const limit = 10;
@@ -82,19 +84,25 @@ async function getHcps(req, res) {
             status
         };
 
-        res.json(data);
+        response.data = data;
+        res.json(response);
     } catch (err) {
-        res.status(500).send(err);
+        response.errors.push(new CustomError(err.message, '', '', err));
+        res.status(500).send(response);
     }
 }
 
 async function editHcp(req, res) {
     const { first_name, last_name, telephone } = req.body;
+    const response = new Response({}, []);
 
     try {
         const HcpUser = await Hcp.findOne({ where: { id: req.params.id } });
 
-        if (!HcpUser) return res.sendStatus(404);
+        if (!HcpUser) {
+            response.errors.push(new CustomError('User not found'));
+            return res.status(404).send(response);
+        }
 
         HcpUser.update({ first_name, last_name, telephone });
 
@@ -102,52 +110,41 @@ async function editHcp(req, res) {
         delete HcpUser.dataValues.created_by;
         delete HcpUser.dataValues.updated_by;
 
-        res.json(HcpUser);
+        response.data = HcpUser;
+        res.json(response);
     } catch (err) {
-        res.status(500).send(err);
+        response.errors.push(new CustomError(err.message, '', '', err));
+        res.status(500).send(response);
     }
 }
 
 async function registrationLookup(req, res) {
     const { email, uuid } = req.body;
 
-    const response = {
-        data: {},
-        errors: []
-    };
+    const response = new Response({}, []);
 
     if (!email) {
-        response.errors.push({
-            field: 'email',
-            message: 'Email address is missing.'
-        });
+        response.errors.push(new CustomError('Email address is missing.', 'email'));
     }
 
     if (!uuid) {
-        response.errors.push({
-            field: 'uuid',
-            message: 'UUID is missing.'
-        });
+        response.errors.push(new CustomError('UUID is missing.', 'uuid'));
     }
 
     if (!uuid || !email) {
-        return res.json(response);
+        return res.status(400).send(response);
     }
 
     try {
-        const profileByEmail = await Hcp.findOne({ where: { email }});
-        const profileByUUID = await Hcp.findOne({ where: { uuid }});
+        const profileByEmail = await Hcp.findOne({ where: { email } });
+        const profileByUUID = await Hcp.findOne({ where: { uuid } });
 
-        if(profileByEmail) {
-            response.errors.push({
-                field: 'email',
-                message: 'Email address is already registered.'
-            });
-        } else if(profileByUUID) {
-            response.errors.push({
-                field: 'uuid',
-                message: 'UUID is already registered.'
-            });
+        if (profileByEmail) {
+            response.errors.push(new CustomError('Email address is already registered.', 'email'));
+            return res.status(400).send(response);
+        } else if (profileByUUID) {
+            response.errors.push(new CustomError('UUID is already registered.', 'uuid'));
+            return res.status(400).send(response);
         } else {
             const master_data = await sequelize.datasyncConnector.query(`
                 SELECT h.*, s.specialty_code
@@ -160,48 +157,38 @@ async function registrationLookup(req, res) {
                 type: QueryTypes.SELECT
             });
 
-            if(master_data && master_data.length) {
+            if (master_data && master_data.length) {
                 response.data = mapMasterDataToHcpProfile(master_data[0]);
             } else {
-                response.errors.push({
-                    field: 'uuid',
-                    message: 'Invalid UUID.'
-                });
+                response.errors.push(new CustomError('Invalid UUID.', 'uuid'));
+                return res.status(400).send(response);
             }
         }
 
         res.json(response);
     } catch (err) {
-        res.status(500).send(err);
+        response.errors.push(new CustomError(err.message, '', '', err));
+        res.status(500).send(response);
     }
 }
 
 async function createHcpProfile(req, res) {
-    const response = {
-        data: {},
-        errors: []
-    };
+    const response = new Response({}, []);
 
     try {
         const isEmailExists =  await Hcp.findOne({ where: { email: req.body.email }});
         const isUUIDExists =  await Hcp.findOne({ where: { uuid: req.body.uuid }});
 
         if (isEmailExists) {
-            response.errors.push({
-                field: 'email',
-                message: 'Email already exists.'
-            });
+            response.errors.push(new CustomError('Email already exists.', 'email'));
         }
 
         if (isUUIDExists) {
-            response.errors.push({
-                field: 'uuid',
-                message: 'UUID already exists.'
-            });
+            response.errors.push(new CustomError('UUID already exists.', 'uuid'));
         }
 
         if (isEmailExists || isUUIDExists) {
-            return res.json(response);
+            return res.status(400).send(response);
         }
 
         let master_data = null;
@@ -253,39 +240,52 @@ async function createHcpProfile(req, res) {
 
         res.json(response);
     } catch (err) {
-        res.status(500).send(err);
+        response.errors.push(new CustomError(err.message, '', '', err));
+        res.status(500).send(response);
     }
 }
 
 async function getHcpProfile(req, res) {
+    const response = new Response({}, []);
     try {
         const doc = await Hcp.findOne({
             where: { id: req.params.id },
             attributes: { exclude: ['password', 'created_at', 'updated_at', 'created_by', 'updated_by', 'reset_password_token', 'reset_password_expires', 'application_id'] }
         });
 
-        if (!doc) return res.status(404).send('Profile not found.');
+        if (!doc) {
+            response.errors.push(new CustomError('Profile not found.'));
+            return res.status(404).send(response);
+        }
 
-        res.json(getHcpViewModel(doc.dataValues));
+        response.data = getHcpViewModel(doc.dataValues);
+        res.json(response);
     } catch (err) {
-        res.status(500).send(err);
+        response.errors.push(new CustomError(err.message, '', '', err));
+        res.status(500).send(response);
     }
 }
 
 async function changePassword(req, res) {
     const { email, current_password, new_password, confirm_password } = req.body;
 
-    if (!email || !current_password || !new_password || !confirm_password) return res.status(400).send('Missing required parameters.');
+    if (!email || !current_password || !new_password || !confirm_password) {
+        response.errors.push(new CustomError('Missing required parameters.'));
+        return res.status(400).send(response);
+    }
 
+    const response = new Response({}, []);
     try {
         const doc = await Hcp.findOne({ where: { email: email } });
 
         if (!doc || !doc.validPassword(current_password)) {
-            return res.status(401).send('Invalid credentials.');
+            response.errors.push(new CustomError('Invalid credentials.'));
+            return res.status(401).send(response);
         }
 
         if (new_password !== confirm_password) {
-            return res.status(400).send("Password and confirm password doesn't match.");
+            response.errors.push(new CustomError(`Password and confirm password doesn't match.`));
+            return res.status(400).send(response);
         }
 
         doc.update({ password: new_password });
@@ -303,21 +303,33 @@ async function changePassword(req, res) {
 
         await emailService.send(options);
 
-        res.send('Password changed successfully.');
+        response.data = 'Password changed successfully.';
+        res.send(response);
     } catch (err) {
-        res.status(500).send(err);
+        response.errors.push(new CustomError(err.message, '', '', err));
+        res.status(500).send(response);
     }
 }
 
 async function resetPassword(req, res) {
+    const response = new Response({}, []);
     try {
         const doc = await Hcp.findOne({ where: { reset_password_token: req.query.token } });
 
-        if(!doc) return res.status(404).send("Invalid password reset token.");
+        if(!doc) {
+            response.errors.push(new CustomError('Invalid password reset token.'));
+            return res.status(404).send(response);
+        }
 
-        if(doc.reset_password_expires < Date.now()) return res.status(400).send("Password reset token has been expired. Please request again.");
+        if (doc.reset_password_expires < Date.now()) {
+            response.errors.push(new CustomError('Password reset token has been expired. Please request again.'));
+            return res.status(400).send(response);
+        }
 
-        if(req.body.new_password !== req.body.confirm_password) return res.status(400).send("Password and confirm password doesn't match.");
+        if (req.body.new_password !== req.body.confirm_password) {
+            response.errors.push(new CustomError(`Password and confirm password doesn't match.`));
+            return res.status(400).send(response);
+        }
 
         doc.update({ password: req.body.new_password });
 
@@ -334,17 +346,23 @@ async function resetPassword(req, res) {
 
         await emailService.send(options);
 
-        res.send('Password reset successfully.');
+        response.data = 'Password reset successfully.';
+        res.send(response);
     } catch(err) {
-        res.status(500).send(err);
+        response.errors.push(new CustomError(err.message, '', '', err));
+        res.status(500).send(response);
     }
 }
 
 async function forgetPassword(req, res) {
+    const response = new Response({}, []);
     try {
         const doc = await Hcp.findOne({ where: { email: req.query.email } });
 
-        if(!doc) return res.status(404).send("Account doesn't exist");
+        if(!doc) {
+            response.errors.push(new CustomError(`Account doesn't exist`));
+            return res.status(404).send(response);
+        }
 
         const randomToken = crypto.randomBytes(36).toString('hex');
 
@@ -353,17 +371,19 @@ async function forgetPassword(req, res) {
             reset_password_expires: Date.now() + 3600000
         });
 
-        res.json({
+        response.data = {
             password_reset_token: randomToken,
             retention_period: '1 hour'
-        });
+        };
+        res.json(response);
     } catch(err) {
-        res.status(500).send(err);
+        response.errors.push(new CustomError(err.message, '', '', err));
+        res.status(500).send(response);
     }
 }
 
 async function getSpecialties(req, res) {
-    const response = new StandardResponse([], []);
+    const response = new Response([], []);
     try {
         const country = req.query.country;
         let locale = req.query.locale;
@@ -394,20 +414,19 @@ async function getSpecialties(req, res) {
         response.data = masterDataSpecialties;
         res.json(response);
     } catch (err) {
-        res.status(500).send(err);
+        response.errors.push(new CustomError(err.message, '', '', err));
+        res.status(500).send(response);
     }
 }
 
 async function getAccessToken(req, res) {
-    const response = {
-        data: {},
-        errors: []
-    };
+    const response = new Response({}, []);
 
     try {
         const { email, password } = req.body;
 
         if(!email) {
+            response.errors.push(new CustomError('Email is required.', 'email'));
             response.errors.push({
                 field: 'email',
                 message: 'Email is required.'
@@ -415,10 +434,7 @@ async function getAccessToken(req, res) {
         }
 
         if(!password) {
-            response.errors.push({
-                field: 'password',
-                message: 'Password is required.'
-            });
+            response.errors.push(new CustomError('Password is required.', 'password'));
         }
 
         if (!email || !password) {
@@ -427,11 +443,8 @@ async function getAccessToken(req, res) {
 
         const doc = await Hcp.findOne({ where: { email } });
 
-        if (!doc || !doc.validPassword(password)) {
-            response.errors.push({
-                message: 'Invalid email or password.'
-            });
-
+        if (!doc || !doc.password || !doc.validPassword(password)) {
+            response.errors.push(new CustomError('Invalid email or password.'));
             return res.status(401).json(response);
         }
 
@@ -444,7 +457,8 @@ async function getAccessToken(req, res) {
 
         res.json(response);
     } catch (err) {
-        res.status(500).send(err);
+        response.errors.push(new CustomError(err.message, '', '', err));
+        res.status(500).send(response);
     }
 }
 
