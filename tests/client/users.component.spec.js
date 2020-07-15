@@ -24,15 +24,15 @@ beforeAll(async () => {
 let data
 beforeEach(() => {
     mockAxios = new MockAdapter(axios);
-    const countries = [{ countryid: 0, countryname: 'null' }, { countryid: 1, countryname: 'Ireland' }, { countryid: 2, countryname: 'Netherlands' }]
+    const countries = [{ countryid: 0, country_iso2: 'null', countryname: '' }, { countryid: 1, country_iso2: 'Ireland', countryname: 'Ireland' }, { countryid: 2, country_iso2: 'Netherlands', countryname: 'Netherlands'}]
     const limit = 3
     data = {
         users: [
-            { id: '1', name: 'John', email: 'email@gmail.com', country: 'Ireland' },
-            { id: '2', name: 'Smith', email: 'email2@gmail.com', country: 'Netherlands' },
-            { id: '3', name: 'Carl', email: 'email3@gmail.com', country: 'Luxembourg' },
-            { id: '4', name: 'Johnson', email: 'email4@gmail.com', country: 'Netherlands' },
-            { id: '5', name: 'Brandon', email: 'email5@gmail.com', country: 'Netherlands' },
+            { id: '1', name: 'John', email: 'email@gmail.com', country_iso2: 'Ireland' },
+            { id: '2', name: 'Smith', email: 'email2@gmail.com', country_iso2: 'Netherlands' },
+            { id: '3', name: 'Carl', email: 'email3@gmail.com', country_iso2: 'Luxembourg' },
+            { id: '4', name: 'Johnson', email: 'email4@gmail.com', country_iso2: 'Netherlands' },
+            { id: '5', name: 'Brandon', email: 'email5@gmail.com', country_iso2: 'Netherlands' },
         ]
     }
 
@@ -42,8 +42,8 @@ beforeEach(() => {
         if (country.countryname === 'null') return
         const response = { ...data }
         const { users: allUsers } = response
-        response.users = allUsers.filter(user => user.country === country.countryname)
-        mockAxios.onGet(`/api/users?page=${1}&country=${country.countryname}`).reply(200, response)
+        response.users = allUsers.filter(user => user.country_iso2 === country.country_iso2)
+        mockAxios.onGet(`/api/users?page=${1}&country=${country.country_iso2}`).reply(200, response)
     })
     mockAxios.onGet(`/api/users?page=${1}&country=null`).reply(200, { users: data.users.slice(0, limit), page: 1, end: 3 })
     mockAxios.onGet(`/api/users?page=${2}&country=null`).reply(200, { users: data.users.slice(limit), page: 2, end: 5 })
@@ -75,53 +75,15 @@ describe('Users component', () => {
         const tbody = container.querySelector('tbody')
         expect(tbody.childNodes.length).toBe(3)
 
-        const filter_button = getByText('Filter')
+        const filter_button = getByText('Filter by Country')
         fireEvent.click(filter_button)
 
+        
         const country_label = getByText('Ireland')
         fireEvent.click(country_label)
 
         await waitFor(() => {
             expect(tbody.childNodes.length).toBe(1)
-        })
-    });
-
-    it('Should go to the next page', async () => {
-        const { container, getByText, queryByText } = render(
-            <Provider store={store}>
-                <MemoryRouter>
-                    <ToastProvider>
-                        <Users />
-                    </ToastProvider>
-                </MemoryRouter>
-            </Provider>
-        );
-
-        let table
-        await waitFor(() => {
-            table = container.querySelector('table')
-            expect(table).toBeTruthy()
-        })
-
-        const tbody = container.querySelector('tbody')
-        expect(tbody.childNodes.length).toBe(3)
-
-        const next_button = getByText('Next')
-        fireEvent.click(next_button)
-
-        await waitFor(() => {
-            expect(queryByText('Johnson')).toBeTruthy()
-            expect(queryByText('John')).toBeFalsy()
-            expect(tbody.childNodes.length).toBe(2)
-        })
-
-        const prev_button = getByText('Prev')
-        fireEvent.click(prev_button)
-
-        await waitFor(() => {
-            expect(queryByText('Johnson')).toBeFalsy()
-            expect(queryByText('John')).toBeTruthy()
-            expect(tbody.childNodes.length).toBe(3)
         })
     });
 });

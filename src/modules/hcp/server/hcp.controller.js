@@ -56,7 +56,7 @@ async function getHcps(req, res) {
 
     try {
         const page = req.query.page ? req.query.page - 1 : 0;
-        const limit = 10;
+        const limit = 20;
         const status = req.query.status === 'null' ? null : req.query.status;
         const offset = page * limit;
 

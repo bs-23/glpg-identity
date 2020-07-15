@@ -49,11 +49,11 @@ export default function hcpUsers() {
     const hcps = useSelector(state => state.hcpReducer.hcps);
 
     const pageLeft = () => {
-        if (hcps.page > 1) dispatch(getHcpProfiles(hcps.page - 1, hcps.is_active));
+        if (hcps.page > 1) dispatch(getHcpProfiles(hcps.page - 1, hcps.status));
     };
 
     const pageRight = () => {
-        if (hcps.end !== hcps.total) dispatch(getHcpProfiles(hcps.page + 1, hcps.is_active));
+        if (hcps.end !== hcps.total) dispatch(getHcpProfiles(hcps.page + 1, hcps.status));
     };
 
     const sortHcp = (sortType, val) => {
@@ -92,8 +92,8 @@ export default function hcpUsers() {
                             </Dropdown.Toggle>
                                     <Dropdown.Menu>
                                         <LinkContainer to="hcps?page=1"><Dropdown.Item onClick={() => dispatch(getHcpProfiles(1, null))}>None</Dropdown.Item></LinkContainer>
-                                        <LinkContainer to="hcps?page=1&is_active=true"><Dropdown.Item onClick={() => dispatch(getHcpProfiles(1, true))}>Active</Dropdown.Item></LinkContainer>
-                                        <LinkContainer to="hcps?page=1&is_active=false"><Dropdown.Item onClick={() => dispatch(getHcpProfiles(1, false))}>Pending</Dropdown.Item></LinkContainer>
+                                        <LinkContainer to="hcps?page=1&status=true"><Dropdown.Item onClick={() => dispatch(getHcpProfiles(1, true))}>Active</Dropdown.Item></LinkContainer>
+                                        <LinkContainer to="hcps?page=1&status=false"><Dropdown.Item onClick={() => dispatch(getHcpProfiles(1, false))}>Pending</Dropdown.Item></LinkContainer>
                                     </Dropdown.Menu>
                                 </Dropdown>
                             </div>
@@ -108,7 +108,7 @@ export default function hcpUsers() {
                                                 <th>Lastname<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'last_name')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'last_name')}></i></span></th>
                                                 <th>Telephone<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'telephone')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'telephone')}></i></span></th>
                                                 <th>UUID <span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'uuid')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'uuid')}></i></span></th>
-                                                <th>Status<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'is_active')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'is_active')}></i></span></th>
+                                                <th>Status<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'status')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'status')}></i></span></th>
                                                 <th>Action</th>
                                                 <th></th>
                                             </tr>
@@ -136,7 +136,7 @@ export default function hcpUsers() {
                                                     }
 
                                                     <td>
-                                                        {row.is_active === true ?
+                                                        {row.status === true ?
                                                             <span><i className="fa fa-xs fa-circle text-success pr-2"></i>Approved</span> :
                                                             <span><i className="fa fa-xs fa-circle text-danger pr-2"></i>Not Approved</span>
                                                         }
@@ -155,12 +155,14 @@ export default function hcpUsers() {
                                             ))}
                                         </tbody>
                                     </table>
-
-                                    <div className="pagination justify-content-end mb-4">
-                                        {hcps.start + '-' + hcps.end + ' of ' + hcps.total}
-                                        <LinkContainer to={`hcps?page=${hcps.page - 1}&is_active=${hcps.is_active}`}><button className="btn btn-secondary mx-2" onClick={() => pageLeft()} disabled={hcps.page <= 1}>Prev</button></LinkContainer>
-                                        <LinkContainer to={`hcps?page=${hcps.page + 1}&is_active=${hcps.is_active}`}><button className="btn btn-secondary" onClick={() => pageRight()} disabled={hcps.end === hcps.total}>Next</button></LinkContainer>
-                                    </div>
+                                    {((hcps.page === 1 && hcps['users'] && hcps['users'].length > 19) ||
+                                        (hcps.page > 1 && hcps['users'])) &&
+                                        <div className="pagination justify-content-end mb-4">
+                                            {hcps.start + '-' + hcps.end + ' of ' + hcps.total}
+                                            <LinkContainer to={`hcps?page=${hcps.page - 1}&status=${hcps.status}`}><button className="btn btn-secondary mx-2" onClick={() => pageLeft()} disabled={hcps.page <= 1}>Prev</button></LinkContainer>
+                                            <LinkContainer to={`hcps?page=${hcps.page + 1}&status=${hcps.status}`}><button className="btn btn-secondary" onClick={() => pageRight()} disabled={hcps.end === hcps.total}>Next</button></LinkContainer>
+                                        </div>
+                                    }
                                 </React.Fragment>
                             }
 
