@@ -20,7 +20,7 @@ export default function Dashboard() {
                                         </NavLink>
                                     </li>
                                     <li className="col-12 col-sm-4 col-md-2 service__item">
-                                        <NavLink to="" className="d-block rounded py-5 px-3 service__link">
+                                        <NavLink to="" className="d-block rounded py-5 px-3 service__link disabled">
                                             Marketing and Promotion Management
                                         </NavLink>
                                     </li>
@@ -30,12 +30,12 @@ export default function Dashboard() {
                                         </NavLink>
                                     </li>
                                     <li className="col-12 col-sm-4 col-md-2 service__item">
-                                        <NavLink to="/" className="d-block rounded py-5 px-3 service__link">
+                                        <NavLink to="/" className="d-block rounded py-5 px-3 service__link disabled">
                                             Sample Request Management
                                         </NavLink>
                                     </li>
                                     <li className="col-12 col-sm-4 col-md-2 service__item">
-                                        <NavLink to="" className="d-block rounded py-5 px-3 service__link">
+                                        <NavLink to="" className="d-block rounded py-5 px-3 service__link disabled">
                                             Tag & Persona Management
                                         </NavLink>
                                     </li>

@@ -23,9 +23,37 @@
                 border-color: $secondary-color-light !important;
             }
         }
+
+        &-outline {
+            &-primary {
+                color: $primary-color;
+                border-color: $primary-color;
+
+                &:hover, &:active, &:focus {
+                    color: #fff;
+                    background-color: $primary-color;
+                    border-color: $primary-color;
+                }
+            }
+
+            &-secondary {
+                color: $secondary-color;
+                border-color: $secondary-color;
+
+                &:hover, &:active, &:focus {
+                    color: #fff;
+                    background-color: $secondary-color;
+                    border-color: $secondary-color;
+                }
+            }
+        }
     }
 
     &-light-bg {
         background: $light-bg-color;
+    }
+
+    &-bg-secondary {
+        background: $secondary-color;
     }
 }

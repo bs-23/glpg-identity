@@ -9,7 +9,7 @@ export default function reducer(state = initialState, action) {
         case Types.GET_HCPS_FULFILLED: {
             return {
                 ...state,
-                hcps: action.payload.data
+                hcps: action.payload.data.data
             };
         }
 
