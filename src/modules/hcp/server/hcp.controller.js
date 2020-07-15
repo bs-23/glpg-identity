@@ -270,12 +270,13 @@ async function getHcpProfile(req, res) {
 async function changePassword(req, res) {
     const { email, current_password, new_password, confirm_password } = req.body;
 
+    const response = new Response({}, []);
+
     if (!email || !current_password || !new_password || !confirm_password) {
         response.errors.push(new CustomError('Missing required parameters.'));
         return res.status(400).send(response);
     }
 
-    const response = new Response({}, []);
     try {
         const doc = await Hcp.findOne({ where: { email: email } });
 
