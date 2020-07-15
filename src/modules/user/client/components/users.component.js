@@ -81,7 +81,7 @@ export default function Users() {
                                     <LinkContainer to="list?page=1"><Dropdown.Item onClick={() => getUserList(1, null)}>None</Dropdown.Item></LinkContainer>
                                     {
                                         countries.length > 0 && countries.map(country => (
-                                            <LinkContainer to={`list?page=1&country=${country.countryname}`} key={country.countryid}><Dropdown.Item onClick={() => getUserList(1, country.countryname)}>{country.countryname}</Dropdown.Item></LinkContainer>
+                                            <LinkContainer to={`list?page=1&country=${country.country_iso2}`} key={country.countryid}><Dropdown.Item onClick={() => getUserList(1, country.country_iso2)}>{country.countryname}</Dropdown.Item></LinkContainer>
                                         ))
                                     }
 
