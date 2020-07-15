@@ -8,6 +8,8 @@ const emailService = require(path.join(process.cwd(), 'src/config/server/lib/ema
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const ResetPassword = require('./reset-password.model');
 const { Op } = require('sequelize');
+const Userpermission = require(path.join(process.cwd(), "src/modules/user/server/user-permission.model"));
+const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
 
 function validatePassword(password) {
     const minimumPasswordLength = 8
@@ -41,12 +43,18 @@ function generateAccessToken(user) {
     });
 }
 
+function getPermissions(userPermission) {
+    const permissions = userPermission.map(up => up.permission.module);
+    return permissions;
+}
+
 function formatProfile(user) {
     const profile = {
         id: user.id,
         name: user.name,
         email: user.email,
-        type: user.type
+        type: user.type,
+        permissions: getPermissions(user.userpermission)
     };
 
     return profile;
@@ -59,7 +67,20 @@ async function getSignedInUserProfile(req, res) {
 async function login(req, res) {
     try {
         const { email, password } = req.body;
-        const user = await User.findOne({ where: { email } });
+        const user = await User.findOne({ where: { email } ,
+        include: [
+            {
+              model: Userpermission,
+              as: 'userpermission',
+              include: [
+                {
+                  model: Permission,
+                  as: 'permission'
+                }
+            ]
+            }
+        ]
+    });
 
         if (!user || !user.validPassword(password)) {
             return res.status(401).send('Invalid email or password.');
@@ -82,6 +103,7 @@ async function login(req, res) {
         res.status(500).send(err);
     }
 }
+
 
 async function logout(req, res) {
     res.clearCookie('access_token').redirect('/');

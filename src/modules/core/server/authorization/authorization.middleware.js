@@ -3,7 +3,6 @@ const passport = require('passport');
 const User = require(path.join(process.cwd(), "src/modules/user/server/user.model"));
 const Userpermission = require(path.join(process.cwd(), "src/modules/user/server/user-permission.model"));
 const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
-const { Modules } = require(path.join(process.cwd(), "src/modules/user/server/authorization/modules.constant"));
 
 const AdminGuard = (req, res, next) => {
     if (!req.user) return res.status(401).send('unauthorized');
@@ -50,7 +49,7 @@ const ModuleGuard = (moduleName) => {
             if (!isPermitted(moduleName, user.userpermission)) {
                 return res
                     .status(403)
-                    .send('Forbidden! You Have No Permission to View This.');
+                    .send('Forbidden! You are not authorized to view this page');
             }
             next();
     }
