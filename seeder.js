@@ -17,7 +17,7 @@ async function init() {
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
     const UserPermission = require(path.join(process.cwd(), "src/modules/user/server/user-permission.model"));
     const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
-    const { Modules } = require(path.join(process.cwd(), 'src/modules/user/server/authorization/modules.constant'));
+    const { Modules } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
     require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model'));
     require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_profile.model'));
     require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
