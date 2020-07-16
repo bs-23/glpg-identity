@@ -5,6 +5,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import { LinkContainer } from 'react-router-bootstrap';
 import { getUsers } from '../user.actions';
 // import { deleteUser } from '../user.actions';
+import axios from "axios";
 
 export default function Users() {
     const dispatch = useDispatch();
