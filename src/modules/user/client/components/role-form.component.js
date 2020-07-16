@@ -1,6 +1,6 @@
 import axios from "axios";
-import { useDispatch } from "react-redux";
-import { NavLink, useHistory, useSelector } from 'react-router-dom';
+import { useDispatch, useSelector } from "react-redux";
+import { NavLink, useHistory } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { Form, Formik, Field, ErrorMessage } from "formik";
 import { getRoles } from "../user.actions";
@@ -21,7 +21,6 @@ export default function RoleForm() {
             const response = await axios.get('/api/permissions');
             setPermissions(response.data);
         }
-        getCountries();
         getPermissions();
 
         dispatch(getRoles());
@@ -130,6 +129,8 @@ export default function RoleForm() {
                                 </div>
                             </Modal.Body>
                         </Modal>
+                    </div>
+                    <div className="col-12 col-sm-12 py-3 d-flex justify-content-between align-items-center">
 
                         {roles && roles.length > 0 &&
                             <table className="table table-hover table-sm mb-0">
@@ -158,6 +159,6 @@ export default function RoleForm() {
                     </div>
                 </div>
             </div>
-        </main>
+        </main >
     )
 }
