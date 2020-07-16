@@ -1,0 +1,14 @@
+.app__header {
+    &-icon {
+        &-user {
+            font-size: 18px;
+            position: relative;
+            top: 2px;
+        }
+
+        &-logout {
+            position: relative;
+            top: 2px;
+        }
+    }
+}

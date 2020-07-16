@@ -16,11 +16,13 @@
         text-align: center;
         height: 100%;
         border-radius: 16px;
+        width: 215px;
 
         &.disabled {
             box-shadow: none !important;
-            color: #999 !important;
-            @include HEX-to-RGBA(background-color, $white-color, .5);
+            color: #9AB1AD !important;
+            background: #F9F9F9 !important;
+            // @include HEX-to-RGBA(background-color, $white-color, .5);
         }
 
         &:hover {
@@ -36,5 +38,15 @@
     }
 
     &__list {
+    }
+
+    @media (max-width: 575.98px) {
+        &__item {
+            width: 100%;
+        }
+
+        &__link {
+            width: 100%;
+        }
     }
 }

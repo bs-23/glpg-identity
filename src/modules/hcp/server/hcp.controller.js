@@ -216,8 +216,8 @@ async function createHcpProfile(req, res) {
         };
 
         if(model.status === 'Approved') {
-            model.reset_password_token = crypto.randomBytes(36).toString('hex'),
-            model.reset_password_expires = Date.now() + 3600000
+            model.reset_password_token = crypto.randomBytes(36).toString('hex');
+            model.reset_password_expires = Date.now() + 3600000;
         }
 
         const doc = await Hcp.create(model);

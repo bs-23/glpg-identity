@@ -138,7 +138,7 @@ async function createUser(req, res) {
         });
 
         if (!created) {
-            return res.sendStatus(400);
+            return res.status(400).send('Email already exists.');
         }
 
         permissions && permissions.forEach(async function (permissionId) {
