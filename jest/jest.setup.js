@@ -18,8 +18,10 @@ module.exports = async function() {
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
     require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
     require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
-    // const Userpermission = require(path.join(process.cwd(), "src/modules/user/server/user-permission.model"));
     const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
+    const RolePermission = require(path.join(process.cwd(), "src/modules/user/server/role/role-permission.model"));
+    const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
+    const UserRole = require(path.join(process.cwd(), "src/modules/user/server/user-role.model"));
 
     await sequelize.cdpConnector.sync();
 
@@ -29,6 +31,9 @@ module.exports = async function() {
     await Hcp_profile.create(specHelper.hcp.defaultUser);
     await Consent.create(specHelper.consent.demoConsent);
     await Permission.bulkCreate(specHelper.permissions, { returning: true, ignoreDuplicates: false })
-    // await Userpermission.bulkCreate(specHelper.userPermissions.defaultAdmin, { returning: true, ignoreDuplicates: false })
+    await Role.bulkCreate(specHelper.roles, { returning: true, ignoreDuplicates: false })
+    await RolePermission.bulkCreate(specHelper.rolePermissions, { returning: true, ignoreDuplicates: false })
+    await UserRole.bulkCreate(specHelper.userRoles.defaultAdmin, { returning: true, ignoreDuplicates: false })
+    await UserRole.bulkCreate(specHelper.userRoles.defaultUser, { returning: true, ignoreDuplicates: false })
     // await Userpermission.bulkCreate(specHelper.userPermissions.defaultUser, { returning: true, ignoreDuplicates: false })
 };
