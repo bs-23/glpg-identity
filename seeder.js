@@ -40,11 +40,11 @@ async function init() {
 
     function userSeeder(callback) {
         User.findOrCreate({
-            where: { email: "admin@glpg-cdp.com" }, defaults: {
-                first_name: "Admin",
-                last_name: '',
-                password: "strong-password",
-                type: "admin"
+            where: { email: 'admin@glpg-cdp.com' }, defaults: {
+                first_name: 'System',
+                last_name: 'Admin',
+                password: 'strong-password',
+                type: 'admin'
             }
         }).then(function () {
             callback();
@@ -68,7 +68,7 @@ async function init() {
 
     function roleSeeder(callback) {
         const roles = [
-            { "name": "System-Admin", "description": "All Permissions", "created_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385", "updated_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
+            { "name": "Root Role", "description": "Has access to all permissions", "created_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385", "updated_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
         ];
 
         Role.destroy({ truncate:  { cascade: true } }).then(() => {
@@ -99,7 +99,6 @@ async function init() {
                 });
             });
         });
-
     }
 
     function userRoleSeeder(callback) {
@@ -143,7 +142,6 @@ async function init() {
             });
         });
     }
-
 
     function consentSeeder(callback) {
         const consents = [

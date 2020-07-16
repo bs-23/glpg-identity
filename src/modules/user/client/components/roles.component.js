@@ -1,9 +1,9 @@
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { NavLink, useHistory } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { Form, Formik, Field, ErrorMessage } from "formik";
-import { getRoles } from "../user.actions";
+import { getRoles, createRole } from "../user.actions";
 import { registerSchema } from "../user.schema";
 import { useToasts } from "react-toast-notifications";
 import Modal from 'react-bootstrap/Modal';
@@ -12,7 +12,6 @@ export default function RoleForm() {
     const dispatch = useDispatch();
     const [permissions, setPermissions] = useState([]);
     const roles = useSelector(state => state.userReducer.roles);
-    const history = useHistory()
     const { addToast } = useToasts();
     const [show, setShow] = useState(false);
 
@@ -57,35 +56,33 @@ export default function RoleForm() {
                             <Modal.Header closeButton>
                                 <Modal.Title id="example-custom-modal-styling-title">
                                     Add New Role
-                            </Modal.Title>
+                                </Modal.Title>
                             </Modal.Header>
-                            <Modal.Body>
 
+                            <Modal.Body>
                                 <div className="add-role p-3">
                                     <Formik
                                         initialValues={{
-                                            role_name: "",
-                                            role_description: "",
-                                            permissions: [],
+                                            name: "",
+                                            description: "",
+                                            permissions: []
                                         }}
                                         displayName="UserForm"
                                         validationSchema={registerSchema}
                                         onSubmit={(values, actions) => {
-                                            dispatch(createUser(values))
-                                                .then(res => {
-                                                    actions.resetForm();
-                                                    addToast('User created successfully', {
-                                                        appearance: 'success',
-                                                        autoDismiss: true
-                                                    });
-                                                    history.push(`/users/${res.value.data.id}`)
-                                                }).catch(err => {
-                                                    const errorMessage = typeof err.response.data === 'string' ? err.response.data : err.response.statusText
-                                                    addToast(errorMessage, {
-                                                        appearance: 'error',
-                                                        autoDismiss: true
-                                                    });
+                                            dispatch(createRole(values)).then(res => {
+                                                actions.resetForm();
+                                                addToast('Role created successfully', {
+                                                    appearance: 'success',
+                                                    autoDismiss: true
                                                 });
+                                            }).catch(err => {
+                                                const errorMessage = typeof err.response.data === 'string' ? err.response.data : err.response.statusText;
+                                                addToast(errorMessage, {
+                                                    appearance: 'error',
+                                                    autoDismiss: true
+                                                });
+                                            });
                                             actions.setSubmitting(false);
                                         }}
                                     >
@@ -94,18 +91,18 @@ export default function RoleForm() {
                                                 <div className="row">
                                                     <div className="col-12 col-sm-12">
                                                         <div className="form-group">
-                                                            <label htmlFor="role_name">Role Name: </label>
-                                                            <Field data-testid="role_name" className="form-control" type="name" name="role_name" />
-                                                            <div className="invalid-feedback" data-testid="lastNameError"><ErrorMessage name="role_name" /></div>
+                                                            <label htmlFor="role_name">Role Name</label>
+                                                            <Field data-testid="role_name" className="form-control" type="name" name="name"/>
+                                                            <div className="invalid-feedback" data-testid="lastNameError"><ErrorMessage name="name"/></div>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div className="row">
                                                     <div className="col-12 col-sm-12">
                                                         <div className="form-group">
-                                                            <label htmlFor="role_description">Role Description: </label>
-                                                            <Field data-testid="role_description" className="form-control" as="textarea" type="name" name="role_description" />
-                                                            <div className="invalid-feedback" data-testid="RoleDescriptionNameError"><ErrorMessage name="role_description" /></div>
+                                                            <label htmlFor="role_description">Role Description</label>
+                                                            <Field data-testid="role_description" className="form-control" as="textarea" type="name" name="description"/>
+                                                            <div className="invalid-feedback" data-testid="RoleDescriptionNameError"><ErrorMessage name="description"/></div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -117,7 +114,7 @@ export default function RoleForm() {
                                                                 {permissions.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
                                                             </Field>
                                                             <div className="invalid-feedback">
-                                                                <ErrorMessage name="permissions" />
+                                                                <ErrorMessage name="permissions"/>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -131,13 +128,12 @@ export default function RoleForm() {
                         </Modal>
                     </div>
                     <div className="col-12 col-sm-12 py-3 d-flex justify-content-between align-items-center">
-
                         {roles && roles.length > 0 &&
                             <table className="table table-hover table-sm mb-0">
                                 <thead className="cdp-light-bg">
                                     <tr>
-                                        <th className="py-2">First Name</th>
-                                        <th className="py-2">Last Name</th>
+                                        <th className="py-2">Role Name</th>
+                                        <th className="py-2">Description</th>
                                         <th className="py-2">Action</th>
                                     </tr>
                                 </thead>

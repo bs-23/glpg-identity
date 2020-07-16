@@ -1,10 +1,11 @@
-import Types from "./user.types";
+import Types from './user.types';
 
 const initialState = {
     loggedInUser: null,
     users: {},
     deletedUserInfo: {},
-    roles: []
+    roles: [],
+    role: null
 };
 
 export default function reducer(state = initialState, action) {
@@ -27,7 +28,6 @@ export default function reducer(state = initialState, action) {
                 roles: action.payload.data
             };
         }
-
         case Types.GET_USERS_REJECTED: {
             return {
                 ...state,
@@ -39,6 +39,12 @@ export default function reducer(state = initialState, action) {
                 ...state,
                 deletedUserInfo: action.payload.data
             }
+        }
+        case Types.CREATE_ROLE_FULFILLED: {
+            return {
+                ...state,
+                roles: state.roles.concat(action.payload.data)
+            };
         }
     }
     return state;
