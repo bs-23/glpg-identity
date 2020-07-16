@@ -3,12 +3,13 @@ const crypto = require('crypto');
 const { Op } = require('sequelize');
 const jwt = require('jsonwebtoken');
 const User = require('./user.model');
-const UserPermission = require('./user-permission.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const ResetPassword = require('./reset-password.model');
-const Userpermission = require(path.join(process.cwd(), "src/modules/user/server/user-permission.model"));
+const UserRole = require(path.join(process.cwd(), "src/modules/user/server/user-role.model"));
+const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
+const RolePermission = require(path.join(process.cwd(), "src/modules/user/server/role/role-permission.model"));
 const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
 
 function validatePassword(password) {
@@ -45,10 +46,13 @@ function generateAccessToken(user) {
     });
 }
 
-function getPermissions(userPermission) {
-    if (userPermission) {
-        const permissions = userPermission.map(up => up.permission.module);
-        return permissions;
+function getPermissions(userrole) {
+    const permissions= [];
+    if (userrole) {
+        userrole.forEach(ur => {
+            permissions.push(ur.role.rolePermission.map(rp => rp.permission.module));
+        })
+        return permissions.flat(1);
     }
 }
 
@@ -59,7 +63,7 @@ function formatProfile(user) {
         last_name: user.last_name,
         email: user.email,
         type: user.type,
-        permissions: getPermissions(user.userpermission)
+        permissions: getPermissions(user.userrole)
     };
 
     return profile;
@@ -75,11 +79,20 @@ async function login(req, res) {
         const user = await User.findOne({
             where: { email },
             include: [{
-                model: Userpermission,
-                as: 'userpermission',
+                model: UserRole,
+                as: 'userrole',
                 include: [{
-                    model: Permission,
-                    as: 'permission'
+                    model: Role,
+                    as: 'role',
+                    include: [{
+                        model: RolePermission,
+                        as: 'rolePermission',
+                        include: [{
+                            model: Permission,
+                            as: 'permission',
+                        }]
+
+                    }]
                 }]
             }]
         });
@@ -117,7 +130,7 @@ async function createUser(req, res) {
         email,
         phone,
         countries,
-        permissions,
+        roles,
         application_id,
         expiary_date
     } = req.body;
@@ -141,13 +154,11 @@ async function createUser(req, res) {
             return res.sendStatus(400);
         }
 
-        permissions && permissions.forEach(async function (permissionId) {
+        roles && roles.forEach(async function (roleId) {
 
-            await UserPermission.create({
-                permissionId: permissionId,
+            await UserRole.create({
+                roleId: roleId,
                 userId: doc.id,
-                created_by: req.user.id,
-                updated_by: req.user.id,
             });
 
         });

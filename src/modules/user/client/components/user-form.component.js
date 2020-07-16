@@ -10,7 +10,7 @@ import { registerSchema } from "../user.schema";
 export default function UserForm() {
     const dispatch = useDispatch();
     const [countries, setCountries] = useState([]);
-    const [permissions, setPermissions] = useState([]);
+    const [roles, setRoles] = useState([]);
     const history = useHistory()
 
     useEffect(() => {
@@ -18,12 +18,12 @@ export default function UserForm() {
             const response = await axios.get('/api/countries');
             setCountries(response.data);
         }
-        async function getPermissions() {
-            const response = await axios.get('/api/permissions');
-            setPermissions(response.data);
+        async function getRoles() {
+            const response = await axios.get('/api/roles');
+            setRoles(response.data);
         }
         getCountries();
-        getPermissions();
+        getRoles();
     }, []);
 
     return (
@@ -51,7 +51,7 @@ export default function UserForm() {
                                     last_name: "",
                                     email: "",
                                     countries: [],
-                                    permissions: [],
+                                    roles: [],
                                     phone: "",
                                     expiary_date: ""
                                 }}
@@ -125,12 +125,12 @@ export default function UserForm() {
                                             </div>
                                             <div className="col-12 col-sm-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="permissions">Assign Service Category</label>
-                                                    <Field data-testid="permission" as="select" name="permissions" className="form-control" multiple>
-                                                        {permissions.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
+                                                    <label htmlFor="roles">Assign Role</label>
+                                                    <Field data-testid="role" as="select" name="roles" className="form-control" multiple>
+                                                        {roles.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
                                                     </Field>
                                                     <div className="invalid-feedback">
-                                                        <ErrorMessage name="permissions" />
+                                                        <ErrorMessage name="roles" />
                                                     </div>
                                                 </div>
                                             </div>

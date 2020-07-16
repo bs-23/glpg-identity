@@ -48,8 +48,8 @@ export const registerSchema = object().shape({
         .required('This field must not be empty'),
     countries: string()
         .required('Must select at least one country'),
-    permissions: string()
-        .required('Must select at least one service category')
+    roles: string()
+        .required('Must select at least one role')
 });
 
 export const changePasswordSchema = object().shape({

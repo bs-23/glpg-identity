@@ -1,10 +1,10 @@
 const path = require('path');
 const { DataTypes } = require('sequelize');
-const Permission = require('./permission/permission.model');
+const Permission = require('../permission/permission.model');
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 
-const UserPermission = sequelize.cdpConnector.define('user-permissions', {
+const RolePermission = sequelize.cdpConnector.define('role-permissions', {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -15,24 +15,18 @@ const UserPermission = sequelize.cdpConnector.define('user-permissions', {
         allowNull: false,
         type: DataTypes.UUID
     },
-    userId: {
+    roleId: {
         allowNull: false,
         type: DataTypes.UUID
-    },
-    created_by: {
-        type: DataTypes.UUID
-    },
-    updated_by: {
-        type: DataTypes.UUID
-    },
+    }
 }, {
     schema: 'ciam',
-    tableName: 'user-permissions',
+    tableName: 'role-permissions',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
 
-UserPermission.belongsTo(Permission, {as: 'permission', foreignKey: 'permissionId'});
+RolePermission.belongsTo(Permission, {as: 'permission', foreignKey: 'permissionId'});
 
-module.exports = UserPermission;
+module.exports = RolePermission;
