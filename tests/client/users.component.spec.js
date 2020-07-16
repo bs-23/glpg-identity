@@ -28,11 +28,11 @@ beforeEach(() => {
     const limit = 3
     data = {
         users: [
-            { id: '1', name: 'John', email: 'email@gmail.com', country_iso2: 'Ireland' },
-            { id: '2', name: 'Smith', email: 'email2@gmail.com', country_iso2: 'Netherlands' },
-            { id: '3', name: 'Carl', email: 'email3@gmail.com', country_iso2: 'Luxembourg' },
-            { id: '4', name: 'Johnson', email: 'email4@gmail.com', country_iso2: 'Netherlands' },
-            { id: '5', name: 'Brandon', email: 'email5@gmail.com', country_iso2: 'Netherlands' },
+            { id: '1', first_name: 'John', email: 'email@gmail.com', country_iso2: 'Ireland' },
+            { id: '2', first_name: 'Smith', email: 'email2@gmail.com', country_iso2: 'Netherlands' },
+            { id: '3', first_name: 'Carl', email: 'email3@gmail.com', country_iso2: 'Luxembourg' },
+            { id: '4', first_name: 'Johnson', email: 'email4@gmail.com', country_iso2: 'Netherlands' },
+            { id: '5', first_name: 'Brandon', email: 'email5@gmail.com', country_iso2: 'Netherlands' },
         ]
     }
 
@@ -78,7 +78,7 @@ describe('Users component', () => {
         const filter_button = getByText('Filter by Country')
         fireEvent.click(filter_button)
 
-        
+
         const country_label = getByText('Ireland')
         fireEvent.click(country_label)
 

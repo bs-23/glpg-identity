@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 
 export default function Navbar() {
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
+    const { first_name, last_name } = loggedInUser;
 
     return (
         <header className="app__header py-1 shadow-sm">
@@ -29,7 +30,7 @@ export default function Navbar() {
                         </div>
                     </div>
                     <div className="col-8 text-right">
-                        <button className="mr-2 btn cdp-btn-secondary text-white"><i className="icon icon-user-round mr-1 app__header-icon-user"></i> {loggedInUser.name}</button>
+                        <button className="mr-2 btn cdp-btn-secondary text-white"><i className="icon icon-user-round mr-1 app__header-icon-user"></i> {first_name + " " + last_name}</button>
                         <a className="btn cdp-btn-outline-primary" href="/api/logout"><i className="icon icon-logout mr-1 app__header-icon-logout"></i>Logout</a>
                     </div>
                 </div>

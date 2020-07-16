@@ -35,7 +35,7 @@ const UserDetails = (props) => {
                     <div className="col-12 col-sm-6">
                         <h3 className="mb-3">Profile Details</h3>
                         <div className="profile-detail p-3">
-                            <h2>{userInfo.name}</h2>
+                            <h2>{userInfo.first_name + " " + userInfo.last_name}</h2>
                             <ul className="list-group list-group-flush">
                                 <li className="list-group-item bg-transparent px-0"><span className="mr-2">Email:</span><span>{userInfo.email}</span></li>
                                 <li className="list-group-item bg-transparent px-0"><span className="mr-2">Phone Number:</span><span>{userInfo.phone}</span></li>

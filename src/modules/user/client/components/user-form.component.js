@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Formik, Field, ErrorMessage } from "formik";
 import { createUser } from "../user.actions";
 import { registerSchema } from "../user.schema";
+import { useToasts } from "react-toast-notifications";
 
 
 export default function UserForm() {
@@ -12,6 +13,7 @@ export default function UserForm() {
     const [countries, setCountries] = useState([]);
     const [permissions, setPermissions] = useState([]);
     const history = useHistory()
+    const { addToast } = useToasts()
 
     useEffect(() => {
         async function getCountries() {
@@ -47,7 +49,8 @@ export default function UserForm() {
                         <div className="add-user p-3">
                             <Formik
                                 initialValues={{
-                                    name: "",
+                                    first_name: "",
+                                    last_name: "",
                                     email: "",
                                     countries: [],
                                     permissions: [],
@@ -60,19 +63,38 @@ export default function UserForm() {
                                     dispatch(createUser(values))
                                         .then(res => {
                                             actions.resetForm();
+                                            addToast('User created successfully', {
+                                                appearance: 'success',
+                                                autoDismiss: true
+                                            });
                                             history.push(`/users/${res.value.data.id}`)
+                                        }).catch(err => {
+                                            const errorMessage = typeof err.response.data === 'string' ? err.response.data : err.response.statusText
+                                            addToast(errorMessage, {
+                                                appearance: 'error',
+                                                autoDismiss: true
+                                            });
                                         });
                                     actions.setSubmitting(false);
                                 }}
                             >
                                 {formikProps => (
                                     <Form onSubmit={formikProps.handleSubmit}>
-                                        <div className="form-group">
-                                            <label htmlFor="name">Name</label>
-                                            <Field data-testid="name" className="form-control" type="name" name="name" />
-                                            <div className="invalid-feedback" data-testid="nameError"><ErrorMessage name="name" /></div>
-                                        </div>
                                         <div className="row">
+                                            <div className="col-12 col-sm-6">
+                                                <div className="form-group">
+                                                    <label htmlFor="first_name">First Name</label>
+                                                    <Field data-testid="first_name" className="form-control" type="name" name="first_name" />
+                                                    <div className="invalid-feedback" data-testid="firstNameError"><ErrorMessage name="first_name" /></div>
+                                                </div>
+                                            </div>
+                                            <div className="col-12 col-sm-6">
+                                                <div className="form-group">
+                                                    <label htmlFor="last_name">Last Name</label>
+                                                    <Field data-testid="last_name" className="form-control" type="name" name="last_name" />
+                                                    <div className="invalid-feedback" data-testid="lastNameError"><ErrorMessage name="last_name" /></div>
+                                                </div>
+                                            </div>
                                             <div className="col-12 col-sm-6">
                                                 <div className="form-group">
                                                     <label htmlFor="email">Email</label>
@@ -104,10 +126,13 @@ export default function UserForm() {
                                         <div className="row">
                                             <div className="col-12 col-sm-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="country">Select Countries</label>
+                                                    <label htmlFor="countries">Select Countries</label>
                                                     <Field data-testid="country" as="select" name="countries" className="form-control" multiple>
                                                         {countries.map(item => <option key={item.countryid} value={item.country_iso2}>{item.countryname}</option>)}
                                                     </Field>
+                                                    <div className="invalid-feedback">
+                                                        <ErrorMessage name="countries" />
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div className="col-12 col-sm-6">
@@ -116,6 +141,9 @@ export default function UserForm() {
                                                     <Field data-testid="permission" as="select" name="permissions" className="form-control" multiple>
                                                         {permissions.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
                                                     </Field>
+                                                    <div className="invalid-feedback">
+                                                        <ErrorMessage name="permissions" />
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
