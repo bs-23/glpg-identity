@@ -43,10 +43,10 @@ beforeEach(() => {
         const response = { ...data }
         const { users: allUsers } = response
         response.users = allUsers.filter(user => user.country_iso2 === country.country_iso2)
-        mockAxios.onGet(`/api/users?page=${1}&country=${country.country_iso2}`).reply(200, response)
+        mockAxios.onGet(`/api/users?page=${1}&country_iso2=${country.country_iso2}`).reply(200, response)
     })
-    mockAxios.onGet(`/api/users?page=${1}&country=null`).reply(200, { users: data.users.slice(0, limit), page: 1, end: 3 })
-    mockAxios.onGet(`/api/users?page=${2}&country=null`).reply(200, { users: data.users.slice(limit), page: 2, end: 5 })
+    mockAxios.onGet(`/api/users?page=${1}&country_iso2=null`).reply(200, { users: data.users.slice(0, limit), page: 1, end: 3 })
+    mockAxios.onGet(`/api/users?page=${2}&country_iso2=null`).reply(200, { users: data.users.slice(limit), page: 2, end: 5 })
 })
 
 describe('Users component', () => {
@@ -85,5 +85,5 @@ describe('Users component', () => {
         await waitFor(() => {
             expect(tbody.childNodes.length).toBe(1)
         })
-    });
+    }); 
 });
