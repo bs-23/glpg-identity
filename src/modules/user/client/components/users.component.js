@@ -137,7 +137,7 @@ export default function Users() {
                         }
 
                         {userdata['users'] && userdata['users'].length === 0 &&
-                            <>No users found!</>
+                            <><div className="alert alert-info mt-5">No users found!</div></>
                         }
 
                     </div>

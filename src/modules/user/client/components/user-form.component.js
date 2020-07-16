@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Formik, Field, ErrorMessage } from "formik";
 import { createUser } from "../user.actions";
 import { registerSchema } from "../user.schema";
+import { useToasts } from "react-toast-notifications";
 
 
 export default function UserForm() {
@@ -12,6 +13,7 @@ export default function UserForm() {
     const [countries, setCountries] = useState([]);
     const [roles, setRoles] = useState([]);
     const history = useHistory()
+    const { addToast } = useToasts()
 
     useEffect(() => {
         async function getCountries() {
@@ -61,7 +63,17 @@ export default function UserForm() {
                                     dispatch(createUser(values))
                                         .then(res => {
                                             actions.resetForm();
+                                            addToast('User created successfully', {
+                                                appearance: 'success',
+                                                autoDismiss: true
+                                            });
                                             history.push(`/users/${res.value.data.id}`)
+                                        }).catch(err => {
+                                            const errorMessage = typeof err.response.data === 'string' ? err.response.data : err.response.statusText
+                                            addToast(errorMessage, {
+                                                appearance: 'error',
+                                                autoDismiss: true
+                                            });
                                         });
                                     actions.setSubmitting(false);
                                 }}

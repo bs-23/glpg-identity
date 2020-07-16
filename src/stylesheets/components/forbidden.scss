@@ -1,0 +1,20 @@
+.forbidden {
+    background: $light-bg-color;
+
+    &__panel {
+        border-radius: 16px;
+    }
+
+    &__header {
+        color: $secondary-color;
+        font-size: 120px;
+    }
+
+    &__subheader {
+        color: $primary-color;
+    }
+
+    &__text {
+        color: $primary-color;
+    }
+}
