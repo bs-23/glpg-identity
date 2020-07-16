@@ -2,7 +2,6 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { Route, Redirect } from "react-router-dom";
 import Navbar from "./components/navbar.component";
-import Forbidden from './Forbidden'
 
 export default function PrivateRoute({ component: Component, module, ...rest }) {
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
