@@ -19,8 +19,9 @@
 
         &.disabled {
             box-shadow: none !important;
-            color: #999 !important;
-            @include HEX-to-RGBA(background-color, $white-color, .5);
+            color: #9AB1AD !important;
+            background: #F9F9F9 !important;
+            // @include HEX-to-RGBA(background-color, $white-color, .5);
         }
 
         &:hover {

@@ -9,7 +9,7 @@ export default function Navbar() {
         <header className="app__header py-1 shadow-sm">
             <div className="container-fluid">
                 <div className="row align-items-center">
-                    <div className="col-12 col-sm-6">
+                    <div className="col-4">
                         <div className="d-flex">
                             <h1 className="text-center">
                                 <a href="/"> <img alt="CIAM logo" src="/assets/CIAM-LOGO.png" height="64" /></a>
@@ -28,9 +28,9 @@ export default function Navbar() {
                             </Dropdown>*/}
                         </div>
                     </div>
-                    <div className="col-12 col-sm-6 text-right">
-                        <button className="mr-2 btn cdp-btn-secondary text-white"><i class="far fa-user-circle mr-2"></i> {loggedInUser.name}</button>
-                        <a className="btn cdp-btn-outline-primary" href="/api/logout"><i className="fas fa-sign-out-alt mr-2"></i>Logout</a>
+                    <div className="col-8 text-right">
+                        <button className="mr-2 btn cdp-btn-secondary text-white"><i className="icon icon-user-round mr-1 app__header-icon-user"></i> {loggedInUser.name}</button>
+                        <a className="btn cdp-btn-outline-primary" href="/api/logout"><i className="icon icon-logout mr-1 app__header-icon-logout"></i>Logout</a>
                     </div>
                 </div>
             </div>

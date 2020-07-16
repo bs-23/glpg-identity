@@ -11,7 +11,7 @@ const Faq = () => {
                     <Card>
                         <Accordion.Toggle as={Card.Header} eventKey="0" className="p-3 d-flex align-items-baseline justify-content-between" role="button">
                             What is a Customer Data Platform?
-                        <i className="fas fa-caret-down ml-2 faq__icon-down"></i>
+                        <i className="icon icon-arrow-down ml-2 faq__icon-down"></i>
                         </Accordion.Toggle>
                         <Accordion.Collapse eventKey="0">
                             <Card.Body>A Customer Data Platform (CDP) is a software that aggregates and organizes customer data across a variety of touchpoints and is used by other software, systems, and marketing efforts. CDPs collect and structure real-time data into individual, centralized customer profiles.</Card.Body>
@@ -20,7 +20,7 @@ const Faq = () => {
                     <Card>
                         <Accordion.Toggle as={Card.Header} eventKey="1" className="p-3 d-flex align-items-baseline justify-content-between" role="button">
                             What is customer data?
-                        <i className="fas fa-caret-down ml-2 faq__icon-down"></i>
+                        <i className="icon icon-arrow-down ml-2 faq__icon-down"></i>
                         </Accordion.Toggle>
                         <Accordion.Collapse eventKey="1">
                             <Card.Body>CDPs exist because customer data has become crucial to both business and marketing operations. So, what is customer data exactly? <br />
@@ -30,10 +30,19 @@ const Faq = () => {
                     <Card>
                         <Accordion.Toggle as={Card.Header} eventKey="2" className="p-3 d-flex align-items-baseline justify-content-between" role="button">
                             Key Benefits of a CDP
-                        <i className="fas fa-caret-down ml-2 faq__icon-down"></i>
+                        <i className="icon icon-arrow-down ml-2 faq__icon-down"></i>
                         </Accordion.Toggle>
                         <Accordion.Collapse eventKey="2">
                             <Card.Body>CDPs improve your organization, better your customer relationships, and complement your current software and marketing efforts. Here are a handful of key benefits of having a CDP.</Card.Body>
+                        </Accordion.Collapse>
+                    </Card>
+                    <Card>
+                        <Accordion.Toggle as={Card.Header} eventKey="3" className="p-3 d-flex align-items-baseline justify-content-between" role="button">
+                            Data Collection
+                        <i className="icon icon-arrow-down ml-2 faq__icon-down"></i>
+                        </Accordion.Toggle>
+                        <Accordion.Collapse eventKey="3">
+                            <Card.Body>A main advantage of a CDP is its ability to collect data from a variety of sources (both online and offline, with a variety of formats and structures) and convert that disparate data into a standardized form.</Card.Body>
                         </Accordion.Collapse>
                     </Card>
                 </Accordion> 
