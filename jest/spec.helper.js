@@ -11,7 +11,8 @@ const defaultAdminId = 'f29b63e5-36c7-4210-a5a8-c1e9d0c5b9e4';
 const defaultApplicationId = '9017a1ee-3391-40a0-ad50-70bc7f1657f0';
 const defaultHCPuserId = 'db2baac3-46d1-425f-b62d-3730a294fd0e';
 const demoConsentId = '3bb2057b-3006-4c87-9ce1-166bd291e86f';
-const allPermissionID = '59ffc4d9-3d47-4b36-ad6f-b7741b0a738d'
+const UserPermissionID = 'e31e7b72-8dd9-43cf-a2b2-823963bfad45'
+const HcpPermissionID = 'bd2b3849-a1a0-40ab-900a-346926edc572'
 const rootRoleID = '1ffe73e9-7922-4640-ba0c-3628b3358aa8'
 
 module.exports = {
@@ -100,13 +101,15 @@ module.exports = {
         },
     },
     permissions: [
-        { id: allPermissionID, "module": Modules.ALL.value, "status": "active", "title": Modules.ALL.title, "created_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385", "updated_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
+        { id: UserPermissionID, module: Modules.USER.value, status: "active", title: Modules.USER.title, created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" },
+        { id: HcpPermissionID, module: Modules.HCP.value, status: "active", title: Modules.HCP.title, created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
     ],
     roles: [
         { id: rootRoleID, name: 'Root Role', slug: 'root', description: "Has access to all permissions", created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
     ],
     rolePermissions: [
-        { "permissionId": allPermissionID, "roleId": rootRoleID }
+        { "permissionId": UserPermissionID, "roleId": rootRoleID },
+        { "permissionId": HcpPermissionID, "roleId": rootRoleID }
     ],
     userRoles: {
         defaultAdmin: [
