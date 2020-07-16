@@ -1,32 +1,30 @@
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { NavLink, useHistory } from 'react-router-dom';
+import { NavLink, useHistory, useSelector } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { Form, Formik, Field, ErrorMessage } from "formik";
-import { createUser } from "../user.actions";
+import { getRoles } from "../user.actions";
 import { registerSchema } from "../user.schema";
 import { useToasts } from "react-toast-notifications";
 import Modal from 'react-bootstrap/Modal';
 
 export default function RoleForm() {
     const dispatch = useDispatch();
-    const [countries, setCountries] = useState([]);
     const [permissions, setPermissions] = useState([]);
+    const roles = useSelector(state => state.userReducer.roles);
     const history = useHistory()
     const { addToast } = useToasts();
     const [show, setShow] = useState(false);
 
     useEffect(() => {
-        async function getCountries() {
-            const response = await axios.get('/api/countries');
-            setCountries(response.data);
-        }
         async function getPermissions() {
             const response = await axios.get('/api/permissions');
             setPermissions(response.data);
         }
         getCountries();
         getPermissions();
+
+        dispatch(getRoles());
     }, []);
 
     return (
@@ -132,6 +130,31 @@ export default function RoleForm() {
                                 </div>
                             </Modal.Body>
                         </Modal>
+
+                        {roles && roles.length > 0 &&
+                            <table className="table table-hover table-sm mb-0">
+                                <thead className="cdp-light-bg">
+                                    <tr>
+                                        <th className="py-2">First Name</th>
+                                        <th className="py-2">Last Name</th>
+                                        <th className="py-2">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {roles.map(row => (
+                                        <tr key={row.id}>
+                                            <td>{row.name}</td>
+                                            <td>{row.description}</td>
+                                            <td></td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        }
+
+                        {roles && roles.length === 0 &&
+                            <><div className="alert alert-info mt-5">No role found!</div></>
+                        }
                     </div>
                 </div>
             </div>
