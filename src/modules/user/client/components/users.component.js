@@ -3,8 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { LinkContainer } from 'react-router-bootstrap';
-import { getUsers } from '../user.actions';
-// import { deleteUser } from '../user.actions';
+import { getUsers, getSignedInUserProfile } from '../user.actions';
 import axios from "axios";
 
 export default function Users() {
@@ -17,13 +16,13 @@ export default function Users() {
     const params = new URLSearchParams(window.location.search);
 
     const getUserList = (page = params.get('page') ? params.get('page') : 1,
-        country = params.get('country') ? params.get('country') : null) => {
-        dispatch(getUsers(page, country));
+        country_iso2 = params.get('country_iso2') ? params.get('country_iso2') : null) => {
+        dispatch(getUsers(page, country_iso2));
     }
+
 
     useEffect(() => {
         getUserList();
-
         async function getCountries() {
             const response = await axios.get('/api/countries');
             setCountries(response.data);
@@ -46,11 +45,11 @@ export default function Users() {
     // };
 
     const pageLeft = () => {
-        if (userdata.page > 1) getUserList(userdata.page - 1, userdata.country);
+        if (userdata.page > 1) getUserList(userdata.page - 1, userdata.country_iso2);
     };
 
     const pageRight = () => {
-        if (userdata.end !== userdata.total) getUserList(userdata.page + 1, userdata.country);
+        if (userdata.end !== userdata.total) getUserList(userdata.page + 1, userdata.country_iso2);
     };
 
     return (
@@ -79,7 +78,7 @@ export default function Users() {
                                     <LinkContainer to="list?page=1"><Dropdown.Item onClick={() => getUserList(1, null)}>None</Dropdown.Item></LinkContainer>
                                     {
                                         countries.length > 0 && countries.map(country => (
-                                            <LinkContainer to={`list?page=1&country=${country.country_iso2}`} key={country.countryid}><Dropdown.Item onClick={() => getUserList(1, country.country_iso2)}>{country.countryname}</Dropdown.Item></LinkContainer>
+                                            <LinkContainer to={`list?page=1&country_iso2=${country.country_iso2}`} key={country.countryid}><Dropdown.Item onClick={() => getUserList(1, country.country_iso2)}>{country.countryname}</Dropdown.Item></LinkContainer>
                                         ))
                                     }
 
@@ -128,8 +127,8 @@ export default function Users() {
                                     &&
                                     < div className="pagination justify-content-end align-items-center mb-4 border-top pt-3">
                                         {userdata.start + '-' + userdata.end + ' of ' + userdata.total}
-                                        <LinkContainer to={`list?page=${userdata.page - 1}&country=${userdata.country}`}><button className="btn btn-sm cdp-btn-secondary text-white mx-2" onClick={() => pageLeft()} disabled={userdata.page <= 1}>Prev</button></LinkContainer>
-                                        <LinkContainer to={`list?page=${userdata.page + 1}&country=${userdata.country}`}><button className="btn btn-sm cdp-btn-secondary text-white" onClick={() => pageRight()} disabled={userdata.end === userdata.total}>Next</button></LinkContainer>
+                                        <LinkContainer to={`list?page=${userdata.page - 1}&country_iso2=${userdata.country_iso2}`}><button className="btn btn-sm cdp-btn-secondary text-white mx-2" onClick={() => pageLeft()} disabled={userdata.page <= 1}>Prev</button></LinkContainer>
+                                        <LinkContainer to={`list?page=${userdata.page + 1}&country_iso2=${userdata.country_iso2}`}><button className="btn btn-sm cdp-btn-secondary text-white" onClick={() => pageRight()} disabled={userdata.end === userdata.total}>Next</button></LinkContainer>
                                     </div>
                                 }
                             </React.Fragment>

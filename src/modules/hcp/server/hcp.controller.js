@@ -201,7 +201,7 @@ async function createHcpProfile(req, res) {
             });
         }
 
-        const doc = await Hcp.create({
+        const model = {
             email: req.body.email,
             uuid: req.body.uuid,
             salutation: req.body.salutation,
@@ -212,10 +212,15 @@ async function createHcpProfile(req, res) {
             application_id: req.user.id,
             created_by: req.user.id,
             updated_by: req.user.id,
-            status: master_data && master_data.length ? 'Approved' : 'Pending',
-            reset_password_token: crypto.randomBytes(36).toString('hex'),
-            reset_password_expires: Date.now() + 3600000
-        });
+            status: master_data && master_data.length ? 'Approved' : 'Pending'
+        };
+
+        if(model.status === 'Approved') {
+            model.reset_password_token = crypto.randomBytes(36).toString('hex'),
+            model.reset_password_expires = Date.now() + 3600000
+        }
+
+        const doc = await Hcp.create(model);
 
         if (req.body.consents) {
             const consentArr = [];
