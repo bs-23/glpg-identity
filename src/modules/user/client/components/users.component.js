@@ -88,9 +88,6 @@ export default function Users() {
                             <NavLink to="/users/create" className="btn cdp-btn-primary btn-sm text-white mr-2">
                                 Create new user
                             </NavLink>
-                            <NavLink to="/users/roles" className="btn cdp-btn-primary btn-sm text-white">
-                                Create new role
-                            </NavLink>
                         </div>
 
                         {userdata['users'] && userdata['users'].length > 0 &&

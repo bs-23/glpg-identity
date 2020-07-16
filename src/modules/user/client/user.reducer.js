@@ -3,7 +3,8 @@ import Types from "./user.types";
 const initialState = {
     loggedInUser: null,
     users: {},
-    deletedUserInfo: {}
+    deletedUserInfo: {},
+    roles: []
 };
 
 export default function reducer(state = initialState, action) {
@@ -20,7 +21,13 @@ export default function reducer(state = initialState, action) {
                 ...state,
                 users: action.payload.data
             };
+        } case Types.GET_ROLES_FULFILLED: {
+            return {
+                ...state,
+                roles: action.payload.data
+            };
         }
+
         case Types.GET_USERS_REJECTED: {
             return {
                 ...state,
