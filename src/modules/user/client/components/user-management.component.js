@@ -40,6 +40,14 @@ const UserManagement = () => {
                                                 <span className="mb-1 d-block cdp-list-group__link-timeing text-muted">5 -7 minutes</span>
                                             </span>
                                         </NavLink>
+                                        <NavLink to="users/roles" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
+                                            <i className="fas fa-plus mr-4 fa-3x cdp-list-group__icon"></i>
+                                            <span>
+                                                <strong className="mb-1 h4 d-block cdp-list-group__link-title">Add New Role</strong>
+                                                <span className="mb-1 d-block cdp-list-group__link-description text-secondary">Add Role for something</span>
+                                                <span className="mb-1 d-block cdp-list-group__link-timeing text-muted">5 -7 minutes</span>
+                                            </span>
+                                        </NavLink>
                                     </div>
                                 </div>
                             </div>
@@ -50,8 +58,9 @@ const UserManagement = () => {
         </main>
 
 
-    
+
     );
 }
- 
+
 export default UserManagement;
+
