@@ -39,7 +39,8 @@ async function init() {
     function userSeeder(callback) {
         User.findOrCreate({
             where: { email: "admin@glpg-cdp.com" }, defaults: {
-                name: "Admin",
+                first_name: "Admin",
+                last_name: '',
                 password: "strong-password",
                 type: "admin"
             }

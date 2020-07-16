@@ -36,7 +36,8 @@ function validatePassword(password) {
 function generateAccessToken(user) {
     return jwt.sign({
         id: user.id,
-        name: user.name,
+        first_name: user.last_name,
+        last_name: user.last_name,
         email: user.email,
     }, nodecache.getValue('CDP_TOKEN_SECRET'), {
         expiresIn: '2d',
@@ -54,7 +55,8 @@ function getPermissions(userPermission) {
 function formatProfile(user) {
     const profile = {
         id: user.id,
-        name: user.name,
+        first_name: user.first_name,
+        last_name: user.last_name,
         email: user.email,
         type: user.type,
         permissions: getPermissions(user.userpermission)
@@ -109,7 +111,8 @@ async function logout(req, res) {
 
 async function createUser(req, res) {
     const {
-        name,
+        first_name,
+        last_name,
         email,
         phone,
         countries,
@@ -122,7 +125,8 @@ async function createUser(req, res) {
         const [doc, created] = await User.findOrCreate({
             where: { email },
             defaults: {
-                name,
+                first_name,
+                last_name,
                 phone,
                 countries,
                 application_id,
@@ -183,7 +187,7 @@ async function createUser(req, res) {
             templateUrl,
             subject: 'Set a password for your new account on GLPG CDP',
             data: {
-                name: doc.name || '',
+                name: `${doc.first_name} ${doc.last_name}`   || '',
                 link
             }
         };
@@ -286,7 +290,7 @@ async function getUser(req, res) {
             where: {
                 id: req.params.id
             },
-            attributes: ['id', 'name', 'email', 'phone', 'type', 'last_login']
+            attributes: ['id', 'first_name', 'last_name', 'email', 'phone', 'type', 'last_login']
         });
 
         if (!user) return res.status(404).send("User is not found or may be removed");
@@ -334,7 +338,7 @@ async function sendPasswordResetLink(req, res) {
             templateUrl,
             subject: 'Password Reset Instructions',
             data: {
-                name: user.name || '',
+                name: user.first_name + " " + user.last_name || '',
                 link
             }
         };
@@ -371,7 +375,7 @@ async function resetPassword(req, res) {
         const options = {
             toAddresses: [user.email],
             data: {
-                name: user.name || ''
+                name: user.first_name + " " + user.last_name || ''
             }
         };
 

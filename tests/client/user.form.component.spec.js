@@ -50,17 +50,20 @@ describe('UserForm component', () => {
         mockAxios.onGet('/api/countries').reply(200, countries)
         mockAxios.onGet('/api/permissions').reply(200, permissions)
 
-        const name = getByTestId('name');
+        const first_name = getByTestId('first_name');
+        const last_name = getByTestId('last_name');
         const email = getByTestId('email');
         const phone = getByTestId('phone');
 
         await waitFor(() => {
-            fireEvent.change(name, { target: { value: 'a' } });
+            fireEvent.change(first_name, { target: { value: 'a' } });
+            fireEvent.change(last_name, { target: { value: 'a' } });
             fireEvent.change(email, { target: { value: 'a' } });
             fireEvent.change(phone, { target: { value: 'a' } });
         });
 
-        expect(name.value).toEqual('a');
+        expect(first_name.value).toEqual('a');
+        expect(last_name.value).toEqual('a');
         expect(email.value).toEqual('a');
         expect(phone.value).toEqual('a');
     });

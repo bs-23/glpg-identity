@@ -32,7 +32,8 @@ module.exports = {
     users: {
         defaultAdmin: {
             id: defaultAdminId,
-            name: 'Default Admin',
+            first_name: 'Default Admin',
+            last_name: '',
             type: 'admin',
             email: 'default-admin@cdp.com',
             password: faker.internet.password(8),
@@ -40,7 +41,8 @@ module.exports = {
             access_token: jwt.sign(
                 {
                     id: defaultAdminId,
-                    name: 'Admin',
+                    first_name: 'Admin',
+                    last_name: '',
                     email: 'default-admin@cdp.com',
                 },
                 process.env.CDP_TOKEN_SECRET,
@@ -50,7 +52,8 @@ module.exports = {
         defaultUser: {
             id: defaultUserId,
             application_id: defaultApplicationId,
-            name: 'Default User',
+            first_name: 'Default User',
+            last_name: '',
             email: 'default-user@cdp.com',
             password: 'strong-password',
             expiary_date: new Date(Date.now() + 24 * 60 * 60 * 1000),
@@ -59,7 +62,8 @@ module.exports = {
             access_token: jwt.sign(
                 {
                     id: defaultUserId,
-                    name: 'Default User',
+                    first_name: 'Default User',
+                    last_name: '',
                     email: 'default-user@cdp.com',
                 },
                 process.env.CDP_TOKEN_SECRET,

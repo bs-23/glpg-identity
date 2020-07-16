@@ -59,7 +59,8 @@ describe('User Routes', () => {
             .post('/api/users')
             .set('Cookie', [`access_token=${defaultUser.access_token}`])
             .send({
-                name: faker.name.firstName(),
+                first_name: faker.name.firstName(),
+                last_name: faker.name.lastName(),
                 email: faker.internet.email(),
                 password: 'Abcdef2!',
                 application_id: specHelper.defaultApplication.id,
@@ -74,7 +75,8 @@ describe('User Routes', () => {
             .post('/api/users')
             .set('Cookie', [`access_token=${defaultUser.access_token}`])
             .send({
-                name: defaultUser.name,
+                first_name: defaultUser.first_name,
+                last_name: defaultUser.last_name,
                 email: defaultUser.email,
                 password: defaultUser.password,
             });
@@ -141,7 +143,8 @@ describe('User Routes', () => {
 
         await User.create({
             id,
-            name: faker.name.firstName(),
+            first_name: faker.name.firstName(),
+            last_name: faker.name.lastName(),
             email: faker.internet.email(),
             password: faker.internet.password(8),
             application_id: specHelper.defaultApplication.id,

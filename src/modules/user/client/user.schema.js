@@ -31,7 +31,11 @@ export const loginSchema = object().shape({
 });
 
 export const registerSchema = object().shape({
-    name: string()
+    first_name: string()
+        .min(2, 'This field must be at least 2 characters long.')
+        .max(20, 'This field must be at most 20 characters long.')
+        .required('This field must not be empty.'),
+    last_name: string()
         .min(2, 'This field must be at least 2 characters long.')
         .max(20, 'This field must be at most 20 characters long.')
         .required('This field must not be empty.'),
@@ -41,7 +45,11 @@ export const registerSchema = object().shape({
     phone: string().matches(/^[0-9]/, 'This field only contains numbers'),
     expiary_date: date()
         .min(Date(), 'Must be a future date')
-        .required('This field must not be empty')
+        .required('This field must not be empty'),
+    countries: string()
+        .required('Must select at least one country'),
+    permissions: string()
+        .required('Must select at least one service category')
 });
 
 export const changePasswordSchema = object().shape({

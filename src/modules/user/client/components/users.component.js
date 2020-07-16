@@ -96,7 +96,8 @@ export default function Users() {
                                 <table className="table table-hover table-sm mb-0">
                                     <thead className="cdp-light-bg">
                                         <tr>
-                                            <th className="py-2">Name</th>
+                                            <th className="py-2">First Name</th>
+                                            <th className="py-2">Last Name</th>
                                             <th className="py-2">Email</th>
                                             <th className="py-2">Account Expiry Date</th>
                                             <th className="py-2">Status</th>
@@ -106,7 +107,8 @@ export default function Users() {
                                     <tbody>
                                         {userdata.users.map(row => (
                                             <tr key={row.id}>
-                                                <td>{row.name}</td>
+                                                <td>{row.first_name}</td>
+                                                <td>{row.last_name}</td>
                                                 <td>{row.email}</td>
                                                 <td>{(new Date(row.expiary_date)).toLocaleDateString().replace(/\//g, '-')}</td>
                                                 <td>
