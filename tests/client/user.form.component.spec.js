@@ -46,9 +46,9 @@ describe('UserForm component', () => {
         );
 
         const countries = [{ countryid: 1, countryname: 'England'}]
-        const permissions = [{ id: 1, title: 'Demo Permission'}]
+        const roles = [{ id: 1, title: 'Demo role'}]
         mockAxios.onGet('/api/countries').reply(200, countries)
-        mockAxios.onGet('/api/permissions').reply(200, permissions)
+        mockAxios.onGet('/api/roles').reply(200, roles)
 
         const first_name = getByTestId('first_name');
         const last_name = getByTestId('last_name');
