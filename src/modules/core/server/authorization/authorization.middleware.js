@@ -17,7 +17,7 @@ const AdminGuard = (req, res, next) => {
 const AuthGuard = passport.authenticate('user-jwt', { session: false });
 
 const isPermitted = (module, permissions) => {
-    if (permissions.some(p => p === module)) {
+    if (permissions.some(p => p === module || p === 'all') ) {
         return true;
     }
     return false;

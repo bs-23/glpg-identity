@@ -4,7 +4,7 @@ const Permission = require('../permission/permission.model');
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 
-const RolePermission = sequelize.cdpConnector.define('role-permissions', {
+const RolePermission = sequelize.cdpConnector.define('role_permissions', {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -21,7 +21,7 @@ const RolePermission = sequelize.cdpConnector.define('role-permissions', {
     }
 }, {
     schema: 'ciam',
-    tableName: 'role-permissions',
+    tableName: 'role_permissions',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'

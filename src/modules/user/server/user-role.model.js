@@ -4,7 +4,7 @@ const Role = require('./role/role.model');
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 
-const UserRole = sequelize.cdpConnector.define('user-roles', {
+const UserRole = sequelize.cdpConnector.define('user_roles', {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -21,7 +21,7 @@ const UserRole = sequelize.cdpConnector.define('user-roles', {
     }
 }, {
     schema: 'ciam',
-    tableName: 'user-roles',
+    tableName: 'user_roles',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
