@@ -8,6 +8,8 @@ export default function PrivateRoute({ component: Component, module, ...rest }) 
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
     const permissions = loggedInUser ? loggedInUser.permissions : [];
 
+    
+
     return (
         <Route {...rest} render={props => {
             return (
@@ -16,12 +18,17 @@ export default function PrivateRoute({ component: Component, module, ...rest }) 
                         <Navbar/>
                         <Component {...props} />
                     </>
-                ) : <Forbidden {...props} /> : (
+                ) : (
+                    props.history.replace({
+                        pathname: "/forbidden",
+                        state: { from: props.location }
+                    })
+                ) : (
                     <Redirect push to={{
                         pathname: "/login",
                         state: { from: props.location }
                     }}/>
-                )
+                ) 
             )
         }}/>
     );

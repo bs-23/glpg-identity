@@ -19,26 +19,11 @@ const UserPermission = sequelize.cdpConnector.define('user-permissions', {
         allowNull: false,
         type: DataTypes.UUID
     },
-
     created_by: {
-        type: DataTypes.UUID,
-        validate: {
-            customValidator(value) {
-                if (value === null && this.type !== 'admin') {
-                    throw new Error("created_by is required for basic user");
-                }
-            }
-        }
+        type: DataTypes.UUID
     },
     updated_by: {
-        type: DataTypes.UUID,
-        validate: {
-            customValidator(value) {
-                if (value === null && this.type !== 'admin') {
-                    throw new Error("updated_by is required for basic user");
-                }
-            }
-        }
+        type: DataTypes.UUID
     },
 }, {
     schema: 'ciam',
@@ -47,7 +32,6 @@ const UserPermission = sequelize.cdpConnector.define('user-permissions', {
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
-
 
 UserPermission.belongsTo(Permission, {as: 'permission', foreignKey: 'permissionId'});
 

@@ -68,14 +68,14 @@ export default function UserForm() {
                                 {formikProps => (
                                     <Form onSubmit={formikProps.handleSubmit}>
                                         <div className="form-group">
-                                            <label htmlFor="name">Name:</label>
+                                            <label htmlFor="name">Name</label>
                                             <Field data-testid="name" className="form-control" type="name" name="name" />
                                             <div className="invalid-feedback" data-testid="nameError"><ErrorMessage name="name" /></div>
                                         </div>
                                         <div className="row">
                                             <div className="col-12 col-sm-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="email">Email:</label>
+                                                    <label htmlFor="email">Email</label>
                                                     <Field data-testid="email" className="form-control" type="email" name="email" autoComplete="username" />
                                                     <div className="invalid-feedback" data-testid="emailError"><ErrorMessage name="email" /></div>
                                                 </div>
@@ -93,7 +93,7 @@ export default function UserForm() {
                                         <div className="row">
                                             <div className="col-12 col-sm-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="expiary_date">Expiary Date:</label>
+                                                    <label htmlFor="expiary_date">Valid Until</label>
                                                     <Field className="form-control" type="date" name="expiary_date" />
                                                     <div className="invalid-feedback">
                                                         <ErrorMessage name="expiary_date" />
@@ -104,7 +104,7 @@ export default function UserForm() {
                                         <div className="row">
                                             <div className="col-12 col-sm-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="country">Select Countries:</label>
+                                                    <label htmlFor="country">Select Countries</label>
                                                     <Field data-testid="country" as="select" name="countries" className="form-control" multiple>
                                                         {countries.map(item => <option key={item.countryid} value={item.country_iso2}>{item.countryname}</option>)}
                                                     </Field>
@@ -112,7 +112,7 @@ export default function UserForm() {
                                             </div>
                                             <div className="col-12 col-sm-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="permissions">Grant Permissions:</label>
+                                                    <label htmlFor="permissions">Assign Service Category</label>
                                                     <Field data-testid="permission" as="select" name="permissions" className="form-control" multiple>
                                                         {permissions.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
                                                     </Field>
