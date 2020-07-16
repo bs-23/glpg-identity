@@ -39,7 +39,7 @@ const UserDetails = (props) => {
                             <ul className="list-group list-group-flush">
                                 <li className="list-group-item bg-transparent px-0"><span className="mr-2">Email:</span><span>{userInfo.email}</span></li>
                                 <li className="list-group-item bg-transparent px-0"><span className="mr-2">Phone Number:</span><span>{userInfo.phone}</span></li>
-                                <li className="list-group-item bg-transparent px-0"><span className="mr-2">Land Number:</span><span>NaN</span></li>
+                                <li className="list-group-item bg-transparent px-0"><span className="mr-2">Expiary Date:</span><span>{userInfo.expiary_date}</span></li>
                                 <li className="list-group-item bg-transparent px-0"><span className="mr-2">Last Login:</span><span>{userInfo.last_login}</span></li>
                                 <li className="list-group-item bg-transparent px-0"><span className="mr-2">Status:</span><span>Active</span></li>
                             </ul>

@@ -46,7 +46,7 @@ function generateAccessToken(user) {
 }
 
 function getPermissions(userPermission) {
-    if(userPermission) {
+    if (userPermission) {
         const permissions = userPermission.map(up => up.permission.module);
         return permissions;
     }
@@ -72,7 +72,8 @@ async function getSignedInUserProfile(req, res) {
 async function login(req, res) {
     try {
         const { email, password } = req.body;
-        const user = await User.findOne({ where: { email },
+        const user = await User.findOne({
+            where: { email },
             include: [{
                 model: Userpermission,
                 as: 'userpermission',
@@ -140,7 +141,7 @@ async function createUser(req, res) {
             return res.sendStatus(400);
         }
 
-        permissions && permissions.forEach(async function(permissionId){
+        permissions && permissions.forEach(async function (permissionId) {
 
             await UserPermission.create({
                 permissionId: permissionId,
@@ -241,16 +242,19 @@ async function getUsers(req, res) {
     if (page < 0) return res.status(404).send("page must be greater or equal 1");
 
     const limit = 20;
-    const country = req.query.country === 'null' ? null : req.query.country;
+    const country_iso2 = req.query.country_iso2 === 'null' ? null : req.query.country_iso2;
     const offset = page * limit;
+
+    const signedInId = (formatProfile(req.user)).id;
 
     try {
 
         const users = await User.findAll(
             {
                 where: {
+                    id: { [Op.ne]: signedInId },
                     type: 'basic',
-                    countries: country ? { [Op.contains]: [country] } : { [Op.ne]: ["undefined"] }
+                    countries: country_iso2 ? { [Op.contains]: [country_iso2] } : { [Op.ne]: ["undefined"] }
                 },
                 offset,
                 limit,
@@ -263,7 +267,7 @@ async function getUsers(req, res) {
         const totalUser = await User.count({
             where: {
                 type: 'basic',
-                countries: country ? { [Op.contains]: [country] } : { [Op.ne]: ["undefined"] }
+                countries: country_iso2 ? { [Op.contains]: [country_iso2] } : { [Op.ne]: ["undefined"] }
             },
         });
 
@@ -274,7 +278,7 @@ async function getUsers(req, res) {
             total: totalUser,
             start: limit * page + 1,
             end: offset + limit > totalUser ? totalUser : offset + limit,
-            country: country ? country : null
+            country_iso2: country_iso2 ? country_iso2 : null
         };
 
         res.json(data);
@@ -290,7 +294,7 @@ async function getUser(req, res) {
             where: {
                 id: req.params.id
             },
-            attributes: ['id', 'first_name', 'last_name', 'email', 'phone', 'type', 'last_login']
+            attributes: ['id', 'first_name', 'last_name', 'email', 'phone', 'type', 'last_login', 'expiary_date']
         });
 
         if (!user) return res.status(404).send("User is not found or may be removed");
@@ -379,12 +383,12 @@ async function resetPassword(req, res) {
             }
         };
 
-        if(resetRequest.type === 'set'){
+        if (resetRequest.type === 'set') {
             options.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp-registration-success.html`);
             options.subject = 'You have successfully set a password for your Galapagos CDP account'
             options.data.link = `${req.protocol}://${req.headers.host}/login`
         }
-        else{
+        else {
             options.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp-password-reset.html`);
             options.subject = 'Your password has been reset'
         }
