@@ -5,11 +5,9 @@ import React, { useState, useEffect } from 'react';
 import { Form, Formik, Field, ErrorMessage } from "formik";
 import { createUser } from "../user.actions";
 import { registerSchema } from "../user.schema";
-import { useToasts } from 'react-toast-notifications';
+
 
 export default function UserForm() {
-    const { addToast } = useToasts();
-
     const dispatch = useDispatch();
     const [countries, setCountries] = useState([]);
     const [permissions, setPermissions] = useState([]);

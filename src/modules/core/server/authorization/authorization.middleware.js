@@ -18,9 +18,9 @@ const isPermitted = (module, userPermission) => {
 
     if(userPermission.some(element =>element.permission.module === module )) {
         return true;
-    } else {
-        return false;
     }
+
+    return false;
 };
 
 async function getUserWithPermissions(id) {

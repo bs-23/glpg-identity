@@ -1,7 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import Dropdown from 'react-bootstrap/Dropdown';
-import { LinkContainer } from 'react-router-bootstrap';
+
 
 export default function Navbar() {
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);

@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from 'react';
-import { NavLink, useHistory } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 const UserDetails = (props) => {
     const [userInfo, setUserInfo] = useState({});
@@ -12,7 +12,7 @@ const UserDetails = (props) => {
             const response = await axios.get(`/api/users/${id}`);
             setUserInfo(response.data);
         }
-        
+
         getInfo();
     }, [props]);
 
@@ -43,14 +43,14 @@ const UserDetails = (props) => {
                                 <li className="list-group-item bg-transparent px-0"><span className="mr-2">Last Login:</span><span>{userInfo.last_login}</span></li>
                                 <li className="list-group-item bg-transparent px-0"><span className="mr-2">Status:</span><span>Active</span></li>
                             </ul>
-                            
+
                         </div>
                     </div>
                 </div>
             </div>
         </main>
-        
+
     );
 }
- 
+
 export default UserDetails;

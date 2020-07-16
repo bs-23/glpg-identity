@@ -3,7 +3,8 @@ import { NavLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { LinkContainer } from 'react-router-bootstrap';
-import { getUsers, deleteUser } from '../user.actions';
+import { getUsers } from '../user.actions';
+// import { deleteUser } from '../user.actions';
 import { useToasts } from 'react-toast-notifications';
 import axios from "axios";
 
@@ -34,18 +35,18 @@ export default function Users() {
 
     }, []);
 
-    const onDeleteUser = id => {
-        if (confirm("Are you sure?")) {
-            dispatch(deleteUser(id)).then(res => {
-                addToast("User deleted successfully", {
-                    appearance: 'error',
-                    autoDismiss: true
-                });
+    // const onDeleteUser = id => {
+    //     if (confirm("Are you sure?")) {
+    //         dispatch(deleteUser(id)).then(res => {
+    //             addToast("User deleted successfully", {
+    //                 appearance: 'error',
+    //                 autoDismiss: true
+    //             });
 
-                getUserList();
-            });
-        }
-    };
+    //             getUserList();
+    //         });
+    //     }
+    // };
 
     const pageLeft = () => {
         if (userdata.page > 1) getUserList(userdata.page - 1, userdata.country);
