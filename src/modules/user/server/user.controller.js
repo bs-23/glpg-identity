@@ -290,7 +290,7 @@ async function getUser(req, res) {
             where: {
                 id: req.params.id
             },
-            attributes: ['id', 'name', 'email', 'phone', 'type', 'last_login']
+            attributes: ['id', 'name', 'email', 'phone', 'type', 'last_login', 'expiary_date']
         });
 
         if (!user) return res.status(404).send("User is not found or may be removed");
