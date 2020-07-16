@@ -55,10 +55,11 @@ async function init() {
 
     function permissionSeeder(callback) {
         const permissions = [
-            { "module": Modules.ALL.value, "status": "active", "title": Modules.ALL.title, "created_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385", "updated_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
+            { module: Modules.USER.value, status: "active", title: Modules.USER.title, created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" },
+            { module: Modules.HCP.value, status: "active", title: Modules.HCP.title, created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
         ];
 
-        Permission.destroy({ truncate:  { cascade: true } }).then(() => {
+        Permission.destroy({ truncate: { cascade: true } }).then(() => {
             Permission.bulkCreate(permissions, {
                 returning: true,
                 ignoreDuplicates: false
@@ -73,7 +74,7 @@ async function init() {
             { name: 'Root Role', slug: 'root', description: "Has access to all permissions", created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
         ];
 
-        Role.destroy({ truncate:  { cascade: true } }).then(() => {
+        Role.destroy({ truncate: { cascade: true } }).then(() => {
             Role.bulkCreate(roles, {
                 returning: true,
                 ignoreDuplicates: false
@@ -85,11 +86,13 @@ async function init() {
 
     function rolePermissionSeeder(callback) {
         const adminRole = Role.findOne({ where: { slug: 'root' } });
-        const allPermission = Permission.findOne({ where: { module: "all" } });
+        const userPermission = Permission.findOne({ where: { module: 'user' } });
+        const hcpPermission = Permission.findOne({ where: { module: 'hcp' } });
 
-        Promise.all([adminRole,allPermission]).then((values) => {
+        Promise.all([adminRole, userPermission, hcpPermission]).then((values) => {
             const rolePermissions = [
-                { "permissionId": values[1].id, "roleId": values[0].id}
+                { permissionId: values[1].id, roleId: values[0].id },
+                { permissionId: values[2].id, roleId: values[0].id }
             ];
 
             RolePermission.destroy({ truncate:  { cascade: true } }).then(() => {
@@ -109,7 +112,7 @@ async function init() {
 
         Promise.all([admin, adminRole]).then((values) => {
             const userRoles = [
-                { "roleId": values[1].id, "userId": values[0].id }
+                { userId: values[0].id, roleId: values[1].id }
             ];
 
             UserRole.destroy({ truncate:  { cascade: true } }).then(() => {

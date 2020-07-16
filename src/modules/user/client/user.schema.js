@@ -82,3 +82,10 @@ export const forgotPasswordSchema = object().shape({
         .email('This field should be an valid email address.')
         .required('This field must not be empty.'),
 });
+
+export const roleSchema = object().shape({
+    name: string()
+        .required('This field must not be empty.'),
+    permissions: string()
+        .required('Must select at least one permission')
+});

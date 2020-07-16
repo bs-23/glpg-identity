@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { Form, Formik, Field, ErrorMessage } from "formik";
 import { getRoles, createRole } from "../user.actions";
-import { registerSchema } from "../user.schema";
+import { roleSchema } from "../user.schema";
 import { useToasts } from "react-toast-notifications";
 import Modal from 'react-bootstrap/Modal';
 
@@ -34,15 +34,14 @@ export default function RoleForm() {
                             <ol className="breadcrumb rounded-0 my-0">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/users">User Management</NavLink></li>
-                                <li className="breadcrumb-item"><NavLink to="/users/list">User List</NavLink></li>
-                                <li className="breadcrumb-item active">Add new</li>
+                                <li className="breadcrumb-item active">Roles</li>
                             </ol>
                         </nav>
                     </div>
                 </div>
                 <div className="row">
                     <div className="col-12 col-sm-12 py-3 d-flex justify-content-between align-items-center">
-                        <h2>Create new Role</h2>
+                        <h2>Manage User Roles</h2>
                         <button className="btn cdp-btn-primary btn-sm text-white" onClick={() => setShow(true)}>
                             Add New Role
                         </button>
@@ -68,7 +67,7 @@ export default function RoleForm() {
                                             permissions: []
                                         }}
                                         displayName="UserForm"
-                                        validationSchema={registerSchema}
+                                        validationSchema={roleSchema}
                                         onSubmit={(values, actions) => {
                                             dispatch(createRole(values)).then(res => {
                                                 actions.resetForm();
@@ -142,7 +141,7 @@ export default function RoleForm() {
                                         <tr key={row.id}>
                                             <td>{row.name}</td>
                                             <td>{row.description}</td>
-                                            <td></td>
+                                            <td><a className="btn btn-outline-primary btn-sm"><i className="far fa-user-circle pr-1"></i>Edit</a></td>
                                         </tr>
                                     ))}
                                 </tbody>

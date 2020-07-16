@@ -6,27 +6,23 @@ const UserRole = require(path.join(process.cwd(), "src/modules/user/server/user-
 const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
 const RolePermission = require(path.join(process.cwd(), "src/modules/user/server/role/role-permission.model"));
 
-
 const AdminGuard = (req, res, next) => {
     if (!req.user) return res.status(401).send('unauthorized');
-    if (req.user.type.toLowerCase() !== 'admin')
-        return res.status(403).send('forbidden');
+    if (req.user.type.toLowerCase() !== 'admin') return res.status(403).send('forbidden');
+
     next();
 };
 
 const AuthGuard = passport.authenticate('user-jwt', { session: false });
 
 const isPermitted = (module, permissions) => {
-    if (permissions.some(p => p === module || p === 'all') ) {
+    if (permissions.some(p => p === module)) {
         return true;
     }
     return false;
-
-
 };
 
 async function getUserWithPermissions(id) {
-
     const userWithPermissions = await User.findOne({
         where: { id },
         include: [{
@@ -49,7 +45,6 @@ async function getUserWithPermissions(id) {
     });
 
     return userWithPermissions;
-
 }
 
 function getPermissions(userrole) {
@@ -74,7 +69,7 @@ const ModuleGuard = (moduleName) => {
         }
         next();
     }
-}
+};
 
 const adminPipeline = [AuthGuard, AdminGuard];
 

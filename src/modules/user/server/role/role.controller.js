@@ -15,12 +15,16 @@ async function getRoles(req, res) {
 }
 
 async function createRole(req, res) {
-    const { name, description, permissions } = req.body;
-
     try {
-        const doc = await Role.create({ name, description, slug: convertToSlug(name) });
+        const doc = await Role.create({
+            name: req.body.name,
+            description: req.body.description,
+            slug: convertToSlug(req.body.name),
+            created_by: req.user.id,
+            updated_by: req.user.id
+        });
 
-        permissions && permissions.forEach(async function (permissionId) {
+        req.body.permissions && req.body.permissions.forEach(async function (permissionId) {
             await RolePermissions.create({
                 permissionId: permissionId,
                 roleId: doc.id
@@ -51,7 +55,7 @@ async function editRole(req, res) {
             return res.sendStatus(400);
         }
 
-        doc.update({ name, description, slug: convertToSlug(name) });
+        doc.update({ name, description, slug: convertToSlug(name), updated_by: req.user.id });
 
         res.json(doc);
     } catch (err) {
