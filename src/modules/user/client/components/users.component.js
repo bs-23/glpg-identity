@@ -5,8 +5,6 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import { LinkContainer } from 'react-router-bootstrap';
 import { getUsers } from '../user.actions';
 // import { deleteUser } from '../user.actions';
-import { useToasts } from 'react-toast-notifications';
-import axios from "axios";
 
 export default function Users() {
     const dispatch = useDispatch();
@@ -21,8 +19,6 @@ export default function Users() {
         country = params.get('country') ? params.get('country') : null) => {
         dispatch(getUsers(page, country));
     }
-
-    const { addToast } = useToasts();
 
     useEffect(() => {
         getUserList();
