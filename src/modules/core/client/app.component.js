@@ -6,6 +6,7 @@ import "bootstrap/scss/bootstrap";
 import "@fortawesome/fontawesome-free/css/all.css";
 import "./app.scss";
 
+import Forbidden from './Forbidden';
 import NoMatch from "./NoMatch";
 import PublicRoute from "./PublicRoute";
 import PrivateRoute from "./PrivateRoute";
@@ -40,6 +41,8 @@ export default function App() {
                 <Route path="/reset-password" component={ResetPasswordForm} />
 
                 <Route path="/forgot-password" component={ForgotPassword} />
+
+                <Route path="/forbidden" component={Forbidden} />
 
                 <Route component={NoMatch} />
 
