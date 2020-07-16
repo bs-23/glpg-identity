@@ -25,7 +25,11 @@ const User = sequelize.cdpConnector.define('users', {
             }
         }
     },
-    name: {
+    first_name: {
+        allowNull: false,
+        type: DataTypes.STRING
+    },
+    last_name: {
         allowNull: false,
         type: DataTypes.STRING
     },
