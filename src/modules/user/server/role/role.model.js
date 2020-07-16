@@ -12,6 +12,12 @@ const Role = sequelize.cdpConnector.define('roles', {
         defaultValue: DataTypes.UUIDV4
     },
     name: {
+        unique: true,
+        allowNull: false,
+        type: DataTypes.STRING
+    },
+    slug: {
+        unique: true,
         allowNull: false,
         type: DataTypes.STRING
     },

@@ -26,6 +26,8 @@ async function init() {
 
     await sequelize.cdpConnector.sync();
 
+    const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, "").replace(/ +/g, "-");
+
     function applicationSeeder(callback) {
         Application.findOrCreate({
             where: { email: "hcp-portal@glpg.com" }, defaults: {
@@ -68,7 +70,7 @@ async function init() {
 
     function roleSeeder(callback) {
         const roles = [
-            { "name": "Root Role", "description": "Has access to all permissions", "created_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385", "updated_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
+            { name: 'Root Role', slug: 'root', description: "Has access to all permissions", created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
         ];
 
         Role.destroy({ truncate:  { cascade: true } }).then(() => {
@@ -82,7 +84,7 @@ async function init() {
     }
 
     function rolePermissionSeeder(callback) {
-        const adminRole = Role.findOne({ where: { name: "System-Admin" } });
+        const adminRole = Role.findOne({ where: { slug: 'root' } });
         const allPermission = Permission.findOne({ where: { module: "all" } });
 
         Promise.all([adminRole,allPermission]).then((values) => {
@@ -103,7 +105,7 @@ async function init() {
 
     function userRoleSeeder(callback) {
         const admin = User.findOne({ where: { email: "admin@glpg-cdp.com" } });
-        const adminRole = Role.findOne({ where: { name: "System-Admin" } });
+        const adminRole = Role.findOne({ where: { slug: 'root' } });
 
         Promise.all([admin, adminRole]).then((values) => {
             const userRoles = [
@@ -158,8 +160,6 @@ async function init() {
             { "title": "Invite to Remote Engagement", "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
             { "title": "Send CLM content after RepSale visit", "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
         ];
-
-        const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, "").replace(/ +/g, "-");
 
         const all_consents = consents.map( consent => {
             if(consent.title.length > 50){

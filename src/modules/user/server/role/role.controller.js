@@ -3,6 +3,8 @@ const Role = require('./role.model');
 const RolePermissions = require('./role-permission.model');
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 
+const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, "").replace(/ +/g, "-");
+
 async function getRoles(req, res) {
     try {
         const roles = await Role.findAll();
@@ -16,7 +18,7 @@ async function createRole(req, res) {
     const { name, description, permissions } = req.body;
 
     try {
-        const doc = await Role.create({ name, description });
+        const doc = await Role.create({ name, description, slug: convertToSlug(name) });
 
         permissions && permissions.forEach(async function (permissionId) {
             await RolePermissions.create({
@@ -49,7 +51,7 @@ async function editRole(req, res) {
             return res.sendStatus(400);
         }
 
-        doc.update({ name, description});
+        doc.update({ name, description, slug: convertToSlug(name) });
 
         res.json(doc);
     } catch (err) {
