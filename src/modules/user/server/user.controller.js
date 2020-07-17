@@ -150,8 +150,9 @@ async function createUser(req, res) {
         countries,
         roles,
         application_id,
-        expiry_date
     } = req.body;
+    const validForMonths = 6
+    const currentDate = new Date()
 
     try {
         const [doc, created] = await User.findOrCreate({
@@ -164,7 +165,7 @@ async function createUser(req, res) {
                 application_id,
                 created_by: req.user.id,
                 updated_by: req.user.id,
-                expiry_date
+                expiry_date: new Date(currentDate.setMonth(currentDate.getMonth() + validForMonths))
             }
         });
 
