@@ -103,6 +103,7 @@ async function formatProfileDetail(user) {
         last_name: user.last_name,
         email: user.email,
         type: user.type,
+        phone: user.phone,
         last_login: user.last_login,
         expiry_date: user.expiry_date,
         roles: getCommaSeparatedRoles(user.userrole)
