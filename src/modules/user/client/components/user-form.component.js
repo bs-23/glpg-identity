@@ -103,7 +103,7 @@ export default function UserForm() {
                                             </div>
                                             <div className="col-12 col-sm-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="phone">Phone Number<span className="text-danger required-field pl-1">*</span></label>
+                                                    <label htmlFor="phone">Phone Number</label>
                                                     <Field data-testid="phone" className="form-control" type="text" name="phone" />
                                                     <div className="invalid-feedback">
                                                         <ErrorMessage name="phone" data-testid="phoneError" />
