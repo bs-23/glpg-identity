@@ -14,8 +14,10 @@ async function init() {
     const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
     const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
-    const UserPermission = require(path.join(process.cwd(), "src/modules/user/server/user-permission.model"));
+    const RolePermission = require(path.join(process.cwd(), "src/modules/user/server/role/role-permission.model"));
     const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
+    const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
+    const UserRole = require(path.join(process.cwd(), "src/modules/user/server/user-role.model"));
     const { Modules } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
     require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model'));
     require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_profile.model'));
@@ -23,6 +25,8 @@ async function init() {
     require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
 
     await sequelize.cdpConnector.sync();
+
+    const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, "").replace(/ +/g, "-");
 
     function applicationSeeder(callback) {
         Application.findOrCreate({
@@ -38,11 +42,11 @@ async function init() {
 
     function userSeeder(callback) {
         User.findOrCreate({
-            where: { email: "admin@glpg-cdp.com" }, defaults: {
-                first_name: "Admin",
-                last_name: '',
-                password: "strong-password",
-                type: "admin"
+            where: { email: 'admin@glpg-cdp.com' }, defaults: {
+                first_name: 'System',
+                last_name: 'Admin',
+                password: 'strong-password',
+                type: 'admin'
             }
         }).then(function () {
             callback();
@@ -51,16 +55,77 @@ async function init() {
 
     function permissionSeeder(callback) {
         const permissions = [
-            { "module": Modules.USER.value, "status": "active", "title": Modules.USER.title, "created_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385", "updated_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385" },
-            { "module": Modules.HCP.value, "status": "active", "title": Modules.HCP.title, "created_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385", "updated_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
+            { module: Modules.USER.value, status: "active", title: Modules.USER.title, created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" },
+            { module: Modules.HCP.value, status: "active", title: Modules.HCP.title, created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
         ];
 
-        Permission.destroy({ truncate:  { cascade: true } }).then(() => {
+        Permission.destroy({ truncate: { cascade: true } }).then(() => {
             Permission.bulkCreate(permissions, {
                 returning: true,
                 ignoreDuplicates: false
             }).then(function () {
                 callback();
+            });
+        });
+    }
+
+    function roleSeeder(callback) {
+        const roles = [
+            { name: 'System Admin', slug: 'system-admin', description: 'Has access to all the services', created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" },
+            { name: 'User Manager', slug: 'user-manager', description: 'Has access to manage CDP users only', created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
+        ];
+
+        Role.destroy({ truncate: { cascade: true } }).then(() => {
+            Role.bulkCreate(roles, {
+                returning: true,
+                ignoreDuplicates: false
+            }).then(function () {
+                callback();
+            });
+        });
+    }
+
+    function rolePermissionSeeder(callback) {
+        const adminRole = Role.findOne({ where: { slug: 'system-admin' } });
+        const userManagerRole = Role.findOne({ where: { slug: 'user-manager' } });
+
+        const userPermission = Permission.findOne({ where: { module: 'user' } });
+        const hcpPermission = Permission.findOne({ where: { module: 'hcp' } });
+
+        Promise.all([adminRole, userManagerRole, userPermission, hcpPermission]).then((values) => {
+            const rolePermissions = [
+                { roleId: values[0].id, permissionId: values[2].id },
+                { roleId: values[0].id, permissionId: values[3].id },
+                { roleId: values[1].id, permissionId: values[2].id }
+            ];
+
+            RolePermission.destroy({ truncate:  { cascade: true } }).then(() => {
+                RolePermission.bulkCreate(rolePermissions, {
+                    returning: true,
+                    ignoreDuplicates: false
+                }).then(function () {
+                    callback();
+                });
+            });
+        });
+    }
+
+    function userRoleSeeder(callback) {
+        const admin = User.findOne({ where: { email: "admin@glpg-cdp.com" } });
+        const adminRole = Role.findOne({ where: { slug: 'system-admin' } });
+
+        Promise.all([admin, adminRole]).then((values) => {
+            const userRoles = [
+                { userId: values[0].id, roleId: values[1].id }
+            ];
+
+            UserRole.destroy({ truncate:  { cascade: true } }).then(() => {
+                UserRole.bulkCreate(userRoles, {
+                    returning: true,
+                    ignoreDuplicates: false
+                }).then(function () {
+                    callback();
+                });
             });
         });
     }
@@ -103,8 +168,6 @@ async function init() {
             { "title": "Send CLM content after RepSale visit", "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
         ];
 
-        const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, "").replace(/ +/g, "-");
-
         const all_consents = consents.map( consent => {
             if(consent.title.length > 50){
                 const code = uniqueSlug(consent.title);
@@ -128,7 +191,7 @@ async function init() {
         });
     }
 
-    async.waterfall([applicationSeeder, userSeeder, consentSeeder, permissionSeeder,userPermissionSeeder], function (err) {
+    async.waterfall([applicationSeeder, userSeeder, consentSeeder, permissionSeeder,roleSeeder, rolePermissionSeeder, userRoleSeeder], function (err) {
         if (err) console.error(err);
         else console.info("DB seed completed!");
         process.exit();

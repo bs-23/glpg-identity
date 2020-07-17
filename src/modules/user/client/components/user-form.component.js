@@ -11,7 +11,7 @@ import { useToasts } from "react-toast-notifications";
 export default function UserForm() {
     const dispatch = useDispatch();
     const [countries, setCountries] = useState([]);
-    const [permissions, setPermissions] = useState([]);
+    const [roles, setRoles] = useState([]);
     const history = useHistory()
     const { addToast } = useToasts()
 
@@ -20,12 +20,12 @@ export default function UserForm() {
             const response = await axios.get('/api/countries');
             setCountries(response.data);
         }
-        async function getPermissions() {
-            const response = await axios.get('/api/permissions');
-            setPermissions(response.data);
+        async function getRoles() {
+            const response = await axios.get('/api/roles');
+            setRoles(response.data);
         }
         getCountries();
-        getPermissions();
+        getRoles();
     }, []);
 
     return (
@@ -53,9 +53,9 @@ export default function UserForm() {
                                     last_name: "",
                                     email: "",
                                     countries: [],
-                                    permissions: [],
+                                    roles: [],
                                     phone: "",
-                                    expiary_date: ""
+                                    expiry_date: ""
                                 }}
                                 displayName="UserForm"
                                 validationSchema={registerSchema}
@@ -104,7 +104,7 @@ export default function UserForm() {
                                             </div>
                                             <div className="col-12 col-sm-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="phone">Phone:</label>
+                                                    <label htmlFor="phone">Phone Number</label>
                                                     <Field data-testid="phone" className="form-control" type="text" name="phone" />
                                                     <div className="invalid-feedback">
                                                         <ErrorMessage name="phone" data-testid="phoneError" />
@@ -115,10 +115,10 @@ export default function UserForm() {
                                         <div className="row">
                                             <div className="col-12 col-sm-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="expiary_date">Valid Until</label>
-                                                    <Field className="form-control" type="date" name="expiary_date" />
+                                                    <label htmlFor="expiry_date">Expiry Date</label>
+                                                    <Field className="form-control" type="date" name="expiry_date" />
                                                     <div className="invalid-feedback">
-                                                        <ErrorMessage name="expiary_date" />
+                                                        <ErrorMessage name="expiry_date" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -137,12 +137,12 @@ export default function UserForm() {
                                             </div>
                                             <div className="col-12 col-sm-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="permissions">Assign Service Category</label>
-                                                    <Field data-testid="permission" as="select" name="permissions" className="form-control" multiple>
-                                                        {permissions.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
+                                                    <label htmlFor="roles">Select Roles</label>
+                                                    <Field data-testid="role" as="select" name="roles" className="form-control" multiple>
+                                                        {roles.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
                                                     </Field>
                                                     <div className="invalid-feedback">
-                                                        <ErrorMessage name="permissions" />
+                                                        <ErrorMessage name="roles" />
                                                     </div>
                                                 </div>
                                             </div>

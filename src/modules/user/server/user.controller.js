@@ -3,12 +3,13 @@ const crypto = require('crypto');
 const { Op } = require('sequelize');
 const jwt = require('jsonwebtoken');
 const User = require('./user.model');
-const UserPermission = require('./user-permission.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const ResetPassword = require('./reset-password.model');
-const Userpermission = require(path.join(process.cwd(), "src/modules/user/server/user-permission.model"));
+const UserRole = require(path.join(process.cwd(), "src/modules/user/server/user-role.model"));
+const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
+const RolePermission = require(path.join(process.cwd(), "src/modules/user/server/role/role-permission.model"));
 const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
 
 function validatePassword(password) {
@@ -45,10 +46,27 @@ function generateAccessToken(user) {
     });
 }
 
-function getPermissions(userPermission) {
-    if (userPermission) {
-        const permissions = userPermission.map(up => up.permission.module);
-        return permissions;
+function getPermissions(userrole) {
+    const permissions= [];
+    if (userrole) {
+        userrole.forEach(ur => {
+            permissions.push(ur.role.rolePermission.map(rp => rp.permission.module));
+        })
+        return permissions.flat(1);
+    }
+}
+
+function getRolesPermissions(userrole) {
+    const roles= [];
+    if (userrole) {
+        userrole.forEach(ur => {
+            roles.push(ur.role.name);
+            roles.push(ur.role.rolePermission.map(rp => rp.permission.module));
+        });
+
+        return roles;
+
+
     }
 }
 
@@ -59,7 +77,8 @@ function formatProfile(user) {
         last_name: user.last_name,
         email: user.email,
         type: user.type,
-        permissions: getPermissions(user.userpermission)
+        permissions: getPermissions(user.userrole),
+        roles: getRolesPermissions(user.userrole)
     };
 
     return profile;
@@ -75,11 +94,20 @@ async function login(req, res) {
         const user = await User.findOne({
             where: { email },
             include: [{
-                model: Userpermission,
-                as: 'userpermission',
+                model: UserRole,
+                as: 'userrole',
                 include: [{
-                    model: Permission,
-                    as: 'permission'
+                    model: Role,
+                    as: 'role',
+                    include: [{
+                        model: RolePermission,
+                        as: 'rolePermission',
+                        include: [{
+                            model: Permission,
+                            as: 'permission',
+                        }]
+
+                    }]
                 }]
             }]
         });
@@ -88,7 +116,7 @@ async function login(req, res) {
             return res.status(401).send('Invalid email or password.');
         }
 
-        if (user.type === 'basic' && user.expiary_date <= new Date()) {
+        if (user.type === 'basic' && user.expiry_date <= new Date()) {
             await user.update({ status: 'inactive' })
             return res.status(401).send('Expired')
         }
@@ -117,9 +145,9 @@ async function createUser(req, res) {
         email,
         phone,
         countries,
-        permissions,
+        roles,
         application_id,
-        expiary_date
+        expiry_date
     } = req.body;
 
     try {
@@ -133,7 +161,7 @@ async function createUser(req, res) {
                 application_id,
                 created_by: req.user.id,
                 updated_by: req.user.id,
-                expiary_date
+                expiry_date
             }
         });
 
@@ -141,16 +169,13 @@ async function createUser(req, res) {
             return res.status(400).send('Email already exists.');
         }
 
-        permissions && permissions.forEach(async function (permissionId) {
-
-            await UserPermission.create({
-                permissionId: permissionId,
+        roles && roles.forEach(async function (roleId) {
+            await UserRole.create({
+                roleId: roleId,
                 userId: doc.id,
-                created_by: req.user.id,
-                updated_by: req.user.id,
             });
-
         });
+
         const logData = {
             event_type: 'CREATE',
             object_id: doc.id,
@@ -241,7 +266,7 @@ async function getUsers(req, res) {
     const page = req.query.page ? req.query.page - 1 : 0;
     if (page < 0) return res.status(404).send("page must be greater or equal 1");
 
-    const limit = 20;
+    const limit = 5;
     const country_iso2 = req.query.country_iso2 === 'null' ? null : req.query.country_iso2;
     const offset = page * limit;
 
@@ -259,8 +284,8 @@ async function getUsers(req, res) {
                 offset,
                 limit,
                 order: [
-                    ['created_at', 'ASC'],
-                    ['id', 'ASC']
+                    ['created_at', 'DESC'],
+                    ['id', 'DESC']
                 ]
             });
 
@@ -294,7 +319,7 @@ async function getUser(req, res) {
             where: {
                 id: req.params.id
             },
-            attributes: ['id', 'first_name', 'last_name', 'email', 'phone', 'type', 'last_login', 'expiary_date']
+            attributes: ['id', 'first_name', 'last_name', 'email', 'phone', 'type', 'last_login', 'expiry_date']
         });
 
         if (!user) return res.status(404).send("User is not found or may be removed");

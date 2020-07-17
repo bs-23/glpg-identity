@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { NavLink } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
 import Dropdown from 'react-bootstrap/Dropdown';
+import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { LinkContainer } from 'react-router-bootstrap';
 import { getUsers, getSignedInUserProfile } from '../user.actions';
-import axios from "axios";
 
 export default function Users() {
     const dispatch = useDispatch();
@@ -18,8 +18,7 @@ export default function Users() {
     const getUserList = (page = params.get('page') ? params.get('page') : 1,
         country_iso2 = params.get('country_iso2') ? params.get('country_iso2') : null) => {
         dispatch(getUsers(page, country_iso2));
-    }
-
+    };
 
     useEffect(() => {
         getUserList();
@@ -28,7 +27,6 @@ export default function Users() {
             setCountries(response.data);
         }
         getCountries();
-
     }, []);
 
     // const onDeleteUser = id => {
@@ -66,6 +64,7 @@ export default function Users() {
                         </nav>
                     </div>
                 </div>
+
                 <div className="row">
                     <div className="col-12">
                         <div className="d-flex justify-content-between align-items-center">
@@ -81,11 +80,10 @@ export default function Users() {
                                             <LinkContainer to={`list?page=1&country_iso2=${country.country_iso2}`} key={country.countryid}><Dropdown.Item onClick={() => getUserList(1, country.country_iso2)}>{country.countryname}</Dropdown.Item></LinkContainer>
                                         ))
                                     }
-
                                 </Dropdown.Menu>
                             </Dropdown>
 
-                            <NavLink to="/users/create" className="btn cdp-btn-primary btn-sm text-white">
+                            <NavLink to="/users/create" className="btn cdp-btn-primary btn-sm text-white mr-2">
                                 Create new user
                             </NavLink>
                         </div>
@@ -98,7 +96,8 @@ export default function Users() {
                                             <th className="py-2">First Name</th>
                                             <th className="py-2">Last Name</th>
                                             <th className="py-2">Email</th>
-                                            <th className="py-2">Account Expiry Date</th>
+                                            <th className="py-2">Registration Date</th>
+                                            <th className="py-2">Expiry Date</th>
                                             <th className="py-2">Status</th>
                                             <th className="py-2">Action</th>
                                         </tr>
@@ -109,7 +108,8 @@ export default function Users() {
                                                 <td>{row.first_name}</td>
                                                 <td>{row.last_name}</td>
                                                 <td>{row.email}</td>
-                                                <td>{(new Date(row.expiary_date)).toLocaleDateString().replace(/\//g, '-')}</td>
+                                                <td>{(new Date(row.created_at)).toLocaleDateString().replace(/\//g, '-')}</td>
+                                                <td>{(new Date(row.expiry_date)).toLocaleDateString().replace(/\//g, '-')}</td>
                                                 <td>
                                                     {row.status === 'active' ?
                                                         <span><i className="fa fa-xs fa-circle text-success pr-2"></i>Active</span> :
@@ -124,26 +124,28 @@ export default function Users() {
                                         ))}
                                     </tbody>
                                 </table>
-                                {((userdata.page === 1 && userdata['users'] && userdata['users'].length > 19) ||
+                                {((userdata.page === 1 && userdata['users'] && userdata['users'].length > 4) ||
                                     (userdata.page > 1 && userdata['users']))
                                     &&
                                     < div className="pagination justify-content-end align-items-center mb-4 border-top pt-3">
                                         {userdata.start + '-' + userdata.end + ' of ' + userdata.total}
-                                        <LinkContainer to={`list?page=${userdata.page - 1}&country_iso2=${userdata.country_iso2}`}><button className="btn btn-sm cdp-btn-secondary text-white mx-2" onClick={() => pageLeft()} disabled={userdata.page <= 1}>Prev</button></LinkContainer>
-                                        <LinkContainer to={`list?page=${userdata.page + 1}&country_iso2=${userdata.country_iso2}`}><button className="btn btn-sm cdp-btn-secondary text-white" onClick={() => pageRight()} disabled={userdata.end === userdata.total}>Next</button></LinkContainer>
+                                        <LinkContainer to={`list?page=${userdata.page - 1}&country_iso2=${userdata.country_iso2}`}>
+                                            <button className="btn btn-sm cdp-btn-secondary text-white mx-2" onClick={() => pageLeft()} disabled={userdata.page <= 1}>Prev</button>
+                                        </LinkContainer>
+                                        <LinkContainer to={`list?page=${userdata.page + 1}&country_iso2=${userdata.country_iso2}`}>
+                                            <button className="btn btn-sm cdp-btn-secondary text-white" onClick={() => pageRight()} disabled={userdata.end === userdata.total}>Next</button>
+                                        </LinkContainer>
                                     </div>
                                 }
                             </React.Fragment>
                         }
 
                         {userdata['users'] && userdata['users'].length === 0 &&
-                            <><div className="alert alert-info mt-5">No users found!</div></>
+                            <div className="alert alert-info mt-5">No users found!</div>
                         }
-
                     </div>
                 </div>
             </div>
-        </main >
-
+        </main>
     );
 }

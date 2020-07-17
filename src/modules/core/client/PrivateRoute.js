@@ -25,7 +25,7 @@ export default function PrivateRoute({ component: Component, module, ...rest }) 
                         pathname: "/login",
                         state: { from: props.location }
                     }}/>
-                ) 
+                )
             )
         }}/>
     );

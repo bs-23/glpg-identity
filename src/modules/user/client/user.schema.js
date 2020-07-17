@@ -43,13 +43,13 @@ export const registerSchema = object().shape({
         .email('This field should be an valid email address.')
         .required('This field must not be empty.'),
     phone: string().matches(/^[0-9]/, 'This field only contains numbers'),
-    expiary_date: date()
+    expiry_date: date()
         .min(Date(), 'Must be a future date')
         .required('This field must not be empty'),
     countries: string()
         .required('Must select at least one country'),
-    permissions: string()
-        .required('Must select at least one service category')
+    roles: string()
+        .required('Must select at least one role')
 });
 
 export const changePasswordSchema = object().shape({
@@ -81,4 +81,11 @@ export const forgotPasswordSchema = object().shape({
     email: string()
         .email('This field should be an valid email address.')
         .required('This field must not be empty.'),
+});
+
+export const roleSchema = object().shape({
+    name: string()
+        .required('This field must not be empty.'),
+    permissions: string()
+        .required('Must select at least one permission')
 });

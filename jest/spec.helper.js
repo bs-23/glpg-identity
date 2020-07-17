@@ -11,6 +11,9 @@ const defaultAdminId = 'f29b63e5-36c7-4210-a5a8-c1e9d0c5b9e4';
 const defaultApplicationId = '9017a1ee-3391-40a0-ad50-70bc7f1657f0';
 const defaultHCPuserId = 'db2baac3-46d1-425f-b62d-3730a294fd0e';
 const demoConsentId = '3bb2057b-3006-4c87-9ce1-166bd291e86f';
+const UserPermissionID = 'e31e7b72-8dd9-43cf-a2b2-823963bfad45'
+const HcpPermissionID = 'bd2b3849-a1a0-40ab-900a-346926edc572'
+const adminRoleID = '1ffe73e9-7922-4640-ba0c-3628b3358aa8'
 
 module.exports = {
     defaultApplication: {
@@ -56,7 +59,7 @@ module.exports = {
             last_name: '',
             email: 'default-user@cdp.com',
             password: 'strong-password',
-            expiary_date: new Date(Date.now() + 24 * 60 * 60 * 1000),
+            expiry_date: new Date(Date.now() + 24 * 60 * 60 * 1000),
             created_by: defaultAdminId,
             updated_by: defaultAdminId,
             access_token: jwt.sign(
@@ -98,17 +101,22 @@ module.exports = {
         },
     },
     permissions: [
-        { id: 'c26ec864-c873-4d8b-8cf0-4221b0598780', "module": Modules.USER.value, "status": "active", "title": Modules.USER.title, "created_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385", "updated_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385" },
-        { id: 'ed220478-12ae-45b4-be6a-5e75863ea693', "module": Modules.HCP.value, "status": "active", "title": Modules.HCP.title, "created_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385", "updated_by": "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
+        { id: UserPermissionID, module: Modules.USER.value, status: "active", title: Modules.USER.title, created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" },
+        { id: HcpPermissionID, module: Modules.HCP.value, status: "active", title: Modules.HCP.title, created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
     ],
-    userPermissions: {
+    roles: [
+        { id: adminRoleID, name: 'System Admin', slug: 'system-admin', description: "Has access to all the services", created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
+    ],
+    rolePermissions: [
+        { "permissionId": UserPermissionID, "roleId": adminRoleID },
+        { "permissionId": HcpPermissionID, "roleId": adminRoleID }
+    ],
+    userRoles: {
         defaultAdmin: [
-            { "userId": defaultAdminId, "permissionId": 'c26ec864-c873-4d8b-8cf0-4221b0598780', "created_by": defaultAdminId, "updated_by": defaultAdminId },
-            { "userId": defaultAdminId, "permissionId": 'ed220478-12ae-45b4-be6a-5e75863ea693',  "created_by": defaultAdminId, "updated_by": defaultAdminId }
+            { "roleId": adminRoleID, "userId": defaultAdminId }
         ],
         defaultUser: [
-            { "userId": defaultUserId, "permissionId": 'c26ec864-c873-4d8b-8cf0-4221b0598780', "created_by": defaultAdminId, "updated_by": defaultAdminId },
-            { "userId": defaultUserId, "permissionId": 'ed220478-12ae-45b4-be6a-5e75863ea693',  "created_by": defaultAdminId, "updated_by": defaultAdminId }
+            { "roleId": adminRoleID, "userId": defaultUserId }
         ]
     }
 };
