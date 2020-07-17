@@ -71,7 +71,7 @@ export default function Users() {
                             <h2>CDP User List</h2>
                             <Dropdown className="ml-auto mr-2">
                                 <Dropdown.Toggle variant="" className="cdp-btn-secondary text-white btn-sm">
-                                    Filter by Country
+                                    <i className="fas fa-filter pr-1"></i> Filter by Country
                             </Dropdown.Toggle>
                                 <Dropdown.Menu>
                                     <LinkContainer to="list?page=1"><Dropdown.Item onClick={() => getUserList(1, null)}>None</Dropdown.Item></LinkContainer>
@@ -84,7 +84,7 @@ export default function Users() {
                             </Dropdown>
 
                             <NavLink to="/users/create" className="btn cdp-btn-primary btn-sm text-white mr-2">
-                                Create new user
+                                <i className="fas fa-plus pr-1"></i> Create new user
                             </NavLink>
                         </div>
 
@@ -117,7 +117,7 @@ export default function Users() {
                                                     }
                                                 </td>
                                                 <td>
-                                                    <NavLink to={`/users/${row.id}`} className="btn btn-outline-primary btn-sm"><i className="far fa-user-circle pr-1"></i>Profile Details</NavLink>
+                                                    <NavLink to={`/users/${row.id}`} className="btn cdp-btn-outline-secondary btn-sm"><i className="far fa-address-card pr-1"></i>Profile</NavLink>
                                                     {/* <button onClick={() => onDeleteUser(row.id)} className="btn btn-outline-danger btn-sm"><i class="far fa-trash-alt mr-2"></i> Delete</button> */}
                                                 </td>
                                             </tr>

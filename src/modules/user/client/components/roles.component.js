@@ -53,7 +53,7 @@ export default function RoleForm() {
                     <div className="col-12 col-sm-12 pt-3 d-flex justify-content-between align-items-center">
                         <h3 className="pb-2">Manage User Roles</h3>
                         <button className="btn cdp-btn-primary btn-sm text-white" onClick={() => { setShow(true); setEditData({}); }}>
-                            Add New Role
+                            <i className="fas fa-plus pr-1"></i> Add New Role
                         </button>
 
                         <Modal
