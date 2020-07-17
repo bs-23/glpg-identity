@@ -50,8 +50,8 @@ export default function RoleForm() {
                     </div>
                 </div>
                 <div className="row">
-                    <div className="col-12 col-sm-12 py-3 d-flex justify-content-between align-items-center">
-                        <h2>Manage User Roles</h2>
+                    <div className="col-12 col-sm-12 pt-3 d-flex justify-content-between align-items-center">
+                        <h3 className="pb-2">Manage User Roles</h3>
                         <button className="btn cdp-btn-primary btn-sm text-white" onClick={() => { setShow(true); setEditData({}); }}>
                             Add New Role
                         </button>
@@ -153,7 +153,7 @@ export default function RoleForm() {
                             </Modal.Body>
                         </Modal>
                     </div>
-                    <div className="col-12 col-sm-12 py-3 d-flex justify-content-between align-items-center">
+                    <div className="col-12 col-sm-12 pb-3 d-flex justify-content-between align-items-center">
                         {roles && roles.length > 0 &&
                             <table className="table table-hover table-sm mb-0">
                                 <thead className="cdp-light-bg">
@@ -173,7 +173,7 @@ export default function RoleForm() {
                                             <td>{(row.rolePermission) && (row.rolePermission).map((item, index) => (
                                                 <span key={index}>{(permissions.find(i => i.id === item.permissionId)).title}{index < row.rolePermission.length - 1 ? ',' : ''}</span>
                                             ))}</td>
-                                            <td><button className="btn btn-outline-primary btn-sm" onClick={() => setEdit(row)}> <i className="far fa-user-circle pr-1"></i>Edit</button></td>
+                                            <td><button className="btn cdp-btn-outline-secondary btn-sm" onClick={() => setEdit(row)}> <i className="fas fa-pen pr-2"></i>Edit Role</button></td>
                                         </tr>
                                     ))}
                                 </tbody>
