@@ -56,6 +56,21 @@ function getPermissions(userrole) {
     }
 }
 
+function getRolesPermissions(userrole) {
+    const permissions= [];
+    const roles= [];
+    if (userrole) {
+        userrole.forEach(ur => {
+            roles.push(ur.role.name);
+            roles.push(ur.role.rolePermission.map(rp => rp.permission.module));
+        });
+
+        return roles;
+
+
+    }
+}
+
 function formatProfile(user) {
     const profile = {
         id: user.id,
@@ -63,7 +78,8 @@ function formatProfile(user) {
         last_name: user.last_name,
         email: user.email,
         type: user.type,
-        permissions: getPermissions(user.userrole)
+        permissions: getPermissions(user.userrole),
+        roles: getRolesPermissions(user.userrole)
     };
 
     return profile;
