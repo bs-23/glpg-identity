@@ -73,6 +73,16 @@ function getRolesPermissions(userrole) {
     }
 }
 
+
+function getCommaSeparatedRoles(userrole) {
+    if (userrole) {
+
+        const roles = userrole.map(ur => ur.role.name);
+        return roles.join();
+
+    }
+}
+
 function formatProfile(user) {
     const profile = {
         id: user.id,
@@ -82,6 +92,21 @@ function formatProfile(user) {
         type: user.type,
         permissions: getPermissions(user.userrole),
         roles: getRolesPermissions(user.userrole)
+    };
+
+    return profile;
+}
+async function formatProfileDetail(user) {
+    const profile = {
+        id: user.id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        type: user.type,
+        phone: user.phone,
+        last_login: user.last_login,
+        expiry_date: user.expiry_date,
+        roles: getCommaSeparatedRoles(user.userrole)
     };
 
     return profile;
@@ -333,16 +358,12 @@ async function getUser(req, res) {
             }],
             attributes: ['id', 'first_name', 'last_name', 'email', 'phone', 'type', 'last_login', 'expiry_date']
         });
-        if (user.userrole) {
 
-            const roles = user.userrole.map(ur => ur.role.name);
-            user.roles = roles.join();
-
-        }
 
         if (!user) return res.status(404).send("User is not found or may be removed");
+        const formattedUser = await formatProfileDetail(user);
 
-        res.json(user);
+        res.json(formattedUser);
     }
     catch (err) {
         res.status(500).send(err);

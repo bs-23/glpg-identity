@@ -96,6 +96,7 @@ export default function Users() {
                                             <th className="py-2">First Name</th>
                                             <th className="py-2">Last Name</th>
                                             <th className="py-2">Email</th>
+                                            <th className="py-2">Country</th>
                                             <th className="py-2">Creation Date</th>
                                             <th className="py-2">Expiry Date</th>
                                             <th className="py-2">Action</th>
@@ -107,6 +108,9 @@ export default function Users() {
                                                 <td>{row.first_name}</td>
                                                 <td>{row.last_name}</td>
                                                 <td>{row.email}</td>
+                                                <td>{countries.length > 0 && (row.countries.length) && (row.countries).map((country, key) => (
+                                                    <span key={key}>{(countries.find(i => i.country_iso2 === country)).countryname} {key < row.countries.length - 1 ? ', ' : ''}</span>
+                                                ))}</td>
                                                 <td>{(new Date(row.created_at)).toLocaleDateString().replace(/\//g, '-')}</td>
                                                 <td>{(new Date(row.expiry_date)).toLocaleDateString().replace(/\//g, '-')}</td>
                                                 <td>
