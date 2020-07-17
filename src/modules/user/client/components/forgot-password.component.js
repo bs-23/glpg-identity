@@ -53,7 +53,7 @@ export default function ForgotPassword() {
                                     {formikProps => (
                                         <Form onSubmit={formikProps.handleSubmit} >
                                             <div className="form-group">
-                                                <label className="">Email Address</label>
+                                                <label className="">Email Address<span className="text-danger required-field pl-1">*</span></label>
                                                 <Field className="form-control" data-testid="email" type="email" name="email" placeholder="Email address" autoComplete="username" />
                                                 <div className="invalid-feedback" data-testid="email-error" >
                                                     <ErrorMessage id="email-error" name="email" />

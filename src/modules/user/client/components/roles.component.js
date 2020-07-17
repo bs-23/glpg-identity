@@ -117,7 +117,7 @@ export default function RoleForm() {
                                                 <div className="row">
                                                     <div className="col-12 col-sm-12">
                                                         <div className="form-group">
-                                                            <label htmlFor="role_name">Role Name</label>
+                                                            <label htmlFor="role_name">Role Name<span className="text-danger required-field pl-1">*</span></label>
                                                             <Field data-testid="role_name" className="form-control" type="name" name="name" />
                                                             <div className="invalid-feedback" data-testid="lastNameError"><ErrorMessage name="name" /></div>
                                                         </div>
@@ -135,7 +135,7 @@ export default function RoleForm() {
                                                 <div className="row">
                                                     <div className="col-12 col-sm-12">
                                                         <div className="form-group">
-                                                            <label htmlFor="permissions">Assign Service Category</label>
+                                                            <label htmlFor="permissions">Assign Service Category<span className="text-danger required-field pl-1">*</span></label>
                                                             <Field data-testid="permission" as="select" name="permissions" className="form-control" multiple >
                                                                 {permissions.map(item => <option key={item.id} value={item.id} onClick={() => setselected([item.id])}>{item.title}</option>)}
                                                             </Field>
