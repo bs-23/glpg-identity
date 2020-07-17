@@ -7,7 +7,12 @@ const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, "").rep
 
 async function getRoles(req, res) {
     try {
-        const roles = await Role.findAll();
+        const roles = await Role.findAll({
+            include: [{
+                model: RolePermissions,
+                as: 'rolePermission'
+            }]
+        });
         res.json(roles);
     } catch (err) {
         res.status(500).send(err);
