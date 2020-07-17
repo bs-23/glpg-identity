@@ -14,9 +14,9 @@ phases:
             - echo seeding database start
             - yarn seed
             - echo seeding database end
-            - echo running unit test
-            - yarn test
-            - echo unit test completed
+            # - echo running unit test
+            # - yarn test
+            # - echo unit test completed
             - echo running code quality test using sonarqube
             - yarn sonarqube
             - echo code review with sonarqube done
