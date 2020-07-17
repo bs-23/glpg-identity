@@ -7,8 +7,6 @@ export default function PrivateRoute({ component: Component, module, ...rest }) 
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
     const permissions = loggedInUser ? loggedInUser.permissions : [];
 
-    
-
     return (
         <Route {...rest} render={props => {
             return (
