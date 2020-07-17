@@ -117,7 +117,8 @@ export default function Users() {
                                         ))}
                                     </tbody>
                                 </table>
-                                {((userdata.page === 1 && userdata['users'].length > userdata.limit - 1) ||
+                                {((userdata.page === 1 &&
+                                    userdata.total > userdata.limit) ||
                                     (userdata.page > 1))
                                     && userdata['users'] &&
                                     < div className="pagination justify-content-end align-items-center mb-4 border-top pt-3">
