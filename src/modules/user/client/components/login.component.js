@@ -19,7 +19,7 @@ export default function Login() {
                             <h1 className="text-center">
                                 <img alt="CDP LOGO" src="/assets/CDP.png" height="102" />
                             </h1>
-                            <h4 className="app-login__header text-center py-3">Welcome to CIAM</h4>
+                            <h4 className="app-login__header text-center py-3">Welcome to CDP</h4>
                             <div className="card-body p-4 p-sm-5 border bg-white">
                                 <Formik
                                     initialValues={{
