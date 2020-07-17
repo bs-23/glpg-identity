@@ -154,7 +154,7 @@ export default function RoleForm() {
                         </Modal>
                     </div>
                     <div className="col-12 col-sm-12 py-3 d-flex justify-content-between align-items-center">
-                        {roles && roles.length > 0 &&
+                        {permissions.length && roles && roles.length > 0 &&
                             <table className="table table-hover table-sm mb-0">
                                 <thead className="cdp-light-bg">
                                     <tr>
