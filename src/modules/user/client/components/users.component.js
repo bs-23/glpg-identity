@@ -71,7 +71,7 @@ export default function Users() {
                             <h2>CDP User List</h2>
                             <Dropdown className="ml-auto mr-2">
                                 <Dropdown.Toggle variant="" className="cdp-btn-secondary text-white btn-sm">
-                                    <i className="fas fa-filter pr-1"></i> Filter by Country
+                                    Filter by Country
                             </Dropdown.Toggle>
                                 <Dropdown.Menu>
                                     <LinkContainer to="list?page=1"><Dropdown.Item onClick={() => getUserList(1, null)}>None</Dropdown.Item></LinkContainer>
@@ -84,7 +84,7 @@ export default function Users() {
                             </Dropdown>
 
                             <NavLink to="/users/create" className="btn cdp-btn-primary btn-sm text-white mr-2">
-                                <i className="fas fa-plus pr-1"></i> Create new user
+                                Create new user
                             </NavLink>
                         </div>
 
@@ -96,9 +96,8 @@ export default function Users() {
                                             <th className="py-2">First Name</th>
                                             <th className="py-2">Last Name</th>
                                             <th className="py-2">Email</th>
-                                            <th className="py-2">Registration Date</th>
+                                            <th className="py-2">Creation Date</th>
                                             <th className="py-2">Expiry Date</th>
-                                            <th className="py-2">Status</th>
                                             <th className="py-2">Action</th>
                                         </tr>
                                     </thead>
@@ -111,22 +110,16 @@ export default function Users() {
                                                 <td>{(new Date(row.created_at)).toLocaleDateString().replace(/\//g, '-')}</td>
                                                 <td>{(new Date(row.expiry_date)).toLocaleDateString().replace(/\//g, '-')}</td>
                                                 <td>
-                                                    {row.status === 'active' ?
-                                                        <span><i className="fa fa-xs fa-circle text-success pr-2"></i>Active</span> :
-                                                        <span><i className="fa fa-xs fa-circle text-danger pr-2"></i>Inactive</span>
-                                                    }
-                                                </td>
-                                                <td>
-                                                    <NavLink to={`/users/${row.id}`} className="btn cdp-btn-outline-secondary btn-sm"><i className="far fa-address-card pr-1"></i>Profile</NavLink>
+                                                    <NavLink to={`/users/${row.id}`} className="btn btn-outline-primary btn-sm"><i className="far fa-user-circle pr-1"></i>Profile Details</NavLink>
                                                     {/* <button onClick={() => onDeleteUser(row.id)} className="btn btn-outline-danger btn-sm"><i class="far fa-trash-alt mr-2"></i> Delete</button> */}
                                                 </td>
                                             </tr>
                                         ))}
                                     </tbody>
                                 </table>
-                                {((userdata.page === 1 && userdata['users'] && userdata['users'].length > 4) ||
-                                    (userdata.page > 1 && userdata['users']))
-                                    &&
+                                {((userdata.page === 1 && userdata['users'].length > userdata.limit - 1) ||
+                                    (userdata.page > 1))
+                                    && userdata['users'] &&
                                     < div className="pagination justify-content-end align-items-center mb-4 border-top pt-3">
                                         {userdata.start + '-' + userdata.end + ' of ' + userdata.total}
                                         <LinkContainer to={`list?page=${userdata.page - 1}&country_iso2=${userdata.country_iso2}`}>
