@@ -71,7 +71,8 @@ async function init() {
 
     function roleSeeder(callback) {
         const roles = [
-            { name: 'Root Role', slug: 'root', description: "Has access to all permissions", created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
+            { name: 'System Admin', slug: 'system-admin', description: "Has access to all the services", created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" },
+            { name: 'User Manager', slug: 'user-manager', description: "Has access to manage CDP users only", created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
         ];
 
         Role.destroy({ truncate: { cascade: true } }).then(() => {
@@ -85,7 +86,7 @@ async function init() {
     }
 
     function rolePermissionSeeder(callback) {
-        const adminRole = Role.findOne({ where: { slug: 'root' } });
+        const adminRole = Role.findOne({ where: { slug: 'system-admin' } });
         const userPermission = Permission.findOne({ where: { module: 'user' } });
         const hcpPermission = Permission.findOne({ where: { module: 'hcp' } });
 
@@ -108,7 +109,7 @@ async function init() {
 
     function userRoleSeeder(callback) {
         const admin = User.findOne({ where: { email: "admin@glpg-cdp.com" } });
-        const adminRole = Role.findOne({ where: { slug: 'root' } });
+        const adminRole = Role.findOne({ where: { slug: 'system-admin' } });
 
         Promise.all([admin, adminRole]).then((values) => {
             const userRoles = [

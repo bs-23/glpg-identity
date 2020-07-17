@@ -117,7 +117,7 @@ async function login(req, res) {
             return res.status(401).send('Invalid email or password.');
         }
 
-        if (user.type === 'basic' && user.expiary_date <= new Date()) {
+        if (user.type === 'basic' && user.expiry_date <= new Date()) {
             await user.update({ status: 'inactive' })
             return res.status(401).send('Expired')
         }
@@ -148,7 +148,7 @@ async function createUser(req, res) {
         countries,
         roles,
         application_id,
-        expiary_date
+        expiry_date
     } = req.body;
 
     try {
@@ -162,7 +162,7 @@ async function createUser(req, res) {
                 application_id,
                 created_by: req.user.id,
                 updated_by: req.user.id,
-                expiary_date
+                expiry_date
             }
         });
 
@@ -171,13 +171,12 @@ async function createUser(req, res) {
         }
 
         roles && roles.forEach(async function (roleId) {
-
             await UserRole.create({
                 roleId: roleId,
                 userId: doc.id,
             });
-
         });
+
         const logData = {
             event_type: 'CREATE',
             object_id: doc.id,
@@ -321,7 +320,7 @@ async function getUser(req, res) {
             where: {
                 id: req.params.id
             },
-            attributes: ['id', 'first_name', 'last_name', 'email', 'phone', 'type', 'last_login', 'expiary_date']
+            attributes: ['id', 'first_name', 'last_name', 'email', 'phone', 'type', 'last_login', 'expiry_date']
         });
 
         if (!user) return res.status(404).send("User is not found or may be removed");

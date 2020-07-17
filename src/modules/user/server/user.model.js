@@ -66,7 +66,7 @@ const User = sequelize.cdpConnector.define('users', {
     last_login: {
         type: DataTypes.DATE
     },
-    expiary_date: {
+    expiry_date: {
         type: DataTypes.DATE
     },
     created_by: {

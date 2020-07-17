@@ -55,7 +55,7 @@ export default function UserForm() {
                                     countries: [],
                                     roles: [],
                                     phone: "",
-                                    expiary_date: ""
+                                    expiry_date: ""
                                 }}
                                 displayName="UserForm"
                                 validationSchema={registerSchema}
@@ -104,7 +104,7 @@ export default function UserForm() {
                                             </div>
                                             <div className="col-12 col-sm-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="phone">Phone:</label>
+                                                    <label htmlFor="phone">Phone Number</label>
                                                     <Field data-testid="phone" className="form-control" type="text" name="phone" />
                                                     <div className="invalid-feedback">
                                                         <ErrorMessage name="phone" data-testid="phoneError" />
@@ -115,10 +115,10 @@ export default function UserForm() {
                                         <div className="row">
                                             <div className="col-12 col-sm-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="expiary_date">Valid Until</label>
-                                                    <Field className="form-control" type="date" name="expiary_date" />
+                                                    <label htmlFor="expiry_date">Expiry Date</label>
+                                                    <Field className="form-control" type="date" name="expiry_date" />
                                                     <div className="invalid-feedback">
-                                                        <ErrorMessage name="expiary_date" />
+                                                        <ErrorMessage name="expiry_date" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -137,7 +137,7 @@ export default function UserForm() {
                                             </div>
                                             <div className="col-12 col-sm-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="roles">Assign Role</label>
+                                                    <label htmlFor="roles">Select Roles</label>
                                                     <Field data-testid="role" as="select" name="roles" className="form-control" multiple>
                                                         {roles.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
                                                     </Field>
