@@ -57,7 +57,6 @@ function getPermissions(userrole) {
 }
 
 function getRolesPermissions(userrole) {
-    const permissions= [];
     const roles= [];
     if (userrole) {
         userrole.forEach(ur => {
