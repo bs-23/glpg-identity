@@ -13,7 +13,7 @@ export default function Navbar() {
                     <div className="col-4">
                         <div className="d-flex">
                             <h1 className="text-center">
-                                <a href="/"> <img alt="CIAM logo" src="/assets/CIAM-LOGO.png" height="64" /></a>
+                                <a href="/"> <img alt="CDP LOGO" src="/assets/CDP.png" height="64" /></a>
                             </h1>
                             {/*<Dropdown>
                                 <Dropdown.Toggle variant="secondary" className="mt-2">

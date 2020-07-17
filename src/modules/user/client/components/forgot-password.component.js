@@ -17,7 +17,7 @@ export default function ForgotPassword() {
                     <div className="row">
                         <div className="col-lg-6 col-md-8 col-12 mx-auto">
                             <h1 className="text-center">
-                                <a href="/login"><img alt="CIAM logo" src="/assets/CIAM-LOGO.png" height="102" /></a>
+                                <a href="/login"><img alt="CDP LOGO" src="/assets/CDP.png" height="102" /></a>
                             </h1>
                             <h4 className="app-login__header text-center py-3">Forgot Password</h4>
 
