@@ -97,7 +97,7 @@ export default function RoleForm() {
                                             } else {
                                                 dispatch(createRole(values)).then(res => {
                                                     dispatch(getRoles());
-                                                    actions.resetForm();
+
                                                     addToast('Role created successfully', {
                                                         appearance: 'success',
                                                         autoDismiss: true
@@ -112,6 +112,7 @@ export default function RoleForm() {
                                             }
                                             setShow(false);
                                             actions.setSubmitting(false);
+                                            actions.resetForm();
 
                                         }}
                                     >
