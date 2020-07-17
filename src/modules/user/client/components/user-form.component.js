@@ -103,7 +103,7 @@ export default function UserForm() {
                                             </div>
                                             <div className="col-12 col-sm-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="phone">Phone Number<span className="text-danger required-field pl-1">*</span></label>
+                                                    <label htmlFor="phone">Phone Number</label>
                                                     <Field data-testid="phone" className="form-control" type="text" name="phone" />
                                                     <div className="invalid-feedback">
                                                         <ErrorMessage name="phone" data-testid="phoneError" />
@@ -114,7 +114,7 @@ export default function UserForm() {
                                         <div className="row">
                                             <div className="col-12 col-sm-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="countries">Select Countries</label>
+                                                    <label htmlFor="countries">Select Countries<span className="text-danger required-field pl-1">*</span></label>
                                                     <Field data-testid="country" as="select" name="countries" className="form-control" multiple>
                                                         {countries.map(item => <option key={item.countryid} value={item.country_iso2}>{item.countryname}</option>)}
                                                     </Field>
