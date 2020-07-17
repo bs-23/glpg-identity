@@ -54,8 +54,7 @@ export default function UserForm() {
                                     email: "",
                                     countries: [],
                                     roles: [],
-                                    phone: "",
-                                    expiry_date: ""
+                                    phone: ""
                                 }}
                                 displayName="UserForm"
                                 validationSchema={registerSchema}
@@ -108,17 +107,6 @@ export default function UserForm() {
                                                     <Field data-testid="phone" className="form-control" type="text" name="phone" />
                                                     <div className="invalid-feedback">
                                                         <ErrorMessage name="phone" data-testid="phoneError" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="row">
-                                            <div className="col-12 col-sm-6">
-                                                <div className="form-group">
-                                                    <label htmlFor="expiry_date">Expiry Date</label>
-                                                    <Field className="form-control" type="date" name="expiry_date" />
-                                                    <div className="invalid-feedback">
-                                                        <ErrorMessage name="expiry_date" />
                                                     </div>
                                                 </div>
                                             </div>
