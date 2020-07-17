@@ -4,8 +4,7 @@ const initialState = {
     loggedInUser: null,
     users: {},
     deletedUserInfo: {},
-    roles: [],
-    role: null
+    roles: []
 };
 
 export default function reducer(state = initialState, action) {
@@ -46,6 +45,7 @@ export default function reducer(state = initialState, action) {
                 roles: state.roles.concat(action.payload.data)
             };
         }
+
     }
     return state;
 }

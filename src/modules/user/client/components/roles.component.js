@@ -14,12 +14,18 @@ export default function RoleForm() {
     const roles = useSelector(state => state.userReducer.roles);
     const { addToast } = useToasts();
     const [show, setShow] = useState(false);
-    const [editData, setEditData] = useState({ id: null, name: null, description: null });
+    const [editData, setEditData] = useState({});
+    const [selected, setselected] = useState(["b217c5c0-0dec-4663-92fe-7f75b8a378e6", "d8e50ff2-64e2-4c98-ae4e-cf554721b5ed"]);
 
     const setEdit = (row) => {
+
+        const list = (row.rolePermission).map(obj => {
+            return obj.permissionId;
+        });
+        setselected(list);
+
         setShow(true); setEditData(row);
     }
-
     useEffect(() => {
         async function getPermissions() {
             const response = await axios.get('/api/permissions');
@@ -47,7 +53,7 @@ export default function RoleForm() {
                 <div className="row">
                     <div className="col-12 col-sm-12 py-3 d-flex justify-content-between align-items-center">
                         <h2>Manage User Roles</h2>
-                        <button className="btn cdp-btn-primary btn-sm text-white" onClick={() => setShow(true)}>
+                        <button className="btn cdp-btn-primary btn-sm text-white" onClick={() => { setShow(true); setEditData({}); }}>
                             Add New Role
                         </button>
 
@@ -67,26 +73,39 @@ export default function RoleForm() {
                                 <div className="add-role p-3">
                                     <Formik
                                         initialValues={{
-                                            name: "",
-                                            description: "",
-                                            permissions: []
+                                            name: editData.name,
+                                            description: editData.description,
+                                            permissions: selected
                                         }}
                                         displayName="UserForm"
                                         validationSchema={roleSchema}
                                         onSubmit={(values, actions) => {
-                                            dispatch(createRole(values)).then(res => {
-                                                actions.resetForm();
-                                                addToast('Role created successfully', {
-                                                    appearance: 'success',
-                                                    autoDismiss: true
+                                            if (editData && editData.id) {
+
+                                                axios.put(`/api/roles/${editData.id}`, values)
+                                                    .then(function (response) {
+                                                        console.log(response);
+                                                        dispatch(getRoles());
+                                                    })
+                                                    .catch(function (error) {
+                                                        console.log(error);
+                                                    });
+
+                                            } else {
+                                                dispatch(createRole(values)).then(res => {
+                                                    actions.resetForm();
+                                                    addToast('Role created successfully', {
+                                                        appearance: 'success',
+                                                        autoDismiss: true
+                                                    });
+                                                }).catch(err => {
+                                                    const errorMessage = typeof err.response.data === 'string' ? err.response.data : err.response.statusText;
+                                                    addToast(errorMessage, {
+                                                        appearance: 'error',
+                                                        autoDismiss: true
+                                                    });
                                                 });
-                                            }).catch(err => {
-                                                const errorMessage = typeof err.response.data === 'string' ? err.response.data : err.response.statusText;
-                                                addToast(errorMessage, {
-                                                    appearance: 'error',
-                                                    autoDismiss: true
-                                                });
-                                            });
+                                            }
                                             setShow(false);
                                             actions.setSubmitting(false);
                                         }}
@@ -97,7 +116,7 @@ export default function RoleForm() {
                                                     <div className="col-12 col-sm-12">
                                                         <div className="form-group">
                                                             <label htmlFor="role_name">Role Name</label>
-                                                            <Field data-testid="role_name" className="form-control" type="name" name="name" value={editData.name} />
+                                                            <Field data-testid="role_name" className="form-control" type="name" name="name" />
                                                             <div className="invalid-feedback" data-testid="lastNameError"><ErrorMessage name="name" /></div>
                                                         </div>
                                                     </div>
@@ -115,8 +134,8 @@ export default function RoleForm() {
                                                     <div className="col-12 col-sm-12">
                                                         <div className="form-group">
                                                             <label htmlFor="permissions">Assign Service Category</label>
-                                                            <Field data-testid="permission" as="select" name="permissions" className="form-control" multiple>
-                                                                {permissions.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
+                                                            <Field data-testid="permission" as="select" name="permissions" className="form-control" multiple >
+                                                                {permissions.map(item => <option key={item.id} value={item.id} onClick={() => setselected([item.id])}>{item.title}</option>)}
                                                             </Field>
                                                             <div className="invalid-feedback">
                                                                 <ErrorMessage name="permissions" />
@@ -152,7 +171,7 @@ export default function RoleForm() {
                                             <td>{(row.rolePermission).map((item, index) => (
                                                 <span key={index}>{(permissions.find(i => i.id === item.permissionId)).title}{index < row.rolePermission.length - 1 ? ',' : ''}</span>
                                             ))}</td>
-                                            <td><button className="btn btn-outline-primary btn-sm" onClick={() => setEdit(row)}><i className="far fa-user-circle pr-1"></i>Edit</button></td>
+                                            <td><button className="btn btn-outline-primary btn-sm" onClick={() => setEdit(row)}> <i className="far fa-user-circle pr-1"></i>Edit</button></td>
                                         </tr>
                                     ))}
                                 </tbody>
