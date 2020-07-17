@@ -47,7 +47,7 @@ function generateAccessToken(user) {
 }
 
 function getPermissions(userrole) {
-    const permissions= [];
+    const permissions = [];
     if (userrole) {
         userrole.forEach(ur => {
             permissions.push(ur.role.rolePermission.map(rp => rp.permission.module));
@@ -57,7 +57,7 @@ function getPermissions(userrole) {
 }
 
 function getRolesPermissions(userrole) {
-    const roles= [];
+    const roles = [];
     if (userrole) {
         userrole.forEach(ur => {
             roles.push(ur.role.name);
@@ -214,7 +214,7 @@ async function createUser(req, res) {
             templateUrl,
             subject: 'Set a password for your new account on GLPG CDP',
             data: {
-                name: `${doc.first_name} ${doc.last_name}`   || '',
+                name: `${doc.first_name} ${doc.last_name}` || '',
                 link
             }
         };
@@ -267,7 +267,7 @@ async function getUsers(req, res) {
     const page = req.query.page ? req.query.page - 1 : 0;
     if (page < 0) return res.status(404).send("page must be greater or equal 1");
 
-    const limit = 5;
+    const limit = 7;
     const country_iso2 = req.query.country_iso2 === 'null' ? null : req.query.country_iso2;
     const offset = page * limit;
 
