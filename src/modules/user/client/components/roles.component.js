@@ -27,13 +27,16 @@ export default function RoleForm() {
         setShow(true); setEditData(row);
     }
     useEffect(() => {
+        let mounted = true;
         async function getPermissions() {
             const response = await axios.get('/api/permissions');
             setPermissions(response.data);
         }
         getPermissions();
-
-        dispatch(getRoles());
+        if (mounted) {
+            dispatch(getRoles());
+        }
+        return () => mounted = false;
     }, []);
 
     return (
@@ -73,18 +76,18 @@ export default function RoleForm() {
                                 <div className="add-role p-3">
                                     <Formik
                                         initialValues={{
-                                            name: editData.name,
-                                            description: editData.description,
-                                            permissions: selected
+                                            name: editData.name ? editData.name : '',
+                                            description: editData.description ? editData.description : '',
+                                            permissions: editData.rolePermission ? selected : []
                                         }}
                                         displayName="UserForm"
                                         validationSchema={roleSchema}
                                         onSubmit={(values, actions) => {
+                                            console.log(values);
                                             if (editData && editData.id) {
 
                                                 axios.put(`/api/roles/${editData.id}`, values)
                                                     .then(function (response) {
-                                                        console.log(response);
                                                         dispatch(getRoles());
                                                     })
                                                     .catch(function (error) {
@@ -93,6 +96,7 @@ export default function RoleForm() {
 
                                             } else {
                                                 dispatch(createRole(values)).then(res => {
+                                                    dispatch(getRoles());
                                                     actions.resetForm();
                                                     addToast('Role created successfully', {
                                                         appearance: 'success',
@@ -108,6 +112,7 @@ export default function RoleForm() {
                                             }
                                             setShow(false);
                                             actions.setSubmitting(false);
+
                                         }}
                                     >
                                         {formikProps => (
@@ -168,7 +173,7 @@ export default function RoleForm() {
                                             <td>{row.name}</td>
                                             <td>{row.description}</td>
                                             {/* <td>{JSON.stringify(row.rolePermission)}</td> */}
-                                            <td>{(row.rolePermission).map((item, index) => (
+                                            <td>{(row.rolePermission) && (row.rolePermission).map((item, index) => (
                                                 <span key={index}>{(permissions.find(i => i.id === item.permissionId)).title}{index < row.rolePermission.length - 1 ? ',' : ''}</span>
                                             ))}</td>
                                             <td><button className="btn btn-outline-primary btn-sm" onClick={() => setEdit(row)}> <i className="far fa-user-circle pr-1"></i>Edit</button></td>
