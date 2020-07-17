@@ -27,16 +27,12 @@ export default function RoleForm() {
         setShow(true); setEditData(row);
     }
     useEffect(() => {
-        let mounted = true;
         async function getPermissions() {
             const response = await axios.get('/api/permissions');
             setPermissions(response.data);
         }
         getPermissions();
-        if (mounted) {
-            dispatch(getRoles());
-        }
-        return () => mounted = false;
+        dispatch(getRoles());
     }, []);
 
     return (
