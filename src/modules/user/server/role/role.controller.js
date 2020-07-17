@@ -2,6 +2,8 @@ const path = require('path');
 const Role = require('./role.model');
 const RolePermissions = require('./role-permission.model');
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
+const RolePermission = require(path.join(process.cwd(), "src/modules/user/server/role/role-permission.model"));
+
 
 const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, "").replace(/ +/g, "-");
 
@@ -54,13 +56,29 @@ async function editRole(req, res) {
     const { name, description, permissions } = req.body;
 
     try {
-        const doc = await Role.findOne({ where: { id: req.params.id } });
+        const doc = await Role.findOne({ where: { id: req.params.id },
+            include: [{
+                model: RolePermission,
+                as: 'rolePermission'
+            }]
+         });
 
         if (!doc) {
             return res.sendStatus(400);
         }
 
         doc.update({ name, description, slug: convertToSlug(name), updated_by: req.user.id });
+        doc.rolePermission.forEach(async rp => {
+            await rp.destroy();
+
+        });
+
+        permissions && permissions.forEach(async function (permissionId) {
+            await RolePermissions.create({
+                permissionId: permissionId,
+                roleId: doc.id
+            });
+        });
 
         res.json(doc);
     } catch (err) {
