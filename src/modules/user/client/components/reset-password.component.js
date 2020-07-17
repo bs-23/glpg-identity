@@ -58,7 +58,7 @@ export default function ResetPasswordForm() {
                                         <Form onSubmit={formikProps.handleSubmit}>
                                             <Field type="text" name="username" autoComplete="username" hidden />
                                             <div className="form-group">
-                                                <label className="">New Password</label>
+                                                <label className="">New Password<span className="text-danger required-field pl-1">*</span></label>
                                                 <Field
                                                     className="form-control"
                                                     type="password"
@@ -72,7 +72,7 @@ export default function ResetPasswordForm() {
                                             </div>
 
                                             <div className="form-group">
-                                                <label className="">Confirm New Password</label>
+                                                <label className="">Confirm New Password<span className="text-danger required-field pl-1">*</span></label>
                                                 <Field
                                                     className="form-control"
                                                     type="password"
