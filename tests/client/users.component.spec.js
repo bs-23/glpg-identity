@@ -24,15 +24,28 @@ beforeAll(async () => {
 let data
 beforeEach(() => {
     mockAxios = new MockAdapter(axios);
-    const countries = [{ countryid: 0, country_iso2: 'null', countryname: '' }, { countryid: 1, country_iso2: 'Ireland', countryname: 'Ireland' }, { countryid: 2, country_iso2: 'Netherlands', countryname: 'Netherlands'}]
+    const countries = [
+        // { countryid: 0, country_iso2: 'null', countryname: '' },
+        { countryid: 1, country_iso2: 'Ireland', countryname: 'Ireland' },
+        { countryid: 2, country_iso2: 'Netherlands', countryname: 'Netherlands'},
+        { countryid: 3, country_iso2: 'Luxembourg', countryname: 'Luxembourg'},
+        { countryid: 4, country_iso2: 'Germany', countryname: 'Germany'}
+    ]
     const limit = 3
     data = {
+        // users: [
+        //     { id: '1', first_name: 'John', email: 'email@gmail.com', country_iso2: 'Ireland' },
+        //     { id: '2', first_name: 'Smith', email: 'email2@gmail.com', country_iso2: 'Netherlands' },
+        //     { id: '3', first_name: 'Carl', email: 'email3@gmail.com', country_iso2: 'Luxembourg' },
+        //     { id: '4', first_name: 'Johnson', email: 'email4@gmail.com', country_iso2: 'Netherlands' },
+        //     { id: '5', first_name: 'Brandon', email: 'email5@gmail.com', country_iso2: 'Netherlands' },
+        // ]
         users: [
-            { id: '1', first_name: 'John', email: 'email@gmail.com', country_iso2: 'Ireland' },
-            { id: '2', first_name: 'Smith', email: 'email2@gmail.com', country_iso2: 'Netherlands' },
-            { id: '3', first_name: 'Carl', email: 'email3@gmail.com', country_iso2: 'Luxembourg' },
-            { id: '4', first_name: 'Johnson', email: 'email4@gmail.com', country_iso2: 'Netherlands' },
-            { id: '5', first_name: 'Brandon', email: 'email5@gmail.com', country_iso2: 'Netherlands' },
+            { id: '1', first_name: 'John', email: 'email@gmail.com', countries: ['Ireland'] },
+            { id: '2', first_name: 'Smith', email: 'email2@gmail.com', countries: ['Netherlands'] },
+            { id: '3', first_name: 'Carl', email: 'email3@gmail.com', countries: ['Luxembourg'] },
+            { id: '4', first_name: 'Johnson', email: 'email4@gmail.com', countries: ['Netherlands'] },
+            { id: '5', first_name: 'Brandon', email: 'email5@gmail.com', countries: ['Netherlands'] },
         ]
     }
 
@@ -78,12 +91,6 @@ describe('Users component', () => {
         const filter_button = getByText('Filter by Country')
         fireEvent.click(filter_button)
 
-
-        const country_label = getByText('Ireland')
-        fireEvent.click(country_label)
-
-        await waitFor(() => {
-            expect(tbody.childNodes.length).toBe(1)
-        })
-    }); 
+        getByText('Germany')
+    });
 });
