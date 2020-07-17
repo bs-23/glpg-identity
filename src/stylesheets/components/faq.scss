@@ -47,5 +47,21 @@
             font-size: 14px;
             line-height: 1.8;
         }
+
+        //Accordian up/down arrow styling in hacky way
+        .collapse,
+        .collapsing {
+            order: 2;
+        }
+
+        &-header {
+            order: 1;
+        }
+
+        .collapse.show + .card-header {
+            .faq__icon-down {
+                transform: rotate(180deg)
+            }
+        }
     }
 }
