@@ -14,6 +14,11 @@ export default function RoleForm() {
     const roles = useSelector(state => state.userReducer.roles);
     const { addToast } = useToasts();
     const [show, setShow] = useState(false);
+    const [editData, setEditData] = useState({ id: null, name: null, description: null });
+
+    const setEdit = (row) => {
+        setShow(true); setEditData(row);
+    }
 
     useEffect(() => {
         async function getPermissions() {
@@ -54,7 +59,7 @@ export default function RoleForm() {
                         >
                             <Modal.Header closeButton>
                                 <Modal.Title id="example-custom-modal-styling-title">
-                                    Add New Role
+                                    {editData.id ? 'Edit Role' : 'Add New Role'}
                                 </Modal.Title>
                             </Modal.Header>
 
@@ -82,6 +87,7 @@ export default function RoleForm() {
                                                     autoDismiss: true
                                                 });
                                             });
+                                            setShow(false);
                                             actions.setSubmitting(false);
                                         }}
                                     >
@@ -91,8 +97,8 @@ export default function RoleForm() {
                                                     <div className="col-12 col-sm-12">
                                                         <div className="form-group">
                                                             <label htmlFor="role_name">Role Name</label>
-                                                            <Field data-testid="role_name" className="form-control" type="name" name="name"/>
-                                                            <div className="invalid-feedback" data-testid="lastNameError"><ErrorMessage name="name"/></div>
+                                                            <Field data-testid="role_name" className="form-control" type="name" name="name" value={editData.name} />
+                                                            <div className="invalid-feedback" data-testid="lastNameError"><ErrorMessage name="name" /></div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -100,8 +106,8 @@ export default function RoleForm() {
                                                     <div className="col-12 col-sm-12">
                                                         <div className="form-group">
                                                             <label htmlFor="role_description">Role Description</label>
-                                                            <Field data-testid="role_description" className="form-control" as="textarea" type="name" name="description"/>
-                                                            <div className="invalid-feedback" data-testid="RoleDescriptionNameError"><ErrorMessage name="description"/></div>
+                                                            <Field data-testid="role_description" className="form-control" as="textarea" type="name" name="description" />
+                                                            <div className="invalid-feedback" data-testid="RoleDescriptionNameError"><ErrorMessage name="description" /></div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -113,7 +119,7 @@ export default function RoleForm() {
                                                                 {permissions.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
                                                             </Field>
                                                             <div className="invalid-feedback">
-                                                                <ErrorMessage name="permissions"/>
+                                                                <ErrorMessage name="permissions" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -133,6 +139,7 @@ export default function RoleForm() {
                                     <tr>
                                         <th className="py-2">Role Name</th>
                                         <th className="py-2">Description</th>
+                                        <th className="py-2">Assigned Service Category</th>
                                         <th className="py-2">Action</th>
                                     </tr>
                                 </thead>
@@ -141,7 +148,11 @@ export default function RoleForm() {
                                         <tr key={row.id}>
                                             <td>{row.name}</td>
                                             <td>{row.description}</td>
-                                            <td><a className="btn btn-outline-primary btn-sm"><i className="far fa-user-circle pr-1"></i>Edit</a></td>
+                                            {/* <td>{JSON.stringify(row.rolePermission)}</td> */}
+                                            <td>{(row.rolePermission).map((item, index) => (
+                                                <span key={index}>{(permissions.find(i => i.id === item.permissionId)).title}{index < row.rolePermission.length - 1 ? ',' : ''}</span>
+                                            ))}</td>
+                                            <td><button className="btn btn-outline-primary btn-sm" onClick={() => setEdit(row)}><i className="far fa-user-circle pr-1"></i>Edit</button></td>
                                         </tr>
                                     ))}
                                 </tbody>
