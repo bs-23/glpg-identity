@@ -319,8 +319,22 @@ async function getUser(req, res) {
             where: {
                 id: req.params.id
             },
+            include: [{
+                model: UserRole,
+                as: 'userrole',
+                include: [{
+                    model: Role,
+                    as: 'role',
+                }]
+            }],
             attributes: ['id', 'first_name', 'last_name', 'email', 'phone', 'type', 'last_login', 'expiry_date']
         });
+        if (user.userrole) {
+
+            const roles = user.userrole.map(ur => ur.role.name);
+            user.roles = roles.join();
+
+        }
 
         if (!user) return res.status(404).send("User is not found or may be removed");
 
