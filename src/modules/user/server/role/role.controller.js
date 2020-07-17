@@ -13,7 +13,11 @@ async function getRoles(req, res) {
             include: [{
                 model: RolePermissions,
                 as: 'rolePermission'
-            }]
+            }],
+            order: [
+                ['created_at', 'ASC'],
+                ['id', 'ASC']
+            ]
         });
         res.json(roles);
     } catch (err) {
