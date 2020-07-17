@@ -71,7 +71,8 @@ async function editRole(req, res) {
             return res.sendStatus(400);
         }
 
-        doc.update({ name, description, slug: convertToSlug(name), updated_by: req.user.id });
+        await doc.update({ name, description, slug: convertToSlug(name), updated_by: req.user.id });
+        
         doc.rolePermission.forEach(async rp => {
             await rp.destroy();
 
@@ -86,7 +87,7 @@ async function editRole(req, res) {
 
         res.json(doc);
     } catch (err) {
-        res.status(500).send(err);
+        return res.status(500).send(err);
     }
 }
 
