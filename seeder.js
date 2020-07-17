@@ -71,8 +71,8 @@ async function init() {
 
     function roleSeeder(callback) {
         const roles = [
-            { name: 'System Admin', slug: 'system-admin', description: "Has access to all the services", created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" },
-            { name: 'User Manager', slug: 'user-manager', description: "Has access to manage CDP users only", created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
+            { name: 'System Admin', slug: 'system-admin', description: 'Has access to all the services', created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" },
+            { name: 'User Manager', slug: 'user-manager', description: 'Has access to manage CDP users only', created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
         ];
 
         Role.destroy({ truncate: { cascade: true } }).then(() => {
@@ -87,13 +87,16 @@ async function init() {
 
     function rolePermissionSeeder(callback) {
         const adminRole = Role.findOne({ where: { slug: 'system-admin' } });
+        const userManagerRole = Role.findOne({ where: { slug: 'user-manager' } });
+
         const userPermission = Permission.findOne({ where: { module: 'user' } });
         const hcpPermission = Permission.findOne({ where: { module: 'hcp' } });
 
-        Promise.all([adminRole, userPermission, hcpPermission]).then((values) => {
+        Promise.all([adminRole, userManagerRole, userPermission, hcpPermission]).then((values) => {
             const rolePermissions = [
-                { permissionId: values[1].id, roleId: values[0].id },
-                { permissionId: values[2].id, roleId: values[0].id }
+                { roleId: values[0].id, permissionId: values[2].id },
+                { roleId: values[0].id, permissionId: values[3].id },
+                { roleId: values[1].id, permissionId: values[2].id }
             ];
 
             RolePermission.destroy({ truncate:  { cascade: true } }).then(() => {
