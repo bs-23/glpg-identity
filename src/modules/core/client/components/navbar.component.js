@@ -10,7 +10,7 @@ export default function Navbar() {
         <header className="app__header py-1 shadow-sm">
             <div className="container-fluid">
                 <div className="row align-items-center">
-                    <div className="col-4">
+                    <div className="col-3">
                         <div className="d-flex">
                             <h1 className="text-center">
                                 <a href="/"> <img alt="CDP LOGO" src="/assets/CDP.png" height="64" /></a>
@@ -29,8 +29,8 @@ export default function Navbar() {
                             </Dropdown>*/}
                         </div>
                     </div>
-                    <div className="col-8 text-right">
-                        <button className="mr-2 btn cdp-btn-secondary text-white"><i className="icon icon-user-round mr-1 app__header-icon-user"></i> {first_name + " " + last_name}</button>
+                    <div className="col-9 text-right">
+                        <button className="mr-2 btn cdp-btn-secondary text-white"><i className="icon icon-user-round mr-1 app__header-icon-user"></i> <span className="d-none d-sm-inline-block">{first_name + " " + last_name}</span></button>
                         <a className="btn cdp-btn-outline-primary" href="/api/logout"><i className="icon icon-logout mr-1 app__header-icon-logout"></i>Logout</a>
                     </div>
                 </div>
