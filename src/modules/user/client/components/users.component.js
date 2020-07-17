@@ -124,7 +124,7 @@ export default function Users() {
                                         ))}
                                     </tbody>
                                 </table>
-                                {((userdata.page === 1 && userdata['users'] && userdata['users'].length > 19) ||
+                                {((userdata.page === 1 && userdata['users'] && userdata['users'].length > 4) ||
                                     (userdata.page > 1 && userdata['users']))
                                     &&
                                     < div className="pagination justify-content-end align-items-center mb-4 border-top pt-3">
