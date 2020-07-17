@@ -52,7 +52,8 @@ function getPermissions(userrole) {
         userrole.forEach(ur => {
             permissions.push(ur.role.rolePermission.map(rp => rp.permission.module));
         })
-        return permissions.flat(1);
+        return [].concat(...permissions);
+
     }
 }
 
@@ -60,8 +61,10 @@ function getRolesPermissions(userrole) {
     const roles = [];
     if (userrole) {
         userrole.forEach(ur => {
-            roles.push(ur.role.name);
-            roles.push(ur.role.rolePermission.map(rp => rp.permission.module));
+            roles.push({
+                title: ur.role.name,
+                permissions: ur.role.rolePermission.map(rp => rp.permission.module)
+            });
         });
 
         return roles;
