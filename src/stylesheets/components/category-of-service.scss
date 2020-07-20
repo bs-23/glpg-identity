@@ -15,20 +15,21 @@
         font-weight: 600;
         text-align: center;
         height: 100%;
-        border-radius: 16px;
+        border-radius: $border-radius;
         width: 215px;
 
         &.disabled {
             box-shadow: none !important;
-            color: #9AB1AD !important;
-            background: #F9F9F9 !important;
+            color: $primary-color-lighter !important;
+            background: $disabaled-bg !important;
+            cursor: default;
             // @include HEX-to-RGBA(background-color, $white-color, .5);
         }
 
         &:hover {
             background: $secondary-color;
             color: $white-color;
-            box-shadow: 0 11px 23px -9px #F69223;
+            box-shadow: 0 11px 23px -9px $secondary-color-light;
             text-decoration: none;
         }
     }
