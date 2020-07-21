@@ -1,6 +1,7 @@
 import React from "react";
 import { Switch, useRouteMatch } from "react-router-dom";
 import HcpUsers from "./components/hcp-users";
+import InformationManagement from './components/information-management.component'
 import PrivateRoute from "../../core/client/PrivateRoute";
 
 export default function HcpRoutes() {
@@ -8,7 +9,8 @@ export default function HcpRoutes() {
 
     return (
         <Switch>
-            <PrivateRoute exact path={path} component={HcpUsers} module={'hcp'} />
+            <PrivateRoute exact path={path} component={InformationManagement} module={'hcp'} />
+            <PrivateRoute path={`${path}/list`} component={HcpUsers} module={'hcp'} />
         </Switch>
     );
 }
