@@ -23,13 +23,13 @@ export default function Dashboard() {
                                     <li className="pr-sm-4 pb-4 service__item">
                                         <NavLink to="" className="d-block py-5 px-3 service__link disabled">
                                             <i className="icon icon-marketing-promotion-management d-block service__icon"></i>
-                                            Consent Management
+                                            Data Privacy & Consent management
                                         </NavLink>
                                     </li>
                                     <li className="pr-sm-4 pb-4 service__item">
                                         <NavLink to="/users" className="d-block py-5 px-3 service__link">
                                             <i className="icon icon-user-management d-block service__icon"></i>
-                                            User Management
+                                          Customer Data Platform Management
                                         </NavLink>
                                     </li>
                                     <li className="pr-sm-4 pb-4 service__item">

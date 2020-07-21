@@ -1,13 +1,20 @@
 .cdp-list-group {
     $this: cdp-list-group;
 
-    background: $light-bg-color;
-
+    /*background: $light-bg-color;*/
     &__link {
         text-decoration: none !important;
 
+        &.disabled {
+            /*box-shadow: none !important;
+            color: $primary-color-lighter !important;
+            background: $disabaled-bg !important;
+            cursor: default;*/
+            // @include HEX-to-RGBA(background-color, $white-color, .5);
+        }
+
         &:hover {
-            background-color: $gray-ddd;
+            background-color: $gray-F8F8F8;
 
             .#{$this}__link-title {
                 text-decoration: none;
@@ -16,19 +23,23 @@
     }
 
     &__icon {
-        color: $secondary-color;
+        color: $primary-color;
         width: 85px;
     }
 
     &__link-title {
         color: $primary-color;
         font-weight: bold;
-        text-decoration: underline;
+        font-size: 18px;
     }
 
     &__link-description {
+        color: $gray-666;
+        font-size: 14px;
     }
 
     &__link-timing {
+        color: $gray-666;
+        font-size: 14px;
     }
 }

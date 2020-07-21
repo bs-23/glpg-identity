@@ -73,3 +73,60 @@
 .icon-user-round:before {
     content: "\6a";
 }
+
+.icon-add-user:before {
+    content: "\6b";
+}
+
+.icon-board-games-with-roles:before {
+    content: "\6c";
+}
+
+.icon-calendar:before {
+    content: "\6d";
+}
+
+.icon-handshake:before {
+    content: "\6e";
+}
+
+.icon-listing:before {
+    content: "\6f";
+}
+
+.icon-network:before {
+    content: "\70";
+}
+
+.icon-secure:before {
+    content: "\71";
+}
+
+.icon-switch:before {
+    content: "\72";
+}
+
+
+
+//custome css
+$class-slug: icon- !default;
+
+@for $i from 10 through 40 {
+    .#{$class-slug}#{$i}#{px} {
+        font-size: 0px + $i
+    }
+}
+
+@for $i from 1 through 10 {
+    .#{$class-slug}#{$i}#{x} {
+        font-size: 0em + $i
+    }
+}
+
+.icon.icon-bold::before {
+    font-weight: bold !important;
+}
+
+.icon.icon-italic::before {
+    font-style: italic !important;
+}

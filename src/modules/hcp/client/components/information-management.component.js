@@ -1,9 +1,10 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import Faq from '../../../shared/client/components/faq.component';
 
 const InformationManagement = () => {
     return (
-        <main className="app__content">
+        <main className="app__content cdp-light-bg">
             <div className="container-fluid">
                 <div className="row">
                     <div className="col-12 px-0">
@@ -15,27 +16,84 @@ const InformationManagement = () => {
                         </nav>
                     </div>
                 </div>
-                <div className="row">
-                    <div className="col-12">
-                        <div>
-                            <div className="d-flex justify-content-between align-items-center">
-                                <h2 className="mb-3">Information Management</h2>
-                            </div>
+                <div className="row h-100">
+                    <div className="col-12 col-lg-8 col-xl-9 py-3">
+                        <div className="h-100 shadow-sm bg-white">
+                            <h2 className="d-flex align-items-center mb-3 px-3 cdp-text-primary">Information Management</h2>
                             <div className="row">
-                                <div className="col-12 col-sm-6">
+                                <div className="col-12">
                                     <div className="list-group cdp-list-group">
                                         <NavLink to="/hcps/list" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
-                                            <i className="fas fa-th-list fa-3x cdp-list-group__icon"></i>
+                                            <i className="icon icon-secure icon-3x icon-3x cdp-list-group__icon"></i>
                                             <span>
                                                 <strong className="mb-1 h4 d-block cdp-list-group__link-title">HCP User List</strong>
                                                 <span className="mb-1 d-block cdp-list-group__link-description text-secondary">A list view of all the HCP users</span>
                                                 <span className="mb-1 d-block cdp-list-group__link-timeing text-muted">10 minutes</span>
                                             </span>
                                         </NavLink>
+                                        <NavLink to="" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
+                                            <i className="icon icon-handshake icon-3x cdp-list-group__icon"></i>
+                                            <span>
+                                                <strong className="mb-1 h4 d-block cdp-list-group__link-title">Manage HCP Master Data</strong>
+                                                <span className="mb-1 d-block cdp-list-group__link-description text-secondary">Checking IQVia individual datasets in relevant country</span>
+                                                <span className="mb-1 d-block cdp-list-group__link-timeing text-muted">5 - 7 minutes</span>
+                                            </span>
+                                        </NavLink>
+                                        <NavLink to="" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
+                                            <i className="icon icon-network icon-3x cdp-list-group__icon"></i>
+                                            <span>
+                                                <strong className="mb-1 h4 d-block cdp-list-group__link-title">Check the HCP Professional Engagements at HCOs</strong>
+                                                <span className="mb-1 d-block cdp-list-group__link-description text-secondary">Assigned IQVia activities to HCPs using Role 1 and Start Activity</span>
+                                                <span className="mb-1 d-block cdp-list-group__link-timeing text-muted">Select your Campaign list considering HCPs Job Function and starting date of activity within 5 - 10 minutes</span>
+                                            </span>
+                                        </NavLink>
+                                        <NavLink to="" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
+                                            <i className="icon icon-calendar icon-3x cdp-list-group__icon"></i>
+                                            <span>
+                                                <strong className="mb-1 h4 d-block cdp-list-group__link-title">Understand IFT Team Engagements with HCPs</strong>
+                                                <span className="mb-1 d-block cdp-list-group__link-description text-secondary">VeevaCRM interactions (Call Reports, Medical Inquiries, etc.)</span>
+                                                <span className="mb-1 d-block cdp-list-group__link-timeing text-muted">Find insights for Omni-channel recommendations within 15 minutes per HCP</span>
+                                            </span>
+                                        </NavLink>
+                                        <NavLink to="" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
+                                            <i className="icon icon-switch icon-3x cdp-list-group__icon"></i>
+                                            <span>
+                                                <strong className="mb-1 h4 d-block cdp-list-group__link-title">Manage Address of a Health Care Organization</strong>
+                                                <span className="mb-1 d-block cdp-list-group__link-description text-secondary">IQVia workplace and addresses including department, buildings</span>
+                                                <span className="mb-1 d-block cdp-list-group__link-timeing text-muted">Do data cleaning for a HCO within 2 - 5 minutes</span>
+                                            </span>
+                                        </NavLink>
+                                        <NavLink to="" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
+                                            <i className="icon icon-th-list icon-3x cdp-list-group__icon"></i>
+                                            <span>
+                                                <strong className="mb-1 h4 d-block cdp-list-group__link-title">Understand HCP with 3rd Party master data (Market Access data, etc.) </strong>
+                                                <span className="mb-1 d-block cdp-list-group__link-description text-secondary">Matching 3rd Party data to IQVia individual data</span>
+                                                <span className="mb-1 d-block cdp-list-group__link-timeing text-muted">Drive Insights with enriched 3rd Party data within 10 - 15 minutes</span>
+                                            </span>
+                                        </NavLink>
+                                        <NavLink to="" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
+                                            <i className="icon icon-th-list icon-3x cdp-list-group__icon"></i>
+                                            <span>
+                                                <strong className="mb-1 h4 d-block cdp-list-group__link-title">Discover Missing HCPs and HCOs</strong>
+                                                <span className="mb-1 d-block cdp-list-group__link-description text-secondary">IQVia OneKey Universe</span>
+                                                <span className="mb-1 d-block cdp-list-group__link-timeing text-muted">Search & Find within 1 to 3 minutes to solve issue</span>
+                                            </span>
+                                        </NavLink>
+                                        <NavLink to="" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
+                                            <i className="icon icon-th-list icon-3x cdp-list-group__icon"></i>
+                                            <span>
+                                                <strong className="mb-1 h4 d-block cdp-list-group__link-title">Find HCPs with their Geolocation</strong>
+                                                <span className="mb-1 d-block cdp-list-group__link-description text-secondary">Using the address assigned to IQVia workplace</span>
+                                                <span className="mb-1 d-block cdp-list-group__link-timeing text-muted">Make new Campaign lists via GPS areas in less than 20 min</span>
+                                            </span>
+                                        </NavLink>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div className="col-12 col-lg-4 col-xl-3 py-3">
+                        <Faq />
                     </div>
                 </div>
             </div>
