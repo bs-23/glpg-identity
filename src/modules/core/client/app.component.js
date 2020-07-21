@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Switch, Route } from "react-router-dom";
@@ -18,6 +19,35 @@ import HcpRoutes from "../../hcp/client/hcp.routes";
 import ForgotPassword from '../../user/client/components/forgot-password.component';
 import ResetPasswordForm from '../../user/client/components/reset-password.component';
 import { ToastProvider} from 'react-toast-notifications';
+
+let refCount = 0;
+
+function setLoading(isLoading) {
+    if (isLoading) {
+        refCount++;
+        document.getElementById('loader').style = 'display: block';
+    } else if (refCount > 0) {
+        refCount--;
+        if(refCount > 0) document.getElementById('loader').style = 'display: block';
+        else document.getElementById('loader').style = 'display: none';
+    }
+}
+
+axios.interceptors.request.use(config => {
+    setLoading(true);
+    return config;
+}, error => {
+    setLoading(false);
+    return Promise.reject(error);
+});
+
+axios.interceptors.response.use(response => {
+    setLoading(false);
+    return response;
+}, error => {
+    setLoading(false);
+    return Promise.reject(error);
+});
 
 export default function App() {
     const dispatch = useDispatch();
