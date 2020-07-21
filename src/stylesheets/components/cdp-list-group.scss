@@ -7,9 +7,9 @@
         text-decoration: none !important;
 
         &:hover {
-            background-color: #ddd;
+            background-color: $gray-ddd;
 
-            .cdp-list-group__link-title {
+            .#{$this}__link-title {
                 text-decoration: none;
             }
         }
