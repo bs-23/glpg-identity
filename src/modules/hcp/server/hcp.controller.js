@@ -271,6 +271,40 @@ async function createHcpProfile(req, res) {
     }
 }
 
+async function confirmConsents(req, res) {
+    const response = new Response({}, []);
+    const id = req.query.id
+    try{
+        const hcpUser = await Hcp.findOne({ where: { id }})
+        if(!hcpUser) {
+            response.errors.push(new CustomError('User does not exists.', 'id'));
+            return res.status(400).send(response);
+        }
+
+        let userConsents = await HcpConsents.findAll({ where: { user_id: id }})
+        userConsents = userConsents.map(consent => ({ ...consent.dataValues, consent_given: true}))
+        await HcpConsents.bulkCreate(userConsents, {
+            updateOnDuplicate: ["consent_given"]
+        })
+
+        hcpUser.status = 'Approved'
+        hcpUser.reset_password_token = crypto.randomBytes(36).toString('hex');
+        hcpUser.reset_password_expires = Date.now() + 3600000;
+        await hcpUser.save()
+
+        response.data = {
+            ...getHcpViewModel(hcpUser.dataValues),
+            password_reset_token: hcpUser.dataValues.reset_password_token,
+            retention_period: '1 hour'
+        };
+
+        res.json(response)
+    }catch(err){
+        response.errors.push(new CustomError(err.message, '', '', err));
+        res.status(500).send(response);
+    }
+}
+
 async function getHcpProfile(req, res) {
     const response = new Response({}, []);
     try {
@@ -500,3 +534,4 @@ exports.resetPassword = resetPassword;
 exports.forgetPassword = forgetPassword;
 exports.getSpecialties = getSpecialties;
 exports.getAccessToken = getAccessToken;
+exports.confirmConsents = confirmConsents;

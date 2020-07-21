@@ -19,6 +19,9 @@ module.exports = app => {
     app.route('/api/hcp-profiles')
         .post(passport.authenticate('application-jwt', { session: false }), controller.createHcpProfile);
 
+    app.route('/api/hcps/confirm-consents')
+        .get(passport.authenticate('application-jwt', { session: false }), controller.confirmConsents);
+
     app.route('/api/hcp-profiles/forget-password')
         .get(passport.authenticate('application-jwt', { session: false }), controller.forgetPassword);
 
