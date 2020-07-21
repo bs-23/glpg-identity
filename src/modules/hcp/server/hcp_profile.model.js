@@ -55,7 +55,7 @@ const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
     },
     status: {
         type: DataTypes.ENUM,
-        values: ['Approved', 'Pending', 'Rejected']
+        values: ['Approved', 'Consent Pending', 'Not Verified', 'Rejected']
     },
     created_by: {
         type: DataTypes.UUID

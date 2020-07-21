@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const { QueryTypes } = require('sequelize');
 const Hcp = require('./hcp_profile.model');
 const HcpConsents = require('./hcp_consents.model');
+const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
@@ -211,38 +212,57 @@ async function createHcpProfile(req, res) {
             specialty_onekey: req.body.specialty_onekey,
             application_id: req.user.id,
             created_by: req.user.id,
-            updated_by: req.user.id,
-            status: master_data && master_data.length ? 'Approved' : 'Pending'
+            updated_by: req.user.id
         };
 
-        if(model.status === 'Approved') {
-            model.reset_password_token = crypto.randomBytes(36).toString('hex');
-            model.reset_password_expires = Date.now() + 3600000;
-        }
+        const hcpUser = await Hcp.create(model);
 
-        const doc = await Hcp.create(model);
+        let hasDoubleOptIn = false
+        const consentArr = [];
 
-        if (req.body.consents) {
-            const consentArr = [];
-            req.body.consents.forEach(element => {
+        if (req.body.consents.length) {
+            await Promise.all(req.body.consents.map(async consent => {
+                const consentSlug = Object.keys(consent)[0]
+                const consentResponse = Object.values(consent)[0]
+                if(!consentResponse) return
+
+                const consentDetails = await Consent.findOne({ where: { slug: consentSlug } })
+
+                if(!consentDetails) return
+                if(consentDetails.dataValues.opt_type === 'double') {
+                    hasDoubleOptIn = true
+                }
+
                 consentArr.push({
-                    user_id: doc.id,
-                    consent_id: Object.keys(element)[0],
-                    response: Object.values(element)[0]
+                    user_id: hcpUser.id,
+                    consent_id: consentDetails.dataValues.id,
+                    response: consentResponse,
+                    consent_given: consentDetails.dataValues.opt_type === 'single' ? true : false
                 });
-            });
-
-            await HcpConsents.bulkCreate(consentArr, {
-                returning: true,
-                ignoreDuplicates: false
-            });
+            }))
         }
 
-        response.data = {
-            ...getHcpViewModel(doc.dataValues),
-            password_reset_token: doc.dataValues.reset_password_token,
-            retention_period: '1 hour'
-        };
+        consentArr.length && await HcpConsents.bulkCreate(consentArr, {
+            returning: true,
+            ignoreDuplicates: false
+        });
+
+        hcpUser.status = master_data && master_data.length ? hasDoubleOptIn ? 'Consent Pending' : 'Approved' : 'Not Verified'
+        hcpUser.status = 'Approved'
+
+        if(hcpUser.status === 'Approved') {
+            hcpUser.reset_password_token = crypto.randomBytes(36).toString('hex');
+            hcpUser.reset_password_expires = Date.now() + 3600000;
+            await hcpUser.save()
+            response.data = {
+                ...getHcpViewModel(hcpUser.dataValues),
+                password_reset_token: hcpUser.dataValues.reset_password_token,
+                retention_period: '1 hour'
+            };
+        }
+
+        // if(hcpUser.dataValues.status === 'Consent Pending') {
+        // }
 
         res.json(response);
     } catch (err) {
