@@ -27,7 +27,7 @@ export default function App() {
     }, []);
 
     return (
-        <ToastProvider>
+        <ToastProvider placement="top-center">
             <Switch>
 
                 <PublicRoute path="/login" component={Login} />
