@@ -26,19 +26,7 @@ async function init() {
 
     await sequelize.cdpConnector.sync();
 
-    const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, "").replace(/ +/g, "-");
-
-    function applicationSeeder(callback) {
-        Application.findOrCreate({
-            where: { email: "hcp-portal@glpg.com" }, defaults: {
-                name: "Authoring Experience Service Account",
-                password: "strong-password",
-                is_active: true
-            }
-        }).then(function () {
-            callback();
-        });
-    }
+    const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
 
     function userSeeder(callback) {
         User.findOrCreate({
@@ -130,19 +118,15 @@ async function init() {
         });
     }
 
-    function userPermissionSeeder(callback) {
-        const admin = User.findOne({ where: { email: "admin@glpg-cdp.com" } });
-        const userPermission = Permission.findOne({ where: { module: "user" } });
-        const hcpPermission = Permission.findOne({ where: { module: "hcp" } });
-
-        Promise.all([admin, userPermission, hcpPermission]).then((values) => {
-            const userPermissions = [
-                { "userId": values[0].id, "permissionId": values[1].id, "created_by": values[0].id, "updated_by": values[0].id },
-                { "userId": values[0].id, "permissionId": values[2].id,  "created_by": values[0].id, "updated_by": values[0].id }
+    function applicationSeeder(callback) {
+        User.findOne({ where: { email: 'admin@glpg-cdp.com' } }).then(admin => {
+            const applications = [
+                { name: 'HCP Portal', slug: convertToSlug('HCP Portal'), email: 'hcp-portal@glpg.com', password: 'strong-password', created_by: admin.id, updated_by: admin.id },
+                { name: 'BrandX', slug: convertToSlug('BrandX'), email: 'brandx@glpg.com', password: 'strong-password', created_by: admin.id, updated_by: admin.id }
             ];
 
-            UserPermission.destroy({ truncate: true }).then(() => {
-                UserPermission.bulkCreate(userPermissions, {
+            Application.destroy({ truncate: { cascade: true } }).then(() => {
+                Application.bulkCreate(applications, {
                     returning: true,
                     ignoreDuplicates: false
                 }).then(function () {
@@ -191,7 +175,7 @@ async function init() {
         });
     }
 
-    async.waterfall([applicationSeeder, userSeeder, consentSeeder, permissionSeeder,roleSeeder, rolePermissionSeeder, userRoleSeeder], function (err) {
+    async.waterfall([userSeeder, permissionSeeder,roleSeeder, rolePermissionSeeder, userRoleSeeder, applicationSeeder, consentSeeder], function (err) {
         if (err) console.error(err);
         else console.info("DB seed completed!");
         process.exit();

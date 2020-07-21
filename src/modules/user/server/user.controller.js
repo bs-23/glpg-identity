@@ -320,6 +320,7 @@ async function getUsers(req, res) {
 
         const totalUser = await User.count({
             where: {
+                id: { [Op.ne]: signedInId },
                 type: 'basic',
                 countries: country_iso2 ? { [Op.contains]: [country_iso2] } : { [Op.ne]: ["undefined"] }
             },
