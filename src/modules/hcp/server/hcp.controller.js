@@ -227,8 +227,8 @@ async function createHcpProfile(req, res) {
                 if(!consentResponse) return
 
                 const consentDetails = await Consent.findOne({ where: { slug: consentSlug } })
-
                 if(!consentDetails) return
+
                 if(consentDetails.dataValues.opt_type === 'double') {
                     hasDoubleOptIn = true
                 }
@@ -248,21 +248,45 @@ async function createHcpProfile(req, res) {
         });
 
         hcpUser.status = master_data && master_data.length ? hasDoubleOptIn ? 'Consent Pending' : 'Approved' : 'Not Verified'
-        hcpUser.status = 'Approved'
+        hcpUser.status = 'Consent Pending'
+        await hcpUser.save()
+
+        response.data = {
+            ...getHcpViewModel(hcpUser.dataValues),
+        }
 
         if(hcpUser.status === 'Approved') {
             hcpUser.reset_password_token = crypto.randomBytes(36).toString('hex');
             hcpUser.reset_password_expires = Date.now() + 3600000;
             await hcpUser.save()
             response.data = {
-                ...getHcpViewModel(hcpUser.dataValues),
+                ...response.data,
                 password_reset_token: hcpUser.dataValues.reset_password_token,
                 retention_period: '1 hour'
             };
         }
 
-        // if(hcpUser.dataValues.status === 'Consent Pending') {
-        // }
+        if(hcpUser.dataValues.status === 'Consent Pending') {
+            const consentIds = consentArr.map(consent => consent.consent_id)
+            let consents = await Consent.findAll({ where: { id: consentIds } })
+            consents = consents.map(consent => consent.dataValues.title)
+
+            // send mail containing all consents with AEM link that is going to have user id
+            const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${req.user.slug}/consent-confirm.html`);
+            const options = {
+                toAddresses: [hcpUser.dataValues.email],
+                templateUrl,
+                subject: 'Confirm the consents to proceed.',
+                data: {
+                    firstName: hcpUser.dataValues.first_name || '',
+                    lastName: hcpUser.dataValues.last_name || '',
+                    consents: consents || [],
+                    link: 'http://www.glpg.com'
+                }
+            };
+
+            await emailService.send(options);
+        }
 
         res.json(response);
     } catch (err) {
@@ -282,10 +306,12 @@ async function confirmConsents(req, res) {
         }
 
         let userConsents = await HcpConsents.findAll({ where: { user_id: id }})
-        userConsents = userConsents.map(consent => ({ ...consent.dataValues, consent_given: true}))
-        await HcpConsents.bulkCreate(userConsents, {
-            updateOnDuplicate: ["consent_given"]
-        })
+        if(userConsents && userConsents.length){
+            userConsents = userConsents.map(consent => ({ ...consent.dataValues, consent_given: true}))
+            await HcpConsents.bulkCreate(userConsents, {
+                updateOnDuplicate: ["consent_given"]
+            })
+        }
 
         hcpUser.status = 'Approved'
         hcpUser.reset_password_token = crypto.randomBytes(36).toString('hex');
