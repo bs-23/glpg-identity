@@ -30,7 +30,7 @@
                 border-color: $primary-color;
 
                 &:hover, &:active, &:focus {
-                    color: #fff;
+                    color: $white-color;
                     background-color: $primary-color;
                     border-color: $primary-color;
                 }
@@ -51,6 +51,10 @@
 
     &-light-bg {
         background: $light-bg-color;
+    }
+
+    &-bg-primary {
+        background: $primary-color;
     }
 
     &-bg-secondary {

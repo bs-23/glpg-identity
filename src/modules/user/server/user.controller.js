@@ -47,25 +47,38 @@ function generateAccessToken(user) {
 }
 
 function getPermissions(userrole) {
-    const permissions= [];
+    const permissions = [];
     if (userrole) {
         userrole.forEach(ur => {
             permissions.push(ur.role.rolePermission.map(rp => rp.permission.module));
         })
-        return permissions.flat(1);
+        return [].concat(...permissions);
+
     }
 }
 
 function getRolesPermissions(userrole) {
-    const roles= [];
+    const roles = [];
     if (userrole) {
         userrole.forEach(ur => {
-            roles.push(ur.role.name);
-            roles.push(ur.role.rolePermission.map(rp => rp.permission.module));
+            roles.push({
+                title: ur.role.name,
+                permissions: ur.role.rolePermission.map(rp => rp.permission.module)
+            });
         });
 
         return roles;
 
+
+    }
+}
+
+
+function getCommaSeparatedRoles(userrole) {
+    if (userrole) {
+
+        const roles = userrole.map(ur => ur.role.name);
+        return roles.join();
 
     }
 }
@@ -79,6 +92,21 @@ function formatProfile(user) {
         type: user.type,
         permissions: getPermissions(user.userrole),
         roles: getRolesPermissions(user.userrole)
+    };
+
+    return profile;
+}
+async function formatProfileDetail(user) {
+    const profile = {
+        id: user.id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        type: user.type,
+        phone: user.phone,
+        last_login: user.last_login,
+        expiry_date: user.expiry_date,
+        roles: getCommaSeparatedRoles(user.userrole)
     };
 
     return profile;
@@ -147,8 +175,9 @@ async function createUser(req, res) {
         countries,
         roles,
         application_id,
-        expiry_date
     } = req.body;
+    const validForMonths = 6
+    const currentDate = new Date()
 
     try {
         const [doc, created] = await User.findOrCreate({
@@ -161,7 +190,7 @@ async function createUser(req, res) {
                 application_id,
                 created_by: req.user.id,
                 updated_by: req.user.id,
-                expiry_date
+                expiry_date: new Date(currentDate.setMonth(currentDate.getMonth() + validForMonths))
             }
         });
 
@@ -213,7 +242,7 @@ async function createUser(req, res) {
             templateUrl,
             subject: 'Set a password for your new account on GLPG CDP',
             data: {
-                name: `${doc.first_name} ${doc.last_name}`   || '',
+                name: `${doc.first_name} ${doc.last_name}` || '',
                 link
             }
         };
@@ -266,7 +295,7 @@ async function getUsers(req, res) {
     const page = req.query.page ? req.query.page - 1 : 0;
     if (page < 0) return res.status(404).send("page must be greater or equal 1");
 
-    const limit = 5;
+    const limit = 7;
     const country_iso2 = req.query.country_iso2 === 'null' ? null : req.query.country_iso2;
     const offset = page * limit;
 
@@ -319,12 +348,22 @@ async function getUser(req, res) {
             where: {
                 id: req.params.id
             },
+            include: [{
+                model: UserRole,
+                as: 'userrole',
+                include: [{
+                    model: Role,
+                    as: 'role',
+                }]
+            }],
             attributes: ['id', 'first_name', 'last_name', 'email', 'phone', 'type', 'last_login', 'expiry_date']
         });
 
-        if (!user) return res.status(404).send("User is not found or may be removed");
 
-        res.json(user);
+        if (!user) return res.status(404).send("User is not found or may be removed");
+        const formattedUser = await formatProfileDetail(user);
+
+        res.json(formattedUser);
     }
     catch (err) {
         res.status(500).send(err);

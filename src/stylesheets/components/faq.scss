@@ -7,8 +7,8 @@
     &__icon {
 
         &-down {
-            color: #000;
-            background: #F2F2F2;
+            color: $gray-base;
+            background: $gray-F2F2F2;
             height: 21px;
             width: 21px;
             border-radius: 50%;
@@ -42,12 +42,11 @@
         }
 
         &-body {
-            background: #F8F8F8;
-            color: #5F5F5F;
+            background: $gray-F8F8F8;
+            color: $gray-5F5F5F;
             font-size: 14px;
             line-height: 1.8;
         }
-
         //Accordian up/down arrow styling in hacky way
         .collapse,
         .collapsing {

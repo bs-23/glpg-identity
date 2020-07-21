@@ -54,8 +54,7 @@ export default function UserForm() {
                                     email: "",
                                     countries: [],
                                     roles: [],
-                                    phone: "",
-                                    expiry_date: ""
+                                    phone: ""
                                 }}
                                 displayName="UserForm"
                                 validationSchema={registerSchema}
@@ -83,21 +82,21 @@ export default function UserForm() {
                                         <div className="row">
                                             <div className="col-12 col-sm-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="first_name">First Name</label>
+                                                    <label htmlFor="first_name">First Name <span className="text-danger required-field pl-1">*</span></label>
                                                     <Field data-testid="first_name" className="form-control" type="name" name="first_name" />
                                                     <div className="invalid-feedback" data-testid="firstNameError"><ErrorMessage name="first_name" /></div>
                                                 </div>
                                             </div>
                                             <div className="col-12 col-sm-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="last_name">Last Name</label>
+                                                    <label htmlFor="last_name">Last Name<span className="text-danger required-field pl-1">*</span></label>
                                                     <Field data-testid="last_name" className="form-control" type="name" name="last_name" />
                                                     <div className="invalid-feedback" data-testid="lastNameError"><ErrorMessage name="last_name" /></div>
                                                 </div>
                                             </div>
                                             <div className="col-12 col-sm-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="email">Email</label>
+                                                    <label htmlFor="email">Email<span className="text-danger required-field pl-1">*</span></label>
                                                     <Field data-testid="email" className="form-control" type="email" name="email" autoComplete="username" />
                                                     <div className="invalid-feedback" data-testid="emailError"><ErrorMessage name="email" /></div>
                                                 </div>
@@ -115,18 +114,7 @@ export default function UserForm() {
                                         <div className="row">
                                             <div className="col-12 col-sm-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="expiry_date">Expiry Date</label>
-                                                    <Field className="form-control" type="date" name="expiry_date" />
-                                                    <div className="invalid-feedback">
-                                                        <ErrorMessage name="expiry_date" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="row">
-                                            <div className="col-12 col-sm-6">
-                                                <div className="form-group">
-                                                    <label htmlFor="countries">Select Countries</label>
+                                                    <label htmlFor="countries">Select Countries<span className="text-danger required-field pl-1">*</span></label>
                                                     <Field data-testid="country" as="select" name="countries" className="form-control" multiple>
                                                         {countries.map(item => <option key={item.countryid} value={item.country_iso2}>{item.countryname}</option>)}
                                                     </Field>
@@ -137,7 +125,7 @@ export default function UserForm() {
                                             </div>
                                             <div className="col-12 col-sm-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="roles">Select Roles</label>
+                                                    <label htmlFor="roles">Select Roles<span className="text-danger required-field pl-1">*</span></label>
                                                     <Field data-testid="role" as="select" name="roles" className="form-control" multiple>
                                                         {roles.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
                                                     </Field>
