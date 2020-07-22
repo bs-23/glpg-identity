@@ -2,7 +2,7 @@ const path = require('path');
 const _ = require('lodash');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
-const { QueryTypes } = require('sequelize');
+const { QueryTypes, Op } = require('sequelize');
 const Hcp = require('./hcp_profile.model');
 const HcpConsents = require('./hcp_consents.model');
 const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
@@ -10,15 +10,25 @@ const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequel
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
-const { Op } = require('sequelize');
 
 function generateAccessToken(doc) {
     return jwt.sign({
         id: doc.id,
         uuid: doc.uuid,
-        email: doc.email,
+        email: doc.email
     }, nodecache.getValue('HCP_TOKEN_SECRET'), {
         expiresIn: '2d',
+        issuer: doc.id.toString()
+    });
+}
+
+function generateConsentConfirmationAccessToken(doc) {
+    return jwt.sign({
+        id: doc.id,
+        uuid: doc.uuid,
+        email: doc.email
+    }, nodecache.getValue('CONSENT_CONFIRMATION_TOKEN_SECRET'), {
+        expiresIn: '7d',
         issuer: doc.id.toString()
     });
 }
@@ -217,73 +227,75 @@ async function createHcpProfile(req, res) {
 
         const hcpUser = await Hcp.create(model);
 
-        let hasDoubleOptIn = false
+        let hasDoubleOptIn = false;
         const consentArr = [];
 
         if (req.body.consents && req.body.consents.length) {
             await Promise.all(req.body.consents.map(async consent => {
-                const consentSlug = Object.keys(consent)[0]
-                const consentResponse = Object.values(consent)[0]
-                if(!consentResponse) return
+                const consentSlug = Object.keys(consent)[0];
+                const consentResponse = Object.values(consent)[0];
 
-                const consentDetails = await Consent.findOne({ where: { slug: consentSlug } })
-                if(!consentDetails) return
+                if(!consentResponse) return;
+
+                const consentDetails = await Consent.findOne({ where: { slug: consentSlug } });
+
+                if(!consentDetails) return;
 
                 if(consentDetails.dataValues.opt_type === 'double') {
-                    hasDoubleOptIn = true
+                    hasDoubleOptIn = true;
                 }
 
                 consentArr.push({
                     user_id: hcpUser.id,
                     consent_id: consentDetails.dataValues.id,
                     response: consentResponse,
-                    consent_confirmed: consentDetails.dataValues.opt_type === 'single' ? true : false
+                    consent_given: consentDetails.dataValues.opt_type === 'double' ? false : true
                 });
-            }))
+            }));
+
+            consentArr.length && await HcpConsents.bulkCreate(consentArr, {
+                returning: true,
+                ignoreDuplicates: false
+            });
         }
 
-        consentArr.length && await HcpConsents.bulkCreate(consentArr, {
-            returning: true,
-            ignoreDuplicates: false
-        });
+        hcpUser.status = master_data && master_data.length ? hasDoubleOptIn ? 'Consent Pending' : 'Approved' : 'Not Verified';
+        await hcpUser.save();
 
-        hcpUser.status = master_data && master_data.length ? hasDoubleOptIn ? 'Consent Pending' : 'Approved' : 'Not Verified'
-        await hcpUser.save()
-
-        response.data = {
-            ...getHcpViewModel(hcpUser.dataValues),
-        }
-
-        if(hcpUser.status === 'Approved') {
-            hcpUser.reset_password_token = crypto.randomBytes(36).toString('hex');
-            hcpUser.reset_password_expires = Date.now() + 3600000;
-            await hcpUser.save()
-            response.data = {
-                ...response.data,
-                password_reset_token: hcpUser.dataValues.reset_password_token,
-                retention_period: '1 hour'
-            };
-        }
+        response.data = getHcpViewModel(hcpUser.dataValues);
 
         if(hcpUser.dataValues.status === 'Consent Pending') {
-            const consentIds = consentArr.map(consent => consent.consent_id)
-            let consents = await Consent.findAll({ where: { id: consentIds } })
-            consents = consents.map(consent => consent.dataValues.title)
+            const consentIds = consentArr.map(consent => consent.consent_id);
+            let consents = await Consent.findAll({ where: { id: consentIds } });
+
+            consents = consents.map(consent => consent.dataValues.title);
+
+            consentConfirmationToken = generateConsentConfirmationAccessToken(hcpUser.dataValues);
 
             const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${req.user.slug}/consent-confirm.html`);
             const options = {
                 toAddresses: [hcpUser.dataValues.email],
                 templateUrl,
-                subject: 'Confirm the consents to proceed.',
+                subject: 'Request consent confirmation',
                 data: {
                     firstName: hcpUser.dataValues.first_name || '',
                     lastName: hcpUser.dataValues.last_name || '',
                     consents: consents || [],
-                    link: 'http://www.glpg.com'
+                    link: `${req.user.consent_confirmation_link}?token=${consentConfirmationToken}`
                 }
             };
 
             await emailService.send(options);
+        }
+
+        if(hcpUser.dataValues.status === 'Approved') {
+            hcpUser.reset_password_token = crypto.randomBytes(36).toString('hex');
+            hcpUser.reset_password_expires = Date.now() + 3600000;
+
+            await hcpUser.save();
+
+            response.data.password_reset_token = hcpUser.dataValues.reset_password_token;
+            response.data.retention_period = '1 hour';
         }
 
         res.json(response);
@@ -295,26 +307,31 @@ async function createHcpProfile(req, res) {
 
 async function confirmConsents(req, res) {
     const response = new Response({}, []);
-    const id = req.query.id
-    try{
-        const hcpUser = await Hcp.findOne({ where: { id }})
+    const payload = jwt.verify(req.body.token, nodecache.getValue('CONSENT_CONFIRMATION_TOKEN_SECRET'));
+
+    try {
+        const hcpUser = await Hcp.findOne({ where: { id: payload.id }});
+
         if(!hcpUser) {
-            response.errors.push(new CustomError('User does not exists.'));
+            response.errors.push(new CustomError('Invalid token.'));
             return res.status(400).send(response);
         }
 
-        let userConsents = await HcpConsents.findAll({ where: { user_id: id }})
-        if(userConsents && userConsents.length){
-            userConsents = userConsents.map(consent => ({ ...consent.dataValues, consent_confirmed: true}))
+        let userConsents = await HcpConsents.findAll({ where: { user_id: payload.id }});
+
+        if(userConsents && userConsents.length) {
+            userConsents = userConsents.map(consent => ({ ...consent.dataValues, consent_given: true}));
+
             await HcpConsents.bulkCreate(userConsents, {
-                updateOnDuplicate: ["consent_confirmed"]
-            })
+                updateOnDuplicate: ['consent_given']
+            });
         }
 
-        hcpUser.status = 'Approved'
+        hcpUser.status = 'Approved';
         hcpUser.reset_password_token = crypto.randomBytes(36).toString('hex');
         hcpUser.reset_password_expires = Date.now() + 3600000;
-        await hcpUser.save()
+
+        await hcpUser.save();
 
         response.data = {
             ...getHcpViewModel(hcpUser.dataValues),
@@ -322,8 +339,8 @@ async function confirmConsents(req, res) {
             retention_period: '1 hour'
         };
 
-        res.json(response)
-    }catch(err){
+        res.json(response);
+    } catch(err) {
         response.errors.push(new CustomError(err.message, '', '', err));
         res.status(500).send(response);
     }

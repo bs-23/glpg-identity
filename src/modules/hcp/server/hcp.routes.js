@@ -1,7 +1,7 @@
 const passport = require('passport');
 const controller = require('./hcp.controller');
 const { Modules } = require('../../core/server/authorization/authorization.constants');
-const {ModuleGuard } = require('../../core/server/authorization/authorization.middleware');
+const { ModuleGuard } = require('../../core/server/authorization/authorization.middleware');
 
 module.exports = app => {
     app.route('/api/hcps')
@@ -19,8 +19,8 @@ module.exports = app => {
     app.route('/api/hcp-profiles')
         .post(passport.authenticate('application-jwt', { session: false }), controller.createHcpProfile);
 
-    app.route('/api/hcps/confirm-consents')
-        .get(passport.authenticate('application-jwt', { session: false }), controller.confirmConsents);
+    app.route('/api/hcp-profiles/confirm-consents')
+        .post(passport.authenticate('application-jwt', { session: false }), controller.confirmConsents);
 
     app.route('/api/hcp-profiles/forget-password')
         .get(passport.authenticate('application-jwt', { session: false }), controller.forgetPassword);

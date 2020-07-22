@@ -13,6 +13,7 @@ async function init() {
 
     const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
     const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
+    const ConsentTitle = require(path.join(process.cwd(), 'src/modules/consent/server/consent-title.model'));
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
     const RolePermission = require(path.join(process.cwd(), "src/modules/user/server/role/role-permission.model"));
     const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
@@ -30,7 +31,7 @@ async function init() {
 
     function userSeeder(callback) {
         User.findOrCreate({
-            where: { email: 'admin@glpg-cdp.com' }, defaults: {
+            where: { email: 'glpg.cdp@gmail.com' }, defaults: {
                 first_name: 'System',
                 last_name: 'Admin',
                 password: 'strong-password',
@@ -99,7 +100,7 @@ async function init() {
     }
 
     function userRoleSeeder(callback) {
-        const admin = User.findOne({ where: { email: "admin@glpg-cdp.com" } });
+        const admin = User.findOne({ where: { email: 'glpg.cdp@gmail.com' } });
         const adminRole = Role.findOne({ where: { slug: 'system-admin' } });
 
         Promise.all([admin, adminRole]).then((values) => {
@@ -119,10 +120,26 @@ async function init() {
     }
 
     function applicationSeeder(callback) {
-        User.findOne({ where: { email: 'admin@glpg-cdp.com' } }).then(admin => {
+        User.findOne({ where: { email: 'glpg.cdp@gmail.com' } }).then(admin => {
             const applications = [
-                { name: 'HCP Portal', slug: convertToSlug('HCP Portal'), email: 'hcp-portal@glpg.com', password: 'strong-password', created_by: admin.id, updated_by: admin.id },
-                { name: 'BrandX', slug: convertToSlug('BrandX'), email: 'brandx@glpg.com', password: 'strong-password', created_by: admin.id, updated_by: admin.id }
+                {
+                    name: 'HCP Portal',
+                    slug: convertToSlug('HCP Portal'),
+                    email: 'hcp-portal@glpg.com',
+                    password: 'strong-password',
+                    consent_confirmation_link: 'http://example.com/bin/public/glpg-hcpportal/consent/confirm.html',
+                    created_by: admin.id,
+                    updated_by: admin.id
+                },
+                {
+                    name: 'BrandX',
+                    slug: convertToSlug('BrandX'),
+                    email: 'brandx@glpg.com',
+                    password: 'strong-password',
+                    consent_confirmation_link: 'http://example.com/bin/public/glpg-hcpportal/consent/confirm.html',
+                    created_by: admin.id,
+                    updated_by: admin.id
+                }
             ];
 
             Application.destroy({ truncate: { cascade: true } }).then(() => {
@@ -137,22 +154,37 @@ async function init() {
     }
 
     function consentSeeder(callback) {
+        const titles = [
+            { "title": "Sample Request" },
+            { "title": "Invite to KOL Webminar" },
+            { "title": "Create credentials for gated HCP area" },
+            { "title": "Register to E-mail Newsletter (Mass email)" },
+            { "title": "Send congress Agenda via email" },
+            { "title": "Congress Newsletter" },
+            { "title": "Send Email about clinical trial studies" },
+            { "title": "That medical information is shorten for teasering content and better readability" },
+            { "title": "Send Mode of Action rich media content" },
+            { "title": "Send e-Detailing aid" },
+            { "title": "Invite to Remote Engagement" },
+            { "title": "Send CLM content after RepSale visit" },
+        ];
+        
         const consents = [
-            { "title": "Sample Request", "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
-            { "title": "Invite to KOL Webminar", "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
-            { "title": "Create credentials for gated HCP area", "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
-            { "title": "Register to E-mail Newsletter (Mass email)", "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
-            { "title": "Send congress Agenda via email", "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
-            { "title": "Congress Newsletter", "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
-            { "title": "Send Email about clinical trial studies", "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
-            { "title": "That medical information is shorten for teasering content and better readability", "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
-            { "title": "Send Mode of Action rich media content", "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
-            { "title": "Send e-Detailing aid", "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
-            { "title": "Invite to Remote Engagement", "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
-            { "title": "Send CLM content after RepSale visit", "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
+            { "consent_title_id": 1, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
+            { "consent_title_id": 2, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
+            { "consent_title_id": 3, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
+            { "consent_title_id": 4, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
+            { "consent_title_id": 5, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
+            { "consent_title_id": 6, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
+            { "consent_title_id": 7, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
+            { "consent_title_id": 8, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
+            { "consent_title_id": 9, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
+            { "consent_title_id": 10, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
+            { "consent_title_id": 11, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
+            { "consent_title_id": 12, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
         ];
 
-        const all_consents = consents.map( consent => {
+        const all_titles = titles.map( consent => {
             if(consent.title.length > 50){
                 const code = uniqueSlug(consent.title);
                 let new_title = consent.title.substring(0, 50);
@@ -165,8 +197,22 @@ async function init() {
             return { ...consent, slug };
         });
 
-        Consent.destroy({ truncate: true }).then(() => {
-            Consent.bulkCreate(all_consents, {
+        Consent.destroy({
+            where: {},
+            include: [
+                {
+                    model: ConsentTitle
+                }
+            ]
+        }).then(() => {
+            ConsentTitle.bulkCreate(all_titles, {
+                returning: true,
+                ignoreDuplicates: false
+            }).then(function () {
+                callback();
+            });
+
+            Consent.bulkCreate(consents, {
                 returning: true,
                 ignoreDuplicates: false
             }).then(function () {
