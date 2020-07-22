@@ -236,7 +236,7 @@ async function createUser(req, res) {
 
         const link = `${req.protocol}://${req.headers.host}/reset-password?token=${token}`;
 
-        const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp-password-set.html`);
+        const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp/password-set.html`);
         const options = {
             toAddresses: [doc.email],
             templateUrl,
@@ -401,7 +401,7 @@ async function sendPasswordResetLink(req, res) {
 
         const link = `${req.protocol}://${req.headers.host}/reset-password?token=${token}`;
 
-        const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp-password-reset-instruction.html`);
+        const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp/password-reset-instruction.html`);
         const options = {
             toAddresses: [user.email],
             templateUrl,
@@ -449,12 +449,12 @@ async function resetPassword(req, res) {
         };
 
         if (resetRequest.type === 'set') {
-            options.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp-registration-success.html`);
+            options.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp/registration-success.html`);
             options.subject = 'You have successfully set a password for your Galapagos CDP account'
             options.data.link = `${req.protocol}://${req.headers.host}/login`
         }
         else {
-            options.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp-password-reset.html`);
+            options.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp/password-reset.html`);
             options.subject = 'Your password has been reset'
         }
 

@@ -14,6 +14,7 @@ async function init() {
     const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
     const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
+    const CountryConsent = require(path.join(process.cwd(), 'src/modules/consent/server/country-consent.model'));
     const RolePermission = require(path.join(process.cwd(), "src/modules/user/server/role/role-permission.model"));
     const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
     const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
@@ -138,35 +139,150 @@ async function init() {
 
     function consentSeeder(callback) {
         const consents = [
-            { "title": "Sample Request", "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
-            { "title": "Invite to KOL Webminar", "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
-            { "title": "Create credentials for gated HCP area", "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
-            { "title": "Register to E-mail Newsletter (Mass email)", "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
-            { "title": "Send congress Agenda via email", "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
-            { "title": "Congress Newsletter", "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
-            { "title": "Send Email about clinical trial studies", "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
-            { "title": "That medical information is shorten for teasering content and better readability", "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
-            { "title": "Send Mode of Action rich media content", "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
-            { "title": "Send e-Detailing aid", "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
-            { "title": "Invite to Remote Engagement", "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
-            { "title": "Send CLM content after RepSale visit", "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
+            { id: 1, "title": "Sample Request" },
+            { id: 2, "title": "Invite to KOL Webminar" },
+            { id: 3, "title": "Create credentials for gated HCP area" },
+            { id: 4, "title": "Register to E-mail Newsletter (Mass email)" },
+            { id: 5, "title": "Send congress Agenda via email" },
+            { id: 6, "title": "Congress Newsletter" },
+            { id: 7, "title": "Send Email about clinical trial studies" },
+            { id: 8, "title": "That medical information is shorten for teasering content and better readability" },
+            { id: 9, "title": "Send Mode of Action rich media content" },
+            { id: 10, "title": "Send e-Detailing aid" },
+            { id: 11, "title": "Invite to Remote Engagement" },
+            { id: 12, "title": "Send CLM content after RepSale visit" },
         ];
 
-        const all_consents = consents.map( consent => {
-            if(consent.title.length > 50){
-                const code = uniqueSlug(consent.title);
-                let new_title = consent.title.substring(0, 50);
-                new_title += ` ${code}`;
+        const country_consents = [
+            { "consent_id": 1, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "BE", "language_code": "en" },
+            { "consent_id": 1, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "IT", "language_code": "en" },
+            { "consent_id": 1, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
+            { "consent_id": 1, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "ES", "language_code": "en" },
+            { "consent_id": 1, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "DE", "language_code": "en" },
+            { "consent_id": 1, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "UK", "language_code": "en" },
+            { "consent_id": 1, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "FR", "language_code": "en" },
+            
+            { "consent_id": 2, "type": "online", "opt_type": "single", "category": "mc", "category_title": "Medical Consent", "country_iso2": "BE", "language_code": "en" },
+            { "consent_id": 2, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "IT", "language_code": "en" },
+            { "consent_id": 2, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
+            { "consent_id": 2, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "ES", "language_code": "en" },
+            { "consent_id": 2, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "DE", "language_code": "en" },
+            { "consent_id": 2, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "UK", "language_code": "en" },
+            { "consent_id": 2, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "FR", "language_code": "en" },
+            
+            { "consent_id": 3, "type": "online", "opt_type": "single", "category": "mc", "category_title": "Medical Consent", "country_iso2": "BE", "language_code": "en" },
+            { "consent_id": 3, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "IT", "language_code": "en" },
+            { "consent_id": 3, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
+            { "consent_id": 3, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "ES", "language_code": "en" },
+            { "consent_id": 3, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "DE", "language_code": "en" },
+            { "consent_id": 3, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "UK", "language_code": "en" },
+            { "consent_id": 3, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "FR", "language_code": "en" },
+            
+            { "consent_id": 4, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "BE", "language_code": "en" },
+            { "consent_id": 4, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "IT", "language_code": "en" },
+            { "consent_id": 4, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
+            { "consent_id": 4, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "ES", "language_code": "en" },
+            { "consent_id": 4, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "DE", "language_code": "en" },
+            { "consent_id": 4, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "UK", "language_code": "en" },
+            { "consent_id": 4, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "FR", "language_code": "en" },
+            
+            
+            { "consent_id": 5, "type": "online", "opt_type": "single", "category": "mc", "category_title": "Medical Consent", "country_iso2": "BE", "language_code": "en" },
+            { "consent_id": 5, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "IT", "language_code": "en" },
+            { "consent_id": 5, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
+            { "consent_id": 5, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "ES", "language_code": "en" },
+            { "consent_id": 5, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "DE", "language_code": "en" },
+            { "consent_id": 5, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "UK", "language_code": "en" },
+            { "consent_id": 5, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "FR", "language_code": "en" },
+            
+            { "consent_id": 6, "type": "online", "opt_type": "single", "category": "mc", "category_title": "Medical Consent", "country_iso2": "BE", "language_code": "en" },
+            { "consent_id": 6, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "IT", "language_code": "en" },
+            { "consent_id": 6, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
+            { "consent_id": 6, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "ES", "language_code": "en" },
+            { "consent_id": 6, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "DE", "language_code": "en" },
+            { "consent_id": 6, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "UK", "language_code": "en" },
+            { "consent_id": 6, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "FR", "language_code": "en" },
+            
+            { "consent_id": 7, "type": "online", "opt_type": "single", "category": "mc", "category_title": "Medical Consent", "country_iso2": "BE", "language_code": "en" },
+            { "consent_id": 7, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "IT", "language_code": "en" },
+            { "consent_id": 7, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
+            { "consent_id": 7, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "ES", "language_code": "en" },
+            { "consent_id": 7, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "DE", "language_code": "en" },
+            { "consent_id": 7, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "UK", "language_code": "en" },
+            { "consent_id": 7, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "FR", "language_code": "en" },
+            
+            { "consent_id": 8, "type": "online", "opt_type": "single", "category": "mc", "category_title": "Medical Consent", "country_iso2": "BE", "language_code": "en" },
+            { "consent_id": 8, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "IT", "language_code": "en" },
+            { "consent_id": 8, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
+            { "consent_id": 8, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "ES", "language_code": "en" },
+            { "consent_id": 8, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "DE", "language_code": "en" },
+            { "consent_id": 8, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "UK", "language_code": "en" },
+            { "consent_id": 8, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "FR", "language_code": "en" },
+            
+            { "consent_id": 9, "type": "online", "opt_type": "single", "category": "mc", "category_title": "Medical Consent", "country_iso2": "BE", "language_code": "en" },
+            { "consent_id": 9, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "IT", "language_code": "en" },
+            { "consent_id": 9, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
+            { "consent_id": 9, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "ES", "language_code": "en" },
+            { "consent_id": 9, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "DE", "language_code": "en" },
+            { "consent_id": 9, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "UK", "language_code": "en" },
+            { "consent_id": 9, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "FR", "language_code": "en" },
+            
+            { "consent_id": 10, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "BE", "language_code": "en" },
+            { "consent_id": 10, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "IT", "language_code": "en" },
+            { "consent_id": 10, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
+            { "consent_id": 10, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "ES", "language_code": "en" },
+            { "consent_id": 10, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "DE", "language_code": "en" },
+            { "consent_id": 10, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "UK", "language_code": "en" },
+            { "consent_id": 10, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "FR", "language_code": "en" },
+            
+            { "consent_id": 11, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "BE", "language_code": "en" },
+            { "consent_id": 11, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "IT", "language_code": "en" },
+            { "consent_id": 11, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
+            { "consent_id": 11, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "ES", "language_code": "en" },
+            { "consent_id": 11, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "DE", "language_code": "en" },
+            { "consent_id": 11, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "UK", "language_code": "en" },
+            { "consent_id": 11, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "FR", "language_code": "en" },
+            
+            { "consent_id": 12, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "BE", "language_code": "en" },
+            { "consent_id": 12, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "IT", "language_code": "en" },
+            { "consent_id": 12, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
+            { "consent_id": 12, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "ES", "language_code": "en" },
+            { "consent_id": 12, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "DE", "language_code": "en" },
+            { "consent_id": 12, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "UK", "language_code": "en" },
+            { "consent_id": 12, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "FR", "language_code": "en" }
+        ];
+
+        const all_country_consents = country_consents.map( country_consent => {
+            const [{ title }] = consents.filter( consent => consent.id === country_consent.consent_id);
+
+            if(title.length > 50){
+                const code = uniqueSlug(title);
+                let new_title = title.substring(0, 50);
+                new_title += ` ${code} ${country_consent.country_iso2}`;
                 const slug = convertToSlug(new_title);
-                return { ...consent, slug };
+                return { ...country_consent, slug };
             }
 
-            const slug = convertToSlug(consent.title);
-            return { ...consent, slug };
+            const slug = convertToSlug(`${title} ${country_consent.country_iso2}`);
+            return { ...country_consent, slug };
         });
 
-        Consent.destroy({ truncate: true }).then(() => {
-            Consent.bulkCreate(all_consents, {
+        CountryConsent.destroy({
+            where: {},
+            include: [
+                {
+                    model: Consent
+                }
+            ]
+        }).then(() => {
+            Consent.bulkCreate(consents, {
+                returning: true,
+                ignoreDuplicates: false
+            }).then(function () {
+                callback();
+            });
+
+            CountryConsent.bulkCreate(all_country_consents, {
                 returning: true,
                 ignoreDuplicates: false
             }).then(function () {

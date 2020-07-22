@@ -79,7 +79,7 @@ export default function hcpUsers() {
                         <nav aria-label="breadcrumb">
                             <ol className="breadcrumb rounded-0">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
-                                <li className="breadcrumb-item active">HCP Profiles</li>
+                                <li className="breadcrumb-item active"><span>HCP Profiles</span></li>
                             </ol>
                         </nav>
                     </div>
