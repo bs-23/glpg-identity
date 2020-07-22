@@ -220,7 +220,7 @@ async function createHcpProfile(req, res) {
         let hasDoubleOptIn = false
         const consentArr = [];
 
-        if (req.body.consents.length) {
+        if (req.body.consents && req.body.consents.length) {
             await Promise.all(req.body.consents.map(async consent => {
                 const consentSlug = Object.keys(consent)[0]
                 const consentResponse = Object.values(consent)[0]
