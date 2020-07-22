@@ -58,8 +58,8 @@ export default function Users() {
                         <nav aria-label="breadcrumb">
                             <ol className="breadcrumb rounded-0">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
-                                <li className="breadcrumb-item"><NavLink to="/users">User Management</NavLink></li>
-                                <li className="breadcrumb-item active">User List</li>
+                                <li className="breadcrumb-item"><NavLink to="/users">Management of Customer Data platform</NavLink></li>
+                                <li className="breadcrumb-item active"><span>User List</span></li>
                             </ol>
                         </nav>
                     </div>
