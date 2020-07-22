@@ -18,7 +18,9 @@
 @import "components/profile-detail";
 @import "components/add-user";
 @import "components/category-of-service";
+@import "components/breadcrumb";
 @import "components/forbidden";
+@import "components/loader";
 
 //Layout
 @import "layouts/layout";
@@ -26,3 +28,4 @@
 @import "layouts/dashboard";
 @import "layouts/header";
 @import "layouts/footer";
+
