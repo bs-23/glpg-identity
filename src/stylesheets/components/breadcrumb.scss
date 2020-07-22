@@ -1,0 +1,42 @@
+.breadcrumb {
+    padding: 0px;
+    background: $white-color;
+    box-shadow: 1px 2px 12px -5px rgba(130,130,138,0.5);
+
+    &-item {
+        padding: 10px 15px;
+
+        &.active {
+            background: $secondary-color;
+            color: $white-color;
+            transform: skewX(-10deg);
+
+            span {
+                transform: skewX(10deg);
+                padding-left: 15px;
+            }
+
+            &:before {
+                display: none !important;
+            }
+        }
+
+    }
+
+    a {
+        color: $primary-color;
+
+        &:hover {
+        }
+    }
+}
+
+.breadcrumb-item + .breadcrumb-item {
+    padding-left: 0px;
+}
+.breadcrumb-item + .breadcrumb-item::before {
+    display: inline-block;
+    padding-right: 15px;
+    color: $primary-color;
+    content: "/";
+}

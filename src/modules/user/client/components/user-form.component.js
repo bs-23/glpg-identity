@@ -36,9 +36,9 @@ export default function UserForm() {
                         <nav aria-label="breadcrumb">
                             <ol className="breadcrumb rounded-0 my-0">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
-                                <li className="breadcrumb-item"><NavLink to="/users">User Management</NavLink></li>
+                                <li className="breadcrumb-item"><NavLink to="/users">Management of Customer Data platform</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/users/list">User List</NavLink></li>
-                                <li className="breadcrumb-item active">Add new</li>
+                                <li className="breadcrumb-item active"><span>Add New</span></li>
                             </ol>
                         </nav>
                     </div>
