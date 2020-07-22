@@ -237,7 +237,7 @@ async function createHcpProfile(req, res) {
                     user_id: hcpUser.id,
                     consent_id: consentDetails.dataValues.id,
                     response: consentResponse,
-                    consent_given: consentDetails.dataValues.opt_type === 'single' ? true : false
+                    consent_confirmed: consentDetails.dataValues.opt_type === 'single' ? true : false
                 });
             }))
         }
@@ -305,9 +305,9 @@ async function confirmConsents(req, res) {
 
         let userConsents = await HcpConsents.findAll({ where: { user_id: id }})
         if(userConsents && userConsents.length){
-            userConsents = userConsents.map(consent => ({ ...consent.dataValues, consent_given: true}))
+            userConsents = userConsents.map(consent => ({ ...consent.dataValues, consent_confirmed: true}))
             await HcpConsents.bulkCreate(userConsents, {
-                updateOnDuplicate: ["consent_given"]
+                updateOnDuplicate: ["consent_confirmed"]
             })
         }
 
