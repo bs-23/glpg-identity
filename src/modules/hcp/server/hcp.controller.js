@@ -248,7 +248,6 @@ async function createHcpProfile(req, res) {
         });
 
         hcpUser.status = master_data && master_data.length ? hasDoubleOptIn ? 'Consent Pending' : 'Approved' : 'Not Verified'
-        hcpUser.status = 'Consent Pending'
         await hcpUser.save()
 
         response.data = {
@@ -271,7 +270,6 @@ async function createHcpProfile(req, res) {
             let consents = await Consent.findAll({ where: { id: consentIds } })
             consents = consents.map(consent => consent.dataValues.title)
 
-            // send mail containing all consents with AEM link that is going to have user id
             const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${req.user.slug}/consent-confirm.html`);
             const options = {
                 toAddresses: [hcpUser.dataValues.email],
@@ -301,7 +299,7 @@ async function confirmConsents(req, res) {
     try{
         const hcpUser = await Hcp.findOne({ where: { id }})
         if(!hcpUser) {
-            response.errors.push(new CustomError('User does not exists.', 'id'));
+            response.errors.push(new CustomError('User does not exists.'));
             return res.status(400).send(response);
         }
 
