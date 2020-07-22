@@ -11,7 +11,7 @@ const UserManagement = () => {
                         <nav aria-label="breadcrumb">
                             <ol className="breadcrumb rounded-0">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
-                                <li className="breadcrumb-item active">Customer Data Platform Management</li>
+                                <li className="breadcrumb-item active"><span>Management of Customer Data platform</span></li>
                             </ol>
                         </nav>
                     </div>
