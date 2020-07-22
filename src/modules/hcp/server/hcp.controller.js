@@ -6,6 +6,7 @@ const { QueryTypes, Op } = require('sequelize');
 const Hcp = require('./hcp_profile.model');
 const HcpConsents = require('./hcp_consents.model');
 const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
+const ConsentTitle = require(path.join(process.cwd(), 'src/modules/consent/server/consent-title.model'));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
@@ -237,19 +238,19 @@ async function createHcpProfile(req, res) {
 
                 if(!consentResponse) return;
 
-                const consentDetails = await Consent.findOne({ where: { slug: consentSlug } });
+                const consentDetails = await ConsentTitle.findOne({ where: { slug: consentSlug }, include: [{ model: Consent, as: 'consents'}] });
 
-                if(!consentDetails) return;
+                if(!consentDetails || !consentDetails.consents.length) return;
 
-                if(consentDetails.dataValues.opt_type === 'double') {
+                if(consentDetails.consents[0].opt_type === 'double') {
                     hasDoubleOptIn = true;
                 }
 
                 consentArr.push({
                     user_id: hcpUser.id,
-                    consent_id: consentDetails.dataValues.id,
+                    consent_id: consentDetails.id,
                     response: consentResponse,
-                    consent_confirmed: consentDetails.dataValues.opt_type === 'double' ? false : true
+                    consent_confirmed: consentDetails.consents[0].opt_type === 'double' ? false : true
                 });
             }));
 
@@ -266,7 +267,7 @@ async function createHcpProfile(req, res) {
 
         if(hcpUser.dataValues.status === 'Consent Pending') {
             const consentIds = consentArr.map(consent => consent.consent_id);
-            let consents = await Consent.findAll({ where: { id: consentIds } });
+            let consents = await ConsentTitle.findAll({ where: { id: consentIds } });
 
             consents = consents.map(consent => consent.dataValues.title);
 
