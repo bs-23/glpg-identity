@@ -1,6 +1,7 @@
 const path = require('path');
 const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
+const ConsentTitle = require('./consent-title.model');
 
 const Consent = sequelize.cdpConnector.define('consents', {
     id: {
@@ -9,15 +10,9 @@ const Consent = sequelize.cdpConnector.define('consents', {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4
     },
-    title: {
-        unique: true,
+    consent_title_id: {
         allowNull: false,
-        type: DataTypes.STRING
-    },
-    slug: {
-        unique: true,
-        allowNull: false,
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER
     },
     type: {
         allowNull: false,
@@ -55,5 +50,14 @@ const Consent = sequelize.cdpConnector.define('consents', {
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
+
+ConsentTitle.hasMany(Consent, {
+    foreignKey: 'consent_title_id'
+});
+
+Consent.belongsTo(ConsentTitle, {
+    foreignKey: 'consent_title_id'
+});
+
 
 module.exports = Consent;
