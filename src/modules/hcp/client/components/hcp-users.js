@@ -65,7 +65,10 @@ export default function hcpUsers() {
 
         dispatch(getHcpProfiles(
             params.get('page') ? params.get('page') : 1,
-            params.get('status') ? params.get('status') : null));
+            params.get('status') ? params.get('status') : null,
+            params.get('country_iso2') ? params.get('country_iso2') : null,
+        ));
+
     }, []);
 
     return (
@@ -86,16 +89,33 @@ export default function hcpUsers() {
                         <div>
                             <div className="d-flex justify-content-between align-items-center">
                                 <h2 className="">HCP Profiles</h2>
-                                <Dropdown>
-                                    <Dropdown.Toggle variant="secondary" className="mt-2">
-                                        Filter
-                            </Dropdown.Toggle>
-                                    <Dropdown.Menu>
-                                        <LinkContainer to="hcps?page=1"><Dropdown.Item onClick={() => dispatch(getHcpProfiles(1, null))}>None</Dropdown.Item></LinkContainer>
-                                        <LinkContainer to="hcps?page=1&status=true"><Dropdown.Item onClick={() => dispatch(getHcpProfiles(1, true))}>Active</Dropdown.Item></LinkContainer>
-                                        <LinkContainer to="hcps?page=1&status=false"><Dropdown.Item onClick={() => dispatch(getHcpProfiles(1, false))}>Pending</Dropdown.Item></LinkContainer>
-                                    </Dropdown.Menu>
-                                </Dropdown>
+                                <div>
+                                    {hcps['countries'] &&
+                                        <Dropdown className="d-inline mr-2">
+                                            <Dropdown.Toggle variant="secondary" className="mt-2">
+                                                Country
+                                    </Dropdown.Toggle>
+                                            <Dropdown.Menu>
+                                                <LinkContainer to={`list?page=1&status=${hcps.status}&country_iso2=null`}><Dropdown.Item onClick={() => dispatch(getHcpProfiles(1, hcps.status, null))}>All</Dropdown.Item></LinkContainer>
+                                                {hcps['countries'].map((country, index) => (
+                                                    <LinkContainer key={index} to={`list?page=1&status=${hcps.status}&country_iso2=${country}`}><Dropdown.Item onClick={() => dispatch(getHcpProfiles(1, hcps.status, country))}>{country}</Dropdown.Item></LinkContainer>
+                                                ))}
+                                            </Dropdown.Menu>
+                                        </Dropdown>
+                                    }
+                                    <Dropdown className="d-inline">
+                                        <Dropdown.Toggle variant="secondary" className="mt-2">
+                                            Status
+                                    </Dropdown.Toggle>
+                                        <Dropdown.Menu>
+                                            <LinkContainer to={`list?page=1&status=null&country_iso2=${hcps.country_iso2}`}><Dropdown.Item onClick={() => dispatch(getHcpProfiles(1, null, hcps.country_iso2))}>All</Dropdown.Item></LinkContainer>
+                                            <LinkContainer to={`list?page=1&status=Approved&country_iso2=${hcps.country_iso2}`}><Dropdown.Item onClick={() => dispatch(getHcpProfiles(1, 'Approved', hcps.country_iso2))}>Approved</Dropdown.Item></LinkContainer>
+                                            <LinkContainer to={`list?page=1&status=Pending&country_iso2=${hcps.country_iso2}`}><Dropdown.Item onClick={() => dispatch(getHcpProfiles(1, 'Pending', hcps.country_iso2))}>Pending</Dropdown.Item></LinkContainer>
+                                            <LinkContainer to={`list?page=1&status=Rejected&country_iso2=${hcps.country_iso2}`}><Dropdown.Item onClick={() => dispatch(getHcpProfiles(1, 'Rejected', hcps.country_iso2))}>Rejected</Dropdown.Item></LinkContainer>
+                                        </Dropdown.Menu>
+                                    </Dropdown>
+                                </div>
+
                             </div>
 
                             {hcps['users'] && hcps['users'].length > 0 &&

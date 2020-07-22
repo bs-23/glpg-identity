@@ -73,7 +73,6 @@ function getRolesPermissions(userrole) {
     }
 }
 
-
 function getCommaSeparatedRoles(userrole) {
     if (userrole) {
 
@@ -91,7 +90,8 @@ function formatProfile(user) {
         email: user.email,
         type: user.type,
         permissions: getPermissions(user.userrole),
-        roles: getRolesPermissions(user.userrole)
+        roles: getRolesPermissions(user.userrole),
+        countries: user.countries
     };
 
     return profile;
