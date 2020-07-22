@@ -85,14 +85,14 @@ module.exports = {
         },
     },
     consent: {
-        demoConsentTitle: {
+        demoConsent: {
             id: 1,
             title: "a",
-            slug: "a",
         },
-        demoConsent: {
+        demoCountryConsent: {
             id: demoConsentId,
-            consent_title_id: 1,
+            consent_id: 1,
+            slug: 'a',
             type: 'online',
             opt_type: 'single',
             category: 'mc',

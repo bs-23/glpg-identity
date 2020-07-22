@@ -1,7 +1,7 @@
 const path = require('path');
 const { Op } = require('sequelize');
+const CountryConsent = require('./country-consent.model');
 const Consent = require('./consent.model');
-const ConsentTitle = require('./consent-title.model');
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 
 async function getConsents(req, res) {
@@ -18,7 +18,7 @@ async function getConsents(req, res) {
         let [country_iso2, language_code] = country_lang.split('_');
         language_code = language_code || 'en';
 
-        const consents = await Consent.findAll({
+        const country_consents = await CountryConsent.findAll({
             where: {
                 country_iso2: {
                     [Op.or]: [
@@ -35,24 +35,23 @@ async function getConsents(req, res) {
             },
             include: [
                 {
-                    model: ConsentTitle
+                    model: Consent
                 }
-            ],
-            attributes: { exclude: ['consent_title_id'] },
+            ]
         });
 
-        const result = consents.map( consent => {
+        const result = country_consents.map( country_consent => {
             return {
-                id: consent.id,
-                title: consent.consent_title.title,
-                slug: consent.consent_title.slug,
-                type: consent.type,
-                opt_type: consent.opt_type,
-                category: consent.category,
-                category_title: consent.category_title,
-                country_iso2: consent.country_iso2,
-                language_code: consent.language_code,
-                purpose: consent.purpose,
+                id: country_consent.id,
+                title: country_consent.consent.title,
+                slug: country_consent.slug,
+                type: country_consent.type,
+                opt_type: country_consent.opt_type,
+                category: country_consent.category,
+                category_title: country_consent.category_title,
+                country_iso2: country_consent.country_iso2,
+                language_code: country_consent.language_code,
+                purpose: country_consent.purpose,
             }
         });
 

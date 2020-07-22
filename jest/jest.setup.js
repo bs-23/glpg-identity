@@ -15,8 +15,8 @@ module.exports = async function() {
     const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
     const Hcp_profile = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_profile.model'));
     const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
-    const ConsentTitle = require(path.join(process.cwd(), 'src/modules/consent/server/consent-title.model'));
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
+    const CountryConsent = require(path.join(process.cwd(), 'src/modules/consent/server/country-consent.model'));
     require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
     require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
     const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
@@ -30,8 +30,8 @@ module.exports = async function() {
     await User.create(specHelper.users.defaultUser);
     await User.create(specHelper.users.defaultAdmin);
     await Hcp_profile.create(specHelper.hcp.defaultUser);
-    await ConsentTitle.create(specHelper.consent.demoConsentTitle);
     await Consent.create(specHelper.consent.demoConsent);
+    await CountryConsent.create(specHelper.consent.demoCountryConsent);
     await Permission.bulkCreate(specHelper.permissions, { returning: true, ignoreDuplicates: false })
     await Role.bulkCreate(specHelper.roles, { returning: true, ignoreDuplicates: false })
     await RolePermission.bulkCreate(specHelper.rolePermissions, { returning: true, ignoreDuplicates: false })
