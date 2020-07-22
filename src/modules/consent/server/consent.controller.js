@@ -1,6 +1,7 @@
 const path = require('path');
 const { Op } = require('sequelize');
 const Consent = require('./consent.model');
+const ConsentTitle = require('./consent-title.model');
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 
 async function getConsents(req, res) {
@@ -32,9 +33,30 @@ async function getConsents(req, res) {
                     ],
                 },
             },
+            include: [
+                {
+                    model: ConsentTitle
+                }
+            ],
+            attributes: { exclude: ['consent_title_id'] },
         });
 
-        response.data = consents;
+        const result = consents.map( consent => {
+            return {
+                id: consent.id,
+                title: consent.consent_title.title,
+                slug: consent.consent_title.slug,
+                type: consent.type,
+                opt_type: consent.opt_type,
+                category: consent.category,
+                category_title: consent.category_title,
+                country_iso2: consent.country_iso2,
+                language_code: consent.language_code,
+                purpose: consent.purpose,
+            }
+        });
+
+        response.data = result;
 
         res.json(response);
     } catch (err) {
