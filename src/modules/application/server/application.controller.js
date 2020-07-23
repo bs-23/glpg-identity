@@ -16,7 +16,7 @@ function generateAccessToken(doc) {
 async function getAccessToken(req, res) {
     try {
         const { email, password } = req.body;
-        const application = await Application.findOne({ where: { email }});
+        const application = await Application.findOne({ where: { email } });
 
         if (!application || !application.validPassword(password)) {
             return res.status(401).send('Invalid email or password.');
@@ -36,4 +36,17 @@ async function getAccessToken(req, res) {
     }
 }
 
+async function getApplications(req, res) {
+    try {
+        const applications = await Application.findAll({
+            attributes: ['id', 'name', 'email', 'is_active', 'slug']
+        });
+        res.json(applications);
+
+    } catch (error) {
+        res.status(500).send(err);
+    }
+}
+
 exports.getAccessToken = getAccessToken;
+exports.getApplications = getApplications;

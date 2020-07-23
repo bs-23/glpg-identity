@@ -41,7 +41,7 @@
     &__list {
     }
 
-    @media (max-width: 575.98px) {
+    @media (max-width: $screen-phone) {
         &__item {
             width: 100%;
         }
