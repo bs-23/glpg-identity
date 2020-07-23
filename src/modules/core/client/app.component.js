@@ -57,7 +57,7 @@ export default function App() {
     }, []);
 
     return (
-        <ToastProvider placement="top-center">
+        <ToastProvider placement="top-center" autoDismissTimeout={2500} >
             <Switch>
 
                 <PublicRoute path="/login" component={Login} />
