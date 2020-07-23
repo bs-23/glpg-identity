@@ -238,19 +238,19 @@ async function createHcpProfile(req, res) {
 
                 if(!consentResponse) return;
 
-                const consentDetails = await Consent.findOne({ include: { model: CountryConsent, as: 'country_consents', where: { slug: consentSlug } } });
+                const consentDetails = await CountryConsent.findOne({ where: { slug: consentSlug } });
 
                 if(!consentDetails) return;
 
-                if(consentDetails.country_consents[0].opt_type === 'double') {
+                if(consentDetails.opt_type === 'double') {
                     hasDoubleOptIn = true;
                 }
 
                 consentArr.push({
                     user_id: hcpUser.id,
-                    consent_id: consentDetails.id,
+                    consent_id: consentDetails.consent_id,
                     response: consentResponse,
-                    consent_confirmed: consentDetails.country_consents[0].opt_type === 'double' ? false : true
+                    consent_confirmed: consentDetails.opt_type === 'double' ? false : true
                 });
             }));
 
