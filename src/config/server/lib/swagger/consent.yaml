@@ -37,9 +37,9 @@ components:
                     type: string
                 title:
                     type: string
-                slug:
+                rich_text:
                     type: string
-                type:
+                slug:
                     type: string
                 opt_type:
                     type: string
