@@ -25,7 +25,7 @@ let data
 beforeEach(() => {
     mockAxios = new MockAdapter(axios);
     const countries = [
-        // { countryid: 0, country_iso2: 'null', countryname: '' },
+        { countryid: 0, country_iso2: 'null', countryname: '' },
         { countryid: 1, country_iso2: 'Ireland', countryname: 'Ireland' },
         { countryid: 2, country_iso2: 'Netherlands', countryname: 'Netherlands'},
         { countryid: 3, country_iso2: 'Luxembourg', countryname: 'Luxembourg'},
@@ -33,13 +33,6 @@ beforeEach(() => {
     ]
     const limit = 3
     data = {
-        // users: [
-        //     { id: '1', first_name: 'John', email: 'email@gmail.com', country_iso2: 'Ireland' },
-        //     { id: '2', first_name: 'Smith', email: 'email2@gmail.com', country_iso2: 'Netherlands' },
-        //     { id: '3', first_name: 'Carl', email: 'email3@gmail.com', country_iso2: 'Luxembourg' },
-        //     { id: '4', first_name: 'Johnson', email: 'email4@gmail.com', country_iso2: 'Netherlands' },
-        //     { id: '5', first_name: 'Brandon', email: 'email5@gmail.com', country_iso2: 'Netherlands' },
-        // ]
         users: [
             { id: '1', first_name: 'John', email: 'email@gmail.com', countries: ['Ireland'] },
             { id: '2', first_name: 'Smith', email: 'email2@gmail.com', countries: ['Netherlands'] },
@@ -52,10 +45,10 @@ beforeEach(() => {
     mockAxios.onGet('/api/countries').reply(200, countries)
     mockAxios.onDelete(`/api/users/1`).reply(200, { id: '1' })
     countries.forEach(country => {
-        if (country.countryname === 'null') return
+        if (country.country_iso2 === 'null') return
         const response = { ...data }
         const { users: allUsers } = response
-        response.users = allUsers.filter(user => user.country_iso2 === country.country_iso2)
+        response.users = allUsers.filter(user => user.countries.includes(country.country_iso2))
         mockAxios.onGet(`/api/users?page=${1}&country_iso2=${country.country_iso2}`).reply(200, response)
     })
     mockAxios.onGet(`/api/users?page=${1}&country_iso2=null`).reply(200, { users: data.users.slice(0, limit), page: 1, end: 3 })
@@ -91,6 +84,11 @@ describe('Users component', () => {
         const filter_button = getByText('Filter by Country')
         fireEvent.click(filter_button)
 
-        getByText('Germany')
+        const country_label = getByText('Germany')
+        fireEvent.click(country_label)
+
+        await waitFor(() => {
+            expect(container.querySelector('tbody')).toBeFalsy()
+        })
     });
 });
