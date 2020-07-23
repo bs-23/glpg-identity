@@ -593,7 +593,7 @@ async function getAccessToken(req, res) {
 
 exports.getHcps = getHcps;
 exports.editHcp = editHcp;
-// exports.registrationLookup = registrationLookup;
+exports.registrationLookup = registrationLookup;
 exports.createHcpProfile = createHcpProfile;
 exports.getHcpProfile = getHcpProfile;
 exports.changePassword = changePassword;
