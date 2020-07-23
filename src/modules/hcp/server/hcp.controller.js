@@ -10,6 +10,7 @@ const emailService = require(path.join(process.cwd(), 'src/config/server/lib/ema
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const { Op } = require('sequelize');
+var validator = require('validator');
 
 function generateAccessToken(doc) {
     return jwt.sign({
@@ -119,7 +120,7 @@ async function editHcp(req, res) {
     }
 }
 
-async function registrationLookup(req, res) {
+async function yar(req, res) {
     const { email, uuid } = req.body;
 
     const response = new Response({}, []);
@@ -133,6 +134,11 @@ async function registrationLookup(req, res) {
     }
 
     if (!uuid || !email) {
+        return res.status(400).send(response);
+    }
+
+    if(!validator.isEmail(email)) {
+        response.errors.push(new CustomError('Email is not valid', 'email'));
         return res.status(400).send(response);
     }
 
