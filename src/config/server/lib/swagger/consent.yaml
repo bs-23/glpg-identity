@@ -39,8 +39,6 @@ components:
                     type: string
                 slug:
                     type: string
-                type:
-                    type: string
                 opt_type:
                     type: string
                 category:

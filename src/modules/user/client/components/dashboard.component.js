@@ -22,26 +22,32 @@ export default function Dashboard() {
                                     </li>
                                     <li className="pr-sm-4 pb-4 service__item">
                                         <NavLink to="" className="d-block py-5 px-3 service__link disabled">
-                                            <i className="icon icon-marketing-promotion-management d-block service__icon"></i>
+                                            <i className="icon icon-consent-management d-block service__icon"></i>
                                             Data Privacy & Consent Management
                                         </NavLink>
                                     </li>
                                     <li className="pr-sm-4 pb-4 service__item">
                                         <NavLink to="/users" className="d-block py-5 px-3 service__link">
-                                            <i className="icon icon-user-management d-block service__icon"></i>
+                                            <i className="icon icon-customer-data-platform d-block service__icon"></i>
                                           Management of Customer Data Platform 
                                         </NavLink>
                                     </li>
                                     <li className="pr-sm-4 pb-4 service__item">
                                         <NavLink to="/" className="d-block py-5 px-3 service__link disabled">
-                                            <i className="icon icon-sample-request-management d-block service__icon"></i>
-                                            Sample Request Management
+                                            <i className="icon icon-marketing-promotion d-block service__icon"></i>
+                                            Marketing and Promotional
                                         </NavLink>
                                     </li>
                                     <li className="pr-sm-4 pb-4 service__item">
-                                        <NavLink to="" className="d-block py-5 px-3 service__link disabled">
-                                            <i className="icon icon-tag-persona-management d-block service__icon"></i>
-                                            Tag & Persona Management
+                                        <NavLink to="/" className="d-block py-5 px-3 service__link disabled">
+                                            <i className="icon icon-market-research d-block service__icon"></i>
+                                           Market Research
+                                        </NavLink>
+                                    </li>
+                                    <li className="pr-sm-4 pb-4 service__item">
+                                        <NavLink to="/" className="d-block py-5 px-3 service__link disabled">
+                                            <i className="icon icon-infield-team d-block service__icon"></i>
+                                            InField-Team Effectiveness
                                         </NavLink>
                                     </li>
                                 </ul>

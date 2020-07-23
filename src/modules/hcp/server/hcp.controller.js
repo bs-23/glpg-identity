@@ -2,6 +2,7 @@ const path = require('path');
 const _ = require('lodash');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
+const validator = require('validator');
 const { QueryTypes, Op } = require('sequelize');
 const Hcp = require('./hcp_profile.model');
 const HcpConsents = require('./hcp_consents.model');
@@ -68,13 +69,20 @@ async function getHcps(req, res) {
 
     try {
         const page = req.query.page ? req.query.page - 1 : 0;
-        const limit = 20;
+        const limit = 7;
         const status = req.query.status === 'null' ? null : req.query.status;
+        const country_iso2 = req.query.country_iso2 === 'null' ? null : req.query.country_iso2;
         const offset = page * limit;
+
+        const application_list = (await Hcp.findAll()).map(i => i.get("application_id"));
+
+        const country_iso2_list = req.user.type === 'admin' ? (await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry", { type: QueryTypes.SELECT })).map(i => i.country_iso2) : (await Hcp.findAll()).map(i => i.get("country_iso2"));
 
         const hcps = await Hcp.findAll({
             where: {
-                status: status === null ? { [Op.or]: ['Approved', 'Pending', 'Rejected', null] } : status
+                status: status === null ? { [Op.or]: ['Approved', 'Pending', 'Rejected', null] } : status,
+                application_id: req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
+                country_iso2: country_iso2 ? { [Op.or]: [country_iso2] } : req.user.type === 'admin' ? { [Op.or]: country_iso2_list } : req.user.countries
             },
             attributes: { exclude: ['password', 'created_by', 'updated_by'] },
             offset,
@@ -85,7 +93,13 @@ async function getHcps(req, res) {
             ]
         });
 
-        const totalUser = await Hcp.count();
+        const totalUser = await Hcp.count({
+            where: {
+                status: status === null ? { [Op.or]: ['Approved', 'Pending', 'Rejected', null] } : status,
+                application_id: req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
+                country_iso2: country_iso2 ? { [Op.or]: [country_iso2] } : req.user.type === 'admin' ? { [Op.or]: country_iso2_list } : req.user.countries
+            }
+        });
 
         const data = {
             users: hcps,
@@ -94,7 +108,9 @@ async function getHcps(req, res) {
             total: totalUser,
             start: limit * page + 1,
             end: offset + limit > totalUser ? totalUser : offset + limit,
-            status
+            status: status ? status : null,
+            country_iso2: country_iso2 ? country_iso2 : null,
+            countries: [...new Set(country_iso2_list)]
         };
 
         response.data = data;
@@ -131,7 +147,7 @@ async function editHcp(req, res) {
     }
 }
 
-async function registrationLookup(req, res) {
+async function yar(req, res) {
     const { email, uuid } = req.body;
 
     const response = new Response({}, []);
@@ -145,6 +161,11 @@ async function registrationLookup(req, res) {
     }
 
     if (!uuid || !email) {
+        return res.status(400).send(response);
+    }
+
+    if(!validator.isEmail(email)) {
+        response.errors.push(new CustomError('Email is not valid', 'email'));
         return res.status(400).send(response);
     }
 
