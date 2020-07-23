@@ -13,9 +13,9 @@ const HcpConsents = sequelize.cdpConnector.define("hcp_consents", {
         allowNull: false,
         type: DataTypes.UUID
     },
-    consent_id: {
+    consent_slug: {
         allowNull: false,
-        type: DataTypes.INTEGER
+        type: DataTypes.STRING
     },
     response: {
         allowNull: false,
