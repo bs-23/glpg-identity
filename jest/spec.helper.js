@@ -85,18 +85,19 @@ module.exports = {
         },
     },
     consent: {
-        demoConsent: {
-            id: 1,
-            title: "a",
+        demoConsentCategory: {
+            id: demoConsentCategoryId,
+            title: "Direct Marketing",
+            type: 'dm'
         },
-        demoCountryConsent: {
+        demoConsent: {
             id: demoConsentId,
-            consent_id: 1,
+            category_id: demoConsentCategoryId,
+            title: 'a',
+            rich_text: '<h1>a</h1>',
             slug: 'a',
             type: 'online',
             opt_type: 'single',
-            category: 'mc',
-            category_title: "Medical Consent",
             country_iso2: 'NL',
             language_code: 'en',
         }
