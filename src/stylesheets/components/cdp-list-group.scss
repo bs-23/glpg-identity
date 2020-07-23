@@ -46,6 +46,19 @@
 
     &__icon {
         color: $primary-color;
-        width: 85px;
+        width: 75px;
+    }
+
+    @media (max-width: $screen-phone) {
+
+        &__link {
+            align-items: flex-start !important;
+        }
+
+        &__icon {
+            font-size: 2.5em;
+            width: 60px;
+            margin-right: 10px;
+        }
     }
 }
