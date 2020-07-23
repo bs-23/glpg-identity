@@ -56,9 +56,9 @@ async function getHcps(req, res) {
 
     try {
         const page = req.query.page ? req.query.page - 1 : 0;
-        const limit = 20;
+        const limit = 7;
         const status = req.query.status === 'null' ? null : req.query.status;
-        const country_iso2 = req.query.status === 'null' ? null : req.query.country_iso2;
+        const country_iso2 = req.query.country_iso2 === 'null' ? null : req.query.country_iso2;
         const offset = page * limit;
 
         const application_list = (await Hcp.findAll()).map(i => i.get("application_id"));
@@ -80,11 +80,12 @@ async function getHcps(req, res) {
             ]
         });
 
+
         const totalUser = await Hcp.count({
             where: {
                 status: status === null ? { [Op.or]: ['Approved', 'Pending', 'Rejected', null] } : status,
                 application_id: req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
-                country_iso2: req.user.type === 'admin' ? { [Op.or]: country_iso2_list } : { [Op.or]: req.user.countries }
+                country_iso2: country_iso2 ? { [Op.or]: [country_iso2] } : req.user.type === 'admin' ? { [Op.or]: country_iso2_list } : req.user.countries
             }
         });
 
@@ -95,7 +96,7 @@ async function getHcps(req, res) {
             total: totalUser,
             start: limit * page + 1,
             end: offset + limit > totalUser ? totalUser : offset + limit,
-            status,
+            status: status ? status : null,
             country_iso2: country_iso2 ? country_iso2 : null,
             countries: [...new Set(country_iso2_list)]
         };
