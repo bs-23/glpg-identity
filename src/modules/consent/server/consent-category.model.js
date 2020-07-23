@@ -5,9 +5,9 @@ const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequel
 const ConsentCategory = sequelize.cdpConnector.define('consent_categories', {
     id: {
         allowNull: false,
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
     },
     title: {
         allowNull: false,
