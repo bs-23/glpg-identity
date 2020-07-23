@@ -44,6 +44,7 @@ async function getConsents(req, res) {
             return {
                 id: consent.id,
                 title: consent.title,
+                rich_text: consent.rich_text,
                 slug: consent.slug,
                 opt_type: consent.opt_type,
                 category: consent.consent_category.type,
