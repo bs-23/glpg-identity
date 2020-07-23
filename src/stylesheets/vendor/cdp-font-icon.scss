@@ -73,3 +73,115 @@
 .icon-user-round:before {
     content: "\6a";
 }
+
+.icon-add-user:before {
+    content: "\6b";
+}
+
+.icon-board-games-with-roles:before {
+    content: "\6c";
+}
+
+.icon-calendar:before {
+    content: "\6d";
+}
+
+.icon-handshake:before {
+    content: "\6e";
+}
+
+.icon-listing:before {
+    content: "\6f";
+}
+
+.icon-network:before {
+    content: "\70";
+}
+
+.icon-secure:before {
+    content: "\71";
+}
+
+.icon-switch:before {
+    content: "\72";
+}
+
+.icon-consent-management:before {
+    content: "\73";
+}
+
+.icon-customer-data-platform:before {
+    content: "\74";
+}
+
+.icon-gear:before {
+    content: "\75";
+}
+
+.icon-infield-team:before {
+    content: "\76";
+}
+
+.icon-laptop:before {
+    content: "\77";
+}
+
+.icon-key:before {
+    content: "\78";
+}
+
+.icon-user-heart:before {
+    content: "\79";
+}
+
+.icon-search-globally:before {
+    content: "\7a";
+}
+
+.icon-role:before {
+    content: "\41";
+}
+
+.icon-place:before {
+    content: "\42";
+}
+
+.icon-marketing-promotion:before {
+    content: "\43";
+}
+
+.icon-market-research:before {
+    content: "\44";
+}
+
+.icon-user-setting:before {
+    content: "\45";
+}
+
+.icon-users:before {
+    content: "\46";
+}
+
+
+//custome css
+$class-slug: icon- !default;
+
+@for $i from 10 through 40 {
+    .#{$class-slug}#{$i}#{px} {
+        font-size: 0px + $i
+    }
+}
+
+@for $i from 1 through 10 {
+    .#{$class-slug}#{$i}#{x} {
+        font-size: 0em + $i
+    }
+}
+
+.icon.icon-bold::before {
+    font-weight: bold !important;
+}
+
+.icon.icon-italic::before {
+    font-style: italic !important;
+}

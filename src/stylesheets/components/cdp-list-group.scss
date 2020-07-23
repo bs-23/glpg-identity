@@ -1,34 +1,64 @@
 .cdp-list-group {
     $this: cdp-list-group;
 
-    background: $light-bg-color;
-
     &__link {
         text-decoration: none !important;
 
+        &.disabled {
+            background: $disabaled-bg !important;
+            cursor: default;
+
+            .#{$this}__link-title,
+            .#{$this}__icon {
+                color: $primary-color-lighter !important;
+            }
+
+            .#{$this}__link-description,
+            .#{$this}__link-activity {
+                color: $gray-999 !important;
+            }
+        }
+
         &:hover {
-            background-color: $gray-ddd;
+            background-color: $gray-F8F8F8;
 
             .#{$this}__link-title {
                 text-decoration: none;
             }
         }
+
+        &-title {
+            color: $primary-color;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        &-description {
+            color: $gray-666;
+            font-size: 14px;
+        }
+
+        &-activity {
+            color: $gray-666;
+            font-size: 14px;
+        }
     }
 
     &__icon {
-        color: $secondary-color;
-        width: 85px;
-    }
-
-    &__link-title {
         color: $primary-color;
-        font-weight: bold;
-        text-decoration: underline;
+        width: 75px;
     }
 
-    &__link-description {
-    }
+    @media (max-width: $screen-phone) {
 
-    &__link-timing {
+        &__link {
+            align-items: flex-start !important;
+        }
+
+        &__icon {
+            font-size: 2.5em;
+            width: 60px;
+            margin-right: 10px;
+        }
     }
 }

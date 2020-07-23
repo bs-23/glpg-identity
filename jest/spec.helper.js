@@ -19,18 +19,15 @@ module.exports = {
     defaultApplication: {
         id: defaultApplicationId,
         name: faker.company.companyName(),
+        slug: 'hcp-portal',
         email: 'hcp-portal@glpg.com',
         password: 'strong-password',
         created_by: defaultAdminId,
         updated_by: defaultAdminId,
-        access_token: jwt.sign(
-            {
-                id: defaultApplicationId,
-                email: 'hcp-portal@glpg.com',
-            },
-            process.env.APPLICATION_TOKEN_SECRET,
-            { expiresIn: '30d', issuer: defaultApplicationId }
-        ),
+        access_token: jwt.sign({
+            id: defaultApplicationId,
+            email: 'hcp-portal@glpg.com',
+        }, process.env.APPLICATION_TOKEN_SECRET, { expiresIn: '30d', issuer: defaultApplicationId }),
     },
     users: {
         defaultAdmin: {
@@ -89,16 +86,20 @@ module.exports = {
     },
     consent: {
         demoConsent: {
+            id: 1,
+            title: "a",
+        },
+        demoCountryConsent: {
             id: demoConsentId,
-            title: 'Sharing personal data with 3rd parties',
-            slug: 'Sharing_personal_data_with_3rd_parties',
+            consent_id: 1,
+            slug: 'a',
             type: 'online',
             opt_type: 'single',
             category: 'mc',
             category_title: "Medical Consent",
             country_iso2: 'NL',
             language_code: 'en',
-        },
+        }
     },
     permissions: [
         { id: UserPermissionID, module: Modules.USER.value, status: "active", title: Modules.USER.title, created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" },

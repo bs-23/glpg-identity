@@ -11,6 +11,12 @@ const Application = sequelize.cdpConnector.define('applications', {
         defaultValue: DataTypes.UUIDV4
     },
     name: {
+        unique: true,
+        allowNull: false,
+        type: DataTypes.STRING
+    },
+    slug: {
+        unique: true,
         allowNull: false,
         type: DataTypes.STRING
     },
@@ -30,7 +36,7 @@ const Application = sequelize.cdpConnector.define('applications', {
     },
     is_active: {
         type: DataTypes.BOOLEAN,
-        defaultValue: false
+        defaultValue: true
     },
     created_by: {
         type: DataTypes.UUID

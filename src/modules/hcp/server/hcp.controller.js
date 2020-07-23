@@ -297,7 +297,8 @@ async function changePassword(req, res) {
 
         doc.update({ password: new_password });
 
-        const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/hcp-password-reset.html`);
+        // req.user.slug is used to select template folder
+        const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${req.user.slug}/password-reset.html`);
         const options = {
             toAddresses: [email],
             templateUrl,
@@ -340,7 +341,8 @@ async function resetPassword(req, res) {
 
         doc.update({ password: req.body.new_password });
 
-        const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/hcp-password-reset.html`);
+        // req.user.slug is used to select template folder
+        const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${req.user.slug}/password-reset.html`);
         const options = {
             toAddresses: [doc.email],
             templateUrl,
