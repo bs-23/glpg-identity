@@ -1,25 +1,33 @@
 const path = require('path');
 const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
+const uniqueSlug = require('unique-slug');
 const ConsentCategory = require('./consent-category.model');
+
+const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+const makeCustomSlug = (title, country, language) => {
+    const code = uniqueSlug(`${title} ${country} ${language}`);
+    if(title.length > 50) return convertToSlug(`${title.substring(0, 50)} ${code}`);
+    return convertToSlug(`${title} ${code}`);
+}
 
 const Consent = sequelize.cdpConnector.define('consents', {
     id: {
         allowNull: false,
         primaryKey: true,
         type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4
+        defaultValue: DataTypes.UUIDV4,
     },
     category_id: {
         allowNull: false,
-        type: DataTypes.INTEGER
+        type: DataTypes.UUID
     },
     title: {
         unique: true,
         allowNull: false,
         type: DataTypes.STRING
     },
-    markup: {
+    rich_text: {
         allowNull: false,
         type: DataTypes.STRING
     },
@@ -27,6 +35,9 @@ const Consent = sequelize.cdpConnector.define('consents', {
         unique: true,
         allowNull: false,
         type: DataTypes.STRING,
+        set(value){
+            this.setDataValue('slug', makeCustomSlug(this.title, this.country_iso2, this.language_code));
+        }
     },
     type: {
         allowNull: false,
