@@ -28,6 +28,11 @@ async function init() {
     await sequelize.cdpConnector.sync();
 
     const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+    const makeCustomSlug = (title, country, language) => {
+        const code = uniqueSlug(`${title} ${country} ${language}`);
+        if(title.length > 50) return convertToSlug(`${title.substring(0, 50)} ${code}`);
+        return convertToSlug(`${title} ${code}`);
+    }
 
     function userSeeder(callback) {
         User.findOrCreate({
