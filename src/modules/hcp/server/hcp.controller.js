@@ -146,7 +146,7 @@ async function editHcp(req, res) {
     }
 }
 
-async function yar(req, res) {
+async function registrationLookup(req, res) {
     const { email, uuid } = req.body;
 
     const response = new Response({}, []);
