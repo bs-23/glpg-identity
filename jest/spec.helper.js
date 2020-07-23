@@ -10,6 +10,7 @@ const defaultUserId = 'ce2f07f9-c40b-43b8-8200-124de9fc2e46';
 const defaultAdminId = 'f29b63e5-36c7-4210-a5a8-c1e9d0c5b9e4';
 const defaultApplicationId = '9017a1ee-3391-40a0-ad50-70bc7f1657f0';
 const defaultHCPuserId = 'db2baac3-46d1-425f-b62d-3730a294fd0e';
+const demoConsentCategoryId = 'fe037405-c676-4d98-bd05-85008900c838';
 const demoConsentId = '3bb2057b-3006-4c87-9ce1-166bd291e86f';
 const UserPermissionID = 'e31e7b72-8dd9-43cf-a2b2-823963bfad45'
 const HcpPermissionID = 'bd2b3849-a1a0-40ab-900a-346926edc572'
