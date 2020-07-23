@@ -6,7 +6,7 @@ const { QueryTypes, Op } = require('sequelize');
 const Hcp = require('./hcp_profile.model');
 const HcpConsents = require('./hcp_consents.model');
 const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
-const CountryConsent = require(path.join(process.cwd(), 'src/modules/consent/server/country-consent.model'));
+const ConsentCategory = require(path.join(process.cwd(), 'src/modules/consent/server/consent-category.model'));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
@@ -238,11 +238,11 @@ async function createHcpProfile(req, res) {
 
                 if(!consentResponse) return;
 
-                const consentDetails = await Consent.findOne({ include: { model: CountryConsent, as: 'country_consents', where: { slug: consentSlug } } });
+                const consentDetails = await Consent.findOne({ where: { slug: consentSlug } });
 
                 if(!consentDetails) return;
 
-                if(consentDetails.country_consents[0].opt_type === 'double') {
+                if(consentDetails[0].opt_type === 'double') {
                     hasDoubleOptIn = true;
                 }
 
@@ -250,7 +250,7 @@ async function createHcpProfile(req, res) {
                     user_id: hcpUser.id,
                     consent_id: consentDetails.id,
                     response: consentResponse,
-                    consent_confirmed: consentDetails.country_consents[0].opt_type === 'double' ? false : true
+                    consent_confirmed: consentDetails[0].opt_type === 'double' ? false : true
                 });
             }));
 
