@@ -1,5 +1,4 @@
 const path = require('path');
-const ConsentCategory = require('../src/modules/consent/server/consent-category.model');
 
 const config = require(path.join(process.cwd(), 'src/config/server/config'));
 
