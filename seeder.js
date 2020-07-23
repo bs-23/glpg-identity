@@ -1,6 +1,5 @@
 const path = require('path');
 const async = require('async');
-const uniqueSlug = require('unique-slug');
 
 async function init() {
     const config = require(path.join(process.cwd(), 'src/config/server/config'));
@@ -28,11 +27,6 @@ async function init() {
     await sequelize.cdpConnector.sync();
 
     const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
-    const makeCustomSlug = (title, country, language) => {
-        const code = uniqueSlug(`${title} ${country} ${language}`);
-        if(title.length > 50) return convertToSlug(`${title.substring(0, 50)} ${code}`);
-        return convertToSlug(`${title} ${code}`);
-    }
 
     function userSeeder(callback) {
         User.findOrCreate({
@@ -160,23 +154,15 @@ async function init() {
 
     function consentSeeder(callback) {
         const consent_categories = [
-            { "id": 1, "title": "Direct Marketing", "type": "dm" },
-            { "id": 2, "title": "Medical Consent", "type": "mc" },
-            { "id": 3, "title": "General Consent", "type": "general" },
+            { 'id': 'fe037405-c676-4d98-bd05-85008900c838', 'title': 'Direct Marketing', 'type': 'dm' },
+            { 'id': '29374bce-7c3f-4408-a138-c062143d2247', 'title': 'Medical Consent', 'type': 'mc' },
+            { 'id': '59953d51-2449-4b65-950f-9f88654019bb', 'title': 'General Consent', 'type': 'general' },
         ]
 
         const consents = [
-            { "category_id": 1, "title": "Sample Request", "markup": "<h1>Sample Request</h1>", "type": "online", "opt_type": "double", "country_iso2": "NL", "language_code": "en" },
-            { "category_id": 3, "title": "Invite to KOL Webminar", "markup": "<h1>Invite to KOL Webmina</h1>", "type": "online", "opt_type": "double", "country_iso2": "NL", "language_code": "en" }
+            { 'category_id': 'fe037405-c676-4d98-bd05-85008900c838', 'title': 'Sample Request', 'rich_text': '<h1>Sample Request</h1>', 'slug': '', 'type': 'online', 'opt_type': 'double', 'country_iso2': 'NL', 'language_code': 'en' },
+            { 'category_id': '59953d51-2449-4b65-950f-9f88654019bb', 'title': 'Invite to KOL Webminar', 'rich_text': '<h1>Invite to KOL Webmina</h1>', 'slug': '', 'type': 'online', 'opt_type': 'double', 'country_iso2': 'NL', 'language_code': 'en' }
         ];
-
-        // generating all slugs
-        const all_consents = consents.map( consent => {
-            const slug = makeCustomSlug(consent.title, consent.country_iso2, consent.language_code);
-            return { ...consent, slug };
-        });
-
-        // console.log("===========================>", all_consents);
 
         Consent.destroy({
             where: {},
@@ -189,7 +175,7 @@ async function init() {
                 callback();
             });
 
-            Consent.bulkCreate(all_consents, {
+            Consent.bulkCreate(consents, {
                 returning: true,
                 ignoreDuplicates: false
             }).then(function () {
