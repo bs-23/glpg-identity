@@ -66,8 +66,19 @@
 .page-title {
     color: $primary-color;
 
-    &__icon {}
-    &__text {
+    &__icon {
+    }
 
+    &__text {
+    }
+
+    @media (max-width: $screen-phone) {
+        &__icon {
+            font-size: 1.7em;
+        }
+
+        &__text {
+            font-size: 24px;
+        }
     }
 }
