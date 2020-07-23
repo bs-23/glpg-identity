@@ -67,7 +67,7 @@ const InformationManagement = () => {
                                             </span>
                                         </NavLink>
                                         <NavLink to="" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link disabled">
-                                            <i className="icon icon-th-list icon-3x cdp-list-group__icon"></i>
+                                            <i className="icon icon-search-globally icon-3x cdp-list-group__icon"></i>
                                             <span>
                                                 <strong className="mb-2 h4 d-block cdp-list-group__link-title">Discover Missing HCPs and HCOs</strong>
                                                 <span className="d-block cdp-list-group__link-description">IQVia OneKey Universe</span>
@@ -75,7 +75,7 @@ const InformationManagement = () => {
                                             </span>
                                         </NavLink>
                                         <NavLink to="" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link disabled">
-                                            <i className="icon icon-th-list icon-3x cdp-list-group__icon"></i>
+                                            <i className="icon icon-place icon-3x cdp-list-group__icon"></i>
                                             <span>
                                                 <strong className="mb-2 h4 d-block cdp-list-group__link-title">Find HCPs with their Geolocation</strong>
                                                 <span className="d-block cdp-list-group__link-description">Using the address assigned to IQVia workplace</span>

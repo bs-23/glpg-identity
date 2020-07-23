@@ -1,21 +1,21 @@
 import { string, object, ref, date } from 'yup';
 
-function validatePassword(password){
+function validatePassword(password) {
     const minimumPasswordLength = 8
 
-    if(!password) return false
-    if(password.length < minimumPasswordLength) return false
+    if (!password) return false
+    if (password.length < minimumPasswordLength) return false
 
     const hasUppercase = new RegExp("^(?=.*[A-Z])").test(password);
-    if(!hasUppercase) return false
+    if (!hasUppercase) return false
 
     const hasDigit = new RegExp("^(?=.*[0-9])").test(password);
-    if(!hasDigit) return false
+    if (!hasDigit) return false
 
     const specialCharacters = "!@#$%^&*"
     let hasSpecialCharacter = false
-    for(const c of password) {
-        if(specialCharacters.includes(c)) {
+    for (const c of password) {
+        if (specialCharacters.includes(c)) {
             hasSpecialCharacter = true
             break
         }
