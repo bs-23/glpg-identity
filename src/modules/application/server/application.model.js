@@ -41,6 +41,9 @@ const Application = sequelize.cdpConnector.define('applications', {
     consent_confirmation_link: {
         type: DataTypes.STRING
     },
+    login_link: {
+        type: DataTypes.STRING
+    },
     created_by: {
         type: DataTypes.UUID
     },

@@ -128,6 +128,7 @@ async function init() {
                     email: 'hcp-portal@glpg.com',
                     password: 'strong-password',
                     consent_confirmation_link: 'http://example.com/bin/public/glpg-hcpportal/consent/confirm.html',
+                    login_link: 'http://example.com/login.html',
                     created_by: admin.id,
                     updated_by: admin.id
                 },
@@ -137,6 +138,7 @@ async function init() {
                     email: 'brandx@glpg.com',
                     password: 'strong-password',
                     consent_confirmation_link: 'http://example.com/bin/public/glpg-hcpportal/consent/confirm.html',
+                    login_link: 'http://example.com/login.html',
                     created_by: admin.id,
                     updated_by: admin.id
                 }
@@ -183,7 +185,7 @@ async function init() {
             { "consent_id": 6, "type": "online", "opt_type": "single", "category": "mc", "category_title": "Medical Consent", "country_iso2": "BE", "language_code": "en" },
             { "consent_id": 6, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
             { "consent_id": 7, "type": "online", "opt_type": "single", "category": "mc", "category_title": "Medical Consent", "country_iso2": "BE", "language_code": "en" },
-            { "consent_id": 7, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },            
+            { "consent_id": 7, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
             { "consent_id": 8, "type": "online", "opt_type": "single", "category": "mc", "category_title": "Medical Consent", "country_iso2": "BE", "language_code": "en" },
             { "consent_id": 8, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
             { "consent_id": 9, "type": "online", "opt_type": "single", "category": "mc", "category_title": "Medical Consent", "country_iso2": "BE", "language_code": "en" },

@@ -435,19 +435,24 @@ async function resetPassword(req, res) {
             return res.status(400).send(response);
         }
 
-        doc.update({ password: req.body.new_password });
-
-        // req.user.slug is used to select template folder
-        const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${req.user.slug}/password-reset.html`);
         const options = {
             toAddresses: [doc.email],
-            templateUrl,
-            subject: 'Your password has been changed.',
             data: {
                 firstName: doc.first_name || '',
-                lastName: doc.last_name || ''
+                lastName: doc.last_name || '',
             }
         };
+
+        if(doc.password) {
+            options.subject = 'Your password has been changed.'
+            options.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${req.user.slug}/password-reset.html`)
+        }else{
+            options.subject = `You have successfully created a ${req.user.name} account.`
+            options.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${req.user.slug}/registration-success.html`)
+            options.data.loginLink = req.user.login_link
+        }
+
+        doc.update({ password: req.body.new_password });
 
         await emailService.send(options);
 
