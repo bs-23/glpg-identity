@@ -56,9 +56,34 @@ async function getTemplate(templateUrl) {
     return templateText;
 }
 
+function buildList(listName, list, template){
+    let newTemplate = template
+
+    const startTag = `{{${listName}}}`
+    const valueTag = `{{${listName}-value}}`
+    const endTag = `{{${listName}-end}}`
+
+    const startTagPos = newTemplate.indexOf(startTag)
+    const contentStartPos =  startTagPos + startTag.length
+    const contentEndPos = newTemplate.indexOf(endTag)
+    const endTagPos = contentEndPos + endTag.length
+
+    const content = newTemplate.slice(contentStartPos, contentEndPos)
+
+    let expandedContent = ''
+    list.map(value => expandedContent += content.replace(valueTag, value))
+
+    newTemplate = newTemplate.slice(0, startTagPos) + expandedContent + newTemplate.slice(endTagPos)
+    return newTemplate
+}
+
 function transformTemplate(templateText, data) {
     for (var key in data) {
         if (data.hasOwnProperty(key)) {
+            if(Array.isArray(data[key])){
+                templateText = buildList(key, data[key], templateText)
+                continue
+            }
             const replacer = `[[${key}]]`;
             const value = `${data[key]}`;
             templateText = templateText

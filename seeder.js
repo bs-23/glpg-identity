@@ -30,7 +30,7 @@ async function init() {
 
     function userSeeder(callback) {
         User.findOrCreate({
-            where: { email: 'admin@glpg-cdp.com' }, defaults: {
+            where: { email: 'glpg.cdp@gmail.com' }, defaults: {
                 first_name: 'System',
                 last_name: 'Admin',
                 password: 'strong-password',
@@ -99,7 +99,7 @@ async function init() {
     }
 
     function userRoleSeeder(callback) {
-        const admin = User.findOne({ where: { email: "admin@glpg-cdp.com" } });
+        const admin = User.findOne({ where: { email: 'glpg.cdp@gmail.com' } });
         const adminRole = Role.findOne({ where: { slug: 'system-admin' } });
 
         Promise.all([admin, adminRole]).then((values) => {
@@ -119,10 +119,28 @@ async function init() {
     }
 
     function applicationSeeder(callback) {
-        User.findOne({ where: { email: 'admin@glpg-cdp.com' } }).then(admin => {
+        User.findOne({ where: { email: 'glpg.cdp@gmail.com' } }).then(admin => {
             const applications = [
-                { name: 'HCP Portal', slug: convertToSlug('HCP Portal'), email: 'hcp-portal@glpg.com', password: 'strong-password', created_by: admin.id, updated_by: admin.id },
-                { name: 'BrandX', slug: convertToSlug('BrandX'), email: 'brandx@glpg.com', password: 'strong-password', created_by: admin.id, updated_by: admin.id }
+                {
+                    name: 'HCP Portal',
+                    slug: convertToSlug('HCP Portal'),
+                    email: 'hcp-portal@glpg.com',
+                    password: 'strong-password',
+                    consent_confirmation_link: 'http://example.com/bin/public/glpg-hcpportal/consent/confirm.html',
+                    login_link: 'http://example.com/login.html',
+                    created_by: admin.id,
+                    updated_by: admin.id
+                },
+                {
+                    name: 'BrandX',
+                    slug: convertToSlug('BrandX'),
+                    email: 'brandx@glpg.com',
+                    password: 'strong-password',
+                    consent_confirmation_link: 'http://example.com/bin/public/glpg-hcpportal/consent/confirm.html',
+                    login_link: 'http://example.com/login.html',
+                    created_by: admin.id,
+                    updated_by: admin.id
+                }
             ];
 
             Application.destroy({ truncate: { cascade: true } }).then(() => {

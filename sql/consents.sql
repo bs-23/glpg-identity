@@ -1,7 +1,7 @@
 CREATE TABLE ciam.consents
 (
     id uuid NOT NULL,
-    category_id integer NOT NULL,
+    category_id uuid NOT NULL,
     title character varying(255) COLLATE pg_catalog."default" NOT NULL,
     rich_text character varying(255) COLLATE pg_catalog."default" NOT NULL,
     slug character varying(255) COLLATE pg_catalog."default" NOT NULL,
