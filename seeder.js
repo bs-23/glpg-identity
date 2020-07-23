@@ -1,6 +1,5 @@
 const path = require('path');
 const async = require('async');
-const uniqueSlug = require('unique-slug');
 
 async function init() {
     const config = require(path.join(process.cwd(), 'src/config/server/config'));
@@ -139,14 +138,14 @@ async function init() {
 
     function consentSeeder(callback) {
         const consent_categories = [
-            { "id": "fe037405-c676-4d98-bd05-85008900c838", "title": "Direct Marketing", "type": "dm" },
-            { "id": "29374bce-7c3f-4408-a138-c062143d2247", "title": "Medical Consent", "type": "mc" },
-            { "id": "59953d51-2449-4b65-950f-9f88654019bb", "title": "General Consent", "type": "general" },
+            { 'id': 'fe037405-c676-4d98-bd05-85008900c838', 'title': 'Direct Marketing', 'type': 'dm' },
+            { 'id': '29374bce-7c3f-4408-a138-c062143d2247', 'title': 'Medical Consent', 'type': 'mc' },
+            { 'id': '59953d51-2449-4b65-950f-9f88654019bb', 'title': 'General Consent', 'type': 'general' },
         ]
 
         const consents = [
-            { "category_id": "fe037405-c676-4d98-bd05-85008900c838", "title": "Sample Request", "rich_text": "<h1>Sample Request</h1>", "slug": "", "type": "online", "opt_type": "double", "country_iso2": "NL", "language_code": "en" },
-            { "category_id": "59953d51-2449-4b65-950f-9f88654019bb", "title": "Invite to KOL Webminar", "rich_text": "<h1>Invite to KOL Webmina</h1>", "slug": "", "type": "online", "opt_type": "double", "country_iso2": "NL", "language_code": "en" }
+            { 'category_id': 'fe037405-c676-4d98-bd05-85008900c838', 'title': 'Sample Request', 'rich_text': '<h1>Sample Request</h1>', 'slug': '', 'type': 'online', 'opt_type': 'double', 'country_iso2': 'NL', 'language_code': 'en' },
+            { 'category_id': '59953d51-2449-4b65-950f-9f88654019bb', 'title': 'Invite to KOL Webminar', 'rich_text': '<h1>Invite to KOL Webmina</h1>', 'slug': '', 'type': 'online', 'opt_type': 'double', 'country_iso2': 'NL', 'language_code': 'en' }
         ];
 
         Consent.destroy({
@@ -171,7 +170,7 @@ async function init() {
 
     async.waterfall([userSeeder, permissionSeeder,roleSeeder, rolePermissionSeeder, userRoleSeeder, applicationSeeder, consentSeeder], function (err) {
         if (err) console.error(err);
-        else console.info("DB seed completed!");
+        else console.info('DB seed completed!');
         process.exit();
     });
 }
