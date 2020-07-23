@@ -1,7 +1,7 @@
 const path = require('path');
 const { Op } = require('sequelize');
-const CountryConsent = require('./country-consent.model');
 const Consent = require('./consent.model');
+const ConsentCategory = require('./consent-category.model');
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 
 async function getConsents(req, res) {
@@ -18,7 +18,7 @@ async function getConsents(req, res) {
         let [country_iso2, language_code] = country_lang.split('_');
         language_code = language_code || 'en';
 
-        const country_consents = await CountryConsent.findAll({
+        const consents = await Consent.findAll({
             where: {
                 country_iso2: {
                     [Op.or]: [
@@ -35,23 +35,22 @@ async function getConsents(req, res) {
             },
             include: [
                 {
-                    model: Consent
+                    model: ConsentCategory
                 }
             ]
         });
 
-        const result = country_consents.map( country_consent => {
+        const result = consents.map( consent => {
             return {
-                id: country_consent.id,
-                title: country_consent.consent.title,
-                slug: country_consent.slug,
-                type: country_consent.type,
-                opt_type: country_consent.opt_type,
-                category: country_consent.category,
-                category_title: country_consent.category_title,
-                country_iso2: country_consent.country_iso2,
-                language_code: country_consent.language_code,
-                purpose: country_consent.purpose,
+                id: consent.id,
+                title: consent.title,
+                slug: consent.slug,
+                opt_type: consent.opt_type,
+                category: consent.consent_category.type,
+                category_title: consent.consent_category.title,
+                country_iso2: consent.country_iso2,
+                language_code: consent.language_code,
+                purpose: consent.purpose,
             }
         });
 
