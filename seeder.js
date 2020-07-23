@@ -13,8 +13,8 @@ async function init() {
 
     const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
     const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
-    const ConsentTitle = require(path.join(process.cwd(), 'src/modules/consent/server/consent-title.model'));
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
+    const CountryConsent = require(path.join(process.cwd(), 'src/modules/consent/server/country-consent.model'));
     const RolePermission = require(path.join(process.cwd(), "src/modules/user/server/role/role-permission.model"));
     const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
     const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
@@ -154,65 +154,79 @@ async function init() {
     }
 
     function consentSeeder(callback) {
-        const titles = [
-            { "title": "Sample Request" },
-            { "title": "Invite to KOL Webminar" },
-            { "title": "Create credentials for gated HCP area" },
-            { "title": "Register to E-mail Newsletter (Mass email)" },
-            { "title": "Send congress Agenda via email" },
-            { "title": "Congress Newsletter" },
-            { "title": "Send Email about clinical trial studies" },
-            { "title": "That medical information is shorten for teasering content and better readability" },
-            { "title": "Send Mode of Action rich media content" },
-            { "title": "Send e-Detailing aid" },
-            { "title": "Invite to Remote Engagement" },
-            { "title": "Send CLM content after RepSale visit" },
-        ];
-        
         const consents = [
-            { "consent_title_id": 1, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
-            { "consent_title_id": 2, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
-            { "consent_title_id": 3, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
-            { "consent_title_id": 4, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
-            { "consent_title_id": 5, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
-            { "consent_title_id": 6, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
-            { "consent_title_id": 7, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
-            { "consent_title_id": 8, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
-            { "consent_title_id": 9, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
-            { "consent_title_id": 10, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
-            { "consent_title_id": 11, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
-            { "consent_title_id": 12, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
+            { id: 1, "title": "Sample Request" },
+            { id: 2, "title": "Invite to KOL Webminar" },
+            { id: 3, "title": "Create credentials for gated HCP area" },
+            { id: 4, "title": "Register to E-mail Newsletter (Mass email)" },
+            { id: 5, "title": "Send congress Agenda via email" },
+            { id: 6, "title": "Congress Newsletter" },
+            { id: 7, "title": "Send Email about clinical trial studies" },
+            { id: 8, "title": "That medical information is shorten for teasering content and better readability" },
+            { id: 9, "title": "Send Mode of Action rich media content" },
+            { id: 10, "title": "Send e-Detailing aid" },
+            { id: 11, "title": "Invite to Remote Engagement" },
+            { id: 12, "title": "Send CLM content after RepSale visit" },
         ];
 
-        const all_titles = titles.map( consent => {
-            if(consent.title.length > 50){
-                const code = uniqueSlug(consent.title);
-                let new_title = consent.title.substring(0, 50);
-                new_title += ` ${code}`;
+        const country_consents = [
+            { "consent_id": 1, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "BE", "language_code": "en" },
+            { "consent_id": 1, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
+            { "consent_id": 2, "type": "online", "opt_type": "single", "category": "mc", "category_title": "Medical Consent", "country_iso2": "BE", "language_code": "en" },
+            { "consent_id": 2, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
+            { "consent_id": 3, "type": "online", "opt_type": "single", "category": "mc", "category_title": "Medical Consent", "country_iso2": "BE", "language_code": "en" },
+            { "consent_id": 3, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
+            { "consent_id": 4, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "BE", "language_code": "en" },
+            { "consent_id": 4, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
+            { "consent_id": 5, "type": "online", "opt_type": "single", "category": "mc", "category_title": "Medical Consent", "country_iso2": "BE", "language_code": "en" },
+            { "consent_id": 5, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
+            { "consent_id": 6, "type": "online", "opt_type": "single", "category": "mc", "category_title": "Medical Consent", "country_iso2": "BE", "language_code": "en" },
+            { "consent_id": 6, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
+            { "consent_id": 7, "type": "online", "opt_type": "single", "category": "mc", "category_title": "Medical Consent", "country_iso2": "BE", "language_code": "en" },
+            { "consent_id": 7, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },            
+            { "consent_id": 8, "type": "online", "opt_type": "single", "category": "mc", "category_title": "Medical Consent", "country_iso2": "BE", "language_code": "en" },
+            { "consent_id": 8, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
+            { "consent_id": 9, "type": "online", "opt_type": "single", "category": "mc", "category_title": "Medical Consent", "country_iso2": "BE", "language_code": "en" },
+            { "consent_id": 9, "type": "online", "opt_type": "double", "category": "mc", "category_title": "Medical Consent", "country_iso2": "NL", "language_code": "en" },
+            { "consent_id": 10, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "BE", "language_code": "en" },
+            { "consent_id": 10, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
+            { "consent_id": 11, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "BE", "language_code": "en" },
+            { "consent_id": 11, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
+            { "consent_id": 12, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "BE", "language_code": "en" },
+            { "consent_id": 12, "type": "online", "opt_type": "double", "category": "dm", "category_title": "Direct Marketing", "country_iso2": "NL", "language_code": "en" },
+        ];
+
+        const all_country_consents = country_consents.map( country_consent => {
+            const [{ title }] = consents.filter( consent => consent.id === country_consent.consent_id);
+
+            if(title.length > 50){
+                const code = uniqueSlug(title);
+                let new_title = title.substring(0, 50);
+                new_title += ` ${code} ${country_consent.country_iso2}`;
                 const slug = convertToSlug(new_title);
-                return { ...consent, slug };
+                return { ...country_consent, slug };
             }
 
-            const slug = convertToSlug(consent.title);
-            return { ...consent, slug };
+            const slug = convertToSlug(`${title} ${country_consent.country_iso2}`);
+            return { ...country_consent, slug };
         });
 
-        Consent.destroy({
+        CountryConsent.destroy({
             where: {},
             include: [
                 {
-                    model: ConsentTitle
+                    model: Consent
                 }
             ]
         }).then(() => {
-            ConsentTitle.bulkCreate(all_titles, {
+            Consent.bulkCreate(consents, {
                 returning: true,
                 ignoreDuplicates: false
             }).then(function () {
                 callback();
             });
 
-            Consent.bulkCreate(consents, {
+            CountryConsent.bulkCreate(all_country_consents, {
                 returning: true,
                 ignoreDuplicates: false
             }).then(function () {
