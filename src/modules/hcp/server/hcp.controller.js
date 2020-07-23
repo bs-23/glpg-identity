@@ -6,7 +6,6 @@ const { QueryTypes, Op } = require('sequelize');
 const Hcp = require('./hcp_profile.model');
 const HcpConsents = require('./hcp_consents.model');
 const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
-const ConsentCategory = require(path.join(process.cwd(), 'src/modules/consent/server/consent-category.model'));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
