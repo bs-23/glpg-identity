@@ -9,8 +9,6 @@ components:
                     type: string
                 code:
                     type: string
-                stackTrace:
-                    type: object
         errorResponse:
             type: object
             properties:
