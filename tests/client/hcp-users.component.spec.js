@@ -12,7 +12,7 @@ import HcpUser from '../../src/modules/hcp/client/components/hcp-users';
 import { login } from '../../src/modules/user/client/user.actions';
 import { getHcpProfiles } from '../../src/modules/hcp/client/hcp.actions'
 
-configure({ adapter: new Adapter() });
+configure({ adapter: new Adapter() }); 
 
 describe('Hcp user component', () => {
     let fakeAxios;
@@ -38,8 +38,8 @@ describe('Hcp user component', () => {
                     { id: '2', first_name: 'b', last_name: 'b', email: 'b', telephone: '2', uuid: '2' }
                 ]
         }};
-        const page = 1, status = null;
-        fakeAxios.onGet(`/api/hcps?page=${page}&status=${status}`).reply(200, data);
+        const page = 1, status = null, country_iso2 = null;
+        fakeAxios.onGet(`/api/hcps?page=${page}&status=${status}&country_iso2=${country_iso2}`).reply(200, data);
         await store.dispatch(getHcpProfiles(page, status));
     });
 
