@@ -82,7 +82,7 @@ async function sendConsentConfirmationMail(user, consents, application) {
     mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/consent-confirm.html`),
     mailOptions.subject = 'Request consent confirmation',
     mailOptions.data.consents = consents || [],
-    mailOptions.data.link = `${application.consent_confirmation_link}?token=${consentConfirmationToken}`;
+    mailOptions.data.link = `${application.consent_confirmation_link}?token=${consentConfirmationToken}&country_lang=${user.country_iso2}_${user.language_code}`;
 
     await emailService.send(mailOptions);
 }
@@ -92,7 +92,7 @@ async function sendRegistrationSuccessMail(user, application) {
 
     mailOptions.subject = `You have successfully created a ${application.name} account.`;
     mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/registration-success.html`);
-    mailOptions.data.loginLink = application.login_link;
+    mailOptions.data.loginLink = `${application.login_link}?country_lang=${user.country_iso2}_${user.language_code}`;
 
     await emailService.send(mailOptions);
 }
@@ -111,7 +111,7 @@ async function sendPasswordResetTokenMail(user, application) {
 
     mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/password-set.html`);
     mailOptions.subject = `Set a password for your account on ${application.name}`;
-    mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}`;
+    mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&country_lang=${user.country_iso2}_${user.language_code}`;
 
     await emailService.send(mailOptions);
 }
