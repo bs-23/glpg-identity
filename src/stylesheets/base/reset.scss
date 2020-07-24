@@ -60,6 +60,16 @@
     &-bg-secondary {
         background: $secondary-color;
     }
+
+    &-text {
+        &-primary {
+            color: $primary-color;
+        }
+
+        &-secondary {
+            color: $secondary-color;
+        }
+    }
 }
 
 

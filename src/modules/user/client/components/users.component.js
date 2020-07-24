@@ -51,7 +51,7 @@ export default function Users() {
     };
 
     return (
-        <main className="app__content">
+        <main className="app__content cdp-light-bg">
             <div className="container-fluid">
                 <div className="row">
                     <div className="col-12 px-0">
@@ -59,7 +59,7 @@ export default function Users() {
                             <ol className="breadcrumb rounded-0">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/users">Management of Customer Data platform</NavLink></li>
-                                <li className="breadcrumb-item active"><span>User List</span></li>
+                                <li className="breadcrumb-item active"><span>CDP User List</span></li>
                             </ol>
                         </nav>
                     </div>
@@ -67,10 +67,10 @@ export default function Users() {
 
                 <div className="row">
                     <div className="col-12">
-                        <div className="d-flex justify-content-between align-items-center">
-                            <h2>CDP User List</h2>
-                            <Dropdown className="ml-auto mr-2">
-                                <Dropdown.Toggle variant="" className="cdp-btn-secondary text-white btn-sm">
+                        <div className="d-flex justify-content-between align-items-center mb-3 mt-4">
+                            <h4 className="cdp-text-primary font-weight-bold mb-0">CDP User List</h4>
+                            <Dropdown className="ml-auto dropdown-customize">
+                                <Dropdown.Toggle variant="" className="cdp-btn-outline-primary">
                                     <i className="fas fa-filter mr-1"></i> Filter by Country
                             </Dropdown.Toggle>
                                 <Dropdown.Menu>
@@ -83,15 +83,15 @@ export default function Users() {
                                 </Dropdown.Menu>
                             </Dropdown>
 
-                            <NavLink to="/users/create" className="btn cdp-btn-primary btn-sm text-white mr-2">
+                            <NavLink to="/users/create" className="btn cdp-btn-secondary text-white ml-2">
                                 <i className="fas fa-plus pr-1"></i> Create new user
                             </NavLink>
                         </div>
 
                         {userdata['users'] && userdata['users'].length > 0 &&
                             <React.Fragment>
-                                <table className="table table-hover table-sm mb-0">
-                                    <thead className="cdp-light-bg">
+                                <table className="table table-hover table-sm mb-0 cdp-table shadow-sm">
+                                <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
                                             <th className="py-2">First Name</th>
                                             <th className="py-2">Last Name</th>
@@ -102,7 +102,7 @@ export default function Users() {
                                             <th className="py-2">Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                <tbody className="cdp-table__body bg-white">
                                         {userdata.users.map(row => (
                                             <tr key={row.id}>
                                                 <td>{row.first_name}</td>
