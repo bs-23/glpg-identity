@@ -160,28 +160,28 @@ async function init() {
         const consent_categories = [
             { id: 'fe037405-c676-4d98-bd05-85008900c838', title: 'Direct Marketing', type: 'dm' },
             { id: '29374bce-7c3f-4408-a138-c062143d2247', title: 'Medical Consent', type: 'mc' },
-            { id: '59953d51-2449-4b65-950f-9f88654019bb', title: 'General Consent', type: 'general' },
-        ]
+            { id: '59953d51-2449-4b65-950f-9f88654019bb', title: 'General Consent', type: 'general' }
+        ];
 
         const consents = [
             {
-                category_id: 'fe037405-c676-4d98-bd05-85008900c838',
-                title: 'Sample Request',
-                rich_text: '<h1>Sample Request</h1>',
+                category_id: '29374bce-7c3f-4408-a138-c062143d2247',
+                title: 'I confirm that I am a healthcare professional',
+                rich_text: '<p>I confirm that I am a healthcare professional, practicing in Netherlands and I accept the <a href="#">Galapagos Pro Terms of Use.</a></p>',
                 slug: '',
                 type: 'online',
                 opt_type: 'double',
-                country_iso2: 'NL',
+                country_iso2: 'nl',
                 language_code: 'en'
             },
             {
-                category_id: '59953d51-2449-4b65-950f-9f88654019bb',
-                title: 'Invite to KOL Webminar',
-                rich_text: '<h1>Invite to KOL Webmina</h1>',
+                category_id: 'fe037405-c676-4d98-bd05-85008900c838',
+                title: 'I give my consent to send me promotional email',
+                rich_text: '<p>I give my consent for Galapagos to send me product and environmental information concerning all of Galapagos specialties on my email address.</p>',
                 slug: '',
                 type: 'online',
                 opt_type: 'double',
-                country_iso2: 'NL',
+                country_iso2: 'nl',
                 language_code: 'en'
             }
         ];
