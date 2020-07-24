@@ -1,5 +1,5 @@
-const controller = require('./application.controller');
 const passport = require('passport');
+const controller = require('./application.controller');
 
 module.exports = app => {
     app.post('/api/applications/generate-token', controller.getAccessToken);

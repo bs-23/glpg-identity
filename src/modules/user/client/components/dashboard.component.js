@@ -29,10 +29,10 @@ export default function Dashboard() {
                                     <li className="pr-sm-4 pb-4 service__item">
                                         <NavLink to="/users" className="d-block py-5 px-3 service__link">
                                             <i className="icon icon-customer-data-platform d-block service__icon"></i>
-                                          Management of Customer Data Platform 
+                                          Management of Customer Data Platform
                                         </NavLink>
                                     </li>
-                                    <li className="pr-sm-4 pb-4 service__item">
+                                    {/* <li className="pr-sm-4 pb-4 service__item">
                                         <NavLink to="/" className="d-block py-5 px-3 service__link disabled">
                                             <i className="icon icon-marketing-promotion d-block service__icon"></i>
                                             Marketing and Promotional
@@ -49,7 +49,7 @@ export default function Dashboard() {
                                             <i className="icon icon-infield-team d-block service__icon"></i>
                                             InField-Team Effectiveness
                                         </NavLink>
-                                    </li>
+                                    </li> */}
                                 </ul>
                             </div>
                         </div>
