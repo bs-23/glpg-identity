@@ -603,13 +603,13 @@ async function resetPassword(req, res) {
             return res.status(400).send(response);
         }
 
-        await doc.update({ password: req.body.new_password });
-
         if(doc.password) {
             await sendResetPasswordSuccessMail(doc, req.user);
         } else {
             await sendRegistrationSuccessMail(doc, req.user);
         }
+
+        await doc.update({ password: req.body.new_password });
 
         response.data = 'Password reset successfully.';
         res.send(response);

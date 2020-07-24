@@ -35,10 +35,10 @@ module.exports = app => {
         .get(passport.authenticate('application-jwt', { session: false }), controller.getSpecialties);
 
     app.route('/api/hcp-profiles/:id/approve')
-        .put(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.USER.value), controller.approveHCPUser);
+        .put(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.HCP.value), controller.approveHCPUser);
 
     app.route('/api/hcp-profiles/:id/reject')
-        .put(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.USER.value), controller.rejectHCPUser);
+        .put(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.HCP.value), controller.rejectHCPUser);
 
     app.route('/api/hcp-profiles/:id')
         .get(passport.authenticate('application-jwt', { session: false }), controller.getHcpProfile)
