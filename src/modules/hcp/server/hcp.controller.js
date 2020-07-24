@@ -175,7 +175,7 @@ async function getHcps(req, res) {
         response.data = data;
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, '', '', err));
+        response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
     }
 }
@@ -201,7 +201,7 @@ async function editHcp(req, res) {
         response.data = HcpUser;
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, '', '', err));
+        response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
     }
 }
@@ -255,7 +255,7 @@ async function registrationLookup(req, res) {
 
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, '', '', err));
+        response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
     }
 }
@@ -381,7 +381,7 @@ async function createHcpProfile(req, res) {
 
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, '', '', err));
+        response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
     }
 }
@@ -419,7 +419,7 @@ async function confirmConsents(req, res) {
 
         res.json(response);
     } catch(err) {
-        response.errors.push(new CustomError(err.message, '', '', err));
+        response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
     }
 }
@@ -476,7 +476,7 @@ async function approveHCPUser(req, res) {
 
         res.json(response);
     } catch(err) {
-        response.errors.push(new CustomError(err.message, '', '', err));
+        response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
     }
 }
@@ -510,7 +510,7 @@ async function rejectHCPUser(req, res) {
 
         res.json(response);
     } catch(err) {
-        response.errors.push(new CustomError(err.message, '', '', err));
+        response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
     }
 }
@@ -531,7 +531,7 @@ async function getHcpProfile(req, res) {
         response.data = getHcpViewModel(doc.dataValues);
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, '', '', err));
+        response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
     }
 }
@@ -577,7 +577,7 @@ async function changePassword(req, res) {
         response.data = 'Password changed successfully.';
         res.send(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, '', '', err));
+        response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
     }
 }
@@ -614,7 +614,7 @@ async function resetPassword(req, res) {
         response.data = 'Password reset successfully.';
         res.send(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, '', '', err));
+        response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
     }
 }
@@ -642,7 +642,7 @@ async function forgetPassword(req, res) {
         };
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, '', '', err));
+        response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
     }
 }
@@ -679,7 +679,7 @@ async function getSpecialties(req, res) {
         response.data = masterDataSpecialties;
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, '', '', err));
+        response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
     }
 }
@@ -692,10 +692,6 @@ async function getAccessToken(req, res) {
 
         if (!email) {
             response.errors.push(new CustomError('Email is required.', 'email'));
-            response.errors.push({
-                field: 'email',
-                message: 'Email is required.'
-            });
         }
 
         if (!password) {
@@ -721,7 +717,7 @@ async function getAccessToken(req, res) {
 
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, '', '', err));
+        response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
     }
 }

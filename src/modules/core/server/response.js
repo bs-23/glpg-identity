@@ -6,11 +6,10 @@ class Response {
 }
 
 class CustomError {
-    constructor(message, field, code, stackTrace) {
+    constructor(message, field, code) {
         this.message = message;
         this.code = code;
         this.field = field;
-        this.stackTrace = stackTrace;
     }
 }
 
