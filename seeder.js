@@ -127,7 +127,6 @@ async function init() {
                     email: 'hcp-portal@glpg.com',
                     password: 'strong-password',
                     consent_confirmation_link: 'http://example.com/bin/public/glpg-hcpportal/consent/confirm.html',
-                    login_link: 'http://example.com/login.html',
                     created_by: admin.id,
                     updated_by: admin.id
                 },
@@ -137,7 +136,6 @@ async function init() {
                     email: 'brandx@glpg.com',
                     password: 'strong-password',
                     consent_confirmation_link: 'http://example.com/bin/public/glpg-hcpportal/consent/confirm.html',
-                    login_link: 'http://example.com/login.html',
                     created_by: admin.id,
                     updated_by: admin.id
                 }
@@ -174,14 +172,12 @@ async function init() {
                 returning: true,
                 ignoreDuplicates: false
             }).then(function () {
-                callback();
-            });
-
-            Consent.bulkCreate(consents, {
-                returning: true,
-                ignoreDuplicates: false
-            }).then(function () {
-                callback();
+                Consent.bulkCreate(consents, {
+                    returning: true,
+                    ignoreDuplicates: false
+                }).then(function () {
+                    callback();
+                });
             });
         });
     }
