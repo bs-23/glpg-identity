@@ -36,7 +36,7 @@ export default function RoleForm() {
     }, []);
 
     return (
-        <main className="app__content">
+        <main className="app__content cdp-light-bg">
             <div className="container-fluid">
                 <div className="row">
                     <div className="col-12 px-0">
@@ -44,17 +44,19 @@ export default function RoleForm() {
                             <ol className="breadcrumb rounded-0 my-0">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/users">Management of Customer Data platform</NavLink></li>
-                                <li className="breadcrumb-item active"><span>Roles</span></li>
+                                <li className="breadcrumb-item active"><span>Manage User Roles</span></li>
                             </ol>
                         </nav>
                     </div>
                 </div>
                 <div className="row">
-                    <div className="col-12 col-sm-12 pt-3 d-flex justify-content-between align-items-center">
-                        <h3 className="pb-2">Manage User Roles</h3>
-                        <button className="btn cdp-btn-primary btn-sm text-white" onClick={() => { setShow(true); setEditData({}); }}>
-                            <i className="fas fa-plus pr-1"></i> Add New Role
-                        </button>
+                    <div className="col-12 col-sm-12 pt-3">
+                        <div className="d-flex justify-content-between align-items-center mb-3 mt-4">
+                            <h4 className="cdp-text-primary font-weight-bold mb-0">Manage User Roles</h4>
+                            <button className="btn cdp-btn-secondary text-white ml-auto " onClick={() => { setShow(true); setEditData({}); }}>
+                                <i className="fas fa-plus pr-1"></i> Add New Role
+                            </button>
+                        </div>
 
                         <Modal
                             show={show}
@@ -152,38 +154,37 @@ export default function RoleForm() {
                                 </div>
                             </Modal.Body>
                         </Modal>
-                    </div>
-                    <div className="col-12 col-sm-12 pb-3 d-flex justify-content-between align-items-center">
-                        {permissions.length && roles && roles.length > 0 &&
-                            <table className="table table-hover table-sm mb-0">
-                                <thead className="cdp-light-bg">
-                                    <tr>
-                                        <th className="py-2">Role Name</th>
-                                        <th className="py-2">Description</th>
-                                        <th className="py-2">Assigned Service Category</th>
-                                        <th className="py-2">Action</th>
+                    
+                    {permissions.length && roles && roles.length > 0 &&
+                        <table className="table table-hover table-sm mb-0 cdp-table shadow-sm">
+                            <thead className="cdp-bg-primary text-white cdp-table__header">
+                                <tr>
+                                    <th className="py-2">Role Name</th>
+                                    <th className="py-2">Description</th>
+                                    <th className="py-2">Assigned Service Category</th>
+                                    <th className="py-2">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody className="cdp-table__body bg-white">
+                                {roles.map(row => (
+                                    <tr key={row.id}>
+                                        <td>{row.name}</td>
+                                        <td>{row.description}</td>
+                                        {/* <td>{JSON.stringify(row.rolePermission)}</td> */}
+                                        <td>{(row.rolePermission) && (row.rolePermission).map((item, index) => (
+                                            <span key={index}>{(permissions.find(i => i.id === item.permissionId)).title}{index < row.rolePermission.length - 1 ? ', ' : ''}</span>
+                                        ))}</td>
+                                        <td><button className="btn cdp-btn-outline-secondary btn-sm" onClick={() => setEdit(row)}> <i className="fas fa-pen pr-2"></i>Edit Role</button></td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    {roles.map(row => (
-                                        <tr key={row.id}>
-                                            <td>{row.name}</td>
-                                            <td>{row.description}</td>
-                                            {/* <td>{JSON.stringify(row.rolePermission)}</td> */}
-                                            <td>{(row.rolePermission) && (row.rolePermission).map((item, index) => (
-                                                <span key={index}>{(permissions.find(i => i.id === item.permissionId)).title}{index < row.rolePermission.length - 1 ? ',' : ''}</span>
-                                            ))}</td>
-                                            <td><button className="btn cdp-btn-outline-secondary btn-sm" onClick={() => setEdit(row)}> <i className="fas fa-pen pr-2"></i>Edit Role</button></td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        }
+                                ))}
+                            </tbody>
+                        </table>
+                    }
 
-                        {roles && roles.length === 0 &&
-                            <><div className="alert alert-info mt-5">No role found!</div></>
-                        }
-                    </div>
+                    {roles && roles.length === 0 &&
+                        <><div className="alert alert-info mt-5">No role found!</div></>
+                    }
+                </div>
                 </div>
             </div>
         </main >
