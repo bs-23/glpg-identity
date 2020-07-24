@@ -297,6 +297,7 @@ async function createHcpProfile(req, res) {
             country_iso2: req.body.country_iso2,
             specialty_onekey: req.body.specialty_onekey,
             application_id: req.user.id,
+            individual_id_onekey: master_data && master_data.length ? master_data[0].individual_id_onekey : null,
             created_by: req.user.id,
             updated_by: req.user.id
         };
