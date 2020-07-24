@@ -65,6 +65,59 @@ function mapMasterDataToHcpProfile(masterData) {
     return model;
 }
 
+function generateDefaultEmailOptions(user){
+    return {
+        toAddresses: [user.email],
+        data: {
+            firstName: user.first_name || '',
+            lastName: user.last_name || '',
+        }
+    };
+}
+
+async function sendConsentConfirmationMail(user, consents, applicationName, confirmationLink) {
+    const consentConfirmationToken = generateConsentConfirmationAccessToken(user);
+    const mailOptions = generateDefaultEmailOptions(user)
+
+    mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${applicationName}/consent-confirm.html`),
+    mailOptions.subject = 'Request consent confirmation',
+    mailOptions.data.consents = consents || [],
+    mailOptions.data.link = `${confirmationLink}?token=${consentConfirmationToken}`
+
+    await emailService.send(mailOptions);
+}
+
+async function sendRegistrationSuccessMail(user, applicationName, applicationSlug, loginLink) {
+    const mailOptions = generateDefaultEmailOptions(user)
+    mailOptions.subject = `You have successfully created a ${applicationName} account.`
+    mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${applicationSlug}/registration-success.html`)
+    mailOptions.data.loginLink = loginLink
+
+    await emailService.send(mailOptions);
+}
+
+async function sendResetPasswordSuccessMail(user, applicationSlug) {
+    const mailOptions = generateDefaultEmailOptions(user)
+    mailOptions.subject = 'Your password has been changed.'
+    mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${applicationSlug}/password-reset.html`)
+    await emailService.send(mailOptions);
+}
+
+async function sendPasswordResetTokenMail(user, applicationName, applicationSlug, resetLink) {
+    const mailOptions = generateDefaultEmailOptions(user)
+    mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${applicationSlug}/password-set.html`);
+    mailOptions.subject = `Set a password for your account on ${applicationName}`
+    mailOptions.data.link = resetLink
+    await emailService.send(mailOptions);
+}
+
+async function addPasswordResetTokenToUser(user){
+    user.reset_password_token = crypto.randomBytes(36).toString('hex');
+    user.reset_password_expires = Date.now() + 3600000;
+
+    await user.save();
+}
+
 async function getHcps(req, res) {
     const response = new Response({}, []);
 
@@ -271,6 +324,7 @@ async function createHcpProfile(req, res) {
                 consentArr.push({
                     user_id: hcpUser.id,
                     consent_id: consentDetails.id,
+                    title: consentDetails.title,
                     response: consentResponse,
                     consent_confirmed: consentDetails.opt_type === 'double' ? false : true
                 });
@@ -289,33 +343,13 @@ async function createHcpProfile(req, res) {
 
         if(hcpUser.dataValues.status === 'Consent Pending') {
             const unconfirmedConsents = consentArr.filter(consent => !consent.consent_confirmed)
-            let consentIds = unconfirmedConsents.map(consent => consent.consent_id);
-            const consents = await Consent.findAll({ where: { id: consentIds }, attributes: ['title'] });
-            const consentTitles = consents.map(consent => consent.dataValues.title);
+            const consentTitles = unconfirmedConsents.map(consent => consent.title);
 
-            consentConfirmationToken = generateConsentConfirmationAccessToken(hcpUser.dataValues);
-
-            const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${req.user.slug}/consent-confirm.html`);
-            const options = {
-                toAddresses: [hcpUser.dataValues.email],
-                templateUrl,
-                subject: 'Request consent confirmation',
-                data: {
-                    firstName: hcpUser.dataValues.first_name || '',
-                    lastName: hcpUser.dataValues.last_name || '',
-                    consents: consentTitles || [],
-                    link: `${req.user.consent_confirmation_link}?token=${consentConfirmationToken}`
-                }
-            };
-
-            await emailService.send(options);
+            await sendConsentConfirmationMail(hcpUser.dataValues, consentTitles, req.user.slug, req.user.consent_confirmation_link)
         }
 
         if(hcpUser.dataValues.status === 'Approved') {
-            hcpUser.reset_password_token = crypto.randomBytes(36).toString('hex');
-            hcpUser.reset_password_expires = Date.now() + 3600000;
-
-            await hcpUser.save();
+            await addPasswordResetTokenToUser(hcpUser)
 
             response.data.password_reset_token = hcpUser.dataValues.reset_password_token;
             response.data.retention_period = '1 hour';
@@ -351,10 +385,7 @@ async function confirmConsents(req, res) {
         }
 
         hcpUser.status = 'Approved';
-        hcpUser.reset_password_token = crypto.randomBytes(36).toString('hex');
-        hcpUser.reset_password_expires = Date.now() + 3600000;
-
-        await hcpUser.save();
+        await addPasswordResetTokenToUser(hcpUser)
 
         response.data = {
             ...getHcpViewModel(hcpUser.dataValues),
@@ -381,7 +412,7 @@ async function approveHCPUser(req, res) {
             return res.status(400).send(response);
         }
 
-        const userApplication = await Application.findOne({ where: { id: hcpUser.application_id }, attributes: ['slug'] })
+        const userApplication = await Application.findOne({ where: { id: hcpUser.application_id }, attributes: ['name', 'slug'] })
 
         let userConsents = await HcpConsents.findAll({ where: { [Op.and]: [{ user_id: id }, { consent_confirmed: false }] }});
 
@@ -401,35 +432,15 @@ async function approveHCPUser(req, res) {
         hcpUser.status = hasDoubleOptIn ? 'Consent Pending' : 'Approved'
         await hcpUser.save()
 
-        const mailOptions = {
-            toAddresses: [hcpUser.dataValues.email],
-            data: {
-                firstName: hcpUser.dataValues.first_name || '',
-                lastName: hcpUser.dataValues.last_name || '',
-            }
-        };
 
         if(hcpUser.dataValues.status === 'Consent Pending') {
-            consentConfirmationToken = generateConsentConfirmationAccessToken(hcpUser.dataValues);
-
-            mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${userApplication.slug}/consent-confirm.html`);
-            mailOptions.subject = 'Request consent confirmation'
-            mailOptions.data.consents = consentTitles
-            mailOptions.data.link = `${req.user.consent_confirmation_link}?token=${consentConfirmationToken}`
-
-            await emailService.send(mailOptions);
+            await sendConsentConfirmationMail(hcpUser, consentTitles, userApplication.slug, req.user.consent_confirmation_link)
         }
 
         if(hcpUser.dataValues.status === 'Approved') {
-            hcpUser.reset_password_token = crypto.randomBytes(36).toString('hex');
-            hcpUser.reset_password_expires = Date.now() + 3600000;
-            await hcpUser.save();
-
-            mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${userApplication.slug}/password-set.html`);
-            mailOptions.subject = `Set a password for your account on ${req.user.name}`
-            mailOptions.data.link = `http://wwww.example.com/password-reset?token=${hcpUser.reset_password_token}`
-
-            await emailService.send(mailOptions);
+            await addPasswordResetTokenToUser(hcpUser)
+            const resetLink = `http://www.example.com/reset-password?token=${hcpUser.reset_password_token}`
+            await sendPasswordResetTokenMail(hcpUser, userApplication.name, userApplication.slug, resetLink)
         }
 
         response.data = getHcpViewModel(hcpUser.dataValues)
@@ -570,26 +581,14 @@ async function resetPassword(req, res) {
             return res.status(400).send(response);
         }
 
-        const options = {
-            toAddresses: [doc.email],
-            data: {
-                firstName: doc.first_name || '',
-                lastName: doc.last_name || '',
-            }
-        };
+        await doc.update({ password: req.body.new_password });
 
         if(doc.password) {
-            options.subject = 'Your password has been changed.'
-            options.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${req.user.slug}/password-reset.html`)
+            await sendResetPasswordSuccessMail(doc, req.user.slug)
         }else{
-            options.subject = `You have successfully created a ${req.user.name} account.`
-            options.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${req.user.slug}/registration-success.html`)
-            options.data.loginLink = 'https://www.example.com/login'
+            const loginLink = 'https://www.example.com/login'
+            await sendRegistrationSuccessMail(doc, req.user.name, req.user.slug, loginLink)
         }
-
-        doc.update({ password: req.body.new_password });
-
-        await emailService.send(options);
 
         response.data = 'Password reset successfully.';
         res.send(response);
