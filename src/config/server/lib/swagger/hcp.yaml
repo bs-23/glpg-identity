@@ -94,8 +94,6 @@ paths:
                                     errors:
                                         $ref: "#/components/schemas/errorBodyInSuccess"
 
-                401:
-                    description: User is not authenticated.
                 400:
                     description: Bad request
                     content:
@@ -459,6 +457,8 @@ components:
                 telephone:
                     type: string
                 country_iso2:
+                    type: string
+                language_code:
                     type: string
                 specialty_onekey:
                     type: string
