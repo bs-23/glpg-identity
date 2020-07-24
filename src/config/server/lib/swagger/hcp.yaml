@@ -440,7 +440,7 @@ components:
         hcpConsent:
             type: object
             description: Key value pair of consent id and answer
-            example: {"consent_id": true }
+            example: { "unique_slug": true }
         createHcpProfile:
             type: object
             properties:
