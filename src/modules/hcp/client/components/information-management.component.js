@@ -34,7 +34,7 @@ const InformationManagement = () => {
                                                 <span className="d-block cdp-list-group__link-activity">5 - 7 minutes</span>
                                             </span>
                                         </NavLink>
-                                        <NavLink to="" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link disabled">
+                                        <NavLink to="#" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link disabled">
                                             <i className="icon icon-handshake icon-3x cdp-list-group__icon"></i>
                                             <span>
                                                 <strong className="mb-2 h4 d-block cdp-list-group__link-title">Check the HCP Professional Engagements at HCOs</strong>
@@ -42,7 +42,7 @@ const InformationManagement = () => {
                                                 <span className="d-block cdp-list-group__link-activity">Select your Campaign list considering HCPs Job Function and starting date of activity within 5 - 10 minutes</span>
                                             </span>
                                         </NavLink>
-                                        <NavLink to="" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link disabled">
+                                        <NavLink to="#" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link disabled">
                                             <i className="icon icon-network icon-3x cdp-list-group__icon"></i>
                                             <span>
                                                 <strong className="mb-2 h4 d-block cdp-list-group__link-title">Understand IFT Team Engagements with HCPs</strong>
@@ -50,7 +50,7 @@ const InformationManagement = () => {
                                                 <span className="d-block cdp-list-group__link-activity">Find insights for Omni-channel recommendations within 15 minutes per HCP</span>
                                             </span>
                                         </NavLink>
-                                        <NavLink to="" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link disabled">
+                                        <NavLink to="#" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link disabled">
                                             <i className="icon icon-calendar icon-3x cdp-list-group__icon"></i>
                                             <span>
                                                 <strong className="mb-2 h4 d-block cdp-list-group__link-title">Manage Address of a Health Care Organization</strong>
@@ -58,7 +58,7 @@ const InformationManagement = () => {
                                                 <span className="d-block cdp-list-group__link-activity">Do data cleaning for a HCO within 2 - 5 minutes</span>
                                             </span>
                                         </NavLink>
-                                        <NavLink to="" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link disabled">
+                                        <NavLink to="#" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link disabled">
                                             <i className="icon icon-switch icon-3x cdp-list-group__icon"></i>
                                             <span>
                                                 <strong className="mb-2 h4 d-block cdp-list-group__link-title">Understand HCP with 3rd Party master data (Market Access data, etc.) </strong>
@@ -66,7 +66,7 @@ const InformationManagement = () => {
                                                 <span className="d-block cdp-list-group__link-activity">Drive Insights with enriched 3rd Party data within 10 - 15 minutes</span>
                                             </span>
                                         </NavLink>
-                                        <NavLink to="" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link disabled">
+                                        <NavLink to="#" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link disabled">
                                             <i className="icon icon-search-globally icon-3x cdp-list-group__icon"></i>
                                             <span>
                                                 <strong className="mb-2 h4 d-block cdp-list-group__link-title">Discover Missing HCPs and HCOs</strong>
@@ -74,7 +74,7 @@ const InformationManagement = () => {
                                                 <span className="d-block cdp-list-group__link-activity">Search & Find within 1 to 3 minutes to solve issue</span>
                                             </span>
                                         </NavLink>
-                                        <NavLink to="" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link disabled">
+                                        <NavLink to="#" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link disabled">
                                             <i className="icon icon-place icon-3x cdp-list-group__icon"></i>
                                             <span>
                                                 <strong className="mb-2 h4 d-block cdp-list-group__link-title">Find HCPs with their Geolocation</strong>
