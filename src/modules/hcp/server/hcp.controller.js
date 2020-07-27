@@ -461,6 +461,7 @@ async function approveHCPUser(req, res) {
 
         if (!hcpUser) {
             response.errors.push(new CustomError('User does not exist.'));
+            return res.status(404).send(response);
         }
 
         const userApplication = await Application.findOne({ where: { id: hcpUser.application_id } });
@@ -518,7 +519,7 @@ async function rejectHCPUser(req, res) {
 
         if (!hcpUser) {
             response.errors.push(new CustomError('User does not exist.'));
-            return res.status(400).send(response);
+            return res.status(404).send(response);
         }
 
         hcpUser.status = 'Rejected';
