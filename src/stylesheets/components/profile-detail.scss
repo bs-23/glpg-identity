@@ -21,6 +21,7 @@
     &__value {
         color: #585F65;
         font-size: 18px;
+        word-break: break-word;
     }
 
     @media (max-width: $screen-phone) {
