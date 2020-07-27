@@ -91,6 +91,9 @@ describe('HCP Routes', () => {
                 last_name: faker.name.firstName(),
                 uuid: faker.random.uuid(),
                 email: faker.internet.email(),
+                country_iso2: 'NL',
+                language_code: 'en',
+
                 consents: [
                     { "827cc68d-a92d-4939-a9b6-d373321d23bb": true },
                     { "827cc68d-a92d-4939-a9b6-d373321d23bb": true },
@@ -110,7 +113,9 @@ describe('HCP Routes', () => {
                 first_name: faker.name.lastName(),
                 last_name: faker.name.firstName(),
                 uuid: faker.random.uuid(),
-                email: defaultUser.email
+                email: defaultUser.email,
+                country_iso2: 'NL',
+                language_code: 'en'
             });
 
         expect(response.statusCode).toBe(400);

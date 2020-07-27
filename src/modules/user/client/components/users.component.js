@@ -74,7 +74,7 @@ export default function Users() {
                                     <i className="fas fa-filter mr-1"></i> Filter by Country
                             </Dropdown.Toggle>
                                 <Dropdown.Menu>
-                                    <LinkContainer to="list?page=1"><Dropdown.Item onClick={() => getUserList(1, null)}>None</Dropdown.Item></LinkContainer>
+                                    <LinkContainer to="list?page=1"><Dropdown.Item onClick={() => getUserList(1, null)}>All</Dropdown.Item></LinkContainer>
                                     {
                                         countries.length > 0 && countries.map(country => (
                                             <LinkContainer to={`list?page=1&country_iso2=${country.country_iso2}`} key={country.countryid}><Dropdown.Item onClick={() => getUserList(1, country.country_iso2)}>{country.countryname}</Dropdown.Item></LinkContainer>
@@ -91,7 +91,7 @@ export default function Users() {
                         {userdata['users'] && userdata['users'].length > 0 &&
                             <React.Fragment>
                                 <table className="table table-hover table-sm mb-0 cdp-table shadow-sm">
-                                <thead className="cdp-bg-primary text-white cdp-table__header">
+                                    <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
                                             <th className="py-2">First Name</th>
                                             <th className="py-2">Last Name</th>
@@ -102,7 +102,7 @@ export default function Users() {
                                             <th className="py-2">Action</th>
                                         </tr>
                                     </thead>
-                                <tbody className="cdp-table__body bg-white">
+                                    <tbody className="cdp-table__body bg-white">
                                         {userdata.users.map(row => (
                                             <tr key={row.id}>
                                                 <td>{row.first_name}</td>
@@ -144,7 +144,9 @@ export default function Users() {
                                     <i class="fas fa-users fa-6x cdp-text-secondary"></i>
                                     <h3 className="font-weight-bold cdp-text-primary pt-4">No Users Found!</h3>
                                     <h4 className="cdp-text-primary pt-3 pb-5">Click on the button below to create new one</h4>
-                                    <button className="btn cdp-btn-secondary text-white px-5 py-2 font-weight-bold">Create New User</button>
+                                    <NavLink to="/users/create" className="btn cdp-btn-secondary text-white px-5 py-2 font-weight-bold">
+                                        <i className="fas fa-plus pr-1"></i> Create New User
+                                    </NavLink>
                                 </div>
                             </div>
                         }
