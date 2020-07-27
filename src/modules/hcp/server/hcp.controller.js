@@ -150,7 +150,7 @@ async function getHcps(req, res) {
         const hcp_filter = {
             status: status === null ? { [Op.or]: ['Approved', 'Consent Pending', 'Not Verified', 'Rejected', null] } : status,
             application_id: req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
-            country_iso2: country_iso2 ? { [Op.or]: [country_iso2] } : req.user.type === 'admin' ? { [Op.or]: country_iso2_list } : req.user.countries
+            country_iso2: country_iso2 ? { [Op.or]: [country_iso2, country_iso2.toLowerCase()] } : req.user.type === 'admin' ? { [Op.or]: country_iso2_list.concat(country_iso2_list.map(v => v.toLowerCase())) } : req.user.countries
         };
 
         const hcps = await Hcp.findAll({
@@ -288,6 +288,18 @@ async function createHcpProfile(req, res) {
         response.errors.push(new CustomError('UUID is missing.', 'uuid'));
     }
 
+    if (!salutation) {
+        response.errors.push(new CustomError('Salutation is missing.', 'salutation'));
+    }
+
+    if (!first_name) {
+        response.errors.push(new CustomError('First name is missing.', 'first_name'));
+    }
+
+    if (!last_name) {
+        response.errors.push(new CustomError('Last name is missing.', 'last_name'));
+    }
+
     if (!country_iso2) {
         response.errors.push(new CustomError('country_iso2 is missing.', 'country_iso2'));
     }
@@ -364,7 +376,7 @@ async function createHcpProfile(req, res) {
                 consentArr.push({
                     user_id: hcpUser.id,
                     consent_id: consentDetails.id,
-                    title: consentDetails.title,
+                    title: consentDetails.rich_text,
                     response: consentResponse,
                     consent_confirmed: consentDetails.opt_type === 'double' ? false : true
                 });
@@ -404,9 +416,9 @@ async function createHcpProfile(req, res) {
 
 async function confirmConsents(req, res) {
     const response = new Response({}, []);
-    const payload = jwt.verify(req.body.token, nodecache.getValue('CONSENT_CONFIRMATION_TOKEN_SECRET'));
 
     try {
+        const payload = jwt.verify(req.body.token, nodecache.getValue('CONSENT_CONFIRMATION_TOKEN_SECRET'));
         const hcpUser = await Hcp.findOne({ where: { id: payload.id } });
 
         if (!hcpUser) {
@@ -449,6 +461,7 @@ async function approveHCPUser(req, res) {
 
         if (!hcpUser) {
             response.errors.push(new CustomError('User does not exist.'));
+            return res.status(404).send(response);
         }
 
         const userApplication = await Application.findOne({ where: { id: hcpUser.application_id } });
@@ -464,7 +477,7 @@ async function approveHCPUser(req, res) {
 
             if (allConsentDetails && allConsentDetails.length) {
                 hasDoubleOptIn = true;
-                allConsentDetails.forEach(consent => consentTitles.push(consent.title));
+                allConsentDetails.forEach(consent => consentTitles.push(consent.rich_text));
             }
         }
 
@@ -506,7 +519,7 @@ async function rejectHCPUser(req, res) {
 
         if (!hcpUser) {
             response.errors.push(new CustomError('User does not exist.'));
-            return res.status(400).send(response);
+            return res.status(404).send(response);
         }
 
         hcpUser.status = 'Rejected';
