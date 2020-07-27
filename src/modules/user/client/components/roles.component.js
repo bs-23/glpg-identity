@@ -147,7 +147,7 @@ export default function RoleForm() {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div className="row">
                                                     <div className="col-12 col-sm-12">
                                                         <div className="form-group">
@@ -166,7 +166,7 @@ export default function RoleForm() {
                                                                                                 name="permissions"
                                                                                                 type="checkbox" 
                                                                                                 value={permission}
-                                                                                                checked={ selected.find( s => s === permission.id) } 
+                                                                                                checked={ selected.includes(permission.id) } 
                                                                                                 onChange={e => {
                                                                                                     if(e.target.checked){
                                                                                                         arrayHelpers.push(permission.id)
