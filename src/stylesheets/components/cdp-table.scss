@@ -29,4 +29,8 @@
         color: #202020;
         font-size: 14px;
     }
+
+    &.table-hover tbody tr:hover {
+        background-color: rgba(20,77,67,0.07);
+    }
 }
