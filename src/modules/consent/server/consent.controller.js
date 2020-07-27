@@ -2,6 +2,7 @@ const path = require('path');
 const { Op } = require('sequelize');
 const Consent = require('./consent.model');
 const ConsentCategory = require('./consent-category.model');
+const validator = require('validator');
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 
 async function getConsents(req, res) {
@@ -44,7 +45,7 @@ async function getConsents(req, res) {
             return {
                 id: consent.id,
                 title: consent.title,
-                rich_text: consent.rich_text,
+                rich_text: validator.unescape(consent.rich_text),
                 slug: consent.slug,
                 opt_type: consent.opt_type,
                 category: consent.consent_category.type,

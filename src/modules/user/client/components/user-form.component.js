@@ -35,24 +35,27 @@ export default function UserForm() {
     }, []);
 
     return (
-        <main className="app__content">
+        <main className="app__content cdp-light-bg">
             <div className="container-fluid">
                 <div className="row">
                     <div className="col-12 px-0">
                         <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb rounded-0 my-0">
+                            <ol className="breadcrumb rounded-0">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/users">Management of Customer Data platform</NavLink></li>
-                                <li className="breadcrumb-item"><NavLink to="/users/list">User List</NavLink></li>
-                                <li className="breadcrumb-item active"><span>Add New</span></li>
+                                <li className="breadcrumb-item"><NavLink to="/users/list">CDP User List</NavLink></li>
+                                <li className="breadcrumb-item active"><span>Add New User</span></li>
                             </ol>
                         </nav>
                     </div>
                 </div>
                 {applications.length > 0 && countries &&
-                    <div className="row">
-                        <div className="col-12 col-sm-6 py-3">
-                            <h2 className="mb-3">Create new user</h2>
+                <div className="row">
+                    <div className="col-12">
+                        <div className="shadow-sm bg-white">
+                            <h2 className="d-flex align-items-center p-3 p-sm-5 page-title light">
+                                <span className="page-title__text font-weight-bold">Create New User</span>
+                            </h2>
                             <div className="add-user p-3">
                                 <Formik
                                     initialValues={{
@@ -89,76 +92,79 @@ export default function UserForm() {
                                     {formikProps => (
                                         <Form onSubmit={formikProps.handleSubmit}>
                                             <div className="row">
-                                                <div className="col-12 col-sm-6">
-                                                    <div className="form-group">
-                                                        <label htmlFor="first_name">First Name <span className="text-danger required-field pl-1">*</span></label>
-                                                        <Field data-testid="first_name" className="form-control" type="name" name="first_name" />
-                                                        <div className="invalid-feedback" data-testid="firstNameError"><ErrorMessage name="first_name" /></div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-12 col-sm-6">
-                                                    <div className="form-group">
-                                                        <label htmlFor="last_name">Last Name<span className="text-danger required-field pl-1">*</span></label>
-                                                        <Field data-testid="last_name" className="form-control" type="name" name="last_name" />
-                                                        <div className="invalid-feedback" data-testid="lastNameError"><ErrorMessage name="last_name" /></div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-12 col-sm-6">
-                                                    <div className="form-group">
-                                                        <label htmlFor="email">Email<span className="text-danger required-field pl-1">*</span></label>
-                                                        <Field data-testid="email" className="form-control" type="email" name="email" autoComplete="username" />
-                                                        <div className="invalid-feedback" data-testid="emailError"><ErrorMessage name="email" /></div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-12 col-sm-6">
-                                                    <div className="form-group">
-                                                        <label htmlFor="phone">Phone Number</label>
-                                                        <Field data-testid="phone" className="form-control" type="text" name="phone" />
-                                                        <div className="invalid-feedback">
-                                                            <ErrorMessage name="phone" data-testid="phoneError" />
+                                                <div className="col-12 col-lg-6">
+                                                    <div className="row">
+                                                        <div className="col-12 col-sm-6">
+                                                            <div className="form-group">
+                                                                <label className="font-weight-bold" htmlFor="first_name">First Name</label>
+                                                                <Field data-testid="first_name" className="form-control" type="name" name="first_name" />
+                                                                <div className="invalid-feedback" data-testid="firstNameError"><ErrorMessage name="first_name" /></div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="col-12 col-sm-6">
+                                                            <div className="form-group">
+                                                                <label className="font-weight-bold" htmlFor="last_name">Last Name</label>
+                                                                <Field data-testid="last_name" className="form-control" type="name" name="last_name" />
+                                                                <div className="invalid-feedback" data-testid="lastNameError"><ErrorMessage name="last_name" /></div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="col-12 col-sm-6">
+                                                            <div className="form-group">
+                                                                <label className="font-weight-bold" htmlFor="email">Email</label>
+                                                                <Field data-testid="email" className="form-control" type="email" name="email" autoComplete="username" />
+                                                                <div className="invalid-feedback" data-testid="emailError"><ErrorMessage name="email" /></div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="col-12 col-sm-6">
+                                                            <div className="form-group">
+                                                                <label className="font-weight-bold" htmlFor="phone">Phone Number <span className="optional font-weight-normal">(Optional)</span></label>
+                                                                <Field data-testid="phone" className="form-control" type="text" name="phone" />
+                                                                <div className="invalid-feedback">
+                                                                    <ErrorMessage name="phone" data-testid="phoneError" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="col-12 col-sm-6">
+                                                            <div className="form-group">
+                                                                <label className="font-weight-bold" htmlFor="application_id">Select Application</label>
+                                                                <Field data-testid="application" as="select" name="application_id" className="form-control">
+                                                                    {applications.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
+                                                                </Field>
+                                                            </div>
+                                                        </div>
+                                                        <div className="col-12 col-sm-6">
+                                                            <div className="form-group">
+                                                                <label className="font-weight-bold" htmlFor="roles">Select Roles</label>
+                                                                <Field data-testid="role" as="select" name="roles" className="form-control" multiple>
+                                                                    {roles.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
+                                                                </Field>
+                                                                <div className="invalid-feedback">
+                                                                    <ErrorMessage name="roles" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="col-12 col-sm-6">
+                                                            <div className="form-group">
+                                                                <label className="font-weight-bold" htmlFor="countries">Select Countries</label>
+                                                                <Field data-testid="country" as="select" name="countries" className="form-control" multiple>
+                                                                    {countries.map(item => <option key={item.countryid} value={item.country_iso2}>{item.countryname}</option>)}
+                                                                </Field>
+                                                                <div className="invalid-feedback">
+                                                                    <ErrorMessage name="countries" />
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
+                                                    <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" >Submit</button>
                                                 </div>
                                             </div>
-                                            <div className="row">
-                                                <div className="col-12 col-sm-4">
-                                                    <div className="form-group">
-                                                        <label htmlFor="countries">Select Countries<span className="text-danger required-field pl-1">*</span></label>
-                                                        <Field data-testid="country" as="select" name="countries" className="form-control" multiple>
-                                                            {countries.map(item => <option key={item.countryid} value={item.country_iso2}>{item.countryname}</option>)}
-                                                        </Field>
-                                                        <div className="invalid-feedback">
-                                                            <ErrorMessage name="countries" />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-12 col-sm-4">
-                                                    <div className="form-group">
-                                                        <label htmlFor="roles">Select Roles<span className="text-danger required-field pl-1">*</span></label>
-                                                        <Field data-testid="role" as="select" name="roles" className="form-control" multiple>
-                                                            {roles.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
-                                                        </Field>
-                                                        <div className="invalid-feedback">
-                                                            <ErrorMessage name="roles" />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-12 col-sm-4">
-                                                    <div className="form-group">
-                                                        <label htmlFor="application_id">Select Application<span className="text-danger required-field pl-1">*</span></label>
-                                                        <Field data-testid="application" as="select" name="application_id" className="form-control">
-                                                            {applications.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
-                                                        </Field>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" >Submit</button>
                                         </Form>
                                     )}
                                 </Formik>
                             </div>
                         </div>
                     </div>
+                </div>
                 }
             </div>
         </main>
