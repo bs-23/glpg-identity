@@ -395,7 +395,7 @@ async function createHcpProfile(req, res) {
 
         if (hcpUser.dataValues.status === 'Consent Pending') {
             const unconfirmedConsents = consentArr.filter(consent => !consent.consent_confirmed);
-            const consentTitles = unconfirmedConsents.map(consent => consent.title);
+            const consentTitles = unconfirmedConsents.map(consent => validator.unescape(consent.title));
 
             await sendConsentConfirmationMail(hcpUser.dataValues, consentTitles, req.user);
         }
@@ -477,7 +477,7 @@ async function approveHCPUser(req, res) {
 
             if (allConsentDetails && allConsentDetails.length) {
                 hasDoubleOptIn = true;
-                allConsentDetails.forEach(consent => consentTitles.push(consent.rich_text));
+                allConsentDetails.forEach(consent => consentTitles.push(validator.unescape(consent.rich_text)));
             }
         }
 

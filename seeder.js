@@ -126,7 +126,7 @@ async function init() {
                     slug: convertToSlug('HCP Portal'),
                     email: 'hcp-portal@glpg.com',
                     password: 'strong-password',
-                    consent_confirmation_link: '',
+                    consent_confirmation_link: 'http://example.com/bin/public/glpg-hcpportal/consent/confirm.html',
                     reset_password_link: '',
                     login_link: '',
                     created_by: admin.id,
@@ -137,9 +137,9 @@ async function init() {
                     slug: convertToSlug('BrandX'),
                     email: 'brandx@glpg.com',
                     password: 'strong-password',
-                    consent_confirmation_link: '',
-                    reset_password_link: '',
-                    login_link: '',
+                    consent_confirmation_link: 'http://172.16.229.25:4503/bin/public/brandx/consentConfirm.consent.html',
+                    reset_password_link: 'http://172.16.229.25:4503/bin/public/brandx/journeyRedirect.journey.html',
+                    login_link: 'http://172.16.229.25:4503/bin/public/brandx/journeyRedirect.journey.html',
                     created_by: admin.id,
                     updated_by: admin.id
                 }
@@ -165,19 +165,19 @@ async function init() {
 
         const consents = [
             {
-                category_id: '29374bce-7c3f-4408-a138-c062143d2247',
-                title: 'I confirm that I am a healthcare professional',
-                rich_text: '<p>I confirm that I am a healthcare professional, practicing in Netherlands and I accept the <a href="#">Galapagos Pro Terms of Use.</a></p>',
+                category_id: '59953d51-2449-4b65-950f-9f88654019bb',
+                title: 'I agree to the Galapagos Terms of Service',
+                rich_text: '<p>I agree to the Galapagos <a href="https://www.glpg.com/">Terms of Service.</a></p>',
                 slug: '',
                 type: 'online',
-                opt_type: 'double',
+                opt_type: 'single',
                 country_iso2: 'nl',
                 language_code: 'en'
             },
             {
                 category_id: 'fe037405-c676-4d98-bd05-85008900c838',
                 title: 'I give my consent to send me promotional email',
-                rich_text: '<p>I give my consent for Galapagos to send me product and environmental information concerning all of Galapagos specialties on my email address.</p>',
+                rich_text: '<p>I give my consent for Galapagos to send me promotional and environmental information concerning all of Galapagos products and services on my provided email address.</p>',
                 slug: '',
                 type: 'online',
                 opt_type: 'double',
