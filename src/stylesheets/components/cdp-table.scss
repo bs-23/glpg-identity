@@ -1,0 +1,32 @@
+.cdp-table {
+
+    &__header {
+        th {
+        }
+    }
+
+    &__footer {
+    }
+
+    tr {
+        th:first-child,
+        td:first-child {
+            padding-left: 20px;
+        }
+    }
+
+    th, td {
+    }
+
+    th {
+        font-size: 16px;
+        font-weight: bold;
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+
+    td {
+        color: #202020;
+        font-size: 14px;
+    }
+}
