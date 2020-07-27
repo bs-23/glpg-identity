@@ -74,15 +74,17 @@ async function getHcps(req, res) {
         const offset = page * limit;
 
         const application_list = (await Hcp.findAll()).map(i => i.get("application_id"));
-
         const country_iso2_list = req.user.type === 'admin' ? (await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry", { type: QueryTypes.SELECT })).map(i => i.country_iso2) : (await Hcp.findAll()).map(i => i.get("country_iso2"));
+        const specialty_list = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwspecialtymaster", { type: QueryTypes.SELECT });
+
+        const hcp_filter = {
+            status: status === null ? { [Op.or]: ['Approved', 'Pending', 'Rejected', null] } : status,
+            application_id: req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
+            country_iso2: country_iso2 ? { [Op.or]: [country_iso2] } : req.user.type === 'admin' ? { [Op.or]: country_iso2_list } : req.user.countries
+        };
 
         const hcps = await Hcp.findAll({
-            where: {
-                status: status === null ? { [Op.or]: ['Approved', 'Pending', 'Rejected', null] } : status,
-                application_id: req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
-                country_iso2: country_iso2 ? { [Op.or]: [country_iso2] } : req.user.type === 'admin' ? { [Op.or]: country_iso2_list } : req.user.countries
-            },
+            where: hcp_filter,
             attributes: { exclude: ['password', 'created_by', 'updated_by'] },
             offset,
             limit,
@@ -92,16 +94,20 @@ async function getHcps(req, res) {
             ]
         });
 
-        const totalUser = await Hcp.count({
-            where: {
-                status: status === null ? { [Op.or]: ['Approved', 'Pending', 'Rejected', null] } : status,
-                application_id: req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
-                country_iso2: country_iso2 ? { [Op.or]: [country_iso2] } : req.user.type === 'admin' ? { [Op.or]: country_iso2_list } : req.user.countries
-            }
+        const totalUser = await Hcp.count({//counting total data for pagintaion
+            where: hcp_filter
+        });
+
+        const hcp_users = [];
+        hcps.forEach(user => {//add specialty name from data sync
+            const specialty = specialty_list.find(i => i.cod_id_onekey === user.specialty_onekey);
+            (specialty) ? user.dataValues.specialty_name = specialty.lis_lbl : user.dataValues.specialty_name = null;
+            hcp_users.push(user);
+
         });
 
         const data = {
-            users: hcps,
+            users: hcp_users,
             page: page + 1,
             limit,
             total: totalUser,
@@ -163,7 +169,7 @@ async function registrationLookup(req, res) {
         return res.status(400).send(response);
     }
 
-    if(!validator.isEmail(email)) {
+    if (!validator.isEmail(email)) {
         response.errors.push(new CustomError('Email is not valid', 'email'));
         return res.status(400).send(response);
     }
@@ -256,13 +262,13 @@ async function createHcpProfile(req, res) {
                 const consentSlug = Object.keys(consent)[0];
                 const consentResponse = Object.values(consent)[0];
 
-                if(!consentResponse) return;
+                if (!consentResponse) return;
 
                 const consentDetails = await Consent.findOne({ where: { slug: consentSlug } });
 
-                if(!consentDetails) return;
+                if (!consentDetails) return;
 
-                if(consentDetails.opt_type === 'double') {
+                if (consentDetails.opt_type === 'double') {
                     hasDoubleOptIn = true;
                 }
 
@@ -285,7 +291,7 @@ async function createHcpProfile(req, res) {
 
         response.data = getHcpViewModel(hcpUser.dataValues);
 
-        if(hcpUser.dataValues.status === 'Consent Pending') {
+        if (hcpUser.dataValues.status === 'Consent Pending') {
             const consentIds = consentArr.map(consent => consent.consent_id);
             let consents = await Consent.findAll({ where: { id: consentIds } });
 
@@ -309,7 +315,7 @@ async function createHcpProfile(req, res) {
             await emailService.send(options);
         }
 
-        if(hcpUser.dataValues.status === 'Approved') {
+        if (hcpUser.dataValues.status === 'Approved') {
             hcpUser.reset_password_token = crypto.randomBytes(36).toString('hex');
             hcpUser.reset_password_expires = Date.now() + 3600000;
 
@@ -331,17 +337,17 @@ async function confirmConsents(req, res) {
     const payload = jwt.verify(req.body.token, nodecache.getValue('CONSENT_CONFIRMATION_TOKEN_SECRET'));
 
     try {
-        const hcpUser = await Hcp.findOne({ where: { id: payload.id }});
+        const hcpUser = await Hcp.findOne({ where: { id: payload.id } });
 
-        if(!hcpUser) {
+        if (!hcpUser) {
             response.errors.push(new CustomError('Invalid token.'));
             return res.status(400).send(response);
         }
 
-        let userConsents = await HcpConsents.findAll({ where: { user_id: payload.id }});
+        let userConsents = await HcpConsents.findAll({ where: { user_id: payload.id } });
 
-        if(userConsents && userConsents.length) {
-            userConsents = userConsents.map(consent => ({ ...consent.dataValues, consent_confirmed: true}));
+        if (userConsents && userConsents.length) {
+            userConsents = userConsents.map(consent => ({ ...consent.dataValues, consent_confirmed: true }));
 
             await HcpConsents.bulkCreate(userConsents, {
                 updateOnDuplicate: ['consent_confirmed']
@@ -361,7 +367,7 @@ async function confirmConsents(req, res) {
         };
 
         res.json(response);
-    } catch(err) {
+    } catch (err) {
         response.errors.push(new CustomError(err.message, '', '', err));
         res.status(500).send(response);
     }
@@ -463,10 +469,10 @@ async function resetPassword(req, res) {
             }
         };
 
-        if(doc.password) {
+        if (doc.password) {
             options.subject = 'Your password has been changed.'
             options.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${req.user.slug}/password-reset.html`)
-        }else{
+        } else {
             options.subject = `You have successfully created a ${req.user.name} account.`
             options.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${req.user.slug}/registration-success.html`)
             options.data.loginLink = req.user.login_link
