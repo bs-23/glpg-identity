@@ -79,7 +79,7 @@ async function sendConsentConfirmationMail(user, consents, application) {
     const consentConfirmationToken = generateConsentConfirmationAccessToken(user);
     const mailOptions = generateDefaultEmailOptions(user);
 
-    mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/consent-confirm.html`),
+    mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/double-opt-in-consent-confirm.html`),
         mailOptions.subject = 'Request consent confirmation',
         mailOptions.data.consents = consents || [],
         mailOptions.data.link = `${application.consent_confirmation_link}?token=${consentConfirmationToken}&country_lang=${user.country_iso2}_${user.language_code}`;
@@ -101,7 +101,7 @@ async function sendResetPasswordSuccessMail(user, application) {
     const mailOptions = generateDefaultEmailOptions(user);
 
     mailOptions.subject = 'Your password has been changed.';
-    mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/password-reset.html`);
+    mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/password-reset-success.html`);
 
     await emailService.send(mailOptions);
 }
@@ -109,7 +109,7 @@ async function sendResetPasswordSuccessMail(user, application) {
 async function sendPasswordResetTokenMail(user, application) {
     const mailOptions = generateDefaultEmailOptions(user);
 
-    mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/password-set.html`);
+    mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/password-setup-instructions.html`);
     mailOptions.subject = `Set a password for your account on ${application.name}`;
     mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&country_lang=${user.country_iso2}_${user.language_code}`;
 
@@ -567,7 +567,7 @@ async function changePassword(req, res) {
 
         doc.update({ password: new_password });
 
-        const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${req.user.slug}/password-reset.html`);
+        const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${req.user.slug}/password-reset-success.html`);
         const options = {
             toAddresses: [email],
             templateUrl,
