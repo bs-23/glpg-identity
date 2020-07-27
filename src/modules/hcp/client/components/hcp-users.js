@@ -4,9 +4,11 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { LinkContainer } from 'react-router-bootstrap';
 import { getHcpProfiles, editHcpProfiles, hcpsSort } from '../hcp.actions';
+import axios from 'axios';
 
 export default function hcpUsers() {
     const dispatch = useDispatch();
+    const [countries, setCountries] = useState([]);
 
     const hcps = useSelector(state => state.hcpReducer.hcps);
 
@@ -22,9 +24,15 @@ export default function hcpUsers() {
         dispatch(hcpsSort(sortType, val));
     };
 
+    async function getCountries() {
+        const response = await axios.get('/api/countries');
+        setCountries(response.data);
+    }
+
+
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
-
+        getCountries();
         dispatch(getHcpProfiles(
             params.get('page') ? params.get('page') : 1,
             params.get('status') ? params.get('status') : null,
@@ -60,8 +68,8 @@ export default function hcpUsers() {
                                             </Dropdown.Toggle>
                                             <Dropdown.Menu>
                                                 <LinkContainer to={`list?page=1&status=${hcps.status}&country_iso2=null`}><Dropdown.Item className={hcps.country_iso2 === null ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, hcps.status, null))}>All</Dropdown.Item></LinkContainer>
-                                                {hcps['countries'].map((country, index) => (
-                                                    <LinkContainer key={index} to={`list?page=1&status=${hcps.status}&country_iso2=${country}`}><Dropdown.Item className={hcps.status === country ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, hcps.status, country))}>{country}</Dropdown.Item></LinkContainer>
+                                                {countries && hcps['countries'].map((country, index) => (
+                                                    <LinkContainer key={index} to={`list?page=1&status=${hcps.status}&country_iso2=${country}`}><Dropdown.Item className={hcps.status === country ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, hcps.status, country))}>{(countries.find(i => i.country_iso2 === country)).countryname}</Dropdown.Item></LinkContainer>
                                                 ))}
                                             </Dropdown.Menu>
                                         </Dropdown>
@@ -92,7 +100,7 @@ export default function hcpUsers() {
                                                 <th>Name<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'first_name')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'first_name')}></i></span></th>
                                                 <th>Status<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'status')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'status')}></i></span></th>
                                                 <th>UUID <span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'uuid')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'uuid')}></i></span></th>
-                                                <th>Specialty</th>
+                                                <th>Specialty<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'specialty_name')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'specialty_name')}></i></span></th>
                                                 <th>Action</th>
                                                 <th></th>
                                             </tr>
@@ -101,7 +109,7 @@ export default function hcpUsers() {
                                             {hcps['users'].map((row, index) => (
                                                 <tr key={index}>
                                                     <td>{row.email}</td>
-                                                    <td>{row.created_at}</td>
+                                                    <td>{(new Date(row.created_at)).toLocaleDateString().replace(/\//g, '-')}</td>
                                                     <td>{row.first_name + ' ' + row.last_name}</td>
                                                     <td>
                                                         {row.status === 'Approved' ? <span><i className="fa fa-xs fa-circle text-success pr-2"></i>Approved</span> :
@@ -110,7 +118,7 @@ export default function hcpUsers() {
                                                         }
                                                     </td>
                                                     <td>{row.uuid}</td>
-                                                    <td>{row.specialty_onekey}</td>
+                                                    <td>{row.specialty_name}</td>
                                                     <td>
                                                         <span><i className="fa fa-caret-down"></i></span>
                                                     </td>

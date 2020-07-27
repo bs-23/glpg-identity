@@ -34,15 +34,21 @@ const Application = sequelize.cdpConnector.define('applications', {
             this.setDataValue('password', bcrypt.hashSync(value, 8));
         }
     },
+    consent_confirmation_link: {
+        allowNull: false,
+        type: DataTypes.STRING,
+    },
+    reset_password_link: {
+        allowNull: false,
+        type: DataTypes.STRING,
+    },
+    login_link: {
+        allowNull: false,
+        type: DataTypes.STRING
+    },
     is_active: {
         type: DataTypes.BOOLEAN,
         defaultValue: true
-    },
-    consent_confirmation_link: {
-        type: DataTypes.STRING
-    },
-    login_link: {
-        type: DataTypes.STRING
     },
     created_by: {
         type: DataTypes.UUID
