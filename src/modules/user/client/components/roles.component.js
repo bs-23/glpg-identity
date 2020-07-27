@@ -2,7 +2,7 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import { Form, Formik, Field, ErrorMessage } from "formik";
+import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
 import { getRoles, createRole } from "../user.actions";
 import { roleSchema } from "../user.schema";
 import { useToasts } from "react-toast-notifications";
@@ -18,7 +18,6 @@ export default function RoleForm() {
     const [selected, setselected] = useState(["b217c5c0-0dec-4663-92fe-7f75b8a378e6", "d8e50ff2-64e2-4c98-ae4e-cf554721b5ed"]);
 
     const setEdit = (row) => {
-
         const list = (row.rolePermission).map(obj => {
             return obj.permissionId;
         });
@@ -26,6 +25,20 @@ export default function RoleForm() {
 
         setShow(true); setEditData(row);
     }
+
+    const selectPermission = (permission_id, alreadySelected) => {
+        if(!alreadySelected) {
+            const items = [...selected, permission_id];
+            setselected(items);
+        }
+        else{
+            const items = [...selected];
+            const idx = items.findIndex(i => i === permission_id);
+            items.splice(idx, 1);
+            setselected(items);
+        }
+    }
+
     useEffect(() => {
         async function getPermissions() {
             const response = await axios.get('/api/permissions');
@@ -81,10 +94,10 @@ export default function RoleForm() {
                                         displayName="UserForm"
                                         validationSchema={roleSchema}
                                         onSubmit={(values, actions) => {
-                                            console.log(values);
+                                            console.log("=================== ====================>", {...values, permissions: editData.rolePermission ? selected : []} );
                                             if (editData && editData.id) {
 
-                                                axios.put(`/api/roles/${editData.id}`, values)
+                                                axios.put(`/api/roles/${editData.id}`, {...values, permissions: editData.rolePermission ? selected : []} )
                                                     .then(function (response) {
                                                         dispatch(getRoles());
                                                     })
@@ -134,33 +147,48 @@ export default function RoleForm() {
                                                         </div>
                                                     </div>
                                                 </div>
+                                                
                                                 <div className="row">
                                                     <div className="col-12 col-sm-12">
                                                         <div className="form-group">
-                                                            <label className="font-weight-bold" htmlFor="permissions">Assign Service Category</label>
-                                                            <Field data-testid="permission" as="select" name="permissions" className="form-control" multiple >
-                                                                {permissions.map(item => <option key={item.id} value={item.id} onClick={() => setselected([item.id])}>{item.title}</option>)}
-                                                            </Field>
-                                                            <ul className="list-unstyled pl-0 py-3">
-                                                                <li className="">
-                                                                    <label className="d-flex justify-content-between align-items-center">
-                                                                        <span>Management of Customer Data Platform</span>
-                                                                        <span className="switch">
-                                                                            <input type="checkbox" />
-                                                                            <span className="slider round"></span>
-                                                                        </span>
-                                                                    </label>
-                                                                </li>
-                                                                <li className="">
-                                                                    <label className="d-flex justify-content-between align-items-center">
-                                                                        <span>Information Management</span>
-                                                                        <span className="switch">
-                                                                            <input type="checkbox" />
-                                                                            <span className="slider round"></span>
-                                                                        </span>
-                                                                    </label>
-                                                                </li>
-                                                            </ul>
+                                                            <label className="font-weight-bold" >Assign Service Category</label>
+                                                            <FieldArray 
+                                                                name="permissions"
+                                                                render ={arrayHelpers => (
+                                                                    <ul className="list-unstyled pl-0 py-3">
+                                                                        {
+                                                                            permissions.map(permission => 
+                                                                                <li key={permission.id} className="">
+                                                                                    <label className="d-flex justify-content-between align-items-center">
+                                                                                        <span>{permission.title}</span>
+                                                                                        <span className="switch">
+                                                                                            <input 
+                                                                                                name="permissions"
+                                                                                                type="checkbox" 
+                                                                                                value={permission}
+                                                                                                checked={ selected.find( s => s === permission.id) } 
+                                                                                                onChange={e => {
+                                                                                                    if(e.target.checked){
+                                                                                                        arrayHelpers.push(permission.id)
+                                                                                                    }
+                                                                                                    else{
+                                                                                                        const idx = permissions.indexOf(p => p.id === permission.id)
+                                                                                                        arrayHelpers.remove(idx);
+                                                                                                    }
+                                                                                                }}
+                                                                                                onClick={() => { selectPermission(permission.id, selected.find(s=> s === permission.id) ? true : false) } }  
+                                                                                            />
+                                                                                            <span className="slider round"></span>
+                                                                                        </span>
+                                                                                    </label>
+                                                                                </li>
+                                                                            )
+                                                                            
+                                                                        }
+                                                                    </ul>
+                                                                )}
+                                                            />
+                                                            
                                                             <div className="invalid-feedback">
                                                                 <ErrorMessage name="permissions" />
                                                             </div>
