@@ -404,9 +404,9 @@ async function createHcpProfile(req, res) {
 
 async function confirmConsents(req, res) {
     const response = new Response({}, []);
-    const payload = jwt.verify(req.body.token, nodecache.getValue('CONSENT_CONFIRMATION_TOKEN_SECRET'));
 
     try {
+        const payload = jwt.verify(req.body.token, nodecache.getValue('CONSENT_CONFIRMATION_TOKEN_SECRET'));
         const hcpUser = await Hcp.findOne({ where: { id: payload.id } });
 
         if (!hcpUser) {
