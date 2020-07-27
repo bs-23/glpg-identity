@@ -27,6 +27,9 @@ async function getAccessToken(req, res) {
             name: application.name,
             email: application.email,
             access_token: generateAccessToken(application),
+            consent_confirmation_link: application.consent_confirmation_link,
+            reset_password_link: application.reset_password_link,
+            login_link: application.login_link,
             retention_period: '30 days'
         };
 

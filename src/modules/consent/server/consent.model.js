@@ -1,4 +1,5 @@
 const path = require('path');
+const validator = require('validator');
 const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const uniqueSlug = require('unique-slug');
@@ -29,13 +30,16 @@ const Consent = sequelize.cdpConnector.define('consents', {
     },
     rich_text: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
+        set(value) {
+            this.setDataValue('rich_text', validator.escape(value));
+        }
     },
     slug: {
         unique: true,
         allowNull: false,
         type: DataTypes.STRING,
-        set(value){
+        set() {
             this.setDataValue('slug', makeCustomSlug(this.title, this.country_iso2, this.language_code));
         }
     },

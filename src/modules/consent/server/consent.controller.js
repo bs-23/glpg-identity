@@ -6,15 +6,15 @@ const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/
 
 async function getConsents(req, res) {
     const response = new Response({}, []);
-    
+
     try {
         const { country_lang } = req.query;
 
         if(!country_lang) {
-            response.errors.push(new CustomError('Invalid query parameter', '', '', new Error().stack));
+            response.errors.push(new CustomError('Invalid query parameter'));
             return res.status(400).send(response);
         }
-        
+
         let [country_iso2, language_code] = country_lang.split('_');
         language_code = language_code || 'en';
 
@@ -59,7 +59,7 @@ async function getConsents(req, res) {
 
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, '', '', err));
+        response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
     }
 }

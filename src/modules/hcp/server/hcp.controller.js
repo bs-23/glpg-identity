@@ -6,7 +6,9 @@ const validator = require('validator');
 const { QueryTypes, Op } = require('sequelize');
 const Hcp = require('./hcp_profile.model');
 const HcpConsents = require('./hcp_consents.model');
+const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
+const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
@@ -61,6 +63,64 @@ function mapMasterDataToHcpProfile(masterData) {
     model.specialty_onekey = masterData.specialty_code;
 
     return model;
+}
+
+function generateDefaultEmailOptions(user) {
+    return {
+        toAddresses: [user.email],
+        data: {
+            firstName: user.first_name || '',
+            lastName: user.last_name || '',
+        }
+    };
+}
+
+async function sendConsentConfirmationMail(user, consents, application) {
+    const consentConfirmationToken = generateConsentConfirmationAccessToken(user);
+    const mailOptions = generateDefaultEmailOptions(user);
+
+    mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/consent-confirm.html`),
+        mailOptions.subject = 'Request consent confirmation',
+        mailOptions.data.consents = consents || [],
+        mailOptions.data.link = `${application.consent_confirmation_link}?token=${consentConfirmationToken}&country_lang=${user.country_iso2}_${user.language_code}`;
+
+    await emailService.send(mailOptions);
+}
+
+async function sendRegistrationSuccessMail(user, application) {
+    const mailOptions = generateDefaultEmailOptions(user);
+
+    mailOptions.subject = `You have successfully created a ${application.name} account.`;
+    mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/registration-success.html`);
+    mailOptions.data.loginLink = `${application.login_link}?country_lang=${user.country_iso2}_${user.language_code}`;
+
+    await emailService.send(mailOptions);
+}
+
+async function sendResetPasswordSuccessMail(user, application) {
+    const mailOptions = generateDefaultEmailOptions(user);
+
+    mailOptions.subject = 'Your password has been changed.';
+    mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/password-reset.html`);
+
+    await emailService.send(mailOptions);
+}
+
+async function sendPasswordResetTokenMail(user, application) {
+    const mailOptions = generateDefaultEmailOptions(user);
+
+    mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/password-set.html`);
+    mailOptions.subject = `Set a password for your account on ${application.name}`;
+    mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&country_lang=${user.country_iso2}_${user.language_code}`;
+
+    await emailService.send(mailOptions);
+}
+
+async function addPasswordResetTokenToUser(user) {
+    user.reset_password_token = crypto.randomBytes(36).toString('hex');
+    user.reset_password_expires = Date.now() + 3600000;
+
+    await user.save();
 }
 
 async function getHcps(req, res) {
@@ -121,7 +181,7 @@ async function getHcps(req, res) {
         response.data = data;
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, '', '', err));
+        response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
     }
 }
@@ -147,7 +207,7 @@ async function editHcp(req, res) {
         response.data = HcpUser;
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, '', '', err));
+        response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
     }
 }
@@ -157,20 +217,15 @@ async function registrationLookup(req, res) {
 
     const response = new Response({}, []);
 
-    if (!email) {
-        response.errors.push(new CustomError('Email address is missing.', 'email'));
+    if (!email || !validator.isEmail(email)) {
+        response.errors.push(new CustomError('Email address is missing or invalid.', 'email'));
     }
 
     if (!uuid) {
         response.errors.push(new CustomError('UUID is missing.', 'uuid'));
     }
 
-    if (!uuid || !email) {
-        return res.status(400).send(response);
-    }
-
-    if (!validator.isEmail(email)) {
-        response.errors.push(new CustomError('Email is not valid', 'email'));
+    if (response.errors.length) {
         return res.status(400).send(response);
     }
 
@@ -206,13 +261,34 @@ async function registrationLookup(req, res) {
 
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, '', '', err));
+        response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
     }
 }
 
 async function createHcpProfile(req, res) {
     const response = new Response({}, []);
+    const { email, uuid, salutation, first_name, last_name, country_iso2, language_code, specialty_onekey } = req.body;
+
+    if (!email || !validator.isEmail(email)) {
+        response.errors.push(new CustomError('Email address is missing or invalid.', 'email'));
+    }
+
+    if (!uuid) {
+        response.errors.push(new CustomError('UUID is missing.', 'uuid'));
+    }
+
+    if (!country_iso2) {
+        response.errors.push(new CustomError('country_iso2 is missing.', 'country_iso2'));
+    }
+
+    if (!language_code) {
+        response.errors.push(new CustomError('language_code is missing.', 'language_code'));
+    }
+
+    if (response.errors.length) {
+        return res.status(400).send(response);
+    }
 
     try {
         const isEmailExists = await Hcp.findOne({ where: { email: req.body.email } });
@@ -226,28 +302,31 @@ async function createHcpProfile(req, res) {
             response.errors.push(new CustomError('UUID already exists.', 'uuid'));
         }
 
-        if (isEmailExists || isUUIDExists) {
+        if (response.errors.length) {
             return res.status(400).send(response);
         }
 
-        let master_data = null;
+        let master_data = {};
 
         if (req.body.uuid) {
             master_data = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwhcpmaster WHERE uuid_1 = $uuid OR uuid_2 = $uuid', {
                 bind: { uuid: req.body.uuid },
                 type: QueryTypes.SELECT
             });
+            master_data = master_data && master_data.length ? master_data[0] : {};
         }
 
         const model = {
-            email: req.body.email,
-            uuid: req.body.uuid,
-            salutation: req.body.salutation,
-            first_name: req.body.first_name,
-            last_name: req.body.last_name,
-            country_iso2: req.body.country_iso2,
-            specialty_onekey: req.body.specialty_onekey,
+            email,
+            uuid,
+            salutation,
+            first_name,
+            last_name,
+            country_iso2,
+            language_code,
+            specialty_onekey,
             application_id: req.user.id,
+            individual_id_onekey: master_data.individual_id_onekey,
             created_by: req.user.id,
             updated_by: req.user.id
         };
@@ -275,6 +354,7 @@ async function createHcpProfile(req, res) {
                 consentArr.push({
                     user_id: hcpUser.id,
                     consent_id: consentDetails.id,
+                    title: consentDetails.title,
                     response: consentResponse,
                     consent_confirmed: consentDetails.opt_type === 'double' ? false : true
                 });
@@ -286,40 +366,20 @@ async function createHcpProfile(req, res) {
             });
         }
 
-        hcpUser.status = master_data && master_data.length ? hasDoubleOptIn ? 'Consent Pending' : 'Approved' : 'Not Verified';
+        hcpUser.status = master_data.individual_id_onekey ? hasDoubleOptIn ? 'Consent Pending' : 'Approved' : 'Not Verified';
         await hcpUser.save();
 
         response.data = getHcpViewModel(hcpUser.dataValues);
 
         if (hcpUser.dataValues.status === 'Consent Pending') {
-            const consentIds = consentArr.map(consent => consent.consent_id);
-            let consents = await Consent.findAll({ where: { id: consentIds } });
+            const unconfirmedConsents = consentArr.filter(consent => !consent.consent_confirmed);
+            const consentTitles = unconfirmedConsents.map(consent => consent.title);
 
-            consents = consents.map(consent => consent.dataValues.title);
-
-            consentConfirmationToken = generateConsentConfirmationAccessToken(hcpUser.dataValues);
-
-            const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${req.user.slug}/consent-confirm.html`);
-            const options = {
-                toAddresses: [hcpUser.dataValues.email],
-                templateUrl,
-                subject: 'Request consent confirmation',
-                data: {
-                    firstName: hcpUser.dataValues.first_name || '',
-                    lastName: hcpUser.dataValues.last_name || '',
-                    consents: consents || [],
-                    link: `${req.user.consent_confirmation_link}?token=${consentConfirmationToken}`
-                }
-            };
-
-            await emailService.send(options);
+            await sendConsentConfirmationMail(hcpUser.dataValues, consentTitles, req.user);
         }
 
         if (hcpUser.dataValues.status === 'Approved') {
-            hcpUser.reset_password_token = crypto.randomBytes(36).toString('hex');
-            hcpUser.reset_password_expires = Date.now() + 3600000;
-
-            await hcpUser.save();
+            await addPasswordResetTokenToUser(hcpUser);
 
             response.data.password_reset_token = hcpUser.dataValues.reset_password_token;
             response.data.retention_period = '1 hour';
@@ -327,7 +387,7 @@ async function createHcpProfile(req, res) {
 
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, '', '', err));
+        response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
     }
 }
@@ -355,10 +415,7 @@ async function confirmConsents(req, res) {
         }
 
         hcpUser.status = 'Approved';
-        hcpUser.reset_password_token = crypto.randomBytes(36).toString('hex');
-        hcpUser.reset_password_expires = Date.now() + 3600000;
-
-        await hcpUser.save();
+        await addPasswordResetTokenToUser(hcpUser);
 
         response.data = {
             ...getHcpViewModel(hcpUser.dataValues),
@@ -368,7 +425,98 @@ async function confirmConsents(req, res) {
 
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, '', '', err));
+        response.errors.push(new CustomError(err.message));
+        res.status(500).send(response);
+    }
+}
+
+async function approveHCPUser(req, res) {
+    const response = new Response({}, []);
+    const id = req.params.id;
+
+    try {
+        const hcpUser = await Hcp.findOne({ where: { id } });
+
+        if (!hcpUser) {
+            response.errors.push(new CustomError('User does not exist.'));
+        }
+
+        const userApplication = await Application.findOne({ where: { id: hcpUser.application_id } });
+
+        let userConsents = await HcpConsents.findAll({ where: { [Op.and]: [{ user_id: id }, { consent_confirmed: false }] } });
+
+        let hasDoubleOptIn = false;
+        const consentTitles = [];
+
+        if (userConsents && userConsents.length) {
+            const consentIds = userConsents.map(consent => consent.consent_id)
+            const allConsentDetails = await Consent.findAll({ where: { id: consentIds } });
+
+            if (allConsentDetails && allConsentDetails.length) {
+                hasDoubleOptIn = true;
+                allConsentDetails.forEach(consent => consentTitles.push(consent.title));
+            }
+        }
+
+        hcpUser.status = hasDoubleOptIn ? 'Consent Pending' : 'Approved';
+        await hcpUser.save();
+
+        if (hcpUser.dataValues.status === 'Consent Pending') {
+            await sendConsentConfirmationMail(hcpUser, consentTitles, userApplication);
+        }
+
+        if (hcpUser.dataValues.status === 'Approved') {
+            await addPasswordResetTokenToUser(hcpUser);
+            await sendPasswordResetTokenMail(hcpUser.dataValues, userApplication);
+        }
+
+        response.data = getHcpViewModel(hcpUser.dataValues);
+
+        await logService.log({
+            event_type: 'UPDATE',
+            object_id: hcpUser.id,
+            table_name: 'hcp_profiles',
+            created_by: req.user.id,
+            description: req.body.comment
+        });
+
+        res.json(response);
+    } catch (err) {
+        response.errors.push(new CustomError(err.message));
+        res.status(500).send(response);
+    }
+}
+
+async function rejectHCPUser(req, res) {
+    const response = new Response({}, []);
+    const id = req.params.id
+
+    try {
+        const hcpUser = await Hcp.findOne({ where: { id } });
+
+        if (!hcpUser) {
+            response.errors.push(new CustomError('User does not exist.'));
+            return res.status(400).send(response);
+        }
+
+        hcpUser.status = 'Rejected';
+        await hcpUser.save();
+
+        response.data = getHcpViewModel(hcpUser.dataValues);
+
+        const logData = {
+            event_type: 'UPDATE',
+            object_id: hcpUser.id,
+            table_name: 'hcp_profiles',
+            created_by: req.user.id,
+            description: req.body.comment
+        }
+
+        await logService.log(logData);
+
+        res.json(response);
+    } catch (err) {
+        response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
     }
 }
@@ -389,7 +537,7 @@ async function getHcpProfile(req, res) {
         response.data = getHcpViewModel(doc.dataValues);
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, '', '', err));
+        response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
     }
 }
@@ -419,7 +567,6 @@ async function changePassword(req, res) {
 
         doc.update({ password: new_password });
 
-        // req.user.slug is used to select template folder
         const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${req.user.slug}/password-reset.html`);
         const options = {
             toAddresses: [email],
@@ -436,13 +583,14 @@ async function changePassword(req, res) {
         response.data = 'Password changed successfully.';
         res.send(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, '', '', err));
+        response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
     }
 }
 
 async function resetPassword(req, res) {
     const response = new Response({}, []);
+
     try {
         const doc = await Hcp.findOne({ where: { reset_password_token: req.query.token } });
 
@@ -461,31 +609,18 @@ async function resetPassword(req, res) {
             return res.status(400).send(response);
         }
 
-        const options = {
-            toAddresses: [doc.email],
-            data: {
-                firstName: doc.first_name || '',
-                lastName: doc.last_name || '',
-            }
-        };
-
         if (doc.password) {
-            options.subject = 'Your password has been changed.'
-            options.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${req.user.slug}/password-reset.html`)
+            await sendResetPasswordSuccessMail(doc, req.user);
         } else {
-            options.subject = `You have successfully created a ${req.user.name} account.`
-            options.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${req.user.slug}/registration-success.html`)
-            options.data.loginLink = req.user.login_link
+            await sendRegistrationSuccessMail(doc, req.user);
         }
 
-        doc.update({ password: req.body.new_password });
-
-        await emailService.send(options);
+        await doc.update({ password: req.body.new_password });
 
         response.data = 'Password reset successfully.';
         res.send(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, '', '', err));
+        response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
     }
 }
@@ -513,7 +648,7 @@ async function forgetPassword(req, res) {
         };
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, '', '', err));
+        response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
     }
 }
@@ -550,7 +685,7 @@ async function getSpecialties(req, res) {
         response.data = masterDataSpecialties;
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, '', '', err));
+        response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
     }
 }
@@ -563,10 +698,6 @@ async function getAccessToken(req, res) {
 
         if (!email) {
             response.errors.push(new CustomError('Email is required.', 'email'));
-            response.errors.push({
-                field: 'email',
-                message: 'Email is required.'
-            });
         }
 
         if (!password) {
@@ -592,7 +723,7 @@ async function getAccessToken(req, res) {
 
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, '', '', err));
+        response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
     }
 }
@@ -608,3 +739,5 @@ exports.forgetPassword = forgetPassword;
 exports.getSpecialties = getSpecialties;
 exports.getAccessToken = getAccessToken;
 exports.confirmConsents = confirmConsents;
+exports.approveHCPUser = approveHCPUser
+exports.rejectHCPUser = rejectHCPUser

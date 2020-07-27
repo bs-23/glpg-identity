@@ -95,5 +95,5 @@ const InformationManagement = () => {
         </main>
     );
 }
- 
+
 export default InformationManagement;
