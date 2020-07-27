@@ -132,7 +132,7 @@ export default function RoleForm() {
                                                 <div className="row">
                                                     <div className="col-12 col-sm-12">
                                                         <div className="form-group">
-                                                            <label className="font-weight-bold" htmlFor="role_name">Role Name</label>
+                                                            <label className="font-weight-bold" htmlFor="role_name">Role Name <span className="text-danger">*</span></label>
                                                             <Field data-testid="role_name" className="form-control" type="name" name="name" />
                                                             <div className="invalid-feedback" data-testid="lastNameError"><ErrorMessage name="name" /></div>
                                                         </div>
@@ -141,7 +141,7 @@ export default function RoleForm() {
                                                 <div className="row">
                                                     <div className="col-12 col-sm-12">
                                                         <div className="form-group">
-                                                            <label className="font-weight-bold" htmlFor="role_description">Role Description <span className="optional">(Optional)</span></label>
+                                                            <label className="font-weight-bold" htmlFor="role_description">Role Description</label>
                                                             <Field data-testid="role_description" className="form-control" as="textarea" type="name" name="description" />
                                                             <div className="invalid-feedback" data-testid="RoleDescriptionNameError"><ErrorMessage name="description" /></div>
                                                         </div>
@@ -151,16 +151,16 @@ export default function RoleForm() {
                                                 <div className="row">
                                                     <div className="col-12 col-sm-12">
                                                         <div className="form-group">
-                                                            <label className="font-weight-bold" >Assign Service Category</label>
+                                                            <label className="font-weight-bold" >Assign Service Category <span className="text-danger">*</span></label>
                                                             <FieldArray 
                                                                 name="permissions"
                                                                 render ={arrayHelpers => (
-                                                                    <ul className="list-unstyled pl-0 py-3">
+                                                                    <ul className="list-unstyled pl-0 py-2 mb-0">
                                                                         {
                                                                             permissions.map(permission => 
                                                                                 <li key={permission.id} className="">
                                                                                     <label className="d-flex justify-content-between align-items-center">
-                                                                                        <span>{permission.title}</span>
+                                                                                        <span className="switch-label">{permission.title}</span>
                                                                                         <span className="switch">
                                                                                             <input 
                                                                                                 name="permissions"
@@ -222,7 +222,7 @@ export default function RoleForm() {
                                         <td>{(row.rolePermission) && (row.rolePermission).map((item, index) => (
                                             <span key={index}>{(permissions.find(i => i.id === item.permissionId)).title}{index < row.rolePermission.length - 1 ? ', ' : ''}</span>
                                         ))}</td>
-                                        <td><button className="btn cdp-btn-outline-secondary btn-sm" onClick={() => setEdit(row)}> <i className="fas fa-pen pr-2"></i>Edit Role</button></td>
+                                        <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => setEdit(row)}> <i className="fas fa-pen pr-2"></i>Edit Role</button></td>
                                     </tr>
                                 ))}
                             </tbody>
