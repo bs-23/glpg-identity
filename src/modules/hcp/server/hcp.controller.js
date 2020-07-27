@@ -106,11 +106,21 @@ async function sendResetPasswordSuccessMail(user, application) {
     await emailService.send(mailOptions);
 }
 
-async function sendPasswordResetTokenMail(user, application) {
+async function sendPasswordSetupInstructionMail(user, application) {
     const mailOptions = generateDefaultEmailOptions(user);
 
     mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/password-setup-instructions.html`);
     mailOptions.subject = `Set a password for your account on ${application.name}`;
+    mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&country_lang=${user.country_iso2}_${user.language_code}`;
+
+    await emailService.send(mailOptions);
+}
+
+async function sendPasswordResetInstructionMail(user, application) {
+    const mailOptions = generateDefaultEmailOptions(user);
+
+    mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/password-reset-instructions.html`);
+    mailOptions.subject = `Reset the password for your account on ${application.name}`;
     mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&country_lang=${user.country_iso2}_${user.language_code}`;
 
     await emailService.send(mailOptions);
@@ -467,7 +477,7 @@ async function approveHCPUser(req, res) {
 
         if (hcpUser.dataValues.status === 'Approved') {
             await addPasswordResetTokenToUser(hcpUser);
-            await sendPasswordResetTokenMail(hcpUser.dataValues, userApplication);
+            await sendPasswordSetupInstructionMail(hcpUser.dataValues, userApplication);
         }
 
         response.data = getHcpViewModel(hcpUser.dataValues);
@@ -629,23 +639,19 @@ async function forgetPassword(req, res) {
     const response = new Response({}, []);
     try {
         const doc = await Hcp.findOne({ where: { email: req.query.email } });
+        const userApplication = await Application.findOne({ where: { id: doc.application_id } });
 
         if (!doc) {
             response.errors.push(new CustomError(`Account doesn't exist`));
             return res.status(404).send(response);
         }
 
-        const randomToken = crypto.randomBytes(36).toString('hex');
+        await addPasswordResetTokenToUser(doc)
 
-        doc.update({
-            reset_password_token: randomToken,
-            reset_password_expires: Date.now() + 3600000
-        });
+        await sendPasswordResetInstructionMail(doc, userApplication)
 
-        response.data = {
-            password_reset_token: randomToken,
-            retention_period: '1 hour'
-        };
+        response.data = 'Successfully sent password reset email.'
+
         res.json(response);
     } catch (err) {
         response.errors.push(new CustomError(err.message));

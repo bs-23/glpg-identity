@@ -61,31 +61,35 @@ export default function hcpUsers() {
                                 <h2 className="">HCP Profiles</h2>
                                 <div>
                                     {hcps['countries'] &&
-                                        <Dropdown className="d-inline-block show dropdown border border-secondary rounded pl-2 mr-2">
-                                            User Country
+                                        <React.Fragment>
+                                            <Dropdown className="d-inline-block show dropdown border border-secondary rounded pl-2 mr-2">
+                                                Country
                                             <Dropdown.Toggle variant="secondary" className="ml-2">
-                                                {hcps.country_iso2 ? hcps.country_iso2 : 'All'}
-                                            </Dropdown.Toggle>
-                                            <Dropdown.Menu>
-                                                <LinkContainer to={`list?page=1&status=${hcps.status}&country_iso2=null`}><Dropdown.Item className={hcps.country_iso2 === null ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, hcps.status, null))}>All</Dropdown.Item></LinkContainer>
-                                                {countries && hcps['countries'].map((country, index) => (
-                                                    <LinkContainer key={index} to={`list?page=1&status=${hcps.status}&country_iso2=${country}`}><Dropdown.Item className={hcps.status === country ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, hcps.status, country))}>{(countries.find(i => i.country_iso2 === country)).countryname}</Dropdown.Item></LinkContainer>
-                                                ))}
-                                            </Dropdown.Menu>
-                                        </Dropdown>
-                                    }
-                                    <Dropdown className="d-inline-block show dropdown border border-secondary rounded pl-2">
-                                        User Status
+                                                    {hcps.country_iso2 ? hcps.country_iso2 : 'All'}
+                                                </Dropdown.Toggle>
+                                                <Dropdown.Menu>
+                                                    <LinkContainer to={`list?page=1&status=${hcps.status}&country_iso2=null`}><Dropdown.Item className={hcps.country_iso2 === null ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, hcps.status, null))}>All</Dropdown.Item></LinkContainer>
+                                                    {countries && hcps['countries'].map((country, index) => (
+                                                        <LinkContainer key={index} to={`list?page=1&status=${hcps.status}&country_iso2=${country}`}><Dropdown.Item className={hcps.status === country ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, hcps.status, country))}>{(countries.find(i => i.country_iso2 === country)).countryname}</Dropdown.Item></LinkContainer>
+                                                    ))}
+                                                </Dropdown.Menu>
+                                            </Dropdown>
+
+                                            <Dropdown className="d-inline-block show dropdown border border-secondary rounded pl-2">
+                                                Status
                                         <Dropdown.Toggle variant="secondary" className="ml-2">
-                                            {hcps.status ? hcps.status : 'All'}
-                                        </Dropdown.Toggle>
-                                        <Dropdown.Menu>
-                                            <LinkContainer to={`list?page=1&status=null&country_iso2=${hcps.country_iso2}`}><Dropdown.Item className={hcps.status === null ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, null, hcps.country_iso2))}>All</Dropdown.Item></LinkContainer>
-                                            <LinkContainer to={`list?page=1&status=Approved&country_iso2=${hcps.country_iso2}`}><Dropdown.Item className={hcps.status === 'Approved' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, 'Approved', hcps.country_iso2))}>Approved</Dropdown.Item></LinkContainer>
-                                            <LinkContainer to={`list?page=1&status=Pending&country_iso2=${hcps.country_iso2}`}><Dropdown.Item className={hcps.status === 'Pending' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, 'Pending', hcps.country_iso2))}>Pending</Dropdown.Item></LinkContainer>
-                                            <LinkContainer to={`list?page=1&status=Rejected&country_iso2=${hcps.country_iso2}`}><Dropdown.Item className={hcps.status === 'Rejected' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, 'Rejected', hcps.country_iso2))}>Rejected</Dropdown.Item></LinkContainer>
-                                        </Dropdown.Menu>
-                                    </Dropdown>
+                                                    {hcps.status ? hcps.status : 'All'}
+                                                </Dropdown.Toggle>
+                                                <Dropdown.Menu>
+                                                    <LinkContainer to={`list?page=1&status=null&country_iso2=${hcps.country_iso2}`}><Dropdown.Item className={hcps.status === null ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, null, hcps.country_iso2))}>All</Dropdown.Item></LinkContainer>
+                                                    <LinkContainer to={`list?page=1&status=Approved&country_iso2=${hcps.country_iso2}`}><Dropdown.Item className={hcps.status === 'Approved' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, 'Approved', hcps.country_iso2))}>Approved</Dropdown.Item></LinkContainer>
+                                                    <LinkContainer to={`list?page=1&status=Pending&country_iso2=${hcps.country_iso2}`}><Dropdown.Item className={hcps.status === 'Consent Pending' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, 'Consent Pending', hcps.country_iso2))}>Consent Pending</Dropdown.Item></LinkContainer>
+                                                    <LinkContainer to={`list?page=1&status=Pending&country_iso2=${hcps.country_iso2}`}><Dropdown.Item className={hcps.status === 'Not Verified' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, 'Consent Pending', hcps.country_iso2))}>Not Verified</Dropdown.Item></LinkContainer>
+                                                    <LinkContainer to={`list?page=1&status=Rejected&country_iso2=${hcps.country_iso2}`}><Dropdown.Item className={hcps.status === 'Rejected' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, 'Rejected', hcps.country_iso2))}>Rejected</Dropdown.Item></LinkContainer>
+                                                </Dropdown.Menu>
+                                            </Dropdown>
+                                        </React.Fragment>
+                                    }
                                 </div>
 
                             </div>
