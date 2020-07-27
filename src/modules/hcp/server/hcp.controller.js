@@ -376,7 +376,7 @@ async function createHcpProfile(req, res) {
                 consentArr.push({
                     user_id: hcpUser.id,
                     consent_id: consentDetails.id,
-                    title: consentDetails.title,
+                    title: consentDetails.rich_text,
                     response: consentResponse,
                     consent_confirmed: consentDetails.opt_type === 'double' ? false : true
                 });
@@ -477,7 +477,7 @@ async function approveHCPUser(req, res) {
 
             if (allConsentDetails && allConsentDetails.length) {
                 hasDoubleOptIn = true;
-                allConsentDetails.forEach(consent => consentTitles.push(consent.title));
+                allConsentDetails.forEach(consent => consentTitles.push(consent.rich_text));
             }
         }
 
