@@ -1,7 +1,7 @@
 const Modules = {
     USER: {
         value: 'user',
-        title: 'User Management'
+        title: 'CDP Management'
     },
     HCP: {
         value: 'hcp',
