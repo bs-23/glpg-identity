@@ -139,7 +139,14 @@ export default function Users() {
                         }
 
                         {userdata['users'] && userdata['users'].length === 0 &&
-                            <div className="alert alert-info mt-5">No users found!</div>
+                            <div className="row justify-content-center mt-5 pt-5 mb-3">
+                                <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">
+                                    <i class="fas fa-users fa-6x cdp-text-secondary"></i>
+                                    <h3 className="font-weight-bold cdp-text-primary pt-4">No Users Found!</h3>
+                                    <h4 className="cdp-text-primary pt-3 pb-5">Click on the button below to create new one</h4>
+                                    <button className="btn cdp-btn-secondary text-white px-5 py-2 font-weight-bold">Create New User</button>
+                                </div>
+                            </div>
                         }
                     </div>
                 </div>
