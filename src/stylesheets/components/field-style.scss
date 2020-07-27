@@ -65,3 +65,25 @@ input:checked + .slider:before {
 .switch-label {
     font-weight: 600;
 }
+
+
+
+
+
+
+/*Checkbox*/
+.custom-control-input:checked ~ .custom-control-label::before {
+    border-color: $primary-color !important;
+    background-color: $primary-color !important;
+}
+.custom-checkbox .custom-control-input:focus ~ .custom-control-label::before {
+    box-shadow: none !important;
+}
+
+.custom-control-label::before {
+    border: #adb5bd solid 1px !important;
+
+}
+.custom-control-input:active ~ .custom-control-label::before {
+    background-color: rgba(20, 77, 67, .25) !important;
+}
