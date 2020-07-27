@@ -23,6 +23,7 @@ const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
         type: DataTypes.STRING
     },
     salutation: {
+        allowNull: false,
         type: DataTypes.STRING
     },
     first_name: {
@@ -48,9 +49,11 @@ const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
         type: DataTypes.STRING
     },
     country_iso2: {
+        allowNull: false,
         type: DataTypes.STRING
     },
     language_code: {
+        allowNull: false,
         type: DataTypes.STRING
     },
     specialty_onekey: {
