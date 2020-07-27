@@ -43,6 +43,15 @@ export default function hcpUsers() {
         setShow(true)
     }
 
+    const loadHcpProfile = () => {
+        const params = new URLSearchParams(window.location.search);
+        dispatch(getHcpProfiles(
+            params.get('page') ? params.get('page') : 1,
+            params.get('status') ? params.get('status') : null,
+            params.get('country_iso2') ? params.get('country_iso2') : null,
+        ))
+    };
+
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         getCountries();
@@ -117,15 +126,15 @@ export default function hcpUsers() {
                                         Status Update
                                     </Modal.Title>
                                 </Modal.Header>
-                                <div className="row">
-                                    <div className="col">
-                                        <h4 class="pl-5 font-weight-bold">{`${currentUser.first_name} ${currentUser.last_name}`}</h4>
-                                        <div class="pl-5">{currentUser.email}</div>
-                                        <div class="pl-5">{currentUser.created_at}</div>
-                                    </div>
-                                </div>
                                 <Modal.Body>
-                                <div className="add-role p-2">
+                                <div className="p-2">
+                                    <div className="row">
+                                        <div className="col">
+                                            <h4 class="font-weight-bold">{`${currentUser.first_name} ${currentUser.last_name}`}</h4>
+                                            <div class="mt-1">{currentUser.email}</div>
+                                            <div class="mt-1">{(new Date(currentUser.created_at)).toLocaleDateString().replace(/\//g, '-')}</div>
+                                        </div>
+                                    </div>
                                     <Formik
                                         initialValues={{
                                             comment: ''
@@ -140,6 +149,7 @@ export default function hcpUsers() {
                                                             appearance: 'success',
                                                             autoDismiss: true
                                                         })
+                                                        loadHcpProfile()
                                                     })
                                                     .catch(err => {
                                                         addToast('Could not update user status.', {
@@ -154,6 +164,7 @@ export default function hcpUsers() {
                                                             appearance: 'success',
                                                             autoDismiss: true
                                                         })
+                                                        loadHcpProfile()
                                                     })
                                                     .catch(err => {
                                                         addToast('Could not update user status.', {
@@ -171,7 +182,7 @@ export default function hcpUsers() {
                                             <Form onSubmit={formikProps.handleSubmit}>
                                                 <button onClick={(e) => {setChangeToStatus('approve'); formikProps.handleSubmit(e)}} type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting || currentUser.status === 'Approved'}>Approve User</button>
                                                 <button onClick={(e) => {setChangeToStatus('reject'); formikProps.handleSubmit(e)}} type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting || currentUser.status === 'Rejected'}>Reject User</button>
-                                                <div className="row">
+                                                <div className="row mt-4">
                                                     <div className="col-12 col-sm-12">
                                                         <div className="form-group">
                                                             <label className="font-weight-bold" htmlFor="comment">Comment <span className="text-danger">*</span></label>
@@ -224,8 +235,8 @@ export default function hcpUsers() {
                                                                 {currentAction ? currentAction : 'Select an action'}
                                                             </Dropdown.Toggle>
                                                             <Dropdown.Menu>
-                                                                <div onClick={() => setCurrentAction('')} class='p-1'> None </div>
-                                                                <div onClick={() => onUpdateStatus(row)} class='p-1'> Update Status </div>
+                                                                <div class="ml-2 p-1" onClick={() => setCurrentAction('')} > None </div>
+                                                                <div class="ml-2 p-1" onClick={() => onUpdateStatus(row)}> Update Status </div>
                                                             </Dropdown.Menu>
                                                         </Dropdown>
                                                         </span>
