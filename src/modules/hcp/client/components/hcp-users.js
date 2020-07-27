@@ -117,8 +117,9 @@ export default function hcpUsers() {
                                                     <td>{row.first_name + ' ' + row.last_name}</td>
                                                     <td>
                                                         {row.status === 'Approved' ? <span><i className="fa fa-xs fa-circle text-success pr-2"></i>Approved</span> :
-                                                            row.status === 'Pending' ? <span><i className="fa fa-xs fa-circle text-warning pr-2"></i>Pending</span> :
-                                                                row.status === 'Rejected' ? <span><i className="fa fa-xs fa-circle text-danger pr-2"></i>Rejected</span> : <span></span>
+                                                            row.status === 'Consent Pending' ? <span><i className="fa fa-xs fa-circle text-warning pr-2"></i>Consent Pending</span> :
+                                                                row.status === 'Not Verified' ? <span><i className="fa fa-xs fa-circle text-warning pr-2"></i>Not Verified</span> :
+                                                                    row.status === 'Rejected' ? <span><i className="fa fa-xs fa-circle text-danger pr-2"></i>Rejected</span> : <span></span>
                                                         }
                                                     </td>
                                                     <td>{row.uuid}</td>
