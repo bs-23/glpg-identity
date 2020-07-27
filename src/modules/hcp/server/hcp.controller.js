@@ -150,7 +150,7 @@ async function getHcps(req, res) {
         const hcp_filter = {
             status: status === null ? { [Op.or]: ['Approved', 'Consent Pending', 'Not Verified', 'Rejected', null] } : status,
             application_id: req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
-            country_iso2: country_iso2 ? { [Op.or]: [country_iso2] } : req.user.type === 'admin' ? { [Op.or]: country_iso2_list } : req.user.countries
+            country_iso2: country_iso2 ? { [Op.or]: [country_iso2, country_iso2.toLowerCase()] } : req.user.type === 'admin' ? { [Op.or]: country_iso2_list.concat(country_iso2_list.map(v => v.toLowerCase())) } : req.user.countries
         };
 
         const hcps = await Hcp.findAll({
@@ -376,7 +376,7 @@ async function createHcpProfile(req, res) {
                 consentArr.push({
                     user_id: hcpUser.id,
                     consent_id: consentDetails.id,
-                    title: consentDetails.title,
+                    title: consentDetails.rich_text,
                     response: consentResponse,
                     consent_confirmed: consentDetails.opt_type === 'double' ? false : true
                 });
@@ -395,7 +395,7 @@ async function createHcpProfile(req, res) {
 
         if (hcpUser.dataValues.status === 'Consent Pending') {
             const unconfirmedConsents = consentArr.filter(consent => !consent.consent_confirmed);
-            const consentTitles = unconfirmedConsents.map(consent => consent.title);
+            const consentTitles = unconfirmedConsents.map(consent => validator.unescape(consent.title));
 
             await sendConsentConfirmationMail(hcpUser.dataValues, consentTitles, req.user);
         }
@@ -461,6 +461,7 @@ async function approveHCPUser(req, res) {
 
         if (!hcpUser) {
             response.errors.push(new CustomError('User does not exist.'));
+            return res.status(404).send(response);
         }
 
         const userApplication = await Application.findOne({ where: { id: hcpUser.application_id } });
@@ -476,7 +477,7 @@ async function approveHCPUser(req, res) {
 
             if (allConsentDetails && allConsentDetails.length) {
                 hasDoubleOptIn = true;
-                allConsentDetails.forEach(consent => consentTitles.push(consent.title));
+                allConsentDetails.forEach(consent => consentTitles.push(validator.unescape(consent.rich_text)));
             }
         }
 
@@ -518,7 +519,7 @@ async function rejectHCPUser(req, res) {
 
         if (!hcpUser) {
             response.errors.push(new CustomError('User does not exist.'));
-            return res.status(400).send(response);
+            return res.status(404).send(response);
         }
 
         hcpUser.status = 'Rejected';
