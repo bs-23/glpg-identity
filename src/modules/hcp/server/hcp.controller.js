@@ -138,7 +138,7 @@ async function getHcps(req, res) {
         const specialty_list = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwspecialtymaster", { type: QueryTypes.SELECT });
 
         const hcp_filter = {
-            status: status === null ? { [Op.or]: ['Approved', 'Pending', 'Rejected', null] } : status,
+            status: status === null ? { [Op.or]: ['Approved', 'Consent Pending', 'Not Verified', 'Rejected', null] } : status,
             application_id: req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
             country_iso2: country_iso2 ? { [Op.or]: [country_iso2] } : req.user.type === 'admin' ? { [Op.or]: country_iso2_list } : req.user.countries
         };
