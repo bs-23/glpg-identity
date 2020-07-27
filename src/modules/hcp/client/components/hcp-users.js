@@ -3,12 +3,20 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { LinkContainer } from 'react-router-bootstrap';
+import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
+import { useToasts } from 'react-toast-notifications';
 import { getHcpProfiles, editHcpProfiles, hcpsSort } from '../hcp.actions';
 import axios from 'axios';
+import Modal from 'react-bootstrap/Modal';
 
 export default function hcpUsers() {
     const dispatch = useDispatch();
     const [countries, setCountries] = useState([]);
+    const [show, setShow] = useState(false);
+    const [currentAction, setCurrentAction] = useState('')
+    const [changeToStatus, setChangeToStatus] = useState('approve')
+    const [currentUser, setCurrentUser] = useState({})
+    const { addToast } = useToasts();
 
     const hcps = useSelector(state => state.hcpReducer.hcps);
 
@@ -29,6 +37,11 @@ export default function hcpUsers() {
         setCountries(response.data);
     }
 
+    const onUpdateStatus = (user) => {
+        setCurrentAction('Update Status')
+        setCurrentUser(user)
+        setShow(true)
+    }
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
@@ -64,7 +77,7 @@ export default function hcpUsers() {
                                         <React.Fragment>
                                             <Dropdown className="d-inline-block show dropdown border border-secondary rounded pl-2 mr-2">
                                                 Country
-                                            <Dropdown.Toggle variant="secondary" className="ml-2">
+                                                <Dropdown.Toggle variant="secondary" className="ml-2">
                                                     {hcps.country_iso2 ? hcps.country_iso2 : 'All'}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
@@ -93,7 +106,87 @@ export default function hcpUsers() {
                                 </div>
 
                             </div>
+                            <Modal
+                            show={show}
+                            onHide={() => setShow(false)}
+                            dialogClassName="modal-90w modal-customize"
+                            aria-labelledby="example-custom-modal-styling-title"
+                            >
+                                <Modal.Header closeButton>
+                                    <Modal.Title id="example-custom-modal-styling-title">
+                                        Status Update
+                                    </Modal.Title>
+                                </Modal.Header>
+                                <div className="row">
+                                    <div className="col">
+                                        <h4 class="pl-5 font-weight-bold">{`${currentUser.first_name} ${currentUser.last_name}`}</h4>
+                                        <div class="pl-5">{currentUser.email}</div>
+                                        <div class="pl-5">{currentUser.created_at}</div>
+                                    </div>
+                                </div>
+                                <Modal.Body>
+                                <div className="add-role p-2">
+                                    <Formik
+                                        initialValues={{
+                                            comment: ''
+                                        }}
+                                        displayName="UserForm"
+                                        onSubmit={(values, actions) => {
+                                            console.log(changeToStatus)
+                                            if(changeToStatus === 'approve'){
+                                                axios.put(`/api/hcp-profiles/${currentUser.id}/approve`, values)
+                                                    .then(() => {
+                                                        addToast('User status changed to approved.', {
+                                                            appearance: 'success',
+                                                            autoDismiss: true
+                                                        })
+                                                    })
+                                                    .catch(err => {
+                                                        addToast('Could not update user status.', {
+                                                            appearance: 'error',
+                                                            autoDismiss: true
+                                                        });
+                                                    })
+                                            }else{
+                                                axios.put(`/api/hcp-profiles/${currentUser.id}/reject`, values)
+                                                    .then(() => {
+                                                        addToast('User status changed to rejected.', {
+                                                            appearance: 'success',
+                                                            autoDismiss: true
+                                                        })
+                                                    })
+                                                    .catch(err => {
+                                                        addToast('Could not update user status.', {
+                                                            appearance: 'error',
+                                                            autoDismiss: true
+                                                        });
+                                                    })
+                                            }
+                                            setShow(false);
+                                            actions.setSubmitting(false);
+                                            actions.resetForm();
+                                        }}
+                                    >
+                                        {formikProps => (
+                                            <Form onSubmit={formikProps.handleSubmit}>
+                                                <button onClick={(e) => {setChangeToStatus('approve'); formikProps.handleSubmit(e)}} type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting || currentUser.status === 'Approved'}>Approve User</button>
+                                                <button onClick={(e) => {setChangeToStatus('reject'); formikProps.handleSubmit(e)}} type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting || currentUser.status === 'Rejected'}>Reject User</button>
+                                                <div className="row">
+                                                    <div className="col-12 col-sm-12">
+                                                        <div className="form-group">
+                                                            <label className="font-weight-bold" htmlFor="comment">Comment <span className="text-danger">*</span></label>
+                                                            <Field className="form-control" type="text" name="comment" />
+                                                            <div className="invalid-feedback"><ErrorMessage name="comment" /></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </Form>
+                                        )}
+                                    </Formik>
+                                </div>
+                            </Modal.Body>
 
+                            </Modal>
                             {hcps['users'] && hcps['users'].length > 0 &&
                                 <React.Fragment>
                                     <table className="table">
@@ -125,7 +218,17 @@ export default function hcpUsers() {
                                                     <td>{row.uuid}</td>
                                                     <td>{row.specialty_name}</td>
                                                     <td>
-                                                        <span><i className="fa fa-caret-down"></i></span>
+                                                        <span>
+                                                        <Dropdown>
+                                                            <Dropdown.Toggle variant="secondary" className="ml-2">
+                                                                {currentAction ? currentAction : 'Select an action'}
+                                                            </Dropdown.Toggle>
+                                                            <Dropdown.Menu>
+                                                                <div onClick={() => setCurrentAction('')} class='p-1'> None </div>
+                                                                <div onClick={() => onUpdateStatus(row)} class='p-1'> Update Status </div>
+                                                            </Dropdown.Menu>
+                                                        </Dropdown>
+                                                        </span>
                                                     </td>
                                                 </tr>
                                             ))}
