@@ -1,0 +1,22 @@
+.modal {
+    &-header {
+        background-color: #FAFAFA;
+        border-bottom: 0px;
+        padding: 40px 30px;
+    }
+
+    &-title {
+        font-size: 34px !important;
+        font-weight: bold !important;
+        color: $primary-color;
+    }
+
+    label {
+        font-size: 14px;
+        color: #353D45;
+
+        .optional {
+            font-weight: normal;
+        }
+    }
+}

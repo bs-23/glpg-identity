@@ -61,7 +61,7 @@ export default function RoleForm() {
                         <Modal
                             show={show}
                             onHide={() => setShow(false)}
-                            dialogClassName="modal-90w"
+                            dialogClassName="modal-90w modal-customize"
                             aria-labelledby="example-custom-modal-styling-title"
                         >
                             <Modal.Header closeButton>
@@ -119,7 +119,7 @@ export default function RoleForm() {
                                                 <div className="row">
                                                     <div className="col-12 col-sm-12">
                                                         <div className="form-group">
-                                                            <label htmlFor="role_name">Role Name<span className="text-danger required-field pl-1">*</span></label>
+                                                            <label className="font-weight-bold" htmlFor="role_name">Role Name</label>
                                                             <Field data-testid="role_name" className="form-control" type="name" name="name" />
                                                             <div className="invalid-feedback" data-testid="lastNameError"><ErrorMessage name="name" /></div>
                                                         </div>
@@ -128,7 +128,7 @@ export default function RoleForm() {
                                                 <div className="row">
                                                     <div className="col-12 col-sm-12">
                                                         <div className="form-group">
-                                                            <label htmlFor="role_description">Role Description</label>
+                                                            <label className="font-weight-bold" htmlFor="role_description">Role Description <span className="optional">(Optional)</span></label>
                                                             <Field data-testid="role_description" className="form-control" as="textarea" type="name" name="description" />
                                                             <div className="invalid-feedback" data-testid="RoleDescriptionNameError"><ErrorMessage name="description" /></div>
                                                         </div>
@@ -137,10 +137,30 @@ export default function RoleForm() {
                                                 <div className="row">
                                                     <div className="col-12 col-sm-12">
                                                         <div className="form-group">
-                                                            <label htmlFor="permissions">Assign Service Category<span className="text-danger required-field pl-1">*</span></label>
+                                                            <label className="font-weight-bold" htmlFor="permissions">Assign Service Category</label>
                                                             <Field data-testid="permission" as="select" name="permissions" className="form-control" multiple >
                                                                 {permissions.map(item => <option key={item.id} value={item.id} onClick={() => setselected([item.id])}>{item.title}</option>)}
                                                             </Field>
+                                                            <ul className="list-unstyled pl-0 py-3">
+                                                                <li className="">
+                                                                    <label className="d-flex justify-content-between align-items-center">
+                                                                        <span>Management of Customer Data Platform</span>
+                                                                        <span className="switch">
+                                                                            <input type="checkbox" />
+                                                                            <span className="slider round"></span>
+                                                                        </span>
+                                                                    </label>
+                                                                </li>
+                                                                <li className="">
+                                                                    <label className="d-flex justify-content-between align-items-center">
+                                                                        <span>Information Management</span>
+                                                                        <span className="switch">
+                                                                            <input type="checkbox" />
+                                                                            <span className="slider round"></span>
+                                                                        </span>
+                                                                    </label>
+                                                                </li>
+                                                            </ul>
                                                             <div className="invalid-feedback">
                                                                 <ErrorMessage name="permissions" />
                                                             </div>
