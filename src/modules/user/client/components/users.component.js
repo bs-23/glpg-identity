@@ -64,7 +64,6 @@ export default function Users() {
                         </nav>
                     </div>
                 </div>
-
                 <div className="row">
                     <div className="col-12">
                         <div className="d-flex justify-content-between align-items-center mb-3 mt-4">
@@ -114,7 +113,7 @@ export default function Users() {
                                                 <td>{(new Date(row.created_at)).toLocaleDateString().replace(/\//g, '-')}</td>
                                                 <td>{(new Date(row.expiry_date)).toLocaleDateString().replace(/\//g, '-')}</td>
                                                 <td>
-                                                    <NavLink to={`/users/${row.id}`} className="btn cdp-btn-outline-secondary btn-sm"><i class="far fa-address-card mr-1"></i>Profile</NavLink>
+                                                    <NavLink to={`/users/${row.id}`} className="btn cdp-btn-outline-primary btn-sm"><i class="far fa-user mr-1"></i>Profile</NavLink>
                                                     {/* <button onClick={() => onDeleteUser(row.id)} className="btn btn-outline-danger btn-sm"><i class="far fa-trash-alt mr-2"></i> Delete</button> */}
                                                 </td>
                                             </tr>

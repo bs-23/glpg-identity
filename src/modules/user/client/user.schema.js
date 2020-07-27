@@ -1,4 +1,5 @@
-import { string, object, ref, date } from 'yup';
+import { string, object, ref, date, array } from 'yup';
+import yup from 'yup';
 
 function validatePassword(password) {
     const minimumPasswordLength = 8
@@ -83,6 +84,11 @@ export const forgotPasswordSchema = object().shape({
 export const roleSchema = object().shape({
     name: string()
         .required('This field must not be empty.'),
-    permissions: string()
+    permissions: 
+        array()
+        .of(string())
+        .min(1, 'Must select at least one permission')
         .required('Must select at least one permission')
+    // permissions: string()
+    //     .required('Must select at least one permission')
 });

@@ -288,6 +288,18 @@ async function createHcpProfile(req, res) {
         response.errors.push(new CustomError('UUID is missing.', 'uuid'));
     }
 
+    if (!salutation) {
+        response.errors.push(new CustomError('Salutation is missing.', 'salutation'));
+    }
+
+    if (!first_name) {
+        response.errors.push(new CustomError('First name is missing.', 'first_name'));
+    }
+
+    if (!last_name) {
+        response.errors.push(new CustomError('Last name is missing.', 'last_name'));
+    }
+
     if (!country_iso2) {
         response.errors.push(new CustomError('country_iso2 is missing.', 'country_iso2'));
     }

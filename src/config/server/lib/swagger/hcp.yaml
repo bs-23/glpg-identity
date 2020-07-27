@@ -471,6 +471,9 @@ components:
               - last_name
               - uuid
               - email
+              - salutation
+              - country_iso2
+              - language_code
         confirmConsent:
             type: object
             properties:
