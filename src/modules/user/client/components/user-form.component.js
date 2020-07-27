@@ -149,11 +149,6 @@ export default function UserForm() {
                                                         </div>
                                                         <div className="col-12 col-sm-6">
                                                             <div className="form-group">
-                                                                {/* <label className="font-weight-bold" htmlFor="roles">Select Roles</label> */}
-                                                                {/* <Field data-testid="role" as="select" name="roles" className="form-control" multiple>
-                                                                    {roles.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
-                                                                </Field> */}
-
                                                                 <div className="row">
                                                                     <div className="col-12 col-sm-12">
                                                                         <div className="form-group">
@@ -201,9 +196,6 @@ export default function UserForm() {
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                {/* <div className="invalid-feedback">
-                                                                    <ErrorMessage name="roles" />
-                                                                </div> */}
                                                             </div>
                                                         </div>
                                                         <div className="col-12 col-sm-6">

@@ -89,6 +89,4 @@ export const roleSchema = object().shape({
         .of(string())
         .min(1, 'Must select at least one permission')
         .required('Must select at least one permission')
-    // permissions: string()
-    //     .required('Must select at least one permission')
 });
