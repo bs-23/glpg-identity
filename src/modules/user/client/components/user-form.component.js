@@ -2,7 +2,7 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { NavLink, useHistory } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import { Form, Formik, Field, ErrorMessage } from "formik";
+import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
 import { createUser } from "../user.actions";
 import { registerSchema } from "../user.schema";
 import { useToasts } from "react-toast-notifications";
@@ -13,6 +13,7 @@ export default function UserForm() {
     const [countries, setCountries] = useState([]);
     const [roles, setRoles] = useState([]);
     const [applications, setApplications] = useState([]);
+    const [selectedRoles, setSelectedRoles] = useState([]);
     const history = useHistory()
     const { addToast } = useToasts()
 
@@ -33,6 +34,20 @@ export default function UserForm() {
         getAppplications();
         getRoles();
     }, []);
+
+    const selectRole = (role_id, alreadySelected) => {
+        if(!alreadySelected) {
+            const items = [...selectedRoles, role_id];
+            setSelectedRoles(items);
+        }
+        else{
+            const items = [...selectedRoles];
+            // const idx = items.findIndex(i => i === role_id);
+            const idx = items.indexOf(role_id);
+            items.splice(idx, 1);
+            setSelectedRoles(items);
+        }
+    }
 
     return (
         <main className="app__content cdp-light-bg">
@@ -134,13 +149,61 @@ export default function UserForm() {
                                                         </div>
                                                         <div className="col-12 col-sm-6">
                                                             <div className="form-group">
-                                                                <label className="font-weight-bold" htmlFor="roles">Select Roles</label>
-                                                                <Field data-testid="role" as="select" name="roles" className="form-control" multiple>
+                                                                {/* <label className="font-weight-bold" htmlFor="roles">Select Roles</label> */}
+                                                                {/* <Field data-testid="role" as="select" name="roles" className="form-control" multiple>
                                                                     {roles.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
-                                                                </Field>
-                                                                <div className="invalid-feedback">
-                                                                    <ErrorMessage name="roles" />
+                                                                </Field> */}
+
+                                                                <div className="row">
+                                                                    <div className="col-12 col-sm-12">
+                                                                        <div className="form-group">
+                                                                            <label className="font-weight-bold" >Select Roles</label>
+                                                                            <FieldArray 
+                                                                                name="roles"
+                                                                                render ={arrayHelpers => (
+                                                                                    <ul className="list-unstyled pl-0 py-3">
+                                                                                        {
+                                                                                            roles.map(role => 
+                                                                                                <li key={role.id} className="">
+                                                                                                    <label className="d-flex justify-content-between align-items-center">
+                                                                                                        <span>{role.name}</span>
+                                                                                                        <span className="switch">
+                                                                                                            <input 
+                                                                                                                name="roles"
+                                                                                                                type="checkbox" 
+                                                                                                                value={role}
+                                                                                                                checked={  selectedRoles.includes(role.id) } 
+                                                                                                                onChange={e => {
+                                                                                                                    if(e.target.checked){
+                                                                                                                        arrayHelpers.push(role.id);
+                                                                                                                    }
+                                                                                                                    else{
+                                                                                                                        const idx = roles.indexOf(r => r.id === role.id);
+                                                                                                                        arrayHelpers.remove(idx);
+                                                                                                                    }
+                                                                                                                }}
+                                                                                                                onClick={() => { selectRole(role.id, selectedRoles.find(s=> s === role.id) ? true : false) } }  
+                                                                                                            />
+                                                                                                            <span className="slider round"></span>
+                                                                                                        </span>
+                                                                                                    </label>
+                                                                                                </li>
+                                                                                            )
+                                                                                            
+                                                                                        }
+                                                                                    </ul>
+                                                                                )}
+                                                                            />
+                                                                            
+                                                                            <div className="invalid-feedback">
+                                                                                <ErrorMessage name="roles" />
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
+                                                                {/* <div className="invalid-feedback">
+                                                                    <ErrorMessage name="roles" />
+                                                                </div> */}
                                                             </div>
                                                         </div>
                                                         <div className="col-12 col-sm-6">
