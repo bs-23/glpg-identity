@@ -691,11 +691,11 @@ async function getSpecialties(req, res) {
             SELECT Country.codbase, countryname, cod_id_onekey, cod_locale, cod_description
             FROM ciam.vwcountry as Country
             INNER JOIN ciam.vwspecialtymaster as Specialty ON Country.codbase=Specialty.codbase
-            WHERE LOWER(country_iso2) = $country_code AND cod_locale = $locale;
+            WHERE LOWER(country_iso2) = $country_code AND LOWER(cod_locale) = $locale;
             `, {
             bind: {
                 country_code: country.toLowerCase(),
-                locale: locale || 'en'
+                locale: locale ? locale.toLowerCase() : 'en'
             },
             type: QueryTypes.SELECT
         });
