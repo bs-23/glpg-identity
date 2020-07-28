@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, waitFor, fireEvent, waitForElement } from '@testing-library/react';
+import { render, waitFor, fireEvent } from '@testing-library/react';
 import { configure, shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import { MemoryRouter } from 'react-router-dom';
@@ -35,7 +35,7 @@ describe('UserForm component', () => {
         countries = [{ countryid: 1, country_iso2: "IE", country_iso3: "IRL", codbase: "WUK", countryname: "Ireland"}]
         roles = [{ id: 1, name: 'a', slug: 'a'}]
         applications = [{ id: 1, name: "a", email: "a@glpg.com", is_active : true, slug: "a" }];
-        // applications = [{}]
+        
         mockAxios.onGet('/api/applications').reply(200, applications);
         mockAxios.onGet('/api/countries').reply(200, countries);
         mockAxios.onGet('/api/roles').reply(200, roles)
@@ -65,10 +65,10 @@ describe('UserForm component', () => {
     it('Should fill out all the input fields', async () => {
         const { getByTestId, getByText, container } = render(wrapperComponent());
 
-        const first_name = await waitForElement(() => getByTestId('first_name'));
-        const last_name = await waitForElement(() => getByTestId('last_name'));
-        const email = await waitForElement(() => getByTestId('email'));
-        const phone = await waitForElement(() => getByTestId('phone'));
+        const first_name = await waitFor(() => getByTestId('first_name'));
+        const last_name = await waitFor(() => getByTestId('last_name'));
+        const email = await waitFor(() => getByTestId('email'));
+        const phone = await waitFor(() => getByTestId('phone'));
         
         await waitFor(() => {
             fireEvent.change(first_name, { target: { value: 'a' } });

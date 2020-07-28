@@ -76,10 +76,10 @@ describe('Hcp user component', () => {
 
     it('should render table', async () => {
         const { getByTestId, container } = render(wrapperComponent());
-        const table = container.querySelector('table');
-        const thead = container.querySelector('thead');
-        const tbody = container.querySelector('tbody');
-        // const a = getByTestId('aaaaaaaaa');
+        const table = await waitFor(() => container.querySelector('table'));
+        const thead = await waitFor(() => container.querySelector('thead'));
+        const tbody = await waitFor(() => container.querySelector('tbody'));
+        
         expect(table).toBeTruthy();
         expect(thead).toBeTruthy();
         expect(tbody).toBeTruthy();
