@@ -354,6 +354,9 @@ paths:
                                     type: string
                                 password:
                                     type: string
+                            required:
+                              - email
+                              - password
             responses:
                 200:
                     description: The request has succeeded.
@@ -435,6 +438,7 @@ components:
                     type: string
             required:
               - email
+              - current_password
               - new_password
               - confirm_password
         hcpConsent:
@@ -474,6 +478,7 @@ components:
               - salutation
               - country_iso2
               - language_code
+              - specialty_onekey
         confirmConsent:
             type: object
             properties:
