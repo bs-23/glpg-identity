@@ -57,6 +57,7 @@ const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
         type: DataTypes.STRING
     },
     specialty_onekey: {
+        allowNull: false,
         type: DataTypes.STRING
     },
     status: {

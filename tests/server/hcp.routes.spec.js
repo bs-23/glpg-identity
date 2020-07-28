@@ -93,6 +93,8 @@ describe('HCP Routes', () => {
                 email: faker.internet.email(),
                 country_iso2: 'NL',
                 language_code: 'en',
+                salutation: 'Mr',
+                specialty_onekey: 'SP.WNL.01',
 
                 consents: [
                     { "827cc68d-a92d-4939-a9b6-d373321d23bb": true },
@@ -115,7 +117,9 @@ describe('HCP Routes', () => {
                 uuid: faker.random.uuid(),
                 email: defaultUser.email,
                 country_iso2: 'NL',
-                language_code: 'en'
+                language_code: 'en',
+                salutation: 'Mr',
+                specialty_onekey: 'SP.WNL.01',
             });
 
         expect(response.statusCode).toBe(400);

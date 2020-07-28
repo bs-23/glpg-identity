@@ -138,7 +138,7 @@ async function getHcps(req, res) {
 
     try {
         const page = req.query.page ? req.query.page - 1 : 0;
-        const limit = 7;
+        const limit = 15;
         const status = req.query.status === 'null' ? null : req.query.status;
         const country_iso2 = req.query.country_iso2 === 'null' ? null : req.query.country_iso2;
         const offset = page * limit;
@@ -306,6 +306,10 @@ async function createHcpProfile(req, res) {
 
     if (!language_code) {
         response.errors.push(new CustomError('language_code is missing.', 'language_code'));
+    }
+
+    if (!specialty_onekey) {
+        response.errors.push(new CustomError('specialty_onekey is missing.', 'specialty_onekey'));
     }
 
     if (response.errors.length) {
