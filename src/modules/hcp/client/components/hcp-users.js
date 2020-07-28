@@ -6,6 +6,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
 import { useToasts } from 'react-toast-notifications';
 import { getHcpProfiles, editHcpProfiles, hcpsSort } from '../hcp.actions';
+import { ApprovalRejectSchema } from '../hcp.schema'
 import axios from 'axios';
 import Modal from 'react-bootstrap/Modal';
 
@@ -130,29 +131,30 @@ export default function hcpUsers() {
                                 <div className="p-2">
                                     <div className="row">
                                         <div className="col">
-                                            <h4 class="font-weight-bold">{`${currentUser.first_name} ${currentUser.last_name}`}</h4>
-                                            <div class="mt-1">{currentUser.email}</div>
-                                            <div class="mt-1">{(new Date(currentUser.created_at)).toLocaleDateString().replace(/\//g, '-')}</div>
+                                            <h4 className="font-weight-bold">{`${currentUser.first_name} ${currentUser.last_name}`}</h4>
+                                            <div className="mt-1">{currentUser.email}</div>
+                                            <div className="mt-1">{(new Date(currentUser.created_at)).toLocaleDateString().replace(/\//g, '-')}</div>
                                         </div>
                                     </div>
                                     <Formik
                                         initialValues={{
                                             comment: ''
                                         }}
-                                        displayName="UserForm"
+                                        displayName="ApproveRejectForm"
+                                        validationSchema={ApprovalRejectSchema}
                                         onSubmit={(values, actions) => {
-                                            console.log(changeToStatus)
                                             if(changeToStatus === 'approve'){
                                                 axios.put(`/api/hcp-profiles/${currentUser.id}/approve`, values)
                                                     .then(() => {
-                                                        addToast('User status changed to approved.', {
+                                                        addToast('Successfully changed user status.', {
                                                             appearance: 'success',
                                                             autoDismiss: true
                                                         })
                                                         loadHcpProfile()
                                                     })
                                                     .catch(err => {
-                                                        addToast('Could not update user status.', {
+                                                        const errorMessage = err.response.data.errors.length ? err.response.data.errors[0].message : 'Could not change user status.'
+                                                        addToast(errorMessage, {
                                                             appearance: 'error',
                                                             autoDismiss: true
                                                         });
@@ -160,14 +162,15 @@ export default function hcpUsers() {
                                             }else{
                                                 axios.put(`/api/hcp-profiles/${currentUser.id}/reject`, values)
                                                     .then(() => {
-                                                        addToast('User status changed to rejected.', {
+                                                        addToast('Successfully changed user status.', {
                                                             appearance: 'success',
                                                             autoDismiss: true
                                                         })
                                                         loadHcpProfile()
                                                     })
                                                     .catch(err => {
-                                                        addToast('Could not update user status.', {
+                                                        const errorMessage = err.response.data.errors.length ? err.response.data.errors[0].message : 'Could not change user status.'
+                                                        addToast(errorMessage, {
                                                             appearance: 'error',
                                                             autoDismiss: true
                                                         });
@@ -180,8 +183,14 @@ export default function hcpUsers() {
                                     >
                                         {formikProps => (
                                             <Form onSubmit={formikProps.handleSubmit}>
-                                                <button onClick={(e) => {setChangeToStatus('approve'); formikProps.handleSubmit(e)}} type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting || currentUser.status === 'Approved'}>Approve User</button>
-                                                <button onClick={(e) => {setChangeToStatus('reject'); formikProps.handleSubmit(e)}} type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting || currentUser.status === 'Rejected'}>Reject User</button>
+                                                <div className="row">
+                                                    <div className="col-6">
+                                                        <button onClick={(e) => {setChangeToStatus('approve'); formikProps.handleSubmit(e)}} type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting || currentUser.status === 'Approved'}>Approve User</button>
+                                                    </div>
+                                                    <div className="col-6">
+                                                        <button onClick={(e) => {setChangeToStatus('reject'); formikProps.handleSubmit(e)}} type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting || currentUser.status === 'Rejected'}>Reject User</button>
+                                                    </div>
+                                                </div>
                                                 <div className="row mt-4">
                                                     <div className="col-12 col-sm-12">
                                                         <div className="form-group">
@@ -235,8 +244,8 @@ export default function hcpUsers() {
                                                                 {currentAction ? currentAction : 'Select an action'}
                                                             </Dropdown.Toggle>
                                                             <Dropdown.Menu>
-                                                                <div class="ml-2 p-1" onClick={() => setCurrentAction('')} > None </div>
-                                                                <div class="ml-2 p-1" onClick={() => onUpdateStatus(row)}> Update Status </div>
+                                                                <div className="ml-2 p-1" onClick={() => setCurrentAction('')} > None </div>
+                                                                <div className="ml-2 p-1" onClick={() => onUpdateStatus(row)}> Update Status </div>
                                                             </Dropdown.Menu>
                                                         </Dropdown>
                                                         </span>
