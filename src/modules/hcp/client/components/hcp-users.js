@@ -44,6 +44,22 @@ export default function hcpUsers() {
         setShow(true)
     }
 
+    const onUpdateStatusSuccess = () => {
+        addToast('Successfully changed user status.', {
+            appearance: 'success',
+            autoDismiss: true
+        })
+        loadHcpProfile()
+    }
+
+    const onUpdateStatusFailure = (error) => {
+        const errorMessage = error.response.data.errors.length ? error.response.data.errors[0].message : 'Could not change user status.'
+        addToast(errorMessage, {
+            appearance: 'error',
+            autoDismiss: true
+        });
+    }
+
     const loadHcpProfile = () => {
         const params = new URLSearchParams(window.location.search);
         dispatch(getHcpProfiles(
@@ -118,7 +134,7 @@ export default function hcpUsers() {
                             </div>
                             <Modal
                             show={show}
-                            onHide={() => setShow(false)}
+                            onHide={() => { setCurrentAction(''); setShow(false) }}
                             dialogClassName="modal-90w modal-customize"
                             aria-labelledby="example-custom-modal-styling-title"
                             >
@@ -145,36 +161,12 @@ export default function hcpUsers() {
                                         onSubmit={(values, actions) => {
                                             if(changeToStatus === 'approve'){
                                                 axios.put(`/api/hcp-profiles/${currentUser.id}/approve`, values)
-                                                    .then(() => {
-                                                        addToast('Successfully changed user status.', {
-                                                            appearance: 'success',
-                                                            autoDismiss: true
-                                                        })
-                                                        loadHcpProfile()
-                                                    })
-                                                    .catch(err => {
-                                                        const errorMessage = err.response.data.errors.length ? err.response.data.errors[0].message : 'Could not change user status.'
-                                                        addToast(errorMessage, {
-                                                            appearance: 'error',
-                                                            autoDismiss: true
-                                                        });
-                                                    })
+                                                    .then(() => onUpdateStatusSuccess())
+                                                    .catch(err => onUpdateStatusFailure(err))
                                             }else{
                                                 axios.put(`/api/hcp-profiles/${currentUser.id}/reject`, values)
-                                                    .then(() => {
-                                                        addToast('Successfully changed user status.', {
-                                                            appearance: 'success',
-                                                            autoDismiss: true
-                                                        })
-                                                        loadHcpProfile()
-                                                    })
-                                                    .catch(err => {
-                                                        const errorMessage = err.response.data.errors.length ? err.response.data.errors[0].message : 'Could not change user status.'
-                                                        addToast(errorMessage, {
-                                                            appearance: 'error',
-                                                            autoDismiss: true
-                                                        });
-                                                    })
+                                                    .then(() => onUpdateStatusSuccess())
+                                                    .catch(err => onUpdateStatusFailure(err))
                                             }
                                             setShow(false);
                                             actions.setSubmitting(false);
@@ -244,8 +236,9 @@ export default function hcpUsers() {
                                                                 {currentAction ? currentAction : 'Select an action'}
                                                             </Dropdown.Toggle>
                                                             <Dropdown.Menu>
-                                                                <div className="ml-2 p-1" onClick={() => setCurrentAction('')} > None </div>
-                                                                <div className="ml-2 p-1" onClick={() => onUpdateStatus(row)}> Update Status </div>
+                                                                <div className="ml-2 p-1"> Profile </div>
+                                                                <div className="ml-2 p-1"> Edit Profile </div>
+                                                                {row.status === 'Not Verified' && <div className="ml-2 p-1" onClick={() => onUpdateStatus(row)}> Update Status </div>}
                                                             </Dropdown.Menu>
                                                         </Dropdown>
                                                         </span>
