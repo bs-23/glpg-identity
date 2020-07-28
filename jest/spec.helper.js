@@ -18,7 +18,7 @@ const adminRoleID = '1ffe73e9-7922-4640-ba0c-3628b3358aa8';
 
 module.exports = {
     defaultApplication: {
-        id: defaultApplicationId, 
+        id: defaultApplicationId,
         name: faker.company.companyName(),
         slug: 'hcp-portal',
         email: 'hcp-portal@glpg.com',
@@ -84,6 +84,10 @@ module.exports = {
             last_name: 'User',
             email: 'default-hcp-user@cdp.com',
             password: 'strong-password',
+            country_iso2: 'NL',
+            language_code: 'en',
+            salutation: 'Mr',
+            specialty_onekey: 'SP.WNL.01',
             created_by: defaultAdminId,
             updated_by: defaultAdminId,
         },

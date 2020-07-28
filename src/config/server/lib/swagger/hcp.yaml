@@ -474,6 +474,7 @@ components:
               - salutation
               - country_iso2
               - language_code
+              - specialty_onekey
         confirmConsent:
             type: object
             properties:

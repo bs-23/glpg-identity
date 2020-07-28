@@ -308,6 +308,10 @@ async function createHcpProfile(req, res) {
         response.errors.push(new CustomError('language_code is missing.', 'language_code'));
     }
 
+    if (!specialty_onekey) {
+        response.errors.push(new CustomError('specialty_onekey is missing.', 'specialty_onekey'));
+    }
+
     if (response.errors.length) {
         return res.status(400).send(response);
     }
