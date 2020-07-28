@@ -9,52 +9,67 @@ import { Provider } from 'react-redux';
 import { ToastProvider } from 'react-toast-notifications';
 import store from '../../src/modules/core/client/store';
 import UserForm from '../../src/modules/user/client/components/user-form.component';
+import { login } from '../../src/modules/user/client/user.actions';
 
 configure({ adapter: new Adapter() });
 
-let mockAxios;
-
-
-
 describe('UserForm component', () => {
-    beforeEach(() => {
+    let mockAxios;
+    let savedUser;
+    let countries;
+    let roles;
+    let applications;
+
+    beforeEach( async () => {
         mockAxios = new MockAdapter(axios);
+
+        savedUser = { name: 'a', email: 'test@gmail.com'};
+        mockAxios.onPost('/api/login').reply(200, savedUser);
+
+        await store.dispatch(login({
+            email: 'test@gmail.com',
+            password: 'test'
+        }));
+
+
+        countries = [{ countryid: 1, country_iso2: "IE", country_iso3: "IRL", codbase: "WUK", countryname: "Ireland"}]
+        roles = [{ id: 1, name: 'a', slug: 'a'}]
+        applications = [{ id: 1, name: "a", email: "a@glpg.com", is_active : true, slug: "a" }];
+        
+        mockAxios.onGet('/api/applications').reply(200, applications);
+        mockAxios.onGet('/api/countries').reply(200, countries);
+        mockAxios.onGet('/api/roles').reply(200, roles)
     });
+
+    const userSlice = () => store.getState().userReducer;
 
     const wrapperComponent = () => (
         <Provider store={store}>
-            <ToastProvider>
-                <UserForm />
-            </ToastProvider>
+            <MemoryRouter>
+                <ToastProvider>
+                    <UserForm />
+                </ToastProvider>
+            </MemoryRouter>
         </Provider>
     );
 
     it('Should render UserForm component', () => {
-        const wrapper = shallow(<wrapperComponent/>);
+        const wrapper = shallow(wrapperComponent());
         expect(wrapper.exists()).toBe(true);
     });
 
+    it('should set user', async () => {
+        expect(userSlice().loggedInUser).toEqual(savedUser);
+    });
+
     it('Should fill out all the input fields', async () => {
-        const { getByTestId, getByText, container } = render(
-            <Provider store={store}>
-                <MemoryRouter>
-                    <ToastProvider>
-                        <UserForm />
-                    </ToastProvider>
-                </MemoryRouter>
-            </Provider>
-        );
+        const { getByTestId, getByText, container } = render(wrapperComponent());
 
-        const countries = [{ countryid: 1, countryname: 'England'}]
-        const roles = [{ id: 1, title: 'Demo role'}]
-        mockAxios.onGet('/api/countries').reply(200, countries)
-        mockAxios.onGet('/api/roles').reply(200, roles)
-
-        const first_name = getByTestId('first_name');
-        const last_name = getByTestId('last_name');
-        const email = getByTestId('email');
-        const phone = getByTestId('phone');
-
+        const first_name = await waitFor(() => getByTestId('first_name'));
+        const last_name = await waitFor(() => getByTestId('last_name'));
+        const email = await waitFor(() => getByTestId('email'));
+        const phone = await waitFor(() => getByTestId('phone'));
+        
         await waitFor(() => {
             fireEvent.change(first_name, { target: { value: 'a' } });
             fireEvent.change(last_name, { target: { value: 'a' } });

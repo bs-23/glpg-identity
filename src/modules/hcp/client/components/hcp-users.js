@@ -3,12 +3,20 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { LinkContainer } from 'react-router-bootstrap';
+import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
+import { useToasts } from 'react-toast-notifications';
 import { getHcpProfiles, editHcpProfiles, hcpsSort } from '../hcp.actions';
+import { ApprovalRejectSchema } from '../hcp.schema'
 import axios from 'axios';
+import Modal from 'react-bootstrap/Modal';
 
 export default function hcpUsers() {
     const dispatch = useDispatch();
     const [countries, setCountries] = useState([]);
+    const [show, setShow] = useState(false);
+    const [currentAction, setCurrentAction] = useState('')
+    const [currentUser, setCurrentUser] = useState({})
+    const { addToast } = useToasts();
 
     const hcps = useSelector(state => state.hcpReducer.hcps);
 
@@ -27,8 +35,39 @@ export default function hcpUsers() {
     async function getCountries() {
         const response = await axios.get('/api/countries');
         setCountries(response.data);
+        // console.log("===============================> countries ", response);
     }
 
+    const onUpdateStatus = (user) => {
+        setCurrentAction('Update Status')
+        setCurrentUser(user)
+        setShow(true)
+    }
+
+    const onUpdateStatusSuccess = () => {
+        addToast('Successfully changed user status.', {
+            appearance: 'success',
+            autoDismiss: true
+        })
+        loadHcpProfile()
+    }
+
+    const onUpdateStatusFailure = (error) => {
+        const errorMessage = error.response.data.errors.length ? error.response.data.errors[0].message : 'Could not change user status.'
+        addToast(errorMessage, {
+            appearance: 'error',
+            autoDismiss: true
+        });
+    }
+
+    const loadHcpProfile = () => {
+        const params = new URLSearchParams(window.location.search);
+        dispatch(getHcpProfiles(
+            params.get('page') ? params.get('page') : 1,
+            params.get('status') ? params.get('status') : null,
+            params.get('country_iso2') ? params.get('country_iso2') : null,
+        ))
+    };
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
@@ -94,7 +133,76 @@ export default function hcpUsers() {
                                 </div>
 
                             </div>
+                            <Modal
+                            show={show}
+                            onHide={() => { setCurrentAction(''); setShow(false) }}
+                            dialogClassName="modal-90w modal-customize"
+                            aria-labelledby="example-custom-modal-styling-title"
+                            >
+                                <Modal.Header closeButton>
+                                    <Modal.Title id="example-custom-modal-styling-title">
+                                        Status Update
+                                    </Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                <div className="p-2">
+                                    <div className="row">
+                                        <div className="col">
+                                            <h4 className="font-weight-bold">{`${currentUser.first_name} ${currentUser.last_name}`}</h4>
+                                            <div className="mt-1">{currentUser.email}</div>
+                                            <div className="mt-1">{(new Date(currentUser.created_at)).toLocaleDateString().replace(/\//g, '-')}</div>
+                                        </div>
+                                    </div>
+                                    <Formik
+                                        initialValues={{
+                                            comment: '',
+                                            selectedStatus: ''
+                                        }}
+                                        displayName="ApproveRejectForm"
+                                        validationSchema={ApprovalRejectSchema}
+                                        onSubmit={(values, actions) => {
+                                            if(values.selectedStatus === 'approve'){
+                                                axios.put(`/api/hcp-profiles/${currentUser.id}/approve`, values)
+                                                    .then(() => onUpdateStatusSuccess())
+                                                    .catch(err => onUpdateStatusFailure(err))
+                                            }
+                                            if(values.selectedStatus === 'reject'){
+                                                axios.put(`/api/hcp-profiles/${currentUser.id}/reject`, values)
+                                                    .then(() => onUpdateStatusSuccess())
+                                                    .catch(err => onUpdateStatusFailure(err))
+                                            }
+                                            setShow(false);
+                                            actions.setSubmitting(false);
+                                            actions.resetForm();
+                                        }}
+                                    >
+                                        {formikProps => (
+                                            <Form onSubmit={formikProps.handleSubmit}>
+                                                <div className="row">
+                                                    <div className="col-6">
+                                                        <a onClick={() => formikProps.setFieldValue('selectedStatus', 'approve')} className={`btn btn-block text-white cdp-btn-secondary mt-4 p-2 ${formikProps.values.selectedStatus === 'approve' ? 'cdp-btn-outline-primary' : '' }`} disabled={formikProps.isSubmitting || currentUser.status === 'Approved'}>Approve User</a>
+                                                    </div>
+                                                    <div className="col-6">
+                                                        <a onClick={() => formikProps.setFieldValue('selectedStatus', 'reject')} className={`btn btn-block text-white cdp-btn-secondary mt-4 p-2 ${formikProps.values.selectedStatus === 'reject' ? 'cdp-btn-outline-primary' : '' }`} disabled={formikProps.isSubmitting || currentUser.status === 'Rejected'}>Reject User</a>
+                                                    </div>
+                                                </div>
+                                                <div className="row mt-4">
+                                                    <div className="col-12 col-sm-12">
+                                                        <div className="form-group">
+                                                            <label className="font-weight-bold" htmlFor="comment">Comment <span className="text-danger">*</span></label>
+                                                            <Field className="form-control" component="textarea" rows="4" name="comment" />
+                                                            <div className="invalid-feedback"><ErrorMessage name="comment" /></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!formikProps.values.selectedStatus || formikProps.isSubmitting}>Submit</button>
+                                            </Form>
+                                        )}
+                                    </Formik>
+                                </div>
+                            </Modal.Body>
 
+                            </Modal>
                             {hcps['users'] && hcps['users'].length > 0 &&
                                 <React.Fragment>
                                     <table className="table">
@@ -126,7 +234,18 @@ export default function hcpUsers() {
                                                     <td>{row.uuid}</td>
                                                     <td>{row.specialty_name}</td>
                                                     <td>
-                                                        <span><i className="fa fa-caret-down"></i></span>
+                                                        <span>
+                                                        <Dropdown>
+                                                            <Dropdown.Toggle variant="secondary" className="ml-2">
+                                                                {currentAction ? currentAction : 'Select an action'}
+                                                            </Dropdown.Toggle>
+                                                            <Dropdown.Menu>
+                                                                <div className="ml-2 p-1"> Profile </div>
+                                                                <div className="ml-2 p-1"> Edit Profile </div>
+                                                                {row.status === 'Not Verified' && <div className="ml-2 p-1" onClick={() => onUpdateStatus(row)}> Update Status </div>}
+                                                            </Dropdown.Menu>
+                                                        </Dropdown>
+                                                        </span>
                                                     </td>
                                                 </tr>
                                             ))}
