@@ -126,9 +126,9 @@ async function init() {
                     slug: convertToSlug('HCP Portal'),
                     email: 'hcp-portal@glpg.com',
                     password: 'strong-password',
-                    consent_confirmation_link: 'http://example.com/bin/public/glpg-hcpportal/consent/confirm.html',
-                    reset_password_link: '',
-                    login_link: '',
+                    consent_confirmation_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/consentConfirm.consent.html',
+                    reset_password_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/journeyRedirect.journey.html',
+                    login_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/journeyRedirect.journey.html',
                     created_by: admin.id,
                     updated_by: admin.id
                 },
@@ -137,9 +137,9 @@ async function init() {
                     slug: convertToSlug('BrandX'),
                     email: 'brandx@glpg.com',
                     password: 'strong-password',
-                    consent_confirmation_link: 'http://172.16.229.25:4503/bin/public/brandx/consentConfirm.consent.html',
-                    reset_password_link: 'http://172.16.229.25:4503/bin/public/brandx/journeyRedirect.journey.html',
-                    login_link: 'http://172.16.229.25:4503/bin/public/brandx/journeyRedirect.journey.html',
+                    consent_confirmation_link: 'http://172.16.229.25:4503/bin/public/glpg-brandx/consentConfirm.consent.html',
+                    reset_password_link: 'http://172.16.229.25:4503/bin/public/glpg-brandx/journeyRedirect.journey.html',
+                    login_link: 'http://172.16.229.25:4503/bin/public/glpg-brandx/journeyRedirect.journey.html',
                     created_by: admin.id,
                     updated_by: admin.id
                 }
