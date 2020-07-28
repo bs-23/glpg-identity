@@ -15,7 +15,6 @@ export default function hcpUsers() {
     const [countries, setCountries] = useState([]);
     const [show, setShow] = useState(false);
     const [currentAction, setCurrentAction] = useState('')
-    const [changeToStatus, setChangeToStatus] = useState('approve')
     const [currentUser, setCurrentUser] = useState({})
     const { addToast } = useToasts();
 
@@ -154,16 +153,18 @@ export default function hcpUsers() {
                                     </div>
                                     <Formik
                                         initialValues={{
-                                            comment: ''
+                                            comment: '',
+                                            selectedStatus: ''
                                         }}
                                         displayName="ApproveRejectForm"
                                         validationSchema={ApprovalRejectSchema}
                                         onSubmit={(values, actions) => {
-                                            if(changeToStatus === 'approve'){
+                                            if(values.selectedStatus === 'approve'){
                                                 axios.put(`/api/hcp-profiles/${currentUser.id}/approve`, values)
                                                     .then(() => onUpdateStatusSuccess())
                                                     .catch(err => onUpdateStatusFailure(err))
-                                            }else{
+                                            }
+                                            if(values.selectedStatus === 'reject'){
                                                 axios.put(`/api/hcp-profiles/${currentUser.id}/reject`, values)
                                                     .then(() => onUpdateStatusSuccess())
                                                     .catch(err => onUpdateStatusFailure(err))
@@ -177,21 +178,22 @@ export default function hcpUsers() {
                                             <Form onSubmit={formikProps.handleSubmit}>
                                                 <div className="row">
                                                     <div className="col-6">
-                                                        <button onClick={(e) => {setChangeToStatus('approve'); formikProps.handleSubmit(e)}} type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting || currentUser.status === 'Approved'}>Approve User</button>
+                                                        <a onClick={() => formikProps.setFieldValue('selectedStatus', 'approve')} className={`btn btn-block text-white cdp-btn-secondary mt-4 p-2 ${formikProps.values.selectedStatus === 'approve' ? 'cdp-btn-outline-primary' : '' }`} disabled={formikProps.isSubmitting || currentUser.status === 'Approved'}>Approve User</a>
                                                     </div>
                                                     <div className="col-6">
-                                                        <button onClick={(e) => {setChangeToStatus('reject'); formikProps.handleSubmit(e)}} type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting || currentUser.status === 'Rejected'}>Reject User</button>
+                                                        <a onClick={() => formikProps.setFieldValue('selectedStatus', 'reject')} className={`btn btn-block text-white cdp-btn-secondary mt-4 p-2 ${formikProps.values.selectedStatus === 'reject' ? 'cdp-btn-outline-primary' : '' }`} disabled={formikProps.isSubmitting || currentUser.status === 'Rejected'}>Reject User</a>
                                                     </div>
                                                 </div>
                                                 <div className="row mt-4">
                                                     <div className="col-12 col-sm-12">
                                                         <div className="form-group">
                                                             <label className="font-weight-bold" htmlFor="comment">Comment <span className="text-danger">*</span></label>
-                                                            <Field className="form-control" type="text" name="comment" />
+                                                            <Field className="form-control" component="textarea" rows="4" name="comment" />
                                                             <div className="invalid-feedback"><ErrorMessage name="comment" /></div>
                                                         </div>
                                                     </div>
                                                 </div>
+                                                <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!formikProps.values.selectedStatus || formikProps.isSubmitting}>Submit</button>
                                             </Form>
                                         )}
                                     </Formik>
