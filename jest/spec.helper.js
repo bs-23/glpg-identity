@@ -82,6 +82,7 @@ module.exports = {
             application_id: defaultApplicationId,
             first_name: 'Default HCP',
             last_name: 'User',
+            salutation: 'Mr',
             email: 'default-hcp-user@cdp.com',
             password: 'strong-password',
             country_iso2: 'NL',
