@@ -162,6 +162,33 @@
     content: "\46";
 }
 
+.icon-close-round:before {
+    content: "\47";
+}
+
+.icon-edit-pencil:before {
+    content: "\48";
+}
+
+.icon-filter:before {
+    content: "\49";
+}
+
+.icon-plus:before {
+    content: "\4a";
+}
+
+.icon-team:before {
+    content: "\4b";
+}
+
+.icon-user:before {
+    content: "\4c";
+}
+
+.icon-serach:before {
+    content: "\4d";
+}
 
 //custome css
 $class-slug: icon- !default;
@@ -184,4 +211,10 @@ $class-slug: icon- !default;
 
 .icon.icon-italic::before {
     font-style: italic !important;
+}
+
+
+.icon.icon-plus {
+    position: relative;
+    top: 2px;
 }

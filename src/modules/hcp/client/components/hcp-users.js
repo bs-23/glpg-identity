@@ -67,7 +67,7 @@ export default function hcpUsers() {
                                             <Dropdown className="d-inline-block show dropdown border border-secondary rounded pl-2 mr-2">
                                                 Country
                                             <Dropdown.Toggle variant="secondary" className="ml-2">
-                                                    {hcps.country_iso2 ? hcps.country_iso2 : 'All'}
+                                                    {hcps.country_iso2 ? (countries.find(i => i.country_iso2 === hcps.country_iso2))?.countryname : 'All'}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
                                                     <LinkContainer to={`list?page=1&status=${hcps.status}&country_iso2=null`}><Dropdown.Item className={hcps.country_iso2 === null ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, hcps.status, null))}>All</Dropdown.Item></LinkContainer>

@@ -3,6 +3,7 @@
         background-color: #FAFAFA;
         border-bottom: 0px;
         padding: 40px 30px;
+        align-items: center;
     }
 
     &-title {
@@ -17,6 +18,32 @@
 
         .optional {
             font-weight: normal;
+        }
+    }
+
+    .close {
+        border: none !important;
+        opacity: 1;
+        padding: 0px;
+        padding-right: 15px;
+        outline: none;
+
+        &:before {
+            color: $primary-color;
+            content: "\47";
+            font-family: "cdp-icon" !important;
+            font-style: normal !important;
+            font-weight: normal !important;
+            font-variant: normal !important;
+            text-transform: none !important;
+            speak: none;
+            line-height: 1;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        span[aria-hidden="true"] {
+            display: none;
         }
     }
 }
