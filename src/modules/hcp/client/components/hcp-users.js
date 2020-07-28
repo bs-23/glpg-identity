@@ -35,6 +35,7 @@ export default function hcpUsers() {
     async function getCountries() {
         const response = await axios.get('/api/countries');
         setCountries(response.data);
+        // console.log("===============================> countries ", response);
     }
 
     const onUpdateStatus = (user) => {
@@ -70,6 +71,7 @@ export default function hcpUsers() {
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
+        console.log("test");
         getCountries();
         dispatch(getHcpProfiles(
             params.get('page') ? params.get('page') : 1,
@@ -98,17 +100,17 @@ export default function hcpUsers() {
                             <div className="d-flex justify-content-between align-items-center">
                                 <h2 className="">HCP Profiles</h2>
                                 <div>
-                                    {hcps['countries'] &&
+                                    {countries && hcps['countries'] &&
                                         <React.Fragment>
                                             <Dropdown className="d-inline-block show dropdown border border-secondary rounded pl-2 mr-2">
                                                 Country
-                                                <Dropdown.Toggle variant="secondary" className="ml-2">
-                                                    {hcps.country_iso2 ? hcps.country_iso2 : 'All'}
+                                            <Dropdown.Toggle variant="secondary" className="ml-2">
+                                                    {hcps.country_iso2 ? (countries.find(i => i.country_iso2 === hcps.country_iso2))?.countryname : 'All'}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
                                                     <LinkContainer to={`list?page=1&status=${hcps.status}&country_iso2=null`}><Dropdown.Item className={hcps.country_iso2 === null ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, hcps.status, null))}>All</Dropdown.Item></LinkContainer>
-                                                    {countries && hcps['countries'].map((country, index) => (
-                                                        <LinkContainer key={index} to={`list?page=1&status=${hcps.status}&country_iso2=${country}`}><Dropdown.Item className={hcps.status === country ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, hcps.status, country))}>{(countries.find(i => i.country_iso2 === country)).countryname}</Dropdown.Item></LinkContainer>
+                                                    {hcps['countries'].map((country, index) => (
+                                                        <LinkContainer key={index} to={`list?page=1&status=${hcps.status}&country_iso2=${country}`}><Dropdown.Item className={hcps.status === country ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, hcps.status, country))}>{(countries.find(i => i.country_iso2 === country))?.countryname}</Dropdown.Item></LinkContainer>
                                                     ))}
                                                 </Dropdown.Menu>
                                             </Dropdown>
