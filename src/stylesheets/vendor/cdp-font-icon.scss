@@ -212,3 +212,9 @@ $class-slug: icon- !default;
 .icon.icon-italic::before {
     font-style: italic !important;
 }
+
+
+.icon.icon-plus {
+    position: relative;
+    top: 2px;
+}
