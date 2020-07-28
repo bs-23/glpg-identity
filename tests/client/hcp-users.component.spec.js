@@ -5,7 +5,7 @@ import Adapter from 'enzyme-adapter-react-16';
 import { MemoryRouter } from 'react-router-dom';
 import axios from 'axios'
 import MockAdapter from 'axios-mock-adapter'
-
+import { ToastProvider } from 'react-toast-notifications';
 import { Provider } from 'react-redux';
 import store from '../../src/modules/core/client/store';
 import HcpUser from '../../src/modules/hcp/client/components/hcp-users';
@@ -56,7 +56,9 @@ describe('Hcp user component', () => {
     const wrapperComponent = () => (
         <Provider store={store}>
             <MemoryRouter>
-                <HcpUser/>
+                <ToastProvider>
+                    <HcpUser/>
+                </ToastProvider>
             </MemoryRouter>
         </Provider>
     );
