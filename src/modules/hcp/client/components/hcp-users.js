@@ -43,7 +43,7 @@ export default function hcpUsers() {
     }, []);
 
     return (
-        <main className="app__content">
+        <main className="app__content cdp-light-bg">
             <div className="container-fluid">
                 <div className="row">
                     <div className="col-12 px-0">
@@ -150,7 +150,14 @@ export default function hcpUsers() {
                             }
 
                             {hcps['users'] && hcps['users'].length === 0 &&
-                                <>No profiles found!</>
+                                <>
+                                <div className="row justify-content-center mt-5 pt-5 mb-3">
+                                    <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">
+                                        <i class="icon icon-team icon-6x cdp-text-secondary"></i>
+                                        <h3 className="font-weight-bold cdp-text-primary pt-4">No Profile Found!</h3>
+                                    </div>
+                                </div>
+                            </>
                             }
                         </div>
                     </div>
