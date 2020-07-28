@@ -89,7 +89,8 @@ export default function hcpUsers() {
                         <nav aria-label="breadcrumb">
                             <ol className="breadcrumb rounded-0">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
-                                <li className="breadcrumb-item active"><span>HCP Profiles</span></li>
+                                <li className="breadcrumb-item"><NavLink to="/hcps">Information Management</NavLink></li>
+                                <li className="breadcrumb-item active"><span>HCP Profiles List</span></li>
                             </ol>
                         </nav>
                     </div>
@@ -97,14 +98,14 @@ export default function hcpUsers() {
                 <div className="row">
                     <div className="col-12">
                         <div>
-                            <div className="d-flex justify-content-between align-items-center">
-                                <h2 className="">HCP Profiles</h2>
+                            <div className="d-flex justify-content-between align-items-center mb-3 mt-4">
+                                <h4 className="cdp-text-primary font-weight-bold mb-0">HCP Profiles</h4>
                                 <div>
                                     {countries && hcps['countries'] &&
                                         <React.Fragment>
-                                            <Dropdown className="d-inline-block show dropdown border border-secondary rounded pl-2 mr-2">
+                                        <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-btn-primary text-white dropdown shadow-sm">
                                                 Country
-                                            <Dropdown.Toggle variant="secondary" className="ml-2">
+                                            <Dropdown.Toggle variant="" className="ml-2 bg-white rounded-0">
                                                     {hcps.country_iso2 ? (countries.find(i => i.country_iso2 === hcps.country_iso2))?.countryname : 'All'}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
@@ -115,9 +116,9 @@ export default function hcpUsers() {
                                                 </Dropdown.Menu>
                                             </Dropdown>
 
-                                            <Dropdown className="d-inline-block show dropdown border border-secondary rounded pl-2">
+                                        <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-btn-secondary text-white dropdown shadow-sm">
                                                 Status
-                                        <Dropdown.Toggle variant="secondary" className="ml-2">
+                                        <Dropdown.Toggle variant="" className="ml-2 bg-white rounded-0">
                                                     {hcps.status ? hcps.status : 'All'}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
@@ -179,11 +180,11 @@ export default function hcpUsers() {
                                         {formikProps => (
                                             <Form onSubmit={formikProps.handleSubmit}>
                                                 <div className="row">
-                                                    <div className="col-6">
-                                                        <a onClick={() => formikProps.setFieldValue('selectedStatus', 'approve')} className={`btn btn-block text-white cdp-btn-secondary mt-4 p-2 ${formikProps.values.selectedStatus === 'approve' ? 'cdp-btn-outline-primary' : '' }`} disabled={formikProps.isSubmitting || currentUser.status === 'Approved'}>Approve User</a>
+                                                        <div className="col-6">
+                                                            <a onClick={() => formikProps.setFieldValue('selectedStatus', 'approve')} className={`btn btn-block cdp-btn-outline-primary mt-4 p-2  ${formikProps.values.selectedStatus === 'approve' ? 'cdp-btn-outline-primary' : ''}`} disabled={formikProps.isSubmitting || currentUser.status === 'Approved'}><i className="fas fa-check mr-1 text-success"></i> Approve User</a>
                                                     </div>
                                                     <div className="col-6">
-                                                        <a onClick={() => formikProps.setFieldValue('selectedStatus', 'reject')} className={`btn btn-block text-white cdp-btn-secondary mt-4 p-2 ${formikProps.values.selectedStatus === 'reject' ? 'cdp-btn-outline-primary' : '' }`} disabled={formikProps.isSubmitting || currentUser.status === 'Rejected'}>Reject User</a>
+                                                            <a onClick={() => formikProps.setFieldValue('selectedStatus', 'reject')} className={`btn btn-block cdp-btn-outline-secondary mt-4 p-2  ${formikProps.values.selectedStatus === 'reject' ? 'cdp-btn-outline-primary' : ''}`} disabled={formikProps.isSubmitting || currentUser.status === 'Rejected'}><i className="fas fa-times mr-1 text-danger"></i> Reject User</a>
                                                     </div>
                                                 </div>
                                                 <div className="row mt-4">
@@ -205,9 +206,10 @@ export default function hcpUsers() {
                             </Modal>
                             {hcps['users'] && hcps['users'].length > 0 &&
                                 <React.Fragment>
-                                    <table className="table">
-                                        <thead className="table-secondary">
-                                            <tr>
+                                <div className="shadow-sm bg-white">
+                                    <table className="table table-hover table-sm mb-0 cdp-table">
+                                        <thead className="cdp-bg-primary text-white cdp-table__header">
+                                            {/*<tr>
                                                 <th>Email<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'email')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'email')}></i></span></th>
                                                 <th>Date of Registration<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'created_at')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'created_at')}></i></span></th>
                                                 <th>Name<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'first_name')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'first_name')}></i></span></th>
@@ -215,10 +217,18 @@ export default function hcpUsers() {
                                                 <th>UUID <span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'uuid')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'uuid')}></i></span></th>
                                                 <th>Specialty<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'specialty_name')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'specialty_name')}></i></span></th>
                                                 <th>Action</th>
-                                                <th></th>
+                                            </tr>*/}
+                                            <tr>
+                                                <th>Email</th>
+                                                <th>Date of Registration</th>
+                                                <th>Name</th>
+                                                <th>Status</th>
+                                                <th>UUID</th>
+                                                <th>Specialty</th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody className="cdp-table__body bg-white">
                                             {hcps['users'].map((row, index) => (
                                                 <tr key={index}>
                                                     <td>{row.email}</td>
@@ -235,16 +245,17 @@ export default function hcpUsers() {
                                                     <td>{row.specialty_name}</td>
                                                     <td>
                                                         <span>
-                                                        <Dropdown>
-                                                            <Dropdown.Toggle variant="secondary" className="ml-2">
-                                                                {currentAction ? currentAction : 'Select an action'}
-                                                            </Dropdown.Toggle>
-                                                            <Dropdown.Menu>
-                                                                <div className="ml-2 p-1"> Profile </div>
-                                                                <div className="ml-2 p-1"> Edit Profile </div>
-                                                                {row.status === 'Not Verified' && <div className="ml-2 p-1" onClick={() => onUpdateStatus(row)}> Update Status </div>}
-                                                            </Dropdown.Menu>
-                                                        </Dropdown>
+                                                            <Dropdown className="ml-auto dropdown-customize">
+                                                                <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm">
+                                                                    {currentAction ? currentAction : 'Select an action'}
+                                                                </Dropdown.Toggle>
+                                                                <Dropdown.Menu>
+                                                                    <LinkContainer to="#"><Dropdown.Item>Profile</Dropdown.Item></LinkContainer>
+                                                                    <LinkContainer to="#"><Dropdown.Item>Edit Profile</Dropdown.Item></LinkContainer>
+                                                                    
+                                                                    {row.status === 'Not Verified' && <LinkContainer to="#"><Dropdown.Item onClick={() => onUpdateStatus(row)}>Update Statu</Dropdown.Item></LinkContainer>}
+                                                                </Dropdown.Menu>
+                                                            </Dropdown>
                                                         </span>
                                                     </td>
                                                 </tr>
@@ -265,6 +276,8 @@ export default function hcpUsers() {
                                             </LinkContainer>
                                         </div>
                                     }
+                                </div>
+                                    
                                 </React.Fragment>
                             }
 

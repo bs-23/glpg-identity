@@ -30,7 +30,7 @@
                 border-color: $primary-color;
 
                 &:hover, &:active, &:focus {
-                    color: $white-color;
+                    color: $white-color !important;
                     background-color: $primary-color;
                     border-color: $primary-color;
                 }
