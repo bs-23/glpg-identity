@@ -15,7 +15,7 @@ export default function RoleForm() {
     const { addToast } = useToasts();
     const [show, setShow] = useState(false);
     const [editData, setEditData] = useState({});
-    const [selected, setselected] = useState(["b217c5c0-0dec-4663-92fe-7f75b8a378e6", "d8e50ff2-64e2-4c98-ae4e-cf554721b5ed"]);
+    const [selected, setselected] = useState([]);
 
     const setEdit = (row) => {
         const list = (row.rolePermission).map(obj => {
@@ -66,7 +66,7 @@ export default function RoleForm() {
                     <div className="col-12 col-sm-12 pt-3">
                         <div className="d-flex justify-content-between align-items-center mb-3 mt-4">
                             <h4 className="cdp-text-primary font-weight-bold mb-0">Manage User Roles</h4>
-                            <button className="btn cdp-btn-secondary text-white ml-auto " onClick={() => { setShow(true); setEditData({}); }}>
+                            <button className="btn cdp-btn-secondary text-white ml-auto " onClick={() => { setShow(true); setEditData({}); setselected([]); }}>
                                 <i className="fas fa-plus pr-1"></i> Add New Role
                             </button>
                         </div>
