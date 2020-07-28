@@ -67,7 +67,7 @@ export default function RoleForm() {
                         <div className="d-flex justify-content-between align-items-center mb-3 mt-4">
                             <h4 className="cdp-text-primary font-weight-bold mb-0">Manage User Roles</h4>
                             <button className="btn cdp-btn-secondary text-white ml-auto " onClick={() => { setShow(true); setEditData({}); setselected([]); }}>
-                                <i className="fas fa-plus pr-1"></i> Add New Role
+                                <i className="icon icon-plus pr-1"></i> Add New Role
                             </button>
                         </div>
 
@@ -222,7 +222,7 @@ export default function RoleForm() {
                                         <td>{(row.rolePermission) && (row.rolePermission).map((item, index) => (
                                             <span key={index}>{(permissions.find(i => i.id === item.permissionId)).title}{index < row.rolePermission.length - 1 ? ', ' : ''}</span>
                                         ))}</td>
-                                        <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => setEdit(row)}> <i className="fas fa-pen pr-2"></i>Edit Role</button></td>
+                                        <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => setEdit(row)}> <i className="icon icon-edit-pencil pr-2"></i>Edit Role</button></td>
                                     </tr>
                                 ))}
                             </tbody>
