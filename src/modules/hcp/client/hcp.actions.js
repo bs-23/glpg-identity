@@ -5,7 +5,7 @@ export function getHcpProfiles(page, status, country_iso2) {
     return {
         type: Types.GET_HCPS,
         payload: axios({
-            method: 'get',
+            method: 'get', 
             url: `/api/hcps?page=${page}&status=${status}&country_iso2=${country_iso2}`
         })
     };

@@ -18,6 +18,7 @@ describe('Hcp user component', () => {
     let fakeAxios;
     let savedUser;
     let data;
+    let countries;
 
     beforeAll(async () => {
         fakeAxios = new MockAdapter(axios);
@@ -31,16 +32,47 @@ describe('Hcp user component', () => {
             password: 'test'
         }));
 
+        // data = {
+        //     "users":[
+        //         { 
+        //             "id": "1",
+        //             "application_id": "1",
+        //             "uuid": "1",
+        //             "salutation": "MR",
+        //             "first_name": "labeba",
+        //             "last_name": "tahsin",
+        //             "email": "abcdefg123456@gmail.com",
+        //             "country_iso2": "DE",
+        //             "language_code": "nl",
+        //             "status":"Not Verified",
+        //         }
+        //     ],
+        //     "page":1,
+        //     "limit":7,
+        //     "total":1,
+        //     "start":1,
+        //     "end":1,
+        //     "status":null,
+        //     "country_iso2":null,
+        //     "countries":["IE","NL","LU","DE","FR","MC","IT","GB","BE","ES","AD"]
+        // }
+
         data = {
-            data : {
+            data: {
                 users: [
                     { id: '1', first_name: 'a', last_name: 'a', email: 'a', telephone: '1', uuid: '1' },
                     { id: '2', first_name: 'b', last_name: 'b', email: 'b', telephone: '2', uuid: '2' }
-                ]
-        }};
+                ],
+                countries: [ 'IE' ]
+            }
+        };
         const page = 1, status = null, country_iso2 = null;
         fakeAxios.onGet(`/api/hcps?page=${page}&status=${status}&country_iso2=${country_iso2}`).reply(200, data);
-        await store.dispatch(getHcpProfiles(page, status));
+        await store.dispatch(getHcpProfiles(page, status, country_iso2));
+
+
+        countries = [ { countryid: 1, country_iso2: "IE", country_iso3: "IRL", codbase: "WUK", countryname: "Ireland"} ]
+        fakeAxios.onGet('/api/countries').reply(200, countries);
     });
 
     const userSlice = () => store.getState().userReducer;
@@ -64,14 +96,20 @@ describe('Hcp user component', () => {
     })
 
     it('should set hcp users', async () => {
+        // console.log("=================================================>", hcpUserSlice());
         expect(hcpUserSlice().hcps).toEqual(data.data);
     })
 
-    it('should render table', () => {
+    it('should render table', async () => {
+        const response = await axios.get('/api/countries');
+        console.log("===============================> countries ", response.data);
+
         const { container } = render(wrapperComponent());
         const table = container.querySelector('table');
         const thead = container.querySelector('thead');
         const tbody = container.querySelector('tbody');
+
+        
 
         expect(table).toBeTruthy();
         expect(thead).toBeTruthy();

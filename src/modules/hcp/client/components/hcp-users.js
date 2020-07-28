@@ -27,6 +27,7 @@ export default function hcpUsers() {
     async function getCountries() {
         const response = await axios.get('/api/countries');
         setCountries(response.data);
+        // console.log("===============================> countries ", response);
     }
 
 
