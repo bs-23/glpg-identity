@@ -138,7 +138,7 @@ async function getHcps(req, res) {
 
     try {
         const page = req.query.page ? req.query.page - 1 : 0;
-        const limit = 7;
+        const limit = 15;
         const status = req.query.status === 'null' ? null : req.query.status;
         const country_iso2 = req.query.country_iso2 === 'null' ? null : req.query.country_iso2;
         const offset = page * limit;
