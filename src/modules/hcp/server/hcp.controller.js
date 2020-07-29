@@ -171,7 +171,7 @@ async function getHcps(req, res) {
         const hcp_users = [];
         hcps.forEach(user => {//add specialty name from data sync
             const specialty = specialty_list.find(i => i.cod_id_onekey === user.specialty_onekey);
-            (specialty) ? user.dataValues.specialty_name = specialty.lis_lbl : user.dataValues.specialty_name = null;
+            (specialty) ? user.dataValues.specialty_description = specialty.cod_description : user.dataValues.specialty_description = null;
             hcp_users.push(user);
 
         });

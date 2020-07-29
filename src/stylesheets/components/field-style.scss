@@ -87,3 +87,9 @@ input:checked + .slider:before {
 .custom-control-input:active ~ .custom-control-label::before {
     background-color: rgba(20, 77, 67, .25) !important;
 }
+
+
+textarea.form-control {
+    height: auto;
+    min-height: 150px;
+}

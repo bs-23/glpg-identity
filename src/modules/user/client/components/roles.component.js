@@ -203,34 +203,41 @@ export default function RoleForm() {
                             </Modal.Body>
                         </Modal>
                     
-                    {permissions.length && roles && roles.length > 0 &&
-                        <table className="table table-hover table-sm mb-0 cdp-table shadow-sm">
-                            <thead className="cdp-bg-primary text-white cdp-table__header">
-                                <tr>
-                                    <th className="py-2">Role Name</th>
-                                    <th className="py-2">Description</th>
-                                    <th className="py-2">Assigned Service Category</th>
-                                    <th className="py-2">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody className="cdp-table__body bg-white">
-                                {roles.map(row => (
-                                    <tr key={row.id}>
-                                        <td>{row.name}</td>
-                                        <td>{row.description}</td>
-                                        {/* <td>{JSON.stringify(row.rolePermission)}</td> */}
-                                        <td>{(row.rolePermission) && (row.rolePermission).map((item, index) => (
-                                            <span key={index}>{(permissions.find(i => i.id === item.permissionId)).title}{index < row.rolePermission.length - 1 ? ', ' : ''}</span>
-                                        ))}</td>
-                                        <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => setEdit(row)}> <i className="icon icon-edit-pencil pr-2"></i>Edit Role</button></td>
+                        {permissions.length && roles && roles.length > 0 &&
+                            <div className="table-responsive shadow-sm bg-white">
+                                <table className="table table-hover table-sm mb-0 cdp-table">
+                                <thead className="cdp-bg-primary text-white cdp-table__header">
+                                    <tr>
+                                        <th className="py-2">Role Name</th>
+                                        <th className="py-2">Description</th>
+                                        <th className="py-2">Assigned Service Category</th>
+                                        <th className="py-2">Action</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    }
+                                </thead>
+                                <tbody className="cdp-table__body bg-white">
+                                    {roles.map(row => (
+                                        <tr key={row.id}>
+                                            <td>{row.name}</td>
+                                            <td>{row.description}</td>
+                                            {/* <td>{JSON.stringify(row.rolePermission)}</td> */}
+                                            <td>{(row.rolePermission) && (row.rolePermission).map((item, index) => (
+                                                <span key={index}>{(permissions.find(i => i.id === item.permissionId)).title}{index < row.rolePermission.length - 1 ? ', ' : ''}</span>
+                                            ))}</td>
+                                            <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => setEdit(row)}> <i className="icon icon-edit-pencil pr-2"></i>Edit Role</button></td>
+                                        </tr>
+                                    ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
 
                     {roles && roles.length === 0 &&
-                        <><div className="alert alert-info mt-5">No role found!</div></>
+                        <><div className="row justify-content-center mt-5 pt-5 mb-3">
+                            <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">
+                                <i class="icon icon-team icon-6x cdp-text-secondary"></i>
+                            <h3 className="font-weight-bold cdp-text-primary pt-4">No role Found!</h3>
+                            </div>
+                        </div></>
                     }
                 </div>
                 </div>
