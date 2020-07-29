@@ -243,7 +243,7 @@ export default function hcpUsers() {
                                                             }
                                                         </td>
                                                         <td>{row.uuid}</td>
-                                                        <td>{row.specialty_name}</td>
+                                                        <td>{row.specialty_description}</td>
                                                         <td>
                                                             <span>
                                                                 <Dropdown className="ml-auto dropdown-customize">
