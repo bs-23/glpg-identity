@@ -150,14 +150,15 @@ async function getHcps(req, res) {
         const offset = page * limit;
 
         const application_list = (await Hcp.findAll()).map(i => i.get("application_id"));
-        let country_iso2_list = req.user.type === 'admin' ? (await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry", { type: QueryTypes.SELECT })).map(i => i.country_iso2) : (await Hcp.findAll()).map(i => i.get("country_iso2"));
-        country_iso2_list = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
+        const country_iso2_list = req.user.type === 'admin' ? (await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry", { type: QueryTypes.SELECT })).map(i => i.country_iso2) : (await Hcp.findAll()).map(i => i.get("country_iso2"));
+        const countries_ignorecase = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
         const specialty_list = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwspecialtymaster", { type: QueryTypes.SELECT });
+
 
         const hcp_filter = {
             status: status === null ? { [Op.or]: ['Approved', 'Consent Pending', 'Not Verified', 'Rejected', null] } : status,
             application_id: req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
-            country_iso2: country_iso2 ? { [Op.or]: ignoreCaseArray(country_iso2) } : req.user.type === 'admin' ? { [Op.or]: [country_iso2_list] } : [].concat.apply([], req.user.countries.map(i => ignoreCaseArray(i)))
+            country_iso2: country_iso2 ? { [Op.any]: ignoreCaseArray(country_iso2) } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : [].concat.apply([], req.user.countries.map(i => ignoreCaseArray(i)))
         };
 
         const hcps = await Hcp.findAll({
@@ -192,7 +193,7 @@ async function getHcps(req, res) {
             end: offset + limit > totalUser ? totalUser : offset + limit,
             status: status ? status : null,
             country_iso2: country_iso2 ? country_iso2 : null,
-            countries: [...new Set(country_iso2_list)]
+            countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : req.user.countries
         };
 
         response.data = data;
