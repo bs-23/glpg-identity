@@ -101,10 +101,11 @@ describe('Hcp user component', () => {
 
     it('should paginate hcp users data', async () => {
         const { getByTestId, getByText, container } = render(wrapperComponent());
-        const prevBtn = await waitFor(() => getByText('Prev'));
         const nextBtn = await waitFor(() => getByText('Next'));
 
         await waitFor(() => fireEvent.click(nextBtn));
+
+        const prevBtn = await waitFor(() => getByText('Prev'));
         await waitFor(() => fireEvent.click(prevBtn));
         
         const tbody = await waitFor(() => container.querySelector('tbody'));
@@ -115,22 +116,6 @@ describe('Hcp user component', () => {
 
         expect(first_td.textContent).toEqual('a');
     });
-
-    it('should update user status', async () => {
-        const { getByTestId, getByText, container } = render(wrapperComponent());
-        const tbody = await waitFor(() => container.querySelector('tbody'));
-        const rows = tbody.childNodes;
-        const first_row = rows[0];
-        const tds = first_row.childNodes;
-        const firstActionBtn = tds[7].childNodes[0].childNodes[0].childNodes[0];
-
-        fireEvent.click(firstActionBtn);
-        // const updateBtn = await waitFor(() => getByText('Update Status'));
-        
-        console.log("=====================================================>", firstActionBtn, " ", firstActionBtn.textContent)
-
-        const a = getByTestId('aaaa');
-    })
 
     // it('should sort table data by first name', async () => {
     //     const { container, getByText } = render(wrapperComponent());

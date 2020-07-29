@@ -21,10 +21,12 @@ export default function hcpUsers() {
     const hcps = useSelector(state => state.hcpReducer.hcps);
 
     const pageLeft = () => {
+        console.log("==================================> page left");
         if (hcps.page > 1) dispatch(getHcpProfiles(hcps.page - 1, hcps.status, hcps.country_iso2));
     };
 
     const pageRight = () => {
+        console.log("==================================> page right");
         if (hcps.end !== hcps.total) dispatch(getHcpProfiles(hcps.page + 1, hcps.status, hcps.country_iso2));
     };
 
@@ -104,7 +106,7 @@ export default function hcpUsers() {
                                         <React.Fragment>
                                             <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-btn-primary text-white dropdown shadow-sm">
                                                 Country
-                                            <Dropdown.Toggle variant="" className="ml-2 bg-white rounded-0">
+                                                <Dropdown.Toggle variant="" className="ml-2 bg-white rounded-0">
                                                     {hcps.country_iso2 ? (countries.find(i => i.country_iso2 === hcps.country_iso2))?.countryname : 'All'}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
@@ -117,7 +119,7 @@ export default function hcpUsers() {
 
                                             <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-btn-secondary text-white dropdown shadow-sm">
                                                 Status
-                                        <Dropdown.Toggle variant="" className="ml-2 bg-white rounded-0">
+                                                <Dropdown.Toggle variant="" className="ml-2 bg-white rounded-0">
                                                     {hcps.status ? hcps.status : 'All'}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu> 
@@ -248,7 +250,6 @@ export default function hcpUsers() {
                                                             <span>
                                                                 <Dropdown className="ml-auto dropdown-customize">
                                                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm">
-                                                                        { console.log("=========================Habib=====================>", currentAction)}
                                                                         {currentAction ? currentAction : 'Select an action'}
                                                                     </Dropdown.Toggle>
                                                                     <Dropdown.Menu>
