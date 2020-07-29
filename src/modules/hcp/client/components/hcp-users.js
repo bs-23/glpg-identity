@@ -21,16 +21,18 @@ export default function hcpUsers() {
     const hcps = useSelector(state => state.hcpReducer.hcps);
 
     const pageLeft = () => {
+        console.log("==================================> page left");
         if (hcps.page > 1) dispatch(getHcpProfiles(hcps.page - 1, hcps.status, hcps.country_iso2));
     };
 
     const pageRight = () => {
+        console.log("==================================> page right");
         if (hcps.end !== hcps.total) dispatch(getHcpProfiles(hcps.page + 1, hcps.status, hcps.country_iso2));
     };
 
-    const sortHcp = (sortType, val) => {
-        dispatch(hcpsSort(sortType, val));
-    };
+    // const sortHcp = (sortType, val) => {
+    //     dispatch(hcpsSort(sortType, val));
+    // };
 
     async function getCountries() {
         const response = await axios.get('/api/countries');
@@ -104,7 +106,7 @@ export default function hcpUsers() {
                                         <React.Fragment>
                                             <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-btn-primary text-white dropdown shadow-sm">
                                                 Country
-                                            <Dropdown.Toggle variant="" className="ml-2 bg-white rounded-0">
+                                                <Dropdown.Toggle variant="" className="ml-2 bg-white rounded-0">
                                                     {hcps.country_iso2 ? (countries.find(i => i.country_iso2 === hcps.country_iso2))?.countryname : 'All'}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
@@ -117,10 +119,10 @@ export default function hcpUsers() {
 
                                             <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-btn-secondary text-white dropdown shadow-sm">
                                                 Status
-                                        <Dropdown.Toggle variant="" className="ml-2 bg-white rounded-0">
+                                                <Dropdown.Toggle variant="" className="ml-2 bg-white rounded-0">
                                                     {hcps.status ? hcps.status : 'All'}
                                                 </Dropdown.Toggle>
-                                                <Dropdown.Menu>
+                                                <Dropdown.Menu> 
                                                     <LinkContainer to={`list?page=1&status=null&country_iso2=${hcps.country_iso2}`}><Dropdown.Item className={hcps.status === null ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, null, hcps.country_iso2))}>All</Dropdown.Item></LinkContainer>
                                                     <LinkContainer to={`list?page=1&status=Approved&country_iso2=${hcps.country_iso2}`}><Dropdown.Item className={hcps.status === 'Approved' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, 'Approved', hcps.country_iso2))}>Approved</Dropdown.Item></LinkContainer>
                                                     <LinkContainer to={`list?page=1&status=Consent Pending&country_iso2=${hcps.country_iso2}`}><Dropdown.Item className={hcps.status === 'Consent Pending' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, 'Consent Pending', hcps.country_iso2))}>Consent Pending</Dropdown.Item></LinkContainer>
@@ -252,7 +254,7 @@ export default function hcpUsers() {
                                                                     </Dropdown.Toggle>
                                                                     <Dropdown.Menu>
                                                                         <LinkContainer to="#"><Dropdown.Item>Profile</Dropdown.Item></LinkContainer>
-                                                                        <LinkContainer to="#"><Dropdown.Item>Edit Profile</Dropdown.Item></LinkContainer>
+                                                                        {/* <LinkContainer to="#"><Dropdown.Item>Edit Profile</Dropdown.Item></LinkContainer> */}
 
                                                                         {row.status === 'Not Verified' && <LinkContainer to="#"><Dropdown.Item onClick={() => onUpdateStatus(row)}>Update Status</Dropdown.Item></LinkContainer>}
                                                                     </Dropdown.Menu>
@@ -267,13 +269,13 @@ export default function hcpUsers() {
                                             hcps.total > hcps.limit) ||
                                             (hcps.page > 1))
                                             && hcps['users'] &&
-                                            < div className="pagination justify-content-end align-items-center mb-4 border-top pt-3">
-                                                {hcps.start + '-' + hcps.end + ' of ' + hcps.total}
+                                            <div className="pagination justify-content-end align-items-center border-top p-3">
+                                                <span className="cdp-text-primary font-weight-bold">{hcps.start + ' - ' + hcps.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + hcps.total}</span> 
                                                 <LinkContainer to={`list?page=${hcps.page - 1}&status=${hcps.status}&country_iso2=${hcps.country_iso2}`}>
-                                                    <button className="btn btn-sm cdp-btn-secondary text-white mx-2" onClick={() => pageLeft()} disabled={hcps.page <= 1}>Prev</button>
+                                                    <span className="pagination-btn" data-testid='Prev' onClick={() => pageLeft()} disabled={hcps.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
                                                 </LinkContainer>
                                                 <LinkContainer to={`list?page=${hcps.page + 1}&status=${hcps.status}&country_iso2=${hcps.country_iso2}`}>
-                                                    <button className="btn btn-sm cdp-btn-secondary text-white" onClick={() => pageRight()} disabled={hcps.end === hcps.total}>Next</button>
+                                                    <span className="pagination-btn" data-testid='Next' onClick={() => pageRight()} disabled={hcps.end === hcps.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
                                                 </LinkContainer>
                                             </div>
                                         }

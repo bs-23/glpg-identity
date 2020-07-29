@@ -1,0 +1,29 @@
+.pagination {
+
+    &-btn {
+        &[disabled] {
+            .icon {
+                color: $primary-color !important;
+                background: $gray-F2F2F2 !important;
+                opacity: .50;
+                cursor: default;
+            }
+        }
+    }
+
+    .icon {
+        @extend .faq__icon-down;
+        cursor: pointer;
+        color: $secondary-color;
+        transform: rotate(-90deg);
+
+        &:hover {
+            background-color: $secondary-color;
+            color: $white-color;
+        }
+
+        &.prev {
+            transform: rotate(90deg);
+        }
+    }
+}

@@ -10,7 +10,7 @@ export default function ChangePasswordForm() {
 
     return (
         <div className="container">
-            <h3>Change Password</h3>
+            <h3>Change Password</h3> 
 
             <Formik
                 initialValues={{

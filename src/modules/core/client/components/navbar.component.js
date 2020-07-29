@@ -30,7 +30,7 @@ export default function Navbar() {
                         </div>
                     </div>
                     <div className="col-9 text-right">
-                        <button className="mr-2 btn cdp-btn-secondary text-white"><i className="icon icon-user-round mr-1 app__header-icon-user"></i> <span className="d-none d-sm-inline-block">{first_name + " " + last_name}</span></button>
+                        <button className="mr-2 btn cdp-btn-secondary text-white"><i className="icon icon-user-round mr-1 app__header-icon-user d-none d-sm-inline-block"></i> <span className="">{first_name + " " + last_name}</span></button>
                         <a className="btn cdp-btn-outline-primary" href="/api/logout"><i className="icon icon-logout mr-1 app__header-icon-logout"></i>Logout</a>
                     </div>
                 </div>
