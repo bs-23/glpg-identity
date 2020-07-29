@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, waitFor, fireEvent } from '@testing-library/react';
+import { render, waitFor, fireEvent, screen } from '@testing-library/react';
 import { configure, shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import { MemoryRouter } from 'react-router-dom';
@@ -35,15 +35,26 @@ describe('Hcp user component', () => {
         data = {
             data: {
                 users: [
-                    { id: '1', first_name: 'a', last_name: 'a', email: 'a', telephone: '1', uuid: '1' },
-                    { id: '2', first_name: 'b', last_name: 'b', email: 'b', telephone: '2', uuid: '2' }
+                    { id: '1', first_name: 'a', last_name: 'a', email: 'a', telephone: '1', uuid: '1', status: 'Not Verified' },
+                    { id: '2', first_name: 'b', last_name: 'b', email: 'b', telephone: '2', uuid: '2', status: 'Not Verified' }
                 ],
-                countries: [ 'IE' ]
+                country_iso2: null,
+                end: 1,
+                limit: 1,
+                page: 1,
+                start: 1,
+                status: null,
+                total: 2,
+                countries: [ 'IE' ],
             }
         };
-        const page = 1, status = null, country_iso2 = null;
-        fakeAxios.onGet(`/api/hcps?page=${page}&status=${status}&country_iso2=${country_iso2}`).reply(200, data);
-        await store.dispatch(getHcpProfiles(page, status, country_iso2));
+        
+
+        const status = null, country_iso2 = null;
+        fakeAxios.onGet(`/api/hcps?page=${1}&status=${status}&country_iso2=${country_iso2}`).reply(200, data);
+        fakeAxios.onGet(`/api/hcps?page=${2}&status=${status}&country_iso2=${country_iso2}`).reply(200, data);
+        await store.dispatch(getHcpProfiles(1, status, country_iso2));
+        
 
 
         countries = [ { countryid: 1, country_iso2: "IE", country_iso3: "IRL", codbase: "WUK", countryname: "Ireland"} ]
@@ -86,6 +97,39 @@ describe('Hcp user component', () => {
         expect(thead).toBeTruthy();
         expect(tbody).toBeTruthy();
         expect(tbody.childElementCount).toBe(2);
+    });
+
+    it('should paginate hcp users data', async () => {
+        const { getByTestId, getByText, container } = render(wrapperComponent());
+        const prevBtn = await waitFor(() => getByText('Prev'));
+        const nextBtn = await waitFor(() => getByText('Next'));
+
+        await waitFor(() => fireEvent.click(nextBtn));
+        await waitFor(() => fireEvent.click(prevBtn));
+        
+        const tbody = await waitFor(() => container.querySelector('tbody'));
+        const rows = tbody.childNodes;
+        const first_row = rows[0];
+        const tds = first_row.childNodes;
+        const first_td = tds[0];
+
+        expect(first_td.textContent).toEqual('a');
+    });
+
+    it('should update user status', async () => {
+        const { getByTestId, getByText, container } = render(wrapperComponent());
+        const tbody = await waitFor(() => container.querySelector('tbody'));
+        const rows = tbody.childNodes;
+        const first_row = rows[0];
+        const tds = first_row.childNodes;
+        const firstActionBtn = tds[7].childNodes[0].childNodes[0].childNodes[0];
+
+        fireEvent.click(firstActionBtn);
+        // const updateBtn = await waitFor(() => getByText('Update Status'));
+        
+        console.log("=====================================================>", firstActionBtn, " ", firstActionBtn.textContent)
+
+        const a = getByTestId('aaaa');
     })
 
     // it('should sort table data by first name', async () => {
