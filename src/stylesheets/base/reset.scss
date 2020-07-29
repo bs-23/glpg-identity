@@ -29,7 +29,7 @@
                 color: $primary-color;
                 border-color: $primary-color;
 
-                &:hover, &:active, &:focus {
+                &:hover, &:active, &:focus, &.selected {
                     color: $white-color !important;
                     background-color: $primary-color;
                     border-color: $primary-color;
@@ -40,7 +40,7 @@
                 color: $secondary-color;
                 border-color: $secondary-color;
 
-                &:hover, &:active, &:focus {
+                &:hover, &:active, &:focus, &.selected {
                     color: #fff;
                     background-color: $secondary-color;
                     border-color: $secondary-color;
