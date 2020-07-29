@@ -22,12 +22,12 @@ export function editHcpProfiles(data, id) {
     };
 }
 
-export function hcpsSort(type, val) {
-    return {
-        type: Types.SORT_HCPS,
-        payload: {
-            type: type,
-            val: val
-        }
-    };
-}
+// export function hcpsSort(type, val) {
+//     return {
+//         type: Types.SORT_HCPS,
+//         payload: {
+//             type: type,
+//             val: val
+//         }
+//     };
+// }
