@@ -235,7 +235,7 @@ export default function RoleForm() {
                         <><div className="row justify-content-center mt-5 pt-5 mb-3">
                             <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">
                                 <i class="icon icon-team icon-6x cdp-text-secondary"></i>
-                            <h3 className="font-weight-bold cdp-text-primary pt-4">No role Found!</h3>
+                            <h3 className="font-weight-bold cdp-text-primary pt-4">No Role Found!</h3>
                             </div>
                         </div></>
                     }

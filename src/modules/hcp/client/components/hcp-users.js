@@ -268,13 +268,13 @@ export default function hcpUsers() {
                                             hcps.total > hcps.limit) ||
                                             (hcps.page > 1))
                                             && hcps['users'] &&
-                                            < div className="pagination justify-content-end align-items-center mb-4 border-top pt-3">
-                                                <span>{hcps.start + '-' + hcps.end }</span> <span> {' of ' + hcps.total}</span> 
+                                            <div className="pagination justify-content-end align-items-center border-top p-3">
+                                                <span className="cdp-text-primary font-weight-bold">{hcps.start + ' - ' + hcps.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + hcps.total}</span> 
                                                 <LinkContainer to={`list?page=${hcps.page - 1}&status=${hcps.status}&country_iso2=${hcps.country_iso2}`}>
-                                                    <button className="btn btn-sm cdp-btn-secondary text-white mx-2" onClick={() => pageLeft()} disabled={hcps.page <= 1}>Prev</button>
+                                                    <span className="pagination-btn" onClick={() => pageLeft()} disabled={hcps.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
                                                 </LinkContainer>
                                                 <LinkContainer to={`list?page=${hcps.page + 1}&status=${hcps.status}&country_iso2=${hcps.country_iso2}`}>
-                                                    <button className="btn btn-sm cdp-btn-secondary text-white" onClick={() => pageRight()} disabled={hcps.end === hcps.total}>Next</button>
+                                                    <span className="pagination-btn" onClick={() => pageRight()} disabled={hcps.end === hcps.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
                                                 </LinkContainer>
                                             </div>
                                         }
