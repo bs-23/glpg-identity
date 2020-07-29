@@ -6,6 +6,7 @@ import { Provider } from 'react-redux';
 import axios from 'axios'
 import { BrowserRouter } from 'react-router-dom';
 import MockAdapter from 'axios-mock-adapter'
+import { ToastProvider } from 'react-toast-notifications';
 import store from '../../src/modules/core/client/store.js';
 import Login from '../../src/modules/user/client/components/login.component';
 
@@ -23,9 +24,11 @@ describe('Login component', () => {
 
     const wrapperComponent = () => (
         <BrowserRouter>
-            <Provider store={store}>
-                <Login />
-            </Provider>
+            <ToastProvider>
+                <Provider store={store}>
+                    <Login />
+                </Provider>
+            </ToastProvider>
         </BrowserRouter>
     );
 
@@ -60,11 +63,11 @@ describe('Login component', () => {
             fireEvent.change(password, { target: { value: '11111111' } });
         });
 
-        await waitFor(() => {
-            fireEvent.click(submit);
-        });
+        fireEvent.click(submit);
 
-        expect(userSlice().loggedInUser).toBeFalsy();
+        await waitFor(() => {
+            expect(userSlice().loggedInUser).toBeFalsy();
+        });
     });
 
     it('Should login successfully if response is 200', async () => {
@@ -80,10 +83,10 @@ describe('Login component', () => {
             fireEvent.change(password, { target: { value: '11111111' } });
         });
 
-        await waitFor(() => {
-            fireEvent.click(submit);
-        })
+        fireEvent.click(submit);
 
-        expect(userSlice().loggedInUser).toEqual(savedUser);
+        await waitFor(() => {
+            expect(userSlice().loggedInUser).toEqual(savedUser);
+        })
     })
 });
