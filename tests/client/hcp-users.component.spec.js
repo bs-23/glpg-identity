@@ -41,7 +41,7 @@ describe('Hcp user component', () => {
                 country_iso2: null,
                 end: 1,
                 limit: 1,
-                page: 1,
+                page: 2,
                 start: 1,
                 status: null,
                 total: 2,
@@ -53,6 +53,7 @@ describe('Hcp user component', () => {
         const status = null, country_iso2 = null;
         fakeAxios.onGet(`/api/hcps?page=${1}&status=${status}&country_iso2=${country_iso2}`).reply(200, data);
         fakeAxios.onGet(`/api/hcps?page=${2}&status=${status}&country_iso2=${country_iso2}`).reply(200, data);
+        fakeAxios.onGet(`/api/hcps?page=${3}&status=${status}&country_iso2=${country_iso2}`).reply(200, data);
         await store.dispatch(getHcpProfiles(1, status, country_iso2));
         
 
@@ -101,11 +102,11 @@ describe('Hcp user component', () => {
 
     it('should paginate hcp users data', async () => {
         const { getByTestId, getByText, container } = render(wrapperComponent());
-        const nextBtn = await waitFor(() => getByText('Next'));
+        const nextBtn = await waitFor(() => getByTestId('Next'));
 
         await waitFor(() => fireEvent.click(nextBtn));
 
-        const prevBtn = await waitFor(() => getByText('Prev'));
+        const prevBtn = await waitFor(() => getByTestId('Prev'));
         await waitFor(() => fireEvent.click(prevBtn));
         
         const tbody = await waitFor(() => container.querySelector('tbody'));
