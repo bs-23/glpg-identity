@@ -224,8 +224,7 @@ export default function hcpUsers() {
                                                     <th>Last Name</th>
                                                     <th>Status</th>
                                                     <th>UUID</th>
-                                                    <th>Specialty One Key</th>
-                                                    <th>Specialty Description</th>
+                                                    <th>Specialty</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -244,7 +243,6 @@ export default function hcpUsers() {
                                                             }
                                                         </td>
                                                         <td>{row.uuid}</td>
-                                                        <td>{row.specialty_onekey}</td>
                                                         <td>{row.specialty_description}</td>
                                                         <td>
                                                             <span>
