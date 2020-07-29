@@ -192,12 +192,12 @@ export default function hcpUsers() {
                                                         <div className="col-12 col-sm-12">
                                                             <div className="form-group">
                                                                 <label className="font-weight-bold" htmlFor="comment">Comment <span className="text-danger">*</span></label>
-                                                                <Field className="form-control" component="textarea" rows="4" name="comment" />
+                                                                <Field className="form-control" data-testid='comment' component="textarea" rows="4" name="comment" />
                                                                 <div className="invalid-feedback"><ErrorMessage name="comment" /></div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!formikProps.values.selectedStatus || formikProps.isSubmitting}>Submit</button>
+                                                    <button type="submit" data-testid='submit' className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!formikProps.values.selectedStatus || formikProps.isSubmitting}>Submit</button>
                                                 </Form>
                                             )}
                                         </Formik>
