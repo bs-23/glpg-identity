@@ -4,7 +4,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { LinkContainer } from 'react-router-bootstrap';
-import { getUsers, getSignedInUserProfile } from '../user.actions';
+import { getUsers } from '../user.actions';
 
 export default function Users() {
     const dispatch = useDispatch();
@@ -136,8 +136,8 @@ export default function Users() {
                                     </div>
                                 }
                             </div>
-                                
-                               
+
+
                             </React.Fragment>
                         }
 
