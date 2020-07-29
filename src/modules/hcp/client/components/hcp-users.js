@@ -252,7 +252,7 @@ export default function hcpUsers() {
                                                                     </Dropdown.Toggle>
                                                                     <Dropdown.Menu>
                                                                         <LinkContainer to="#"><Dropdown.Item>Profile</Dropdown.Item></LinkContainer>
-                                                                        <LinkContainer to="#"><Dropdown.Item>Edit Profile</Dropdown.Item></LinkContainer>
+                                                                        {/* <LinkContainer to="#"><Dropdown.Item>Edit Profile</Dropdown.Item></LinkContainer> */}
 
                                                                         {row.status === 'Not Verified' && <LinkContainer to="#"><Dropdown.Item onClick={() => onUpdateStatus(row)}>Update Status</Dropdown.Item></LinkContainer>}
                                                                     </Dropdown.Menu>
