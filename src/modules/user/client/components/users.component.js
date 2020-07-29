@@ -126,7 +126,8 @@ export default function Users() {
                                     (userdata.page > 1))
                                     && userdata['users'] &&
                                     <div className="pagination justify-content-end align-items-center  border-top p-3">
-                                        {userdata.start + '-' + userdata.end + ' of ' + userdata.total}
+                                        {/* {userdata.start + '-' + userdata.end + ' of ' + userdata.total} */}
+                                        <span>{userdata.start + '-' + userdata.end }</span> <span> {' of ' + userdata.total}</span> 
                                         <LinkContainer to={`list?page=${userdata.page - 1}&country_iso2=${userdata.country_iso2}`}>
                                             <button className="btn btn-sm cdp-btn-secondary text-white mx-2" onClick={() => pageLeft()} disabled={userdata.page <= 1}>Prev</button>
                                         </LinkContainer>

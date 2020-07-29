@@ -120,7 +120,7 @@ export default function hcpUsers() {
                                         <Dropdown.Toggle variant="" className="ml-2 bg-white rounded-0">
                                                     {hcps.status ? hcps.status : 'All'}
                                                 </Dropdown.Toggle>
-                                                <Dropdown.Menu>
+                                                <Dropdown.Menu> 
                                                     <LinkContainer to={`list?page=1&status=null&country_iso2=${hcps.country_iso2}`}><Dropdown.Item className={hcps.status === null ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, null, hcps.country_iso2))}>All</Dropdown.Item></LinkContainer>
                                                     <LinkContainer to={`list?page=1&status=Approved&country_iso2=${hcps.country_iso2}`}><Dropdown.Item className={hcps.status === 'Approved' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, 'Approved', hcps.country_iso2))}>Approved</Dropdown.Item></LinkContainer>
                                                     <LinkContainer to={`list?page=1&status=Consent Pending&country_iso2=${hcps.country_iso2}`}><Dropdown.Item className={hcps.status === 'Consent Pending' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, 'Consent Pending', hcps.country_iso2))}>Consent Pending</Dropdown.Item></LinkContainer>
@@ -248,6 +248,7 @@ export default function hcpUsers() {
                                                             <span>
                                                                 <Dropdown className="ml-auto dropdown-customize">
                                                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm">
+                                                                        { console.log("=========================Habib=====================>", currentAction)}
                                                                         {currentAction ? currentAction : 'Select an action'}
                                                                     </Dropdown.Toggle>
                                                                     <Dropdown.Menu>
@@ -268,7 +269,7 @@ export default function hcpUsers() {
                                             (hcps.page > 1))
                                             && hcps['users'] &&
                                             < div className="pagination justify-content-end align-items-center mb-4 border-top pt-3">
-                                                {hcps.start + '-' + hcps.end + ' of ' + hcps.total}
+                                                <span>{hcps.start + '-' + hcps.end }</span> <span> {' of ' + hcps.total}</span> 
                                                 <LinkContainer to={`list?page=${hcps.page - 1}&status=${hcps.status}&country_iso2=${hcps.country_iso2}`}>
                                                     <button className="btn btn-sm cdp-btn-secondary text-white mx-2" onClick={() => pageLeft()} disabled={hcps.page <= 1}>Prev</button>
                                                 </LinkContainer>

@@ -160,6 +160,45 @@ export default function UserForm() {
                                                                     {applications.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
                                                                 </Field>
                                                             </div>
+                                                            <div className="form-group">
+                                                                <label className="font-weight-bold" htmlFor="countries">Select Countries <span className="text-danger">*</span></label>
+                                                                <FieldArray
+                                                                    name="countries"
+                                                                    render={arrayHelpers => (
+                                                                        <div>
+                                                                            {
+                                                                                countries.map(item =>
+                                                                                    <div key={item.countryid} className="custom-control custom-checkbox">
+                                                                                        <input
+                                                                                            name="countries"
+                                                                                            type="checkbox"
+                                                                                            value={item.country_iso2}
+                                                                                            className="custom-control-input"
+                                                                                            id={item.country_iso2}
+                                                                                            checked={selectedCountries.includes(item.country_iso2)}
+                                                                                            onChange={e => {
+                                                                                                if (e.target.checked) {
+                                                                                                    arrayHelpers.push(item.country_iso2);
+                                                                                                }
+                                                                                                else {
+                                                                                                    const idx = countries.indexOf(c => c.country_iso2 === item.country_iso2);
+                                                                                                    arrayHelpers.remove(idx);
+                                                                                                }
+                                                                                            }}
+                                                                                            onClick={() => { selectCountry(item.country_iso2, selectedCountries.find(s => s === item.country_iso2) ? true : false) }}
+                                                                                        />
+                                                                                        <label className="custom-control-label" for={item.country_iso2}>{item.countryname}</label>
+                                                                                    </div>
+                                                                                )
+
+                                                                            }
+                                                                        </div>
+                                                                    )}
+                                                                />
+                                                                <div className="invalid-feedback">
+                                                                    <ErrorMessage name="countries" />
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                         <div className="col-12 col-sm-6">
                                                             <div className="form-group">
@@ -203,47 +242,6 @@ export default function UserForm() {
 
                                                                 <div className="invalid-feedback">
                                                                     <ErrorMessage name="roles" />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-12 col-sm-6">
-                                                            <div className="form-group">
-                                                                <label className="font-weight-bold" htmlFor="countries">Select Countries <span className="text-danger">*</span></label>
-                                                                <FieldArray
-                                                                    name="countries"
-                                                                    render={arrayHelpers => (
-                                                                        <div>
-                                                                            {
-                                                                                countries.map(item =>
-                                                                                    <div key={item.countryid} className="custom-control custom-checkbox">
-                                                                                        <input 
-                                                                                            name="countries"
-                                                                                            type="checkbox"
-                                                                                            value={item.country_iso2}
-                                                                                            className="custom-control-input" 
-                                                                                            id={item.country_iso2}
-                                                                                            checked={selectedCountries.includes(item.country_iso2)}
-                                                                                            onChange={e => {
-                                                                                                if (e.target.checked) {
-                                                                                                    arrayHelpers.push(item.country_iso2);
-                                                                                                }
-                                                                                                else {
-                                                                                                    const idx = countries.indexOf(c => c.country_iso2 === item.country_iso2);
-                                                                                                    arrayHelpers.remove(idx);
-                                                                                                }
-                                                                                            }}
-                                                                                            onClick={() => { selectCountry(item.country_iso2, selectedCountries.find(s => s === item.country_iso2) ? true : false) }}
-                                                                                        />
-                                                                                        <label className="custom-control-label" for={item.country_iso2}>{item.countryname}</label>
-                                                                                    </div>
-                                                                                )
-
-                                                                            }
-                                                                        </div>
-                                                                    )}
-                                                                />
-                                                                <div className="invalid-feedback">
-                                                                    <ErrorMessage name="countries" />
                                                                 </div>
                                                             </div>
                                                         </div>
