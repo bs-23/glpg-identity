@@ -21,21 +21,21 @@ export default function reducer(state = initialState, action) {
         //     }
         // }
 
-        case Types.EDIT_HCPS_FULFILLED: {
-            return {
-                ...state,
-                hcps: {
-                    ...state.hcps,
-                    users: (state['hcps'].users).map(item => {
-                        if (item.id === action.payload.data.id) {
-                            return action.payload.data
-                        }
-                        return item
-                    })
-                }
+        // case Types.EDIT_HCPS_FULFILLED: {
+        //     return {
+        //         ...state,
+        //         hcps: {
+        //             ...state.hcps,
+        //             users: (state['hcps'].users).map(item => {
+        //                 if (item.id === action.payload.data.id) {
+        //                     return action.payload.data
+        //                 }
+        //                 return item
+        //             })
+        //         }
 
-            };
-        }
+        //     };
+        // }
     }
     return state;
 }

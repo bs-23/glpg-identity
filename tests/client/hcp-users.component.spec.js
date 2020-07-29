@@ -60,6 +60,8 @@ describe('Hcp user component', () => {
 
         countries = [ { countryid: 1, country_iso2: "IE", country_iso3: "IRL", codbase: "WUK", countryname: "Ireland"} ]
         fakeAxios.onGet('/api/countries').reply(200, countries);
+
+        fakeAxios.onPut(`/api/hcp-profiles/${1}/approve`).reply(200);
     });
 
     const userSlice = () => store.getState().userReducer;
@@ -116,6 +118,33 @@ describe('Hcp user component', () => {
         const first_td = tds[0];
 
         expect(first_td.textContent).toEqual('a');
+    });
+
+    it('should work', async () => {
+        const { debug, getByTestId, getByText, container } = render(wrapperComponent());
+        const tbody = await waitFor(() => container.querySelector('tbody'));
+        const rows = tbody.childNodes;
+        const first_row = rows[0];
+        const actionBtn = first_row.childNodes[7].childNodes[0].childNodes[0].childNodes[0];
+        // actionBtn.setAttribute("aria-expanded", true);
+
+        fireEvent.click(actionBtn);
+
+        const updateBtn = await waitFor(() => getByText('Update Status')); 
+
+        fireEvent.click(updateBtn);
+
+        const approveBtn = await waitFor(() => getByText('Approve User'));
+        const commentInput = await waitFor(() => getByTestId('comment'));
+        const submitBtn = await waitFor(() => getByTestId('submit'));
+        
+        await waitFor(() => fireEvent.click(approveBtn));
+        await waitFor(() => fireEvent.change(commentInput, { target: { value: 'a' } }));
+        
+        expect(commentInput.value).toEqual('a');
+
+        await waitFor(() => fireEvent.click(submitBtn));
+        
     });
 
     // it('should sort table data by first name', async () => {

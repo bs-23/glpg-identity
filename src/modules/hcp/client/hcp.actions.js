@@ -11,16 +11,16 @@ export function getHcpProfiles(page, status, country_iso2) {
     };
 }
 
-export function editHcpProfiles(data, id) {
-    return {
-        type: Types.EDIT_HCPS,
-        payload: axios({
-            method: 'put',
-            url: '/api/hcps/' + id,
-            data
-        })
-    };
-}
+// export function editHcpProfiles(data, id) {
+//     return {
+//         type: Types.EDIT_HCPS,
+//         payload: axios({
+//             method: 'put',
+//             url: '/api/hcps/' + id,
+//             data
+//         })
+//     };
+// }
 
 // export function hcpsSort(type, val) {
 //     return {
