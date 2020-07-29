@@ -642,7 +642,7 @@ async function resetPassword(req, res) {
             await sendRegistrationSuccessMail(doc, req.user);
         }
 
-        await doc.update({ password: req.body.new_password });
+        await doc.update({ password: req.body.new_password, reset_password_token: null, reset_password_expires: null });
 
         response.data = 'Password reset successfully.';
         res.send(response);
