@@ -79,10 +79,10 @@ async function sendConsentConfirmationMail(user, consents, application) {
     const consentConfirmationToken = generateConsentConfirmationAccessToken(user);
     const mailOptions = generateDefaultEmailOptions(user);
 
-    mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/double-opt-in-consent-confirm.html`),
-        mailOptions.subject = 'Request consent confirmation',
-        mailOptions.data.consents = consents || [],
-        mailOptions.data.link = `${application.consent_confirmation_link}?token=${consentConfirmationToken}&journey=consent_confirmation&country_lang=${user.country_iso2}_${user.language_code}`;
+    mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/double-opt-in-consent-confirm.html`)
+    mailOptions.subject = 'Request consent confirmation'
+    mailOptions.data.consents = consents || []
+    mailOptions.data.link = `${application.consent_confirmation_link}?token=${consentConfirmationToken}&journey=consent_confirmation&country_lang=${user.country_iso2}_${user.language_code}`;
 
     await emailService.send(mailOptions);
 }
