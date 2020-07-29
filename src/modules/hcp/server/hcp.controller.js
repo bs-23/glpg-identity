@@ -136,6 +136,12 @@ async function addPasswordResetTokenToUser(user) {
 async function getHcps(req, res) {
     const response = new Response({}, []);
 
+    function ignoreCaseArray(str) {
+        return [str.toLowerCase(), str.toUpperCase(), str.charAt(0).toLowerCase() + str.charAt(1).toUpperCase(), str.charAt(0).toUpperCase() + str.charAt(1).toLowerCase()]
+    }
+
+
+
     try {
         const page = req.query.page ? req.query.page - 1 : 0;
         const limit = 15;
@@ -144,13 +150,14 @@ async function getHcps(req, res) {
         const offset = page * limit;
 
         const application_list = (await Hcp.findAll()).map(i => i.get("application_id"));
-        const country_iso2_list = req.user.type === 'admin' ? (await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry", { type: QueryTypes.SELECT })).map(i => i.country_iso2) : (await Hcp.findAll()).map(i => i.get("country_iso2"));
+        let country_iso2_list = req.user.type === 'admin' ? (await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry", { type: QueryTypes.SELECT })).map(i => i.country_iso2) : (await Hcp.findAll()).map(i => i.get("country_iso2"));
+        country_iso2_list = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
         const specialty_list = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwspecialtymaster", { type: QueryTypes.SELECT });
 
         const hcp_filter = {
             status: status === null ? { [Op.or]: ['Approved', 'Consent Pending', 'Not Verified', 'Rejected', null] } : status,
             application_id: req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
-            country_iso2: country_iso2 ? { [Op.or]: [country_iso2, country_iso2.toLowerCase()] } : req.user.type === 'admin' ? { [Op.or]: country_iso2_list.concat(country_iso2_list.map(v => v.toLowerCase())) } : req.user.countries
+            country_iso2: country_iso2 ? { [Op.or]: ignoreCaseArray(country_iso2) } : req.user.type === 'admin' ? { [Op.or]: [country_iso2_list] } : [].concat.apply([], req.user.countries.map(i => ignoreCaseArray(i)))
         };
 
         const hcps = await Hcp.findAll({
@@ -642,7 +649,7 @@ async function resetPassword(req, res) {
             await sendRegistrationSuccessMail(doc, req.user);
         }
 
-        await doc.update({ password: req.body.new_password });
+        await doc.update({ password: req.body.new_password, reset_password_token: null, reset_password_expires: null });
 
         response.data = 'Password reset successfully.';
         res.send(response);

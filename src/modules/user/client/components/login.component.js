@@ -2,6 +2,7 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { Form, Formik, Field, ErrorMessage } from "formik";
 import { Link } from 'react-router-dom';
+import { useToasts } from 'react-toast-notifications';
 
 import { login } from "../user.actions";
 import { loginSchema } from "../user.schema";
@@ -9,6 +10,7 @@ import { loginSchema } from "../user.schema";
 
 export default function Login() {
     const dispatch = useDispatch();
+    const { addToast } = useToasts();
 
     return (
         <div className="app-login">
@@ -34,7 +36,10 @@ export default function Login() {
                                             password: values.password
                                         }))
                                         .catch(error => {
-                                            alert(error.response.data);
+                                            addToast(error.response.data, {
+                                                appearance: 'error',
+                                                autoDismiss: true
+                                            });
                                         });
 
                                         actions.setSubmitting(false);
