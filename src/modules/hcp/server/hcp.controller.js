@@ -166,7 +166,7 @@ async function getHcps(req, res) {
             offset,
             limit,
             order: [
-                ['created_at', 'ASC'],
+                ['created_at', 'DESC'],
                 ['id', 'ASC']
             ]
         });
