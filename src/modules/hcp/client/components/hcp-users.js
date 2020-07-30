@@ -91,7 +91,7 @@ export default function hcpUsers() {
                             <ol className="breadcrumb rounded-0">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/hcps">Information Management</NavLink></li>
-                                <li className="breadcrumb-item active"><span>HCP Profiles List</span></li>
+                                <li className="breadcrumb-item active"><span>HCP Profile List</span></li>
                             </ol>
                         </nav>
                     </div>
