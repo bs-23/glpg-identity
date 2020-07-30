@@ -133,14 +133,13 @@ async function addPasswordResetTokenToUser(user) {
     await user.save();
 }
 
+function ignoreCaseArray(str) {
+    return [str.toLowerCase(), str.toUpperCase(), str.charAt(0).toLowerCase() + str.charAt(1).toUpperCase(), str.charAt(0).toUpperCase() + str.charAt(1).toLowerCase()]
+}
+
+
 async function getHcps(req, res) {
     const response = new Response({}, []);
-
-    function ignoreCaseArray(str) {
-        return [str.toLowerCase(), str.toUpperCase(), str.charAt(0).toLowerCase() + str.charAt(1).toUpperCase(), str.charAt(0).toUpperCase() + str.charAt(1).toLowerCase()]
-    }
-
-
 
     try {
         const page = req.query.page ? req.query.page - 1 : 0;
@@ -390,7 +389,9 @@ async function createHcpProfile(req, res) {
                     consent_id: consentDetails.id,
                     title: consentDetails.rich_text,
                     response: consentResponse,
-                    consent_confirmed: consentDetails.opt_type === 'double' ? false : true
+                    consent_confirmed: consentDetails.opt_type === 'double' ? false : true,
+                    created_by: req.user.id,
+                    updated_by: req.user.id
                 });
             }));
 
