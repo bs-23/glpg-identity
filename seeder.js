@@ -177,7 +177,7 @@ async function init() {
             {
                 category_id: 'fe037405-c676-4d98-bd05-85008900c838',
                 title: 'I give my consent to send me promotional email',
-                rich_text: '<p>I give my consent for Galapagos to send me promotional and environmental information concerning all of Galapagos products and services on my provided email address.</p>',
+                rich_text: '<p>I give my consent for Galapagos to send me promotional and environmental information concerning all of Galapagos products and services on my provided email address. For more information on how we treat your personal information please refer to our <a href="https://www.glpg.com/">privacy notice.</a></p>',
                 slug: '',
                 type: 'online',
                 opt_type: 'double',

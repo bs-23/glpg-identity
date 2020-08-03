@@ -10,7 +10,7 @@ const makeCustomSlug = (title, country, language) => {
     const code = uniqueSlug(`${title} ${country} ${language}`);
     if(title.length > 50) return convertToSlug(`${title.substring(0, 50)} ${code}`);
     return convertToSlug(`${title} ${code}`);
-}
+};
 
 const Consent = sequelize.cdpConnector.define('consents', {
     id: {
@@ -30,7 +30,7 @@ const Consent = sequelize.cdpConnector.define('consents', {
     },
     rich_text: {
         allowNull: false,
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(500),
         set(value) {
             this.setDataValue('rich_text', validator.escape(value));
         }
