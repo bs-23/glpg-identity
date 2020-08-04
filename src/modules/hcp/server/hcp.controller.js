@@ -80,9 +80,9 @@ async function sendConsentConfirmationMail(user, consents, application) {
     const consentConfirmationToken = generateConsentConfirmationAccessToken(user);
     const mailOptions = generateDefaultEmailOptions(user);
 
-    mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/double-opt-in-consent-confirm.html`)
-    mailOptions.subject = 'Request consent confirmation'
-    mailOptions.data.consents = consents || []
+    mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/double-opt-in-consent-confirm.html`);
+    mailOptions.subject = 'Request consent confirmation';
+    mailOptions.data.consents = consents || [];
     mailOptions.data.link = `${application.consent_confirmation_link}?token=${consentConfirmationToken}&journey=consent_confirmation&country_lang=${user.country_iso2}_${user.language_code}`;
 
     await emailService.send(mailOptions);
@@ -135,9 +135,8 @@ async function addPasswordResetTokenToUser(user) {
 }
 
 function ignoreCaseArray(str) {
-    return [str.toLowerCase(), str.toUpperCase(), str.charAt(0).toLowerCase() + str.charAt(1).toUpperCase(), str.charAt(0).toUpperCase() + str.charAt(1).toLowerCase()]
+    return [str.toLowerCase(), str.toUpperCase(), str.charAt(0).toLowerCase() + str.charAt(1).toUpperCase(), str.charAt(0).toUpperCase() + str.charAt(1).toLowerCase()];
 }
-
 
 async function getHcps(req, res) {
     const response = new Response({}, []);
@@ -526,7 +525,7 @@ async function approveHCPUser(req, res) {
 
 async function rejectHCPUser(req, res) {
     const response = new Response({}, []);
-    const id = req.params.id
+    const id = req.params.id;
 
     try {
         const hcpUser = await Hcp.findOne({ where: { id } });
@@ -536,20 +535,19 @@ async function rejectHCPUser(req, res) {
             return res.status(404).send(response);
         }
 
-        await HcpArchives.create({ ...hcpUser.dataValues, status: 'rejected' })
+        await HcpArchives.create({ ...hcpUser.dataValues, status: 'rejected' });
 
         response.data = getHcpViewModel(hcpUser.dataValues);
 
-        const logData = {
-            event_type: 'DELETE',
+        await logService.log({
+            event_type: 'CREATE',
             object_id: hcpUser.id,
-            table_name: 'hcp_profiles',
+            table_name: 'hcp_archives',
             created_by: req.user.id,
             description: req.body.comment
-        }
+        });
 
-        await hcpUser.destroy()
-        await logService.log(logData);
+        await hcpUser.destroy();
 
         res.json(response);
     } catch (err) {
@@ -772,5 +770,5 @@ exports.forgetPassword = forgetPassword;
 exports.getSpecialties = getSpecialties;
 exports.getAccessToken = getAccessToken;
 exports.confirmConsents = confirmConsents;
-exports.approveHCPUser = approveHCPUser
-exports.rejectHCPUser = rejectHCPUser
+exports.approveHCPUser = approveHCPUser;
+exports.rejectHCPUser = rejectHCPUser;

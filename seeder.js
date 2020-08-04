@@ -59,9 +59,7 @@ async function init() {
                     callback();
                 });
             });
-
         });
-
     }
 
     function roleSeeder(callback) {
@@ -80,9 +78,7 @@ async function init() {
                     callback();
                 });
             });
-
         });
-
     }
 
     function rolePermissionSeeder(callback) {
@@ -221,9 +217,7 @@ async function init() {
                 country_iso2: 'nl',
                 language_code: 'en'
             }
-
-
-        ]
+        ];
 
         Consent.destroy({
             where: {},
@@ -242,11 +236,10 @@ async function init() {
                         ignoreDuplicates: false
                     }).then(function () {
                         callback();
-
                     })
-                })
-            })
-        })
+                });
+            });
+        });
     }
 
     async.waterfall([userSeeder, permissionSeeder, roleSeeder, rolePermissionSeeder, userRoleSeeder, applicationSeeder, consentSeeder], function (err) {
