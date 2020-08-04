@@ -2,8 +2,10 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { Route, Redirect } from "react-router-dom";
 import Navbar from "./components/navbar.component";
+import { useCookies } from 'react-cookie';
 
 export default function PrivateRoute({ component: Component, module, ...rest }) {
+    const [cookies, setCookie] = useCookies();
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
     const roles = loggedInUser ? loggedInUser.roles : [];
     let permissions = [];
@@ -12,7 +14,6 @@ export default function PrivateRoute({ component: Component, module, ...rest }) 
         const union = (a, b) => [...new Set([...a, ...b])];
         if(role.permissions) permissions = union(permissions, role.permissions);
     })
-    // const permissions = loggedInUser ? loggedInUser.permissions : [];
 
     return (
         <Route {...rest} render={props => {
@@ -27,7 +28,7 @@ export default function PrivateRoute({ component: Component, module, ...rest }) 
                         pathname: "/forbidden",
                         state: { from: props.location }
                     })
-                ) : (
+                ) : cookies.logged_in ? null : (
                     <Redirect push to={{
                         pathname: "/login",
                         state: { from: props.location }
