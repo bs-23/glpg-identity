@@ -2,6 +2,7 @@ const path = require('path');
 const { Op } = require('sequelize');
 const Consent = require('./consent.model');
 const ConsentCategory = require('./consent-category.model');
+const ConsentLanguage = require('./consent_language.model');
 const validator = require('validator');
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 
@@ -11,7 +12,7 @@ async function getConsents(req, res) {
     try {
         const { country_lang } = req.query;
 
-        if(!country_lang) {
+        if (!country_lang) {
             response.errors.push(new CustomError('Invalid query parameter'));
             return res.status(400).send(response);
         }
@@ -19,7 +20,7 @@ async function getConsents(req, res) {
         let [country_iso2, language_code] = country_lang.split('_');
         language_code = language_code || 'en';
 
-        const consents = await Consent.findAll({
+        const consentLangs = await ConsentLanguage.findAll({
             where: {
                 country_iso2: {
                     [Op.or]: [
@@ -36,27 +37,31 @@ async function getConsents(req, res) {
             },
             include: [
                 {
-                    model: ConsentCategory
+                    model: Consent,
+                    as: 'consent',
+                    include: [{
+                        model: ConsentCategory,
+                    }]
                 }
             ]
         });
 
-        const result = consents.map( consent => {
+        const result =  consentLangs.map(consentLang=> {
             return {
-                id: consent.id,
-                title: consent.title,
-                rich_text: validator.unescape(consent.rich_text),
-                slug: consent.slug,
-                opt_type: consent.opt_type,
-                category: consent.consent_category.type,
-                category_title: consent.consent_category.title,
-                country_iso2: consent.country_iso2,
-                language_code: consent.language_code,
-                purpose: consent.purpose,
+                id: consentLang.consent.id,
+                title: consentLang.consent.title,
+                rich_text: validator.unescape(consentLang.rich_text),
+                slug: consentLang.consent.slug,
+                opt_type: consentLang.consent.opt_type,
+                category: consentLang.consent.consent_category.type,
+                category_title: consentLang.consent.consent_category.title,
+                country_iso2: consentLang.country_iso2,
+                language_code: consentLang.language_code,
+                purpose: consentLang.consent.purpose,
             }
         });
 
-        response.data = result;
+         response.data =  result;
 
         res.json(response);
     } catch (err) {
