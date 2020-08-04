@@ -3,10 +3,16 @@ import { useDispatch } from "react-redux";
 import { Form, Formik, Field, ErrorMessage } from "formik";
 import { Link } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
+import ReCAPTCHA from "react-google-recaptcha";
+import axios from 'axios';
 
 import { login } from "../user.actions";
 import { loginSchema } from "../user.schema";
 
+async function onSolveCaptcha(captchaResponseToken) {
+    console.log("Captcha value:", captchaResponseToken);
+    const siteVerifyResponse = await axios.post(`/api/users/site-verify`, { captchaResponseToken: captchaResponseToken });
+}
 
 export default function Login() {
     const dispatch = useDispatch();
@@ -35,12 +41,12 @@ export default function Login() {
                                             email: values.email,
                                             password: values.password
                                         }))
-                                        .catch(error => {
-                                            addToast(error.response.data, {
-                                                appearance: 'error',
-                                                autoDismiss: true
+                                            .catch(error => {
+                                                addToast(error.response.data, {
+                                                    appearance: 'error',
+                                                    autoDismiss: true
+                                                });
                                             });
-                                        });
 
                                         actions.setSubmitting(false);
                                     }}
@@ -57,6 +63,12 @@ export default function Login() {
                                                 <Field className="form-control" data-testid="password" type="password" name="password" autoComplete="current-password" />
                                                 <div className="invalid-feedback" data-testid="password-error"><ErrorMessage name="password" /></div>
                                             </div>
+
+                                            <ReCAPTCHA
+                                                sitekey={process.env.RECAPTCHA_SITE_KEY}
+                                                onChange={onSolveCaptcha}
+                                            />
+
                                             <button type="submit" className="btn btn-block text-white app-login__btn mt-4 p-2">Sign In</button>
                                         </Form>
                                     )}

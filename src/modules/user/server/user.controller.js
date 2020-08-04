@@ -11,6 +11,7 @@ const UserRole = require(path.join(process.cwd(), "src/modules/user/server/user-
 const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
 const RolePermission = require(path.join(process.cwd(), "src/modules/user/server/role/role-permission.model"));
 const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
+const axios = require("axios");
 
 function validatePassword(password) {
     const minimumPasswordLength = 8;
@@ -468,6 +469,27 @@ async function resetPassword(req, res) {
     }
 }
 
+async function siteVerify(req, res) {
+    try {
+        const { captchaResponseToken } = req.body;
+
+        const siteverifyResponse = await axios.post(
+            `https://www.google.com/recaptcha/api/siteverify?secret=6LdZN7oZAAAAAK3T7IXHbEAHFEJOzHCUtyB-1nse&response=${captchaResponseToken}`,
+            null,
+            {
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
+                }
+            }
+        );
+
+        res.json(siteverifyResponse.data);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+}
+
 exports.login = login;
 exports.logout = logout;
 exports.createUser = createUser;
@@ -478,3 +500,4 @@ exports.getUsers = getUsers;
 exports.getUser = getUser;
 exports.sendPasswordResetLink = sendPasswordResetLink;
 exports.resetPassword = resetPassword;
+exports.siteVerify = siteVerify;

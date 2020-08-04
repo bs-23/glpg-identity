@@ -23,4 +23,6 @@ module.exports = app => {
     app.post('/api/users/forgot-password', controller.sendPasswordResetLink);
 
     app.put('/api/users/reset-password', controller.resetPassword);
+
+    app.post('/api/users/site-verify', controller.siteVerify);
 };
