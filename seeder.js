@@ -22,6 +22,7 @@ async function init() {
     require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model'));
     require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_profile.model'));
     require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
+    require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_archives.model'));
     require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
 
     await sequelize.cdpConnector.sync();

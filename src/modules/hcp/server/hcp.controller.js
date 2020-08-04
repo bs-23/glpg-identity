@@ -5,7 +5,8 @@ const jwt = require('jsonwebtoken');
 const validator = require('validator');
 const { QueryTypes, Op } = require('sequelize');
 const Hcp = require('./hcp_profile.model');
-const HcpConsents = require('./hcp_consents.model');
+const HcpArchives = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_archives.model'));
+const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
 const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
@@ -535,19 +536,19 @@ async function rejectHCPUser(req, res) {
             return res.status(404).send(response);
         }
 
-        hcpUser.status = 'Rejected';
-        await hcpUser.save();
+        await HcpArchives.create({ ...hcpUser.dataValues, status: 'Rejected' })
 
         response.data = getHcpViewModel(hcpUser.dataValues);
 
         const logData = {
-            event_type: 'UPDATE',
+            event_type: 'DELETE',
             object_id: hcpUser.id,
             table_name: 'hcp_profiles',
             created_by: req.user.id,
             description: req.body.comment
         }
 
+        await hcpUser.destroy()
         await logService.log(logData);
 
         res.json(response);
