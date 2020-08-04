@@ -156,7 +156,7 @@ async function getHcps(req, res) {
 
 
         const hcp_filter = {
-            status: status === null ? { [Op.or]: ['Approved', 'Consent Pending', 'Not Verified', 'Rejected', null] } : status,
+            status: status === null ? { [Op.or]: ['approved', 'consent_pending', 'not_verified', null] } : status,
             application_id: req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
             country_iso2: country_iso2 ? { [Op.any]: ignoreCaseArray(country_iso2) } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : [].concat.apply([], req.user.countries.map(i => ignoreCaseArray(i)))
         };
@@ -402,19 +402,19 @@ async function createHcpProfile(req, res) {
             });
         }
 
-        hcpUser.status = master_data.individual_id_onekey ? hasDoubleOptIn ? 'Consent Pending' : 'Approved' : 'Not Verified';
+        hcpUser.status = master_data.individual_id_onekey ? hasDoubleOptIn ? 'consent_pending' : 'approved' : 'not_verified';
         await hcpUser.save();
 
         response.data = getHcpViewModel(hcpUser.dataValues);
 
-        if (hcpUser.dataValues.status === 'Consent Pending') {
+        if (hcpUser.dataValues.status === 'consent_pending') {
             const unconfirmedConsents = consentArr.filter(consent => !consent.consent_confirmed);
             const consentTitles = unconfirmedConsents.map(consent => validator.unescape(consent.title));
 
             await sendConsentConfirmationMail(hcpUser.dataValues, consentTitles, req.user);
         }
 
-        if (hcpUser.dataValues.status === 'Approved') {
+        if (hcpUser.dataValues.status === 'approved') {
             await addPasswordResetTokenToUser(hcpUser);
 
             response.data.password_reset_token = hcpUser.dataValues.reset_password_token;
@@ -450,7 +450,7 @@ async function confirmConsents(req, res) {
             });
         }
 
-        hcpUser.status = 'Approved';
+        hcpUser.status = 'approved';
         await addPasswordResetTokenToUser(hcpUser);
 
         response.data = {
@@ -495,14 +495,14 @@ async function approveHCPUser(req, res) {
             }
         }
 
-        hcpUser.status = hasDoubleOptIn ? 'Consent Pending' : 'Approved';
+        hcpUser.status = hasDoubleOptIn ? 'consent_pending' : 'approved';
         await hcpUser.save();
 
-        if (hcpUser.dataValues.status === 'Consent Pending') {
+        if (hcpUser.dataValues.status === 'consent_pending') {
             await sendConsentConfirmationMail(hcpUser, consentTitles, userApplication);
         }
 
-        if (hcpUser.dataValues.status === 'Approved') {
+        if (hcpUser.dataValues.status === 'approved') {
             await addPasswordResetTokenToUser(hcpUser);
             await sendPasswordSetupInstructionMail(hcpUser.dataValues, userApplication);
         }
@@ -536,7 +536,7 @@ async function rejectHCPUser(req, res) {
             return res.status(404).send(response);
         }
 
-        await HcpArchives.create({ ...hcpUser.dataValues, status: 'Rejected' })
+        await HcpArchives.create({ ...hcpUser.dataValues, status: 'rejected' })
 
         response.data = getHcpViewModel(hcpUser.dataValues);
 

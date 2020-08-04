@@ -124,10 +124,10 @@ export default function hcpUsers() {
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
                                                     <LinkContainer to={`list?page=1&status=null&country_iso2=${hcps.country_iso2}`}><Dropdown.Item className={hcps.status === null ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, null, hcps.country_iso2))}>All</Dropdown.Item></LinkContainer>
-                                                    <LinkContainer to={`list?page=1&status=Approved&country_iso2=${hcps.country_iso2}`}><Dropdown.Item className={hcps.status === 'Approved' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, 'Approved', hcps.country_iso2))}>Approved</Dropdown.Item></LinkContainer>
-                                                    <LinkContainer to={`list?page=1&status=Consent Pending&country_iso2=${hcps.country_iso2}`}><Dropdown.Item className={hcps.status === 'Consent Pending' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, 'Consent Pending', hcps.country_iso2))}>Consent Pending</Dropdown.Item></LinkContainer>
-                                                    <LinkContainer to={`list?page=1&status=Not Verified&country_iso2=${hcps.country_iso2}`}><Dropdown.Item className={hcps.status === 'Not Verified' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, 'Not Verified', hcps.country_iso2))}>Not Verified</Dropdown.Item></LinkContainer>
-                                                    <LinkContainer to={`list?page=1&status=Rejected&country_iso2=${hcps.country_iso2}`}><Dropdown.Item className={hcps.status === 'Rejected' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, 'Rejected', hcps.country_iso2))}>Rejected</Dropdown.Item></LinkContainer>
+                                                    <LinkContainer to={`list?page=1&status=approved&country_iso2=${hcps.country_iso2}`}><Dropdown.Item className={hcps.status === 'approved' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, 'approved', hcps.country_iso2))}>Approved</Dropdown.Item></LinkContainer>
+                                                    <LinkContainer to={`list?page=1&status=consent_pending&country_iso2=${hcps.country_iso2}`}><Dropdown.Item className={hcps.status === 'consent_pending' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, 'consent_pending', hcps.country_iso2))}>Consent Pending</Dropdown.Item></LinkContainer>
+                                                    <LinkContainer to={`list?page=1&status=not_verified&country_iso2=${hcps.country_iso2}`}><Dropdown.Item className={hcps.status === 'not_verified' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, 'not_verified', hcps.country_iso2))}>Not Verified</Dropdown.Item></LinkContainer>
+                                                    {/* <LinkContainer to={`list?page=1&status=Rejected&country_iso2=${hcps.country_iso2}`}><Dropdown.Item className={hcps.status === 'Rejected' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, 'Rejected', hcps.country_iso2))}>Rejected</Dropdown.Item></LinkContainer> */}
                                                 </Dropdown.Menu>
                                             </Dropdown>
                                         </React.Fragment>
@@ -182,10 +182,10 @@ export default function hcpUsers() {
                                                 <Form onSubmit={formikProps.handleSubmit}>
                                                     <div className="row">
                                                         <div className="col-6">
-                                                            <a onClick={() => formikProps.setFieldValue('selectedStatus', 'approve')} className={`btn btn-block cdp-btn-outline-primary mt-4 p-2  ${formikProps.values.selectedStatus === 'approve' ? 'selected' : ''}`} disabled={formikProps.isSubmitting || currentUser.status === 'Approved'}><i className="fas fa-check mr-1 text-success"></i> Approve User</a>
+                                                            <a onClick={() => formikProps.setFieldValue('selectedStatus', 'approve')} className={`btn btn-block cdp-btn-outline-primary mt-4 p-2  ${formikProps.values.selectedStatus === 'approve' ? 'selected' : ''}`} ><i className="fas fa-check mr-1 text-success"></i> Approve User</a>
                                                         </div>
                                                         <div className="col-6">
-                                                            <a onClick={() => formikProps.setFieldValue('selectedStatus', 'reject')} className={`btn btn-block cdp-btn-outline-secondary mt-4 p-2  ${formikProps.values.selectedStatus === 'reject' ? 'selected' : ''}`} disabled={formikProps.isSubmitting || currentUser.status === 'Rejected'}><i className="fas fa-times mr-1 text-danger"></i> Reject User</a>
+                                                            <a onClick={() => formikProps.setFieldValue('selectedStatus', 'reject')} className={`btn btn-block cdp-btn-outline-secondary mt-4 p-2  ${formikProps.values.selectedStatus === 'reject' ? 'selected' : ''}`} ><i className="fas fa-times mr-1 text-danger"></i> Reject User</a>
                                                         </div>
                                                     </div>
                                                     <div className="row mt-4">
@@ -238,10 +238,10 @@ export default function hcpUsers() {
                                                         <td>{row.first_name}</td>
                                                         <td>{row.last_name}</td>
                                                         <td>
-                                                            {row.status === 'Approved' ? <span><i className="fa fa-xs fa-circle text-success pr-2"></i>Approved</span> :
-                                                                row.status === 'Consent Pending' ? <span><i className="fa fa-xs fa-circle text-warning pr-2"></i>Consent Pending</span> :
-                                                                    row.status === 'Not Verified' ? <span><i className="fa fa-xs fa-circle text-warning pr-2"></i>Not Verified</span> :
-                                                                        row.status === 'Rejected' ? <span><i className="fa fa-xs fa-circle text-danger pr-2"></i>Rejected</span> : <span></span>
+                                                            {row.status === 'approved' ? <span><i className="fa fa-xs fa-circle text-success pr-2"></i>Approved</span> :
+                                                                row.status === 'consent_pending' ? <span><i className="fa fa-xs fa-circle text-warning pr-2"></i>Consent Pending</span> :
+                                                                    row.status === 'not_verified' ? <span><i className="fa fa-xs fa-circle text-warning pr-2"></i>Not Verified</span> :
+                                                                        row.status === 'rejected' ? <span><i className="fa fa-xs fa-circle text-danger pr-2"></i>Rejected</span> : <span></span>
                                                             }
                                                         </td>
                                                         <td>{row.uuid}</td>
@@ -256,7 +256,7 @@ export default function hcpUsers() {
                                                                         <LinkContainer to="#"><Dropdown.Item>Manage Profile</Dropdown.Item></LinkContainer>
                                                                         {/* <LinkContainer to="#"><Dropdown.Item>Edit Profile</Dropdown.Item></LinkContainer> */}
 
-                                                                        {row.status === 'Not Verified' && <LinkContainer to="#"><Dropdown.Item onClick={() => onUpdateStatus(row)}>Manage Status</Dropdown.Item></LinkContainer>}
+                                                                        {row.status === 'not_verified' && <LinkContainer to="#"><Dropdown.Item onClick={() => onUpdateStatus(row)}>Manage Status</Dropdown.Item></LinkContainer>}
                                                                     </Dropdown.Menu>
                                                                 </Dropdown>
                                                             </span>

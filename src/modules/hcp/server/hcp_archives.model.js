@@ -51,7 +51,7 @@ const HcpArchives = sequelize.cdpConnector.define('hcp_archives', {
     },
     status: {
         type: DataTypes.ENUM,
-        values: ['Rejected']
+        values: ['rejected']
     },
     created_by: {
         type: DataTypes.UUID
