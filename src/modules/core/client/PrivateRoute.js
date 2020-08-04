@@ -5,7 +5,14 @@ import Navbar from "./components/navbar.component";
 
 export default function PrivateRoute({ component: Component, module, ...rest }) {
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
-    const permissions = loggedInUser ? loggedInUser.permissions : [];
+    const roles = loggedInUser ? loggedInUser.roles : [];
+    let permissions = [];
+
+    roles.forEach(role => {
+        const union = (a, b) => [...new Set([...a, ...b])];
+        if(role.permissions) permissions = union(permissions, role.permissions);
+    })
+    // const permissions = loggedInUser ? loggedInUser.permissions : [];
 
     return (
         <Route {...rest} render={props => {
