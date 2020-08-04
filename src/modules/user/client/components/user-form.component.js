@@ -99,7 +99,6 @@ export default function UserForm() {
                                     displayName="UserForm"
                                     validationSchema={registerSchema}
                                     onSubmit={(values, actions) => {
-                                        console.log("=====================================================>", values);
                                         dispatch(createUser(values))
                                             .then(res => {
                                                 actions.resetForm();
