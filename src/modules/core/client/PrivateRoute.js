@@ -15,7 +15,7 @@ export default function PrivateRoute({ component: Component, module, ...rest }) 
         if(role.permissions) permissions = union(permissions, role.permissions);
     })
 
-    alert(typeof(cookies.logged_in))
+    // alert(typeof(cookies.logged_in))
     return (
         <Route {...rest} render={props => {
             return (
