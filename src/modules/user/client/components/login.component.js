@@ -38,7 +38,7 @@ export default function Login() {
                                             password: values.password
                                         }))
                                         .then( response => {
-                                            setCookie('logged_in', 'true', { path: '/' });
+                                            setCookie('logged_in', true, { path: '/' });
                                         })
                                         .catch(error => {
                                             addToast(error.response.data, {

@@ -9,7 +9,7 @@ export default function Navbar() {
 
     const handleLogOut = () => {
         // alert('clicked auto');
-        setCookie('logged_in', 'false', { path: '/' });
+        setCookie('logged_in', false, { path: '/' });
         removeCookie('logged_in');
     }
 
