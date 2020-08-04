@@ -145,8 +145,8 @@ async function getHcps(req, res) {
     try {
         const page = req.query.page ? req.query.page - 1 : 0;
         const limit = 15;
-        const status = req.query.status === 'null' ? null : req.query.status;
-        const country_iso2 = req.query.country_iso2 === 'null' ? null : req.query.country_iso2;
+        const status = req.query.status === undefined ? null : req.query.status;
+        const country_iso2 = req.query.country_iso2 === undefined ? null : req.query.country_iso2;
         const offset = page * limit;
 
         const application_list = (await Hcp.findAll()).map(i => i.get("application_id"));
