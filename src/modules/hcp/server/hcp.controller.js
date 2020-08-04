@@ -101,7 +101,7 @@ async function sendRegistrationSuccessMail(user, application) {
 async function sendResetPasswordSuccessMail(user, application) {
     const mailOptions = generateDefaultEmailOptions(user);
 
-    mailOptions.subject = 'Your password has been changed.';
+    mailOptions.subject = 'Your password has been reset.';
     mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/password-reset-success.html`);
 
     await emailService.send(mailOptions);
