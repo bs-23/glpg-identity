@@ -145,8 +145,9 @@ export default function hcpUsers() {
                             <Modal
                                 show={show}
                                 onHide={() => { setCurrentAction(''); setShow(false) }}
-                                dialogClassName="modal-90w modal-customize"
+                                dialogClassName="modal-customize"
                                 aria-labelledby="example-custom-modal-styling-title"
+                                centered
                             >
                                 <Modal.Header closeButton>
                                     <Modal.Title id="example-custom-modal-styling-title">
@@ -154,7 +155,7 @@ export default function hcpUsers() {
                                     </Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
-                                    <div className="p-2">
+                                    <div className="p-3">
                                         <div className="row">
                                             <div className="col">
                                                 <h4 className="font-weight-bold">{`${currentUser.first_name} ${currentUser.last_name}`}</h4>
@@ -189,22 +190,22 @@ export default function hcpUsers() {
                                                 <Form onSubmit={formikProps.handleSubmit}>
                                                     <div className="row">
                                                         <div className="col-6">
-                                                            <a onClick={() => formikProps.setFieldValue('selectedStatus', 'approve')} className={`btn btn-block cdp-btn-outline-primary mt-4 p-2  ${formikProps.values.selectedStatus === 'approve' ? 'selected' : ''}`} >Approve User</a>
+                                                            <a onClick={() => formikProps.setFieldValue('selectedStatus', 'approve')} className={`btn btn-block cdp-btn-outline-primary mt-4 p-2 font-weight-bold ${formikProps.values.selectedStatus === 'approve' ? 'selected' : ''}`} >Approve User</a>
                                                         </div>
                                                         <div className="col-6">
-                                                            <a onClick={() => formikProps.setFieldValue('selectedStatus', 'reject')} className={`btn btn-block cdp-btn-outline-danger mt-4 p-2  ${formikProps.values.selectedStatus === 'reject' ? 'selected' : ''}`} >Reject User</a>
+                                                            <a onClick={() => formikProps.setFieldValue('selectedStatus', 'reject')} className={`btn btn-block cdp-btn-outline-danger mt-4 p-2 font-weight-bold  ${formikProps.values.selectedStatus === 'reject' ? 'selected' : ''}`} >Reject User</a>
                                                         </div>
                                                     </div>
                                                     {formikProps.values.selectedStatus === 'reject' && <div className="row mt-4">
                                                         <div className="col-12 col-sm-12">
-                                                            <div className="form-group">
+                                                            <div className="form-group mb-0">
                                                                 <label className="font-weight-bold" htmlFor="comment">Comment <span className="text-danger">*</span></label>
                                                                 <Field className="form-control" data-testid='comment' component="textarea" rows="4" name="comment" />
                                                                 <div className="invalid-feedback"><ErrorMessage name="comment" /></div>
                                                             </div>
                                                         </div>
                                                     </div>}
-                                                    <button type="submit" data-testid='submit' className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!formikProps.values.selectedStatus || formikProps.isSubmitting}>Submit</button>
+                                                    <button type="submit" data-testid='submit' className="btn btn-block text-white cdp-btn-secondary mt-5 p-2" disabled={!formikProps.values.selectedStatus || formikProps.isSubmitting}>Save Changes</button>
                                                 </Form>
                                             )}
                                         </Formik>
