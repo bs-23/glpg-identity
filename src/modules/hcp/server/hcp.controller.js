@@ -82,7 +82,7 @@ async function sendConsentConfirmationMail(user, consents, application) {
     const mailOptions = generateDefaultEmailOptions(user);
 
     mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/double-opt-in-consent-confirm.html`);
-    mailOptions.subject = 'Request consent confirmation';
+    mailOptions.subject = 'Thank you for registering!';
     mailOptions.data.consents = consents || [];
     mailOptions.data.link = `${application.consent_confirmation_link}?token=${consentConfirmationToken}&journey=consent_confirmation&country_lang=${user.country_iso2}_${user.language_code}`;
 
@@ -92,7 +92,7 @@ async function sendConsentConfirmationMail(user, consents, application) {
 async function sendRegistrationSuccessMail(user, application) {
     const mailOptions = generateDefaultEmailOptions(user);
 
-    mailOptions.subject = `You have successfully created a ${application.name} account.`;
+    mailOptions.subject = `Congratulations your registration was successful`;
     mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/registration-success.html`);
     mailOptions.data.loginLink = `${application.login_link}?journey=login&country_lang=${user.country_iso2}_${user.language_code}`;
 
@@ -112,7 +112,7 @@ async function sendPasswordSetupInstructionMail(user, application) {
     const mailOptions = generateDefaultEmailOptions(user);
 
     mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/password-setup-instructions.html`);
-    mailOptions.subject = `Set a password for your account on ${application.name}`;
+    mailOptions.subject = `Registration verified. Please setup your password`;
     mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&journey=set_password&country_lang=${user.country_iso2}_${user.language_code}`;
 
     await emailService.send(mailOptions);
@@ -122,7 +122,7 @@ async function sendPasswordResetInstructionMail(user, application) {
     const mailOptions = generateDefaultEmailOptions(user);
 
     mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/password-reset-instructions.html`);
-    mailOptions.subject = `Reset the password for your account on ${application.name}`;
+    mailOptions.subject = `Setup Password`;
     mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&journey=set_password&country_lang=${user.country_iso2}_${user.language_code}`;
 
     await emailService.send(mailOptions);
