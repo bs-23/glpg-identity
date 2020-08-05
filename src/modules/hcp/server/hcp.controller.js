@@ -382,8 +382,8 @@ async function createHcpProfile(req, res) {
 
                 const consentLang = await ConsentLanguage.findOne({
                     where: {
-                        country_iso2: model.country_iso2,
-                        language_code: model.language_code,
+                        country_iso2: model.country_iso2.toLowerCase(),
+                        language_code: model.language_code.toLowerCase(),
                         consent_id: consentDetails.id
                     }
                 });
