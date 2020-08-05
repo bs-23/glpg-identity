@@ -6,7 +6,7 @@ export function getHcpProfiles(page, status, country_iso2) {
         type: Types.GET_HCPS,
         payload: axios({
             method: 'get',
-            url: `/api/hcps?${page?`page=${page}`:''}${status?`${page?'&':''}status=${status}`:''}${country_iso2?`${page||status?'&':''}country_iso2=${country_iso2}`:''}`
+            url: `/api/hcps?${page ? `page=${page}` : ''}${status ? `${page ? '&' : ''}status=${status}` : ''}${country_iso2 ? `${page || status ? '&' : ''}country_iso2=${country_iso2}` : ''}`
         })
     };
 }
@@ -22,12 +22,12 @@ export function getHcpProfiles(page, status, country_iso2) {
 //     };
 // }
 
-// export function hcpsSort(type, val) {
-//     return {
-//         type: Types.SORT_HCPS,
-//         payload: {
-//             type: type,
-//             val: val
-//         }
-//     };
-// }
+export function hcpsSort(type, val) {
+    return {
+        type: Types.SORT_HCPS,
+        payload: {
+            type: type,
+            val: val
+        }
+    };
+}
