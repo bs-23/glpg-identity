@@ -54,10 +54,12 @@ const UserDetails = (props) => {
                                         <span className="mr-2 d-block profile-detail__label">Roles</span>
                                         <span className="profile-detail__value">{userInfo.roles}</span>
                                     </div>
-                                    <div className="profile-detail__col pb-3">
-                                        <span className="mr-2 d-block profile-detail__label">Expiary Date</span>
-                                        <span className="profile-detail__value">{(new Date(userInfo.expiry_date)).toLocaleDateString().replace(/\//g, '-')}</span>
-                                    </div>
+                                    { userInfo.expiry_date ? 
+                                        <div className="profile-detail__col pb-3">
+                                            <span className="mr-2 d-block profile-detail__label">Expiary Date</span>
+                                            <span className="profile-detail__value">{(new Date(userInfo.expiry_date)).toLocaleDateString().replace(/\//g, '-')}</span>
+                                        </div> : null
+                                    }
                                 </div>
                                 <div className="profile-detail__row pb-0 pb-sm-2 d-block d-sm-flex">
                                     { userInfo.last_login ? 
@@ -66,10 +68,10 @@ const UserDetails = (props) => {
                                             <span className="profile-detail__value">{(new Date(userInfo.last_login)).toLocaleDateString().replace(/\//g, '-')}</span>
                                         </div> : null
                                     }
-                                    {/* <div className="profile-detail__col pb-3">
+                                    <div className="profile-detail__col pb-3">
                                         <span className="mr-2 d-block profile-detail__label">Status</span>
-                                        <span className="profile-detail__value">Active</span>
-                                    </div> */}
+                                        <span className="profile-detail__value">{ userInfo.status }</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>

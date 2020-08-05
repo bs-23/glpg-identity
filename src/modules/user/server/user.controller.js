@@ -86,6 +86,18 @@ function formatProfile(user) {
     return profile;
 }
 async function formatProfileDetail(user) {
+    // // attributes: ['id', 'first_name', 'last_name', 'email', 'phone', 'type', 'last_login', 'expiry_date']
+    // const user_data = {
+    //     id: user.id,
+    //     first_name: user.first_name,
+    //     last_name: user.last_name,
+    //     email: user.email,
+    //     phone: user.phone,
+    //     type: user.type,
+    //     last_login: user.last_login,
+    //     expiry_date: user.password ? null : user.expiry_date,
+    //     status: user.password ? 'Active' : 'Inactive'
+    // }
     const profile = {
         id: user.id,
         first_name: user.first_name,
@@ -94,7 +106,8 @@ async function formatProfileDetail(user) {
         type: user.type,
         phone: user.phone,
         last_login: user.last_login,
-        expiry_date: user.expiry_date,
+        expiry_date: user.password ? null : user.expiry_date,
+        status: user.password ? 'Active' : 'Inactive',
         roles: getCommaSeparatedRoles(user.userrole)
     };
 
@@ -338,7 +351,7 @@ async function getUser(req, res) {
             where: {
                 id: req.params.id
             },
-            include: [{
+            include: [{ 
                 model: UserRole,
                 as: 'userrole',
                 include: [{
@@ -346,9 +359,7 @@ async function getUser(req, res) {
                     as: 'role',
                 }]
             }],
-            attributes: ['id', 'first_name', 'last_name', 'email', 'phone', 'type', 'last_login', 'expiry_date']
         });
-
 
         if (!user) return res.status(404).send("User is not found or may be removed");
         const formattedUser = await formatProfileDetail(user);

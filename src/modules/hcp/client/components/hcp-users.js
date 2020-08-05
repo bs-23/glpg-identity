@@ -15,30 +15,35 @@ export default function hcpUsers() {
     const dispatch = useDispatch();
     const [countries, setCountries] = useState([]);
     const [show, setShow] = useState(false);
-    const [currentAction, setCurrentAction] = useState('')
-    const [currentUser, setCurrentUser] = useState({})
+    const [currentAction, setCurrentAction] = useState('');
+    const [currentUser, setCurrentUser] = useState({});
     const { addToast } = useToasts();
+    const [sort, setSort] = useState({ type: 'ASC', value: '' });
 
     const hcps = useSelector(state => state.hcpReducer.hcps);
 
     const pageLeft = () => {
-        console.log("==================================> page left");
         if (hcps.page > 1) dispatch(getHcpProfiles(hcps.page - 1, hcps.status, hcps.country_iso2));
     };
 
     const pageRight = () => {
-        console.log("==================================> page right");
         if (hcps.end !== hcps.total) dispatch(getHcpProfiles(hcps.page + 1, hcps.status, hcps.country_iso2));
     };
 
-    // const sortHcp = (sortType, val) => {
-    //     dispatch(hcpsSort(sortType, val));
-    // };
+
+    const sortHcp = (val) => {
+        if (sort.value === val) {
+            dispatch(hcpsSort(sort.type === 'ASC' ? 'DESC' : 'ASC', val));
+            setSort({ type: sort.type === 'ASC' ? 'DESC' : 'ASC', value: val });
+        } else {
+            dispatch(hcpsSort('ASC', val));
+            setSort({ type: 'ASC', value: val });
+        }
+    };
 
     async function getCountries() {
         const response = await axios.get('/api/countries');
         setCountries(response.data);
-        // console.log("===============================> countries ", response);
     }
 
     const onUpdateStatus = (user) => {
@@ -111,9 +116,9 @@ export default function hcpUsers() {
                                                     {hcps.country_iso2 && (countries.find(i => i.country_iso2 === hcps.country_iso2)) ? (countries.find(i => i.country_iso2 === hcps.country_iso2)).countryname : 'All'}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
-                                                    <LinkContainer to={`list${hcps.status ? `?status=${hcps.status}` : '' }`}><Dropdown.Item className={hcps.country_iso2 === null ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, hcps.status, null))}>All</Dropdown.Item></LinkContainer>
+                                                    <LinkContainer to={`list${hcps.status ? `?status=${hcps.status}` : ''}`}><Dropdown.Item className={hcps.country_iso2 === null ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, hcps.status, null))}>All</Dropdown.Item></LinkContainer>
                                                     {hcps['countries'].map((country, index) => (
-                                                        <LinkContainer key={index} to={`list?${hcps.status ? `status=${hcps.status}`:''}${country?`${status?'&':''}country_iso2=${country}`:''}`}><Dropdown.Item className={hcps.status === country ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, hcps.status, country))}>{(countries.find(i => i.country_iso2 === country)) ? (countries.find(i => i.country_iso2 === country)).countryname : null}</Dropdown.Item></LinkContainer>
+                                                        <LinkContainer key={index} to={`list?${hcps.status ? `status=${hcps.status}` : ''}${country ? `${status ? '&' : ''}country_iso2=${country}` : ''}`}><Dropdown.Item className={hcps.status === country ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, hcps.status, country))}>{(countries.find(i => i.country_iso2 === country)) ? (countries.find(i => i.country_iso2 === country)).countryname : null}</Dropdown.Item></LinkContainer>
                                                     ))}
                                                 </Dropdown.Menu>
                                             </Dropdown>
@@ -124,7 +129,7 @@ export default function hcpUsers() {
                                                     {hcps.status ? _.startCase(_.toLower(hcps.status.replace('_', ' '))) : 'All'}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
-                                                    <LinkContainer to={`list${hcps.country_iso2 ? `?country_iso2=${hcps.country_iso2}`: ''}`}><Dropdown.Item className={hcps.status === null ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, null, hcps.country_iso2))}>All</Dropdown.Item></LinkContainer>
+                                                    <LinkContainer to={`list${hcps.country_iso2 ? `?country_iso2=${hcps.country_iso2}` : ''}`}><Dropdown.Item className={hcps.status === null ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, null, hcps.country_iso2))}>All</Dropdown.Item></LinkContainer>
                                                     <LinkContainer to={`list?status=approved${hcps.country_iso2 ? `&country_iso2=${hcps.country_iso2}` : ''}`}><Dropdown.Item className={hcps.status === 'approved' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, 'approved', hcps.country_iso2))}>Approved</Dropdown.Item></LinkContainer>
                                                     <LinkContainer to={`list?status=consent_pending${hcps.country_iso2 ? `&country_iso2=${hcps.country_iso2}` : ''}`}><Dropdown.Item className={hcps.status === 'consent_pending' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, 'consent_pending', hcps.country_iso2))}>Consent Pending</Dropdown.Item></LinkContainer>
                                                     <LinkContainer to={`list?status=not_verified${hcps.country_iso2 ? `&country_iso2=${hcps.country_iso2}` : ''}`}><Dropdown.Item className={hcps.status === 'not_verified' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, 'not_verified', hcps.country_iso2))}>Not Verified</Dropdown.Item></LinkContainer>
@@ -211,23 +216,14 @@ export default function hcpUsers() {
                                     <div className="shadow-sm bg-white">
                                         <table className="table table-hover table-sm mb-0 cdp-table">
                                             <thead className="cdp-bg-primary text-white cdp-table__header">
-                                                {/*<tr>
-                                                <th>Email<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'email')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'email')}></i></span></th>
-                                                <th>Date of Registration<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'created_at')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'created_at')}></i></span></th>
-                                                <th>Name<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'first_name')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'first_name')}></i></span></th>
-                                                <th>Status<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'status')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'status')}></i></span></th>
-                                                <th>UUID <span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'uuid')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'uuid')}></i></span></th>
-                                                <th>Specialty<span className="d-inline-flex flex-column ml-1"><i className="fa fa-caret-up" onClick={() => sortHcp('ASC', 'specialty_name')}></i><i className="fa fa-caret-down" onClick={() => sortHcp('DESC', 'specialty_name')}></i></span></th>
-                                                <th>Action</th>
-                                            </tr>*/}
                                                 <tr>
-                                                    <th>Email</th>
-                                                    <th>Date of Registration</th>
-                                                    <th>First Name</th>
-                                                    <th>Last Name</th>
-                                                    <th>Status</th>
-                                                    <th>UUID</th>
-                                                    <th>Specialty</th>
+                                                    <th>Email<i className="icon icon-sorting cdp-table__icon-sorting" onClick={() => sortHcp('email')}></i></th>
+                                                    <th>Date of Registration<i className="icon icon-sorting cdp-table__icon-sorting" onClick={() => sortHcp('created_at')}></i></th>
+                                                    <th>First Name<i className="icon icon-sorting cdp-table__icon-sorting" onClick={() => sortHcp('first_name')}></i></th>
+                                                    <th>Last Name<i className="icon icon-sorting cdp-table__icon-sorting" onClick={() => sortHcp('last_name')}></i></th>
+                                                    <th>Status<i className="icon icon-sorting cdp-table__icon-sorting" onClick={() => sortHcp('status')}></i></th>
+                                                    <th>UUID <i className="icon icon-sorting cdp-table__icon-sorting" onClick={() => sortHcp('uuid')}></i></th>
+                                                    <th>Specialty<i className="icon icon-sorting cdp-table__icon-sorting" onClick={() => sortHcp('specialty_name')}></i></th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -272,10 +268,10 @@ export default function hcpUsers() {
                                             && hcps['users'] &&
                                             <div className="pagination justify-content-end align-items-center border-top p-3">
                                                 <span className="cdp-text-primary font-weight-bold">{hcps.start + ' - ' + hcps.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + hcps.total}</span>
-                                                <LinkContainer to={`list?page=${hcps.page - 1}${hcps.status ? `&status=${hcps.status}` : ''}${hcps.country_iso2 ? `&country_iso2=${hcps.country_iso2}`: ''}`}>
+                                                <LinkContainer to={`list?page=${hcps.page - 1}${hcps.status ? `&status=${hcps.status}` : ''}${hcps.country_iso2 ? `&country_iso2=${hcps.country_iso2}` : ''}`}>
                                                     <span className="pagination-btn" data-testid='Prev' onClick={() => pageLeft()} disabled={hcps.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
                                                 </LinkContainer>
-                                                <LinkContainer to={`list?page=${hcps.page + 1}${hcps.status ? `&status=${hcps.status}` : ''}${hcps.country_iso2 ? `&country_iso2=${hcps.country_iso2}`: ''}`}>
+                                                <LinkContainer to={`list?page=${hcps.page + 1}${hcps.status ? `&status=${hcps.status}` : ''}${hcps.country_iso2 ? `&country_iso2=${hcps.country_iso2}` : ''}`}>
                                                     <span className="pagination-btn" data-testid='Next' onClick={() => pageRight()} disabled={hcps.end === hcps.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
                                                 </LinkContainer>
                                             </div>
