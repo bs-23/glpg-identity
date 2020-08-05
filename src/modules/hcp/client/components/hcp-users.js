@@ -213,17 +213,17 @@ export default function hcpUsers() {
                             </Modal>
                             {hcps['users'] && hcps['users'].length > 0 &&
                                 <React.Fragment>
-                                    <div className="shadow-sm bg-white">
+                                    <div className="shadow-sm bg-white table-responsive">
                                         <table className="table table-hover table-sm mb-0 cdp-table">
                                             <thead className="cdp-bg-primary text-white cdp-table__header">
                                                 <tr>
-                                                    <th>Email<i className="icon icon-sorting cdp-table__icon-sorting" onClick={() => sortHcp('email')}></i></th>
-                                                    <th>Date of Registration<i className="icon icon-sorting cdp-table__icon-sorting" onClick={() => sortHcp('created_at')}></i></th>
-                                                    <th>First Name<i className="icon icon-sorting cdp-table__icon-sorting" onClick={() => sortHcp('first_name')}></i></th>
-                                                    <th>Last Name<i className="icon icon-sorting cdp-table__icon-sorting" onClick={() => sortHcp('last_name')}></i></th>
-                                                    <th>Status<i className="icon icon-sorting cdp-table__icon-sorting" onClick={() => sortHcp('status')}></i></th>
-                                                    <th>UUID <i className="icon icon-sorting cdp-table__icon-sorting" onClick={() => sortHcp('uuid')}></i></th>
-                                                    <th>Specialty<i className="icon icon-sorting cdp-table__icon-sorting" onClick={() => sortHcp('specialty_name')}></i></th>
+                                                    <th className="cdp-table__col-sorting" onClick={() => sortHcp('email')}>Email<i className="icon icon-sorting cdp-table__icon-sorting"></i></th>
+                                                    <th className="cdp-table__col-sorting" onClick={() => sortHcp('created_at')}>Date of Registration<i className="icon icon-sorting cdp-table__icon-sorting"></i></th>
+                                                    <th className="cdp-table__col-sorting" onClick={() => sortHcp('first_name')}>First Name<i className="icon icon-sorting cdp-table__icon-sorting"></i></th>
+                                                    <th className="cdp-table__col-sorting" onClick={() => sortHcp('last_name')}>Last Name<i className="icon icon-sorting cdp-table__icon-sorting"></i></th>
+                                                    <th className="cdp-table__col-sorting" onClick={() => sortHcp('status')}>Status<i className="icon icon-sorting cdp-table__icon-sorting"></i></th>
+                                                    <th className="cdp-table__col-sorting" onClick={() => sortHcp('uuid')}>UUID<i className="icon icon-sorting cdp-table__icon-sorting"></i></th>
+                                                    <th className="cdp-table__col-sorting" onClick={() => sortHcp('specialty_name')}>Specialty<i className="icon icon-sorting cdp-table__icon-sorting"></i></th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
