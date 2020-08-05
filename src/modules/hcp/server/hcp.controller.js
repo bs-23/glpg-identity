@@ -9,6 +9,7 @@ const HcpArchives = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
+const ConsentLanguage = require(path.join(process.cwd(), 'src/modules/consent/server/consent_language.model'));
 const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
@@ -377,6 +378,14 @@ async function createHcpProfile(req, res) {
                 if (!consentResponse) return;
 
                 const consentDetails = await Consent.findOne({ where: { slug: consentSlug } });
+                const consentLang = await ConsentLanguage.findOne({
+                    where: {
+                        country_iso2: model.country_iso2,
+                        language_code: model.language_code,
+                        consent_id: consentDetails.id
+                    }
+                });
+
 
                 if (!consentDetails) return;
 
@@ -387,7 +396,7 @@ async function createHcpProfile(req, res) {
                 consentArr.push({
                     user_id: hcpUser.id,
                     consent_id: consentDetails.id,
-                    title: consentDetails.rich_text,
+                    title: consentLang.rich_text,
                     response: consentResponse,
                     consent_confirmed: consentDetails.opt_type === 'double' ? false : true,
                     created_by: req.user.id,
