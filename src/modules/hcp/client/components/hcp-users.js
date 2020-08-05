@@ -18,7 +18,7 @@ export default function hcpUsers() {
     const [currentAction, setCurrentAction] = useState('');
     const [currentUser, setCurrentUser] = useState({});
     const { addToast } = useToasts();
-    const [sort, setSort] = useState({ type: 'ASC', value: '' });
+    const [sort, setSort] = useState({ type: 'ASC', value: null });
 
     const hcps = useSelector(state => state.hcpReducer.hcps);
 
@@ -33,11 +33,12 @@ export default function hcpUsers() {
 
     const sortHcp = (val) => {
         if (sort.value === val) {
+            console.log("here");
             dispatch(hcpsSort(sort.type === 'ASC' ? 'DESC' : 'ASC', val));
             setSort({ type: sort.type === 'ASC' ? 'DESC' : 'ASC', value: val });
         } else {
-            dispatch(hcpsSort('ASC', val));
-            setSort({ type: 'ASC', value: val });
+            dispatch(hcpsSort(sort.value === null ? 'DESC' : 'ASC', val));
+            setSort({ type: sort.value === null ? 'DESC' : 'ASC', value: val });
         }
     };
 
