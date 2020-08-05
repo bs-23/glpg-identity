@@ -18,7 +18,7 @@ export default function hcpUsers() {
     const [currentAction, setCurrentAction] = useState('');
     const [currentUser, setCurrentUser] = useState({});
     const { addToast } = useToasts();
-    const [sort, setSort] = useState({ type: 'ASC', value: '' });
+    const [sort, setSort] = useState({ type: 'ASC', value: null });
 
     const hcps = useSelector(state => state.hcpReducer.hcps);
 
@@ -33,11 +33,12 @@ export default function hcpUsers() {
 
     const sortHcp = (val) => {
         if (sort.value === val) {
+            console.log("here");
             dispatch(hcpsSort(sort.type === 'ASC' ? 'DESC' : 'ASC', val));
             setSort({ type: sort.type === 'ASC' ? 'DESC' : 'ASC', value: val });
         } else {
-            dispatch(hcpsSort('ASC', val));
-            setSort({ type: 'ASC', value: val });
+            dispatch(hcpsSort(sort.value === null ? 'DESC' : 'ASC', val));
+            setSort({ type: sort.value === null ? 'DESC' : 'ASC', value: val });
         }
     };
 
@@ -144,8 +145,9 @@ export default function hcpUsers() {
                             <Modal
                                 show={show}
                                 onHide={() => { setCurrentAction(''); setShow(false) }}
-                                dialogClassName="modal-90w modal-customize"
+                                dialogClassName="modal-customize"
                                 aria-labelledby="example-custom-modal-styling-title"
+                                centered
                             >
                                 <Modal.Header closeButton>
                                     <Modal.Title id="example-custom-modal-styling-title">
@@ -153,7 +155,7 @@ export default function hcpUsers() {
                                     </Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
-                                    <div className="p-2">
+                                    <div className="p-3">
                                         <div className="row">
                                             <div className="col">
                                                 <h4 className="font-weight-bold">{`${currentUser.first_name} ${currentUser.last_name}`}</h4>
@@ -170,7 +172,7 @@ export default function hcpUsers() {
                                             validationSchema={ApprovalRejectSchema}
                                             onSubmit={(values, actions) => {
                                                 if (values.selectedStatus === 'approve') {
-                                                    axios.put(`/api/hcp-profiles/${currentUser.id}/approve`, values)
+                                                    axios.put(`/api/hcp-profiles/${currentUser.id}/approve`, { comment: '' })
                                                         .then(() => onUpdateStatusSuccess())
                                                         .catch(err => onUpdateStatusFailure(err))
                                                 }
@@ -188,22 +190,22 @@ export default function hcpUsers() {
                                                 <Form onSubmit={formikProps.handleSubmit}>
                                                     <div className="row">
                                                         <div className="col-6">
-                                                            <a onClick={() => formikProps.setFieldValue('selectedStatus', 'approve')} className={`btn btn-block cdp-btn-outline-primary mt-4 p-2  ${formikProps.values.selectedStatus === 'approve' ? 'selected' : ''}`} ><i className="fas fa-check mr-1 text-success"></i> Approve User</a>
+                                                            <a onClick={() => formikProps.setFieldValue('selectedStatus', 'approve')} className={`btn btn-block cdp-btn-outline-primary mt-4 p-2 font-weight-bold ${formikProps.values.selectedStatus === 'approve' ? 'selected' : ''}`} >Approve User</a>
                                                         </div>
                                                         <div className="col-6">
-                                                            <a onClick={() => formikProps.setFieldValue('selectedStatus', 'reject')} className={`btn btn-block cdp-btn-outline-secondary mt-4 p-2  ${formikProps.values.selectedStatus === 'reject' ? 'selected' : ''}`} ><i className="fas fa-times mr-1 text-danger"></i> Reject User</a>
+                                                            <a onClick={() => formikProps.setFieldValue('selectedStatus', 'reject')} className={`btn btn-block cdp-btn-outline-danger mt-4 p-2 font-weight-bold  ${formikProps.values.selectedStatus === 'reject' ? 'selected' : ''}`} >Reject User</a>
                                                         </div>
                                                     </div>
-                                                    <div className="row mt-4">
+                                                    {formikProps.values.selectedStatus === 'reject' && <div className="row mt-4">
                                                         <div className="col-12 col-sm-12">
-                                                            <div className="form-group">
+                                                            <div className="form-group mb-0">
                                                                 <label className="font-weight-bold" htmlFor="comment">Comment <span className="text-danger">*</span></label>
                                                                 <Field className="form-control" data-testid='comment' component="textarea" rows="4" name="comment" />
                                                                 <div className="invalid-feedback"><ErrorMessage name="comment" /></div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <button type="submit" data-testid='submit' className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!formikProps.values.selectedStatus || formikProps.isSubmitting}>Submit</button>
+                                                    </div>}
+                                                    <button type="submit" data-testid='submit' className="btn btn-block text-white cdp-btn-secondary mt-5 p-2" disabled={!formikProps.values.selectedStatus || formikProps.isSubmitting}>Save Changes</button>
                                                 </Form>
                                             )}
                                         </Formik>
@@ -213,17 +215,17 @@ export default function hcpUsers() {
                             </Modal>
                             {hcps['users'] && hcps['users'].length > 0 &&
                                 <React.Fragment>
-                                    <div className="shadow-sm bg-white">
+                                    <div className="shadow-sm bg-white table-responsive">
                                         <table className="table table-hover table-sm mb-0 cdp-table">
                                             <thead className="cdp-bg-primary text-white cdp-table__header">
                                                 <tr>
-                                                    <th>Email<i className="icon icon-sorting cdp-table__icon-sorting" onClick={() => sortHcp('email')}></i></th>
-                                                    <th>Date of Registration<i className="icon icon-sorting cdp-table__icon-sorting" onClick={() => sortHcp('created_at')}></i></th>
-                                                    <th>First Name<i className="icon icon-sorting cdp-table__icon-sorting" onClick={() => sortHcp('first_name')}></i></th>
-                                                    <th>Last Name<i className="icon icon-sorting cdp-table__icon-sorting" onClick={() => sortHcp('last_name')}></i></th>
-                                                    <th>Status<i className="icon icon-sorting cdp-table__icon-sorting" onClick={() => sortHcp('status')}></i></th>
-                                                    <th>UUID <i className="icon icon-sorting cdp-table__icon-sorting" onClick={() => sortHcp('uuid')}></i></th>
-                                                    <th>Specialty<i className="icon icon-sorting cdp-table__icon-sorting" onClick={() => sortHcp('specialty_name')}></i></th>
+                                                    <th><span className="cdp-table__col-sorting" onClick={() => sortHcp('email')}>Email<i className="icon icon-sorting cdp-table__icon-sorting"></i></span></th>
+                                                    <th><span className="cdp-table__col-sorting" onClick={() => sortHcp('created_at')}>Date of Registration<i className="icon icon-sorting cdp-table__icon-sorting"></i></span></th>
+                                                    <th><span className="cdp-table__col-sorting" onClick={() => sortHcp('first_name')}>First Name<i className="icon icon-sorting cdp-table__icon-sorting"></i></span></th>
+                                                    <th><span className="cdp-table__col-sorting" onClick={() => sortHcp('last_name')}>Last Name<i className="icon icon-sorting cdp-table__icon-sorting"></i></span></th>
+                                                    <th><span className="cdp-table__col-sorting" onClick={() => sortHcp('status')}>Status<i className="icon icon-sorting cdp-table__icon-sorting"></i></span></th>
+                                                    <th><span className="cdp-table__col-sorting" onClick={() => sortHcp('uuid')}>UUID<i className="icon icon-sorting cdp-table__icon-sorting"></i></span></th>
+                                                    <th><span className="cdp-table__col-sorting" onClick={() => sortHcp('specialty_name')}>Specialty<i className="icon icon-sorting cdp-table__icon-sorting"></i></span></th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
