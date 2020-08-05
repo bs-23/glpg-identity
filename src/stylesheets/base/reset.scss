@@ -62,6 +62,21 @@
                     box-shadow: 0 0 0 0.2rem rgba(247, 160, 51, .25);
                 }
             }
+
+            &-danger {
+                color: $red-color;
+                border-color: $red-color;
+
+                &:hover, &:active, &:focus, &.selected {
+                    color: $white-color;
+                    background-color: $red-color;
+                    border-color: $red-color;
+                }
+
+                &:focus {
+                    box-shadow: 0 0 0 0.2rem rgba(247, 160, 51, .25);
+                }
+            }
         }
     }
 

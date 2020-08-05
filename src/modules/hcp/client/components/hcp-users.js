@@ -188,10 +188,10 @@ export default function hcpUsers() {
                                                 <Form onSubmit={formikProps.handleSubmit}>
                                                     <div className="row">
                                                         <div className="col-6">
-                                                            <a onClick={() => formikProps.setFieldValue('selectedStatus', 'approve')} className={`btn btn-block cdp-btn-outline-primary mt-4 p-2  ${formikProps.values.selectedStatus === 'approve' ? 'selected' : ''}`} ><i className="fas fa-check mr-1 text-success"></i> Approve User</a>
+                                                            <a onClick={() => formikProps.setFieldValue('selectedStatus', 'approve')} className={`btn btn-block cdp-btn-outline-primary mt-4 p-2  ${formikProps.values.selectedStatus === 'approve' ? 'selected' : ''}`} >Approve User</a>
                                                         </div>
                                                         <div className="col-6">
-                                                            <a onClick={() => formikProps.setFieldValue('selectedStatus', 'reject')} className={`btn btn-block cdp-btn-outline-secondary mt-4 p-2  ${formikProps.values.selectedStatus === 'reject' ? 'selected' : ''}`} ><i className="fas fa-times mr-1 text-danger"></i> Reject User</a>
+                                                            <a onClick={() => formikProps.setFieldValue('selectedStatus', 'reject')} className={`btn btn-block cdp-btn-outline-danger mt-4 p-2  ${formikProps.values.selectedStatus === 'reject' ? 'selected' : ''}`} >Reject User</a>
                                                         </div>
                                                     </div>
                                                     <div className="row mt-4">
