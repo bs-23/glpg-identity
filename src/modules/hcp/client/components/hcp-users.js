@@ -171,7 +171,7 @@ export default function hcpUsers() {
                                             validationSchema={ApprovalRejectSchema}
                                             onSubmit={(values, actions) => {
                                                 if (values.selectedStatus === 'approve') {
-                                                    axios.put(`/api/hcp-profiles/${currentUser.id}/approve`, values)
+                                                    axios.put(`/api/hcp-profiles/${currentUser.id}/approve`, { comment: '' })
                                                         .then(() => onUpdateStatusSuccess())
                                                         .catch(err => onUpdateStatusFailure(err))
                                                 }
@@ -195,7 +195,7 @@ export default function hcpUsers() {
                                                             <a onClick={() => formikProps.setFieldValue('selectedStatus', 'reject')} className={`btn btn-block cdp-btn-outline-danger mt-4 p-2  ${formikProps.values.selectedStatus === 'reject' ? 'selected' : ''}`} >Reject User</a>
                                                         </div>
                                                     </div>
-                                                    <div className="row mt-4">
+                                                    {formikProps.values.selectedStatus === 'reject' && <div className="row mt-4">
                                                         <div className="col-12 col-sm-12">
                                                             <div className="form-group">
                                                                 <label className="font-weight-bold" htmlFor="comment">Comment <span className="text-danger">*</span></label>
@@ -203,7 +203,7 @@ export default function hcpUsers() {
                                                                 <div className="invalid-feedback"><ErrorMessage name="comment" /></div>
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                    </div>}
                                                     <button type="submit" data-testid='submit' className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!formikProps.values.selectedStatus || formikProps.isSubmitting}>Submit</button>
                                                 </Form>
                                             )}
