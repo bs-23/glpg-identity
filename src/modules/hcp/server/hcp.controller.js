@@ -378,16 +378,18 @@ async function createHcpProfile(req, res) {
                 if (!consentResponse) return;
 
                 const consentDetails = await Consent.findOne({ where: { slug: consentSlug } });
+                if (!consentDetails) return;
+
                 const consentLang = await ConsentLanguage.findOne({
                     where: {
-                        country_iso2: model.country_iso2,
-                        language_code: model.language_code,
+                        country_iso2: model.country_iso2.toLowerCase(),
+                        language_code: model.language_code.toLowerCase(),
                         consent_id: consentDetails.id
                     }
                 });
 
+                if (!consentLang) return;
 
-                if (!consentDetails) return;
 
                 if (consentDetails.opt_type === 'double') {
                     hasDoubleOptIn = true;
