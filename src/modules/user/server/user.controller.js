@@ -46,16 +46,6 @@ function generateAccessToken(user) {
     });
 }
 
-function getPermissions(userrole) {
-    const permissions = [];
-    if (userrole) {
-        userrole.forEach(ur => {
-            permissions.push(ur.role.rolePermission.map(rp => rp.permission.module));
-        })
-        return [].concat(...permissions);
-
-    }
-}
 
 function getRolesPermissions(userrole) {
     const roles = [];
@@ -89,7 +79,6 @@ function formatProfile(user) {
         last_name: user.last_name,
         email: user.email,
         type: user.type,
-        permissions: getPermissions(user.userrole),
         roles: getRolesPermissions(user.userrole),
         countries: user.countries
     };
