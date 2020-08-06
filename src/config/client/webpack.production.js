@@ -30,15 +30,7 @@ module.exports = merge(commonConfig, {
     ],
 
     optimization: {
-        minimizer: [
-            new TerserPlugin({
-                terserOptions: {
-                    compress: true,
-                    output: {
-                        comments: false
-                    }
-                }
-            })
-        ]
+        minimize: true,
+        minimizer: [new TerserPlugin()]
     }
 });

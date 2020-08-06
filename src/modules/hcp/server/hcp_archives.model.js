@@ -1,9 +1,8 @@
 const path = require('path');
-const bcrypt = require('bcryptjs');
 const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 
-const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
+const HcpArchives = sequelize.cdpConnector.define('hcp_archives', {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -15,10 +14,6 @@ const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
         type: DataTypes.UUID
     },
     uuid: {
-        unique: true,
-        type: DataTypes.STRING
-    },
-    individual_id_onekey: {
         unique: true,
         type: DataTypes.STRING
     },
@@ -39,12 +34,6 @@ const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
         allowNull: false,
         type: DataTypes.STRING
     },
-    password: {
-        type: DataTypes.STRING,
-        set(value) {
-            this.setDataValue('password', bcrypt.hashSync(value, 8));
-        }
-    },
     telephone: {
         type: DataTypes.STRING
     },
@@ -62,31 +51,17 @@ const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
     },
     status: {
         type: DataTypes.ENUM,
-        values: ['approved', 'consent_pending', 'not_verified']
+        values: ['rejected']
     },
     created_by: {
         type: DataTypes.UUID
-    },
-    updated_by: {
-        type: DataTypes.UUID
-    },
-    reset_password_token: {
-        unique: true,
-        type: DataTypes.STRING
-    },
-    reset_password_expires: {
-        type: DataTypes.STRING
     }
 }, {
     schema: 'ciam',
-    tableName: 'hcp_profiles',
+    tableName: 'hcp_archives',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
 
-HcpProfile.prototype.validPassword = function (password) {
-    return bcrypt.compareSync(password, this.password);
-};
-
-module.exports = HcpProfile;
+module.exports = HcpArchives;

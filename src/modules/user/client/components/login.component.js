@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
 import ReCAPTCHA from "react-google-recaptcha";
 import axios from 'axios';
+import { useCookies } from 'react-cookie';
 
 import { login } from "../user.actions";
 import { loginSchema } from "../user.schema";
@@ -17,6 +18,7 @@ async function onSolveCaptcha(captchaResponseToken) {
 export default function Login() {
     const dispatch = useDispatch();
     const { addToast } = useToasts();
+    const [cookies, setCookie] = useCookies();
 
     return (
         <div className="app-login">
@@ -29,7 +31,7 @@ export default function Login() {
                             </h1>
                             <h4 className="app-login__header text-center py-3">Welcome to CDP</h4>
                             <div className="card-body p-4 p-sm-5 border bg-white">
-                                <Formik
+                            <Formik
                                     initialValues={{
                                         email: "",
                                         password: ""
@@ -41,12 +43,15 @@ export default function Login() {
                                             email: values.email,
                                             password: values.password
                                         }))
-                                            .catch(error => {
-                                                addToast(error.response.data, {
-                                                    appearance: 'error',
-                                                    autoDismiss: true
-                                                });
+                                        .then( response => {
+                                            setCookie('logged_in', true, { path: '/' });
+                                        })
+                                        .catch(error => {
+                                            addToast(error.response.data, {
+                                                appearance: 'error',
+                                                autoDismiss: true
                                             });
+                                        });
 
                                         actions.setSubmitting(false);
                                     }}

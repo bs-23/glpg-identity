@@ -20,9 +20,10 @@
 
     th {
         font-size: 16px;
-        font-weight: bold;
+        font-weight: 600;
         padding-top: 12px;
         padding-bottom: 12px;
+        white-space: nowrap;
     }
 
     td {
@@ -32,5 +33,18 @@
 
     &.table-hover tbody tr:hover {
         background-color: rgba(20,77,67,0.07);
+    }
+
+    &__col {
+        &-sorting {
+            cursor: pointer;
+        }
+    }
+
+    &__icon {
+        &-sorting {
+            font-size: 9px;
+            padding-left: 1px;
+        }
     }
 }

@@ -14,6 +14,7 @@ async function init() {
     const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
     const ConsentCategory = require(path.join(process.cwd(), 'src/modules/consent/server/consent-category.model'));
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
+    const ConsentLanguage = require(path.join(process.cwd(), 'src/modules/consent/server/consent_language.model'));
     const RolePermission = require(path.join(process.cwd(), "src/modules/user/server/role/role-permission.model"));
     const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
     const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
@@ -22,6 +23,7 @@ async function init() {
     require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model'));
     require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_profile.model'));
     require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
+    require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_archives.model'));
     require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
 
     await sequelize.cdpConnector.sync();
@@ -33,7 +35,7 @@ async function init() {
             where: { email: 'glpg.cdp@gmail.com' }, defaults: {
                 first_name: 'System',
                 last_name: 'Admin',
-                password: 'strong-password',
+                password: 'P@ssword123',
                 type: 'admin'
             }
         }).then(function () {
@@ -42,52 +44,60 @@ async function init() {
     }
 
     function permissionSeeder(callback) {
-        const permissions = [
-            { module: Modules.USER.value, status: "active", title: Modules.USER.title, created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" },
-            { module: Modules.HCP.value, status: "active", title: Modules.HCP.title, created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
-        ];
+        User.findOne({ where: { email: 'glpg.cdp@gmail.com' } }).then(admin => {
 
-        Permission.destroy({ truncate: { cascade: true } }).then(() => {
-            Permission.bulkCreate(permissions, {
-                returning: true,
-                ignoreDuplicates: false
-            }).then(function () {
-                callback();
+            const permissions = [
+                { module: Modules.USER.value, status: "active", title: Modules.USER.title, created_by: admin.id, updated_by: admin.id },
+                { module: Modules.HCP.value, status: "active", title: Modules.HCP.title, created_by: admin.id, updated_by: admin.id }
+            ];
+
+            Permission.destroy({ truncate: { cascade: true } }).then(() => {
+                Permission.bulkCreate(permissions, {
+                    returning: true,
+                    ignoreDuplicates: false
+                }).then(function () {
+                    callback();
+                });
             });
         });
     }
 
     function roleSeeder(callback) {
-        const roles = [
-            { name: 'System Admin', slug: 'system-admin', description: 'Has access to all the services', created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" },
-            { name: 'User Manager', slug: 'user-manager', description: 'Has access to manage CDP users only', created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
-        ];
+        User.findOne({ where: { email: 'glpg.cdp@gmail.com' } }).then(admin => {
+            const roles = [
+                { name: 'User & HCP Manager', slug: 'user-hcp-manager', description: 'Has access to all the services', created_by: admin.id, updated_by: admin.id },
+                { name: 'User Manager', slug: 'user-manager', description: 'Has access to manage CDP users only', created_by: admin.id, updated_by: admin.id },
+                { name: 'HCP Manager', slug: 'hcp-manager', description: 'Has access to manage HCP users only', created_by: admin.id, updated_by: admin.id }
+            ];
 
-        Role.destroy({ truncate: { cascade: true } }).then(() => {
-            Role.bulkCreate(roles, {
-                returning: true,
-                ignoreDuplicates: false
-            }).then(function () {
-                callback();
+            Role.destroy({ truncate: { cascade: true } }).then(() => {
+                Role.bulkCreate(roles, {
+                    returning: true,
+                    ignoreDuplicates: false
+                }).then(function () {
+                    callback();
+                });
             });
         });
     }
 
     function rolePermissionSeeder(callback) {
-        const adminRole = Role.findOne({ where: { slug: 'system-admin' } });
+        const adminRole = Role.findOne({ where: { slug: 'user-hcp-manager' } });
         const userManagerRole = Role.findOne({ where: { slug: 'user-manager' } });
+        const hcpManagerRole = Role.findOne({ where: { slug: 'hcp-manager' } });
 
         const userPermission = Permission.findOne({ where: { module: 'user' } });
         const hcpPermission = Permission.findOne({ where: { module: 'hcp' } });
 
-        Promise.all([adminRole, userManagerRole, userPermission, hcpPermission]).then((values) => {
+        Promise.all([adminRole, userManagerRole, hcpManagerRole, userPermission, hcpPermission]).then((values) => {
             const rolePermissions = [
-                { roleId: values[0].id, permissionId: values[2].id },
                 { roleId: values[0].id, permissionId: values[3].id },
-                { roleId: values[1].id, permissionId: values[2].id }
+                { roleId: values[0].id, permissionId: values[4].id },
+                { roleId: values[1].id, permissionId: values[3].id },
+                { roleId: values[2].id, permissionId: values[4].id }
             ];
 
-            RolePermission.destroy({ truncate:  { cascade: true } }).then(() => {
+            RolePermission.destroy({ truncate: { cascade: true } }).then(() => {
                 RolePermission.bulkCreate(rolePermissions, {
                     returning: true,
                     ignoreDuplicates: false
@@ -100,14 +110,14 @@ async function init() {
 
     function userRoleSeeder(callback) {
         const admin = User.findOne({ where: { email: 'glpg.cdp@gmail.com' } });
-        const adminRole = Role.findOne({ where: { slug: 'system-admin' } });
+        const adminRole = Role.findOne({ where: { slug: 'user-hcp-manager' } });
 
         Promise.all([admin, adminRole]).then((values) => {
             const userRoles = [
                 { userId: values[0].id, roleId: values[1].id }
             ];
 
-            UserRole.destroy({ truncate:  { cascade: true } }).then(() => {
+            UserRole.destroy({ truncate: { cascade: true } }).then(() => {
                 UserRole.bulkCreate(userRoles, {
                     returning: true,
                     ignoreDuplicates: false
@@ -165,22 +175,45 @@ async function init() {
 
         const consents = [
             {
-                category_id: '59953d51-2449-4b65-950f-9f88654019bb',
+                id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
                 title: 'I agree to the Galapagos Terms of Service',
-                rich_text: '<p>I agree to the Galapagos <a href="https://www.glpg.com/">Terms of Service.</a></p>',
                 slug: '',
+                category_id: '59953d51-2449-4b65-950f-9f88654019bb',
                 type: 'online',
-                opt_type: 'single',
+                opt_type: 'single'
+            },
+            {
+                id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
+                title: 'I give my consent to send me promotional email',
+                slug: '',
+                category_id: 'fe037405-c676-4d98-bd05-85008900c838',
+                type: 'online',
+                opt_type: 'double'
+            }
+        ];
+
+        const consentLanguages = [
+            {
+                rich_text: "<p>J'accepte les Galapagos <a href='https://www.glpg.com/'>Conditions d'utilisation.</a></p>",
+                consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
+                country_iso2: 'fr',
+                language_code: 'fr'
+            },
+            {
+                rich_text: '<p>I agree to the Galapagos <a href="https://www.glpg.com/">Terms of Service.</a></p>',
+                consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
                 country_iso2: 'nl',
                 language_code: 'en'
             },
             {
-                category_id: 'fe037405-c676-4d98-bd05-85008900c838',
-                title: 'I give my consent to send me promotional email',
+                rich_text: "<p>J'autorise Galapagos à m'envoyer des informations promotionnelles et environnementales concernant tous les produits et services Galapagos sur mon adresse e-mail fournie. Pour plus d'informations sur la manière dont nous traitons vos informations personnelles, veuillez consulter notre<a href='https://www.glpg.com/'>privacy notice.</a></p>",
+                consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
+                country_iso2: 'fr',
+                language_code: 'fr'
+            },
+            {
                 rich_text: '<p>I give my consent for Galapagos to send me promotional and environmental information concerning all of Galapagos products and services on my provided email address. For more information on how we treat your personal information please refer to our <a href="https://www.glpg.com/">privacy notice.</a></p>',
-                slug: '',
-                type: 'online',
-                opt_type: 'double',
+                consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 country_iso2: 'nl',
                 language_code: 'en'
             }
@@ -188,7 +221,7 @@ async function init() {
 
         Consent.destroy({
             where: {},
-            include: [ { model: ConsentCategory } ]
+            include: [{ model: ConsentCategory }]
         }).then(() => {
             ConsentCategory.bulkCreate(consent_categories, {
                 returning: true,
@@ -198,13 +231,18 @@ async function init() {
                     returning: true,
                     ignoreDuplicates: false
                 }).then(function () {
-                    callback();
+                    ConsentLanguage.bulkCreate(consentLanguages, {
+                        returning: true,
+                        ignoreDuplicates: false
+                    }).then(function () {
+                        callback();
+                    })
                 });
             });
         });
     }
 
-    async.waterfall([userSeeder, permissionSeeder,roleSeeder, rolePermissionSeeder, userRoleSeeder, applicationSeeder, consentSeeder], function (err) {
+    async.waterfall([userSeeder, permissionSeeder, roleSeeder, rolePermissionSeeder, userRoleSeeder, applicationSeeder, consentSeeder], function (err) {
         if (err) console.error(err);
         else console.info('DB seed completed!');
         process.exit();

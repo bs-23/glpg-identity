@@ -25,7 +25,7 @@ const Audit = sequelize.cdpConnector.define('audits', {
     },
     table_name: {
         type: DataTypes.ENUM,
-        values: ['users', 'hcp_profiles', 'consents', 'applications', 'personas']
+        values: ['users', 'hcp_profiles', 'consents', 'applications', 'personas', 'hcp_archives']
     },
     created_by: {
         allowNull: false,

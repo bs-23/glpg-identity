@@ -27,11 +27,11 @@ export default function RoleForm() {
     }
 
     const selectPermission = (permission_id, alreadySelected) => {
-        if(!alreadySelected) {
+        if (!alreadySelected) {
             const items = [...selected, permission_id];
             setselected(items);
         }
-        else{
+        else {
             const items = [...selected];
             const idx = items.findIndex(i => i === permission_id);
             items.splice(idx, 1);
@@ -94,15 +94,14 @@ export default function RoleForm() {
                                         displayName="UserForm"
                                         validationSchema={roleSchema}
                                         onSubmit={(values, actions) => {
-                                            console.log("=================== ====================>", {...values, permissions: editData.rolePermission ? selected : []} );
+
                                             if (editData && editData.id) {
 
-                                                axios.put(`/api/roles/${editData.id}`, {...values, permissions: editData.rolePermission ? selected : []} )
+                                                axios.put(`/api/roles/${editData.id}`, { ...values, permissions: editData.rolePermission ? selected : [] })
                                                     .then(function (response) {
                                                         dispatch(getRoles());
                                                     })
                                                     .catch(function (error) {
-                                                        console.log(error);
                                                     });
 
                                             } else {
@@ -152,43 +151,43 @@ export default function RoleForm() {
                                                     <div className="col-12 col-sm-12">
                                                         <div className="form-group">
                                                             <label className="font-weight-bold" >Assign Service Category <span className="text-danger">*</span></label>
-                                                            <FieldArray 
+                                                            <FieldArray
                                                                 name="permissions"
-                                                                render ={arrayHelpers => (
+                                                                render={arrayHelpers => (
                                                                     <ul className="list-unstyled pl-0 py-2 mb-0">
                                                                         {
-                                                                            permissions.map(permission => 
+                                                                            permissions.map(permission =>
                                                                                 <li key={permission.id} className="">
                                                                                     <label className="d-flex justify-content-between align-items-center">
                                                                                         <span className="switch-label">{permission.title}</span>
                                                                                         <span className="switch">
-                                                                                            <input 
+                                                                                            <input
                                                                                                 name="permissions"
-                                                                                                type="checkbox" 
+                                                                                                type="checkbox"
                                                                                                 value={permission}
-                                                                                                checked={ selected.includes(permission.id) } 
+                                                                                                checked={selected.includes(permission.id)}
                                                                                                 onChange={e => {
-                                                                                                    if(e.target.checked){
+                                                                                                    if (e.target.checked) {
                                                                                                         arrayHelpers.push(permission.id)
                                                                                                     }
-                                                                                                    else{
+                                                                                                    else {
                                                                                                         const idx = permissions.indexOf(p => p.id === permission.id)
                                                                                                         arrayHelpers.remove(idx);
                                                                                                     }
                                                                                                 }}
-                                                                                                onClick={() => { selectPermission(permission.id, selected.find(s=> s === permission.id) ? true : false) } }  
+                                                                                                onClick={() => { selectPermission(permission.id, selected.find(s => s === permission.id) ? true : false) }}
                                                                                             />
                                                                                             <span className="slider round"></span>
                                                                                         </span>
                                                                                     </label>
                                                                                 </li>
                                                                             )
-                                                                            
+
                                                                         }
                                                                     </ul>
                                                                 )}
                                                             />
-                                                            
+
                                                             <div className="invalid-feedback">
                                                                 <ErrorMessage name="permissions" />
                                                             </div>
@@ -202,44 +201,44 @@ export default function RoleForm() {
                                 </div>
                             </Modal.Body>
                         </Modal>
-                    
+
                         {permissions.length && roles && roles.length > 0 &&
                             <div className="table-responsive shadow-sm bg-white">
                                 <table className="table table-hover table-sm mb-0 cdp-table">
-                                <thead className="cdp-bg-primary text-white cdp-table__header">
-                                    <tr>
-                                        <th className="py-2">Role Name</th>
-                                        <th className="py-2">Description</th>
-                                        <th className="py-2">Assigned Service Category</th>
-                                        <th className="py-2">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="cdp-table__body bg-white">
-                                    {roles.map(row => (
-                                        <tr key={row.id}>
-                                            <td>{row.name}</td>
-                                            <td>{row.description}</td>
-                                            {/* <td>{JSON.stringify(row.rolePermission)}</td> */}
-                                            <td>{(row.rolePermission) && (row.rolePermission).map((item, index) => (
-                                                <span key={index}>{(permissions.find(i => i.id === item.permissionId)).title}{index < row.rolePermission.length - 1 ? ', ' : ''}</span>
-                                            ))}</td>
-                                            <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => setEdit(row)}> <i className="icon icon-edit-pencil pr-2"></i>Edit Role</button></td>
+                                    <thead className="cdp-bg-primary text-white cdp-table__header">
+                                        <tr>
+                                            <th className="py-2">Role Name</th>
+                                            <th className="py-2">Description</th>
+                                            <th className="py-2">Assigned Service Category</th>
+                                            <th className="py-2">Action</th>
                                         </tr>
-                                    ))}
+                                    </thead>
+                                    <tbody className="cdp-table__body bg-white">
+                                        {roles.map(row => (
+                                            <tr key={row.id}>
+                                                <td>{row.name}</td>
+                                                <td>{row.description}</td>
+                                                {/* <td>{JSON.stringify(row.rolePermission)}</td> */}
+                                                <td>{(row.rolePermission) && (row.rolePermission).map((item, index) => (
+                                                    <span key={index}>{(permissions.find(i => i.id === item.permissionId)).title}{index < row.rolePermission.length - 1 ? ', ' : ''}</span>
+                                                ))}</td>
+                                                <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => setEdit(row)}> <i className="icon icon-edit-pencil pr-2"></i>Edit Role</button></td>
+                                            </tr>
+                                        ))}
                                     </tbody>
                                 </table>
                             </div>
                         }
 
-                    {roles && roles.length === 0 &&
-                        <><div className="row justify-content-center mt-5 pt-5 mb-3">
-                            <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">
-                                <i class="icon icon-team icon-6x cdp-text-secondary"></i>
-                            <h3 className="font-weight-bold cdp-text-primary pt-4">No Role Found!</h3>
-                            </div>
-                        </div></>
-                    }
-                </div>
+                        {roles && roles.length === 0 &&
+                            <><div className="row justify-content-center mt-5 pt-5 mb-3">
+                                <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">
+                                    <i class="icon icon-team icon-6x cdp-text-secondary"></i>
+                                    <h3 className="font-weight-bold cdp-text-primary pt-4">No Role Found!</h3>
+                                </div>
+                            </div></>
+                        }
+                    </div>
                 </div>
             </div>
         </main >
