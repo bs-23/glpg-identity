@@ -11,6 +11,8 @@ const UserRole = require(path.join(process.cwd(), "src/modules/user/server/user-
 const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
 const RolePermission = require(path.join(process.cwd(), "src/modules/user/server/role/role-permission.model"));
 const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
+const axios = require("axios");
+const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
 
 function validatePassword(password) {
     const minimumPasswordLength = 8;
@@ -85,7 +87,8 @@ function formatProfile(user) {
 
     return profile;
 }
-async function formatProfileDetail(user) {
+
+function formatProfileDetail(user) {
     // // attributes: ['id', 'first_name', 'last_name', 'email', 'phone', 'type', 'last_login', 'expiry_date']
     // const user_data = {
     //     id: user.id,
@@ -108,7 +111,9 @@ async function formatProfileDetail(user) {
         last_login: user.last_login,
         expiry_date: user.password ? null : user.expiry_date,
         status: user.password ? 'Active' : 'Inactive',
-        roles: getCommaSeparatedRoles(user.userrole)
+        roles: getCommaSeparatedRoles(user.userrole),
+        application: user.application_name,
+        countries: user.countries
     };
 
     return profile;
@@ -120,7 +125,18 @@ async function getSignedInUserProfile(req, res) {
 
 async function login(req, res) {
     try {
-        const { email, password } = req.body;
+        const { email, password, recaptchaToken } = req.body;
+
+        if (!recaptchaToken) {
+            return res.status(400).send('Captcha verification required.');
+        }
+
+        const isSiteVerified = await verifySite(recaptchaToken);
+
+        if (!isSiteVerified) {
+            return res.status(400).send('Failed captcha verification.');
+        }
+
         const user = await User.findOne({
             where: { email },
             include: [{
@@ -351,7 +367,7 @@ async function getUser(req, res) {
             where: {
                 id: req.params.id
             },
-            include: [{ 
+            include: [{
                 model: UserRole,
                 as: 'userrole',
                 include: [{
@@ -362,7 +378,11 @@ async function getUser(req, res) {
         });
 
         if (!user) return res.status(404).send("User is not found or may be removed");
-        const formattedUser = await formatProfileDetail(user);
+
+        const userApplication = await Application.findOne({ where: { id: user.application_id }});
+        user.application_name = userApplication.name
+
+        const formattedUser = formatProfileDetail(user);
 
         res.json(formattedUser);
     }
@@ -465,6 +485,27 @@ async function resetPassword(req, res) {
         res.sendStatus(200);
     } catch (error) {
         res.status(500).send(error);
+    }
+}
+
+async function verifySite(captchaResponseToken) {
+    try {
+        const secretKey = nodecache.getValue('RECAPTCHA_SECRET_KEY');
+
+        const siteverifyResponse = await axios.post(
+            `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${captchaResponseToken}`,
+            null,
+            {
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
+                }
+            }
+        );
+
+        return siteverifyResponse.data.success;
+    } catch (error) {
+        return false;
     }
 }
 

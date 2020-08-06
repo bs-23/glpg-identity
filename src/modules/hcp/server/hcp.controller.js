@@ -82,7 +82,7 @@ async function sendConsentConfirmationMail(user, consents, application) {
     const mailOptions = generateDefaultEmailOptions(user);
 
     mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/double-opt-in-consent-confirm.html`);
-    mailOptions.subject = 'Request consent confirmation';
+    mailOptions.subject = 'Thank you for registering!';
     mailOptions.data.consents = consents || [];
     mailOptions.data.link = `${application.consent_confirmation_link}?token=${consentConfirmationToken}&journey=consent_confirmation&country_lang=${user.country_iso2}_${user.language_code}`;
 
@@ -92,7 +92,7 @@ async function sendConsentConfirmationMail(user, consents, application) {
 async function sendRegistrationSuccessMail(user, application) {
     const mailOptions = generateDefaultEmailOptions(user);
 
-    mailOptions.subject = `You have successfully created a ${application.name} account.`;
+    mailOptions.subject = `Congratulations your registration was successful`;
     mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/registration-success.html`);
     mailOptions.data.loginLink = `${application.login_link}?journey=login&country_lang=${user.country_iso2}_${user.language_code}`;
 
@@ -112,7 +112,7 @@ async function sendPasswordSetupInstructionMail(user, application) {
     const mailOptions = generateDefaultEmailOptions(user);
 
     mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/password-setup-instructions.html`);
-    mailOptions.subject = `Set a password for your account on ${application.name}`;
+    mailOptions.subject = `Registration verified. Please setup your password`;
     mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&journey=set_password&country_lang=${user.country_iso2}_${user.language_code}`;
 
     await emailService.send(mailOptions);
@@ -122,7 +122,7 @@ async function sendPasswordResetInstructionMail(user, application) {
     const mailOptions = generateDefaultEmailOptions(user);
 
     mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/password-reset-instructions.html`);
-    mailOptions.subject = `Reset the password for your account on ${application.name}`;
+    mailOptions.subject = `Setup Password`;
     mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&journey=set_password&country_lang=${user.country_iso2}_${user.language_code}`;
 
     await emailService.send(mailOptions);
@@ -378,16 +378,18 @@ async function createHcpProfile(req, res) {
                 if (!consentResponse) return;
 
                 const consentDetails = await Consent.findOne({ where: { slug: consentSlug } });
+                if (!consentDetails) return;
+
                 const consentLang = await ConsentLanguage.findOne({
                     where: {
-                        country_iso2: model.country_iso2,
-                        language_code: model.language_code,
+                        country_iso2: model.country_iso2.toLowerCase(),
+                        language_code: model.language_code.toLowerCase(),
                         consent_id: consentDetails.id
                     }
                 });
 
+                if (!consentLang) return;
 
-                if (!consentDetails) return;
 
                 if (consentDetails.opt_type === 'double') {
                     hasDoubleOptIn = true;
@@ -495,7 +497,11 @@ async function approveHCPUser(req, res) {
 
         if (userConsents && userConsents.length) {
             const consentIds = userConsents.map(consent => consent.consent_id)
-            const allConsentDetails = await Consent.findAll({ where: { id: consentIds } });
+            const allConsentDetails = await ConsentLanguage.findAll({ where: {
+                consent_id: consentIds,
+                country_iso2: hcpUser.country_iso2.toLowerCase(),
+                language_code: hcpUser.language_code.toLowerCase(),
+            } });
 
             if (allConsentDetails && allConsentDetails.length) {
                 hasDoubleOptIn = true;

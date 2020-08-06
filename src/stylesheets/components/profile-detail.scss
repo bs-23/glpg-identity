@@ -1,26 +1,32 @@
 .profile-detail {
 
     &__name {
-        color: $gray-base;
-        font-size: 28px;
+        color: #212529;
+        font-size: 26px;
+        font-weight: 600;
     }
 
     &__row {
     }
 
     &__col {
-        width: 250px;
+        width: 50%;
+
+        &-fluid {
+            width: 100%;
+        }
     }
 
     &__label {
-        color: $gray-base;
-        font-size: 14px;
-        font-weight: 500;
+        color: #2D3032;
+        font-size: 18px;
+        font-weight: 600;
+        padding-bottom: 5px;
     }
 
     &__value {
-        color: #585F65;
-        font-size: 18px;
+        color: #636A70;
+        font-size: 16px;
         word-break: break-word;
     }
 
