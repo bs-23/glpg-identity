@@ -33,7 +33,6 @@ export default function hcpUsers() {
 
     const sortHcp = (val) => {
         if (sort.value === val) {
-            console.log("here");
             dispatch(hcpsSort(sort.type === 'ASC' ? 'DESC' : 'ASC', val));
             setSort({ type: sort.type === 'ASC' ? 'DESC' : 'ASC', value: val });
         } else {
