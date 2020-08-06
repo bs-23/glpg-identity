@@ -497,7 +497,11 @@ async function approveHCPUser(req, res) {
 
         if (userConsents && userConsents.length) {
             const consentIds = userConsents.map(consent => consent.consent_id)
-            const allConsentDetails = await Consent.findAll({ where: { id: consentIds } });
+            const allConsentDetails = await ConsentLanguage.findAll({ where: {
+                consent_id: consentIds,
+                country_iso2: hcpUser.country_iso2.toLowerCase(),
+                language_code: hcpUser.language_code.toLowerCase(),
+            } });
 
             if (allConsentDetails && allConsentDetails.length) {
                 hasDoubleOptIn = true;
