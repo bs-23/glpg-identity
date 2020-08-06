@@ -121,7 +121,18 @@ async function getSignedInUserProfile(req, res) {
 
 async function login(req, res) {
     try {
-        const { email, password } = req.body;
+        const { email, password, recaptchaToken } = req.body;
+
+        if (!recaptchaToken) {
+            return res.status(400).send('Captcha verification required.');
+        }
+
+        const isSiteVerified = await verifySite(recaptchaToken);
+
+        if (!isSiteVerified) {
+            return res.status(400).send('Failed captcha verification.');
+        }
+
         const user = await User.findOne({
             where: { email },
             include: [{
@@ -352,7 +363,7 @@ async function getUser(req, res) {
             where: {
                 id: req.params.id
             },
-            include: [{ 
+            include: [{
                 model: UserRole,
                 as: 'userrole',
                 include: [{
@@ -469,9 +480,8 @@ async function resetPassword(req, res) {
     }
 }
 
-async function siteVerify(req, res) {
+async function verifySite(captchaResponseToken) {
     try {
-        const { captchaResponseToken } = req.body;
         const secretKey = nodecache.getValue('RECAPTCHA_SECRET_KEY');
 
         const siteverifyResponse = await axios.post(
@@ -485,9 +495,9 @@ async function siteVerify(req, res) {
             }
         );
 
-        res.json(siteverifyResponse.data);
+        return siteverifyResponse.data.success;
     } catch (error) {
-        res.status(500).send(error);
+        return false;
     }
 }
 
@@ -501,4 +511,3 @@ exports.getUsers = getUsers;
 exports.getUser = getUser;
 exports.sendPasswordResetLink = sendPasswordResetLink;
 exports.resetPassword = resetPassword;
-exports.siteVerify = siteVerify;

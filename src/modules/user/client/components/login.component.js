@@ -4,21 +4,19 @@ import { Form, Formik, Field, ErrorMessage } from "formik";
 import { Link } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
 import ReCAPTCHA from "react-google-recaptcha";
-import axios from 'axios';
 import { useCookies } from 'react-cookie';
 
 import { login } from "../user.actions";
 import { loginSchema } from "../user.schema";
 
-async function onSolveCaptcha(captchaResponseToken) {
-    console.log("Captcha value:", captchaResponseToken);
-    const siteVerifyResponse = await axios.post(`/api/users/site-verify`, { captchaResponseToken: captchaResponseToken });
-}
-
 export default function Login() {
     const dispatch = useDispatch();
     const { addToast } = useToasts();
     const [cookies, setCookie] = useCookies();
+    let recaptchaToken = '';
+    const onSolveCaptcha = (captchaResponseToken) => {
+        recaptchaToken = captchaResponseToken;
+    }
 
     return (
         <div className="app-login">
@@ -34,14 +32,16 @@ export default function Login() {
                             <Formik
                                     initialValues={{
                                         email: "",
-                                        password: ""
+                                        password: "",
+                                        recaptchaToken: ""
                                     }}
                                     displayName="Login"
                                     validationSchema={loginSchema}
                                     onSubmit={(values, actions) => {
                                         dispatch(login({
                                             email: values.email,
-                                            password: values.password
+                                            password: values.password,
+                                            recaptchaToken: recaptchaToken
                                         }))
                                         .then( response => {
                                             setCookie('logged_in', true, { path: '/' });
@@ -69,10 +69,12 @@ export default function Login() {
                                                 <div className="invalid-feedback" data-testid="password-error"><ErrorMessage name="password" /></div>
                                             </div>
 
-                                            <ReCAPTCHA
-                                                sitekey={process.env.RECAPTCHA_SITE_KEY}
-                                                onChange={onSolveCaptcha}
-                                            />
+                                            <div className="form-group">
+                                                <ReCAPTCHA name="recaptcha"
+                                                    sitekey={process.env.RECAPTCHA_SITE_KEY}
+                                                    onChange={onSolveCaptcha}
+                                                />
+                                            </div>
 
                                             <button type="submit" className="btn btn-block text-white app-login__btn mt-4 p-2">Sign In</button>
                                         </Form>

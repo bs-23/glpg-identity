@@ -28,6 +28,7 @@ export const loginSchema = object().shape({
         .email('This field should be an valid email address.')
         .required('This field must not be empty.'),
     password: string().required('This field must not be empty.'),
+    recaptchaToken: string()
 });
 
 export const registerSchema = object().shape({
