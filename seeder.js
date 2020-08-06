@@ -212,7 +212,7 @@ async function init() {
                 language_code: 'fr'
             },
             {
-                rich_text: '<p>I give my consent for Galapagos to send me promotional and environmental information concerning all of Galapagos products and services on my provided email address. For more information on how we treat your personal information please refer to our <a href="https://www.glpg.com/">privacy notice.</a></p>',
+                rich_text: '<p>I give my consent for Galapagos to send me promotional and environmental information concerning all of Galapagos products and services on my provided email address.</p> <p>For more information on how we treat your personal information please refer to our <a href="https://www.glpg.com/">privacy notice.</a></p>',
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 country_iso2: 'nl',
                 language_code: 'en'

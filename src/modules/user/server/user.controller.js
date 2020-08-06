@@ -12,6 +12,7 @@ const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role
 const RolePermission = require(path.join(process.cwd(), "src/modules/user/server/role/role-permission.model"));
 const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
 const axios = require("axios");
+const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
 
 function validatePassword(password) {
     const minimumPasswordLength = 8;
@@ -86,7 +87,8 @@ function formatProfile(user) {
 
     return profile;
 }
-async function formatProfileDetail(user) {
+
+function formatProfileDetail(user) {
     // // attributes: ['id', 'first_name', 'last_name', 'email', 'phone', 'type', 'last_login', 'expiry_date']
     // const user_data = {
     //     id: user.id,
@@ -109,7 +111,9 @@ async function formatProfileDetail(user) {
         last_login: user.last_login,
         expiry_date: user.password ? null : user.expiry_date,
         status: user.password ? 'Active' : 'Inactive',
-        roles: getCommaSeparatedRoles(user.userrole)
+        roles: getCommaSeparatedRoles(user.userrole),
+        application: user.application_name,
+        countries: user.countries
     };
 
     return profile;
@@ -374,7 +378,11 @@ async function getUser(req, res) {
         });
 
         if (!user) return res.status(404).send("User is not found or may be removed");
-        const formattedUser = await formatProfileDetail(user);
+
+        const userApplication = await Application.findOne({ where: { id: user.application_id }});
+        user.application_name = userApplication.name
+
+        const formattedUser = formatProfileDetail(user);
 
         res.json(formattedUser);
     }
