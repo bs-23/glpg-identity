@@ -4,6 +4,7 @@ import { NavLink } from 'react-router-dom';
 
 const UserDetails = (props) => {
     const [userInfo, setUserInfo] = useState({});
+    const [countries, setCountries] = useState([]);
 
     useEffect(() => {
         const { id } = props.match.params;
@@ -13,7 +14,13 @@ const UserDetails = (props) => {
             setUserInfo(response.data);
         }
 
+        async function getCountries() {
+            const response = await axios.get('/api/countries');
+            setCountries(response.data);
+        }
+
         getInfo();
+        getCountries();
     }, [props]);
 
     return (
@@ -43,43 +50,39 @@ const UserDetails = (props) => {
                                     <div className="profile-detail__row pb-0 pb-sm-2 d-block d-sm-flex">
                                         <div className="profile-detail__col pb-3 pr-0 pr-sm-3">
                                             <span className="mr-2 d-block profile-detail__label">Email</span>
-                                            <span className="profile-detail__value">{userInfo.email}</span>
+                                            <span className="profile-detail__value">{userInfo.email ? userInfo.email : '--'}</span>
                                         </div>
                                         <div className="profile-detail__col pb-3">
                                             <span className="mr-2 d-block profile-detail__label">Phone Number</span>
-                                            <span className="profile-detail__value">{userInfo.phone}</span>
+                                            <span className="profile-detail__value">{userInfo.phone ? userInfo.phone : '--'}</span>
                                         </div>
                                     </div>
                                     <div className="profile-detail__row pb-0 pb-sm-2 d-block d-sm-flex">
-                                        {userInfo.expiry_date ?
-                                            <div className="profile-detail__col pb-3">
-                                                <span className="mr-2 d-block profile-detail__label">Expiary Date</span>
-                                                <span className="profile-detail__value">{(new Date(userInfo.expiry_date)).toLocaleDateString().replace(/\//g, '-')}</span>
-                                            </div> : null
-                                        }
-                                        {userInfo.last_login ?
-                                            <div className="profile-detail__col pb-3 pr-0 pr-sm-3">
-                                                <span className="mr-2 d-block profile-detail__label">Last Login</span>
-                                                <span className="profile-detail__value">{(new Date(userInfo.last_login)).toLocaleDateString().replace(/\//g, '-')}</span>
-                                            </div> : null
-                                        }
-                                       
-                                        
+                                        <div className="profile-detail__col pb-3">
+                                            <span className="mr-2 d-block profile-detail__label">Expiary Date</span>
+                                            <span className="profile-detail__value">{userInfo.expiry_date ? (new Date(userInfo.expiry_date)).toLocaleDateString().replace(/\//g, '.') : '--'}</span>
+                                        </div>
+                                        <div className="profile-detail__col pb-3 pr-0 pr-sm-3">
+                                            <span className="mr-2 d-block profile-detail__label">Last Login</span>
+                                            <span className="profile-detail__value">{userInfo.last_login ? (new Date(userInfo.last_login)).toLocaleDateString().replace(/\//g, '.') : '--'}</span>
+                                        </div>
                                     </div>
                                     <div className="profile-detail__row pb-0 pb-sm-2 d-block d-sm-flex">
                                         <div className="profile-detail__col pb-3 pr-0 pr-sm-3">
                                             <span className="mr-2 d-block profile-detail__label">Applications</span>
-                                            <span className="profile-detail__value">BrandX, HCP Portal</span>
+                                            <span className="profile-detail__value">{userInfo.application ? userInfo.application : '--'}</span>
                                         </div>
                                         <div className="profile-detail__col pb-3 pr-0 pr-sm-3">
                                             <span className="mr-2 d-block profile-detail__label">Countries</span>
-                                            <span className="profile-detail__value">Netherlands, Belgium</span>
+                                            <span className="profile-detail__value">
+                                                {countries.length > 0 && userInfo.countries.length ? userInfo.countries.map((country) => countries.find(i => i.country_iso2 === country).countryname).join(', ') : '--'}
+                                            </span>
                                         </div>
                                     </div>
                                     <div className="profile-detail__row pb-0 pb-sm-2 d-block d-sm-flex">
                                         <div className="profile-detail__col-fluid pb-3 pr-0 pr-sm-3">
                                             <span className="mr-2 d-block profile-detail__label">Roles</span>
-                                            <span className="profile-detail__value">{userInfo.roles}</span>
+                                            <span className="profile-detail__value">{userInfo.roles ? userInfo.roles.replace(/,/g, ', ') : '--'}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -87,7 +90,7 @@ const UserDetails = (props) => {
                         </div>
                     </div>
                 </div>
-                
+
             </div>
         </main>
 
