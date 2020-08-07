@@ -33,6 +33,13 @@ export default function reducer(state = initialState, action) {
                 hasError: true
             };
         }
+        case Types.SORT_USERS: {
+            return {
+                ...state,
+                users: (action.payload.type === 'ASC') ? { ...state.users, users: state.users['users'].sort((a, b) => (a[action.payload.val] > b[action.payload.val]) ? 1 : -1) } :
+                    { ...state.users, users: state.users['users'].sort((a, b) => (a[action.payload.val] < b[action.payload.val]) ? 1 : -1) }
+            }
+        }
         case Types.DELETE_USER_FULFILLED: {
             return {
                 ...state,

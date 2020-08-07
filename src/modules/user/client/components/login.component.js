@@ -13,10 +13,6 @@ export default function Login() {
     const dispatch = useDispatch();
     const { addToast } = useToasts();
     const [cookies, setCookie] = useCookies();
-    let recaptchaToken = '';
-    const onSolveCaptcha = (captchaResponseToken) => {
-        recaptchaToken = captchaResponseToken;
-    }
 
     return (
         <div className="app-login">
@@ -41,7 +37,7 @@ export default function Login() {
                                         dispatch(login({
                                             email: values.email,
                                             password: values.password,
-                                            recaptchaToken: recaptchaToken
+                                            recaptchaToken: values.recaptchaToken
                                         }))
                                         .then( response => {
                                             setCookie('logged_in', true, { path: '/' });
@@ -70,10 +66,17 @@ export default function Login() {
                                             </div>
 
                                             <div className="form-group">
-                                                <ReCAPTCHA name="recaptcha"
+                                                <ReCAPTCHA
                                                     sitekey={process.env.RECAPTCHA_SITE_KEY}
-                                                    onChange={onSolveCaptcha}
+                                                    onChange={
+                                                        (response) => {
+                                                            formikProps.setFieldValue("recaptchaToken", response);
+                                                        }
+                                                    }
                                                 />
+                                                {formikProps.errors.recaptchaToken && formikProps.touched.recaptchaToken && (
+                                                    <div className="invalid-feedback">{formikProps.errors.recaptchaToken}</div>
+                                                )}
                                             </div>
 
                                             <button type="submit" className="btn btn-block text-white app-login__btn mt-4 p-2">Sign In</button>

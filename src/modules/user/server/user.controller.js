@@ -89,18 +89,6 @@ function formatProfile(user) {
 }
 
 function formatProfileDetail(user) {
-    // // attributes: ['id', 'first_name', 'last_name', 'email', 'phone', 'type', 'last_login', 'expiry_date']
-    // const user_data = {
-    //     id: user.id,
-    //     first_name: user.first_name,
-    //     last_name: user.last_name,
-    //     email: user.email,
-    //     phone: user.phone,
-    //     type: user.type,
-    //     last_login: user.last_login,
-    //     expiry_date: user.password ? null : user.expiry_date,
-    //     status: user.password ? 'Active' : 'Inactive'
-    // }
     const profile = {
         id: user.id,
         first_name: user.first_name,
@@ -109,7 +97,7 @@ function formatProfileDetail(user) {
         type: user.type,
         phone: user.phone,
         last_login: user.last_login,
-        expiry_date: user.password ? null : user.expiry_date,
+        expiry_date: user.expiry_date,
         status: user.password ? 'Active' : 'Inactive',
         roles: getCommaSeparatedRoles(user.userrole),
         application: user.application_name,

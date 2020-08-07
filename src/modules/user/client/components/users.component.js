@@ -4,7 +4,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { LinkContainer } from 'react-router-bootstrap';
-import { getUsers } from '../user.actions';
+import { getUsers, cdpSort } from '../user.actions';
 
 export default function Users() {
     const dispatch = useDispatch();
@@ -14,6 +14,7 @@ export default function Users() {
     const [countries, setCountries] = useState([]);
 
     const params = new URLSearchParams(window.location.search);
+    const [sort, setSort] = useState({ type: 'ASC', value: null });
 
     const getUserList = (page = params.get('page') ? params.get('page') : 1,
         country_iso2 = params.get('country_iso2') ? params.get('country_iso2') : null) => {
@@ -28,6 +29,17 @@ export default function Users() {
         }
         getCountries();
     }, []);
+
+    const sortCdp = (val) => {
+        console.log(sort.value);
+        if (sort.value === val) {
+            dispatch(cdpSort(sort.type === 'ASC' ? 'DESC' : 'ASC', val));
+            setSort({ type: sort.type === 'ASC' ? 'DESC' : 'ASC', value: val });
+        } else {
+            dispatch(cdpSort('ASC', val));
+            setSort({ type: 'ASC', value: val });
+        }
+    };
 
     // const onDeleteUser = id => {
     //     if (confirm("Are you sure?")) {
@@ -93,13 +105,13 @@ export default function Users() {
                                     <table className="table table-hover table-sm mb-0 cdp-table">
                                         <thead className="cdp-bg-primary text-white cdp-table__header">
                                             <tr>
-                                                <th className="py-2">First Name</th>
-                                                <th className="py-2">Last Name</th>
-                                                <th className="py-2">Email</th>
-                                                <th className="py-2">Countries</th>
-                                                <th className="py-2">Creation Date</th>
-                                                <th className="py-2">Expiry Date</th>
-                                                <th className="py-2">Action</th>
+                                                <th><span className="cdp-table__col-sorting" onClick={() => sortCdp('first_name')}>First Name<i className="icon icon-sorting cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className="cdp-table__col-sorting" onClick={() => sortCdp('last_name')}>Last Name<i className="icon icon-sorting cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className="cdp-table__col-sorting" onClick={() => sortCdp('email')}>Email<i className="icon icon-sorting cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className="cdp-table__col-sorting">Countries</span></th>
+                                                <th><span className="cdp-table__col-sorting" onClick={() => sortCdp('created_at')}>Creation Date<i className="icon icon-sorting cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className="cdp-table__col-sorting" onClick={() => sortCdp('expiry_date')}>Expiry Date<i className="icon icon-sorting cdp-table__icon-sorting"></i></span></th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody className="cdp-table__body bg-white">
