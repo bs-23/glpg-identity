@@ -1,14 +1,20 @@
 const path = require('path');
 const faker = require('faker');
 const supertest = require('supertest');
+import axios from 'axios'
+import MockAdapter from 'axios-mock-adapter'
 
 const specHelper = require(path.join(process.cwd(), 'jest/spec.helper'));
 const app = require(path.join(process.cwd(), 'src/config/server/lib/express'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
+const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
 const { defaultAdmin, defaultUser } = specHelper.users;
 
 let request;
+let fakeAxios;
+let siteVerifyResponse;
+const recaptchaResponse = faker.random.uuid();
 
 beforeAll(async () => {
     const config = require(path.join(process.cwd(), 'src/config/server/config'));
@@ -16,13 +22,20 @@ beforeAll(async () => {
 
     const appInstance = await app();
     request = supertest(appInstance);
+
+    const secretKey = nodecache.getValue('RECAPTCHA_SECRET_KEY');
+    fakeAxios = new MockAdapter(axios);
+    siteVerifyResponse = { challenge_ts: '2020-08-06T15:35:15Z', hostname: 'localhost', success: true };
+    fakeAxios.onPost(`https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${recaptchaResponse}`).reply(200, siteVerifyResponse);
 });
 
 describe('User Routes', () => {
+
     it('Should get 401 Unauthorized http status code with invalid credential', async () => {
         const response = await request.post('/api/login').send({
             email: faker.internet.email(),
             password: faker.internet.password(),
+            recaptchaToken: recaptchaResponse
         });
 
         expect(response.statusCode).toBe(401);
@@ -32,6 +45,7 @@ describe('User Routes', () => {
         const response = await request.post('/api/login').send({
             email: defaultUser.email,
             password: defaultUser.password,
+            recaptchaToken: recaptchaResponse
         });
 
         expect(response.statusCode).toBe(200);

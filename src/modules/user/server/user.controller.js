@@ -119,12 +119,6 @@ async function login(req, res) {
             return res.status(400).send('Captcha verification required.');
         }
 
-        const isSiteVerified = await verifySite(recaptchaToken);
-
-        if (!isSiteVerified) {
-            return res.status(400).send('Failed captcha verification.');
-        }
-
         const user = await User.findOne({
             where: { email },
             include: [{
@@ -153,6 +147,12 @@ async function login(req, res) {
         if (user.type === 'basic' && user.expiry_date <= new Date()) {
             await user.update({ status: 'inactive' })
             return res.status(401).send('Expired')
+        }
+
+        const isSiteVerified = await verifySite(recaptchaToken);
+
+        if (!isSiteVerified) {
+            return res.status(400).send('Failed captcha verification.');
         }
 
         res.cookie('access_token', generateAccessToken(user), {

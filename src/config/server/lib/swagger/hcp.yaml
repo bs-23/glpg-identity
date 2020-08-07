@@ -147,16 +147,21 @@ paths:
                                 $ref: "#/components/schemas/errorResponse"
 
     /api/hcp-profiles/forget-password:
-        get:
+        post:
             tags:
                 - hcp-profiles
             summary: Get new reset password token.
-            parameters:
-                - name: email
-                  in: query
-                  required: true
-                  schema:
-                    type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                email:
+                                    type: string
+                            required:
+                                - email
             responses:
                 200:
                     description: The request has succeeded.

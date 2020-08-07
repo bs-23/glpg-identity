@@ -678,7 +678,7 @@ async function resetPassword(req, res) {
 async function forgetPassword(req, res) {
     const response = new Response({}, []);
     try {
-        const doc = await Hcp.findOne({ where: { email: req.query.email } });
+        const doc = await Hcp.findOne({ where: { email: req.body.email } });
 
         if (!doc) {
             response.errors.push(new CustomError(`Account doesn't exist`));
