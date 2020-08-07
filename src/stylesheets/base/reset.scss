@@ -76,6 +76,22 @@
                 }
             }
 
+            &-gray {
+                color: $primary-color !important;
+                border-color: #DFDEDE !important;
+                background: none !important;
+
+                &:hover, &:active, &:focus, &.selected {
+                }
+
+                &:focus {
+                    box-shadow: 0 0 0 0.2rem rgba(223, 222, 222, .25) !important;
+                }
+
+                &[disabled] {
+                }
+            }
+
             &-danger {
                 color: $red-color;
                 border-color: $red-color;
