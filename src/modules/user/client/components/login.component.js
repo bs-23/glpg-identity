@@ -3,16 +3,20 @@ import { useDispatch } from "react-redux";
 import { Form, Formik, Field, ErrorMessage } from "formik";
 import { Link } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
+import ReCAPTCHA from "react-google-recaptcha";
 import { useCookies } from 'react-cookie';
 
 import { login } from "../user.actions";
 import { loginSchema } from "../user.schema";
 
-
 export default function Login() {
     const dispatch = useDispatch();
     const { addToast } = useToasts();
     const [cookies, setCookie] = useCookies();
+    let recaptchaToken = '';
+    const onSolveCaptcha = (captchaResponseToken) => {
+        recaptchaToken = captchaResponseToken;
+    }
 
     return (
         <div className="app-login">
@@ -25,17 +29,19 @@ export default function Login() {
                             </h1>
                             <h4 className="app-login__header text-center py-3">Welcome to CDP</h4>
                             <div className="card-body p-4 p-sm-5 border bg-white">
-                                <Formik
+                            <Formik
                                     initialValues={{
                                         email: "",
-                                        password: ""
+                                        password: "",
+                                        recaptchaToken: ""
                                     }}
                                     displayName="Login"
                                     validationSchema={loginSchema}
                                     onSubmit={(values, actions) => {
                                         dispatch(login({
                                             email: values.email,
-                                            password: values.password
+                                            password: values.password,
+                                            recaptchaToken: recaptchaToken
                                         }))
                                         .then( response => {
                                             setCookie('logged_in', true, { path: '/' });
@@ -62,6 +68,14 @@ export default function Login() {
                                                 <Field className="form-control" data-testid="password" type="password" name="password" autoComplete="current-password" />
                                                 <div className="invalid-feedback" data-testid="password-error"><ErrorMessage name="password" /></div>
                                             </div>
+
+                                            <div className="form-group">
+                                                <ReCAPTCHA name="recaptcha"
+                                                    sitekey={process.env.RECAPTCHA_SITE_KEY}
+                                                    onChange={onSolveCaptcha}
+                                                />
+                                            </div>
+
                                             <button type="submit" className="btn btn-block text-white app-login__btn mt-4 p-2">Sign In</button>
                                         </Form>
                                     )}
