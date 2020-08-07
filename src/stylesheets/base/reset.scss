@@ -132,6 +132,10 @@
         &-secondary {
             color: $secondary-color;
         }
+
+        &-light {
+            color: #636A70; 
+        }
     }
 }
 
@@ -158,4 +162,9 @@
             font-size: 24px;
         }
     }
+}
+
+.label-style {
+    font-size: 14px;
+    font-weight: bold;
 }

@@ -19,10 +19,10 @@ export default function ForgotPassword() {
                             <h1 className="text-center">
                                 <a href="/login"><img alt="CDP LOGO" src="/assets/CDP.png" height="102" /></a>
                             </h1>
-                            <h4 className="app-login__header text-center py-3">Forgot Password</h4>
+                            <h3 className="app-login__header text-center py-3">Forgot Password</h3>
 
                             <div className="card-body p-4 p-sm-5 border bg-white">
-                                <p className="text-muted">
+                                <p className="cdp-text-light pb-4">
                                     Please enter your email address and we will send you a link to reset your password
                                 </p>
                                 <Formik
@@ -53,13 +53,13 @@ export default function ForgotPassword() {
                                     {formikProps => (
                                         <Form onSubmit={formikProps.handleSubmit} >
                                             <div className="form-group">
-                                                <label className="">Email Address<span className="text-danger required-field pl-1">*</span></label>
+                                                <label className="label-style">Email Address<span className="text-danger required-field pl-1">*</span></label>
                                                 <Field className="form-control" data-testid="email" type="email" name="email" placeholder="Email address" autoComplete="username" />
                                                 <div className="invalid-feedback" data-testid="email-error" >
                                                     <ErrorMessage id="email-error" name="email" />
                                                 </div>
                                             </div>
-                                            <button type="submit" className="btn btn-block text-white app-login__btn mt-4 p-2" > Send password reset email </button>
+                                            <button type="submit" className="btn btn-block text-white app-login__btn mt-4 p-2 font-weight-bold" >Send </button>
                                         </Form>
                                     )}
                                 </Formik>

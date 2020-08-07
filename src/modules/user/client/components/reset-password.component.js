@@ -19,11 +19,11 @@ export default function ResetPasswordForm() {
             <div className="w-100">
                 <div className="container">
                     <div className="row">
-                        <div className="col-lg-5 col-md-8 col-12 mx-auto">
+                        <div className="col-lg-6 col-md-8 col-12 mx-auto">
                             <h1 className="text-center">
                                 <a href="/login"><img alt="CDP LOGO" src="/assets/CDP.png" height="102" /></a>
                             </h1>
-                            <h4 className="app-login__header text-center py-3">Reset Password</h4>
+                            <h3 className="app-login__header text-center py-3">Reset Password</h3>
                             <div className="card-body p-4 p-sm-5 border bg-white">
                                 <Formik
                                     initialValues={{
@@ -58,7 +58,7 @@ export default function ResetPasswordForm() {
                                         <Form onSubmit={formikProps.handleSubmit}>
                                             <Field type="text" name="username" autoComplete="username" hidden />
                                             <div className="form-group">
-                                                <label className="">New Password<span className="text-danger required-field pl-1">*</span></label>
+                                                <label className="label-style">New Password<span className="text-danger required-field pl-1">*</span></label>
                                                 <Field
                                                     className="form-control"
                                                     type="password"
@@ -72,7 +72,7 @@ export default function ResetPasswordForm() {
                                             </div>
 
                                             <div className="form-group">
-                                                <label className="">Confirm New Password<span className="text-danger required-field pl-1">*</span></label>
+                                                <label className="label-style">Re-enter New Password<span className="text-danger required-field pl-1">*</span></label>
                                                 <Field
                                                     className="form-control"
                                                     type="password"
@@ -86,7 +86,7 @@ export default function ResetPasswordForm() {
                                                 </div>
                                             </div>
 
-                                            <button type="submit" className="btn btn-block text-white app-login__btn mt-4 p-2" disabled={formikProps.isSubmitting} >
+                                            <button type="submit" className="btn btn-block text-white app-login__btn mt-4 p-2 font-weight-bold" disabled={formikProps.isSubmitting} >
                                                 Submit
                                             </button>
                                         </Form>

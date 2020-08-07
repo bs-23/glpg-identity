@@ -45,7 +45,6 @@ export default function Navbar() {
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
                                     <Dropdown.Item href="#/action-1">Brand X</Dropdown.Item>
-                                    <Dropdown.Item href="#/action-2">HCP Portal</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
                             <Dropdown className="dropdown-customize">
@@ -55,11 +54,6 @@ export default function Navbar() {
                                 <Dropdown.Menu>
                                     <Dropdown.Item href="#/action-1"><img height="26" width="26" src="/assets/flag/flag-netherlands.svg" alt="Flag" /> Netherlands</Dropdown.Item>
                                     <Dropdown.Item href="#/action-1"><img height="26" width="26" src="/assets/flag/flag-belgium.svg" alt="Flag" /> Belgium</Dropdown.Item>
-                                    <Dropdown.Item href="#/action-1"><img height="26" width="26" src="/assets/flag/flag-france.svg" alt="Flag" /> France</Dropdown.Item>
-                                    <Dropdown.Item href="#/action-1"><img height="26" width="26" src="/assets/flag/flag-Germany.svg" alt="Flag" /> Germany</Dropdown.Item>
-                                    <Dropdown.Item href="#/action-1"><img height="26" width="26" src="/assets/flag/flag-uk.svg" alt="Flag" /> United Kingdom</Dropdown.Item>
-                                    <Dropdown.Item href="#/action-1"><img height="26" width="26" src="/assets/flag/flag-spain.svg" alt="Flag" /> Spain</Dropdown.Item>
-                                    <Dropdown.Item href="#/action-1"><img height="26" width="26" src="/assets/flag/flag-italy.svg" alt="Flag" /> Italy</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
                             <button className="mr-2 btn cdp-btn-secondary text-white"><i className="icon icon-user-round mr-1 app__header-icon-user d-none d-sm-inline-block"></i> <span className="">{first_name + " " + last_name}</span></button>

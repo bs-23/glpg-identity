@@ -23,7 +23,7 @@ export default function Login() {
                             <h1 className="text-center">
                                 <img alt="CDP LOGO" src="/assets/CDP.png" height="102" />
                             </h1>
-                            <h4 className="app-login__header text-center py-3">Welcome to CDP</h4>
+                            <h3 className="app-login__header text-center py-3">Welcome to CDP</h3>
                             <div className="card-body p-4 p-sm-5 border bg-white">
                             <Formik
                                     initialValues={{
@@ -55,17 +55,17 @@ export default function Login() {
                                     {formikProps => (
                                         <Form onSubmit={formikProps.handleSubmit}>
                                             <div className="form-group">
-                                                <label className="">Email</label>
+                                                <label className="label-style">Email</label>
                                                 <Field className="form-control" data-testid="email" type="email" name="email" autoComplete="username" />
                                                 <div className="invalid-feedback" data-testid="email-error"><ErrorMessage id="email-error" name="email" /></div>
                                             </div>
                                             <div className="form-group">
-                                                <label className="">Password</label>
+                                                <label className="label-style">Password</label>
                                                 <Field className="form-control" data-testid="password" type="password" name="password" autoComplete="current-password" />
                                                 <div className="invalid-feedback" data-testid="password-error"><ErrorMessage name="password" /></div>
                                             </div>
 
-                                            <div className="form-group">
+                                            <div className="form-group mt-2">
                                                 <ReCAPTCHA
                                                     sitekey={process.env.RECAPTCHA_SITE_KEY}
                                                     testprops={formikProps}
@@ -81,7 +81,7 @@ export default function Login() {
                                                 )}
                                             </div>
 
-                                            <button type="submit" className="btn btn-block text-white app-login__btn mt-4 p-2">Sign In</button>
+                                            <button type="submit" className="btn btn-block text-white app-login__btn mt-4 p-2 font-weight-bold">Sign In</button>
                                         </Form>
                                     )}
                                 </Formik>
