@@ -9,6 +9,8 @@ import MockAdapter from 'axios-mock-adapter'
 import { ToastProvider } from 'react-toast-notifications';
 import store from '../../src/modules/core/client/store.js';
 import Login from '../../src/modules/user/client/components/login.component';
+import ReCAPTCHA from "react-google-recaptcha";
+import { act } from 'react-dom/test-utils';
 
 configure({ adapter: new Adapter() });
 
@@ -71,7 +73,7 @@ describe('Login component', () => {
     });
 
     it('Should login successfully if response is 200', async () => {
-        const { container } = render(wrapperComponent());
+        const { container, getByTestId } = render(wrapperComponent());
         const email = container.querySelector('input[name="email"]');
         const password = container.querySelector('input[name="password"]');
         const submit = container.querySelector('button[type="submit"]');
@@ -82,6 +84,11 @@ describe('Login component', () => {
             fireEvent.change(email, { target: { value: 'test@gmail.com' } });
             fireEvent.change(password, { target: { value: '11111111' } });
         });
+
+        act(() => {
+            const mockedField = getByTestId("captcha");
+            mockedField[Object.keys(mockedField)[1]].testprops.setFieldValue("recaptchaToken", 'token')
+        })
 
         fireEvent.click(submit);
 

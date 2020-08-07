@@ -68,6 +68,8 @@ export default function Login() {
                                             <div className="form-group">
                                                 <ReCAPTCHA
                                                     sitekey={process.env.RECAPTCHA_SITE_KEY}
+                                                    testprops={formikProps}
+                                                    data-testid="captcha"
                                                     onChange={
                                                         (response) => {
                                                             formikProps.setFieldValue("recaptchaToken", response);
