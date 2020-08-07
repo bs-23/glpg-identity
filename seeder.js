@@ -206,6 +206,12 @@ async function init() {
                 language_code: 'en'
             },
             {
+                rich_text: '<p>Ik ga akkoord met de Galapagos <a href="https://www.glpg.com/">Servicevoorwaarden.</a></p>',
+                consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
+                country_iso2: 'nl',
+                language_code: 'nl'
+            },
+            {
                 rich_text: "<p>J'autorise Galapagos à m'envoyer des informations promotionnelles et environnementales concernant tous les produits et services Galapagos sur mon adresse e-mail fournie. Pour plus d'informations sur la manière dont nous traitons vos informations personnelles, veuillez consulter notre<a href='https://www.glpg.com/'>privacy notice.</a></p>",
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 country_iso2: 'fr',
@@ -216,6 +222,12 @@ async function init() {
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 country_iso2: 'nl',
                 language_code: 'en'
+            },
+            {
+                rich_text: '<p>Ik geef Galapagos mijn toestemming om mij promotionele en milieu-informatie te sturen over alle Galapagos-producten en -diensten op het door mij opgegeven e-mailadres. </p> <p> Voor meer informatie over hoe we omgaan met uw persoonlijke informatie, verwijzen wij u naar onze <a href="https://www.glpg.com/">privacyverklaring.</a></p>',
+                consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
+                country_iso2: 'nl',
+                language_code: 'nl'
             }
         ];
 
