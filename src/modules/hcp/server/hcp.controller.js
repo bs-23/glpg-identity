@@ -702,9 +702,6 @@ async function forgetPassword(req, res) {
         response.errors.push(new CustomError(`User is not approved yet.`));
         res.status(400).send(response);
 
-
-
-
     } catch (err) {
         response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
