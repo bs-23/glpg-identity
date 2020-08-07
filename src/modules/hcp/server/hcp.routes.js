@@ -23,7 +23,7 @@ module.exports = app => {
         .post(passport.authenticate('application-jwt', { session: false }), controller.confirmConsents);
 
     app.route('/api/hcp-profiles/forget-password')
-        .get(passport.authenticate('application-jwt', { session: false }), controller.forgetPassword);
+        .post(passport.authenticate('application-jwt', { session: false }), controller.forgetPassword);
 
     app.route('/api/hcp-profiles/reset-password')
         .put(passport.authenticate('application-jwt', { session: false }), controller.resetPassword);

@@ -102,7 +102,7 @@ async function sendRegistrationSuccessMail(user, application) {
 async function sendResetPasswordSuccessMail(user, application) {
     const mailOptions = generateDefaultEmailOptions(user);
 
-    mailOptions.subject = 'Your password has been reset.';
+    mailOptions.subject = 'Your password has been reset';
     mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/password-reset-success.html`);
 
     await emailService.send(mailOptions);
@@ -678,7 +678,7 @@ async function resetPassword(req, res) {
 async function forgetPassword(req, res) {
     const response = new Response({}, []);
     try {
-        const doc = await Hcp.findOne({ where: { email: req.query.email } });
+        const doc = await Hcp.findOne({ where: { email: req.body.email } });
 
         if (!doc) {
             response.errors.push(new CustomError(`Account doesn't exist`));
