@@ -497,11 +497,13 @@ async function approveHCPUser(req, res) {
 
         if (userConsents && userConsents.length) {
             const consentIds = userConsents.map(consent => consent.consent_id)
-            const allConsentDetails = await ConsentLanguage.findAll({ where: {
-                consent_id: consentIds,
-                country_iso2: hcpUser.country_iso2.toLowerCase(),
-                language_code: hcpUser.language_code.toLowerCase(),
-            } });
+            const allConsentDetails = await ConsentLanguage.findAll({
+                where: {
+                    consent_id: consentIds,
+                    country_iso2: hcpUser.country_iso2.toLowerCase(),
+                    language_code: hcpUser.language_code.toLowerCase(),
+                }
+            });
 
             if (allConsentDetails && allConsentDetails.length) {
                 hasDoubleOptIn = true;
@@ -687,13 +689,22 @@ async function forgetPassword(req, res) {
 
         const userApplication = await Application.findOne({ where: { id: doc.application_id } });
 
-        await addPasswordResetTokenToUser(doc)
+        if (doc.dataValues.status === 'approved') {
+            await addPasswordResetTokenToUser(doc)
 
-        await sendPasswordResetInstructionMail(doc, userApplication)
+            await sendPasswordResetInstructionMail(doc, userApplication)
 
-        response.data = 'Successfully sent password reset email.'
+            response.data = 'Successfully sent password reset email.'
 
-        res.json(response);
+            return res.json(response);
+        }
+
+        response.errors.push(new CustomError(`User is not approved yet.`));
+        res.status(400).send(response);
+
+
+
+
     } catch (err) {
         response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
