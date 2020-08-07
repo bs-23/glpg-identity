@@ -85,5 +85,16 @@ export function createRole(data) {
     };
 }
 
+export function cdpSort(type, val) {
+    return {
+        type: Types.SORT_USERS,
+        payload: {
+            type: type,
+            val: val
+        }
+    };
+}
+
+
 
 
