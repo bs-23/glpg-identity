@@ -450,6 +450,11 @@ async function confirmConsents(req, res) {
             return res.status(400).send(response);
         }
 
+        if(hcpUser.status !== 'consent_pending') {
+            response.errors.push(new CustomError('Invalid token.'));
+            return res.status(400).send(response);
+        }
+
         let userConsents = await HcpConsents.findAll({ where: { user_id: payload.id } });
 
         if (userConsents && userConsents.length) {
