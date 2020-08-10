@@ -1,18 +1,18 @@
-import React from "react";
-import { useDispatch } from "react-redux";
-import { Form, Formik, Field, ErrorMessage } from "formik";
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { useToasts } from 'react-toast-notifications';
-import ReCAPTCHA from "react-google-recaptcha";
+import { useDispatch } from 'react-redux';
 import { useCookies } from 'react-cookie';
+import ReCAPTCHA from 'react-google-recaptcha';
+import { useToasts } from 'react-toast-notifications';
+import { Form, Formik, Field, ErrorMessage } from 'formik';
 
-import { login } from "../user.actions";
-import { loginSchema } from "../user.schema";
+import { login } from '../user.actions';
+import { loginSchema } from '../user.schema';
 
 export default function Login() {
     const dispatch = useDispatch();
     const { addToast } = useToasts();
-    const [cookies, setCookie] = useCookies();
+    const [, setCookie] = useCookies();
 
     return (
         <div className="app-login">
@@ -65,21 +65,23 @@ export default function Login() {
                                                 <div className="invalid-feedback" data-testid="password-error"><ErrorMessage name="password" /></div>
                                             </div>
 
-                                            <div className="form-group mt-2">
-                                                <ReCAPTCHA
-                                                    sitekey={process.env.RECAPTCHA_SITE_KEY}
-                                                    testprops={formikProps}
-                                                    data-testid="captcha"
-                                                    onChange={
-                                                        (response) => {
-                                                            formikProps.setFieldValue("recaptchaToken", response);
+                                            { process.env.RECAPTCHA_SITE_KEY &&
+                                                <div className="form-group mt-2">
+                                                    <ReCAPTCHA
+                                                        sitekey={process.env.RECAPTCHA_SITE_KEY}
+                                                        testprops={formikProps}
+                                                        data-testid="captcha"
+                                                        onChange={
+                                                            (response) => {
+                                                                formikProps.setFieldValue("recaptchaToken", response);
+                                                            }
                                                         }
-                                                    }
-                                                />
-                                                {formikProps.errors.recaptchaToken && formikProps.touched.recaptchaToken && (
-                                                    <div className="invalid-feedback">{formikProps.errors.recaptchaToken}</div>
-                                                )}
-                                            </div>
+                                                    />
+                                                    {formikProps.errors.recaptchaToken && formikProps.touched.recaptchaToken && (
+                                                        <div className="invalid-feedback">{formikProps.errors.recaptchaToken}</div>
+                                                    )}
+                                                </div>
+                                            }
 
                                             <button type="submit" className="btn btn-block text-white app-login__btn mt-4 p-2 font-weight-bold">Sign In</button>
                                         </Form>
