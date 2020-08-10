@@ -93,6 +93,7 @@ async function sendRegistrationSuccessMail(user, application) {
     const mailOptions = generateDefaultEmailOptions(user);
 
     mailOptions.subject = `Congratulations your registration was successful`;
+    mailOptions.locale = user.language_code;
     mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/registration-success.html`);
     mailOptions.data.loginLink = `${application.login_link}?journey=login&country_lang=${user.country_iso2}_${user.language_code}`;
 

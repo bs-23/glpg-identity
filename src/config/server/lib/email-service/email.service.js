@@ -19,9 +19,10 @@ AWS.config.update({
  * @param {[string]} options.toAddresses - To email addresses
  * @param {string} options.subject - Subject line for email
  * @param {string} options.data - Values to be replaced in the template
+ * @param {string} options.locale - Users language code
  */
 async function send(options) {
-    const template = options.template || await getTemplate(options.templateUrl);
+    const template = options.template || await getTemplate(options.templateUrl, options.locale);
 
     const htmlBody = options.data
         ? transformTemplate(template, options.data)
@@ -51,9 +52,14 @@ async function send(options) {
     return response;
 }
 
-async function getTemplate(templateUrl) {
-    const templateText = fs.readFileSync(templateUrl, 'utf8');
-    return templateText;
+async function getTemplate(templateUrl, locale) {
+    let templateUrlInLocale = templateUrl.replace('.html', `-${locale.toLowerCase()}.html`)
+
+    if (fs.existsSync(templateUrlInLocale)) {
+        return fs.readFileSync(templateUrlInLocale, 'utf8');
+    }
+
+    return fs.readFileSync(templateUrl, 'utf8');
 }
 
 function buildList(listName, list, template){
