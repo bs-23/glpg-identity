@@ -67,14 +67,14 @@ export default function Navbar() {
                     </div>
                     <div className="col-9 text-right">
                         <div className="d-block d-sm-flex justify-content-end align-items-center">
-                            <div className="mb-2 mb-sm-0 d-flex justify-content-end align-items-center">
+                            {loggedInUser.type !== 'admin' && <div className="mb-2 mb-sm-0 d-flex justify-content-end align-items-center">
                                 <div className="mr-3">
                                     {renderApplicationIcon()}
                                 </div>
                                 <div className="mr-2">
                                     {renderCountryIcons()}
                                 </div>
-                            </div>
+                            </div>}
                             <div className="mb-2 mb-sm-0 d-flex justify-content-end align-items-center">
                                 <button className="mr-2 btn cdp-btn-secondary text-white"><i className="icon icon-user-round mr-1 app__header-icon-user d-none d-sm-inline-block"></i> <span className="">{first_name + " " + last_name}</span></button>
                                 <a className="btn cdp-btn-outline-primary d-flex align-items-center" onClick={handleLogOut} href="/api/logout"><i className="icon icon-logout mr-1 app__header-icon-logout"></i>Sign out</a>
