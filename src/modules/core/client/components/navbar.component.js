@@ -41,7 +41,7 @@ export default function Navbar() {
                         <div className="d-block d-sm-flex justify-content-end align-items-center">
                             <div className="mb-2 mb-sm-0 d-flex justify-content-end align-items-center">
                                 <div className="mr-3">
-                                    <img src="https://cdp-asset.s3.eu-central-1.amazonaws.com/brandx_logo.png" title="Brand X" alt="Brand X Logo" width="122" />
+                                    <img src="https://cdp-asset.s3.eu-central-1.amazonaws.com/brandx/logo.png.png" title="Brand X" alt="Brand X Logo" width="122" />
                                 </div>
                                 <div className="mr-2">
                                     <img height="26" width="26" src="/assets/flag/flag-netherlands.svg" title="Netherlands" alt="Flag" className="ml-1" />
@@ -51,7 +51,7 @@ export default function Navbar() {
                             </div>
                             <div className="mb-2 mb-sm-0 d-flex justify-content-end align-items-center">
                                 <button className="mr-2 btn cdp-btn-secondary text-white"><i className="icon icon-user-round mr-1 app__header-icon-user d-none d-sm-inline-block"></i> <span className="">{first_name + " " + last_name}</span></button>
-                                <a className="btn cdp-btn-outline-primary d-flex align-items-center" onClick={handleLogOut} href="/api/logout"><i className="icon icon-logout mr-1 app__header-icon-logout"></i>Sign out</a>    
+                                <a className="btn cdp-btn-outline-primary d-flex align-items-center" onClick={handleLogOut} href="/api/logout"><i className="icon icon-logout mr-1 app__header-icon-logout"></i>Sign out</a>
                             </div>
                         </div>
                     </div>

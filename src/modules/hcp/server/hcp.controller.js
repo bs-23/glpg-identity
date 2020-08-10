@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const _ = require('lodash');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
@@ -77,11 +78,21 @@ function generateDefaultEmailOptions(user) {
     };
 }
 
+function getTemplateUrl(fileName, applicationSlug, locale) {
+    const templateUrlInLocale = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${applicationSlug}/${locale.toLowerCase()}/${fileName}`);
+
+    if(fs.existsSync(templateUrlInLocale)) {
+        return templateUrlInLocale;
+    }
+
+    return path.join(process.cwd(), `src/config/server/lib/email-service/templates/${applicationSlug}/en/${fileName}`);
+}
+
 async function sendConsentConfirmationMail(user, consents, application) {
     const consentConfirmationToken = generateConsentConfirmationAccessToken(user);
     const mailOptions = generateDefaultEmailOptions(user);
 
-    mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/double-opt-in-consent-confirm.html`);
+    mailOptions.templateUrl = getTemplateUrl('double-opt-in-consent-confirm.html', application.slug, user.language_code);
     mailOptions.subject = 'Thank you for registering!';
     mailOptions.data.consents = consents || [];
     mailOptions.data.link = `${application.consent_confirmation_link}?token=${consentConfirmationToken}&journey=consent_confirmation&country_lang=${user.country_iso2}_${user.language_code}`;
@@ -93,8 +104,7 @@ async function sendRegistrationSuccessMail(user, application) {
     const mailOptions = generateDefaultEmailOptions(user);
 
     mailOptions.subject = `Congratulations your registration was successful`;
-    mailOptions.locale = user.language_code;
-    mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/registration-success.html`);
+    mailOptions.templateUrl = getTemplateUrl('registration-success.html', application.slug, user.language_code);
     mailOptions.data.loginLink = `${application.login_link}?journey=login&country_lang=${user.country_iso2}_${user.language_code}`;
 
     await emailService.send(mailOptions);
@@ -104,7 +114,7 @@ async function sendResetPasswordSuccessMail(user, application) {
     const mailOptions = generateDefaultEmailOptions(user);
 
     mailOptions.subject = 'Your password has been reset';
-    mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/password-reset-success.html`);
+    mailOptions.templateUrl = getTemplateUrl('password-reset-success.html', application.slug, user.language_code);
 
     await emailService.send(mailOptions);
 }
@@ -112,7 +122,7 @@ async function sendResetPasswordSuccessMail(user, application) {
 async function sendPasswordSetupInstructionMail(user, application) {
     const mailOptions = generateDefaultEmailOptions(user);
 
-    mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/password-setup-instructions.html`);
+    mailOptions.templateUrl = getTemplateUrl('password-setup-instructions.html', application.slug, user.language_code);
     mailOptions.subject = `Registration verified. Please setup your password`;
     mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&journey=set_password&country_lang=${user.country_iso2}_${user.language_code}`;
 
@@ -122,7 +132,7 @@ async function sendPasswordSetupInstructionMail(user, application) {
 async function sendPasswordResetInstructionMail(user, application) {
     const mailOptions = generateDefaultEmailOptions(user);
 
-    mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/password-reset-instructions.html`);
+    mailOptions.templateUrl = getTemplateUrl('password-reset-instructions.html', application.slug, user.language_code);
     mailOptions.subject = `Setup Password`;
     mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&journey=set_password&country_lang=${user.country_iso2}_${user.language_code}`;
 
