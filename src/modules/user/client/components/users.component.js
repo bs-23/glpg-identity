@@ -31,7 +31,6 @@ export default function Users() {
     }, []);
 
     const sortCdp = (val) => {
-        console.log(sort.value);
         if (sort.value === val) {
             dispatch(cdpSort(sort.type === 'ASC' ? 'DESC' : 'ASC', val));
             setSort({ type: sort.type === 'ASC' ? 'DESC' : 'ASC', value: val });
@@ -105,12 +104,12 @@ export default function Users() {
                                     <table className="table table-hover table-sm mb-0 cdp-table">
                                         <thead className="cdp-bg-primary text-white cdp-table__header">
                                             <tr>
-                                                <th><span className="cdp-table__col-sorting" onClick={() => sortCdp('first_name')}>First Name<i className="icon icon-arrow-down cdp-table__icon-sorting"></i></span></th>
-                                                <th><span className="cdp-table__col-sorting" onClick={() => sortCdp('last_name')}>Last Name<i className="icon icon-arrow-down cdp-table__icon-sorting"></i></span></th>
-                                                <th><span className="cdp-table__col-sorting" onClick={() => sortCdp('email')}>Email<i className="icon icon-arrow-down cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className={sort.value === 'first_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => sortCdp('first_name')}>First Name<i className="icon icon-arrow-down cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className={sort.value === 'last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => sortCdp('last_name')}>Last Name<i className="icon icon-arrow-down cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className={sort.value === 'email' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => sortCdp('email')}>Email<i className="icon icon-arrow-down cdp-table__icon-sorting"></i></span></th>
                                                 <th><span className="cdp-table__col-sorting">Countries</span></th>
-                                                <th><span className="cdp-table__col-sorting" onClick={() => sortCdp('created_at')}>Creation Date<i className="icon icon-arrow-down cdp-table__icon-sorting"></i></span></th>
-                                                <th><span className="cdp-table__col-sorting" onClick={() => sortCdp('expiry_date')}>Expiry Date<i className="icon icon-arrow-down cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className={sort.value === 'created_at' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => sortCdp('created_at')}>Creation Date<i className="icon icon-arrow-down cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className={sort.value === 'expiry_date' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => sortCdp('expiry_date')}>Expiry Date<i className="icon icon-arrow-down cdp-table__icon-sorting"></i></span></th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
