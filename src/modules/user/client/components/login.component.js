@@ -12,7 +12,7 @@ import { loginSchema } from "../user.schema";
 export default function Login() {
     const dispatch = useDispatch();
     const { addToast } = useToasts();
-    const [cookies, setCookie] = useCookies();
+    const [, setCookie] = useCookies();
 
     return (
         <div className="app-login">

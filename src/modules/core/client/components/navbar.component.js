@@ -4,7 +4,7 @@ import { useCookies } from 'react-cookie';
 // import Dropdown from 'react-bootstrap/Dropdown';
 
 export default function Navbar() {
-    const [cookies, setCookie, removeCookie] = useCookies();
+    const [, setCookie, removeCookie] = useCookies();
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
     const { first_name, last_name } = loggedInUser;
 
@@ -51,7 +51,7 @@ export default function Navbar() {
                             </div>
                             <div className="mb-2 mb-sm-0 d-flex justify-content-end align-items-center">
                                 <button className="mr-2 btn cdp-btn-secondary text-white"><i className="icon icon-user-round mr-1 app__header-icon-user d-none d-sm-inline-block"></i> <span className="">{first_name + " " + last_name}</span></button>
-                                <a className="btn cdp-btn-outline-primary d-flex align-items-center" onClick={handleLogOut} href="/api/logout"><i className="icon icon-logout mr-1 app__header-icon-logout"></i>Sign out</a>    
+                                <a className="btn cdp-btn-outline-primary d-flex align-items-center" onClick={handleLogOut} href="/api/logout"><i className="icon icon-logout mr-1 app__header-icon-logout"></i>Sign out</a>
                             </div>
                         </div>
                     </div>
