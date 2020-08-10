@@ -38,6 +38,16 @@
     &__col {
         &-sorting {
             cursor: pointer;
+
+            .cdp-table__icon-sorting {
+                visibility: hidden;
+            }
+
+            &:hover {
+                .cdp-table__icon-sorting {
+                    visibility: visible;
+                }
+            }
         }
     }
 
