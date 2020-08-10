@@ -20,7 +20,6 @@
                 display: none !important;
             }
         }
-
     }
 
     a {
@@ -29,10 +28,29 @@
         &:hover {
         }
     }
+
+    @media (max-width: $screen-phone) {
+
+        &-item {
+            padding-top: 5px;
+            padding-bottom: 5px;
+            padding-right: 0px;
+
+            &.active {
+                padding-right: 15px;
+            }
+        }
+    }
 }
 
 .breadcrumb-item + .breadcrumb-item {
     padding-left: 0px;
+
+    @media (max-width: $screen-phone) {
+        margin-left: 15px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
 }
 .breadcrumb-item + .breadcrumb-item::before {
     display: inline-block;
@@ -40,3 +58,4 @@
     color: $primary-color;
     content: "/";
 }
+

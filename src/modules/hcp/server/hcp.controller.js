@@ -114,7 +114,7 @@ async function sendPasswordSetupInstructionMail(user, application) {
 
     mailOptions.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/password-setup-instructions.html`);
     mailOptions.subject = `Registration verified. Please setup your password`;
-    mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&journey=set_password&country_lang=${user.country_iso2}_${user.language_code}`;
+    mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&journey=single_optin_verified&country_lang=${user.country_iso2}_${user.language_code}`;
 
     await emailService.send(mailOptions);
 }

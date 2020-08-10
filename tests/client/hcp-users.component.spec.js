@@ -12,7 +12,7 @@ import HcpUser from '../../src/modules/hcp/client/components/hcp-users';
 import { login } from '../../src/modules/user/client/user.actions';
 import { getHcpProfiles } from '../../src/modules/hcp/client/hcp.actions'
 
-configure({ adapter: new Adapter() }); 
+configure({ adapter: new Adapter() });
 
 describe('Hcp user component', () => {
     let fakeAxios;
@@ -48,14 +48,16 @@ describe('Hcp user component', () => {
                 countries: [ 'IE' ],
             }
         };
-        
+
 
         const status = null, country_iso2 = null;
+        fakeAxios.onGet('/api/hcps').reply(200, data);
+        fakeAxios.onGet('/api/hcps?page=1').reply(200, data);
         fakeAxios.onGet(`/api/hcps?page=${1}&status=${status}&country_iso2=${country_iso2}`).reply(200, data);
         fakeAxios.onGet(`/api/hcps?page=${2}&status=${status}&country_iso2=${country_iso2}`).reply(200, data);
         fakeAxios.onGet(`/api/hcps?page=${3}&status=${status}&country_iso2=${country_iso2}`).reply(200, data);
         await store.dispatch(getHcpProfiles(1, status, country_iso2));
-        
+
 
 
         countries = [ { countryid: 1, country_iso2: "IE", country_iso3: "IRL", codbase: "WUK", countryname: "Ireland"} ]
@@ -95,7 +97,7 @@ describe('Hcp user component', () => {
         const table = await waitFor(() => container.querySelector('table'));
         const thead = await waitFor(() => container.querySelector('thead'));
         const tbody = await waitFor(() => container.querySelector('tbody'));
-        
+
         expect(table).toBeTruthy();
         expect(thead).toBeTruthy();
         expect(tbody).toBeTruthy();
@@ -110,7 +112,7 @@ describe('Hcp user component', () => {
 
         const prevBtn = await waitFor(() => getByTestId('Prev'));
         await waitFor(() => fireEvent.click(prevBtn));
-        
+
         const tbody = await waitFor(() => container.querySelector('tbody'));
         const rows = tbody.childNodes;
         const first_row = rows[0];
@@ -130,21 +132,21 @@ describe('Hcp user component', () => {
 
         fireEvent.click(actionBtn);
 
-        const updateBtn = await waitFor(() => getByText('Update Status')); 
+        const updateBtn = await waitFor(() => getByText('Update Status'));
 
         fireEvent.click(updateBtn);
 
         const approveBtn = await waitFor(() => getByText('Approve User'));
         const commentInput = await waitFor(() => getByTestId('comment'));
         const submitBtn = await waitFor(() => getByTestId('submit'));
-        
+
         await waitFor(() => fireEvent.click(approveBtn));
         await waitFor(() => fireEvent.change(commentInput, { target: { value: 'a' } }));
-        
+
         expect(commentInput.value).toEqual('a');
 
         await waitFor(() => fireEvent.click(submitBtn));
-        
+
     });
 
     // it('should sort table data by first name', async () => {
