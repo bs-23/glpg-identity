@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { useCookies } from 'react-cookie';
-import Dropdown from 'react-bootstrap/Dropdown';
+// import Dropdown from 'react-bootstrap/Dropdown';
 
 export default function Navbar() {
     const [cookies, setCookie, removeCookie] = useCookies();

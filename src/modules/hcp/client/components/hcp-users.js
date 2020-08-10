@@ -3,9 +3,9 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
+import { Form, Formik, Field, ErrorMessage } from "formik";
 import { useToasts } from 'react-toast-notifications';
-import { getHcpProfiles, editHcpProfiles, hcpsSort } from '../hcp.actions';
+import { getHcpProfiles, hcpsSort } from '../hcp.actions';
 import { ApprovalRejectSchema } from '../hcp.schema'
 import axios from 'axios';
 import Modal from 'react-bootstrap/Modal';
