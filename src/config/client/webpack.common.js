@@ -1,17 +1,17 @@
-const path = require("path");
-const dotenv = require('dotenv');
+const fs = require('fs');
+const path = require('path');
 const webpack = require('webpack');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 function initializeEnv() {
-    if (process.env && process.env.RECAPTCHA_SITE_KEY) {
-        return new webpack.DefinePlugin({
-            'process.env.RECAPTCHA_SITE_KEY': JSON.stringify(process.env.RECAPTCHA_SITE_KEY)
-        });
-    }
+    let env;
 
-    const env = dotenv.config().parsed;
+    if(fs.existsSync(path.join(process.cwd(), '.env'))) {
+        env = require('dotenv').config().parsed;
+    } else {
+        env = process.env;
+    }
 
     const envKeys = Object.keys(env).reduce((prev, next) => {
         prev[`process.env.${next}`] = JSON.stringify(env[next]);
