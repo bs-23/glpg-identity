@@ -185,7 +185,7 @@ describe('HCP Routes', () => {
 
     it('Should get hcp users data', async () => {
         const response = await request
-            .get('/api/hcps/?page=1&status=Approved')
+            .get('/api/hcps/?page=1&status=approved')
             .set('Cookie', [`access_token=${defaultAdmin.access_token}`]);
 
         expect(response.statusCode).toBe(200);

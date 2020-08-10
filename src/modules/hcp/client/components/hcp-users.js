@@ -3,9 +3,9 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
+import { Form, Formik, Field, ErrorMessage } from "formik";
 import { useToasts } from 'react-toast-notifications';
-import { getHcpProfiles, editHcpProfiles, hcpsSort } from '../hcp.actions';
+import { getHcpProfiles, hcpsSort } from '../hcp.actions';
 import { ApprovalRejectSchema } from '../hcp.schema'
 import axios from 'axios';
 import Modal from 'react-bootstrap/Modal';
@@ -105,9 +105,9 @@ export default function hcpUsers() {
                 <div className="row">
                     <div className="col-12">
                         <div>
-                            <div className="d-flex justify-content-between align-items-center mb-3 mt-4">
+                            <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
                                 <h4 className="cdp-text-primary font-weight-bold mb-0">HCP Profiles</h4>
-                                <div>
+                                <div className="d-flex pt-3 pt-sm-0">
                                     {countries && hcps['countries'] &&
                                         <React.Fragment>
                                             <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-btn-primary text-white dropdown shadow-sm">
@@ -284,7 +284,7 @@ export default function hcpUsers() {
 
                             {hcps['users'] && hcps['users'].length === 0 &&
                                 <>
-                                    <div className="row justify-content-center mt-5 pt-5 mb-3">
+                                    <div className="row justify-content-center mt-sm-5 pt-5 mb-3">
                                         <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">
                                             <i class="icon icon-team icon-6x cdp-text-secondary"></i>
                                             <h3 className="font-weight-bold cdp-text-primary pt-4">No Profile Found!</h3>
