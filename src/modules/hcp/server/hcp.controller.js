@@ -9,7 +9,8 @@ const HcpArchives = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
-const ConsentLanguage = require(path.join(process.cwd(), 'src/modules/consent/server/consent_language.model'));
+const ConsentLanguage = require(path.join(process.cwd(), 'src/modules/consent/server/consent-language.model'));
+const ConsentCountry = require(path.join(process.cwd(), 'src/modules/consent/server/consent-country.model'));
 const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
@@ -382,13 +383,30 @@ async function createHcpProfile(req, res) {
 
                 const consentLang = await ConsentLanguage.findOne({
                     where: {
-                        country_iso2: model.country_iso2.toLowerCase(),
-                        language_code: model.language_code.toLowerCase(),
+                        language_code: {
+                            [Op.or]: [
+                                model.language_code.toUpperCase(),
+                                model.language_code.toLowerCase(),
+                            ],
+                        },
                         consent_id: consentDetails.id
                     }
                 });
 
-                if (!consentLang) return;
+
+                const consentCountry = await ConsentCountry.findOne({
+                    where: {
+                        country_iso2: {
+                            [Op.or]: [
+                                model.country_iso2.toUpperCase(),
+                                model.country_iso2.toLowerCase(),
+                            ],
+                        },
+                        consent_id: consentDetails.id
+                    }
+                });
+
+                if (!consentLang || !consentCountry) return;
 
 
                 if (consentDetails.opt_type === 'double') {
@@ -505,7 +523,6 @@ async function approveHCPUser(req, res) {
             const allConsentDetails = await ConsentLanguage.findAll({
                 where: {
                     consent_id: consentIds,
-                    country_iso2: hcpUser.country_iso2.toLowerCase(),
                     language_code: hcpUser.language_code.toLowerCase(),
                 }
             });
