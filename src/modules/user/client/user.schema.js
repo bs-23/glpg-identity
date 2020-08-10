@@ -45,7 +45,9 @@ export const registerSchema = object().shape({
     email: string()
         .email('This field should be an valid email address.')
         .required('This field must not be empty.'),
-    phone: string().matches(/^[0-9]/, 'This field only contains numbers'),
+    phone: string()
+        .min(8, 'This field must be at least 8 characters long.')
+        .matches(/^[+]?[0-9]+$/, 'This field only contains numbers'),
     countries: string()
         .required('Must select at least one country'),
     roles: string()
