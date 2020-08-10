@@ -418,7 +418,7 @@ async function createHcpProfile(req, res) {
                     consent_id: consentDetails.id,
                     title: consentLang.rich_text,
                     response: consentResponse,
-                    consent_confirmed: consentDetails.opt_type === 'double' ? false : true,
+                    consent_confirmed: consentCountry.opt_type === 'double' ? false : true,
                     created_by: req.user.id,
                     updated_by: req.user.id
                 });

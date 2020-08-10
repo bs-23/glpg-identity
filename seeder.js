@@ -182,16 +182,14 @@ async function init() {
                 title: 'I agree to the Galapagos Terms of Service',
                 slug: '',
                 category_id: '59953d51-2449-4b65-950f-9f88654019bb',
-                type: 'online',
-                opt_type: 'single'
+                type: 'online'
             },
             {
                 id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 title: 'I give my consent to send me promotional email',
                 slug: '',
                 category_id: 'fe037405-c676-4d98-bd05-85008900c838',
-                type: 'online',
-                opt_type: 'double'
+                type: 'online'
             }
         ];
 
@@ -234,18 +232,22 @@ async function init() {
             {
                 consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
                 country_iso2: 'fr',
+                opt_type: 'single'
             },
             {
                 consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
                 country_iso2: 'nl',
+                opt_type: 'single'
             },
             {
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 country_iso2: 'nl',
+                opt_type: 'double'
             },
             {
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 country_iso2: 'fr',
+                opt_type: 'double'
             },
         ];
 
