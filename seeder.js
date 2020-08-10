@@ -140,6 +140,7 @@ async function init() {
                     consent_confirmation_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/consentConfirm.consent.html',
                     reset_password_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/journeyRedirect.journey.html',
                     login_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/journeyRedirect.journey.html',
+                    logo_link: 'https://cdp-asset.s3.eu-central-1.amazonaws.com/glpg_logo.png',
                     created_by: admin.id,
                     updated_by: admin.id
                 },
@@ -151,6 +152,7 @@ async function init() {
                     consent_confirmation_link: 'http://172.16.229.25:4503/bin/public/glpg-brandx/consentConfirm.consent.html',
                     reset_password_link: 'http://172.16.229.25:4503/bin/public/glpg-brandx/journeyRedirect.journey.html',
                     login_link: 'http://172.16.229.25:4503/bin/public/glpg-brandx/journeyRedirect.journey.html',
+                    logo_link: 'https://cdp-asset.s3.eu-central-1.amazonaws.com/brandx_logo.png',
                     created_by: admin.id,
                     updated_by: admin.id
                 }

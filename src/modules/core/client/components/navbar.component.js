@@ -1,17 +1,45 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { useCookies } from 'react-cookie';
+import { getCountries } from '../../../user/client/user.actions'
 // import Dropdown from 'react-bootstrap/Dropdown';
 
 export default function Navbar() {
     const [, setCookie, removeCookie] = useCookies();
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
+    const countries = useSelector(state => state.userReducer.countries);
     const { first_name, last_name } = loggedInUser;
+    const dispatch = useDispatch()
+
+    useEffect(() => {
+        dispatch(getCountries())
+    }, [])
 
     const handleLogOut = () => {
         // alert('clicked auto');
         setCookie('logged_in', '', { path: '/' });
         removeCookie('logged_in');
+    }
+
+    const generateCountryIconPath = (country) => {
+        if(country) return `/assets/flag/flag-${country.toLowerCase().replace(/ /g, "-")}.svg`
+        return `/assets/flag/flag-placeholder.svg`
+    }
+
+    const renderCountryIcons = () => {
+        if(loggedInUser.countries){
+            return loggedInUser.countries.map(country_iso2 => {
+                const country = countries && countries.find(country => country.country_iso2 === country_iso2)
+                return <img key={country_iso2} height="26" width="26" src={generateCountryIconPath(country && country.countryname)} title={country ? country.countryname : country_iso2 } alt="Flag" className="ml-1" />
+            })
+        }
+    }
+
+    const renderApplicationIcon = () => {
+        if(loggedInUser.application){
+            const { name, logo_link } = loggedInUser.application
+            return <img src={logo_link} title={name} alt={`${name} Logo`} width="122" />
+        }
     }
 
     return (
@@ -41,12 +69,10 @@ export default function Navbar() {
                         <div className="d-block d-sm-flex justify-content-end align-items-center">
                             <div className="mb-2 mb-sm-0 d-flex justify-content-end align-items-center">
                                 <div className="mr-3">
-                                    <img src="https://cdp-asset.s3.eu-central-1.amazonaws.com/brandx_logo.png" title="Brand X" alt="Brand X Logo" width="122" />
+                                    {renderApplicationIcon()}
                                 </div>
                                 <div className="mr-2">
-                                    <img height="26" width="26" src="/assets/flag/flag-netherlands.svg" title="Netherlands" alt="Flag" className="ml-1" />
-                                    <img height="26" width="26" src="/assets/flag/flag-belgium.svg" title="Belgium" alt="Flag" className="ml-1" />
-                                    <img height="26" width="26" src="/assets/flag/flag-france.svg" title="France" alt="Flag" className="ml-1" />
+                                    {renderCountryIcons()}
                                 </div>
                             </div>
                             <div className="mb-2 mb-sm-0 d-flex justify-content-end align-items-center">

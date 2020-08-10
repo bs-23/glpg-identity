@@ -1,7 +1,25 @@
-const path = require('path');
+const path = require("path");
+const dotenv = require('dotenv');
 const webpack = require('webpack');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+function initializeEnv() {
+    if (process.env && process.env.RECAPTCHA_SITE_KEY) {
+        return new webpack.DefinePlugin({
+            'process.env.RECAPTCHA_SITE_KEY': JSON.stringify(process.env.RECAPTCHA_SITE_KEY)
+        });
+    }
+
+    const env = dotenv.config().parsed;
+
+    const envKeys = Object.keys(env).reduce((prev, next) => {
+        prev[`process.env.${next}`] = JSON.stringify(env[next]);
+        return prev;
+    }, {});
+
+    return new webpack.DefinePlugin(envKeys);
+}
 
 module.exports = {
     devtool: 'eval-source-map',
@@ -20,9 +38,7 @@ module.exports = {
         new CleanWebpackPlugin({
             verbose: true
         }),
-        new webpack.DefinePlugin({
-            'process.env.RECAPTCHA_SITE_KEY': JSON.stringify(process.env.RECAPTCHA_SITE_KEY)
-        })
+        initializeEnv()
     ],
 
     module: {
