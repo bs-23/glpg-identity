@@ -105,12 +105,12 @@ export default function Users() {
                                     <table className="table table-hover table-sm mb-0 cdp-table">
                                         <thead className="cdp-bg-primary text-white cdp-table__header">
                                             <tr>
-                                                <th><span className="cdp-table__col-sorting" onClick={() => sortCdp('first_name')}>First Name<i className="icon icon-sorting cdp-table__icon-sorting"></i></span></th>
-                                                <th><span className="cdp-table__col-sorting" onClick={() => sortCdp('last_name')}>Last Name<i className="icon icon-sorting cdp-table__icon-sorting"></i></span></th>
-                                                <th><span className="cdp-table__col-sorting" onClick={() => sortCdp('email')}>Email<i className="icon icon-sorting cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className="cdp-table__col-sorting" onClick={() => sortCdp('first_name')}>First Name<i className="icon icon-arrow-down cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className="cdp-table__col-sorting" onClick={() => sortCdp('last_name')}>Last Name<i className="icon icon-arrow-down cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className="cdp-table__col-sorting" onClick={() => sortCdp('email')}>Email<i className="icon icon-arrow-down cdp-table__icon-sorting"></i></span></th>
                                                 <th><span className="cdp-table__col-sorting">Countries</span></th>
-                                                <th><span className="cdp-table__col-sorting" onClick={() => sortCdp('created_at')}>Creation Date<i className="icon icon-sorting cdp-table__icon-sorting"></i></span></th>
-                                                <th><span className="cdp-table__col-sorting" onClick={() => sortCdp('expiry_date')}>Expiry Date<i className="icon icon-sorting cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className="cdp-table__col-sorting" onClick={() => sortCdp('created_at')}>Creation Date<i className="icon icon-arrow-down cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className="cdp-table__col-sorting" onClick={() => sortCdp('expiry_date')}>Expiry Date<i className="icon icon-arrow-down cdp-table__icon-sorting"></i></span></th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
