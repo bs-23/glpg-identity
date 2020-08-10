@@ -1,10 +1,10 @@
 const path = require("path");
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const webpack = require('webpack');
 const dotenv = require('dotenv');
+const webpack = require('webpack');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-function getEnvPlugin() {
+function initializeEnv() {
     const env = dotenv.config().parsed;
 
     const envKeys = Object.keys(env).reduce((prev, next) => {
@@ -16,15 +16,15 @@ function getEnvPlugin() {
 }
 
 module.exports = {
-    devtool: "eval-source-map",
+    devtool: 'eval-source-map',
 
     entry: {
-        app: "./src/modules/core/client/main.js"
+        app: './src/modules/core/client/main.js'
     },
 
     resolve: {
-        modules: [path.join(process.cwd(), "app"), "node_modules"],
-        extensions: [".js", ".css", ".scss"],
+        modules: [path.join(process.cwd(), 'app'), 'node_modules'],
+        extensions: ['.js', '.css', '.scss'],
         symlinks: false
     },
 
@@ -32,7 +32,7 @@ module.exports = {
         new CleanWebpackPlugin({
             verbose: true
         }),
-        getEnvPlugin()
+        initializeEnv()
     ],
 
     module: {
@@ -40,7 +40,7 @@ module.exports = {
             {
                 test: /\.js?$/,
                 exclude: /node_modules/,
-                loader: "babel-loader"
+                loader: 'babel-loader'
             },
             {
                 test: /\.(scss|css)$/,
@@ -48,13 +48,13 @@ module.exports = {
                     {
                         loader: MiniCssExtractPlugin.loader
                     },
-                    "css-loader",
-                    "sass-loader"
+                    'css-loader',
+                    'sass-loader'
                 ]
             },
             {
                 test: /\.(png|ttf|otf|eot|svg|woff(2)?)(\?[a-z0-9]+)?$/,
-                loader: "url-loader"
+                loader: 'url-loader'
             }
         ]
     }
