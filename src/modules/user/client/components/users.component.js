@@ -78,25 +78,27 @@ export default function Users() {
                 </div>
                 <div className="row">
                     <div className="col-12">
-                        <div className="d-flex justify-content-between align-items-center mb-3 mt-4">
-                            <h4 className="cdp-text-primary font-weight-bold mb-0">CDP User List</h4>
-                            <Dropdown className="ml-auto dropdown-customize">
-                                <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center">
-                                    <i className="icon icon-filter mr-2 mb-n1"></i> Filter by Country
+                        <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
+                            <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">CDP User List</h4>
+                            <div className="d-flex justify-content-between align-items-center">
+                                <Dropdown className="ml-auto dropdown-customize">
+                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center">
+                                        <i className="icon icon-filter mr-2 mb-n1"></i> Filter by Country
                             </Dropdown.Toggle>
-                                <Dropdown.Menu>
-                                    <LinkContainer to="list?page=1"><Dropdown.Item onClick={() => getUserList(1, null)}>All</Dropdown.Item></LinkContainer>
-                                    {
-                                        countries.length > 0 && countries.map(country => (
-                                            <LinkContainer to={`list?page=1&country_iso2=${country.country_iso2}`} key={country.countryid}><Dropdown.Item onClick={() => getUserList(1, country.country_iso2)}>{country.countryname}</Dropdown.Item></LinkContainer>
-                                        ))
-                                    }
-                                </Dropdown.Menu>
-                            </Dropdown>
+                                    <Dropdown.Menu>
+                                        <LinkContainer to="list?page=1"><Dropdown.Item onClick={() => getUserList(1, null)}>All</Dropdown.Item></LinkContainer>
+                                        {
+                                            countries.length > 0 && countries.map(country => (
+                                                <LinkContainer to={`list?page=1&country_iso2=${country.country_iso2}`} key={country.countryid}><Dropdown.Item onClick={() => getUserList(1, country.country_iso2)}>{country.countryname}</Dropdown.Item></LinkContainer>
+                                            ))
+                                        }
+                                    </Dropdown.Menu>
+                                </Dropdown>
 
-                            <NavLink to="/users/create" className="btn cdp-btn-secondary text-white ml-2">
-                                <i className="icon icon-plus pr-1"></i> Create new user
-                            </NavLink>
+                                <NavLink to="/users/create" className="btn cdp-btn-secondary text-white ml-2">
+                                    <i className="icon icon-plus pr-1"></i> Create new user
+                                </NavLink>
+                            </div>
                         </div>
 
                         {userdata['users'] && userdata['users'].length > 0 &&
