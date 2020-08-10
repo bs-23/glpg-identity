@@ -5,7 +5,7 @@ import Navbar from "./components/navbar.component";
 import { useCookies } from 'react-cookie';
 
 export default function PrivateRoute({ component: Component, module, ...rest }) {
-    const [cookies, setCookie] = useCookies();
+    const [cookies] = useCookies();
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
     const roles = loggedInUser ? loggedInUser.roles : [];
     let permissions = [];

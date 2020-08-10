@@ -14,7 +14,8 @@ async function init() {
     const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
     const ConsentCategory = require(path.join(process.cwd(), 'src/modules/consent/server/consent-category.model'));
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
-    const ConsentLanguage = require(path.join(process.cwd(), 'src/modules/consent/server/consent_language.model'));
+    const ConsentLanguage = require(path.join(process.cwd(), 'src/modules/consent/server/consent-language.model'));
+    const ConsentCountry = require(path.join(process.cwd(), 'src/modules/consent/server/consent-country.model'));
     const RolePermission = require(path.join(process.cwd(), "src/modules/user/server/role/role-permission.model"));
     const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
     const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
@@ -139,6 +140,7 @@ async function init() {
                     consent_confirmation_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/consentConfirm.consent.html',
                     reset_password_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/journeyRedirect.journey.html',
                     login_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/journeyRedirect.journey.html',
+                    logo_link: 'https://cdp-asset.s3.eu-central-1.amazonaws.com/glpg_logo.png',
                     created_by: admin.id,
                     updated_by: admin.id
                 },
@@ -150,6 +152,7 @@ async function init() {
                     consent_confirmation_link: 'http://172.16.229.25:4503/bin/public/glpg-brandx/consentConfirm.consent.html',
                     reset_password_link: 'http://172.16.229.25:4503/bin/public/glpg-brandx/journeyRedirect.journey.html',
                     login_link: 'http://172.16.229.25:4503/bin/public/glpg-brandx/journeyRedirect.journey.html',
+                    logo_link: 'https://cdp-asset.s3.eu-central-1.amazonaws.com/brandx_logo.png',
                     created_by: admin.id,
                     updated_by: admin.id
                 }
@@ -179,56 +182,73 @@ async function init() {
                 title: 'I agree to the Galapagos Terms of Service',
                 slug: '',
                 category_id: '59953d51-2449-4b65-950f-9f88654019bb',
-                type: 'online',
-                opt_type: 'single'
+                type: 'online'
             },
             {
                 id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 title: 'I give my consent to send me promotional email',
                 slug: '',
                 category_id: 'fe037405-c676-4d98-bd05-85008900c838',
-                type: 'online',
-                opt_type: 'double'
+                type: 'online'
             }
         ];
+
 
         const consentLanguages = [
             {
                 rich_text: "<p>J'accepte les Galapagos <a href='https://www.glpg.com/'>Conditions d'utilisation.</a></p>",
                 consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
-                country_iso2: 'fr',
                 language_code: 'fr'
             },
             {
                 rich_text: '<p>I agree to the Galapagos <a href="https://www.glpg.com/">Terms of Service.</a></p>',
                 consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
-                country_iso2: 'nl',
                 language_code: 'en'
             },
             {
                 rich_text: '<p>Ik ga akkoord met de Galapagos <a href="https://www.glpg.com/">Servicevoorwaarden.</a></p>',
                 consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
-                country_iso2: 'nl',
                 language_code: 'nl'
             },
             {
                 rich_text: "<p>J'autorise Galapagos à m'envoyer des informations promotionnelles et environnementales concernant tous les produits et services Galapagos sur mon adresse e-mail fournie. Pour plus d'informations sur la manière dont nous traitons vos informations personnelles, veuillez consulter notre<a href='https://www.glpg.com/'>privacy notice.</a></p>",
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
-                country_iso2: 'fr',
                 language_code: 'fr'
             },
             {
                 rich_text: '<p>I give my consent for Galapagos to send me promotional and environmental information concerning all of Galapagos products and services on my provided email address.</p> <p>For more information on how we treat your personal information please refer to our <a href="https://www.glpg.com/">privacy notice.</a></p>',
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
-                country_iso2: 'nl',
                 language_code: 'en'
             },
             {
                 rich_text: '<p>Ik geef Galapagos mijn toestemming om mij promotionele en milieu-informatie te sturen over alle Galapagos-producten en -diensten op het door mij opgegeven e-mailadres. </p> <p> Voor meer informatie over hoe we omgaan met uw persoonlijke informatie, verwijzen wij u naar onze <a href="https://www.glpg.com/">privacyverklaring.</a></p>',
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
-                country_iso2: 'nl',
                 language_code: 'nl'
             }
+        ];
+
+
+        const consentCountries = [
+            {
+                consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
+                country_iso2: 'fr',
+                opt_type: 'single'
+            },
+            {
+                consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
+                country_iso2: 'nl',
+                opt_type: 'single'
+            },
+            {
+                consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
+                country_iso2: 'nl',
+                opt_type: 'double'
+            },
+            {
+                consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
+                country_iso2: 'fr',
+                opt_type: 'double'
+            },
         ];
 
         Consent.destroy({
@@ -247,8 +267,13 @@ async function init() {
                         returning: true,
                         ignoreDuplicates: false
                     }).then(function () {
-                        callback();
-                    })
+                        ConsentCountry.bulkCreate(consentCountries, {
+                            returning: true,
+                            ignoreDuplicates: false
+                        }).then(function () {
+                            callback();
+                        });
+                    });
                 });
             });
         });

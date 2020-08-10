@@ -24,16 +24,10 @@ const ConsentLanguage = sequelize.cdpConnector.define('consent_languages', {
             this.setDataValue('rich_text', validator.escape(value));
         }
     },
-
-    country_iso2: {
-        allowNull: false,
-        type: DataTypes.STRING
-    },
-
     language_code: {
         type: DataTypes.STRING
     }
-    
+
 }, {
     schema: 'ciam',
     tableName: 'consent_languages',

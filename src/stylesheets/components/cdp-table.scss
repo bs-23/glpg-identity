@@ -38,9 +38,19 @@
     &__col {
         &-sorting {
             cursor: pointer;
+            display: flex;
+            align-items: center;
 
-            .cdp-table__icon-sorting {
-                visibility: hidden;
+            &.sorted {
+                .cdp-table__icon-sorting {
+                    visibility: visible;
+                }
+
+                &.desc {
+                    .cdp-table__icon-sorting {
+                        transform: rotate(180deg)
+                    }
+                }
             }
 
             &:hover {
@@ -53,8 +63,10 @@
 
     &__icon {
         &-sorting {
+            visibility: hidden;
+            display: inline-block;
             font-size: 9px;
-            padding-left: 1px;
+            margin-left: 5px;
         }
     }
 }

@@ -10,7 +10,8 @@ const HcpArchives = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
-const ConsentLanguage = require(path.join(process.cwd(), 'src/modules/consent/server/consent_language.model'));
+const ConsentLanguage = require(path.join(process.cwd(), 'src/modules/consent/server/consent-language.model'));
+const ConsentCountry = require(path.join(process.cwd(), 'src/modules/consent/server/consent-country.model'));
 const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
@@ -124,7 +125,7 @@ async function sendPasswordSetupInstructionMail(user, application) {
 
     mailOptions.templateUrl = getTemplateUrl('password-setup-instructions.html', application.slug, user.language_code);
     mailOptions.subject = `Registration verified. Please setup your password`;
-    mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&journey=set_password&country_lang=${user.country_iso2}_${user.language_code}`;
+    mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&journey=single_optin_verified&country_lang=${user.country_iso2}_${user.language_code}`;
 
     await emailService.send(mailOptions);
 }
@@ -393,13 +394,30 @@ async function createHcpProfile(req, res) {
 
                 const consentLang = await ConsentLanguage.findOne({
                     where: {
-                        country_iso2: model.country_iso2.toLowerCase(),
-                        language_code: model.language_code.toLowerCase(),
+                        language_code: {
+                            [Op.or]: [
+                                model.language_code.toUpperCase(),
+                                model.language_code.toLowerCase(),
+                            ],
+                        },
                         consent_id: consentDetails.id
                     }
                 });
 
-                if (!consentLang) return;
+
+                const consentCountry = await ConsentCountry.findOne({
+                    where: {
+                        country_iso2: {
+                            [Op.or]: [
+                                model.country_iso2.toUpperCase(),
+                                model.country_iso2.toLowerCase(),
+                            ],
+                        },
+                        consent_id: consentDetails.id
+                    }
+                });
+
+                if (!consentLang || !consentCountry) return;
 
 
                 if (consentDetails.opt_type === 'double') {
@@ -411,7 +429,7 @@ async function createHcpProfile(req, res) {
                     consent_id: consentDetails.id,
                     title: consentLang.rich_text,
                     response: consentResponse,
-                    consent_confirmed: consentDetails.opt_type === 'double' ? false : true,
+                    consent_confirmed: consentCountry.opt_type === 'double' ? false : true,
                     created_by: req.user.id,
                     updated_by: req.user.id
                 });
@@ -516,7 +534,6 @@ async function approveHCPUser(req, res) {
             const allConsentDetails = await ConsentLanguage.findAll({
                 where: {
                     consent_id: consentIds,
-                    country_iso2: hcpUser.country_iso2.toLowerCase(),
                     language_code: hcpUser.language_code.toLowerCase(),
                 }
             });
