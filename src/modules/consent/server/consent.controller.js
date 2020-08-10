@@ -70,13 +70,29 @@ async function getConsents(req, res) {
 
 
 
-        const result = _.flatten(consentLangs).map(consentLang => {
+        const result = await Promise.all(_.flatten(consentLangs).map( async consentLang => {
+
+
+            const consentCountry = await ConsentCountry.findOne({
+                where :
+                {
+                    country_iso2: {
+                        [Op.or]: [
+                            country_iso2.toUpperCase(),
+                            country_iso2.toLowerCase(),
+                        ],
+                    },
+                    consent_id : consentLang.consent_id
+
+                }
+
+            });
             return {
                 id: consentLang.consent.id,
                 title: consentLang.consent.title,
                 rich_text: validator.unescape(consentLang.rich_text),
                 slug: consentLang.consent.slug,
-                opt_type: consentLang.consent.opt_type,
+                opt_type: consentCountry.opt_type ,
                 category: consentLang.consent.consent_category.type,
                 category_title: consentLang.consent.consent_category.title,
                 country_iso2: country_iso2,
@@ -84,7 +100,7 @@ async function getConsents(req, res) {
                 purpose: consentLang.consent.purpose,
             }
 
-        });
+        }));
 
 
         response.data = await result;

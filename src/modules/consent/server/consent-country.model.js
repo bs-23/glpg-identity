@@ -19,6 +19,11 @@ const ConsentCountry = sequelize.cdpConnector.define('consent_countries', {
     country_iso2: {
         allowNull: false,
         type: DataTypes.STRING
+    },
+    opt_type: {
+        allowNull: false,
+        type: DataTypes.ENUM,
+        values: ['single', 'double'],
     }
 
 }, {

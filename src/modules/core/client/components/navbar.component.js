@@ -37,8 +37,8 @@ export default function Navbar() {
 
     const renderApplicationIcon = () => {
         if(loggedInUser.application){
-            const { name, logo_link } = loggedInUser.application
-            return <img src={logo_link} title={name} alt={`${name} Logo`} width="122" />
+            const { name } = loggedInUser.application
+            return <img src={'https://cdp-asset.s3.eu-central-1.amazonaws.com/hcp-portal/logo.png'} title={name} alt={`${name} Logo`} width="122" />
         }
     }
 
