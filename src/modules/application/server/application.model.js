@@ -46,6 +46,10 @@ const Application = sequelize.cdpConnector.define('applications', {
         allowNull: false,
         type: DataTypes.STRING
     },
+    logo_link: {
+        allowNull: false,
+        type: DataTypes.STRING
+    },
     is_active: {
         type: DataTypes.BOOLEAN,
         defaultValue: true

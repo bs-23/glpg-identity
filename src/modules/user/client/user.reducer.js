@@ -4,7 +4,8 @@ const initialState = {
     loggedInUser: null,
     users: {},
     deletedUserInfo: {},
-    roles: []
+    roles: [],
+    countries: []
 };
 
 export default function reducer(state = initialState, action) {
@@ -52,7 +53,12 @@ export default function reducer(state = initialState, action) {
                 roles: state.roles.concat(action.payload.data)
             };
         }
-
+        case Types.GET_COUNTRIES_FULFILLED: {
+            return {
+                ...state,
+                countries: action.payload.data
+            }
+        }
     }
     return state;
 }

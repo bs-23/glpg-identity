@@ -82,9 +82,9 @@ function formatProfile(user) {
         email: user.email,
         type: user.type,
         roles: getRolesPermissions(user.userrole),
+        application: user.application,
         countries: user.countries
     };
-
     return profile;
 }
 
@@ -107,8 +107,23 @@ function formatProfileDetail(user) {
     return profile;
 }
 
+async function attachApplicationInfoToUser(user){
+    const userApplication = await Application.findOne({ where: { id: user.application_id }});
+    user.application = userApplication ? {
+            name: userApplication.name,
+            slug: userApplication.slug,
+            logo_link: userApplication.logo_link
+        } : null;
+    return user
+}
+
 async function getSignedInUserProfile(req, res) {
-    res.json(formatProfile(req.user));
+    try{
+        const user = await attachApplicationInfoToUser(req.user)
+        res.json(formatProfile(user));
+    }catch(err){
+        res.status(500).send(err)
+    }
 }
 
 async function login(req, res) {
@@ -162,7 +177,9 @@ async function login(req, res) {
 
         await user.update({ last_login: Date() })
 
-        res.json(formatProfile(user));
+        const userWithApplication = await attachApplicationInfoToUser(user)
+
+        res.json(formatProfile(userWithApplication));
     } catch (err) {
         res.status(500).send(err);
     }
