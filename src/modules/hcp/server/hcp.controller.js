@@ -368,8 +368,8 @@ async function createHcpProfile(req, res) {
             salutation,
             first_name,
             last_name,
-            country_iso2,
-            language_code,
+            country_iso2: country_iso2.toLowerCase(),
+            language_code: language_code.toLowerCase(),
             specialty_onekey,
             application_id: req.user.id,
             individual_id_onekey: master_data.individual_id_onekey,
@@ -662,7 +662,7 @@ async function changePassword(req, res) {
                 lastName: doc.last_name || ''
             }
         };
-        
+
         await emailService.send(options);
 
         response.data = 'Password changed successfully.';
