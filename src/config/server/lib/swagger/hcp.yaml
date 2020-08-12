@@ -310,7 +310,7 @@ paths:
                 - name: locale
                   in: query
                   required: true
-                  description: Cod Locale code (ex. nl_NL). Default is 'en'.
+                  description: Cod Locale code (e.g nl_NL). Case insensitive.
                   schema:
                     type: string
             responses:
