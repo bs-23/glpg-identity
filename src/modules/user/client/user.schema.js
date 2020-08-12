@@ -1,4 +1,5 @@
 import { string, object, ref, array } from 'yup';
+import phoneNumber from 'awesome-phonenumber'
 
 function validatePassword(password) {
     const minimumPasswordLength = 8
@@ -46,8 +47,9 @@ export const registerSchema = object().shape({
         .email('This field should be an valid email address.')
         .required('This field must not be empty.'),
     phone: string()
-        .min(8, 'This field must be at least 8 characters long.')
-        .matches(/^[+]?[0-9]+$/, 'This field only contains numbers'),
+        // .min(8, 'This field must be at least 8 characters long.')
+        // .matches(/^[+]?[0-9]+$/, 'This field only contains numbers')
+        .test('is-valid-phone', 'Must be a valid international phone number.', phone => phoneNumber(phone).isValid()),
     countries: string()
         .required('Must select at least one country'),
     roles: string()
