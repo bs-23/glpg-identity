@@ -75,9 +75,10 @@ describe('HCP Routes', () => {
             .send({
                 email: defaultUser.email,
                 current_password: defaultUser.password,
-                new_password: '123456789',
-                confirm_password: '123456789'
+                new_password: 'P@ssword123',
+                confirm_password: 'P@ssword123'
             });
+        
 
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveProperty('data');

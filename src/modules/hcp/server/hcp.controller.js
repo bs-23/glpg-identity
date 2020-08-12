@@ -662,7 +662,7 @@ async function changePassword(req, res) {
                 lastName: doc.last_name || ''
             }
         };
-
+        
         await emailService.send(options);
 
         response.data = 'Password changed successfully.';
