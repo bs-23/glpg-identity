@@ -112,6 +112,15 @@ async function sendRegistrationSuccessMail(user, application) {
     await emailService.send(mailOptions);
 }
 
+async function sendChangePasswordSuccessMail(user, application) {
+    const mailOptions = generateDefaultEmailOptions(user);
+
+    mailOptions.subject = 'Your password has been changed.';
+    mailOptions.templateUrl = getTemplateUrl('password-reset-success.html', application.slug, user);
+
+    await emailService.send(mailOptions);
+}
+
 async function sendResetPasswordSuccessMail(user, application) {
     const mailOptions = generateDefaultEmailOptions(user);
 
@@ -653,18 +662,7 @@ async function changePassword(req, res) {
 
         doc.update({ password: new_password });
 
-        const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${req.user.slug}/password-reset-success.html`);
-        const options = {
-            toAddresses: [email],
-            templateUrl,
-            subject: 'Your password has been changed.',
-            data: {
-                firstName: doc.first_name || '',
-                lastName: doc.last_name || ''
-            }
-        };
-
-        await emailService.send(options);
+        await sendChangePasswordSuccessMail(doc, req.user);
 
         response.data = 'Password changed successfully.';
         res.send(response);
