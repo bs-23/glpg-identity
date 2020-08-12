@@ -93,6 +93,7 @@
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.11",
     "webpack-merge": "^5.1.1",
+    "xregexp": "^4.3.0",
     "yup": "^0.29.3"
   }
 }

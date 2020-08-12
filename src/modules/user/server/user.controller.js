@@ -92,7 +92,6 @@ function formatProfileDetail(user) {
         phone: user.phone,
         last_login: user.last_login,
         expiry_date: user.expiry_date,
-        status: user.password ? 'Active' : 'Inactive',
         roles: getCommaSeparatedRoles(user.userrole),
         application: user.application_name,
         countries: user.countries

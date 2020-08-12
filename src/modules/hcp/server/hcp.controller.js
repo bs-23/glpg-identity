@@ -97,7 +97,7 @@ async function sendConsentConfirmationMail(user, consents, application) {
     mailOptions.templateUrl = getTemplateUrl('double-opt-in-consent-confirm.html', application.slug, user);
     mailOptions.subject = 'Thank you for registering!';
     mailOptions.data.consents = consents || [];
-    mailOptions.data.link = `${application.consent_confirmation_link}?token=${consentConfirmationToken}&journey=consent_confirmation&country_lang=${user.country_iso2}_${user.language_code}`;
+    mailOptions.data.link = `${application.consent_confirmation_link}?token=${consentConfirmationToken}&journey=consent_confirmation&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
 }
@@ -107,7 +107,7 @@ async function sendRegistrationSuccessMail(user, application) {
 
     mailOptions.subject = `Congratulations your registration was successful`;
     mailOptions.templateUrl = getTemplateUrl('registration-success.html', application.slug, user);
-    mailOptions.data.loginLink = `${application.login_link}?journey=login&country_lang=${user.country_iso2}_${user.language_code}`;
+    mailOptions.data.loginLink = `${application.login_link}?journey=login&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
 }
@@ -126,7 +126,7 @@ async function sendPasswordSetupInstructionMail(user, application) {
 
     mailOptions.templateUrl = getTemplateUrl('password-setup-instructions.html', application.slug, user);
     mailOptions.subject = `Registration verified. Please setup your password`;
-    mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&journey=single_optin_verified&country_lang=${user.country_iso2}_${user.language_code}`;
+    mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&journey=single_optin_verified&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
 }
@@ -136,7 +136,7 @@ async function sendPasswordResetInstructionMail(user, application) {
 
     mailOptions.templateUrl = getTemplateUrl('password-reset-instructions.html', application.slug, user);
     mailOptions.subject = `Setup Password`;
-    mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&journey=set_password&country_lang=${user.country_iso2}_${user.language_code}`;
+    mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&journey=set_password&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
 }
@@ -369,8 +369,8 @@ async function createHcpProfile(req, res) {
             salutation,
             first_name,
             last_name,
-            country_iso2,
-            language_code,
+            country_iso2: country_iso2.toLowerCase(),
+            language_code: language_code.toLowerCase(),
             specialty_onekey,
             application_id: req.user.id,
             individual_id_onekey: master_data.individual_id_onekey,
