@@ -78,7 +78,7 @@ describe('HCP Routes', () => {
                 new_password: 'P@ssword123',
                 confirm_password: 'P@ssword123'
             });
-        
+
 
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveProperty('data');
@@ -194,9 +194,9 @@ describe('HCP Routes', () => {
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
-    it('Should get specialties for given country code', async () => {
+    it('Should get specialties for given locale', async () => {
         const response = await request
-            .get('/api/hcp-profiles/specialties?country=nl')
+            .get('/api/hcp-profiles/specialties?locale=nl_NL')
             .set('Authorization', `bearer ${defaultApplication.access_token}`);
 
         expect(response.statusCode).toBe(200);
@@ -204,7 +204,7 @@ describe('HCP Routes', () => {
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
-    it('Should get "Bad Request" status for missing country code', async () => {
+    it('Should get "Bad Request" status for missing locale', async () => {
         const response = await request
             .get('/api/hcp-profiles/specialties')
             .set('Authorization', `bearer ${defaultApplication.access_token}`);
@@ -214,9 +214,9 @@ describe('HCP Routes', () => {
         expect(response.body.errors).toHaveLength(1);
     });
 
-    it('Should get "Not Found" status for unknown country code', async () => {
+    it('Should get "Not Found" status for unknown locale', async () => {
         const response = await request
-            .get('/api/hcp-profiles/specialties?country=unknown_country_code')
+            .get('/api/hcp-profiles/specialties?locale=unknown_locale')
             .set('Authorization', `bearer ${defaultApplication.access_token}`);
 
         expect(response.statusCode).toBe(404);
