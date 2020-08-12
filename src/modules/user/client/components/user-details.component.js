@@ -47,7 +47,7 @@ const UserDetails = (props) => {
                                     <span className="page-title__text font-weight-bold py-3">Profile Details</span>
                                 </h2>
                                 <div className="profile-detail p-3 py-sm-4 px-sm-5 mb-3 mb-sm-0">
-                                    <h2 className="profile-detail__name pb-3">{userInfo.first_name + " " + userInfo.last_name}</h2>
+                                    <h2 className="profile-detail__name pb-3">{ userInfo.first_name && userInfo.last_name ? userInfo.first_name + " " + userInfo.last_name : '' }</h2>
                                     <div className="profile-detail__row pb-0 pb-sm-2 d-block d-sm-flex">
                                         <div className="profile-detail__col pb-3 pr-0 pr-sm-3">
                                             <span className="mr-2 d-block profile-detail__label">Email</span>

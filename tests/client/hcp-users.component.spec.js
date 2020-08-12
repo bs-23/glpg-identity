@@ -35,8 +35,8 @@ describe('Hcp user component', () => {
         data = {
             data: {
                 users: [
-                    { id: '1', first_name: 'a', last_name: 'a', email: 'a', telephone: '1', uuid: '1', status: 'Not Verified' },
-                    { id: '2', first_name: 'b', last_name: 'b', email: 'b', telephone: '2', uuid: '2', status: 'Not Verified' }
+                    { id: '1', first_name: 'a', last_name: 'a', email: 'a', telephone: '1', uuid: '1', status: 'not_verified' },
+                    { id: '2', first_name: 'b', last_name: 'b', email: 'b', telephone: '2', uuid: '2', status: 'not_verified' }
                 ],
                 country_iso2: null,
                 end: 1,
@@ -53,9 +53,9 @@ describe('Hcp user component', () => {
         const status = null, country_iso2 = null;
         fakeAxios.onGet('/api/hcps').reply(200, data);
         fakeAxios.onGet('/api/hcps?page=1').reply(200, data);
-        fakeAxios.onGet(`/api/hcps?page=${1}&status=${status}&country_iso2=${country_iso2}`).reply(200, data);
-        fakeAxios.onGet(`/api/hcps?page=${2}&status=${status}&country_iso2=${country_iso2}`).reply(200, data);
-        fakeAxios.onGet(`/api/hcps?page=${3}&status=${status}&country_iso2=${country_iso2}`).reply(200, data);
+        fakeAxios.onGet(`/api/hcps?page=${1}`).reply(200, data);
+        fakeAxios.onGet(`/api/hcps?page=${2}`).reply(200, data);
+        fakeAxios.onGet(`/api/hcps?page=${3}`).reply(200, data);
         await store.dispatch(getHcpProfiles(1, status, country_iso2));
 
 
@@ -122,7 +122,7 @@ describe('Hcp user component', () => {
         expect(first_td.textContent).toEqual('a');
     });
 
-    it('should work', async () => {
+    it('should update status of a hcp user', async () => {
         const { debug, getByTestId, getByText, container } = render(wrapperComponent());
         const tbody = await waitFor(() => container.querySelector('tbody'));
         const rows = tbody.childNodes;
@@ -132,18 +132,18 @@ describe('Hcp user component', () => {
 
         fireEvent.click(actionBtn);
 
-        const updateBtn = await waitFor(() => getByText('Update Status'));
+        const updateBtn = await waitFor(() => getByText('Manage Status'));
 
         fireEvent.click(updateBtn);
 
         const approveBtn = await waitFor(() => getByText('Approve User'));
-        const commentInput = await waitFor(() => getByTestId('comment'));
+        // const commentInput = await waitFor(() => getByTestId('comment'));
         const submitBtn = await waitFor(() => getByTestId('submit'));
 
         await waitFor(() => fireEvent.click(approveBtn));
-        await waitFor(() => fireEvent.change(commentInput, { target: { value: 'a' } }));
+        // await waitFor(() => fireEvent.change(commentInput, { target: { value: 'a' } }));
 
-        expect(commentInput.value).toEqual('a');
+        // expect(commentInput.value).toEqual('a');
 
         await waitFor(() => fireEvent.click(submitBtn));
 
