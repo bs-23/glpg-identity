@@ -15,25 +15,19 @@ const axios = require("axios");
 const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
 
 function validatePassword(password) {
-    const minimumPasswordLength = 8;
-    if (password.length < minimumPasswordLength) return false;
-
+    const minLength = 8;
+    const maxLength = 50;
     const hasUppercase = new RegExp("^(?=.*[A-Z])").test(password);
-    if (!hasUppercase) return false;
-
+    const hasLowercase = new RegExp("^(?=.*[a-z])").test(password);
     const hasDigit = new RegExp("^(?=.*[0-9])").test(password);
-    if (!hasDigit) return false;
+    const hasSpecialCharacter = new RegExp("[!@#$%^&*]").test(password);
 
-    const specialCharacters = "!@#$%^&*"
-    let hasSpecialCharacter = false;
-
-    for (const c of password) {
-        if (specialCharacters.includes(c)) {
-            hasSpecialCharacter = true
-            break;
-        }
+    if (password.length < minLength || password.length > maxLength || !hasUppercase || !hasLowercase || !hasDigit || !hasSpecialCharacter) {
+        return false;
     }
-    return hasSpecialCharacter;
+
+    return true;
+
 }
 
 function generateAccessToken(user) {
@@ -107,21 +101,21 @@ function formatProfileDetail(user) {
     return profile;
 }
 
-async function attachApplicationInfoToUser(user){
-    const userApplication = await Application.findOne({ where: { id: user.application_id }});
+async function attachApplicationInfoToUser(user) {
+    const userApplication = await Application.findOne({ where: { id: user.application_id } });
     user.application = userApplication ? {
-            name: userApplication.name,
-            slug: userApplication.slug,
-            logo_link: userApplication.logo_link
-        } : null;
+        name: userApplication.name,
+        slug: userApplication.slug,
+        logo_link: userApplication.logo_link
+    } : null;
     return user
 }
 
 async function getSignedInUserProfile(req, res) {
-    try{
+    try {
         const user = await attachApplicationInfoToUser(req.user)
         res.json(formatProfile(user));
-    }catch(err){
+    } catch (err) {
         res.status(500).send(err)
     }
 }
@@ -288,7 +282,7 @@ async function changePassword(req, res) {
             return res.status(400).send('Current Password not valid');
         }
 
-        if (!validatePassword(newPassword)) return res.status(400).send('Invalid password')
+        if (!validatePassword(newPassword)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.')
 
         if (newPassword !== confirmPassword) {
             return res.status(400).send('Passwords should match');
@@ -384,7 +378,7 @@ async function getUser(req, res) {
 
         if (!user) return res.status(404).send("User is not found or may be removed");
 
-        const userApplication = await Application.findOne({ where: { id: user.application_id }});
+        const userApplication = await Application.findOne({ where: { id: user.application_id } });
         user.application_name = userApplication.name
 
         const formattedUser = formatProfileDetail(user);
@@ -459,6 +453,8 @@ async function resetPassword(req, res) {
             await resetRequest.destroy();
             return res.status(400).send("Password reset token has been expired. Please request again.");
         }
+
+        if (!validatePassword(req.body.newPassword)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.');
 
         if (req.body.newPassword !== req.body.confirmPassword) return res.status(400).send("Password and confirm password doesn't match.");
 

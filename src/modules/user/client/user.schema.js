@@ -1,26 +1,19 @@
 import { string, object, ref, array } from 'yup';
 
 function validatePassword(password) {
-    const minimumPasswordLength = 8
-
-    if (!password) return false
-    if (password.length < minimumPasswordLength) return false
-
+    const minLength = 8;
+    const maxLength = 50;
     const hasUppercase = new RegExp("^(?=.*[A-Z])").test(password);
-    if (!hasUppercase) return false
-
+    const hasLowercase = new RegExp("^(?=.*[a-z])").test(password);
     const hasDigit = new RegExp("^(?=.*[0-9])").test(password);
-    if (!hasDigit) return false
+    const hasSpecialCharacter = new RegExp("[!@#$%^&*]").test(password);
 
-    const specialCharacters = "!@#$%^&*"
-    let hasSpecialCharacter = false
-    for (const c of password) {
-        if (specialCharacters.includes(c)) {
-            hasSpecialCharacter = true
-            break
-        }
+    if (password.length < minLength || password.length > maxLength || !hasUppercase || !hasLowercase || !hasDigit || !hasSpecialCharacter) {
+        return false;
     }
-    return hasSpecialCharacter
+
+    return true;
+
 }
 
 export const loginSchema = object().shape({
@@ -57,11 +50,13 @@ export const registerSchema = object().shape({
 export const changePasswordSchema = object().shape({
     currentPassword: string()
         .min(8, 'This field must be at least 8 characters long.')
+        .max(50, 'This field must be at most 50 characters long.')
         .required('This field must not be empty.'),
     newPassword: string()
         .min(8, 'This field must be at least 8 characters long.')
+        .max(50, 'This field must be at most 50 characters long.')
         .required('This field must not be empty.')
-        .test('is-valid-password', 'Password must contain at least a digit, an uppercase and a special character',
+        .test('is-valid-password', 'Password must contain at least a digit, an uppercase, a lowercase and a special character',
             password => validatePassword(password)),
     confirmPassword: string()
         .required('This field must not be empty.')
@@ -71,8 +66,9 @@ export const changePasswordSchema = object().shape({
 export const resetPasswordSchema = object().shape({
     newPassword: string()
         .min(8, 'This field must be at least 8 characters long.')
+        .max(50, 'This field must be at most 50 characters long.')
         .required('This field must not be empty.')
-        .test('is-valid-password', 'Password must contain at least a digit, an uppercase and a special character',
+        .test('is-valid-password', 'Password must contain at least a digit, an uppercase, a lowercase and a special character',
             password => validatePassword(password)),
     confirmPassword: string()
         .required('This field must not be empty.')
@@ -90,7 +86,7 @@ export const roleSchema = object().shape({
         .required('This field must not be empty.'),
     permissions:
         array()
-        .of(string())
-        .min(1, 'Must select at least one permission')
-        .required('Must select at least one permission')
+            .of(string())
+            .min(1, 'Must select at least one permission')
+            .required('Must select at least one permission')
 });
