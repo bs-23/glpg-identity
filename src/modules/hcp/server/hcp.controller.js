@@ -79,7 +79,8 @@ function generateDefaultEmailOptions(user) {
     };
 }
 
-function getTemplateUrl(fileName, applicationSlug, locale) {
+function getTemplateUrl(fileName, applicationSlug, user) {
+    const locale = `${user.language_code}_${user.country_iso2}`;
     const templateUrlInLocale = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${applicationSlug}/${locale.toLowerCase()}/${fileName}`);
 
     if(fs.existsSync(templateUrlInLocale)) {
@@ -93,7 +94,7 @@ async function sendConsentConfirmationMail(user, consents, application) {
     const consentConfirmationToken = generateConsentConfirmationAccessToken(user);
     const mailOptions = generateDefaultEmailOptions(user);
 
-    mailOptions.templateUrl = getTemplateUrl('double-opt-in-consent-confirm.html', application.slug, user.language_code);
+    mailOptions.templateUrl = getTemplateUrl('double-opt-in-consent-confirm.html', application.slug, user);
     mailOptions.subject = 'Thank you for registering!';
     mailOptions.data.consents = consents || [];
     mailOptions.data.link = `${application.consent_confirmation_link}?token=${consentConfirmationToken}&journey=consent_confirmation&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
@@ -105,7 +106,7 @@ async function sendRegistrationSuccessMail(user, application) {
     const mailOptions = generateDefaultEmailOptions(user);
 
     mailOptions.subject = `Congratulations your registration was successful`;
-    mailOptions.templateUrl = getTemplateUrl('registration-success.html', application.slug, user.language_code);
+    mailOptions.templateUrl = getTemplateUrl('registration-success.html', application.slug, user);
     mailOptions.data.loginLink = `${application.login_link}?journey=login&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
@@ -115,7 +116,7 @@ async function sendResetPasswordSuccessMail(user, application) {
     const mailOptions = generateDefaultEmailOptions(user);
 
     mailOptions.subject = 'Your password has been reset';
-    mailOptions.templateUrl = getTemplateUrl('password-reset-success.html', application.slug, user.language_code);
+    mailOptions.templateUrl = getTemplateUrl('password-reset-success.html', application.slug, user);
 
     await emailService.send(mailOptions);
 }
@@ -123,7 +124,7 @@ async function sendResetPasswordSuccessMail(user, application) {
 async function sendPasswordSetupInstructionMail(user, application) {
     const mailOptions = generateDefaultEmailOptions(user);
 
-    mailOptions.templateUrl = getTemplateUrl('password-setup-instructions.html', application.slug, user.language_code);
+    mailOptions.templateUrl = getTemplateUrl('password-setup-instructions.html', application.slug, user);
     mailOptions.subject = `Registration verified. Please setup your password`;
     mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&journey=single_optin_verified&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
@@ -133,7 +134,7 @@ async function sendPasswordSetupInstructionMail(user, application) {
 async function sendPasswordResetInstructionMail(user, application) {
     const mailOptions = generateDefaultEmailOptions(user);
 
-    mailOptions.templateUrl = getTemplateUrl('password-reset-instructions.html', application.slug, user.language_code);
+    mailOptions.templateUrl = getTemplateUrl('password-reset-instructions.html', application.slug, user);
     mailOptions.subject = `Setup Password`;
     mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&journey=set_password&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
@@ -744,29 +745,41 @@ async function forgetPassword(req, res) {
 async function getSpecialties(req, res) {
     const response = new Response([], []);
     try {
-        const country = req.query.country;
-        let locale = req.query.locale;
+        const locale = req.query.locale;
 
-        if (!country) {
-            response.errors.push(new CustomError(`Missing required query parameter`, 'country'));
+        if (!locale) {
+            response.errors.push(new CustomError(`Missing required query parameter`, 'locale'));
             return res.status(400).send(response);
         }
 
-        const masterDataSpecialties = await sequelize.datasyncConnector.query(`
-            SELECT Country.codbase, countryname, cod_id_onekey, cod_locale, cod_description
-            FROM ciam.vwcountry as Country
-            INNER JOIN ciam.vwspecialtymaster as Specialty ON Country.codbase=Specialty.codbase
-            WHERE LOWER(country_iso2) = $country_code AND LOWER(cod_locale) = $locale;
+        let masterDataSpecialties = await sequelize.datasyncConnector.query(`
+            SELECT codbase, cod_id_onekey, cod_locale, cod_description
+            FROM ciam.vwspecialtymaster as Specialty
+            WHERE LOWER(cod_locale) = $locale;
             `, {
             bind: {
-                country_code: country.toLowerCase(),
-                locale: locale ? locale.toLowerCase() : 'en'
+                locale: locale.toLowerCase()
             },
             type: QueryTypes.SELECT
         });
 
         if (!masterDataSpecialties || masterDataSpecialties.length === 0) {
-            response.errors.push(new CustomError(`No specialties found for Country=${country}`));
+            const languageCode = locale.split('_')[0];
+
+            masterDataSpecialties = await sequelize.datasyncConnector.query(`
+            SELECT codbase, cod_id_onekey, cod_locale, cod_description
+            FROM ciam.vwspecialtymaster as Specialty
+            WHERE LOWER(cod_locale) = $locale;
+            `, {
+                bind: {
+                    locale: languageCode.toLowerCase()
+                },
+                type: QueryTypes.SELECT
+            });
+        }
+
+        if (!masterDataSpecialties || masterDataSpecialties.length === 0) {
+            response.errors.push(new CustomError(`No specialties found for Locale=${locale}`));
             return res.status(404).send(response);
         }
 

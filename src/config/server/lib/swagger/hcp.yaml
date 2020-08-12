@@ -307,16 +307,10 @@ paths:
                 - hcp-profiles
             summary: Get specialties by country code.
             parameters:
-                - name: country
-                  in: query
-                  required: true
-                  description: The ISO2 country code (case-insensitive)
-                  schema:
-                    type: string
                 - name: locale
                   in: query
-                  required: false
-                  description: Cod Locale code. Default is 'en'
+                  required: true
+                  description: Cod Locale code (ex. nl_NL). Default is 'en'.
                   schema:
                     type: string
             responses:
@@ -328,7 +322,7 @@ paths:
                                 type: object
                                 properties:
                                     data:
-                                        $ref: "#/components/schemas/specialtiesByCountry"
+                                        $ref: "#/components/schemas/specialtiesByLocale"
                                     errors:
                                         $ref: "#/components/schemas/errorBodyInSuccess"
                 404:
@@ -521,15 +515,13 @@ components:
             properties:
                 codbase:
                     type: string
-                countryname:
-                    type: string
                 cod_id_onekey:
                     type: string
                 cod_locale:
                     type: string
                 cod_description:
                     type: string
-        specialtiesByCountry:
+        specialtiesByLocale:
             type: array
             items:
                 $ref: "#/components/schemas/specialty"
