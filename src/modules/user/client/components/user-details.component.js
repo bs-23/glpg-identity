@@ -76,7 +76,7 @@ const UserDetails = (props) => {
                                         <div className="profile-detail__col pb-3 pr-0 pr-sm-3">
                                             <span className="mr-2 d-block profile-detail__label">Countries</span>
                                             <span className="profile-detail__value">
-                                                {countries.length > 0 && userInfo.countries.length ? userInfo.countries.map((country) => countries.find(i => i.country_iso2 === country).countryname).join(', ') : nullValueToken}
+                                                {countries && countries.length > 0 && userInfo.countries.length ? userInfo.countries.map((country) => countries.find(i => i.country_iso2 === country).countryname).join(', ') : nullValueToken}
                                             </span>
                                         </div>
                                     </div>

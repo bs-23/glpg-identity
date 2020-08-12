@@ -29,4 +29,10 @@
             }
         }
     }
+
+    &-item {
+        &.active, &:active {
+            background-color: $primary-color;
+        }
+    }
 }
