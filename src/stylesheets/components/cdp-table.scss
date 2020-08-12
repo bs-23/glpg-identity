@@ -38,17 +38,19 @@
     &__col {
         &-sorting {
             cursor: pointer;
-            display: flex;
+            display: inline-flex;
             align-items: center;
 
             &.sorted {
                 .cdp-table__icon-sorting {
                     visibility: visible;
+                    color: $white-color;
                 }
 
                 &.desc {
                     .cdp-table__icon-sorting {
-                        transform: rotate(180deg)
+                        transform: rotate(180deg);
+                        padding: 2px 1px 1px 6px;
                     }
                 }
             }
@@ -67,6 +69,11 @@
             display: inline-block;
             font-size: 9px;
             margin-left: 5px;
+            border: 1px solid #6E918B;
+            padding: 2px 2px 1px 5px;
+            color: #6E918B;
+            position: relative;
+            top: 1px;
         }
     }
 }

@@ -119,21 +119,24 @@
             <td class="email-content-wrapper" align="center">
                 <div class="email-content">
                     <h2 style="margin-bottom:40px;margin-top: 0px;">
-                        <img src="https://cdp-asset.s3.eu-central-1.amazonaws.com/brandx_logo.png" alt="Brand X Logo"
-                             width="174" />
+                        <img src="https://cdp-asset.s3.eu-central-1.amazonaws.com/brandx/logo.png" alt="Brand X Logo"
+                            width="174" />
                     </h2>
-
                     <h3>Hello [[firstName]] [[lastName]],</h3>
-                    <p>
-                        Please click on the button below to setup your password on <b>Brand X portal</b>.
-                    </p>
+                    <p>Thank you for registering on the <b>Brand X Portal</b>. Please confirm the consents you have provided during registration: </p>
+                    {{consents}}
+                    <ul>
+                        <li>{{consents-value}}</li>
+                    </ul>
+                    {{consents-end}}
+                    <p>We confirm that you provided a consent to receive promotional and environmental information concerning all of Galapagos products and services on your provided email address. If you wish to withdrawal this consent you can do so at any time by clicking the unsubscribe link in future promotional materials. </p>
+                    <p>Please click on the button below to start. </p>
                     <p style="margin-top: 40px; margin-bottom: 40px;">
-                        <a class="btn" href="[[link]]" target="_blank" style="color: #fff;">Setup password</a>
+                        <a class="btn" href="[[link]]" target="_blank" style="color: #fff;">Let's start</a>
                     </p>
-                    <p>
-                        If the password reset wasn't requested by you, please report the issue by replying to this mail
-                        <a href="mailto: support@glpg.com">(support@glpg.com)</a>
-                    </p>
+                    <p>If you have any further queries you can reach us at <a
+                            href="mailto: support@glpg.com">support@glpg.com</a>. For further information on
+                        the Galapagos HCP Portal, visit our website www.glpg-pro.com</p>
                     <p style="margin-bottom: 0px;">
                         <span>Yours Sincerely,</span>
                         <b style="display: block;">The GLPG Team</b>

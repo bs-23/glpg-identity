@@ -21,16 +21,20 @@ export default function Navbar() {
         removeCookie('logged_in');
     }
 
+    const addFallbackIcon = (e) => {
+        e.target.src = '/assets/flag/flag-placeholder.svg';
+    }
+
     const generateCountryIconPath = (country) => {
-        if(country) return `/assets/flag/flag-${country.toLowerCase().replace(/ /g, "-")}.svg`
-        return `/assets/flag/flag-placeholder.svg`
+        if(country) return `/assets/flag/flag-${country.toLowerCase().replace(/ /g, "-")}.svg`;
+        return `/assets/flag/flag-placeholder.svg`;
     }
 
     const renderCountryIcons = () => {
         if(loggedInUser.countries){
             return loggedInUser.countries.map(country_iso2 => {
-                const country = countries && countries.find(country => country.country_iso2 === country_iso2)
-                return <img key={country_iso2} height="26" width="26" src={generateCountryIconPath(country && country.countryname)} title={country ? country.countryname : country_iso2 } alt="Flag" className="ml-1" />
+                const country = countries && countries.find(country => country.country_iso2 === country_iso2);
+                return <img key={country_iso2} height="26" width="26" src={generateCountryIconPath(country && country.countryname)} onError={addFallbackIcon} title={country ? country.countryname : country_iso2 } alt="Flag" className="ml-1" />;
             })
         }
     }

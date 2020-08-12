@@ -80,7 +80,7 @@
             width: auto;
             text-align: center;
             font-weight: bold;
-            background-color: #005DAC;
+            background-color: #F58800;
             color: #fff;
         }
 
@@ -119,19 +119,27 @@
             <td class="email-content-wrapper" align="center">
                 <div class="email-content">
                     <h2 style="margin-bottom:40px;margin-top: 0px;">
-                        <img src="https://cdp-asset.s3.eu-central-1.amazonaws.com/brandx_logo.png" alt="Brand X Logo"
-                             width="174" />
+                        <img src="https://cdp-asset.s3.eu-central-1.amazonaws.com/hcp-portal/logo.png" alt="Galapagos Logo"
+                             width="248" />
                     </h2>
-                    <h3>Hello [[firstName]] [[lastName]],</h3>
-                    <p>Thank you for registration. We have verified your information.</p>
+                    <h3>Hallo [[firstName]] [[lastName]],</h3>
                     <p>
-                        Please click the button below to setup your password on the <b>Brand X portal</b>
+                        Thank you for registering on the <b>Galapagos HCP Portal.</b> Please confirm the consents you
+                        have provided during registration:
                     </p>
+                    {{consents}}
+                    <ul>
+                        <li>{{consents-value}}</li>
+                    </ul>
+                    {{consents-end}}
+                    <p>We confirm that you provided a consent to receive promotional and environmental information concerning all of Galapagos products and services on your provided email address. If you wish to withdrawal this consent you can do so at any time by clicking the unsubscribe link in future promotional materials. </p>
+                    <p>Please click on the button below to start. </p>
                     <p style="margin-top: 40px; margin-bottom: 40px;">
-                        <a class="btn" href="[[link]]" target="_blank" style="color: #fff;">Setup password</a>
+                        <a class="btn" href="[[link]]" target="_blank" style="color: #fff;">Let's start</a>
                     </p>
                     <p>
-                        If the password reset wasn’t requested by you, please report the issue by replying to this mail <a href="mailto: support@glpg.com">(support@glpg.com)</a>.
+                        If you have any further queries you can reach us at <a href="mailto: support@glpg.com">support@glpg.com</a>. For further information on
+                        the Galapagos HCP Portal, visit our website www.glpg-pro.com
                     </p>
                     <p style="margin-bottom: 0px;">
                         <span>Yours Sincerely,</span>
@@ -141,9 +149,9 @@
                 <hr class="email-content-separator" />
                 <div class="email-footer">
                     <p class="text-small">
-                        This email was sent to you as a registered member of brand X. Use of the service and website is subject to our <a href="#">Terms of Use</a> and <a href="#">Privacy Statement</a>.
+                        This email was sent to you as a registered member of Galapagos HCP Portal. Use of the service and website is subject to our <a href="#">Terms of Use</a> and <a href="#">Privacy Statement</a>.
                     </p>
-                    <p class="text-small"> © 2020 Brand X. All rights reserved</p>
+                    <p class="text-small"> © 2020 Galapagos HCP Portal. All rights reserved</p>
                 </div>
             </td>
         </tr>
