@@ -76,4 +76,11 @@
             top: 1px;
         }
     }
+
+   
+}
+@media (min-width: $screen-desktop) {
+    .table-responsive {
+        overflow: visible;
+    }
 }
