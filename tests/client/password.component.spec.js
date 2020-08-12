@@ -53,37 +53,16 @@ describe('PasswordForm component', () => {
         const { getByTestId } = render(wrapperComponent());
         const current_password = getByTestId('currentPassword');
         const new_password = getByTestId('newPassword');
-        const confirm_password = getByTestId('newPassword');
+        const confirm_password = getByTestId('confirmPassword');
 
         await waitFor(() => {
-            fireEvent.change(current_password, { target: { value: 'a' } });
-            fireEvent.change(new_password, { target: { value: 'b' } });
-            fireEvent.change(confirm_password, { target: { value: 'b' } });
+            fireEvent.change(current_password, { target: { value: 'strong-passworD12@' } });
+            fireEvent.change(new_password, { target: { value: 'P@ssword123' } });
+            fireEvent.change(confirm_password, { target: { value: 'P@ssword123' } });
         });
 
-        expect(current_password.value).toEqual('a');
-        expect(new_password.value).toEqual('b');
-        expect(confirm_password.value).toEqual('b');
-    });
-
-    it('Should fill out the current password, new password and confirm password and update it', async () => {
-        const { getByTestId, container } = render(wrapperComponent());
-        const current_password = getByTestId('currentPassword');
-        const new_password = getByTestId('newPassword');
-        const confirm_password = getByTestId('newPassword');
-
-        await waitFor(() => {
-            fireEvent.change(current_password, { target: { value: 'a' } });
-            fireEvent.change(new_password, { target: { value: 'a' } });
-            fireEvent.change(confirm_password, { target: { value: 'a' } });
-        });
-
-        expect(current_password.value).toEqual('a');
-        expect(new_password.value).toEqual('a');
-        expect(confirm_password.value).toEqual('a');
-
-        // await waitFor(() => fireEvent.click(submit));
-        // console.log("=====================================>", submit)
-        // const a = getByTestId('aaaa');
+        expect(current_password.value).toEqual('strong-passworD12@');
+        expect(new_password.value).toEqual('P@ssword123');
+        expect(confirm_password.value).toEqual('P@ssword123'); 
     });
 });
