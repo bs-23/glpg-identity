@@ -305,12 +305,12 @@ paths:
         get:
             tags:
                 - hcp-profiles
-            summary: Get specialties by country code.
+            summary: Get specialties by locale.
             parameters:
                 - name: locale
                   in: query
                   required: true
-                  description: Cod Locale code (e.g nl_NL). Case insensitive.
+                  description: Case insensitive value in language_country format (e.g. nl_nl or en_nl)
                   schema:
                     type: string
             responses:
