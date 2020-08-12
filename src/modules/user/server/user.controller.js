@@ -397,7 +397,7 @@ async function sendPasswordResetLink(req, res) {
         const user = await User.findOne({ where: { email } });
 
         if (!user) {
-            return res.status(400).send('Email does not exist.');
+            return res.json({ message: 'An email has been sent to the provided email with further instructions.' });
         }
 
         const token = crypto.randomBytes(36).toString('hex');
@@ -433,7 +433,7 @@ async function sendPasswordResetLink(req, res) {
 
         emailService.send(options);
 
-        res.json({ message: `Password reset link sent to ${email}.` });
+        res.json({ message: 'An email has been sent to the provided email with further instructions.' });
     } catch (error) {
         res.status(500).send(error);
     }
