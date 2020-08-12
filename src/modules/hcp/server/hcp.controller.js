@@ -745,29 +745,41 @@ async function forgetPassword(req, res) {
 async function getSpecialties(req, res) {
     const response = new Response([], []);
     try {
-        const country = req.query.country;
-        let locale = req.query.locale;
+        const locale = req.query.locale;
 
-        if (!country) {
-            response.errors.push(new CustomError(`Missing required query parameter`, 'country'));
+        if (!locale) {
+            response.errors.push(new CustomError(`Missing required query parameter`, 'locale'));
             return res.status(400).send(response);
         }
 
-        const masterDataSpecialties = await sequelize.datasyncConnector.query(`
-            SELECT Country.codbase, countryname, cod_id_onekey, cod_locale, cod_description
-            FROM ciam.vwcountry as Country
-            INNER JOIN ciam.vwspecialtymaster as Specialty ON Country.codbase=Specialty.codbase
-            WHERE LOWER(country_iso2) = $country_code AND LOWER(cod_locale) = $locale;
+        let masterDataSpecialties = await sequelize.datasyncConnector.query(`
+            SELECT codbase, cod_id_onekey, cod_locale, cod_description
+            FROM ciam.vwspecialtymaster as Specialty
+            WHERE LOWER(cod_locale) = $locale;
             `, {
             bind: {
-                country_code: country.toLowerCase(),
-                locale: locale ? locale.toLowerCase() : 'en'
+                locale: locale.toLowerCase()
             },
             type: QueryTypes.SELECT
         });
 
         if (!masterDataSpecialties || masterDataSpecialties.length === 0) {
-            response.errors.push(new CustomError(`No specialties found for Country=${country}`));
+            const languageCode = locale.split('_')[0];
+
+            masterDataSpecialties = await sequelize.datasyncConnector.query(`
+            SELECT codbase, cod_id_onekey, cod_locale, cod_description
+            FROM ciam.vwspecialtymaster as Specialty
+            WHERE LOWER(cod_locale) = $locale;
+            `, {
+                bind: {
+                    locale: languageCode.toLowerCase()
+                },
+                type: QueryTypes.SELECT
+            });
+        }
+
+        if (!masterDataSpecialties || masterDataSpecialties.length === 0) {
+            response.errors.push(new CustomError(`No specialties found for Locale=${locale}`));
             return res.status(404).send(response);
         }
 
