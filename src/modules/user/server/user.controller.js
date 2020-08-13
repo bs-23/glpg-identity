@@ -10,9 +10,80 @@ const ResetPassword = require('./reset-password.model');
 const UserRole = require(path.join(process.cwd(), "src/modules/user/server/user-role.model"));
 const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
 const RolePermission = require(path.join(process.cwd(), "src/modules/user/server/role/role-permission.model"));
+const PasswordHistory = require(path.join(process.cwd(), "src/modules/user/server/user-password-history.model.js"));
 const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
 const axios = require("axios");
 const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
+const fs = require('fs');
+const bcrypt = require('bcryptjs');
+
+async function passwordHistoryCheck(newPassword, userId) {
+    try {
+        const oldPasswords = await PasswordHistory.findOne({ where: { user_id: userId } });
+        const user = await User.findOne({
+            where: { id: userId },
+        });
+
+        if (user && bcrypt.compareSync(newPassword, user.password)) {
+            return true;
+        }
+
+        if (oldPasswords !== null) {
+            oldPasswords.passwords.forEach(element => {
+                if (bcrypt.compareSync(newPassword, element.password)) {
+                    return true;
+                }
+            });
+        }
+
+        return false;
+
+    } catch (error) {
+        return false;
+    }
+}
+
+async function oldPasswordSave(oldPassword, userId) {
+
+    try {
+        const oldPasswords = await PasswordHistory.findOne({ where: { user_id: userId } });
+
+        let passwordArray = oldPasswords ? oldPasswords.passwords : [];
+        if (passwordArray.length >= 20) {
+            passwordArray.shift();
+        }
+
+        passwordArray.push(oldPassword);
+        if (oldPasswords) {
+            PasswordHistory.update({ passwords: passwordArray });
+        } else {
+            const [doc, created] = await PasswordHistory.findOrCreate({
+                where: { user_id: userId },
+                defaults: {
+                    passwords: passwordArray,
+                    created_by: userId,
+                    updated_by: userId
+                }
+            });
+
+        }
+        return true;
+
+    } catch (error) {
+        return false;
+    }
+}
+
+
+function commonPassword(password, user) {
+
+    if (password.includes(user.first_name) || password.includes(user.last_name) || password.includes((user.email).split("@")[0])) return true;
+
+    const commonPasswords = JSON.parse(fs.readFileSync('src/config/server/lib/common-password.json'));
+    if (commonPasswords.hasOwnProperty(password)) return true;
+
+    return false;
+}
 
 function validatePassword(password) {
     const minLength = 8;
@@ -54,7 +125,6 @@ function getRolesPermissions(userrole) {
         });
 
         return roles;
-
 
     }
 }
@@ -112,7 +182,7 @@ async function attachApplicationInfoToUser(user) {
 
 async function getSignedInUserProfile(req, res) {
     try {
-        const user = await attachApplicationInfoToUser(req.user)
+        const user = await attachApplicationInfoToUser(req.user);
         res.json(formatProfile(user));
     } catch (err) {
         res.status(500).send(err)
@@ -201,7 +271,7 @@ async function createUser(req, res) {
             defaults: {
                 first_name,
                 last_name,
-                phone,
+                phone: phone ? phone.replace(/\s+/g, '') : null,
                 countries,
                 application_id,
                 created_by: req.user.id,
@@ -271,30 +341,6 @@ async function createUser(req, res) {
     }
 }
 
-async function changePassword(req, res) {
-    const { currentPassword, newPassword, confirmPassword } = req.body;
-
-    try {
-        const user = await User.findOne({ where: { id: req.user.id } });
-
-        if (!user || !user.validPassword(currentPassword)) {
-            return res.status(400).send('Current Password not valid');
-        }
-
-        if (!validatePassword(newPassword)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.')
-
-        if (newPassword !== confirmPassword) {
-            return res.status(400).send('Passwords should match');
-        }
-
-        user.password = newPassword;
-        await user.save();
-
-        res.json(formatProfile(user));
-    } catch (err) {
-        res.status(500).send(err);
-    }
-}
 
 async function deleteUser(req, res) {
     try {
@@ -438,6 +484,38 @@ async function sendPasswordResetLink(req, res) {
     }
 }
 
+async function changePassword(req, res) {
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+
+    try {
+        const user = await User.findOne({ where: { id: req.user.id } });
+
+        if (!user || !user.validPassword(currentPassword)) {
+            return res.status(400).send('Current Password not valid');
+        }
+
+        if (await passwordHistoryCheck(newPassword, user.id)) return res.status(400).send('New password can not be your previously used password.');
+
+        if (!validatePassword(newPassword)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.')
+
+        if (newPassword !== confirmPassword) return res.status(400).send('Passwords should match');
+
+        if (commonPassword(newPassword, user)) return res.status(400).send('You have chosen a commonly used password. Try a different one.');
+
+        if (user.password) await oldPasswordSave(user.password, user.id);
+
+
+
+        user.password = newPassword;
+        await user.save();
+
+        res.json(formatProfile(user));
+    } catch (err) {
+        res.status(500).send(err);
+    }
+}
+
+
 async function resetPassword(req, res) {
     try {
         const { token } = req.query;
@@ -453,14 +531,19 @@ async function resetPassword(req, res) {
             return res.status(400).send("Password reset token has been expired. Please request again.");
         }
 
+        const user = await User.findOne({ where: { id: resetRequest.user_id } });
+
+        if (await passwordHistoryCheck(req.body.newPassword, user.id)) return res.status(400).send('New password can not be your previously used password.');
+
         if (!validatePassword(req.body.newPassword)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.');
+
+        if (commonPassword(req.body.newPassword, user)) return res.status(400).send('You have chosen a commonly used password. Try a different one.');
 
         if (req.body.newPassword !== req.body.confirmPassword) return res.status(400).send("Password and confirm password doesn't match.");
 
-        const user = await User.findOne({ where: { id: resetRequest.user_id } });
+        if (user.password) await oldPasswordSave(user.password, user.id);
 
         user.update({ password: req.body.newPassword });
-
         const options = {
             toAddresses: [user.email],
             data: {
@@ -483,6 +566,11 @@ async function resetPassword(req, res) {
         await resetRequest.destroy();
 
         res.sendStatus(200);
+
+
+
+
+
     } catch (error) {
         res.status(500).send(error);
     }
