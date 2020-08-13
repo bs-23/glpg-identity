@@ -38,21 +38,14 @@ async function passwordHistoryCheck(newPassword, userId) {
 
         return false;
 
-
     } catch (error) {
-
+        return false;
     }
-
-
-
-
-
 }
 
 async function oldPasswordSave(oldPassword, userId) {
 
     try {
-
         const oldPasswords = await PasswordHistory.findOne({ where: { user_id: userId } });
 
         let passwordArray = oldPasswords ? oldPasswords.passwords : [];
@@ -132,7 +125,6 @@ function getRolesPermissions(userrole) {
         });
 
         return roles;
-
 
     }
 }
