@@ -183,6 +183,7 @@ export default function hcpUsers() {
                                                 setShow(false);
                                                 actions.setSubmitting(false);
                                                 actions.resetForm();
+                                                setCurrentAction('');
                                             }}
                                         >
                                             {formikProps => (
