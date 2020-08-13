@@ -420,7 +420,7 @@ async function createHcpProfile(req, res) {
                 if (!consentLang || !consentCountry) return;
 
 
-                if (consentDetails.opt_type === 'double') {
+                if (consentCountry.opt_type === 'double') {
                     hasDoubleOptIn = true;
                 }
 
