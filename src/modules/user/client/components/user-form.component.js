@@ -63,6 +63,12 @@ export default function UserForm() {
         }
     }
 
+    const onPhoneNumberChange = (e, changeHandler) => {
+        const { value: phone } = e.target;
+        e.target.value = phone.replace( /  +/g, ' ');
+        changeHandler(e);
+    }
+
     return (
         <main className="app__content cdp-light-bg">
             <div className="container-fluid">
@@ -146,7 +152,7 @@ export default function UserForm() {
                                                             <div className="col-12 col-sm-6">
                                                                 <div className="form-group">
                                                                     <label className="font-weight-bold" htmlFor="phone">Phone Number</label>
-                                                                    <Field data-testid="phone" className="form-control" type="text" name="phone" />
+                                                                    <Field data-testid="phone" className="form-control" type="text" name="phone" onChange={(e) => onPhoneNumberChange(e, formikProps.handleChange)} />
                                                                     <div className="invalid-feedback">
                                                                         <ErrorMessage name="phone" data-testid="phoneError" />
                                                                     </div>

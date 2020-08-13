@@ -24,6 +24,11 @@ function validatePassword(password) {
     return hasSpecialCharacter
 }
 
+const validatePhone = phone => {
+    if(!phone) return false
+    return phoneNumber(phone).isValid()
+}
+
 export const loginSchema = object().shape({
     email: string()
         .email('This field should be an valid email address.')
@@ -47,9 +52,10 @@ export const registerSchema = object().shape({
         .email('This field should be an valid email address.')
         .required('This field must not be empty.'),
     phone: string()
-        // .min(8, 'This field must be at least 8 characters long.')
-        // .matches(/^[+]?[0-9]+$/, 'This field only contains numbers')
-        .test('is-valid-phone', 'Must be a valid international phone number.', phone => phoneNumber(phone).isValid()),
+        .matches(/^[+]+/, 'This field must start with a plus.')
+        .matches(/^[+]?[ 0-9]+$/, 'Must conform to international phone number format and can only contain digits, spaces or plus.')
+        .matches(/[0-9]+$/, 'This field must end with a digit.')
+        .test('is-valid-phone', 'Must be a valid international phone number.', validatePhone),
     countries: string()
         .required('Must select at least one country'),
     roles: string()
