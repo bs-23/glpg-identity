@@ -26,7 +26,7 @@ describe('Forgot password component', () => {
         const submit = container.querySelector('button[type="submit"]');
 
         const mockAxios = new MockAdapter(axios);
-        mockAxios.onPost('/api/users/forgot-password').reply(200)
+        mockAxios.onPost('/api/users/forgot-password').reply(200, { data: { message: 'Successfull' } })
 
         fireEvent.change(email, { target: { value: 'email@gmail.com' } });
 
@@ -36,7 +36,7 @@ describe('Forgot password component', () => {
 
         await waitFor(() => {
             expect(email.value).toEqual('');
-        })
+        }) 
     });
 
     it('Should fill out email, submit and get error response', async () => {
