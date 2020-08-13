@@ -198,7 +198,11 @@ async function login(req, res) {
         }
 
         const user = await User.findOne({
-            where: { email },
+            where: {
+                email: {
+                    [Op.iLike]: `%${email}%`
+                }
+            },
             include: [{
                 model: UserRole,
                 as: 'userrole',
@@ -267,7 +271,7 @@ async function createUser(req, res) {
 
     try {
         const [doc, created] = await User.findOrCreate({
-            where: { email },
+            where: { email: email.toLowerCase() },
             defaults: {
                 first_name,
                 last_name,
