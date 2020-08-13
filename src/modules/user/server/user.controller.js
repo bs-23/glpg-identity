@@ -24,8 +24,6 @@ async function passwordHistoryCheck(newPassword, userId) {
             where: { id: userId },
         });
 
-        console.log(user.password);
-
         if (user && bcrypt.compareSync(newPassword, user.password)) {
             return true;
         }
@@ -56,8 +54,6 @@ async function oldPasswordSave(oldPassword, userId) {
     try {
 
         const oldPasswords = await PasswordHistory.findOne({ where: { user_id: userId } });
-
-        console.log(oldPasswords);
 
         let passwordArray = oldPasswords ? oldPasswords.passwords : [];
         if (passwordArray.length >= 20) {
@@ -161,7 +157,6 @@ function formatProfile(user) {
         application: user.application,
         countries: user.countries
     };
-    console.log(profile);
     return profile;
 }
 
@@ -196,7 +191,6 @@ async function attachApplicationInfoToUser(user) {
 async function getSignedInUserProfile(req, res) {
     try {
         const user = await attachApplicationInfoToUser(req.user);
-        console.log(user);
         res.json(formatProfile(user));
     } catch (err) {
         res.status(500).send(err)
@@ -586,7 +580,6 @@ async function resetPassword(req, res) {
 
 
     } catch (error) {
-        console.log(error);
         res.status(500).send(error);
     }
 }
