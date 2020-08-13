@@ -126,6 +126,7 @@ async function sendResetPasswordSuccessMail(user, application) {
 
     mailOptions.subject = 'Your password has been reset';
     mailOptions.templateUrl = getTemplateUrl('password-reset-success.html', application.slug, user);
+    mailOptions.data.loginLink = `${application.login_link}?journey=login&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
 }
