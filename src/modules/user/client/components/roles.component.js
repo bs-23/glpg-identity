@@ -57,7 +57,7 @@ export default function RoleForm() {
                             <ol className="breadcrumb rounded-0 my-0">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/users">Management of Customer Data platform</NavLink></li>
-                                <li className="breadcrumb-item active"><span>Manage User Roles</span></li>
+                                <li className="breadcrumb-item active"><span>Define Roles</span></li>
                             </ol>
                         </nav>
                     </div>
@@ -65,7 +65,7 @@ export default function RoleForm() {
                 <div className="row">
                     <div className="col-12 col-sm-12 pt-3">
                         <div className="d-flex justify-content-between align-items-center mb-3 mt-4">
-                            <h4 className="cdp-text-primary font-weight-bold mb-0">Manage User Roles</h4>
+                            <h4 className="cdp-text-primary font-weight-bold mb-0">Define Roles</h4>
                             <button className="btn cdp-btn-secondary text-white ml-auto " onClick={() => { setShow(true); setEditData({}); setselected([]); }}>
                                 <i className="icon icon-plus pr-1"></i> Add New Role
                             </button>
