@@ -263,7 +263,7 @@ async function createUser(req, res) {
         const options = {
             toAddresses: [doc.email],
             templateUrl,
-            subject: 'Set a password for your new account on GLPG CDP',
+            subject: 'Setup password for your CDP account',
             data: {
                 name: `${doc.first_name} ${doc.last_name}` || '',
                 link
@@ -475,7 +475,7 @@ async function resetPassword(req, res) {
 
         if (resetRequest.type === 'set') {
             options.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp/registration-success.html`);
-            options.subject = 'You have successfully set a password for your Galapagos CDP account'
+            options.subject = 'Registration Successfull'
             options.data.link = `${req.protocol}://${req.headers.host}/login`
         }
         else {
