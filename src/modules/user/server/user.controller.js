@@ -201,7 +201,7 @@ async function createUser(req, res) {
             defaults: {
                 first_name,
                 last_name,
-                phone,
+                phone: phone ? phone.replace(/\s+/g, '') : null,
                 countries,
                 application_id,
                 created_by: req.user.id,
