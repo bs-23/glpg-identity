@@ -77,7 +77,7 @@ async function oldPasswordSave(oldPassword, userId) {
 
 function commonPassword(password, user) {
 
-    if (password === user.first_name || password === user.last_name || password === user.email) return true;
+    if (password.includes(user.first_name) || password.includes(user.last_name) || password.includes((user.email).split("@")[0])) return true;
 
     const commonPasswords = JSON.parse(fs.readFileSync('src/config/server/lib/common-password.json'));
     if (commonPasswords.hasOwnProperty(password)) return true;
