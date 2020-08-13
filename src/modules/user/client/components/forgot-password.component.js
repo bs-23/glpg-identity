@@ -31,8 +31,8 @@ export default function ForgotPassword() {
                                     validationSchema={forgotPasswordSchema}
                                     onSubmit={(values, actions) => {
                                         Axios.post('/api/users/forgot-password', values)
-                                            .then(() => {
-                                                addToast('An email has been sent with further information.', {
+                                            .then((response) => {
+                                                addToast(response.data.message, {
                                                     appearance: 'success',
                                                     autoDismiss: true
                                                 });
