@@ -6,7 +6,7 @@ class Response {
 }
 
 class CustomError {
-    constructor(message, field, code) {
+    constructor(message, code, field) {
         this.message = message;
         this.code = code;
         this.field = field;
