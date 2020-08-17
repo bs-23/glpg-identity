@@ -21,6 +21,24 @@ export default function Users() {
         dispatch(getUsers(page, country_iso2));
     };
 
+    const sortCountries = (userCountries) => {
+        let countryArr = [];
+        let countryString = "";
+        if (countries.length > 0 && (userCountries.length)) {
+            (userCountries).map((country, key) => (
+                countryArr.push(countries.find(i => i.country_iso2 === country)).countryname)
+            );
+        }
+
+        countryArr.sort((a, b) => (a.countryname > b.countryname) ? 1 : -1);
+        countryArr.forEach((element, key) => {
+            countryString = countryString + element.countryname;
+            (key < countryArr.length - 1) ? countryString = countryString + ', ' : countryString = countryString;
+        });
+
+        return countryString;
+    }
+
     useEffect(() => {
         getUserList();
         async function getCountries() {
@@ -28,6 +46,7 @@ export default function Users() {
             setCountries(response.data);
         }
         getCountries();
+
     }, []);
 
     const sortCdp = (val) => {
@@ -121,11 +140,12 @@ export default function Users() {
                                                     <td>{row.first_name}</td>
                                                     <td>{row.last_name}</td>
                                                     <td>{row.email}</td>
-                                                    <td>{countries.length > 0 && (row.countries.length) && (row.countries).map((country, key) => (
+                                                    {/* <td>{countries.length > 0 && (row.countries.length) && (row.countries).map((country, key) => (
                                                         <span key={key}>{(countries.find(i => i.country_iso2 === country)).countryname} {key < row.countries.length - 1 ? ', ' : ''}</span>
-                                                    ))}</td>
-                                                    <td>{(new Date(row.created_at)).toLocaleDateString().replace(/\//g, '-')}</td>
-                                                    <td>{(new Date(row.expiry_date)).toLocaleDateString().replace(/\//g, '-')}</td>
+                                                    ))}</td> */}
+                                                    <td>{sortCountries(row.countries)}</td>
+                                                    <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
+                                                    <td>{(new Date(row.expiry_date)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                     <td>
                                                         <NavLink to={`/users/${row.id}`} className="btn cdp-btn-outline-primary btn-sm"><i class="icon icon-user mr-2"></i>Profile</NavLink>
                                                         {/* <button onClick={() => onDeleteUser(row.id)} className="btn btn-outline-danger btn-sm"><i class="far fa-trash-alt mr-2"></i> Delete</button> */}

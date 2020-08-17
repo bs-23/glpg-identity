@@ -93,7 +93,7 @@ function validatePassword(password) {
     const hasDigit = new RegExp("^(?=.*[0-9])").test(password);
     const hasSpecialCharacter = new RegExp("[!@#$%^&*]").test(password);
 
-    if (password.length < minLength || password.length > maxLength || !hasUppercase || !hasLowercase || !hasDigit || !hasSpecialCharacter) {
+    if (password && (password.length < minLength || password.length > maxLength || !hasUppercase || !hasLowercase || !hasDigit || !hasSpecialCharacter)) {
         return false;
     }
 

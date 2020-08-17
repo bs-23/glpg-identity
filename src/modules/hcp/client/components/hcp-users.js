@@ -159,7 +159,7 @@ export default function hcpUsers() {
                                             <div className="col">
                                                 <h4 className="font-weight-bold">{`${currentUser.first_name} ${currentUser.last_name}`}</h4>
                                                 <div className="mt-1">{currentUser.email}</div>
-                                                <div className="mt-1">{(new Date(currentUser.created_at)).toLocaleDateString().replace(/\//g, '-')}</div>
+                                                <div className="mt-1">{(new Date(currentUser.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
                                             </div>
                                         </div>
                                         <Formik
@@ -233,7 +233,7 @@ export default function hcpUsers() {
                                                 {hcps['users'].map((row, index) => (
                                                     <tr key={index}>
                                                         <td>{row.email}</td>
-                                                        <td>{(new Date(row.created_at)).toLocaleDateString().replace(/\//g, '-')}</td>
+                                                        <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                         <td>{row.first_name}</td>
                                                         <td>{row.last_name}</td>
                                                         <td>

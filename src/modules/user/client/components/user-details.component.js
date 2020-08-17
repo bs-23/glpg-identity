@@ -61,11 +61,11 @@ const UserDetails = (props) => {
                                     <div className="profile-detail__row pb-0 pb-sm-2 d-block d-sm-flex">
                                         <div className="profile-detail__col pb-3">
                                             <span className="mr-2 d-block profile-detail__label">Expiary Date</span>
-                                            <span className="profile-detail__value">{userInfo.expiry_date ? (new Date(userInfo.expiry_date)).toLocaleDateString().replace(/\//g, '.') : nullValueToken}</span>
+                                            <span className="profile-detail__value">{userInfo.expiry_date ? (new Date(userInfo.expiry_date)).toLocaleDateString('en-GB').replace(/\//g, '.') : nullValueToken}</span>
                                         </div>
                                         <div className="profile-detail__col pb-3 pr-0 pr-sm-3">
                                             <span className="mr-2 d-block profile-detail__label">Last Login</span>
-                                            <span className="profile-detail__value">{userInfo.last_login ? (new Date(userInfo.last_login)).toLocaleDateString().replace(/\//g, '.') : nullValueToken}</span>
+                                            <span className="profile-detail__value">{userInfo.last_login ? (new Date(userInfo.last_login)).toLocaleDateString('en-GB').replace(/\//g, '.') : nullValueToken}</span>
                                         </div>
                                     </div>
                                     <div className="profile-detail__row pb-0 pb-sm-2 d-block d-sm-flex">
