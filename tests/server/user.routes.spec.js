@@ -129,9 +129,9 @@ describe('User Routes', () => {
             .post('/api/users/change-password')
             .set('Cookie', [`access_token=${defaultUser.access_token}`])
             .send({
-                currentPassword: defaultUser.password,
-                newPassword: 'Abcdef2!',
-                confirmPassword: 'Abcdef2!'
+                currentPassword: defaultUser.password, 
+                newPassword: '1c9QZu5YU%J$',
+                confirmPassword: '1c9QZu5YU%J$'
             });
 
         const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));

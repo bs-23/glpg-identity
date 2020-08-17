@@ -110,6 +110,6 @@ async function getConsents(req, res) {
         response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
     }
-}
+} 
 
 exports.getConsents = getConsents;

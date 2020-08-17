@@ -17,6 +17,8 @@ module.exports = async function() {
     const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
     const ConsentCategory = require(path.join(process.cwd(), 'src/modules/consent/server/consent-category.model'));
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
+    
+    require(path.join(process.cwd(), 'src/modules/consent/server/consent-country.model'));
     require(path.join(process.cwd(), 'src/modules/consent/server/consent-language.model'));
     require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
     require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
