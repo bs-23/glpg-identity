@@ -5,10 +5,16 @@ paths:
                 - consents
             summary: Get all consents by country code and language code.
             parameters:
-                - name: country_lang
+                - name: country
                   in: query
                   required: true
-                  description: Country code and Language code for which consent is to be returned.
+                  description: Country code for which consent is to be returned.
+                  schema:
+                    type: string
+                - name: locale
+                  in: query
+                  required: false
+                  description: Language code for which consent is to be returned.
                   schema:
                     type: string
             responses:
@@ -56,7 +62,7 @@ components:
         consentsForCountry:
             type: object
             properties:
-                data: 
+                data:
                     type: array
                     items:
                         $ref: "#/components/schemas/consent"
