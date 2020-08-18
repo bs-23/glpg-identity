@@ -12,14 +12,13 @@ async function getConsents(req, res) {
     const response = new Response({}, []);
 
     try {
-        const { country_lang } = req.query;
+        let { country: country_iso2, locale: language_code } = req.query;
 
-        if (!country_lang) {
+        if (!country_iso2) {
             response.errors.push(new CustomError('Invalid query parameter'));
             return res.status(400).send(response);
         }
 
-        let [country_iso2, language_code] = country_lang.split('_');
         language_code = language_code || 'en';
 
         const consentCountries = await ConsentCountry.findAll({
@@ -110,6 +109,6 @@ async function getConsents(req, res) {
         response.errors.push(new CustomError(err.message));
         res.status(500).send(response);
     }
-} 
+}
 
 exports.getConsents = getConsents;
