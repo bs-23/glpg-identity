@@ -10,7 +10,7 @@ const HcpArchives = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
-const ConsentLanguage = require(path.join(process.cwd(), 'src/modules/consent/server/consent-language.model'));
+const ConsentLocale = require(path.join(process.cwd(), 'src/modules/consent/server/consent-locale.model'));
 const ConsentCountry = require(path.join(process.cwd(), 'src/modules/consent/server/consent-country.model'));
 const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
@@ -414,9 +414,9 @@ async function createHcpProfile(req, res) {
                 const consentDetails = await Consent.findOne({ where: { slug: consentSlug } });
                 if (!consentDetails) return;
 
-                const consentLang = await ConsentLanguage.findOne({
+                const consentLocale = await ConsentLocale.findOne({
                     where: {
-                        language_code: {
+                        locale: {
                             [Op.or]: [
                                 model.language_code.toUpperCase(),
                                 model.language_code.toLowerCase(),
@@ -439,8 +439,7 @@ async function createHcpProfile(req, res) {
                     }
                 });
 
-                if (!consentLang || !consentCountry) return;
-
+                if (!consentLocale || !consentCountry) return;
 
                 if (consentCountry.opt_type === 'double') {
                     hasDoubleOptIn = true;
@@ -449,7 +448,7 @@ async function createHcpProfile(req, res) {
                 consentArr.push({
                     user_id: hcpUser.id,
                     consent_id: consentDetails.id,
-                    title: consentLang.rich_text,
+                    title: consentLocale.rich_text,
                     response: consentResponse,
                     consent_confirmed: consentCountry.opt_type === 'double' ? false : true,
                     created_by: req.user.id,
@@ -553,10 +552,10 @@ async function approveHCPUser(req, res) {
 
         if (userConsents && userConsents.length) {
             const consentIds = userConsents.map(consent => consent.consent_id)
-            const allConsentDetails = await ConsentLanguage.findAll({
+            const allConsentDetails = await ConsentLocale.findAll({
                 where: {
                     consent_id: consentIds,
-                    language_code: hcpUser.language_code.toLowerCase(),
+                    locale: hcpUser.language_code.toLowerCase()
                 }
             });
 

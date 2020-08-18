@@ -4,8 +4,7 @@ const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequel
 const Consent = require('./consent.model');
 const validator = require('validator');
 
-
-const ConsentLanguage = sequelize.cdpConnector.define('consent_languages', {
+const ConsentLanguage = sequelize.cdpConnector.define('consent_locales', {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -16,7 +15,6 @@ const ConsentLanguage = sequelize.cdpConnector.define('consent_languages', {
         allowNull: false,
         type: DataTypes.UUID
     },
-
     rich_text: {
         allowNull: false,
         type: DataTypes.STRING(500),
@@ -24,13 +22,12 @@ const ConsentLanguage = sequelize.cdpConnector.define('consent_languages', {
             this.setDataValue('rich_text', validator.escape(value));
         }
     },
-    language_code: {
+    locale: {
         type: DataTypes.STRING
     }
-
 }, {
     schema: 'ciam',
-    tableName: 'consent_languages',
+    tableName: 'consent_locales',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
