@@ -222,7 +222,7 @@ async function getHcps(req, res) {
         response.data = data;
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message));
+        response.errors.push(new CustomError(err.message, 500));
         res.status(500).send(response);
     }
 }
@@ -235,7 +235,7 @@ async function editHcp(req, res) {
         const HcpUser = await Hcp.findOne({ where: { id: req.params.id } });
 
         if (!HcpUser) {
-            response.errors.push(new CustomError('User not found'));
+            response.errors.push(new CustomError('User not found', 404));
             return res.status(404).send(response);
         }
 
@@ -248,7 +248,7 @@ async function editHcp(req, res) {
         response.data = HcpUser;
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message));
+        response.errors.push(new CustomError(err.message, 500));
         res.status(500).send(response);
     }
 }
@@ -259,11 +259,11 @@ async function registrationLookup(req, res) {
     const response = new Response({}, []);
 
     if (!email || !validator.isEmail(email)) {
-        response.errors.push(new CustomError('Email address is missing or invalid.', 'email'));
+        response.errors.push(new CustomError('Email address is missing or invalid.', 400, 'email'));
     }
 
     if (!uuid) {
-        response.errors.push(new CustomError('UUID is missing.', 'uuid'));
+        response.errors.push(new CustomError('UUID is missing.', 400, 'uuid'));
     }
 
     if (response.errors.length) {
@@ -275,10 +275,10 @@ async function registrationLookup(req, res) {
         const profileByUUID = await Hcp.findOne({ where: { uuid } });
 
         if (profileByEmail) {
-            response.errors.push(new CustomError('Email address is already registered.', 'email'));
+            response.errors.push(new CustomError('Email address is already registered.', 4001, 'email'));
             return res.status(400).send(response);
         } else if (profileByUUID) {
-            response.errors.push(new CustomError('UUID is already registered.', 'uuid'));
+            response.errors.push(new CustomError('UUID is already registered.', 4101, 'uuid'));
             return res.status(400).send(response);
         } else {
             const master_data = await sequelize.datasyncConnector.query(`
@@ -295,14 +295,14 @@ async function registrationLookup(req, res) {
             if (master_data && master_data.length) {
                 response.data = mapMasterDataToHcpProfile(master_data[0]);
             } else {
-                response.errors.push(new CustomError('Invalid UUID.', 'uuid'));
+                response.errors.push(new CustomError('Invalid UUID.', 4100, 'uuid'));
                 return res.status(400).send(response);
             }
         }
 
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message));
+        response.errors.push(new CustomError(err.message, 500));
         res.status(500).send(response);
     }
 }
@@ -312,35 +312,35 @@ async function createHcpProfile(req, res) {
     const { email, uuid, salutation, first_name, last_name, country_iso2, language_code, specialty_onekey } = req.body;
 
     if (!email || !validator.isEmail(email)) {
-        response.errors.push(new CustomError('Email address is missing or invalid.', 'email'));
+        response.errors.push(new CustomError('Email address is missing or invalid.', 400, 'email'));
     }
 
     if (!uuid) {
-        response.errors.push(new CustomError('UUID is missing.', 'uuid'));
+        response.errors.push(new CustomError('UUID is missing.', 400, 'uuid'));
     }
 
     if (!salutation) {
-        response.errors.push(new CustomError('Salutation is missing.', 'salutation'));
+        response.errors.push(new CustomError('Salutation is missing.', 400, 'salutation'));
     }
 
     if (!first_name) {
-        response.errors.push(new CustomError('First name is missing.', 'first_name'));
+        response.errors.push(new CustomError('First name is missing.', 400, 'first_name'));
     }
 
     if (!last_name) {
-        response.errors.push(new CustomError('Last name is missing.', 'last_name'));
+        response.errors.push(new CustomError('Last name is missing.', 400, 'last_name'));
     }
 
     if (!country_iso2) {
-        response.errors.push(new CustomError('country_iso2 is missing.', 'country_iso2'));
+        response.errors.push(new CustomError('country_iso2 is missing.', 400, 'country_iso2'));
     }
 
     if (!language_code) {
-        response.errors.push(new CustomError('language_code is missing.', 'language_code'));
+        response.errors.push(new CustomError('language_code is missing.', 400, 'language_code'));
     }
 
     if (!specialty_onekey) {
-        response.errors.push(new CustomError('specialty_onekey is missing.', 'specialty_onekey'));
+        response.errors.push(new CustomError('specialty_onekey is missing.', 400, 'specialty_onekey'));
     }
 
     if(specialty_onekey) {
@@ -363,11 +363,11 @@ async function createHcpProfile(req, res) {
         const isUUIDExists = await Hcp.findOne({ where: { uuid: req.body.uuid } });
 
         if (isEmailExists) {
-            response.errors.push(new CustomError('Email already exists.', 'email'));
+            response.errors.push(new CustomError('Email already exists.', 4001, 'email'));
         }
 
         if (isUUIDExists) {
-            response.errors.push(new CustomError('UUID already exists.', 'uuid'));
+            response.errors.push(new CustomError('UUID already exists.', 4101, 'uuid'));
         }
 
         if (response.errors.length) {
@@ -484,7 +484,7 @@ async function createHcpProfile(req, res) {
 
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message));
+        response.errors.push(new CustomError(err.message, 500));
         res.status(500).send(response);
     }
 }
@@ -497,12 +497,12 @@ async function confirmConsents(req, res) {
         const hcpUser = await Hcp.findOne({ where: { id: payload.id } });
 
         if (!hcpUser) {
-            response.errors.push(new CustomError('Invalid token.'));
+            response.errors.push(new CustomError('Invalid token.', 4400));
             return res.status(400).send(response);
         }
 
         if(hcpUser.status !== 'consent_pending') {
-            response.errors.push(new CustomError('Invalid token.'));
+            response.errors.push(new CustomError('Invalid token.', 4400));
             return res.status(400).send(response);
         }
 
@@ -527,7 +527,7 @@ async function confirmConsents(req, res) {
 
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message));
+        response.errors.push(new CustomError(err.message, 500));
         res.status(500).send(response);
     }
 }
@@ -540,7 +540,7 @@ async function approveHCPUser(req, res) {
         const hcpUser = await Hcp.findOne({ where: { id } });
 
         if (!hcpUser) {
-            response.errors.push(new CustomError('User does not exist.'));
+            response.errors.push(new CustomError('User does not exist.', 404));
             return res.status(404).send(response);
         }
 
@@ -590,7 +590,7 @@ async function approveHCPUser(req, res) {
 
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message));
+        response.errors.push(new CustomError(err.message, 500));
         res.status(500).send(response);
     }
 }
@@ -603,7 +603,7 @@ async function rejectHCPUser(req, res) {
         const hcpUser = await Hcp.findOne({ where: { id } });
 
         if (!hcpUser) {
-            response.errors.push(new CustomError('User does not exist.'));
+            response.errors.push(new CustomError('User does not exist.', 404));
             return res.status(404).send(response);
         }
 
@@ -623,7 +623,7 @@ async function rejectHCPUser(req, res) {
 
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message));
+        response.errors.push(new CustomError(err.message, 500));
         res.status(500).send(response);
     }
 }
@@ -637,14 +637,14 @@ async function getHcpProfile(req, res) {
         });
 
         if (!doc) {
-            response.errors.push(new CustomError('Profile not found.'));
+            response.errors.push(new CustomError('Profile not found.', 404));
             return res.status(404).send(response);
         }
 
         response.data = getHcpViewModel(doc.dataValues);
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message));
+        response.errors.push(new CustomError(err.message, 500));
         res.status(500).send(response);
     }
 }
@@ -655,7 +655,7 @@ async function changePassword(req, res) {
     const response = new Response({}, []);
 
     if (!email || !current_password || !new_password || !confirm_password) {
-        response.errors.push(new CustomError('Missing required parameters.'));
+        response.errors.push(new CustomError('Missing required parameters.', 400));
         return res.status(400).send(response);
     }
 
@@ -663,12 +663,12 @@ async function changePassword(req, res) {
         const doc = await Hcp.findOne({ where: { email: email } });
 
         if (!doc || !doc.validPassword(current_password)) {
-            response.errors.push(new CustomError('Invalid credentials.'));
+            response.errors.push(new CustomError('Invalid credentials.', 401));
             return res.status(401).send(response);
         }
 
         if (new_password !== confirm_password) {
-            response.errors.push(new CustomError(`Password and confirm password doesn't match.`));
+            response.errors.push(new CustomError(`Password and confirm password doesn't match.`, 4201));
             return res.status(400).send(response);
         }
 
@@ -679,7 +679,7 @@ async function changePassword(req, res) {
         response.data = 'Password changed successfully.';
         res.send(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message));
+        response.errors.push(new CustomError(err.message, 500));
         res.status(500).send(response);
     }
 }
@@ -691,17 +691,17 @@ async function resetPassword(req, res) {
         const doc = await Hcp.findOne({ where: { reset_password_token: req.query.token } });
 
         if (!doc) {
-            response.errors.push(new CustomError('Invalid password reset token.'));
+            response.errors.push(new CustomError('Invalid password reset token.', 4400));
             return res.status(404).send(response);
         }
 
         if (doc.reset_password_expires < Date.now()) {
-            response.errors.push(new CustomError('Password reset token has been expired. Please request again.'));
+            response.errors.push(new CustomError('Password reset token has been expired. Please request again.', 4400));
             return res.status(400).send(response);
         }
 
         if (req.body.new_password !== req.body.confirm_password) {
-            response.errors.push(new CustomError(`Password and confirm password doesn't match.`));
+            response.errors.push(new CustomError(`Password and confirm password doesn't match.`, 4201));
             return res.status(400).send(response);
         }
 
@@ -716,7 +716,7 @@ async function resetPassword(req, res) {
         response.data = 'Password reset successfully.';
         res.send(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message));
+        response.errors.push(new CustomError(err.message, 500));
         res.status(500).send(response);
     }
 }
@@ -727,7 +727,7 @@ async function forgetPassword(req, res) {
         const doc = await Hcp.findOne({ where: { email: req.body.email } });
 
         if (!doc) {
-            response.errors.push(new CustomError(`Account doesn't exist`));
+            response.errors.push(new CustomError(`Account doesn't exist`, 404));
             return res.status(404).send(response);
         }
 
@@ -743,11 +743,11 @@ async function forgetPassword(req, res) {
             return res.json(response);
         }
 
-        response.errors.push(new CustomError(`User is not approved yet.`));
+        response.errors.push(new CustomError(`User is not approved yet.`, 400));
         res.status(400).send(response);
 
     } catch (err) {
-        response.errors.push(new CustomError(err.message));
+        response.errors.push(new CustomError(err.message, 500));
         res.status(500).send(response);
     }
 }
@@ -758,7 +758,7 @@ async function getSpecialties(req, res) {
         const locale = req.query.locale;
 
         if (!locale) {
-            response.errors.push(new CustomError(`Missing required query parameter`, 'locale'));
+            response.errors.push(new CustomError(`Missing required query parameter`, 4300, 'locale'));
             return res.status(400).send(response);
         }
 
@@ -789,14 +789,14 @@ async function getSpecialties(req, res) {
         }
 
         if (!masterDataSpecialties || masterDataSpecialties.length === 0) {
-            response.errors.push(new CustomError(`No specialties found for Locale=${locale}`));
+            response.errors.push(new CustomError(`No specialties found for Locale=${locale}`, 404));
             return res.status(404).send(response);
         }
 
         response.data = masterDataSpecialties;
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message));
+        response.errors.push(new CustomError(err.message, 500));
         res.status(500).send(response);
     }
 }
@@ -808,11 +808,11 @@ async function getAccessToken(req, res) {
         const { email, password } = req.body;
 
         if (!email) {
-            response.errors.push(new CustomError('Email is required.', 'email'));
+            response.errors.push(new CustomError('Email is required.', 400, 'email'));
         }
 
         if (!password) {
-            response.errors.push(new CustomError('Password is required.', 'password'));
+            response.errors.push(new CustomError('Password is required.', 400, 'password'));
         }
 
         if (!email || !password) {
@@ -822,7 +822,7 @@ async function getAccessToken(req, res) {
         const doc = await Hcp.findOne({ where: { email } });
 
         if (!doc || !doc.password || !doc.validPassword(password)) {
-            response.errors.push(new CustomError('Invalid email or password.'));
+            response.errors.push(new CustomError('Invalid email or password.', 401));
             return res.status(401).json(response);
         }
 
@@ -834,7 +834,7 @@ async function getAccessToken(req, res) {
 
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message));
+        response.errors.push(new CustomError(err.message, 500));
         res.status(500).send(response);
     }
 }

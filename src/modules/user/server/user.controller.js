@@ -93,7 +93,7 @@ function validatePassword(password) {
     const hasDigit = new RegExp("^(?=.*[0-9])").test(password);
     const hasSpecialCharacter = new RegExp("[!@#$%^&*]").test(password);
 
-    if (password.length < minLength || password.length > maxLength || !hasUppercase || !hasLowercase || !hasDigit || !hasSpecialCharacter) {
+    if (password && (password.length < minLength || password.length > maxLength || !hasUppercase || !hasLowercase || !hasDigit || !hasSpecialCharacter)) {
         return false;
     }
 
@@ -198,7 +198,11 @@ async function login(req, res) {
         }
 
         const user = await User.findOne({
-            where: { email },
+            where: {
+                email: {
+                    [Op.iLike]: `%${email}%`
+                }
+            },
             include: [{
                 model: UserRole,
                 as: 'userrole',
@@ -267,7 +271,7 @@ async function createUser(req, res) {
 
     try {
         const [doc, created] = await User.findOrCreate({
-            where: { email },
+            where: { email: email.toLowerCase() },
             defaults: {
                 first_name,
                 last_name,
