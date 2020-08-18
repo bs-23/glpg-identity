@@ -343,6 +343,17 @@ async function createHcpProfile(req, res) {
         response.errors.push(new CustomError('specialty_onekey is missing.', 'specialty_onekey'));
     }
 
+    if(specialty_onekey) {
+        const specialty_master_data = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwspecialtymaster WHERE cod_id_onekey = $specialty_onekey", {
+            bind: { specialty_onekey },
+            type: QueryTypes.SELECT
+        });
+
+        if(!specialty_master_data.length) {
+            response.errors.push(new CustomError('specialty_onekey is invalid.', 'specialty_onekey'));
+        }
+    }
+
     if (response.errors.length) {
         return res.status(400).send(response);
     }
