@@ -20,7 +20,7 @@ module.exports = {
     defaultApplication: {
         id: defaultApplicationId,
         name: faker.company.companyName(),
-        slug: 'hcp-portal', 
+        slug: 'hcp-portal',
         email: 'hcp-portal@glpg.com',
         password: 'strong-password',
         consent_confirmation_link: 'a',
@@ -59,7 +59,7 @@ module.exports = {
             application_id: defaultApplicationId,
             first_name: 'Default User',
             last_name: '',
-            email: 'default-user@cdp.com', 
+            email: 'default-user@cdp.com',
             password: 'strong-password',
             expiry_date: new Date(Date.now() + 24 * 60 * 60 * 1000),
             created_by: defaultAdminId,
@@ -109,7 +109,7 @@ module.exports = {
             type: 'online',
             opt_type: 'single',
             country_iso2: 'NL',
-            language_code: 'en',
+            locale: 'en',
         }
     },
     permissions: [
