@@ -168,7 +168,8 @@ async function getHcps(req, res) {
     try {
         const page = req.query.page ? req.query.page - 1 : 0;
         const limit = 15;
-        const status = req.query.status === undefined ? null : req.query.status;
+        let status = req.query.status === undefined ? null : req.query.status;
+        if(status) status = Array.isArray(status) ? status.filter(e => Hcp.rawAttributes.status.values.includes(e)) : Hcp.rawAttributes.status.values.includes(status) ? status : [];
         //const country_iso2 = req.query.country_iso2 === undefined ? null : req.query.country_iso2;
         const codbase = req.query.codbase === undefined ? null : req.query.codbase;
         const offset = page * limit;
@@ -230,6 +231,7 @@ async function getHcps(req, res) {
         response.data = data;
         res.json(response);
     } catch (err) {
+        console.log(err)
         response.errors.push(new CustomError(err.message, 500));
         res.status(500).send(response);
     }
