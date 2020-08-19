@@ -6,6 +6,7 @@ import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
 import { createUser } from "../user.actions";
 import { registerSchema } from "../user.schema";
 import { useToasts } from "react-toast-notifications";
+import Dropdown from 'react-bootstrap/Dropdown';
 
 
 export default function UserForm() {
@@ -153,10 +154,36 @@ export default function UserForm() {
                                                                 <div className="form-group">
                                                                     <label className="font-weight-bold" htmlFor="phone">Phone Number</label>
                                                                     <Field data-testid="phone" className="form-control" type="text" name="phone" onChange={(e) => onPhoneNumberChange(e, formikProps.handleChange)} />
-                                                                    <div className="invalid-feedback">
+                                                                {/*<div className="phone-list">
+                                                                    <div className="input-group phone-input">
+                                                                        <span className="input-group-btn">
+                                                                            <Dropdown>
+                                                                                <Dropdown.Toggle variant="" id="dropdown-basic" className="bg-light border rounded-0 rounded-left p-1 pt-2 px-2 d-flex align-items-center ">
+                                                                                    <img height="20" width="20" src="/assets/flag/flag-andorra.svg" title="Andorra" /> <span className="country-phone-code pl-1">+44</span>
+                                                                                </Dropdown.Toggle>
+                                                                                <Dropdown.Menu>
+                                                                                    <Dropdown.Item href="#/action-1" className="px-2 d-flex align-items-center"><img height="20" width="20" src="/assets/flag/flag-belgium.svg" title="Belgium" /> <span className="country-phone-code pl-1">+32</span></Dropdown.Item>
+                                                                                    <Dropdown.Item href="#/action-1" className="px-2 d-flex align-items-center"><img height="20" width="20" src="/assets/flag/flag-france.svg" title="France" /> <span className="country-phone-code pl-1">+33</span></Dropdown.Item>
+                                                                                    <Dropdown.Item href="#/action-1" className="px-2 d-flex align-items-center"><img height="20" width="20" src="/assets/flag/flag-germany.svg" title="Germany" /> <span className="country-phone-code pl-1">+32</span></Dropdown.Item>
+                                                                                    <Dropdown.Item href="#/action-1" className="px-2 d-flex align-items-center"><img height="20" width="20" src="/assets/flag/flag-ireland.svg" title="Ireland" /> <span className="country-phone-code pl-1">+33</span></Dropdown.Item>
+                                                                                    <Dropdown.Item href="#/action-1" className="px-2 d-flex align-items-center"><img height="20" width="20" src="/assets/flag/flag-italy.svg" title="Italy" /> <span className="country-phone-code pl-1">+32</span></Dropdown.Item>
+                                                                                    <Dropdown.Item href="#/action-1" className="px-2 d-flex align-items-center"><img height="20" width="20" src="/assets/flag/flag-luxembourg.svg" title="Luxembourg" /> <span className="country-phone-code pl-1">+33</span></Dropdown.Item>
+                                                                                    <Dropdown.Item href="#/action-1" className="px-2 d-flex align-items-center"><img height="20" width="20" src="/assets/flag/flag-monaco.svg" title="Monaco" /> <span className="country-phone-code pl-1">+32</span></Dropdown.Item>
+                                                                                    <Dropdown.Item href="#/action-1" className="px-2 d-flex align-items-center"><img height="20" width="20" src="/assets/flag/flag-netherlands.svg" title="Netherlands" /> <span className="country-phone-code pl-1">+33</span></Dropdown.Item>
+                                                                                    <Dropdown.Item href="#/action-1" className="px-2 d-flex align-items-center"><img height="20" width="20" src="/assets/flag/flag-spain.svg" title="Spain" /> <span className="country-phone-code pl-1">+33</span></Dropdown.Item>
+                                                                                    <Dropdown.Item href="#/action-1" className="px-2 d-flex align-items-center"><img height="20" width="20" src="/assets/flag/flag-united-kingdom.svg" title="United Kingdom" /> <span className="country-phone-code pl-1">+33</span></Dropdown.Item>
+                                                                                </Dropdown.Menu>
+                                                                            </Dropdown>
+                                                                        </span>
+                                                                        <input type="text" name="" className="form-control" placeholder="" />
+                                                                    </div>
+
+                                                                </div>*/}
+                                                                <div className="invalid-feedback">
                                                                         <ErrorMessage name="phone" data-testid="phoneError" />
                                                                     </div>
-                                                                </div>
+                                                            </div>
+                                                            
                                                             </div>
                                                             <div className="col-12 col-sm-6">
                                                                 <div className="form-group">
