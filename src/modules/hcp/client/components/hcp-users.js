@@ -72,19 +72,28 @@ export default function hcpUsers() {
         const params = new URLSearchParams(window.location.search);
         dispatch(getHcpProfiles(
             params.get('page') ? params.get('page') : null,
-            params.get('status') ? params.get('status') : null,
-            params.get('codbase') ? params.get('codbase') : null,
+            params.get('status') ? params.getAll('status') : null,
+            params.get('codbase') ? params.get('codbase') : null
         ))
     };
 
+    const isAllVerifiedStatus = () => {
+        if(Array.isArray(hcps.status)) {
+            const allVerifiedStatus = ["self_verified", "manually_verified"];
+            let isSubset = true;
+            allVerifiedStatus.forEach(status => { if(!hcps.status.includes(status)) isSubset = false });
+            return isSubset && (hcps.status.length === 2);
+        }
+        return false;
+    }
+
+    const getSelectedStatus = () => {
+        if(Array.isArray(hcps.status)) return isAllVerifiedStatus() ? 'All Verified' : hcps.status.map(status => _.startCase(_.toLower(status.replace('_', ' ')))).join(', ');
+        return hcps.status ? _.startCase(_.toLower(hcps.status.replace('_', ' '))) : 'All';
+    }
+
     useEffect(() => {
         getCountries();
-        // const params = new URLSearchParams(window.location.search);
-        // dispatch(getHcpProfiles(
-        //     params.get('page') ? params.get('page') : 1,
-        //     params.get('status') ? params.get('status') : null,
-        //     params.get('country_iso2') ? params.get('country_iso2') : null,
-        // ));
         loadHcpProfile()
     }, []);
 
@@ -119,29 +128,42 @@ export default function hcpUsers() {
                                                     <LinkContainer to={`list${hcps.status ? `?status=${hcps.status}` : ''}`}><Dropdown.Item className={hcps.codbase === null ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, hcps.status, null))}>All</Dropdown.Item></LinkContainer>
                                                     {
                                                         countries.map((item, index) => (
-                                                            <LinkContainer key={index} to={`list?${hcps.status ? `status=${hcps.status}` : ''}${`${hcps.status ? '&' : ''}codbase=${item.codbase}`}`}> 
+                                                            <LinkContainer key={index} to={`list?${hcps.status ? `status=${hcps.status}` : ''}${`${hcps.status ? '&' : ''}codbase=${item.codbase}`}`}>
                                                                 <Dropdown.Item className={hcps.countries.includes(item.country_iso2) && hcps.codbase === item.codbase ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, hcps.status, item.codbase))}>
-                                                                    { 
+                                                                    {
                                                                         hcps.countries.includes(item.country_iso2) ? item.codbase_desc : null
                                                                     }
                                                                 </Dropdown.Item>
                                                             </LinkContainer>
                                                         ))
-                                                        
+
                                                     }
                                                 </Dropdown.Menu>
                                             </Dropdown>
                                             <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-btn-secondary text-white dropdown shadow-sm">
                                                 Status
                                                 <Dropdown.Toggle variant="" className="ml-2 bg-white rounded-0">
-                                                    {hcps.status ? _.startCase(_.toLower(hcps.status.replace('_', ' '))) : 'All'}
+                                                    {getSelectedStatus()}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
-                                                    <LinkContainer to={`list${hcps.codbase ? `?codbase=${hcps.codbase}` : ''}`}><Dropdown.Item className={hcps.status === null ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, null, hcps.codbase))}>All</Dropdown.Item></LinkContainer>
-                                                    <LinkContainer to={`list?status=approved${hcps.codbase ? `&codbase=${hcps.codbase_desc}` : ''}`}><Dropdown.Item className={hcps.status === 'approved' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, 'approved', hcps.codbase))}>Approved</Dropdown.Item></LinkContainer>
-                                                    <LinkContainer to={`list?status=consent_pending${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`}><Dropdown.Item className={hcps.status === 'consent_pending' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, 'consent_pending', hcps.codbase))}>Consent Pending</Dropdown.Item></LinkContainer>
-                                                    <LinkContainer to={`list?status=not_verified${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`}><Dropdown.Item className={hcps.status === 'not_verified' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, 'not_verified', hcps.codbase))}>Not Verified</Dropdown.Item></LinkContainer>
-                                                    {/* <LinkContainer to={`list?page=1&status=Rejected&country_iso2=${hcps.country_iso2}`}><Dropdown.Item className={hcps.status === 'Rejected' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, 'Rejected', hcps.country_iso2))}>Rejected</Dropdown.Item></LinkContainer> */}
+                                                    <LinkContainer to={`list${hcps.codbase ? `?codbase=${hcps.codbase}` : ''}`}>
+                                                        <Dropdown.Item className={hcps.status === null ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, null, hcps.codbase))}>All</Dropdown.Item>
+                                                    </LinkContainer>
+                                                    <LinkContainer to={`list?status=self_verified&status=manually_verified${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`} disabled={isAllVerifiedStatus()}>
+                                                        <Dropdown.Item onClick={() => dispatch(getHcpProfiles(null, ['self_verified', 'manually_verified'], hcps.codbase))}>All Verified</Dropdown.Item>
+                                                    </LinkContainer>
+                                                    <LinkContainer to={`list?status=self_verified${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`}>
+                                                        <Dropdown.Item className={hcps.status === 'self_verified' ? 'd-none' : 'pl-5'} onClick={() => dispatch(getHcpProfiles(null, 'self_verified', hcps.codbase))}>Self Verified</Dropdown.Item>
+                                                    </LinkContainer>
+                                                    <LinkContainer to={`list?status=manually_verified${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`}>
+                                                        <Dropdown.Item className={hcps.status === 'manually_verified' ? 'd-none' : 'pl-5'} onClick={() => dispatch(getHcpProfiles(null, 'manually_verified', hcps.codbase))}>Manually Verified</Dropdown.Item>
+                                                    </LinkContainer>
+                                                    <LinkContainer to={`list?status=consent_pending${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`}>
+                                                        <Dropdown.Item className={hcps.status === 'consent_pending' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, 'consent_pending', hcps.codbase))}>Consent Pending</Dropdown.Item>
+                                                    </LinkContainer>
+                                                    <LinkContainer to={`list?status=not_verified${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`}>
+                                                        <Dropdown.Item className={hcps.status === 'not_verified' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, 'not_verified', hcps.codbase))}>Not Verified</Dropdown.Item>
+                                                    </LinkContainer>
                                                 </Dropdown.Menu>
                                             </Dropdown>
                                         </React.Fragment>
@@ -233,8 +255,8 @@ export default function hcpUsers() {
                                                 <th><span className={sort.value === 'last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                 <th><span className={sort.value === 'status' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('status')}>Status<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                 <th><span className={sort.value === 'uuid' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('uuid')}>UUID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                <th><span className={sort.value === 'uuid' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('uuid')}>Consent Type<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th
                                                 <th><span className={sort.value === 'specialty_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('specialty_name')}>Specialty<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className={sort.value === 'consent_type' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('consent_type')}>Consent Type<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -246,7 +268,8 @@ export default function hcpUsers() {
                                                         <td>{row.first_name}</td>
                                                         <td>{row.last_name}</td>
                                                         <td>
-                                                            {row.status === 'approved' ? <span><i className="fa fa-xs fa-circle text-success pr-2"></i>Approved</span> :
+                                                            {row.status === 'self_verified' ? <span><i className="fa fa-xs fa-circle text-success pr-2"></i>Self Verified</span> :
+                                                                row.status === 'manually_verified' ? <span><i className="fa fa-xs fa-circle text-success pr-2"></i>Manually Verified</span> :
                                                                 row.status === 'consent_pending' ? <span><i className="fa fa-xs fa-circle text-warning pr-2"></i>Consent Pending</span> :
                                                                     row.status === 'not_verified' ? <span><i className="fa fa-xs fa-circle text-warning pr-2"></i>Not Verified</span> :
                                                                         row.status === 'rejected' ? <span><i className="fa fa-xs fa-circle text-danger pr-2"></i>Rejected</span> : <span></span>
@@ -254,7 +277,7 @@ export default function hcpUsers() {
                                                         </td>
                                                         <td>{row.uuid}</td>
                                                         <td>{row.specialty_description}</td>
-                                                        <td>Single Opt-in, Double Opt-in</td>
+                                                        <td>{row.consent_types}</td>
                                                         <td>
                                                             <span>
                                                                 <Dropdown className="ml-auto dropdown-customize">

@@ -4,14 +4,15 @@ CREATE TABLE ciam.hcp_profiles
     application_id uuid NOT NULL,
     uuid character varying(255) COLLATE pg_catalog."default",
     individual_id_onekey character varying(255) COLLATE pg_catalog."default",
-    salutation character varying(255) COLLATE pg_catalog."default",
+    salutation character varying(255) COLLATE pg_catalog."default" NOT NULL,
     first_name character varying(255) COLLATE pg_catalog."default" NOT NULL,
     last_name character varying(255) COLLATE pg_catalog."default" NOT NULL,
     email character varying(255) COLLATE pg_catalog."default" NOT NULL,
     password character varying(255) COLLATE pg_catalog."default",
     telephone character varying(255) COLLATE pg_catalog."default",
-    country_iso2 character varying(255) COLLATE pg_catalog."default",
-    specialty_onekey character varying(255) COLLATE pg_catalog."default",
+    country_iso2 character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    language_code character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    specialty_onekey character varying(255) COLLATE pg_catalog."default" NOT NULL,
     status ciam.enum_hcp_profiles_status,
     created_by uuid,
     updated_by uuid,
@@ -27,4 +28,4 @@ CREATE TABLE ciam.hcp_profiles
 )
 
 CREATE TYPE ciam.enum_hcp_profiles_status AS ENUM
-    ('Approved', 'Pending', 'Rejected');
+    ('self_verified', 'manually_verified', 'consent_pending', 'not_verified');

@@ -5,8 +5,12 @@ export function getHcpProfiles(page, status, codbase) {
     const search_params = new URLSearchParams('');
 
     page && search_params.append('page', page);
-    status && search_params.append('status', status);
     codbase && search_params.append('codbase', codbase);
+
+    if(status) {
+        if(Array.isArray(status)) status.forEach(item => search_params.append('status', item));
+        else search_params.append('status', status);
+    }
 
     const url = `/api/hcps${search_params.toString() !== '' ? '?' + search_params.toString() : '' }`;
 
