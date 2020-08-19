@@ -88,7 +88,7 @@ export default function hcpUsers() {
     }
 
     const getSelectedStatus = () => {
-        if(isAllVerifiedStatus()) return 'All Verified';
+        if(Array.isArray(hcps.status)) return isAllVerifiedStatus() ? 'All Verified' : hcps.status.map(status => _.startCase(_.toLower(status.replace('_', ' ')))).join(', ');
         return hcps.status ? _.startCase(_.toLower(hcps.status.replace('_', ' '))) : 'All';
     }
 
