@@ -131,7 +131,6 @@ export default function hcpUsers() {
                                                     }
                                                 </Dropdown.Menu>
                                             </Dropdown>
-
                                             <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-btn-secondary text-white dropdown shadow-sm">
                                                 Status
                                                 <Dropdown.Toggle variant="" className="ml-2 bg-white rounded-0">
@@ -310,4 +309,3 @@ export default function hcpUsers() {
             </div>
         </main >
     );
-}
