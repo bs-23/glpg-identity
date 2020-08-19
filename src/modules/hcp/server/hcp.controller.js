@@ -193,6 +193,16 @@ async function getHcps(req, res) {
 
         const hcps = await Hcp.findAll({
             where: hcp_filter,
+            include: [{
+                model: HcpConsents,
+                as: 'hcpConsents',
+                attributes: ['consent_id'],
+                include: [{
+                    model: ConsentCountry,
+                    as: 'consentCountry',
+                    attributes: ['opt_type'],
+                }]
+            }],
             attributes: { exclude: ['password', 'created_by', 'updated_by'] },
             offset,
             limit,
@@ -201,6 +211,15 @@ async function getHcps(req, res) {
                 ['id', 'ASC']
             ]
         });
+
+        hcps.forEach(hcp => {
+            const list_of_consent_types = hcp['hcpConsents'].map(hcpConsent => hcpConsent.consentCountry.opt_type );
+            const consent_types = new Set(list_of_consent_types);
+            hcp.dataValues.consent_types = [...consent_types];
+            delete hcp.dataValues['hcpConsents'];
+        });
+
+        let a = hcps;
 
         const totalUser = await Hcp.count({//counting total data for pagintaion
             where: hcp_filter
@@ -211,7 +230,6 @@ async function getHcps(req, res) {
             const specialty = specialty_list.find(i => i.cod_id_onekey === user.specialty_onekey);
             (specialty) ? user.dataValues.specialty_description = specialty.cod_description : user.dataValues.specialty_description = null;
             hcp_users.push(user);
-
         });
 
         const data = {

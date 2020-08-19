@@ -1,6 +1,7 @@
 const path = require("path");
 const { DataTypes } = require("sequelize");
 const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequelize"));
+const ConsentCountry = require(path.join(process.cwd(), 'src/modules/consent/server/consent-country.model'));
 
 const HcpConsents = sequelize.cdpConnector.define("hcp_consents", {
     id: {
@@ -37,5 +38,11 @@ const HcpConsents = sequelize.cdpConnector.define("hcp_consents", {
     createdAt: "created_at",
     updatedAt: "updated_at"
 });
+
+HcpConsents.belongsTo(ConsentCountry, {
+    as: 'consentCountry',
+    foreignKey: 'consent_id',
+    targetKey: 'consent_id'
+})
 
 module.exports = HcpConsents;

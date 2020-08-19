@@ -234,8 +234,8 @@ export default function hcpUsers() {
                                                 <th><span className={sort.value === 'last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                 <th><span className={sort.value === 'status' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('status')}>Status<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                 <th><span className={sort.value === 'uuid' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('uuid')}>UUID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                <th><span className={sort.value === 'uuid' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('uuid')}>Consent Type<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th
                                                 <th><span className={sort.value === 'specialty_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('specialty_name')}>Specialty<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className={sort.value === 'consent_type' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('consent_type')}>Consent Type<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -255,7 +255,7 @@ export default function hcpUsers() {
                                                         </td>
                                                         <td>{row.uuid}</td>
                                                         <td>{row.specialty_description}</td>
-                                                        <td>Single Opt-in, Double Opt-in</td>
+                                                        <td>{row.consent_types}</td> 
                                                         <td>
                                                             <span>
                                                                 <Dropdown className="ml-auto dropdown-customize">
