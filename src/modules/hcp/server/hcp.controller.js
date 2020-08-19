@@ -198,11 +198,6 @@ async function getHcps(req, res) {
                 model: HcpConsents,
                 as: 'hcpConsents',
                 attributes: ['consent_id'],
-                include: [{
-                    model: ConsentCountry,
-                    as: 'consentCountry',
-                    attributes: ['opt_type'],
-                }]
             }],
             attributes: { exclude: ['password', 'created_by', 'updated_by'] },
             offset,
@@ -213,14 +208,17 @@ async function getHcps(req, res) {
             ]
         });
 
-        hcps.forEach(hcp => {
-            const list_of_consent_types = hcp['hcpConsents'].map(hcpConsent => hcpConsent.consentCountry.opt_type );
-            const consent_types = new Set(list_of_consent_types);
+        await Promise.all(hcps.map(async hcp => {
+            const consent_types = new Set();
+            
+            await Promise.all(hcp['hcpConsents'].map(async hcpConsent => {
+                const country_consent = await ConsentCountry.findOne({ where: { consent_id: hcpConsent.consent_id }});
+                consent_types.add(country_consent.opt_type);
+            }));
+            
             hcp.dataValues.consent_types = [...consent_types];
             delete hcp.dataValues['hcpConsents'];
-        });
-
-        let a = hcps;
+        }));
 
         const totalUser = await Hcp.count({//counting total data for pagintaion
             where: hcp_filter
