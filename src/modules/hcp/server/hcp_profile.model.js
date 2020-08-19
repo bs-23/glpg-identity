@@ -2,6 +2,7 @@ const path = require('path');
 const bcrypt = require('bcryptjs');
 const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
+const HcpConsents = require('./hcp_consents.model');
 
 const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
     id: {
@@ -88,5 +89,10 @@ const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
 HcpProfile.prototype.validPassword = function (password) {
     return bcrypt.compareSync(password, this.password);
 };
+
+HcpProfile.hasMany(HcpConsents, {
+    as: 'hcpConsents',
+    foreignKey: 'user_id'
+})
 
 module.exports = HcpProfile;
