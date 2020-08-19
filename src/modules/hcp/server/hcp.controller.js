@@ -10,7 +10,7 @@ const HcpArchives = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
-const ConsentLanguage = require(path.join(process.cwd(), 'src/modules/consent/server/consent-language.model'));
+const ConsentLocale = require(path.join(process.cwd(), 'src/modules/consent/server/consent-locale.model'));
 const ConsentCountry = require(path.join(process.cwd(), 'src/modules/consent/server/consent-country.model'));
 const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
@@ -169,19 +169,26 @@ async function getHcps(req, res) {
         const page = req.query.page ? req.query.page - 1 : 0;
         const limit = 15;
         const status = req.query.status === undefined ? null : req.query.status;
-        const country_iso2 = req.query.country_iso2 === undefined ? null : req.query.country_iso2;
+        //const country_iso2 = req.query.country_iso2 === undefined ? null : req.query.country_iso2;
+        const codbase = req.query.codbase === undefined ? null : req.query.codbase;
         const offset = page * limit;
 
         const application_list = (await Hcp.findAll()).map(i => i.get("application_id"));
+
+        const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => i.codbase === codbase).map(i => i.country_iso2);
+        const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
+
         const country_iso2_list = req.user.type === 'admin' ? (await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry", { type: QueryTypes.SELECT })).map(i => i.country_iso2) : (await Hcp.findAll()).map(i => i.get("country_iso2"));
         const countries_ignorecase = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
+
         const specialty_list = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwspecialtymaster", { type: QueryTypes.SELECT });
 
 
         const hcp_filter = {
             status: status === null ? { [Op.or]: ['self_verified', 'manually_verified', 'consent_pending', 'not_verified', null] } : status,
             application_id: req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
-            country_iso2: country_iso2 ? { [Op.any]: ignoreCaseArray(country_iso2) } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : [].concat.apply([], req.user.countries.map(i => ignoreCaseArray(i)))
+            //country_iso2: codbase ? { [Op.or]: country_iso2_for_codbase } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : [].concat.apply([], req.user.countries.map(i => ignoreCaseArray(i)))
+            country_iso2: codbase ? { [Op.any]: [countries_ignorecase_for_codbase] } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : [].concat.apply([], req.user.countries.map(i =>ignoreCaseArray(i)))
         };
 
         const hcps = await Hcp.findAll({
@@ -215,7 +222,8 @@ async function getHcps(req, res) {
             start: limit * page + 1,
             end: offset + limit > totalUser ? totalUser : offset + limit,
             status: status ? status : null,
-            country_iso2: country_iso2 ? country_iso2 : null,
+            // country_iso2: country_iso2 ? country_iso2 : null,
+            codbase: codbase ? codbase : null,
             countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : req.user.countries
         };
 
@@ -414,9 +422,9 @@ async function createHcpProfile(req, res) {
                 const consentDetails = await Consent.findOne({ where: { slug: consentSlug } });
                 if (!consentDetails) return;
 
-                const consentLang = await ConsentLanguage.findOne({
+                const consentLocale = await ConsentLocale.findOne({
                     where: {
-                        language_code: {
+                        locale: {
                             [Op.or]: [
                                 model.language_code.toUpperCase(),
                                 model.language_code.toLowerCase(),
@@ -439,8 +447,7 @@ async function createHcpProfile(req, res) {
                     }
                 });
 
-                if (!consentLang || !consentCountry) return;
-
+                if (!consentLocale || !consentCountry) return;
 
                 if (consentCountry.opt_type === 'double') {
                     hasDoubleOptIn = true;
@@ -449,7 +456,7 @@ async function createHcpProfile(req, res) {
                 consentArr.push({
                     user_id: hcpUser.id,
                     consent_id: consentDetails.id,
-                    title: consentLang.rich_text,
+                    title: consentLocale.rich_text,
                     response: consentResponse,
                     consent_confirmed: consentCountry.opt_type === 'double' ? false : true,
                     created_by: req.user.id,
@@ -553,10 +560,10 @@ async function approveHCPUser(req, res) {
 
         if (userConsents && userConsents.length) {
             const consentIds = userConsents.map(consent => consent.consent_id)
-            const allConsentDetails = await ConsentLanguage.findAll({
+            const allConsentDetails = await ConsentLocale.findAll({
                 where: {
                     consent_id: consentIds,
-                    language_code: hcpUser.language_code.toLowerCase(),
+                    locale: hcpUser.language_code.toLowerCase()
                 }
             });
 
@@ -727,8 +734,8 @@ async function forgetPassword(req, res) {
         const doc = await Hcp.findOne({ where: { email: req.body.email } });
 
         if (!doc) {
-            response.errors.push(new CustomError(`Account doesn't exist`, 404));
-            return res.status(404).send(response);
+            response.data = 'Successfully sent password reset email.';
+            return res.json(response);
         }
 
         const userApplication = await Application.findOne({ where: { id: doc.application_id } });

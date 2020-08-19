@@ -131,6 +131,7 @@ export default function Users() {
                                                 <th><span className="cdp-table__col-sorting">Countries</span></th>
                                                 <th><span className={sort.value === 'created_at' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => sortCdp('created_at')}>Creation Date<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                 <th><span className={sort.value === 'expiry_date' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => sortCdp('expiry_date')}>Expiry Date<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className={sort.value === 'created_by' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => sortCdp('created_by')}>Created By<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -146,6 +147,11 @@ export default function Users() {
                                                     <td>{sortCountries(row.countries)}</td>
                                                     <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                     <td>{(new Date(row.expiry_date)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
+                                                    <td>
+                                                        <NavLink to={`/users/${row.createdByUser.id}`}>
+                                                            {`${row.createdByUser.first_name} ${row.createdByUser.last_name}`} 
+                                                        </NavLink>
+                                                    </td>
                                                     <td>
                                                         <NavLink to={`/users/${row.id}`} className="btn cdp-btn-outline-primary btn-sm"><i class="icon icon-user mr-2"></i>Profile</NavLink>
                                                         {/* <button onClick={() => onDeleteUser(row.id)} className="btn btn-outline-danger btn-sm"><i class="far fa-trash-alt mr-2"></i> Delete</button> */}

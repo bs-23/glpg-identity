@@ -1,11 +1,11 @@
 import axios from 'axios';
 import Types from './hcp.types';
 
-export function getHcpProfiles(page, status, country_iso2) {
+export function getHcpProfiles(page, status, codbase) {
     const search_params = new URLSearchParams('');
 
     page && search_params.append('page', page);
-    country_iso2 && search_params.append('country_iso2', country_iso2);
+    codbase && search_params.append('codbase', codbase);
 
     if(status) {
         if(Array.isArray(status)) status.forEach(item => search_params.append('status', item));

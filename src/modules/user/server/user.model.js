@@ -101,6 +101,8 @@ User.prototype.validPassword = function(password) {
     return bcrypt.compareSync(password, this.password);
 };
 
-User.hasMany(Userrole, {as: 'userrole', foreignKey: 'userId',sourceKey: 'id'});
+User.hasMany(Userrole, { as: 'userrole', foreignKey: 'userId',sourceKey: 'id' });
+
+User.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by' });
 
 module.exports = User;

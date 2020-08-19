@@ -192,7 +192,7 @@ export default function UserForm() {
                                                                                                 }}
                                                                                                 onClick={() => { selectCountry(item.country_iso2, selectedCountries.find(s => s === item.country_iso2) ? true : false) }}
                                                                                             />
-                                                                                            <label className="custom-control-label" for={item.country_iso2}>{item.countryname}</label>
+                                                                                            <label className="custom-control-label" for={item.country_iso2}>{item.codbase_desc}</label>
                                                                                         </div>
                                                                                     )
 

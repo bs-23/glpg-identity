@@ -368,21 +368,25 @@ async function getUsers(req, res) {
     const signedInId = (formatProfile(req.user)).id;
 
     try {
-
-        const users = await User.findAll(
-            {
-                where: {
-                    id: { [Op.ne]: signedInId },
-                    type: 'basic',
-                    countries: country_iso2 ? { [Op.contains]: [country_iso2] } : { [Op.ne]: ["undefined"] }
-                },
-                offset,
-                limit,
-                order: [
-                    ['created_at', 'DESC'],
-                    ['id', 'DESC']
-                ]
-            });
+        const users = await User.findAll({
+            where: {
+                id: { [Op.ne]: signedInId },
+                type: 'basic',
+                countries: country_iso2 ? { [Op.contains]: [country_iso2] } : { [Op.ne]: ["undefined"] }
+            },
+            offset,
+            limit,
+            order: [
+                ['created_at', 'DESC'],
+                ['id', 'DESC']
+            ],
+            include: [{
+                model: User,
+                as: 'createdByUser',
+                attributes: ['id', 'first_name', 'last_name'],
+            }],
+            attributes: { exclude: ['password'] },
+        });
 
         const totalUser = await User.count({
             where: {
@@ -435,7 +439,7 @@ async function getUser(req, res) {
         res.json(formattedUser);
     }
     catch (err) {
-        res.status(500).send(err);
+        res.status(500).send(err); 
     }
 }
 
