@@ -174,13 +174,13 @@ async function getHcps(req, res) {
         const offset = page * limit;
 
         const application_list = (await Hcp.findAll()).map(i => i.get("application_id"));
-        
+
         const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => i.codbase === codbase).map(i => i.country_iso2);
         const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
-        
+
         const country_iso2_list = req.user.type === 'admin' ? (await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry", { type: QueryTypes.SELECT })).map(i => i.country_iso2) : (await Hcp.findAll()).map(i => i.get("country_iso2"));
         const countries_ignorecase = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
-        
+
         const specialty_list = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwspecialtymaster", { type: QueryTypes.SELECT });
 
 
@@ -752,8 +752,8 @@ async function forgetPassword(req, res) {
         const doc = await Hcp.findOne({ where: { email: req.body.email } });
 
         if (!doc) {
-            response.errors.push(new CustomError(`Account doesn't exist`, 404));
-            return res.status(404).send(response);
+            response.data = 'Successfully sent password reset email.';
+            return res.json(response);
         }
 
         const userApplication = await Application.findOne({ where: { id: doc.application_id } });
