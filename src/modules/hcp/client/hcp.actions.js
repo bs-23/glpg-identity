@@ -5,8 +5,12 @@ export function getHcpProfiles(page, status, country_iso2) {
     const search_params = new URLSearchParams('');
 
     page && search_params.append('page', page);
-    status && search_params.append('status', status);
     country_iso2 && search_params.append('country_iso2', country_iso2);
+
+    if(status) {
+        if(Array.isArray(status)) status.forEach(item => search_params.append('status', item));
+        else search_params.append('status', status);
+    }
 
     const url = `/api/hcps${search_params.toString() !== '' ? '?' + search_params.toString() : '' }`;
 

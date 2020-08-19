@@ -179,7 +179,7 @@ async function getHcps(req, res) {
 
 
         const hcp_filter = {
-            status: status === null ? { [Op.or]: ['approved', 'consent_pending', 'not_verified', null] } : status,
+            status: status === null ? { [Op.or]: ['self_verified', 'manually_verified', 'consent_pending', 'not_verified', null] } : status,
             application_id: req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
             country_iso2: country_iso2 ? { [Op.any]: ignoreCaseArray(country_iso2) } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : [].concat.apply([], req.user.countries.map(i => ignoreCaseArray(i)))
         };
@@ -463,7 +463,7 @@ async function createHcpProfile(req, res) {
             });
         }
 
-        hcpUser.status = master_data.individual_id_onekey ? hasDoubleOptIn ? 'consent_pending' : 'approved' : 'not_verified';
+        hcpUser.status = master_data.individual_id_onekey ? hasDoubleOptIn ? 'consent_pending' : 'self_verified' : 'not_verified';
         await hcpUser.save();
 
         response.data = getHcpViewModel(hcpUser.dataValues);
@@ -475,7 +475,7 @@ async function createHcpProfile(req, res) {
             await sendConsentConfirmationMail(hcpUser.dataValues, consentTitles, req.user);
         }
 
-        if (hcpUser.dataValues.status === 'approved') {
+        if (hcpUser.dataValues.status === 'self_verified') {
             await addPasswordResetTokenToUser(hcpUser);
 
             response.data.password_reset_token = hcpUser.dataValues.reset_password_token;
@@ -516,7 +516,7 @@ async function confirmConsents(req, res) {
             });
         }
 
-        hcpUser.status = 'approved';
+        hcpUser.status = hcpUser.individual_id_onekey ? 'self_verified' : 'manually_verified';
         await addPasswordResetTokenToUser(hcpUser);
 
         response.data = {
@@ -566,14 +566,14 @@ async function approveHCPUser(req, res) {
             }
         }
 
-        hcpUser.status = hasDoubleOptIn ? 'consent_pending' : 'approved';
+        hcpUser.status = hasDoubleOptIn ? 'consent_pending' : 'manually_verified';
         await hcpUser.save();
 
         if (hcpUser.dataValues.status === 'consent_pending') {
             await sendConsentConfirmationMail(hcpUser, consentTitles, userApplication);
         }
 
-        if (hcpUser.dataValues.status === 'approved') {
+        if (hcpUser.dataValues.status === 'manually_verified') {
             await addPasswordResetTokenToUser(hcpUser);
             await sendPasswordSetupInstructionMail(hcpUser.dataValues, userApplication);
         }
@@ -733,7 +733,7 @@ async function forgetPassword(req, res) {
 
         const userApplication = await Application.findOne({ where: { id: doc.application_id } });
 
-        if (doc.dataValues.status === 'approved') {
+        if (doc.dataValues.status === 'self_verified' || doc.dataValues.status === 'manually_verified') {
             await addPasswordResetTokenToUser(doc)
 
             await sendPasswordResetInstructionMail(doc, userApplication)
