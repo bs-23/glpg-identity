@@ -139,7 +139,7 @@ export default function UserForm() {
                                         {formikProps => (
                                             <Form onSubmit={formikProps.handleSubmit}>
                                                 <div className="row">
-                                                    <div className="col-12 col-lg-6">
+                                                <div className="col-12 col-lg-8 col-xl-6">
                                                         <div className="row">
                                                             <div className="col-12 col-sm-6">
                                                                 <div className="form-group">
@@ -165,39 +165,35 @@ export default function UserForm() {
                                                             <div className="col-12 col-sm-6">
                                                                 <div className="form-group">
                                                                     <label className="font-weight-bold" htmlFor="phone">Phone Number</label>
-
-
-                                                                <div className="phone-list">
-                                                                    <div className="input-group phone-input">
-                                                                        <span className="input-group-btn">
-                                                                            <Dropdown>
-                                                                                {
-                                                                                    countries.map( (country, index) => {
-                                                                                        return index === selectedCountryCode ? (
-                                                                                        <Dropdown.Toggle key={index} variant="" className="bg-light border rounded-0 rounded-left p-1 pt-2 px-2 d-flex align-items-center ">
-                                                                                            <img height="20" width="20" src={generateCountryIconPath(country.codbase_desc)} title={country.codbase_desc} /> 
-                                                                                            <span className="country-phone-code pl-1">{ CountryCodesObject[country.country_iso2] }</span>
-                                                                                        </Dropdown.Toggle>) : null
-                                                                                    })
-                                                                                }
-                                                                                <Dropdown.Menu>
+                                                                    <div className="phone-list">
+                                                                        <div className="input-group phone-input">
+                                                                            <span className="input-group-btn">
+                                                                                <Dropdown>
                                                                                     {
                                                                                         countries.map( (country, index) => {
-                                                                                            return index === selectedCountryCode ? null : 
-                                                                                            (<Dropdown.Item onClick={() => setSelectedCountryCode(index)} key={index} className="px-2 d-flex align-items-center">
+                                                                                            return index === selectedCountryCode ? (
+                                                                                            <Dropdown.Toggle key={index} variant="" className="border rounded-0 rounded-left p-1 pt-2 px-2 d-flex align-items-center ">
                                                                                                 <img height="20" width="20" src={generateCountryIconPath(country.codbase_desc)} title={country.codbase_desc} /> 
                                                                                                 <span className="country-phone-code pl-1">{ CountryCodesObject[country.country_iso2] }</span>
-                                                                                            </Dropdown.Item>)
+                                                                                            </Dropdown.Toggle>) : null
                                                                                         })
                                                                                     }
-                                                                                </Dropdown.Menu>
-                                                                            </Dropdown>
-                                                                        </span>
-                                                                        <Field data-testid="phone" className="form-control" type="text" name="phone" />
+                                                                                    <Dropdown.Menu>
+                                                                                        {
+                                                                                            countries.map( (country, index) => {
+                                                                                                return index === selectedCountryCode ? null : 
+                                                                                                (<Dropdown.Item onClick={() => setSelectedCountryCode(index)} key={index} className="px-2 d-flex align-items-center">
+                                                                                                    <img height="20" width="20" src={generateCountryIconPath(country.codbase_desc)} title={country.codbase_desc} /> 
+                                                                                                    <span className="country-phone-code pl-1">{ CountryCodesObject[country.country_iso2] }</span>
+                                                                                                </Dropdown.Item>)
+                                                                                            })
+                                                                                        }
+                                                                                    </Dropdown.Menu>
+                                                                                </Dropdown>
+                                                                            </span>
+                                                                            <Field data-testid="phone" className="form-control" type="text" name="phone" />
+                                                                        </div>
                                                                     </div>
-
-                                                                </div>
-
                                                                 <div className="invalid-feedback">
                                                                     <ErrorMessage name="phone" data-testid="phoneError" />
                                                                 </div>
