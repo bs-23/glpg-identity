@@ -40,6 +40,9 @@ module.exports = app => {
     app.route('/api/hcp-profiles/:id/reject')
         .put(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.HCP.value), controller.rejectHCPUser);
 
+    app.route('/api/hcp-profiles/:id/consents')
+        .get(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.HCP.value), controller.getHCPUserConsents);
+
     app.route('/api/hcp-profiles/:id')
         .get(passport.authenticate('application-jwt', { session: false }), controller.getHcpProfile)
         .put(passport.authenticate('application-jwt', { session: false }), controller.editHcp);

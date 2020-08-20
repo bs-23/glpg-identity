@@ -674,6 +674,32 @@ async function getHcpProfile(req, res) {
     }
 }
 
+async function getHCPUserConsents(req, res) {
+    const response = new Response({}, []);
+    try {
+        const doc = await Hcp.findOne({
+            where: { id: req.params.id }
+        });
+
+        if (!doc) {
+            response.errors.push(new CustomError('Profile not found.', 404));
+            return res.status(404).send(response);
+        }
+
+        const userConsentIDs = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id'] });
+
+        if(!userConsentIDs) return res.json([]);
+
+        const userConsents = await Consent.findAll({ where: { id: userConsentIDs.map(consent => consent.consent_id) }, attributes: ['id', 'title'] })
+
+        response.data = userConsents || [];
+        res.json(response);
+    } catch (err) {
+        response.errors.push(new CustomError(err.message, 500));
+        res.status(500).send(response);
+    }
+}
+
 async function changePassword(req, res) {
     const { email, current_password, new_password, confirm_password } = req.body;
 
@@ -877,3 +903,4 @@ exports.getAccessToken = getAccessToken;
 exports.confirmConsents = confirmConsents;
 exports.approveHCPUser = approveHCPUser;
 exports.rejectHCPUser = rejectHCPUser;
+exports.getHCPUserConsents = getHCPUserConsents;
