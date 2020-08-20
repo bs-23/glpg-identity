@@ -34,11 +34,11 @@ beforeEach(() => {
     const limit = 3
     data = {
         users: [
-            { id: '1', first_name: 'John', email: 'email@gmail.com', countries: ['Ireland'] },
-            { id: '2', first_name: 'Smith', email: 'email2@gmail.com', countries: ['Netherlands'] },
-            { id: '3', first_name: 'Carl', email: 'email3@gmail.com', countries: ['Luxembourg'] },
-            { id: '4', first_name: 'Johnson', email: 'email4@gmail.com', countries: ['Netherlands'] },
-            { id: '5', first_name: 'Brandon', email: 'email5@gmail.com', countries: ['Netherlands'] },
+            { id: '1', first_name: 'John', email: 'email@gmail.com', countries: ['Ireland'], createdByUser: '1' },
+            { id: '2', first_name: 'Smith', email: 'email2@gmail.com', countries: ['Netherlands'], createdByUser: '1' },
+            { id: '3', first_name: 'Carl', email: 'email3@gmail.com', countries: ['Luxembourg'], createdByUser: '1' },
+            { id: '4', first_name: 'Johnson', email: 'email4@gmail.com', countries: ['Netherlands'], createdByUser: '1' },
+            { id: '5', first_name: 'Brandon', email: 'email5@gmail.com', countries: ['Netherlands'], createdByUser: '1' },
         ]
     }
 
