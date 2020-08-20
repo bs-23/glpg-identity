@@ -561,7 +561,7 @@ async function resetPassword(req, res) {
 
         if (resetRequest.type === 'set') {
             options.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp/registration-success.html`);
-            options.subject = 'Registration Successfull'
+            options.subject = 'Registration Successful'
             options.data.link = `${req.protocol}://${req.headers.host}/login`
         }
         else {
