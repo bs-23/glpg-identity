@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Switch, Route } from "react-router-dom";
+import { useCookies } from 'react-cookie';
 
 import "bootstrap/scss/bootstrap";
 import "@fortawesome/fontawesome-free/css/all.css";
@@ -51,9 +52,12 @@ axios.interceptors.response.use(response => {
 
 export default function App() {
     const dispatch = useDispatch();
+    const [, , removeCookie] = useCookies();
 
     useEffect(() => {
-        dispatch(getSignedInUserProfile());
+        dispatch(getSignedInUserProfile()).catch(err => {
+            if(err.response.status === 401) removeCookie('logged_in');
+        });
     }, []);
 
     return (
