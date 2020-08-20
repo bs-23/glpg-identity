@@ -30,8 +30,8 @@ module.exports = async function() {
     await sequelize.cdpConnector.sync();
 
     await Application.create(specHelper.defaultApplication);
-    await User.create(specHelper.users.defaultUser);
     await User.create(specHelper.users.defaultAdmin);
+    await User.create(specHelper.users.defaultUser);
     await Hcp_profile.create(specHelper.hcp.defaultUser);
     await ConsentCategory.create(specHelper.consent.demoConsentCategory);
     await Consent.create(specHelper.consent.demoConsent);
