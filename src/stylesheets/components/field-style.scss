@@ -93,3 +93,19 @@ textarea.form-control {
     height: auto;
     min-height: 150px;
 }
+
+
+.phone-list {
+    .dropdown {
+        &-toggle {
+            background: $gray-F2F2F2;
+            cursor: pointer;
+            border-top-left-radius: 3px !important;
+            border-bottom-left-radius: 3px !important;
+
+            &:focus {
+                box-shadow: none;
+            }
+        }
+    }
+}
