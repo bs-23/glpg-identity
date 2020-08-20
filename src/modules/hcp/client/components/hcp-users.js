@@ -15,7 +15,7 @@ export default function hcpUsers() {
     const dispatch = useDispatch();
     const [countries, setCountries] = useState([]);
     const [show, setShow] = useState(false);
-    const [currentAction, setCurrentAction] = useState('');
+    const [currentAction, setCurrentAction] = useState({ userId: null, action: null });
     const [currentUser, setCurrentUser] = useState({});
     const { addToast } = useToasts();
     const [sort, setSort] = useState({ type: 'ASC', value: null });
@@ -47,12 +47,9 @@ export default function hcpUsers() {
     }
 
     const onUpdateStatus = (user) => {
-        axios.get(`/api/hcp-profiles/${user.id}/consents`).then((response) => {
-            user.consents = response.data.data;
-            setCurrentAction('Update Status');
-            setCurrentUser(user);
-            setShow(true);
-        });
+        setCurrentAction({ userId: user.id, action: 'Update Status' });
+        setCurrentUser(user);
+        setShow(true);
     }
 
     const onUpdateStatusSuccess = () => {
@@ -177,7 +174,12 @@ export default function hcpUsers() {
                             </div>
                             <Modal
                                 show={show}
-                                onHide={() => { setCurrentAction(''); setShow(false) }}
+                                onShow={() => {
+                                    axios.get(`/api/hcp-profiles/${currentUser.id}/consents`).then((response) => {
+                                        setCurrentUser({...currentUser, consents: response.data.data });
+                                    });
+                                }}
+                                onHide={() => { setCurrentAction({ action: null, userId: null }); setShow(false) }}
                                 dialogClassName="modal-customize"
                                 aria-labelledby="example-custom-modal-styling-title"
                                 centered
@@ -220,10 +222,10 @@ export default function hcpUsers() {
                                                         .then(() => onUpdateStatusSuccess())
                                                         .catch(err => onUpdateStatusFailure(err))
                                                 }
-                                                setShow(false);
                                                 actions.setSubmitting(false);
                                                 actions.resetForm();
-                                                setCurrentAction('');
+                                                setShow(false);
+                                                setCurrentAction({ action: null, userId: null });
                                             }}
                                         >
                                             {formikProps => (
@@ -292,7 +294,7 @@ export default function hcpUsers() {
                                                             <span>
                                                                 <Dropdown className="ml-auto dropdown-customize">
                                                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm">
-                                                                        {currentAction ? currentAction : 'Select an action'}
+                                                                        {currentAction.userId === row.id ? currentAction.action : 'Select an action'}
                                                                     </Dropdown.Toggle>
                                                                     <Dropdown.Menu>
                                                                         <LinkContainer to="#"><Dropdown.Item>Manage Profile</Dropdown.Item></LinkContainer>
