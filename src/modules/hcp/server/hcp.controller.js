@@ -83,7 +83,7 @@ function getTemplateUrl(fileName, applicationSlug, user) {
     const locale = `${user.language_code}_${user.country_iso2}`;
     const templateUrlInLocale = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${applicationSlug}/${locale.toLowerCase()}/${fileName}`);
 
-    if(fs.existsSync(templateUrlInLocale)) {
+    if (fs.existsSync(templateUrlInLocale)) {
         return templateUrlInLocale;
     }
 
@@ -169,7 +169,7 @@ async function getHcps(req, res) {
         const page = req.query.page ? req.query.page - 1 : 0;
         const limit = 15;
         let status = req.query.status === undefined ? null : req.query.status;
-        if(status) status = Array.isArray(status) ? status.filter(e => Hcp.rawAttributes.status.values.includes(e)) : Hcp.rawAttributes.status.values.includes(status) ? status : [];
+        if (status) status = Array.isArray(status) ? status.filter(e => Hcp.rawAttributes.status.values.includes(e)) : Hcp.rawAttributes.status.values.includes(status) ? status : [];
         //const country_iso2 = req.query.country_iso2 === undefined ? null : req.query.country_iso2;
         const codbase = req.query.codbase === undefined ? null : req.query.codbase;
         const offset = page * limit;
@@ -189,7 +189,7 @@ async function getHcps(req, res) {
             status: status === null ? { [Op.or]: ['self_verified', 'manually_verified', 'consent_pending', 'not_verified', null] } : status,
             application_id: req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
             //country_iso2: codbase ? { [Op.or]: country_iso2_for_codbase } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : [].concat.apply([], req.user.countries.map(i => ignoreCaseArray(i)))
-            country_iso2: codbase ? { [Op.any]: [countries_ignorecase_for_codbase] } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : [].concat.apply([], req.user.countries.map(i =>ignoreCaseArray(i)))
+            country_iso2: codbase ? { [Op.any]: [countries_ignorecase_for_codbase] } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : [].concat.apply([], req.user.countries.map(i => ignoreCaseArray(i)))
         };
 
         const hcps = await Hcp.findAll({
@@ -210,12 +210,12 @@ async function getHcps(req, res) {
 
         await Promise.all(hcps.map(async hcp => {
             const consent_types = new Set();
-            
+
             await Promise.all(hcp['hcpConsents'].map(async hcpConsent => {
-                const country_consent = await ConsentCountry.findOne({ where: { consent_id: hcpConsent.consent_id }});
+                const country_consent = await ConsentCountry.findOne({ where: { consent_id: hcpConsent.consent_id } });
                 consent_types.add(country_consent.opt_type);
             }));
-            
+
             hcp.dataValues.consent_types = [...consent_types];
             delete hcp.dataValues['hcpConsents'];
         }));
@@ -369,13 +369,13 @@ async function createHcpProfile(req, res) {
         response.errors.push(new CustomError('specialty_onekey is missing.', 400, 'specialty_onekey'));
     }
 
-    if(specialty_onekey) {
+    if (specialty_onekey) {
         const specialty_master_data = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwspecialtymaster WHERE cod_id_onekey = $specialty_onekey", {
             bind: { specialty_onekey },
             type: QueryTypes.SELECT
         });
 
-        if(!specialty_master_data.length) {
+        if (!specialty_master_data.length) {
             response.errors.push(new CustomError('specialty_onekey is invalid.', 'specialty_onekey'));
         }
     }
@@ -526,7 +526,7 @@ async function confirmConsents(req, res) {
             return res.status(400).send(response);
         }
 
-        if(hcpUser.status !== 'consent_pending') {
+        if (hcpUser.status !== 'consent_pending') {
             response.errors.push(new CustomError('Invalid token.', 4400));
             return res.status(400).send(response);
         }
