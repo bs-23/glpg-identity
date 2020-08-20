@@ -47,9 +47,12 @@ export default function hcpUsers() {
     }
 
     const onUpdateStatus = (user) => {
-        setCurrentAction('Update Status')
-        setCurrentUser(user)
-        setShow(true)
+        axios.get(`/api/hcp-profiles/${user.id}/consents`).then((response) => {
+            user.consents = response.data.data;
+            setCurrentAction('Update Status');
+            setCurrentUser(user);
+            setShow(true);
+        });
     }
 
     const onUpdateStatusSuccess = () => {
@@ -165,11 +168,6 @@ export default function hcpUsers() {
                                                     <LinkContainer to={`list?status=not_verified${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`}>
                                                         <Dropdown.Item className={hcps.status === 'not_verified' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, 'not_verified', hcps.codbase))}>Not Verified</Dropdown.Item>
                                                     </LinkContainer>
-                                                    {/* <LinkContainer to={`list${hcps.codbase ? `?codbase=${hcps.codbase}` : ''}`}><Dropdown.Item className={hcps.status === null ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, null, hcps.codbase))}>All</Dropdown.Item></LinkContainer>
-                                                    <LinkContainer to={`list?status=approved${hcps.codbase ? `&codbase=${hcps.codbase_desc}` : ''}`}><Dropdown.Item className={hcps.status === 'approved' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, 'approved', hcps.codbase))}>Approved</Dropdown.Item></LinkContainer>
-                                                    <LinkContainer to={`list?status=consent_pending${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`}><Dropdown.Item className={hcps.status === 'consent_pending' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, 'consent_pending', hcps.codbase))}>Consent Pending</Dropdown.Item></LinkContainer>
-                                                    <LinkContainer to={`list?status=not_verified${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`}><Dropdown.Item className={hcps.status === 'not_verified' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, 'not_verified', hcps.codbase))}>Not Verified</Dropdown.Item></LinkContainer> */}
-                                                    {/* <LinkContainer to={`list?page=1&status=Rejected&country_iso2=${hcps.country_iso2}`}><Dropdown.Item className={hcps.status === 'Rejected' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(1, 'Rejected', hcps.country_iso2))}>Rejected</Dropdown.Item></LinkContainer> */}
                                                 </Dropdown.Menu>
                                             </Dropdown>
                                         </React.Fragment>
@@ -198,6 +196,12 @@ export default function hcpUsers() {
                                                 <div className="mt-1">{(new Date(currentUser.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
                                             </div>
                                         </div>
+                                        <h6 className="font-weight-bold mt-3">Consents: </h6>
+                                        {currentUser.consents && currentUser.consents.length && <div className="row mt-1">
+                                            <div className="col">
+                                                {currentUser.consents.map(consent => <div key={consent.id} >{ consent.title }</div> )}
+                                            </div>
+                                        </div>}
                                         <Formik
                                             initialValues={{
                                                 comment: '',
