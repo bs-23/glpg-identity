@@ -7,7 +7,8 @@ import { createUser } from "../user.actions";
 import { registerSchema } from "../user.schema";
 import { useToasts } from "react-toast-notifications";
 import Dropdown from 'react-bootstrap/Dropdown';
-
+// const countryCodes = require('country-codes-list');
+import CountryCodes from 'country-codes-list';
 
 export default function UserForm() {
     const dispatch = useDispatch();
@@ -18,6 +19,12 @@ export default function UserForm() {
     const [selectedCountries, setSelectedCountries] = useState([]);
     const history = useHistory()
     const { addToast } = useToasts()
+    const CountryCodesObject = CountryCodes.customList('countryCode', '+{countryCallingCode}')
+
+    const generateCountryIconPath = (country) => {
+        if(country) return `/assets/flag/flag-${country.toLowerCase().replace(/ /g, "-")}.svg`;
+        return `/assets/flag/flag-placeholder.svg`;
+    }
 
     useEffect(() => {
         async function getCountries() {
@@ -153,35 +160,46 @@ export default function UserForm() {
                                                             <div className="col-12 col-sm-6">
                                                                 <div className="form-group">
                                                                     <label className="font-weight-bold" htmlFor="phone">Phone Number</label>
-                                                                    <Field data-testid="phone" className="form-control" type="text" name="phone" onChange={(e) => onPhoneNumberChange(e, formikProps.handleChange)} />
-                                                                {/*<div className="phone-list">
+                                                                    {/* <Field data-testid="phone" className="form-control" type="text" name="phone" onChange={(e) => onPhoneNumberChange(e, formikProps.handleChange)} /> */}
+                                                                
+                                                                {/* -------------------------------------------------------------------- */}
+
+
+                                                                <div className="phone-list">
                                                                     <div className="input-group phone-input">
                                                                         <span className="input-group-btn">
                                                                             <Dropdown>
-                                                                                <Dropdown.Toggle variant="" id="dropdown-basic" className="bg-light border rounded-0 rounded-left p-1 pt-2 px-2 d-flex align-items-center ">
-                                                                                    <img height="20" width="20" src="/assets/flag/flag-andorra.svg" title="Andorra" /> <span className="country-phone-code pl-1">+44</span>
-                                                                                </Dropdown.Toggle>
+                                                                                {
+                                                                                    countries.map( (country, index) => {
+                                                                                        return index === 0 ? (
+                                                                                        <Dropdown.Toggle key={index} variant="" id="dropdown-basic" className="bg-light border rounded-0 rounded-left p-1 pt-2 px-2 d-flex align-items-center ">
+                                                                                            <img height="20" width="20" src={generateCountryIconPath(country.codbase_desc)} title={country.codbase_desc} /> 
+                                                                                            <span className="country-phone-code pl-1">{ CountryCodesObject[country.country_iso2] }</span>
+                                                                                        </Dropdown.Toggle>) : null
+                                                                                    })
+                                                                                }
                                                                                 <Dropdown.Menu>
-                                                                                    <Dropdown.Item href="#/action-1" className="px-2 d-flex align-items-center"><img height="20" width="20" src="/assets/flag/flag-belgium.svg" title="Belgium" /> <span className="country-phone-code pl-1">+32</span></Dropdown.Item>
-                                                                                    <Dropdown.Item href="#/action-1" className="px-2 d-flex align-items-center"><img height="20" width="20" src="/assets/flag/flag-france.svg" title="France" /> <span className="country-phone-code pl-1">+33</span></Dropdown.Item>
-                                                                                    <Dropdown.Item href="#/action-1" className="px-2 d-flex align-items-center"><img height="20" width="20" src="/assets/flag/flag-germany.svg" title="Germany" /> <span className="country-phone-code pl-1">+32</span></Dropdown.Item>
-                                                                                    <Dropdown.Item href="#/action-1" className="px-2 d-flex align-items-center"><img height="20" width="20" src="/assets/flag/flag-ireland.svg" title="Ireland" /> <span className="country-phone-code pl-1">+33</span></Dropdown.Item>
-                                                                                    <Dropdown.Item href="#/action-1" className="px-2 d-flex align-items-center"><img height="20" width="20" src="/assets/flag/flag-italy.svg" title="Italy" /> <span className="country-phone-code pl-1">+32</span></Dropdown.Item>
-                                                                                    <Dropdown.Item href="#/action-1" className="px-2 d-flex align-items-center"><img height="20" width="20" src="/assets/flag/flag-luxembourg.svg" title="Luxembourg" /> <span className="country-phone-code pl-1">+33</span></Dropdown.Item>
-                                                                                    <Dropdown.Item href="#/action-1" className="px-2 d-flex align-items-center"><img height="20" width="20" src="/assets/flag/flag-monaco.svg" title="Monaco" /> <span className="country-phone-code pl-1">+32</span></Dropdown.Item>
-                                                                                    <Dropdown.Item href="#/action-1" className="px-2 d-flex align-items-center"><img height="20" width="20" src="/assets/flag/flag-netherlands.svg" title="Netherlands" /> <span className="country-phone-code pl-1">+33</span></Dropdown.Item>
-                                                                                    <Dropdown.Item href="#/action-1" className="px-2 d-flex align-items-center"><img height="20" width="20" src="/assets/flag/flag-spain.svg" title="Spain" /> <span className="country-phone-code pl-1">+33</span></Dropdown.Item>
-                                                                                    <Dropdown.Item href="#/action-1" className="px-2 d-flex align-items-center"><img height="20" width="20" src="/assets/flag/flag-united-kingdom.svg" title="United Kingdom" /> <span className="country-phone-code pl-1">+33</span></Dropdown.Item>
+                                                                                    {
+                                                                                        countries.map( (country, index) => {
+                                                                                            return index === 0 ? null : (<Dropdown.Item key={index} href="#/action-1" className="px-2 d-flex align-items-center">
+                                                                                                <img height="20" width="20" src={generateCountryIconPath(country.codbase_desc)} title={country.codbase_desc} /> 
+                                                                                                <span className="country-phone-code pl-1">{ CountryCodesObject[country.country_iso2] }</span>
+                                                                                            </Dropdown.Item>)
+                                                                                        })
+                                                                                    }
                                                                                 </Dropdown.Menu>
                                                                             </Dropdown>
                                                                         </span>
-                                                                        <input type="text" name="" className="form-control" placeholder="" />
+                                                                        {/* <input type="text" name="" className="form-control" placeholder="" /> */}
+                                                                        <Field data-testid="phone" className="form-control" type="text" name="phone" onChange={(e) => onPhoneNumberChange(e, formikProps.handleChange)} />
                                                                     </div>
 
-                                                                </div>*/}
+                                                                </div>
+
+                                                                {/* ------------------- */}
                                                                 <div className="invalid-feedback">
-                                                                        <ErrorMessage name="phone" data-testid="phoneError" />
-                                                                    </div>
+                                                                    <ErrorMessage name="phone" data-testid="phoneError" />
+                                                                </div>
                                                             </div>
                                                             
                                                             </div>
