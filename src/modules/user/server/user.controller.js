@@ -555,14 +555,14 @@ async function resetPassword(req, res) {
         const options = {
             toAddresses: [user.email],
             data: {
-                name: user.first_name + " " + user.last_name || ''
+                name: user.first_name + " " + user.last_name,
+                link: `${req.protocol}://${req.headers.host}/login`
             }
         };
 
         if (resetRequest.type === 'set') {
             options.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp/registration-success.html`);
-            options.subject = 'Registration Successful'
-            options.data.link = `${req.protocol}://${req.headers.host}/login`
+            options.subject = 'Registration Successful';
         }
         else {
             options.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp/password-reset.html`);
