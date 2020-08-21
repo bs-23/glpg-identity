@@ -270,10 +270,12 @@ export default function hcpUsers() {
                                                 <div className="mt-1">{(new Date(currentUser.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
                                             </div>
                                         </div>
-                                        <h6 className="font-weight-bold mt-3">Consents: </h6>
-                                        {currentUser.consents && currentUser.consents.length && <div className="row mt-1">
-                                            <div className="col">
-                                                {currentUser.consents.map(consent => <div key={consent.id} >{ consent.title }</div> )}
+                                        {currentUser.consents && <div>
+                                            { currentUser.consents.length ? <h6 className="font-weight-bold mt-3">Consents: </h6> : null }
+                                            <div className="row mt-1">
+                                                <div className="col">
+                                                    {currentUser.consents.map(consent => <div key={consent.id} >{ consent.title }</div> )}
+                                                </div>
                                             </div>
                                         </div>}
                                         <Formik
