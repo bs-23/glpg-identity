@@ -174,6 +174,7 @@ export default function UserForm() {
                                                                                             return index === selectedCountryCode ? (
                                                                                             <Dropdown.Toggle key={index} variant="" className="border rounded-0 rounded-left p-1 pt-2 px-2 d-flex align-items-center ">
                                                                                                 <img height="20" width="20" src={generateCountryIconPath(country.codbase_desc)} title={country.codbase_desc} /> 
+                                                                                                <span className="country-phone-code pl-1">{ country.codbase_desc }</span>
                                                                                                 <span className="country-phone-code pl-1">{ CountryCodesObject[country.country_iso2] }</span>
                                                                                             </Dropdown.Toggle>) : null
                                                                                         })
@@ -184,6 +185,7 @@ export default function UserForm() {
                                                                                                 return index === selectedCountryCode ? null : 
                                                                                                 (<Dropdown.Item onClick={() => setSelectedCountryCode(index)} key={index} className="px-2 d-flex align-items-center">
                                                                                                     <img height="20" width="20" src={generateCountryIconPath(country.codbase_desc)} title={country.codbase_desc} /> 
+                                                                                                    <span className="country-phone-code pl-1">{ country.codbase_desc }</span>
                                                                                                     <span className="country-phone-code pl-1">{ CountryCodesObject[country.country_iso2] }</span>
                                                                                                 </Dropdown.Item>)
                                                                                             })
