@@ -4,7 +4,7 @@ const PasswordHistory = require(path.join(process.cwd(), "src/modules/core/serve
 const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
 
 
-async function passwordHistoryCheck(newPassword, user) {
+async function isOldPassword(newPassword, user) {
     try {
         const oldPasswords = await PasswordHistory.findOne({ where: { user_id: user.id, application_id: user.application_id } });
 
@@ -27,7 +27,7 @@ async function passwordHistoryCheck(newPassword, user) {
     }
 }
 
-async function oldPasswordSave(user) {
+async function saveOldPassword(user) {
     const oldPassword = user.password;
 
     try {
@@ -59,11 +59,11 @@ async function oldPasswordSave(user) {
     }
 }
 
-function commonPassword(password, user) {
+function isCommonPassword(password, user) {
 
     if (password.includes(user.first_name) || password.includes(user.last_name) || password.includes((user.email).split("@")[0])) return true;
 
-    const commonPasswords = JSON.parse(fs.readFileSync('src/config/server/lib/common-password.json'));
+    const commonPasswords = JSON.parse(fs.readFileSync('src/config/server/lib/common-passwords.json'));
     if (commonPasswords.hasOwnProperty(password)) return true;
 
     return false;
@@ -85,7 +85,7 @@ function validatePassword(password) {
 
 }
 
-exports.passwordHistoryCheck = passwordHistoryCheck;
-exports.oldPasswordSave = oldPasswordSave;
-exports.commonPassword = commonPassword;
+exports.isOldPassword = isOldPassword;
+exports.saveOldPassword = saveOldPassword;
+exports.isCommonPassword = isCommonPassword;
 exports.validatePassword = validatePassword;

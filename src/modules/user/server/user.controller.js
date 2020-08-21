@@ -13,7 +13,7 @@ const RolePermission = require(path.join(process.cwd(), "src/modules/user/server
 const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
 const axios = require("axios");
 const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
-const PasswordPolicy = require(path.join(process.cwd(), "src/modules/core/server/password/password_policy.js"));
+const PasswordPolicy = require(path.join(process.cwd(), "src/modules/core/server/password/password-policy.js"));
 
 function generateAccessToken(user) {
     return jwt.sign({
@@ -418,15 +418,15 @@ async function changePassword(req, res) {
             return res.status(400).send('Current Password not valid');
         }
 
-        if (await PasswordPolicy.passwordHistoryCheck(newPassword, user)) return res.status(400).send('New password can not be your previously used password.');
+        if (await PasswordPolicy.isOldPassword(newPassword, user)) return res.status(400).send('New password can not be your previously used password.');
 
         if (!PasswordPolicy.validatePassword(newPassword)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.')
 
         if (newPassword !== confirmPassword) return res.status(400).send('Passwords should match');
 
-        if (PasswordPolicy.commonPassword(newPassword, user)) return res.status(400).send('Password can not be commonly used passwords or personal info. Try a different one.');
+        if (PasswordPolicy.isCommonPassword(newPassword, user)) return res.status(400).send('Password can not be commonly used passwords or personal info. Try a different one.');
 
-        if (user.password) await PasswordPolicy.oldPasswordSave(user);
+        if (user.password) await PasswordPolicy.saveOldPassword(user);
 
         user.password = newPassword;
         await user.save();
@@ -455,15 +455,15 @@ async function resetPassword(req, res) {
 
         const user = await User.findOne({ where: { id: resetRequest.user_id } });
 
-        if (await PasswordPolicy.passwordHistoryCheck(req.body.newPassword, user)) return res.status(400).send('New password can not be your previously used password.');
+        if (await PasswordPolicy.isOldPassword(req.body.newPassword, user)) return res.status(400).send('New password can not be your previously used password.');
 
         if (!PasswordPolicy.validatePassword(req.body.newPassword)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.');
 
-        if (PasswordPolicy.commonPassword(req.body.newPassword, user)) return res.status(400).send('Password can not be commonly used passwords or personal info. Try a different one.');
+        if (PasswordPolicy.isCommonPassword(req.body.newPassword, user)) return res.status(400).send('Password can not be commonly used passwords or personal info. Try a different one.');
 
         if (req.body.newPassword !== req.body.confirmPassword) return res.status(400).send("Password and confirm password doesn't match.");
 
-        if (user.password) await PasswordPolicy.oldPasswordSave(user);
+        if (user.password) await PasswordPolicy.saveOldPassword(user);
 
         user.update({ password: req.body.newPassword });
         const options = {
