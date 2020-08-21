@@ -15,20 +15,19 @@ async function getConsents(req, res) {
         let { country_iso2, locale } = req.query;
 
         if (!country_iso2) {
-            response.errors.push(new CustomError('Invalid query parameter'));
+            response.errors.push(new CustomError('Invalid query parameters'));
             return res.status(400).send(response);
         }
 
         locale = locale || 'en';
 
         const consentCountries = await ConsentCountry.findAll({where: {
-                country_iso2: {
-                    [Op.or]: [
-                        country_iso2.toUpperCase(),
-                        country_iso2.toLowerCase()
-                    ]
-                }
-            }, include: [{
+            country_iso2: {
+                [Op.or]: [
+                    country_iso2.toUpperCase(),
+                    country_iso2.toLowerCase()
+                ]
+            }}, include: [{
                 model: Consent,
                 as: 'consent',
                 include: [{
@@ -39,14 +38,13 @@ async function getConsents(req, res) {
 
         const consentLocales = await Promise.all(consentCountries.map(async consentCountry => {
             return await ConsentLocale.findAll({where: {
-                    consent_id: consentCountry.consent_id,
-                    locale: {
-                        [Op.or]: [
-                            locale.toUpperCase(),
-                            locale.toLowerCase()
-                        ]
-                    }
-                }, include: [{
+                consent_id: consentCountry.consent_id,
+                locale: {
+                    [Op.or]: [
+                        locale.toUpperCase(),
+                        locale.toLowerCase()
+                    ]
+                }}, include: [{
                     model: Consent,
                     as: 'consent',
                     include: [{
@@ -81,7 +79,12 @@ async function getConsents(req, res) {
             }
         }));
 
-        response.data = await result;
+        if(!result || !result.length) {
+            response.data = [];
+            return res.status(204).send(response);
+        }
+
+        response.data = result;
 
         res.json(response);
     } catch (err) {
