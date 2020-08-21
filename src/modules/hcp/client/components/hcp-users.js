@@ -365,13 +365,12 @@ export default function hcpUsers() {
                                                         <td>
                                                             <span>
                                                                 <Dropdown className="ml-auto dropdown-customize">
-                                                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm">
-                                                                        {currentAction.userId === row.id ? currentAction.action : 'Select an action'}
+                                                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm pb-0">
+                                                                        {/*{currentAction.userId === row.id ? currentAction.action : 'Select an action'}*/}
                                                                     </Dropdown.Toggle>
                                                                     <Dropdown.Menu>
                                                                         <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(row)}>Manage Profile</Dropdown.Item></LinkContainer>
                                                                         {/* <LinkContainer to="#"><Dropdown.Item>Edit Profile</Dropdown.Item></LinkContainer> */}
-
                                                                         {row.status === 'not_verified' && <LinkContainer to="#"><Dropdown.Item onClick={() => onUpdateStatus(row)}>Manage Status</Dropdown.Item></LinkContainer>}
                                                                     </Dropdown.Menu>
                                                                 </Dropdown>

@@ -98,14 +98,46 @@ textarea.form-control {
 .phone-list {
     .dropdown {
         &-toggle {
-            background: $gray-F2F2F2;
+            background: $white-color;
             cursor: pointer;
-            border-top-left-radius: 3px !important;
-            border-bottom-left-radius: 3px !important;
+            position: absolute;
+            z-index: 10;
+            top: 1px;
+            left: 1px;
+            padding-top: 5px !important;
+            padding-right: 0px !important;
 
             &:focus {
                 box-shadow: none;
             }
+
+            &::after {
+                position: absolute;
+                top: 11px;
+                left: 28px;
+                font-size: 10px;
+            }
         }
+
+        &-item {
+            .country-name,
+            .country-phone-code {
+                font-size: 14px;
+            }
+
+            &:active {
+                .country-phone-code {
+                    color: $white-color;
+                }
+            }
+        }
+    }
+
+    .country-phone-code {
+        color: #636A70;
+    }
+
+    .form-control {
+        padding-left: 95px;
     }
 }
