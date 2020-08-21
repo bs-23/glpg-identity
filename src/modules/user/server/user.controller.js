@@ -175,11 +175,13 @@ async function createUser(req, res) {
         first_name,
         last_name,
         email,
+        country_code,
         phone,
         countries,
         roles,
         application_id,
     } = req.body;
+    const phone_number = country_code + phone;
     const validForMonths = 6
     const currentDate = new Date()
 
@@ -189,7 +191,7 @@ async function createUser(req, res) {
             defaults: {
                 first_name,
                 last_name,
-                phone: phone ? phone.replace(/\s+/g, '') : null,
+                phone: phone_number ? phone_number.replace(/\s+/g, '') : null,
                 countries,
                 application_id,
                 created_by: req.user.id,

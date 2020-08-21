@@ -247,7 +247,6 @@ async function getHcps(req, res) {
         response.data = data;
         res.json(response);
     } catch (err) {
-        console.log(err)
         response.errors.push(new CustomError(err.message, 500));
         res.status(500).send(response);
     }
@@ -774,8 +773,19 @@ async function resetPassword(req, res) {
 
 async function forgetPassword(req, res) {
     const response = new Response({}, []);
+    const { email } = req.body;
     try {
-        const doc = await Hcp.findOne({ where: { email: req.body.email } });
+        if(!email) {
+            response.errors.push(new CustomError('Missing required parameters.', 400));
+            return res.status(400).send(response);
+        }
+
+        if (!validator.isEmail(email)) {
+            response.errors.push(new CustomError('The email address format is invalid.', 4000, 'email'));
+            return res.status(400).send(response);
+        }
+
+        const doc = await Hcp.findOne({ where: { email } });
 
         if (!doc) {
             response.data = 'Successfully sent password reset email.';
