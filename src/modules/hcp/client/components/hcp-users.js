@@ -343,7 +343,6 @@ export default function hcpUsers() {
                                                     <th><span className={sort.value === 'uuid' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('uuid')}>UUID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th><span className={sort.value === 'specialty_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('specialty_name')}>Specialty<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th><span className={sort.value === 'consent_type' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('consent_type')}>Consent Type<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                    <th>Single opt-in</th>
                                                     <th>Double opt-in</th>
                                                     <th>Action</th>
                                                 </tr>
@@ -365,9 +364,8 @@ export default function hcpUsers() {
                                                         </td>
                                                         <td>{row.uuid}</td>
                                                         <td>{row.specialty_description}</td>
-                                                        <td>{row.consent_types}</td>
-                                                        <td><i className="fas fa-check-square cdp-text-primary"></i></td>
-                                                        <td><i className="fas fa-window-close text-danger"></i></td>
+                                                        <td>{row.consent_types.includes('single') ? <i className="fas fa-check-square cdp-text-primary"></i> : <i className="fas fa-window-close text-danger"> </i> }</td>
+                                                        <td>{row.consent_types.includes('double') ? <i className="fas fa-check-square cdp-text-primary"></i> : <i className="fas fa-window-close text-danger"> </i> }</td>
                                                         <td>
                                                             <span>
                                                                 <Dropdown className="ml-auto dropdown-customize">
