@@ -774,6 +774,7 @@ async function resetPassword(req, res) {
 async function forgetPassword(req, res) {
     const response = new Response({}, []);
     const { email } = req.body;
+
     try {
         if(!email) {
             response.errors.push(new CustomError('Missing required parameters.', 400));
@@ -850,8 +851,8 @@ async function getSpecialties(req, res) {
         }
 
         if (!masterDataSpecialties || masterDataSpecialties.length === 0) {
-            response.errors.push(new CustomError(`No specialties found for Locale=${locale}`, 404));
-            return res.status(404).send(response);
+            response.data = [];
+            return res.status(204).send(response);
         }
 
         response.data = masterDataSpecialties;
