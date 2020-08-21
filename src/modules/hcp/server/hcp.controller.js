@@ -675,6 +675,8 @@ async function getHcpProfile(req, res) {
 
 async function getHCPUserConsents(req, res) {
     const response = new Response({}, []);
+    const { locale } = req.query;
+
     try {
         const doc = await Hcp.findOne({
             where: { id: req.params.id }
@@ -689,9 +691,10 @@ async function getHCPUserConsents(req, res) {
 
         if(!userConsentIDs) return res.json([]);
 
-        const userConsents = await Consent.findAll({ where: { id: userConsentIDs.map(consent => consent.consent_id) }, attributes: ['id', 'title'] })
+        const userConsents = await ConsentLocale.findAll({ include: { model: Consent, as: 'consent', attributes: ['title'] }, where: { consent_id: userConsentIDs.map(consent => consent.consent_id), locale: locale ? locale.toLowerCase() : 'en' }, attributes: ['consent_id', 'rich_text'] });
 
-        response.data = userConsents || [];
+        response.data = userConsents.map(({ consent_id: id, rich_text, consent: { title } }) => ({ id, title, rich_text: validator.unescape(rich_text) }));
+
         res.json(response);
     } catch (err) {
         response.errors.push(new CustomError(err.message, 500));

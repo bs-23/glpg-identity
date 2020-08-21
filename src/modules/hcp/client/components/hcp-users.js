@@ -9,12 +9,13 @@ import { getHcpProfiles, hcpsSort } from '../hcp.actions';
 import { ApprovalRejectSchema } from '../hcp.schema'
 import axios from 'axios';
 import Modal from 'react-bootstrap/Modal';
-import _ from 'lodash'
+import _ from 'lodash';
+import parse from 'html-react-parser';
 
 export default function hcpUsers() {
     const dispatch = useDispatch();
     const [countries, setCountries] = useState([]);
-    const [show, setShow] = useState(false);
+    const [show, setShow] = useState({ profileManage: false, updateStatus: false });
     const [currentAction, setCurrentAction] = useState({ userId: null, action: null });
     const [currentUser, setCurrentUser] = useState({});
     const { addToast } = useToasts();
@@ -49,7 +50,7 @@ export default function hcpUsers() {
     const onUpdateStatus = (user) => {
         setCurrentAction({ userId: user.id, action: 'Update Status' });
         setCurrentUser(user);
-        setShow(true);
+        setShow({ ...show, updateStatus: true });
     }
 
     const onUpdateStatusSuccess = () => {
@@ -77,6 +78,11 @@ export default function hcpUsers() {
         ))
     };
 
+    const getConsentsForCurrentUser = async () => {
+        const { data } = await axios.get(`/api/hcp-profiles/${currentUser.id}/consents`);
+        setCurrentUser({ ...currentUser, consents: data.data });
+    }
+
     const isAllVerifiedStatus = () => {
         if(Array.isArray(hcps.status)) {
             const allVerifiedStatus = ["self_verified", "manually_verified"];
@@ -90,6 +96,18 @@ export default function hcpUsers() {
     const getSelectedStatus = () => {
         if(Array.isArray(hcps.status)) return isAllVerifiedStatus() ? 'All Verified' : hcps.status.map(status => _.startCase(_.toLower(status.replace('_', ' ')))).join(', ');
         return hcps.status ? _.startCase(_.toLower(hcps.status.replace('_', ' '))) : 'All';
+    }
+
+    const onManageProfile = (user) => {
+        setCurrentAction({ userId: user.id, action: 'Manage Profile' });
+        setShow({ ...show, profileManage: true });
+        setCurrentUser(user);
+    }
+
+    const getCountryName = (country_iso2) => {
+        if(!countries || !country_iso2) return null;
+        const country = countries.find(country => country.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+        return country && country.countryname;
     }
 
     useEffect(() => {
@@ -173,13 +191,67 @@ export default function hcpUsers() {
 
                             </div>
                             <Modal
-                                show={show}
-                                onShow={() => {
-                                    axios.get(`/api/hcp-profiles/${currentUser.id}/consents`).then((response) => {
-                                        setCurrentUser({...currentUser, consents: response.data.data });
-                                    });
-                                }}
-                                onHide={() => { setCurrentAction({ action: null, userId: null }); setShow(false) }}
+                                show={show.profileManage}
+                                onShow={getConsentsForCurrentUser}
+                                onHide={() => { setCurrentAction({ action: null, userId: null }); setShow({ ...show, profileManage: false }) }}
+                                dialogClassName="modal-customize mw-75"
+                                aria-labelledby="example-custom-modal-styling-title"
+                                centered
+                            >
+                                <Modal.Header closeButton>
+                                    <Modal.Title id="example-custom-modal-styling-title">
+                                        Profile Details
+                                    </Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                    <div className="px-4 py-3">
+                                        <div className="row">
+                                            <div className="col">
+                                                <h4 className="mt-1 font-weight-bold">{`${currentUser.first_name || ''} ${currentUser.last_name || ''}`}</h4>
+                                                <div className="">{currentUser.specialty_description}</div>
+                                            </div>
+                                        </div>
+                                        <div className="row mt-3">
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">UUID &amp; OneKeyID</div>
+                                                <div className="">{currentUser.individual_id_onekey || '--'}</div>
+                                            </div>
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Email</div>
+                                                <div className="">{currentUser.email || '--'}</div>
+                                            </div>
+                                        </div>
+                                        <div className="row mt-3">
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Date of Registration</div>
+                                                <div className="">{ currentUser.created_at ? (new Date(currentUser.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.') : '--' }</div>
+                                            </div>
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Phone</div>
+                                                <div className="">{currentUser.telephone || '--'}</div>
+                                            </div>
+                                        </div>
+                                        <div className="row mt-3">
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Country</div>
+                                                <div className="">{getCountryName(currentUser.country_iso2) || '--'}</div>
+                                            </div>
+                                        </div>
+                                        {currentUser.consents && <div className="row mt-4">
+                                            <div className="col">
+                                                {currentUser.consents.map(consent => <div key={consent.id} style={{ fontSize: 14 }} className="mt-3">
+                                                    <div className="font-weight-bold">{consent.title}</div>
+                                                    <div>{parse(consent.rich_text)}</div>
+                                                </div>)}
+                                            </div>
+                                        </div>}
+                                    </div>
+                                </Modal.Body>
+                            </Modal>
+                            <Modal
+                                show={show.updateStatus}
+                                onShow={getConsentsForCurrentUser}
+                                onHide={() => { setCurrentAction({ action: null, userId: null }); setShow({ ...show, updateStatus: false}) }}
                                 dialogClassName="modal-customize"
                                 aria-labelledby="example-custom-modal-styling-title"
                                 centered
@@ -224,7 +296,7 @@ export default function hcpUsers() {
                                                 }
                                                 actions.setSubmitting(false);
                                                 actions.resetForm();
-                                                setShow(false);
+                                                setShow({ ...show, updateStatus: false });
                                                 setCurrentAction({ action: null, userId: null });
                                             }}
                                         >
@@ -297,7 +369,7 @@ export default function hcpUsers() {
                                                                         {currentAction.userId === row.id ? currentAction.action : 'Select an action'}
                                                                     </Dropdown.Toggle>
                                                                     <Dropdown.Menu>
-                                                                        <LinkContainer to="#"><Dropdown.Item>Manage Profile</Dropdown.Item></LinkContainer>
+                                                                        <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(row)}>Manage Profile</Dropdown.Item></LinkContainer>
                                                                         {/* <LinkContainer to="#"><Dropdown.Item>Edit Profile</Dropdown.Item></LinkContainer> */}
 
                                                                         {row.status === 'not_verified' && <LinkContainer to="#"><Dropdown.Item onClick={() => onUpdateStatus(row)}>Manage Status</Dropdown.Item></LinkContainer>}
