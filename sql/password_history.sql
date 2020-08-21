@@ -2,7 +2,7 @@
 
 -- DROP TABLE ciam.password_history;
 
-CREATE TABLE ciam.user_password_history
+CREATE TABLE ciam.password_history
 (
     id uuid NOT NULL,
     user_id uuid NOT NULL,
@@ -17,5 +17,5 @@ CREATE TABLE ciam.user_password_history
 
 TABLESPACE pg_default;
 
-ALTER TABLE ciam.user_password_history
+ALTER TABLE ciam.password_history
     OWNER to postgres;
