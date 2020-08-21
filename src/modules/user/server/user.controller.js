@@ -181,7 +181,7 @@ async function createUser(req, res) {
         roles,
         application_id,
     } = req.body;
-    const phone_number = country_code + phone;
+    const phone_number = phone ? country_code + phone : '';
     const validForMonths = 6
     const currentDate = new Date()
 
