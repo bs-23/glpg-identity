@@ -348,7 +348,7 @@ async function getUser(req, res) {
         if (!user) return res.status(404).send("User is not found or may be removed");
 
         const userApplication = await Application.findOne({ where: { id: user.application_id } });
-        user.application_name = userApplication.name
+        user.application_name = userApplication ? userApplication.name : null;
 
         const formattedUser = formatProfileDetail(user);
 
