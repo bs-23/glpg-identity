@@ -17,6 +17,7 @@ const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequel
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
+const PasswordPolicy = require(path.join(process.cwd(), "src/modules/core/server/password/password_policy.js"));
 
 function generateAccessToken(doc) {
     return jwt.sign({
@@ -687,7 +688,7 @@ async function getHCPUserConsents(req, res) {
 
         const userConsentIDs = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id'] });
 
-        if(!userConsentIDs) return res.json([]);
+        if (!userConsentIDs) return res.json([]);
 
         const userConsents = await Consent.findAll({ where: { id: userConsentIDs.map(consent => consent.consent_id) }, attributes: ['id', 'title'] })
 
@@ -717,10 +718,15 @@ async function changePassword(req, res) {
             return res.status(401).send(response);
         }
 
-        if (new_password !== confirm_password) {
-            response.errors.push(new CustomError(`Password and confirm password doesn't match.`, 4201));
-            return res.status(400).send(response);
-        }
+        if (await PasswordPolicy.passwordHistoryCheck(new_password, doc)) return res.status(400).send('New password can not be your previously used password.');
+
+        if (!PasswordPolicy.validatePassword(new_password)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.');
+
+        if (PasswordPolicy.commonPassword(new_password, doc)) return res.status(400).send('Password can not be commonly used passwords or personal info. Try a different one.');
+
+        if (new_password !== confirm_password) return res.status(400).send("Password and confirm password doesn't match.");
+
+        if (doc.password) await PasswordPolicy.oldPasswordSave(doc);
 
         doc.update({ password: new_password });
 
@@ -755,6 +761,17 @@ async function resetPassword(req, res) {
             return res.status(400).send(response);
         }
 
+        if (await PasswordPolicy.passwordHistoryCheck(req.body.new_password, doc)) return res.status(400).send('New password can not be your previously used password.');
+
+        if (!PasswordPolicy.validatePassword(req.body.new_password)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.');
+
+        if (PasswordPolicy.commonPassword(req.body.new_password, doc)) return res.status(400).send('Password can not be commonly used passwords or personal info. Try a different one.');
+
+        if (req.body.new_password !== req.body.confirm_password) return res.status(400).send("Password and confirm password doesn't match.");
+
+        if (doc.password) await PasswordPolicy.oldPasswordSave(doc);
+
+
         if (doc.password) {
             await sendResetPasswordSuccessMail(doc, req.user);
         } else {
@@ -775,7 +792,7 @@ async function forgetPassword(req, res) {
     const response = new Response({}, []);
     const { email } = req.body;
     try {
-        if(!email) {
+        if (!email) {
             response.errors.push(new CustomError('Missing required parameters.', 400));
             return res.status(400).send(response);
         }
@@ -791,6 +808,7 @@ async function forgetPassword(req, res) {
             response.data = 'Successfully sent password reset email.';
             return res.json(response);
         }
+
 
         const userApplication = await Application.findOne({ where: { id: doc.application_id } });
 

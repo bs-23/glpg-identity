@@ -424,7 +424,7 @@ async function changePassword(req, res) {
 
         if (newPassword !== confirmPassword) return res.status(400).send('Passwords should match');
 
-        if (PasswordPolicy.commonPassword(newPassword, user)) return res.status(400).send('You have chosen a commonly used password. Try a different one.');
+        if (PasswordPolicy.commonPassword(newPassword, user)) return res.status(400).send('Password can not be commonly used passwords or personal info. Try a different one.');
 
         if (user.password) await PasswordPolicy.oldPasswordSave(user);
 
@@ -459,7 +459,7 @@ async function resetPassword(req, res) {
 
         if (!PasswordPolicy.validatePassword(req.body.newPassword)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.');
 
-        if (PasswordPolicy.commonPassword(req.body.newPassword, user)) return res.status(400).send('You have chosen a commonly used password. Try a different one.');
+        if (PasswordPolicy.commonPassword(req.body.newPassword, user)) return res.status(400).send('Password can not be commonly used passwords or personal info. Try a different one.');
 
         if (req.body.newPassword !== req.body.confirmPassword) return res.status(400).send("Password and confirm password doesn't match.");
 
