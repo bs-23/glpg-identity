@@ -57,8 +57,8 @@ module.exports = {
         defaultUser: {
             id: defaultUserId,
             application_id: defaultApplicationId,
-            first_name: 'Default User',
-            last_name: '',
+            first_name: 'Default',
+            last_name: 'User',
             email: 'default-user@cdp.com',
             password: 'strong-password',
             expiry_date: new Date(Date.now() + 24 * 60 * 60 * 1000),

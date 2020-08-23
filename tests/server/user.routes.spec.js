@@ -129,7 +129,7 @@ describe('User Routes', () => {
             .post('/api/users/change-password')
             .set('Cookie', [`access_token=${defaultUser.access_token}`])
             .send({
-                currentPassword: defaultUser.password, 
+                currentPassword: defaultUser.password,
                 newPassword: '1c9QZu5YU%J$',
                 confirmPassword: '1c9QZu5YU%J$'
             });
@@ -183,14 +183,14 @@ describe('User Routes', () => {
         expect(response.statusCode).toBe(200);
     });
 
-    it('Should get "Bad request" with an invalid email in forget-password api', async () => {
+    it('Should get 200 with an invalid email in forget-password api', async () => {
         const response = await request
             .post('/api/users/forgot-password')
             .send({
                 email: faker.internet.email()
             });
 
-        expect(response.statusCode).toBe(400);
+        expect(response.statusCode).toBe(200);
     });
 
     it('Should get "Bad request" without password reset token', async () => {
@@ -207,7 +207,7 @@ describe('User Routes', () => {
     });
 
     it('Should reset password with valid token', async () => {
-        const password = faker.internet.password();
+        const password = 'P@ssW0rD!@#';
         const token = faker.random.uuid();
         const { email } = defaultUser;
         const expireAt = new Date(Date.now() + 60 * 60 * 1000);
