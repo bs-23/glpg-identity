@@ -110,6 +110,16 @@ module.exports = {
             opt_type: 'single',
             country_iso2: 'NL',
             locale: 'en',
+        },
+        demoConsentLocales: {
+            rich_text: '<p>I agree to the Galapagos <a href="https://www.glpg.com/">Terms of Service.</a></p>',
+            consent_id: demoConsentId,
+            locale: 'en'
+        },
+        demoConsentCountry: {
+            consent_id: demoConsentId,
+            country_iso2: 'nl',
+            opt_type: 'single'
         }
     },
     permissions: [
