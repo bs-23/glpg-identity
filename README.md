@@ -13,8 +13,7 @@
 
 ```bash
 PORT=<express_server_port>
-CDP_TOKEN_SECRET=<cdp_token_secret>
-APPLICATION_TOKEN_SECRET=<application_token_secret>
+RECAPTCHA_SITE_KEY=<recaptcha_site_key>
 POSTGRES_CDP_URL=<postgresql_connection_string>
 POSTGRES_CDP_DATABASE=<database_name>
 AWS_ACCESS_KEY_ID=<aws_access_key_id>

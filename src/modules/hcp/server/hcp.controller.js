@@ -727,17 +727,34 @@ async function changePassword(req, res) {
             return res.status(401).send(response);
         }
 
-        if (await PasswordPolicies.isOldPassword(new_password, doc)) return res.status(400).send('New password can not be your previously used password.');
+        if (await PasswordPolicies.minimumPasswordAge(doc.last_password_changed)) {
+            response.errors.push(new CustomError(`Yannot change password before 1 day`, 4202));
+            return res.status(400).send(response);
+        }
 
-        if (!PasswordPolicies.validatePassword(new_password)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.');
+        if (await PasswordPolicies.isOldPassword(new_password, doc)) {
+            response.errors.push(new CustomError(`New password can not be your previously used password.`, 400));
+            return res.status(400).send(response);
+        }
 
-        if (PasswordPolicies.isCommonPassword(new_password, doc)) return res.status(400).send('Password can not be commonly used passwords or personal info. Try a different one.');
+        if (!PasswordPolicies.validatePassword(new_password)) {
+            response.errors.push(new CustomError(`Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.`, 4200));
+            return res.status(400).send(response);
+        }
 
-        if (new_password !== confirm_password) return res.status(400).send("Password and confirm password doesn't match.");
+        if (PasswordPolicies.isCommonPassword(new_password, doc)) {
+            response.errors.push(new CustomError(`Password can not be commonly used passwords or personal info. Try a different one.`, 400));
+            return res.status(400).send(response);
+        }
+
+        if (new_password !== confirm_password) {
+            response.errors.push(new CustomError(`Password and confirm password doesn't match.`, 4201));
+            return res.status(400).send(response);
+        }
 
         if (doc.password) await PasswordPolicies.saveOldPassword(doc);
 
-        doc.update({ password: new_password });
+        doc.update({ password: new_password, last_password_changed: new Date(Date.now()) });
 
         await sendChangePasswordSuccessMail(doc, req.user);
 
@@ -760,6 +777,11 @@ async function resetPassword(req, res) {
             return res.status(404).send(response);
         }
 
+        if (await PasswordPolicies.minimumPasswordAge(doc.last_password_changed)) {
+            response.errors.push(new CustomError(`Yannot change password before 1 day`, 4202));
+            return res.status(400).send(response);
+        }
+
         if (doc.reset_password_expires < Date.now()) {
             response.errors.push(new CustomError('Password reset token has been expired. Please request again.', 4400));
             return res.status(400).send(response);
@@ -770,13 +792,25 @@ async function resetPassword(req, res) {
             return res.status(400).send(response);
         }
 
-        if (await PasswordPolicies.isOldPassword(req.body.new_password, doc)) return res.status(400).send('New password can not be your previously used password.');
+        if (await PasswordPolicies.isOldPassword(req.body.new_password, doc)) {
+            response.errors.push(new CustomError(`New password can not be your previously used password.`, 400));
+            return res.status(400).send(response);
+        }
 
-        if (!PasswordPolicies.validatePassword(req.body.new_password)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.');
+        if (!PasswordPolicies.validatePassword(req.body.new_password)) {
+            response.errors.push(new CustomError(`Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.`, 4200));
+            return res.status(400).send(response);
+        }
 
-        if (PasswordPolicies.isCommonPassword(req.body.new_password, doc)) return res.status(400).send('Password can not be commonly used passwords or personal info. Try a different one.');
+        if (PasswordPolicies.isCommonPassword(req.body.new_password, doc)) {
+            response.errors.push(new CustomError(`Password can not be commonly used passwords or personal info. Try a different one.`, 400));
+            return res.status(400).send(response);
+        }
 
-        if (req.body.new_password !== req.body.confirm_password) return res.status(400).send("Password and confirm password doesn't match.");
+        if (req.body.new_password !== req.body.confirm_password) {
+            response.errors.push(new CustomError(`Password and confirm password doesn't match.`, 4201));
+            return res.status(400).send(response);
+        }
 
         if (doc.password) await PasswordPolicies.saveOldPassword(doc);
 
@@ -786,11 +820,11 @@ async function resetPassword(req, res) {
             await sendRegistrationSuccessMail(doc, req.user);
         }
 
-        await doc.update({ password: req.body.new_password, reset_password_token: null, reset_password_expires: null });
+        await doc.update({ password: req.body.new_password, last_password_changed: new Date(Date.now()), reset_password_token: null, reset_password_expires: null });
 
         await doc.update(
             { failed_auth_attempt: 0 },
-            { where: { email: doc.dataValues.email }}
+            { where: { email: doc.dataValues.email } }
         );
 
         response.data = 'Password reset successfully.';
@@ -921,7 +955,7 @@ async function getAccessToken(req, res) {
         if (doc && (!doc.password || !doc.validPassword(password))) {
             await doc.update(
                 { failed_auth_attempt: parseInt(doc.dataValues.failed_auth_attempt ? doc.dataValues.failed_auth_attempt : '0') + 1 },
-                { where: { email: email }}
+                { where: { email: email } }
             );
         }
 

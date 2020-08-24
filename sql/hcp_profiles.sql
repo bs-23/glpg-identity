@@ -21,6 +21,7 @@ CREATE TABLE ciam.hcp_profiles
     reset_password_expires character varying(255) COLLATE pg_catalog."default",
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
+    last_password_changed timestamp with time zone,
     CONSTRAINT hcp_profiles_pkey PRIMARY KEY (id),
     CONSTRAINT hcp_profiles_email_key UNIQUE (email),
     CONSTRAINT hcp_profiles_individual_id_onekey_key UNIQUE (individual_id_onekey),
