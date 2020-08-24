@@ -24,6 +24,7 @@ module.exports = async function() {
     require(path.join(process.cwd(), 'src/modules/consent/server/consent-locale.model'));
     require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
     require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
+    require(path.join(process.cwd(), 'src/modules/core/server/password/password-history.model'));
     const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
     const RolePermission = require(path.join(process.cwd(), "src/modules/user/server/role/role-permission.model"));
     const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
