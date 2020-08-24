@@ -106,7 +106,7 @@ export default function hcpUsers() {
 
     const getCountryName = (country_iso2) => {
         if(!countries || !country_iso2) return null;
-        const country = countries.find(country => country.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+        const country = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
         return country && country.countryname;
     }
 
@@ -242,6 +242,7 @@ export default function hcpUsers() {
                                             <div className="col">
                                                 {currentUser.consents.map(consent => <div key={consent.id} style={{ fontSize: 14 }} className="mt-3">
                                                     <div className="font-weight-bold">{consent.title}</div>
+                                                    <div>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
                                                     <div>{parse(consent.rich_text)}</div>
                                                 </div>)}
                                             </div>

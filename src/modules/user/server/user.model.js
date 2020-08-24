@@ -63,6 +63,10 @@ const User = sequelize.cdpConnector.define('users', {
     countries: {
         type: DataTypes.ARRAY(DataTypes.STRING)
     },
+    login_failed_attempt: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    },
     last_login: {
         type: DataTypes.DATE
     },
@@ -97,11 +101,11 @@ const User = sequelize.cdpConnector.define('users', {
     updatedAt: 'updated_at'
 });
 
-User.prototype.validPassword = function(password) {
+User.prototype.validPassword = function (password) {
     return bcrypt.compareSync(password, this.password);
 };
 
-User.hasMany(Userrole, { as: 'userrole', foreignKey: 'userId',sourceKey: 'id' });
+User.hasMany(Userrole, { as: 'userrole', foreignKey: 'userId', sourceKey: 'id' });
 
 User.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by' });
 

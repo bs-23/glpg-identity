@@ -688,13 +688,19 @@ async function getHCPUserConsents(req, res) {
             return res.status(404).send(response);
         }
 
-        const userConsentIDs = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id'] });
+        const userConsents = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id', 'updated_at'] });
 
-        if (!userConsentIDs) return res.json([]);
+        if (!userConsents) return res.json([]);
 
-        const userConsents = await ConsentLocale.findAll({ include: { model: Consent, as: 'consent', attributes: ['title'] }, where: { consent_id: userConsentIDs.map(consent => consent.consent_id), locale: locale ? locale.toLowerCase() : 'en' }, attributes: ['consent_id', 'rich_text'] });
+        const userConsentDetails = await ConsentLocale.findAll({ include: { model: Consent, as: 'consent', attributes: ['title'] }, where: { consent_id: userConsents.map(consent => consent.consent_id), locale: locale ? locale.toLowerCase() : 'en' }, attributes: ['consent_id', 'rich_text'] });
 
-        response.data = userConsents.map(({ consent_id: id, rich_text, consent: { title } }) => ({ id, title, rich_text: validator.unescape(rich_text) }));
+        const consentResponse = userConsentDetails.map(({ consent_id: id, rich_text, consent: { title } }) => ({ id, title, rich_text: validator.unescape(rich_text) }));
+
+        response.data = consentResponse.map(conRes => {
+            const matchedConsent = userConsents.find(consent => consent.consent_id === conRes.id);
+            conRes.consent_given_time = matchedConsent ? matchedConsent.updated_at : null;
+            return conRes;
+        });
 
         res.json(response);
     } catch (err) {
@@ -782,6 +788,10 @@ async function resetPassword(req, res) {
         }
 
         await doc.update({ password: req.body.new_password, reset_password_token: null, reset_password_expires: null });
+
+        await doc.update(
+            { login_failed_attempt: 0 },
+            { where: { email: doc.dataValues.email } });
 
         response.data = 'Password reset successfully.';
         res.send(response);
@@ -904,6 +914,17 @@ async function getAccessToken(req, res) {
 
         const doc = await Hcp.findOne({ where: { email } });
 
+        if (doc && doc.dataValues.login_failed_attempt >= 5) {
+            response.errors.push(new CustomError('Your account has been locked for consecutive failed login attempts.', 4002));
+            return res.status(401).send(response);
+        }
+
+        if (doc && (!doc.password || !doc.validPassword(password))) {
+            await doc.update(
+                { login_failed_attempt: parseInt(doc.dataValues.login_failed_attempt ? doc.dataValues.login_failed_attempt : '0') + 1 },
+                { where: { email: email } });
+        }
+
         if (!doc || !doc.password || !doc.validPassword(password)) {
             response.errors.push(new CustomError('Invalid email or password.', 401));
             return res.status(401).json(response);
@@ -914,6 +935,10 @@ async function getAccessToken(req, res) {
             access_token: generateAccessToken(doc.dataValues),
             retention_period: '48 hours'
         }
+
+        await doc.update(
+            { login_failed_attempt: 0 },
+            { where: { email: email } });
 
         res.json(response);
     } catch (err) {
