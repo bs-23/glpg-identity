@@ -728,7 +728,7 @@ async function changePassword(req, res) {
         }
 
         if (await PasswordPolicies.minimumPasswordAge(doc.password_updated_at)) {
-            response.errors.push(new CustomError(`Yannot change password before 1 day`, 4202));
+            response.errors.push(new CustomError(`You cannot change password before 1 day`, 4202));
             return res.status(400).send(response);
         }
 
