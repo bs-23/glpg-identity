@@ -1,14 +1,17 @@
 import { NavLink } from 'react-router-dom';
 import Dropdown from 'react-bootstrap/Dropdown';
+import Modal from 'react-bootstrap/Modal';
+import Accordion from 'react-bootstrap/Accordion';
+import Card from 'react-bootstrap/Card';
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Form, Formik, Field, ErrorMessage } from "formik";
 import { useToasts } from 'react-toast-notifications';
 import { getHcpProfiles, hcpsSort } from '../hcp.actions';
-import { ApprovalRejectSchema } from '../hcp.schema'
+import { ApprovalRejectSchema } from '../hcp.schema';
 import axios from 'axios';
-import Modal from 'react-bootstrap/Modal';
+
 import _ from 'lodash';
 import parse from 'html-react-parser';
 
@@ -239,12 +242,22 @@ export default function hcpUsers() {
                                             </div>
                                         </div>
                                         {currentUser.consents && <div className="row mt-4">
-                                            <div className="col">
-                                                {currentUser.consents.map(consent => <div key={consent.id} style={{ fontSize: 14 }} className="mt-3">
-                                                    <div className="font-weight-bold">{consent.title}</div>
-                                                    <div>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
-                                                    <div>{parse(consent.rich_text)}</div>
-                                                </div>)}
+                                            <div className="col accordion-consent rounded shadow-sm p-0">
+                                                <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Consents</h4>
+                                                <Accordion>{currentUser.consents.map(consent =>
+                                                        <Card key={consent.id} className="mt-3">
+                                                            <Accordion.Collapse eventKey={consent.id}>
+                                                                <Card.Body className="pl-5">
+                                                                    <div>{parse(consent.rich_text)}</div>
+                                                                    <div>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
+                                                                </Card.Body>
+                                                            </Accordion.Collapse>
+                                                            <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
+                                                                <span className="d-flex align-items-center"><i class="icon icon-check-filled cdp-text-primary mr-3"></i> {consent.title}</span>
+                                                                <i className="icon icon-arrow-down ml-2 accordion-consent__icon-down"></i>
+                                                            </Accordion.Toggle>
+                                                        </Card>
+                                                )}</Accordion>
                                             </div>
                                         </div>}
                                     </div>

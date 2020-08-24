@@ -1,4 +1,5 @@
-.faq {
+.faq,
+.accordion-consent {
 
     &__header {
         color: $primary-color;
@@ -58,7 +59,8 @@
         }
 
         .collapse.show + .card-header {
-            .faq__icon-down {
+            .faq__icon-down,
+            .accordion-consent__icon-down {
                 transform: rotate(180deg)
             }
         }
