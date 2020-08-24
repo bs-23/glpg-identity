@@ -12,18 +12,11 @@ async function isOldPassword(newPassword, user) {
         }
 
         if (oldPasswords !== null) {
-            oldPasswords.passwords.forEach(element => {
-                if (bcrypt.compareSync(newPassword, element)) {
-                    // console.log(newPassword);
-                    return true;
-                }
-            });
+            const isOldPassword = oldPasswords.passwords.find(p => bcrypt.compareSync(newPassword, p));
+            return !!isOldPassword;
         }
 
-        // return true;
-
         return false;
-
     } catch (error) {
         return false;
     }
