@@ -106,7 +106,7 @@ export default function hcpUsers() {
 
     const getCountryName = (country_iso2) => {
         if(!countries || !country_iso2) return null;
-        const country = countries.find(country => country.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+        const country = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
         return country && country.countryname;
     }
 
