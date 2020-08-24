@@ -151,11 +151,6 @@ async function login(req, res) {
         }
 
 
-        if (user.type === 'basic' && user.expiry_date <= new Date()) {
-            await user.update({ status: 'inactive' })
-            return res.status(401).send('Expired')
-        }
-
         const isSiteVerified = await verifySite(recaptchaToken);
 
         if (!isSiteVerified) {
