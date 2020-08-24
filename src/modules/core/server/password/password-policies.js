@@ -84,10 +84,10 @@ function validatePassword(password) {
 
 function minimumPasswordAge(date) {
     if (!date) return false;
-    const date = new Date(new Date(date).getTime() + 60 * 60 * 24 * 1000);
+    const minimumDate = new Date(new Date(date).getTime() + 60 * 60 * 24 * 1000);
     const today = new Date(Date.now());
 
-    if (today < date) return true;
+    if (today < minimumDate) return true;
     return false;
 
 }
