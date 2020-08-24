@@ -191,6 +191,7 @@ export default function hcpUsers() {
 
                             </div>
                             <Modal
+                                size="lg"
                                 show={show.profileManage}
                                 onShow={getConsentsForCurrentUser}
                                 onHide={() => { setCurrentAction({ action: null, userId: null }); setShow({ ...show, profileManage: false }) }}
@@ -250,6 +251,7 @@ export default function hcpUsers() {
                                 </Modal.Body>
                             </Modal>
                             <Modal
+                                
                                 show={show.updateStatus}
                                 onShow={getConsentsForCurrentUser}
                                 onHide={() => { setCurrentAction({ action: null, userId: null }); setShow({ ...show, updateStatus: false}) }}
@@ -268,14 +270,14 @@ export default function hcpUsers() {
                                             <div className="col">
                                                 <h4 className="font-weight-bold">{`${currentUser.first_name} ${currentUser.last_name}`}</h4>
                                                 <div className="mt-1">{currentUser.email}</div>
-                                                <div className="mt-1">{(new Date(currentUser.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
+                                                <div className="mt-1 pb-2">{(new Date(currentUser.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
                                             </div>
                                         </div>
                                         {currentUser.consents && <div>
-                                            { currentUser.consents.length ? <h6 className="font-weight-bold mt-3">Consents: </h6> : null }
-                                            <div className="row mt-1">
+                                            { currentUser.consents.length ? <h5 className="font-weight-bold my-3">Consents: </h5> : null }
+                                            <div className="row pb-3">
                                                 <div className="col">
-                                                    {currentUser.consents.map(consent => <div key={consent.id} >{ consent.title }</div> )}
+                                                    {currentUser.consents.map(consent => <div className="pb-1" key={consent.id} ><i className="icon icon-check-filled cdp-text-primary mr-2 small"></i>{ consent.title }</div> )}
                                                 </div>
                                             </div>
                                         </div>}
