@@ -5,7 +5,7 @@ import UserForm from "./components/user-form.component";
 import UserManagement from "./components/user-management.component";
 import ChangePasswordForm from "./components/password.component";
 import UserDetails from "./components/user-details.component";
-import PasswordComponent from "./components/password.component"
+// import PasswordComponent from "./components/password.component"
 import PrivateRoute from "../../core/client/PrivateRoute";
 import Roles from "./components/roles.component";
 

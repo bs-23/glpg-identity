@@ -172,9 +172,9 @@ export default function UserForm() {
                                                                                     {
                                                                                         countries.map( (country, index) => {
                                                                                             return index === selectedCountryCode ? (
-                                                                                            <Dropdown.Toggle key={index} variant="" className="p-1 pt-2 pl-2 pr-0 d-flex align-items-center">
+                                                                                            <Dropdown.Toggle key={index} variant="" className="p-1 pt-2 px-2 pr-0 d-flex align-items-center rounded-0">
                                                                                                 <img height="20" width="20" src={generateCountryIconPath(country.codbase_desc)} title={country.codbase_desc} /> 
-                                                                                                <span className="country-phone-code pl-4">{ CountryCodesObject[country.country_iso2] }</span>
+                                                                                                <span className="country-phone-code pl-1">{ CountryCodesObject[country.country_iso2] }</span>
                                                                                             </Dropdown.Toggle>) : null
                                                                                         })
                                                                                     }

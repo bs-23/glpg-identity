@@ -32,10 +32,10 @@ describe('UserForm component', () => {
         }));
 
 
-        countries = [{ countryid: 1, country_iso2: "IE", country_iso3: "IRL", codbase: "WUK", countryname: "Ireland"}]
+        countries = [{ countryid: 1, country_iso2: "IE", country_iso3: "IRL", codbase: "WUK", codbase_desc: 'Ireland', countryname: "Ireland"}]
         roles = [{ id: 1, name: 'role-test', slug: 'role-test'}]
         applications = [{ id: 1, name: "application-test", email: "a@glpg.com", is_active : true, slug: "application-test" }];
-        
+
         mockAxios.onGet('/api/applications').reply(200, applications);
         mockAxios.onGet('/api/countries').reply(200, countries);
         mockAxios.onGet('/api/roles').reply(200, roles)
@@ -71,12 +71,11 @@ describe('UserForm component', () => {
         const phone = await waitFor(() => getByTestId('phone'));
         const countryBtn = await waitFor(() => getByText('Ireland'));
         const roleBtn = await waitFor(() => getByText('role-test'));
-        
-        
+
         await waitFor(() => {
             fireEvent.change(first_name, { target: { value: 'a' } });
             fireEvent.change(last_name, { target: { value: 'a' } });
-            fireEvent.change(email, { target: { value: 'a' } }); 
+            fireEvent.change(email, { target: { value: 'a' } });
             fireEvent.change(phone, { target: { value: 'a' } });
             fireEvent.click(countryBtn);
             fireEvent.click(roleBtn);

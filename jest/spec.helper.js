@@ -57,8 +57,8 @@ module.exports = {
         defaultUser: {
             id: defaultUserId,
             application_id: defaultApplicationId,
-            first_name: 'Default User',
-            last_name: '',
+            first_name: 'Default',
+            last_name: 'User',
             email: 'default-user@cdp.com',
             password: 'strong-password',
             expiry_date: new Date(Date.now() + 24 * 60 * 60 * 1000),
@@ -110,6 +110,16 @@ module.exports = {
             opt_type: 'single',
             country_iso2: 'NL',
             locale: 'en',
+        },
+        demoConsentLocales: {
+            rich_text: '<p>I agree to the Galapagos <a href="https://www.glpg.com/">Terms of Service.</a></p>',
+            consent_id: demoConsentId,
+            locale: 'en'
+        },
+        demoConsentCountry: {
+            consent_id: demoConsentId,
+            country_iso2: 'nl',
+            opt_type: 'single'
         }
     },
     permissions: [

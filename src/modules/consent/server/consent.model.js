@@ -11,7 +11,6 @@ const makeCustomSlug = (title) => {
     return convertToSlug(`${title} ${code}`);
 };
 
-
 const Consent = sequelize.cdpConnector.define('consents', {
     id: {
         allowNull: false,

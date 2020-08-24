@@ -35,8 +35,8 @@ describe('Hcp user component', () => {
         data = {
             data: {
                 users: [
-                    { id: '1', first_name: 'a', last_name: 'a', email: 'a', telephone: '1', uuid: '1', status: 'not_verified' },
-                    { id: '2', first_name: 'b', last_name: 'b', email: 'b', telephone: '2', uuid: '2', status: 'not_verified' }
+                    { id: '1', first_name: 'a', last_name: 'a', email: 'a', telephone: '1', uuid: '1', status: 'not_verified', consent_types: 'double' },
+                    { id: '2', first_name: 'b', last_name: 'b', email: 'b', telephone: '2', uuid: '2', status: 'not_verified', consent_types: 'double' }
                 ],
                 country_iso2: null,
                 end: 1,
@@ -56,6 +56,7 @@ describe('Hcp user component', () => {
         fakeAxios.onGet(`/api/hcps?page=${1}`).reply(200, data);
         fakeAxios.onGet(`/api/hcps?page=${2}`).reply(200, data);
         fakeAxios.onGet(`/api/hcps?page=${3}`).reply(200, data);
+        fakeAxios.onGet('api/hcp-profiles/1/consents').reply(200, []);
         await store.dispatch(getHcpProfiles(1, status, country_iso2));
 
 
@@ -127,9 +128,9 @@ describe('Hcp user component', () => {
         const tbody = await waitFor(() => container.querySelector('tbody'));
         const rows = tbody.childNodes;
         const first_row = rows[0];
-        const actionBtn = first_row.childNodes[8].childNodes[0].childNodes[0].childNodes[0];
+        // console.log('Something: ', first_row.childNodes[8].childNodes[0])
+        const actionBtn = first_row.childNodes[9].childNodes[0].childNodes[0].childNodes[0];
         // actionBtn.setAttribute("aria-expanded", true);
-
         fireEvent.click(actionBtn);
 
         const updateBtn = await waitFor(() => getByText('Manage Status'));

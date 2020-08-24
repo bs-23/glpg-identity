@@ -17,7 +17,7 @@ const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequel
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
-const PasswordPolicy = require(path.join(process.cwd(), "src/modules/core/server/password/password-policy.js"));
+const PasswordPolicies = require(path.join(process.cwd(), 'src/modules/core/server/password/password-policies.js'));
 
 function generateAccessToken(doc) {
     return jwt.sign({
@@ -319,8 +319,8 @@ async function registrationLookup(req, res) {
 
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, 500));
-        res.status(500).send(response);
+        console.error(err);
+        res.status(500).send('Internal server error');
     }
 }
 
@@ -500,8 +500,8 @@ async function createHcpProfile(req, res) {
 
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, 500));
-        res.status(500).send(response);
+        console.error(err);
+        res.status(500).send('Internal server error');
     }
 }
 
@@ -543,8 +543,8 @@ async function confirmConsents(req, res) {
 
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, 500));
-        res.status(500).send(response);
+        console.error(err);
+        res.status(500).send('Internal server error');
     }
 }
 
@@ -606,8 +606,8 @@ async function approveHCPUser(req, res) {
 
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, 500));
-        res.status(500).send(response);
+        console.error(err);
+        res.status(500).send('Internal server error');
     }
 }
 
@@ -639,8 +639,8 @@ async function rejectHCPUser(req, res) {
 
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, 500));
-        res.status(500).send(response);
+        console.error(err);
+        res.status(500).send('Internal server error');
     }
 }
 
@@ -660,8 +660,8 @@ async function getHcpProfile(req, res) {
         response.data = getHcpViewModel(doc.dataValues);
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, 500));
-        res.status(500).send(response);
+        console.error(err);
+        res.status(500).send('Internal server error');
     }
 }
 
@@ -679,18 +679,24 @@ async function getHCPUserConsents(req, res) {
             return res.status(404).send(response);
         }
 
-        const userConsentIDs = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id'] });
+        const userConsents = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id', 'updated_at'] });
 
-        if (!userConsentIDs) return res.json([]);
+        if (!userConsents) return res.json([]);
 
-        const userConsents = await ConsentLocale.findAll({ include: { model: Consent, as: 'consent', attributes: ['title'] }, where: { consent_id: userConsentIDs.map(consent => consent.consent_id), locale: locale ? locale.toLowerCase() : 'en' }, attributes: ['consent_id', 'rich_text'] });
+        const userConsentDetails = await ConsentLocale.findAll({ include: { model: Consent, as: 'consent', attributes: ['title'] }, where: { consent_id: userConsents.map(consent => consent.consent_id), locale: locale ? locale.toLowerCase() : 'en' }, attributes: ['consent_id', 'rich_text'] });
 
-        response.data = userConsents.map(({ consent_id: id, rich_text, consent: { title } }) => ({ id, title, rich_text: validator.unescape(rich_text) }));
+        const consentResponse = userConsentDetails.map(({ consent_id: id, rich_text, consent: { title } }) => ({ id, title, rich_text: validator.unescape(rich_text) }));
+
+        response.data = consentResponse.map(conRes => {
+            const matchedConsent = userConsents.find(consent => consent.consent_id === conRes.id);
+            conRes.consent_given_time = matchedConsent ? matchedConsent.updated_at : null;
+            return conRes;
+        });
 
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, 500));
-        res.status(500).send(response);
+        console.error(err);
+        res.status(500).send('Internal server error');
     }
 }
 
@@ -712,15 +718,15 @@ async function changePassword(req, res) {
             return res.status(401).send(response);
         }
 
-        if (await PasswordPolicy.isOldPassword(new_password, doc)) return res.status(400).send('New password can not be your previously used password.');
+        if (await PasswordPolicies.isOldPassword(new_password, doc)) return res.status(400).send('New password can not be your previously used password.');
 
-        if (!PasswordPolicy.validatePassword(new_password)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.');
+        if (!PasswordPolicies.validatePassword(new_password)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.');
 
-        if (PasswordPolicy.isCommonPassword(new_password, doc)) return res.status(400).send('Password can not be commonly used passwords or personal info. Try a different one.');
+        if (PasswordPolicies.isCommonPassword(new_password, doc)) return res.status(400).send('Password can not be commonly used passwords or personal info. Try a different one.');
 
         if (new_password !== confirm_password) return res.status(400).send("Password and confirm password doesn't match.");
 
-        if (doc.password) await PasswordPolicy.saveOldPassword(doc);
+        if (doc.password) await PasswordPolicies.saveOldPassword(doc);
 
         doc.update({ password: new_password });
 
@@ -729,8 +735,8 @@ async function changePassword(req, res) {
         response.data = 'Password changed successfully.';
         res.send(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, 500));
-        res.status(500).send(response);
+        console.error(err);
+        res.status(500).send('Internal server error');
     }
 }
 
@@ -755,16 +761,15 @@ async function resetPassword(req, res) {
             return res.status(400).send(response);
         }
 
-        if (await PasswordPolicy.isOldPassword(req.body.new_password, doc)) return res.status(400).send('New password can not be your previously used password.');
+        if (await PasswordPolicies.isOldPassword(req.body.new_password, doc)) return res.status(400).send('New password can not be your previously used password.');
 
-        if (!PasswordPolicy.validatePassword(req.body.new_password)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.');
+        if (!PasswordPolicies.validatePassword(req.body.new_password)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.');
 
-        if (PasswordPolicy.isCommonPassword(req.body.new_password, doc)) return res.status(400).send('Password can not be commonly used passwords or personal info. Try a different one.');
+        if (PasswordPolicies.isCommonPassword(req.body.new_password, doc)) return res.status(400).send('Password can not be commonly used passwords or personal info. Try a different one.');
 
         if (req.body.new_password !== req.body.confirm_password) return res.status(400).send("Password and confirm password doesn't match.");
 
-        if (doc.password) await PasswordPolicy.saveOldPassword(doc);
-
+        if (doc.password) await PasswordPolicies.saveOldPassword(doc);
 
         if (doc.password) {
             await sendResetPasswordSuccessMail(doc, req.user);
@@ -774,11 +779,16 @@ async function resetPassword(req, res) {
 
         await doc.update({ password: req.body.new_password, reset_password_token: null, reset_password_expires: null });
 
+        await doc.update(
+            { failed_auth_attempt: 0 },
+            { where: { email: doc.dataValues.email }}
+        );
+
         response.data = 'Password reset successfully.';
         res.send(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, 500));
-        res.status(500).send(response);
+        console.error(err);
+        res.status(500).send('Internal server error');
     }
 }
 
@@ -804,7 +814,6 @@ async function forgetPassword(req, res) {
             return res.json(response);
         }
 
-
         const userApplication = await Application.findOne({ where: { id: doc.application_id } });
 
         if (doc.dataValues.status === 'self_verified' || doc.dataValues.status === 'manually_verified') {
@@ -821,8 +830,8 @@ async function forgetPassword(req, res) {
         res.status(400).send(response);
 
     } catch (err) {
-        response.errors.push(new CustomError(err.message, 500));
-        res.status(500).send(response);
+        console.error(err);
+        res.status(500).send('Internal server error');
     }
 }
 
@@ -870,8 +879,8 @@ async function getSpecialties(req, res) {
         response.data = masterDataSpecialties;
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, 500));
-        res.status(500).send(response);
+        console.error(err);
+        res.status(500).send('Internal server error');
     }
 }
 
@@ -895,6 +904,18 @@ async function getAccessToken(req, res) {
 
         const doc = await Hcp.findOne({ where: { email } });
 
+        if (doc && doc.dataValues.failed_auth_attempt >= 5) {
+            response.errors.push(new CustomError('Your account has been locked for consecutive failed login attempts.', 4002));
+            return res.status(401).send(response);
+        }
+
+        if (doc && (!doc.password || !doc.validPassword(password))) {
+            await doc.update(
+                { failed_auth_attempt: parseInt(doc.dataValues.failed_auth_attempt ? doc.dataValues.failed_auth_attempt : '0') + 1 },
+                { where: { email: email }}
+            );
+        }
+
         if (!doc || !doc.password || !doc.validPassword(password)) {
             response.errors.push(new CustomError('Invalid email or password.', 401));
             return res.status(401).json(response);
@@ -906,10 +927,14 @@ async function getAccessToken(req, res) {
             retention_period: '48 hours'
         }
 
+        await doc.update(
+            { failed_auth_attempt: 0 },
+            { where: { email: email } });
+
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, 500));
-        res.status(500).send(response);
+        console.error(err);
+        res.status(500).send('Internal server error');
     }
 }
 

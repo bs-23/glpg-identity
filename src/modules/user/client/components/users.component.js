@@ -33,7 +33,7 @@ export default function Users() {
         countryArr.sort((a, b) => (a.countryname > b.countryname) ? 1 : -1);
         countryArr.forEach((element, key) => {
             countryString = countryString + element.countryname;
-            (key < countryArr.length - 1) ? countryString = countryString + ', ' : countryString = countryString;
+            if(key < countryArr.length - 1)  countryString = countryString + ', ';
         });
 
         return countryString;

@@ -17,11 +17,14 @@ module.exports = async function() {
     const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
     const ConsentCategory = require(path.join(process.cwd(), 'src/modules/consent/server/consent-category.model'));
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
+    const ConsentLocale = require(path.join(process.cwd(), 'src/modules/consent/server/consent-locale.model'));
+    const ConsentCountry = require(path.join(process.cwd(), 'src/modules/consent/server/consent-country.model'));
 
     require(path.join(process.cwd(), 'src/modules/consent/server/consent-country.model'));
     require(path.join(process.cwd(), 'src/modules/consent/server/consent-locale.model'));
     require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
     require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
+    require(path.join(process.cwd(), 'src/modules/core/server/password/password-history.model'));
     const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
     const RolePermission = require(path.join(process.cwd(), "src/modules/user/server/role/role-permission.model"));
     const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
@@ -35,6 +38,8 @@ module.exports = async function() {
     await Hcp_profile.create(specHelper.hcp.defaultUser);
     await ConsentCategory.create(specHelper.consent.demoConsentCategory);
     await Consent.create(specHelper.consent.demoConsent);
+    await ConsentLocale.create(specHelper.consent.demoConsentLocales);
+    await ConsentCountry.create(specHelper.consent.demoConsentCountry);
     await Permission.bulkCreate(specHelper.permissions, { returning: true, ignoreDuplicates: false })
     await Role.bulkCreate(specHelper.roles, { returning: true, ignoreDuplicates: false })
     await RolePermission.bulkCreate(specHelper.rolePermissions, { returning: true, ignoreDuplicates: false })

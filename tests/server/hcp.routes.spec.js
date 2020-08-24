@@ -65,8 +65,6 @@ describe('HCP Routes', () => {
             });
 
         expect(response.statusCode).toBe(400);
-        expect(response.body).toHaveProperty('errors');
-        expect(response.body.errors).toHaveLength(1);
     });
 
     it('Should change password with valid parameters', async () => {
@@ -219,8 +217,6 @@ describe('HCP Routes', () => {
             .get('/api/hcp-profiles/specialties?locale=unknown_locale')
             .set('Authorization', `bearer ${defaultApplication.access_token}`);
 
-        expect(response.statusCode).toBe(404);
-        expect(response.body).toHaveProperty('errors');
-        expect(response.body.errors).toHaveLength(1);
+        expect(response.statusCode).toBe(204);
     });
 });
