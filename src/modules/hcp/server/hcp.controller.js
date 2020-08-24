@@ -789,6 +789,10 @@ async function resetPassword(req, res) {
 
         await doc.update({ password: req.body.new_password, reset_password_token: null, reset_password_expires: null });
 
+        await doc.update(
+            { login_failed_attempt: 0 },
+            { where: { email: doc.dataValues.email } });
+
         response.data = 'Password reset successfully.';
         res.send(response);
     } catch (err) {
@@ -910,6 +914,17 @@ async function getAccessToken(req, res) {
 
         const doc = await Hcp.findOne({ where: { email } });
 
+        if (doc && doc.dataValues.login_failed_attempt >= 5) {
+            response.errors.push(new CustomError('Your account has been locked for consecutive failed login attempts.', 4002));
+            return res.status(401).send(response);
+        }
+
+        if (doc && (!doc.password || !doc.validPassword(password))) {
+            await doc.update(
+                { login_failed_attempt: parseInt(doc.dataValues.login_failed_attempt ? doc.dataValues.login_failed_attempt : '0') + 1 },
+                { where: { email: email } });
+        }
+
         if (!doc || !doc.password || !doc.validPassword(password)) {
             response.errors.push(new CustomError('Invalid email or password.', 401));
             return res.status(401).json(response);
@@ -920,6 +935,10 @@ async function getAccessToken(req, res) {
             access_token: generateAccessToken(doc.dataValues),
             retention_period: '48 hours'
         }
+
+        await doc.update(
+            { login_failed_attempt: 0 },
+            { where: { email: email } });
 
         res.json(response);
     } catch (err) {

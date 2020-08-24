@@ -136,13 +136,13 @@ async function login(req, res) {
             }]
         });
 
-        if (user.dataValues.login_failed_attempt >= 5) {
+        if (user && user.dataValues.login_failed_attempt >= 5) {
             return res.status(401).send('Your account has been locked for consecutive failed login attempts. Please click Forgot Password to unlock.');
         }
 
         if (user && (!user.password || !user.validPassword(password))) {
             await user.update(
-                { login_failed_attempt: parseInt(user.dataValues.login_failed_attempt) + 1 },
+                { login_failed_attempt: parseInt(user.dataValues.login_failed_attempt ? user.dataValues.login_failed_attempt : '0') + 1 },
                 { where: { email: email } });
         }
 

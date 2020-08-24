@@ -64,7 +64,8 @@ const User = sequelize.cdpConnector.define('users', {
         type: DataTypes.ARRAY(DataTypes.STRING)
     },
     login_failed_attempt: {
-        type: DataTypes.INTEGER
+        type: DataTypes.INTEGER,
+        defaultValue: 0
     },
     last_login: {
         type: DataTypes.DATE
