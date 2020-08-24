@@ -52,16 +52,13 @@ async function saveOldPassword(user) {
                     updated_by: user.id
                 }
             });
-
         }
-
     } catch (err) {
         console.error(err);
     }
 }
 
 function isCommonPassword(password, user) {
-
     if (password.includes(user.first_name) || password.includes(user.last_name) || password.includes((user.email).split("@")[0])) return true;
 
     const commonPasswords = JSON.parse(fs.readFileSync('src/modules/core/server/password/common-passwords.json'));
@@ -83,7 +80,6 @@ function validatePassword(password) {
     }
 
     return true;
-
 }
 
 function minimumPasswordAge(date) {
@@ -93,7 +89,6 @@ function minimumPasswordAge(date) {
 
     if (today < minimumDate) return true;
     return false;
-
 }
 
 
