@@ -718,7 +718,7 @@ async function changePassword(req, res) {
             return res.status(401).send(response);
         }
 
-        if (await PasswordPolicies.minimumPasswordAge(doc.last_password_changed)) {
+        if (await PasswordPolicies.minimumPasswordAge(doc.password_updated_at)) {
             response.errors.push(new CustomError(`Yannot change password before 1 day`, 4202));
             return res.status(400).send(response);
         }
@@ -745,7 +745,7 @@ async function changePassword(req, res) {
 
         if (doc.password) await PasswordPolicies.saveOldPassword(doc);
 
-        doc.update({ password: new_password, last_password_changed: new Date(Date.now()) });
+        doc.update({ password: new_password, password_updated_at: new Date(Date.now()) });
 
         await sendChangePasswordSuccessMail(doc, req.user);
 
@@ -768,8 +768,8 @@ async function resetPassword(req, res) {
             return res.status(404).send(response);
         }
 
-        if (await PasswordPolicies.minimumPasswordAge(doc.last_password_changed)) {
-            response.errors.push(new CustomError(`Yannot change password before 1 day`, 4202));
+        if (await PasswordPolicies.minimumPasswordAge(doc.password_updated_at)) {
+            response.errors.push(new CustomError(`You cannot change password before 1 day`, 4202));
             return res.status(400).send(response);
         }
 
@@ -811,7 +811,7 @@ async function resetPassword(req, res) {
             await sendRegistrationSuccessMail(doc, req.user);
         }
 
-        await doc.update({ password: req.body.new_password, last_password_changed: new Date(Date.now()), reset_password_token: null, reset_password_expires: null });
+        await doc.update({ password: req.body.new_password, password_updated_at: new Date(Date.now()), reset_password_token: null, reset_password_expires: null });
 
         await doc.update(
             { failed_auth_attempt: 0 },

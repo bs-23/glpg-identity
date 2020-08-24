@@ -1,10 +1,10 @@
 const path = require('path');
 const fs = require('fs');
-const PasswordHistory = require(path.join(process.cwd(), 'src/modules/core/server/password/password-history.model.js'));
+const PasswordHistory = require(path.join(process.cwd(), "src/modules/core/server/password/password-history.model.js"));
 
 async function isOldPassword(newPassword, user) {
     try {
-        const oldPasswords = await PasswordHistory.findOne({ where: { user_id: user.id, application_id: user.application_id } });
+        const oldPasswords = await PasswordHistory.findOne({ where: { user_id: user.id } });
 
         if (user && bcrypt.compareSync(newPassword, user.password)) {
             return true;
@@ -20,8 +20,7 @@ async function isOldPassword(newPassword, user) {
 
         return false;
 
-    } catch (err) {
-        console.error(err);
+    } catch (error) {
         return false;
     }
 }
@@ -30,7 +29,7 @@ async function saveOldPassword(user) {
     const oldPassword = user.password;
 
     try {
-        const oldPasswords = await PasswordHistory.findOne({ where: { user_id: user.id, application_id: user.application_id } });
+        const oldPasswords = await PasswordHistory.findOne({ where: { user_id: user.id } });
 
         let passwordArray = oldPasswords ? oldPasswords.passwords : [];
         if (passwordArray.length >= 20) {
@@ -39,31 +38,29 @@ async function saveOldPassword(user) {
 
         passwordArray.push(oldPassword);
         if (oldPasswords) {
-            PasswordHistory.update({ passwords: passwordArray }, { where: { user_id: user.id, application_id: user.application_id } });
+            PasswordHistory.update({ passwords: passwordArray }, { where: { user_id: user.id } });
         } else {
-            const [doc, created] = await PasswordHistory.findOrCreate({
-                where: { user_id: user.id, application_id: user.application_id },
+            await PasswordHistory.findOrCreate({
+                where: { user_id: user.id },
                 defaults: {
                     passwords: passwordArray,
                     created_by: user.id,
                     updated_by: user.id
                 }
             });
-        }
 
-        return true;
+        }
 
     } catch (err) {
         console.error(err);
-        return false;
     }
 }
 
 function isCommonPassword(password, user) {
+
     if (password.includes(user.first_name) || password.includes(user.last_name) || password.includes((user.email).split("@")[0])) return true;
 
-    const commonPasswords = JSON.parse(fs.readFileSync('./common-passwords.json'));
-
+    const commonPasswords = JSON.parse(fs.readFileSync('src/modules/core/server/password/common-passwords.json'));
     if (commonPasswords.hasOwnProperty(password)) return true;
 
     return false;
@@ -82,9 +79,22 @@ function validatePassword(password) {
     }
 
     return true;
+
 }
+
+function minimumPasswordAge(date) {
+    if (!date) return false;
+    const date = new Date(new Date(date).getTime() + 60 * 60 * 24 * 1000);
+    const today = new Date(Date.now());
+
+    if (today < date) return true;
+    return false;
+
+}
+
 
 exports.isOldPassword = isOldPassword;
 exports.saveOldPassword = saveOldPassword;
 exports.isCommonPassword = isCommonPassword;
 exports.validatePassword = validatePassword;
+exports.minimumPasswordAge = minimumPasswordAge;

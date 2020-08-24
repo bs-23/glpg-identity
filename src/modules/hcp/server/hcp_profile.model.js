@@ -76,7 +76,7 @@ const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
     updated_by: {
         type: DataTypes.UUID
     },
-    last_password_changed: {
+    password_updated_at: {
         type: Sequelize.DATE
     },
     reset_password_token: {
