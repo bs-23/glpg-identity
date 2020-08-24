@@ -70,9 +70,29 @@ function mapMasterDataToHcpProfile(masterData) {
     return model;
 }
 
-function generateDefaultEmailOptions(user) {
+function generateEmailOptions(emailType, applicationSlug, user) {
+    const locale = `${user.language_code}_${user.country_iso2}`;
+
+    const emailDataUrl = path.join(process.cwd(), `src/config/server/lib/email-service/email-options.json`);
+    const emailOptionsText = fs.readFileSync(emailDataUrl, 'utf8');
+    const emailOptions = JSON.parse(emailOptionsText);
+    const emailData = emailOptions[emailType];
+
+    let templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${applicationSlug}/en/${emailData.template_url}`)
+    const templateUrlInLocale = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${applicationSlug}/${locale.toLowerCase()}/${emailData.template_url}`);
+
+    if (fs.existsSync(templateUrlInLocale)) {
+        templateUrl = templateUrlInLocale;
+    }
+
+    const subject = emailData.subject[locale] || emailData.subject['en'];
+    const plaintext = emailData.plain_text[locale] || emailData.plain_text['en'];
+
     return {
         toAddresses: [user.email],
+        subject: subject,
+        templateUrl: templateUrl,
+        plaintext: plaintext,
         data: {
             firstName: user.first_name || '',
             lastName: user.last_name || '',
@@ -80,23 +100,10 @@ function generateDefaultEmailOptions(user) {
     };
 }
 
-function getTemplateUrl(fileName, applicationSlug, user) {
-    const locale = `${user.language_code}_${user.country_iso2}`;
-    const templateUrlInLocale = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${applicationSlug}/${locale.toLowerCase()}/${fileName}`);
-
-    if (fs.existsSync(templateUrlInLocale)) {
-        return templateUrlInLocale;
-    }
-
-    return path.join(process.cwd(), `src/config/server/lib/email-service/templates/${applicationSlug}/en/${fileName}`);
-}
-
 async function sendConsentConfirmationMail(user, consents, application) {
     const consentConfirmationToken = generateConsentConfirmationAccessToken(user);
-    const mailOptions = generateDefaultEmailOptions(user);
 
-    mailOptions.templateUrl = getTemplateUrl('double-opt-in-consent-confirm.html', application.slug, user);
-    mailOptions.subject = 'Thank you for registering!';
+    const mailOptions = generateEmailOptions('double-opt-in-consent-confirm', application.slug, user);
     mailOptions.data.consents = consents || [];
     mailOptions.data.link = `${application.consent_confirmation_link}?token=${consentConfirmationToken}&journey=consent_confirmation&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
@@ -104,49 +111,33 @@ async function sendConsentConfirmationMail(user, consents, application) {
 }
 
 async function sendRegistrationSuccessMail(user, application) {
-    const mailOptions = generateDefaultEmailOptions(user);
-
-    mailOptions.subject = `Congratulations your registration was successful`;
-    mailOptions.templateUrl = getTemplateUrl('registration-success.html', application.slug, user);
+    const mailOptions = generateEmailOptions('registration-success', application.slug, user);
     mailOptions.data.loginLink = `${application.login_link}?journey=login&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
 }
 
 async function sendChangePasswordSuccessMail(user, application) {
-    const mailOptions = generateDefaultEmailOptions(user);
-
-    mailOptions.subject = 'Your password has been changed.';
-    mailOptions.templateUrl = getTemplateUrl('password-reset-success.html', application.slug, user);
-
+    mailOptions = generateEmailOptions('password-change-success', application.slug, user);
     await emailService.send(mailOptions);
 }
 
 async function sendResetPasswordSuccessMail(user, application) {
-    const mailOptions = generateDefaultEmailOptions(user);
-
-    mailOptions.subject = 'Your password has been reset';
-    mailOptions.templateUrl = getTemplateUrl('password-reset-success.html', application.slug, user);
+    const mailOptions = generateEmailOptions('password-reset-success', application.slug, user);
     mailOptions.data.loginLink = `${application.login_link}?journey=login&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
 }
 
 async function sendPasswordSetupInstructionMail(user, application) {
-    const mailOptions = generateDefaultEmailOptions(user);
-
-    mailOptions.templateUrl = getTemplateUrl('password-setup-instructions.html', application.slug, user);
-    mailOptions.subject = `Registration verified. Please setup your password`;
+    const mailOptions = generateEmailOptions('password-setup-instructions', application.slug, user);
     mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&journey=single_optin_verified&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
 }
 
 async function sendPasswordResetInstructionMail(user, application) {
-    const mailOptions = generateDefaultEmailOptions(user);
-
-    mailOptions.templateUrl = getTemplateUrl('password-reset-instructions.html', application.slug, user);
-    mailOptions.subject = `Setup Password`;
+    const mailOptions = generateEmailOptions('password-reset-instructions', application.slug, user);
     mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&journey=set_password&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
