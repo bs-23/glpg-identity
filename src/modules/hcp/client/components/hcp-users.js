@@ -332,7 +332,7 @@ export default function hcpUsers() {
                             {hcps['users'] && hcps['users'].length > 0 &&
                                 <React.Fragment>
                                     <div className="shadow-sm bg-white table-responsive">
-                                        <table className="table table-hover table-sm mb-0 cdp-table">
+                                    <table className="table table-hover table-sm mb-0 cdp-table cdp-table-sm">
                                             <thead className="cdp-bg-primary text-white cdp-table__header">
                                                 <tr>
                                                     <th><span className={sort.value === 'email' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('email')}>Email<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
@@ -342,8 +342,8 @@ export default function hcpUsers() {
                                                     <th><span className={sort.value === 'status' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('status')}>Status<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th><span className={sort.value === 'uuid' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('uuid')}>UUID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th><span className={sort.value === 'specialty_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('specialty_name')}>Specialty<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                    <th>Single opt-in</th>
-                                                    <th>Double opt-in</th>
+                                                    <th className="consent-col">Single<br /> Opt-in</th>
+                                                    <th className="consent-col">Double<br /> Opt-in</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
