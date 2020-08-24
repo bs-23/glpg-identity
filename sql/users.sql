@@ -10,7 +10,7 @@ CREATE TABLE ciam.users
     type ciam.enum_users_type DEFAULT 'basic'::ciam.enum_users_type,
     countries character varying(255)[] COLLATE pg_catalog."default",
     permissions character varying(255)[] COLLATE pg_catalog."default",
-    login_failed_attempt integer DEFAULT 0 NOT NULL,
+    failed_auth_attempt integer DEFAULT 0 NOT NULL,
     created_by uuid,
     updated_by uuid,
     created_at timestamp with time zone NOT NULL,

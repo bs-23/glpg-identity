@@ -63,7 +63,7 @@ const User = sequelize.cdpConnector.define('users', {
     countries: {
         type: DataTypes.ARRAY(DataTypes.STRING)
     },
-    login_failed_attempt: {
+    failed_auth_attempt: {
         type: DataTypes.INTEGER,
         defaultValue: 0
     },

@@ -6,7 +6,6 @@ CREATE TABLE ciam.password_history
 (
     id uuid NOT NULL,
     user_id uuid NOT NULL,
-    application_id uuid NOT NULL,
     passwords character varying(255)[] COLLATE pg_catalog."default" NOT NULL,
     created_by uuid,
     updated_by uuid,
@@ -14,8 +13,3 @@ CREATE TABLE ciam.password_history
     updated_at timestamp with time zone NOT NULL,
     CONSTRAINT password_history_pkey PRIMARY KEY (id)
 )
-
-TABLESPACE pg_default;
-
-ALTER TABLE ciam.password_history
-    OWNER to postgres;

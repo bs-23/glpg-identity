@@ -13,7 +13,7 @@ CREATE TABLE ciam.hcp_profiles
     country_iso2 character varying(255) COLLATE pg_catalog."default" NOT NULL,
     language_code character varying(255) COLLATE pg_catalog."default" NOT NULL,
     specialty_onekey character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    login_failed_attempt integer DEFAULT 0 NOT NULL,
+    failed_auth_attempt integer DEFAULT 0 NOT NULL,
     status ciam.enum_hcp_profiles_status,
     created_by uuid,
     updated_by uuid,
