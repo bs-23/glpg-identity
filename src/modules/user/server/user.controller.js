@@ -136,9 +136,20 @@ async function login(req, res) {
             }]
         });
 
+        if (user.dataValues.login_failed_attempt >= 5) {
+            return res.status(401).send('Your account has been locked for consecutive failed login attempts. Please click Forgot Password to unlock.');
+        }
+
+        if (user && (!user.password || !user.validPassword(password))) {
+            await user.update(
+                { login_failed_attempt: parseInt(user.dataValues.login_failed_attempt) + 1 },
+                { where: { email: email } });
+        }
+
         if (!user || !user.password || !user.validPassword(password)) {
             return res.status(401).send('Invalid email or password.');
         }
+
 
         if (user.type === 'basic' && user.expiry_date <= new Date()) {
             await user.update({ status: 'inactive' })
@@ -160,8 +171,13 @@ async function login(req, res) {
 
         const userWithApplication = await attachApplicationInfoToUser(user)
 
+        await user.update(
+            { login_failed_attempt: 0 },
+            { where: { email: email } });
+
         res.json(formatProfile(userWithApplication));
     } catch (err) {
+
         res.status(500).send(err);
     }
 }
@@ -482,6 +498,11 @@ async function resetPassword(req, res) {
             options.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp/password-reset.html`);
             options.subject = 'Your password has been reset'
         }
+
+        await user.update(
+            { login_failed_attempt: 0 },
+            { where: { email: user.dataValues.email } });
+
 
         emailService.send(options);
 
