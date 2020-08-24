@@ -172,10 +172,10 @@ export default function hcpUsers() {
                                                         <Dropdown.Item onClick={() => dispatch(getHcpProfiles(null, ['self_verified', 'manually_verified'], hcps.codbase))}>All Verified</Dropdown.Item>
                                                     </LinkContainer>
                                                     <LinkContainer to={`list?status=self_verified${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`}>
-                                                        <Dropdown.Item className={hcps.status === 'self_verified' ? 'd-none' : 'pl-5'} onClick={() => dispatch(getHcpProfiles(null, 'self_verified', hcps.codbase))}>Self Verified</Dropdown.Item>
+                                                        <Dropdown.Item className={hcps.status === 'self_verified' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, 'self_verified', hcps.codbase))}>Self Verified</Dropdown.Item>
                                                     </LinkContainer>
                                                     <LinkContainer to={`list?status=manually_verified${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`}>
-                                                        <Dropdown.Item className={hcps.status === 'manually_verified' ? 'd-none' : 'pl-5'} onClick={() => dispatch(getHcpProfiles(null, 'manually_verified', hcps.codbase))}>Manually Verified</Dropdown.Item>
+                                                        <Dropdown.Item className={hcps.status === 'manually_verified' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, 'manually_verified', hcps.codbase))}>Manually Verified</Dropdown.Item>
                                                     </LinkContainer>
                                                     <LinkContainer to={`list?status=consent_pending${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`}>
                                                         <Dropdown.Item className={hcps.status === 'consent_pending' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, 'consent_pending', hcps.codbase))}>Consent Pending</Dropdown.Item>
@@ -241,6 +241,7 @@ export default function hcpUsers() {
                                             <div className="col">
                                                 {currentUser.consents.map(consent => <div key={consent.id} style={{ fontSize: 14 }} className="mt-3">
                                                     <div className="font-weight-bold">{consent.title}</div>
+                                                    <div>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
                                                     <div>{parse(consent.rich_text)}</div>
                                                 </div>)}
                                             </div>
@@ -332,7 +333,7 @@ export default function hcpUsers() {
                             {hcps['users'] && hcps['users'].length > 0 &&
                                 <React.Fragment>
                                     <div className="shadow-sm bg-white table-responsive">
-                                        <table className="table table-hover table-sm mb-0 cdp-table">
+                                    <table className="table table-hover table-sm mb-0 cdp-table cdp-table-sm">
                                             <thead className="cdp-bg-primary text-white cdp-table__header">
                                                 <tr>
                                                     <th><span className={sort.value === 'email' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('email')}>Email<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
@@ -342,8 +343,8 @@ export default function hcpUsers() {
                                                     <th><span className={sort.value === 'status' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('status')}>Status<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th><span className={sort.value === 'uuid' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('uuid')}>UUID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th><span className={sort.value === 'specialty_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('specialty_name')}>Specialty<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                    <th>Single opt-in</th>
-                                                    <th>Double opt-in</th>
+                                                    <th className="consent-col">Single<br /> Opt-in</th>
+                                                    <th className="consent-col">Double<br /> Opt-in</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -354,7 +355,7 @@ export default function hcpUsers() {
                                                         <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                         <td>{row.first_name}</td>
                                                         <td>{row.last_name}</td>
-                                                        <td>
+                                                        <td className="text-nowrap">
                                                         {row.status === 'self_verified' ? <span><i className="fa fa-xs fa-circle text-success pr-2"></i>Self Verified</span> :
                                                             row.status === 'manually_verified' ? <span><i className="fa fa-xs fa-circle text-success pr-2"></i>Manually Verified</span> :
                                                                 row.status === 'consent_pending' ? <span><i className="fa fa-xs fa-circle text-warning pr-2"></i>Consent Pending</span> :
