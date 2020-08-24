@@ -14,7 +14,8 @@ AWS.config.update({
 /**
  *
  * @param {string} options.templateUrl - URL of the template file to use
- * @param {string} options.template - Name of teh template to use
+ * @param {string} options.template - Template content
+ * @param {string} options.plaintext - Plaintext to be sent for supporting legacy clients
  * @param {string} options.fromAddress - From email address
  * @param {[string]} options.toAddresses - To email addresses
  * @param {string} options.subject - Subject line for email
@@ -24,8 +25,12 @@ async function send(options) {
     const template = options.template || await getTemplate(options.templateUrl);
 
     const htmlBody = options.data
-        ? transformTemplate(template, options.data)
+        ? transformContent(template, options.data)
         : template;
+
+    const plaintext = options.data
+        ? transformContent(options.plaintext, options.data)
+        : options.plaintext;
 
     // Create SES sendEmail params
     var params = {
@@ -37,6 +42,10 @@ async function send(options) {
                 Html: {
                     Charset: 'UTF-8',
                     Data: htmlBody,
+                },
+                Text: {
+                    Charset: "UTF-8",
+                    Data: plaintext
                 }
             },
             Subject: {
@@ -56,7 +65,7 @@ async function getTemplate(templateUrl) {
     return templateText;
 }
 
-function buildList(listName, list, template){
+function buildList(listName, list, template) {
     let newTemplate = template
 
     const startTag = `{{${listName}}}`
@@ -64,7 +73,7 @@ function buildList(listName, list, template){
     const endTag = `{{${listName}-end}}`
 
     const startTagPos = newTemplate.indexOf(startTag)
-    const contentStartPos =  startTagPos + startTag.length
+    const contentStartPos = startTagPos + startTag.length
     const contentEndPos = newTemplate.indexOf(endTag)
     const endTagPos = contentEndPos + endTag.length
 
@@ -77,22 +86,26 @@ function buildList(listName, list, template){
     return newTemplate
 }
 
-function transformTemplate(templateText, data) {
+function transformContent(content, data) {
+    if(!content) {
+        return '';
+    }
+
     for (var key in data) {
         if (data.hasOwnProperty(key)) {
-            if(Array.isArray(data[key])){
-                templateText = buildList(key, data[key], templateText)
+            if (Array.isArray(data[key])) {
+                content = buildList(key, data[key], content)
                 continue
             }
             const replacer = `[[${key}]]`;
             const value = `${data[key]}`;
-            templateText = templateText
-                ? templateText.replace(replacer, value)
+            content = content
+                ? content.replace(replacer, value)
                 : "";
         }
     }
 
-    return templateText;
+    return content;
 }
 
 exports.send = send;
