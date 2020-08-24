@@ -1,6 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const PasswordHistory = require(path.join(process.cwd(), "src/modules/core/server/password/password-history.model.js"));
+const bcrypt = require('bcryptjs');
 
 async function isOldPassword(newPassword, user) {
     try {
@@ -12,11 +13,14 @@ async function isOldPassword(newPassword, user) {
 
         if (oldPasswords !== null) {
             oldPasswords.passwords.forEach(element => {
-                if (bcrypt.compareSync(newPassword, element.password)) {
+                if (bcrypt.compareSync(newPassword, element)) {
+                    // console.log(newPassword);
                     return true;
                 }
             });
         }
+
+        // return true;
 
         return false;
 
