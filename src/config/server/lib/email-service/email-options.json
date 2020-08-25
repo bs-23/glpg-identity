@@ -48,7 +48,7 @@
             "en": "Registration verified. Please setup your password",
             "nl_nl": "(NL_NL) Registration verified. Please setup your password"
         },
-        "template_url": "password-setup-instructions",
+        "template_url": "password-setup-instructions.html",
         "plain_text": {
             "en": "Hello [[firstName]] [[lastName]],\r\nThank you for registration. We have verified your information.\r\n\r\nPlease click the button below to setup your password on the Galapagos HCP Portal. The link will be valid for only one hour.\r\n\r\n[[link]]\r\n\r\nIf the password reset wasn't requested by you, please report the issue by replying to this mail (support@glpg.com)\r\n\r\nYours Sincerely,\r\nThe GLPG Team",
             "nl_nl": "(NL_NL) Hello [[firstName]] [[lastName]],\r\nThank you for registration. We have verified your information.\r\n\r\nPlease click the button below to setup your password on the Galapagos HCP Portal. The link will be valid for only one hour.\r\n\r\n[[link]]\r\n\r\nIf the password reset wasn't requested by you, please report the issue by replying to this mail (support@glpg.com)\r\n\r\nYours Sincerely,\r\nThe GLPG Team"
