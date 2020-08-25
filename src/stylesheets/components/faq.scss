@@ -66,3 +66,27 @@
         }
     }
 }
+
+.accordion-consent {
+    &__header {
+        color: inherit;
+        font-size: 18px;
+        background: $gray-FAFAFA;
+    }
+
+    .accordion {
+        .card:last-child {
+            border-bottom: 0px !important;
+        }
+    }
+
+    .consent-check {
+        position: relative;
+        top: 2px;
+    }
+
+    .consent-summary {
+        color: #202020;
+        font-size: 14px;
+    }
+}
