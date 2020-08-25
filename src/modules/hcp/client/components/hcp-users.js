@@ -241,10 +241,10 @@ export default function hcpUsers() {
                                                 <div className="">{getCountryName(currentUser.country_iso2) || '--'}</div>
                                             </div>
                                         </div>
-                                        {currentUser.consents && <div className="row mt-4">
+                                        <div className="row mt-4">
                                             <div className="col accordion-consent rounded shadow-sm p-0">
                                                 <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Consents</h4>
-                                                <Accordion>{currentUser.consents.map(consent =>
+                                                {currentUser.consents && currentUser.consents.length  ? <Accordion>{currentUser.consents.map(consent =>
                                                         <Card key={consent.id} className="">
                                                             <Accordion.Collapse eventKey={consent.id}>
                                                                 <Card.Body className="">
@@ -257,14 +257,14 @@ export default function hcpUsers() {
                                                                 <i className="icon icon-arrow-down ml-2 accordion-consent__icon-down"></i>
                                                             </Accordion.Toggle>
                                                         </Card>
-                                                )}</Accordion>
+                                                )}</Accordion> : <div className="p-3">The HCP has not given any consent.</div>}
                                             </div>
-                                        </div>}
+                                        </div>
                                     </div>
                                 </Modal.Body>
                             </Modal>
                             <Modal
-                                
+
                                 show={show.updateStatus}
                                 onShow={getConsentsForCurrentUser}
                                 onHide={() => { setCurrentAction({ action: null, userId: null }); setShow({ ...show, updateStatus: false}) }}
@@ -286,14 +286,16 @@ export default function hcpUsers() {
                                                 <div className="mt-1 pb-2">{(new Date(currentUser.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
                                             </div>
                                         </div>
-                                        {currentUser.consents && <div>
-                                            { currentUser.consents.length ? <h5 className="font-weight-bold my-3">Consents: </h5> : null }
+                                        <div>
+                                            <h5 className="font-weight-bold my-3">Consents: </h5>
                                             <div className="row pb-3">
                                                 <div className="col">
-                                                    {currentUser.consents.map(consent => <div className="pb-1" key={consent.id} ><i className="icon icon-check-filled cdp-text-primary mr-2 small"></i>{ consent.title }</div> )}
+                                                    {currentUser.consents && currentUser.consents.length ?
+                                                        currentUser.consents.map(consent => <div className="pb-1" key={consent.id} ><i className="icon icon-check-filled cdp-text-primary mr-2 small"></i>{ consent.title }</div>)
+                                                        : <div className="pb-1">The HCP has not given any consent.</div>}
                                                 </div>
                                             </div>
-                                        </div>}
+                                        </div>
                                         <Formik
                                             initialValues={{
                                                 comment: '',
