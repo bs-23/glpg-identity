@@ -12,6 +12,7 @@ async function init() {
 
     const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
     const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
+    const User1 = require(path.join(process.cwd(), 'src/modules/user/server/user1.model'));
     const ConsentCategory = require(path.join(process.cwd(), 'src/modules/consent/server/consent-category.model'));
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
     const ConsentLocale = require(path.join(process.cwd(), 'src/modules/consent/server/consent-locale.model'));
@@ -20,6 +21,11 @@ async function init() {
     const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
     const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
     const UserRole = require(path.join(process.cwd(), "src/modules/user/server/user-role.model"));
+    const UserProfile = require(path.join(process.cwd(), "src/modules/user/server/user-profile.model"));
+    const ServiceCategory = require(path.join(process.cwd(), "src/modules/user/server/permission/service-category.model"));
+    const PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permission-set.model"));
+    const PermissionSet_ServiceCategory = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-serviceCategory.model"));
+    const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/userProfile-permissionSet.model"));
     const { Modules } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
     require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model'));
     require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_profile.model'));
@@ -34,6 +40,18 @@ async function init() {
 
     function userSeeder(callback) {
         User.findOrCreate({
+            where: { email: 'glpg.cdp@gmail.com' }, defaults: {
+                first_name: 'System',
+                last_name: 'Admin',
+                password: 'P@ssword123',
+                type: 'admin'
+            }
+        }).then(function () {
+            callback();
+        });
+    }
+    function user1Seeder(callback) {
+        User1.findOrCreate({
             where: { email: 'glpg.cdp@gmail.com' }, defaults: {
                 first_name: 'System',
                 last_name: 'Admin',
@@ -128,6 +146,130 @@ async function init() {
                 });
             });
         });
+    }
+
+    function userProfileSeeder(callback) {
+        User.findOne({ where: { email: 'glpg.cdp@gmail.com' } }).then(admin => {
+
+            const userProfiles = [
+                { title: "System Admin", slug: "system_admin", created_by: admin.id, updated_by: admin.id },
+                { title: "Site Admin", slug: "site_admin", created_by: admin.id, updated_by: admin.id },
+                { title: "GDS", slug: "gds", created_by: admin.id, updated_by: admin.id },
+                { title: "LDS", slug: "lds", created_by: admin.id, updated_by: admin.id }
+            ];
+
+            UserProfile.destroy({ truncate: { cascade: true } }).then(() => {
+                UserProfile.bulkCreate(userProfiles, {
+                    returning: true,
+                    ignoreDuplicates: false
+                }).then(function () {
+                    callback();
+                });
+            });
+        });
+    }
+
+
+    function user1UpdateSeeder(callback) {
+        User1.findOne({
+            where: { email: 'glpg.cdp@gmail.com' }
+        }).then(admin => {
+            UserProfile.findOne({ where: { slug: 'system_admin' } }).then(sysAdminProfile => {
+                admin.update({profileId: sysAdminProfile.id});
+            })
+
+        }).then(function () {
+            callback();
+        });
+    }
+
+    function serviceCategorySeeder(callback) {
+        User.findOne({ where: { email: 'glpg.cdp@gmail.com' } }).then(admin => {
+
+            const serviceCategories = [
+                { title: "Information Management", slug: "hcp", created_by: admin.id, updated_by: admin.id },
+                { title: "User Management", slug: "user", created_by: admin.id, updated_by: admin.id },
+                { title: "Consent Management", slug: "consent", created_by: admin.id, updated_by: admin.id }
+            ];
+
+            ServiceCategory.destroy({ truncate: { cascade: true } }).then(() => {
+                ServiceCategory.bulkCreate(serviceCategories, {
+                    returning: true,
+                    ignoreDuplicates: false
+                }).then(function () {
+                    callback();
+                });
+            });
+        });
+    }
+
+    function permissionSetSeeder(callback) {
+
+        User.findOne({ where: { email: 'glpg.cdp@gmail.com' } }).then(admin => {
+
+            const permissionSet = [
+                { title: "System Admin Permission Set", created_by: admin.id, updated_by: admin.id },
+            ];
+
+            PermissionSet.destroy({ truncate: { cascade: true } }).then(() => {
+                PermissionSet.bulkCreate(permissionSet, {
+                    returning: true,
+                    ignoreDuplicates: false
+                }).then(function () {
+                    callback();
+                });
+            });
+        });
+    }
+
+    function permissionSetServiceCategorySeeder(callback) {
+        User.findOne({ where: { email: 'glpg.cdp@gmail.com' } }).then(admin => {
+            const permissionSet = PermissionSet.findOne({ where: { title: 'System Admin Permission Set' } });
+            const hcpServiceCategory = ServiceCategory.findOne({ where: { slug: 'hcp' } });
+            const userServiceCategory = ServiceCategory.findOne({ where: { slug: 'user' } });
+            const consentServiceCategory = ServiceCategory.findOne({ where: { slug: 'consent' } });
+
+            Promise.all([permissionSet, hcpServiceCategory, userServiceCategory, consentServiceCategory]).then((values) => {
+                const permissionSet_serviceCategory = [
+                    { permissionSetId: values[0].id, serviceCategoryId: values[1].id },
+                    { permissionSetId: values[0].id, serviceCategoryId: values[2].id },
+                    { permissionSetId: values[0].id, serviceCategoryId: values[3].id },
+                ];
+
+                PermissionSet_ServiceCategory.destroy({ truncate: { cascade: true } }).then(() => {
+                    PermissionSet_ServiceCategory.bulkCreate(permissionSet_serviceCategory, {
+                        returning: true,
+                        ignoreDuplicates: false
+                    }).then(function () {
+                        callback();
+                    });
+                });
+            });
+
+        });
+    }
+
+    function userProfilePermissionSetSeeder(callback) {
+
+        const permissionSet = PermissionSet.findOne({ where: { title: 'System Admin Permission Set' } });
+        const userProfile = UserProfile.findOne({ where: { slug: 'system_admin' } });
+
+        Promise.all([permissionSet, userProfile]).then((values) => {
+            const userprofile_permissionSet = [
+                { permissionSetId: values[0].id, userProfileId: values[1].id }
+            ];
+
+            UserProfile_PermissionSet.destroy({ truncate: { cascade: true } }).then(() => {
+                UserProfile_PermissionSet.bulkCreate(userprofile_permissionSet, {
+                    returning: true,
+                    ignoreDuplicates: false
+                }).then(function () {
+                    callback();
+                });
+            });
+        });
+
+
     }
 
     function applicationSeeder(callback) {
@@ -278,7 +420,7 @@ async function init() {
         });
     }
 
-    async.waterfall([userSeeder, permissionSeeder, roleSeeder, rolePermissionSeeder, userRoleSeeder, applicationSeeder, consentSeeder], function (err) {
+    async.waterfall([userSeeder,user1Seeder, permissionSeeder, roleSeeder, rolePermissionSeeder, userRoleSeeder, applicationSeeder, consentSeeder, userProfileSeeder, user1UpdateSeeder, serviceCategorySeeder, permissionSetSeeder, permissionSetServiceCategorySeeder, userProfilePermissionSetSeeder], function (err) {
         if (err) console.error(err);
         else console.info('DB seed completed!');
         process.exit();
