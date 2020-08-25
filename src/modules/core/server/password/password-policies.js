@@ -29,7 +29,7 @@ async function saveOldPassword(user) {
         const oldPasswords = await PasswordHistory.findOne({ where: { user_id: user.id } });
 
         let passwordArray = oldPasswords ? oldPasswords.passwords : [];
-        if (passwordArray.length >= 20) {
+        if (passwordArray.length >= 19) {
             passwordArray.shift();
         }
 
