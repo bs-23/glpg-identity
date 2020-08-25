@@ -733,7 +733,7 @@ async function changePassword(req, res) {
         }
 
         if (await PasswordPolicies.isOldPassword(new_password, doc)) {
-            response.errors.push(new CustomError(`New password can not be your previously used password.`, 400));
+            response.errors.push(new CustomError(`New password can not be your previously used password.`, 4203));
             return res.status(400).send(response);
         }
 
@@ -794,7 +794,7 @@ async function resetPassword(req, res) {
         }
 
         if (await PasswordPolicies.isOldPassword(req.body.new_password, doc)) {
-            response.errors.push(new CustomError(`New password can not be your previously used password.`, 400));
+            response.errors.push(new CustomError(`New password can not be your previously used password.`, 4203));
             return res.status(400).send(response);
         }
 
