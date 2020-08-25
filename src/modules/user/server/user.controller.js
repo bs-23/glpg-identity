@@ -288,7 +288,7 @@ async function getUsers(req, res) {
     const page = req.query.page ? req.query.page - 1 : 0;
     if (page < 0) return res.status(404).send("page must be greater or equal 1");
 
-    const limit = 3;
+    const limit = 15;
     const country_iso2 = req.query.country_iso2 === 'null' ? null : req.query.country_iso2;
     const offset = page * limit;
 
