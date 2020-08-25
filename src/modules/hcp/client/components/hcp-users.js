@@ -245,15 +245,15 @@ export default function hcpUsers() {
                                             <div className="col accordion-consent rounded shadow-sm p-0">
                                                 <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Consents</h4>
                                                 <Accordion>{currentUser.consents.map(consent =>
-                                                        <Card key={consent.id} className="mt-3">
+                                                        <Card key={consent.id} className="">
                                                             <Accordion.Collapse eventKey={consent.id}>
-                                                                <Card.Body className="pl-5">
+                                                                <Card.Body className="">
                                                                     <div>{parse(consent.rich_text)}</div>
                                                                     <div>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
                                                                 </Card.Body>
                                                             </Accordion.Collapse>
-                                                            <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
-                                                                <span className="d-flex align-items-center"><i class="icon icon-check-filled cdp-text-primary mr-3"></i> {consent.title}</span>
+                                                        <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
+                                                            <span className="d-flex align-items-center"><i class="icon icon-check-filled cdp-text-primary mr-4 consent-check"></i> <span className="consent-summary">{consent.title}</span></span>
                                                                 <i className="icon icon-arrow-down ml-2 accordion-consent__icon-down"></i>
                                                             </Accordion.Toggle>
                                                         </Card>
