@@ -26,7 +26,7 @@
             "en": "Your password has been changed.",
             "nl_nl": "(NL_NL) Your password has been changed."
         },
-        "template_url": "password-reset-success",
+        "template_url": "password-reset-success.html",
         "plain_text": {
             "en": "Hello [[firstName]] [[lastName]],\r\nYour password has been reset successfully on the Galapagos HCP portal.\r\n\r\n[[loginLink]]\r\n\r\nIf the password reset wasn’t requested by you, please report the issue by replying to this mail support@glpg.com\r\n\r\nYours Sincerely,\r\nThe GLPG Team",
             "nl_nl": "(NL_NL) Hello [[firstName]] [[lastName]],\r\nYour password has been reset successfully on the Galapagos HCP portal.\r\n\r\n[[loginLink]]\r\n\r\nIf the password reset wasn’t requested by you, please report the issue by replying to this mail support@glpg.com\r\n\r\nYours Sincerely,\r\nThe GLPG Team"
@@ -37,7 +37,7 @@
             "en": "Your password has been reset.",
             "nl_nl": "(NL_NL) Your password has been reset."
         },
-        "template_url": "password-reset-success",
+        "template_url": "password-reset-success.html",
         "plain_text": {
             "en": "Hello [[firstName]] [[lastName]],\r\nYour password has been reset successfully on the Galapagos HCP portal.\r\n\r\n[[loginLink]]\r\n\r\nIf the password reset wasn’t requested by you, please report the issue by replying to this mail support@glpg.com\r\n\r\nYours Sincerely,\r\nThe GLPG Team",
             "nl_nl": "(NL_NL) Hello [[firstName]] [[lastName]],\r\nYour password has been reset successfully on the Galapagos HCP portal.\r\n\r\n[[loginLink]]\r\n\r\nIf the password reset wasn’t requested by you, please report the issue by replying to this mail support@glpg.com\r\n\r\nYours Sincerely,\r\nThe GLPG Team"

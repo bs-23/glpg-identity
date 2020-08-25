@@ -118,7 +118,7 @@ async function sendRegistrationSuccessMail(user, application) {
 }
 
 async function sendChangePasswordSuccessMail(user, application) {
-    mailOptions = generateEmailOptions('password-change-success', application.slug, user);
+    const mailOptions = generateEmailOptions('password-change-success', application.slug, user);
     await emailService.send(mailOptions);
 }
 
