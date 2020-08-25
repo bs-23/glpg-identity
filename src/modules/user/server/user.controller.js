@@ -141,7 +141,7 @@ async function login(req, res) {
         if (user && (!user.password || !user.validPassword(password))) {
             await user.update(
                 { failed_auth_attempt: parseInt(user.dataValues.failed_auth_attempt ? user.dataValues.failed_auth_attempt : '0') + 1 },
-                { where: { email: email }}
+                { where: { email: email } }
             );
         }
 
@@ -166,7 +166,7 @@ async function login(req, res) {
 
         await user.update(
             { failed_auth_attempt: 0 },
-            { where: { email: email }}
+            { where: { email: email } }
         );
 
         res.json(formatProfile(userWithApplication));
@@ -288,7 +288,7 @@ async function getUsers(req, res) {
     const page = req.query.page ? req.query.page - 1 : 0;
     if (page < 0) return res.status(404).send("page must be greater or equal 1");
 
-    const limit = 15;
+    const limit = 3;
     const country_iso2 = req.query.country_iso2 === 'null' ? null : req.query.country_iso2;
     const offset = page * limit;
 
@@ -499,7 +499,7 @@ async function resetPassword(req, res) {
 
         await user.update(
             { failed_auth_attempt: 0 },
-            { where: { email: user.dataValues.email }}
+            { where: { email: user.dataValues.email } }
         );
 
         emailService.send(options);
