@@ -247,13 +247,13 @@ export default function hcpUsers() {
                                                 <Accordion>{currentUser.consents.map(consent =>
                                                         <Card key={consent.id} className="">
                                                             <Accordion.Collapse eventKey={consent.id}>
-                                                                <Card.Body className="pl-5">
+                                                                <Card.Body className="">
                                                                     <div>{parse(consent.rich_text)}</div>
                                                                     <div>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
                                                                 </Card.Body>
                                                             </Accordion.Collapse>
                                                         <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
-                                                            <span className="d-flex align-items-center"><i class="icon icon-check-filled cdp-text-primary mr-3 consent-check"></i> <span className="consent-summary">{consent.title}</span></span>
+                                                            <span className="d-flex align-items-center"><i class="icon icon-check-filled cdp-text-primary mr-4 consent-check"></i> <span className="consent-summary">{consent.title}</span></span>
                                                                 <i className="icon icon-arrow-down ml-2 accordion-consent__icon-down"></i>
                                                             </Accordion.Toggle>
                                                         </Card>

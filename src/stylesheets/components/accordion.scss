@@ -75,8 +75,35 @@
     }
 
     .accordion {
-        .card:last-child {
+        .card {
             border-bottom: 0px !important;
+            position: relative;
+
+            &:after {
+                content: "";
+                display: block;
+                position: absolute;
+                bottom: 0px;
+                height: 1px;
+                background: #E8E8E8;
+                width: calc(100% - 42px);
+                right: 0px;
+            }
+
+            &:last-child {
+                &:after {
+                    display: none;
+                }
+            }
+
+            &-body {
+                margin-left: 42px;
+                padding: 15px;
+
+                p {
+                    margin-bottom: 0px;
+                }
+            }
         }
     }
 
