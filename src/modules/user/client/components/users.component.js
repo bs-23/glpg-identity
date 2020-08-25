@@ -57,7 +57,6 @@ export default function Users() {
     }, []);
 
     useEffect(() => {
-        console.log("here");
         sortWithUrlChange();
     }, [userdata.users]);
 
