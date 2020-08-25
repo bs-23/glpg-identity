@@ -1,6 +1,6 @@
 import { string, object, ref, array } from 'yup';
 import XRegExp from 'xregexp'
-import phoneNumber from 'awesome-phonenumber'
+// import phoneNumber from 'awesome-phonenumber'
 
 function validatePassword(password) {
     const minLength = 8;
@@ -18,10 +18,10 @@ function validatePassword(password) {
 
 }
 
-const validatePhone = phone => {
-    if (!phone) return true
-    return phoneNumber(phone).isValid()
-}
+// const validatePhone = phone => {
+//     if (!phone) return true
+//     return phoneNumber(phone).isValid()
+// }
 
 export const loginSchema = object().shape({
     email: string()
@@ -51,9 +51,9 @@ export const registerSchema = object().shape({
         .matches(/^[+]+/, 'This field must start with a plus.')
         .matches(/^[+]?[ 0-9]+$/, 'Must conform to international phone number format and can only contain digits, spaces or plus.'),
     phone: string()
-        // .matches(/^[+]+/, 'This field must start with a plus.')
-        // .matches(/^[+]?[ 0-9]+$/, 'Must conform to international phone number format and can only contain digits, spaces or plus.')
-        .matches(/^[0-9]*$/, 'This field only contains digits.'),
+        .matches(/^[0-9]*$/, 'This field only contains digits.')
+        .min(4, 'This field must be at least 4 characters long.')
+        .max(15, 'This field must be at most 15 characters long.'),
         // .test('is-valid-phone', 'Must be a valid international phone number.', validatePhone),
     countries: string()
         .required('Must select at least one country'),
