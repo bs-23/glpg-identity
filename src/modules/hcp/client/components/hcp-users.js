@@ -1,14 +1,17 @@
 import { NavLink } from 'react-router-dom';
 import Dropdown from 'react-bootstrap/Dropdown';
+import Modal from 'react-bootstrap/Modal';
+import Accordion from 'react-bootstrap/Accordion';
+import Card from 'react-bootstrap/Card';
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Form, Formik, Field, ErrorMessage } from "formik";
 import { useToasts } from 'react-toast-notifications';
 import { getHcpProfiles, hcpsSort } from '../hcp.actions';
-import { ApprovalRejectSchema } from '../hcp.schema'
+import { ApprovalRejectSchema } from '../hcp.schema';
 import axios from 'axios';
-import Modal from 'react-bootstrap/Modal';
+
 import _ from 'lodash';
 import parse from 'html-react-parser';
 
@@ -106,7 +109,7 @@ export default function hcpUsers() {
 
     const getCountryName = (country_iso2) => {
         if(!countries || !country_iso2) return null;
-        const country = countries.find(country => country.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+        const country = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
         return country && country.countryname;
     }
 
@@ -172,10 +175,10 @@ export default function hcpUsers() {
                                                         <Dropdown.Item onClick={() => dispatch(getHcpProfiles(null, ['self_verified', 'manually_verified'], hcps.codbase))}>All Verified</Dropdown.Item>
                                                     </LinkContainer>
                                                     <LinkContainer to={`list?status=self_verified${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`}>
-                                                        <Dropdown.Item className={hcps.status === 'self_verified' ? 'd-none' : 'pl-5'} onClick={() => dispatch(getHcpProfiles(null, 'self_verified', hcps.codbase))}>Self Verified</Dropdown.Item>
+                                                        <Dropdown.Item className={hcps.status === 'self_verified' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, 'self_verified', hcps.codbase))}>Self Verified</Dropdown.Item>
                                                     </LinkContainer>
                                                     <LinkContainer to={`list?status=manually_verified${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`}>
-                                                        <Dropdown.Item className={hcps.status === 'manually_verified' ? 'd-none' : 'pl-5'} onClick={() => dispatch(getHcpProfiles(null, 'manually_verified', hcps.codbase))}>Manually Verified</Dropdown.Item>
+                                                        <Dropdown.Item className={hcps.status === 'manually_verified' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, 'manually_verified', hcps.codbase))}>Manually Verified</Dropdown.Item>
                                                     </LinkContainer>
                                                     <LinkContainer to={`list?status=consent_pending${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`}>
                                                         <Dropdown.Item className={hcps.status === 'consent_pending' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, 'consent_pending', hcps.codbase))}>Consent Pending</Dropdown.Item>
@@ -191,6 +194,7 @@ export default function hcpUsers() {
 
                             </div>
                             <Modal
+                                size="lg"
                                 show={show.profileManage}
                                 onShow={getConsentsForCurrentUser}
                                 onHide={() => { setCurrentAction({ action: null, userId: null }); setShow({ ...show, profileManage: false }) }}
@@ -237,18 +241,30 @@ export default function hcpUsers() {
                                                 <div className="">{getCountryName(currentUser.country_iso2) || '--'}</div>
                                             </div>
                                         </div>
-                                        {currentUser.consents && <div className="row mt-4">
-                                            <div className="col">
-                                                {currentUser.consents.map(consent => <div key={consent.id} style={{ fontSize: 14 }} className="mt-3">
-                                                    <div className="font-weight-bold">{consent.title}</div>
-                                                    <div>{parse(consent.rich_text)}</div>
-                                                </div>)}
+                                        <div className="row mt-4">
+                                            <div className="col accordion-consent rounded shadow-sm p-0">
+                                                <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Consents</h4>
+                                                {currentUser.consents && currentUser.consents.length  ? <Accordion>{currentUser.consents.map(consent =>
+                                                        <Card key={consent.id} className="">
+                                                            <Accordion.Collapse eventKey={consent.id}>
+                                                                <Card.Body className="">
+                                                                    <div>{parse(consent.rich_text)}</div>
+                                                                    <div>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
+                                                                </Card.Body>
+                                                            </Accordion.Collapse>
+                                                        <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
+                                                            <span className="d-flex align-items-center"><i class="icon icon-check-filled cdp-text-primary mr-4 consent-check"></i> <span className="consent-summary">{consent.title}</span></span>
+                                                                <i className="icon icon-arrow-down ml-2 accordion-consent__icon-down"></i>
+                                                            </Accordion.Toggle>
+                                                        </Card>
+                                                )}</Accordion> : <div className="p-3">The HCP has not given any consent.</div>}
                                             </div>
-                                        </div>}
+                                        </div>
                                     </div>
                                 </Modal.Body>
                             </Modal>
                             <Modal
+
                                 show={show.updateStatus}
                                 onShow={getConsentsForCurrentUser}
                                 onHide={() => { setCurrentAction({ action: null, userId: null }); setShow({ ...show, updateStatus: false}) }}
@@ -267,17 +283,19 @@ export default function hcpUsers() {
                                             <div className="col">
                                                 <h4 className="font-weight-bold">{`${currentUser.first_name} ${currentUser.last_name}`}</h4>
                                                 <div className="mt-1">{currentUser.email}</div>
-                                                <div className="mt-1">{(new Date(currentUser.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
+                                                <div className="mt-1 pb-2">{(new Date(currentUser.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
                                             </div>
                                         </div>
-                                        {currentUser.consents && <div>
-                                            { currentUser.consents.length ? <h6 className="font-weight-bold mt-3">Consents: </h6> : null }
-                                            <div className="row mt-1">
+                                        <div>
+                                            <h5 className="font-weight-bold my-3">Consents: </h5>
+                                            <div className="row pb-3">
                                                 <div className="col">
-                                                    {currentUser.consents.map(consent => <div key={consent.id} >{ consent.title }</div> )}
+                                                    {currentUser.consents && currentUser.consents.length ?
+                                                        currentUser.consents.map(consent => <div className="pb-1" key={consent.id} ><i className="icon icon-check-filled cdp-text-primary mr-2 small"></i>{ consent.title }</div>)
+                                                        : <div className="pb-1">The HCP has not given any consent.</div>}
                                                 </div>
                                             </div>
-                                        </div>}
+                                        </div>
                                         <Formik
                                             initialValues={{
                                                 comment: '',
@@ -332,7 +350,7 @@ export default function hcpUsers() {
                             {hcps['users'] && hcps['users'].length > 0 &&
                                 <React.Fragment>
                                     <div className="shadow-sm bg-white table-responsive">
-                                        <table className="table table-hover table-sm mb-0 cdp-table">
+                                    <table className="table table-hover table-sm mb-0 cdp-table cdp-table-sm">
                                             <thead className="cdp-bg-primary text-white cdp-table__header">
                                                 <tr>
                                                     <th><span className={sort.value === 'email' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('email')}>Email<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
@@ -342,8 +360,8 @@ export default function hcpUsers() {
                                                     <th><span className={sort.value === 'status' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('status')}>Status<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th><span className={sort.value === 'uuid' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('uuid')}>UUID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th><span className={sort.value === 'specialty_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('specialty_name')}>Specialty<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                    <th>Single opt-in</th>
-                                                    <th>Double opt-in</th>
+                                                    <th className="consent-col">Single<br /> Opt-in</th>
+                                                    <th className="consent-col">Double<br /> Opt-in</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -354,7 +372,7 @@ export default function hcpUsers() {
                                                         <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                         <td>{row.first_name}</td>
                                                         <td>{row.last_name}</td>
-                                                        <td>
+                                                        <td className="text-nowrap">
                                                         {row.status === 'self_verified' ? <span><i className="fa fa-xs fa-circle text-success pr-2"></i>Self Verified</span> :
                                                             row.status === 'manually_verified' ? <span><i className="fa fa-xs fa-circle text-success pr-2"></i>Manually Verified</span> :
                                                                 row.status === 'consent_pending' ? <span><i className="fa fa-xs fa-circle text-warning pr-2"></i>Consent Pending</span> :

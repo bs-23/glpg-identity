@@ -13,7 +13,7 @@ const RolePermission = require(path.join(process.cwd(), "src/modules/user/server
 const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
 const axios = require("axios");
 const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
-const PasswordPolicy = require(path.join(process.cwd(), "src/modules/core/server/password/password-policy.js"));
+const PasswordPolicies = require(path.join(process.cwd(), "src/modules/core/server/password/password-policies.js"));
 
 function generateAccessToken(user) {
     return jwt.sign({
@@ -27,9 +27,9 @@ function generateAccessToken(user) {
     });
 }
 
-
 function getRolesPermissions(userrole) {
     const roles = [];
+
     if (userrole) {
         userrole.forEach(ur => {
             roles.push({
@@ -39,16 +39,13 @@ function getRolesPermissions(userrole) {
         });
 
         return roles;
-
     }
 }
 
 function getCommaSeparatedRoles(userrole) {
     if (userrole) {
-
         const roles = userrole.map(ur => ur.role.name);
         return roles.join();
-
     }
 }
 
@@ -91,7 +88,7 @@ async function attachApplicationInfoToUser(user) {
         slug: userApplication.slug,
         logo_link: userApplication.logo_link
     } : null;
-    return user
+    return user;
 }
 
 async function getSignedInUserProfile(req, res) {
@@ -99,7 +96,8 @@ async function getSignedInUserProfile(req, res) {
         const user = await attachApplicationInfoToUser(req.user);
         res.json(formatProfile(user));
     } catch (err) {
-        res.status(500).send(err)
+        console.error(err);
+        res.status(500).send('Internal server error');
     }
 }
 
@@ -136,13 +134,19 @@ async function login(req, res) {
             }]
         });
 
-        if (!user || !user.password || !user.validPassword(password)) {
-            return res.status(401).send('Invalid email or password.');
+        if (user && user.dataValues.failed_auth_attempt >= 5) {
+            return res.status(401).send('Your account has been locked for consecutive failed auth attempts. Please use the Forgot Password link to unlock.');
         }
 
-        if (user.type === 'basic' && user.expiry_date <= new Date()) {
-            await user.update({ status: 'inactive' })
-            return res.status(401).send('Expired')
+        if (user && (!user.password || !user.validPassword(password))) {
+            await user.update(
+                { failed_auth_attempt: parseInt(user.dataValues.failed_auth_attempt ? user.dataValues.failed_auth_attempt : '0') + 1 },
+                { where: { email: email } }
+            );
+        }
+
+        if (!user || !user.password || !user.validPassword(password)) {
+            return res.status(401).send('Invalid email or password.');
         }
 
         const isSiteVerified = await verifySite(recaptchaToken);
@@ -160,9 +164,15 @@ async function login(req, res) {
 
         const userWithApplication = await attachApplicationInfoToUser(user)
 
+        await user.update(
+            { failed_auth_attempt: 0 },
+            { where: { email: email } }
+        );
+
         res.json(formatProfile(userWithApplication));
     } catch (err) {
-        res.status(500).send(err);
+        console.error(err);
+        res.status(500).send('Internal server error');
     }
 }
 
@@ -257,10 +267,10 @@ async function createUser(req, res) {
 
         res.json(doc);
     } catch (err) {
-        res.status(500).send(err);
+        console.error(err);
+        res.status(500).send('Internal server error');
     }
 }
-
 
 async function deleteUser(req, res) {
     try {
@@ -268,7 +278,8 @@ async function deleteUser(req, res) {
 
         res.json({ id: req.params.id });
     } catch (err) {
-        res.status(500).send(err);
+        console.error(err);
+        res.status(500).send('Internal server error');
     }
 }
 
@@ -325,7 +336,8 @@ async function getUsers(req, res) {
         res.json(data);
 
     } catch (err) {
-        res.status(500).send(err);
+        console.error(err);
+        res.status(500).send('Internal server error');
     }
 }
 
@@ -355,7 +367,8 @@ async function getUser(req, res) {
         res.json(formattedUser);
     }
     catch (err) {
-        res.status(500).send(err);
+        console.error(err);
+        res.status(500).send('Internal server error');
     }
 }
 
@@ -403,8 +416,9 @@ async function sendPasswordResetLink(req, res) {
         emailService.send(options);
 
         res.json({ message: 'An email has been sent to the provided email with further instructions.' });
-    } catch (error) {
-        res.status(500).send(error);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
     }
 }
 
@@ -418,25 +432,25 @@ async function changePassword(req, res) {
             return res.status(400).send('Current Password not valid');
         }
 
-        if (await PasswordPolicy.isOldPassword(newPassword, user)) return res.status(400).send('New password can not be your previously used password.');
+        if (await PasswordPolicies.isOldPassword(newPassword, user)) return res.status(400).send('New password can not be your previously used password.');
 
-        if (!PasswordPolicy.validatePassword(newPassword)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.')
+        if (!PasswordPolicies.validatePassword(newPassword)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.')
 
         if (newPassword !== confirmPassword) return res.status(400).send('Passwords should match');
 
-        if (PasswordPolicy.isCommonPassword(newPassword, user)) return res.status(400).send('Password can not be commonly used passwords or personal info. Try a different one.');
+        if (PasswordPolicies.isCommonPassword(newPassword, user)) return res.status(400).send('Password can not be commonly used passwords or personal info. Try a different one.');
 
-        if (user.password) await PasswordPolicy.saveOldPassword(user);
+        if (user.password) await PasswordPolicies.saveOldPassword(user);
 
         user.password = newPassword;
         await user.save();
 
         res.json(formatProfile(user));
     } catch (err) {
-        res.status(500).send(err);
+        console.error(err);
+        res.status(500).send('Internal server error');
     }
 }
-
 
 async function resetPassword(req, res) {
     try {
@@ -455,15 +469,15 @@ async function resetPassword(req, res) {
 
         const user = await User.findOne({ where: { id: resetRequest.user_id } });
 
-        if (await PasswordPolicy.isOldPassword(req.body.newPassword, user)) return res.status(400).send('New password can not be your previously used password.');
+        if (await PasswordPolicies.isOldPassword(req.body.newPassword, user)) return res.status(400).send('New password can not be your previously used password.');
 
-        if (!PasswordPolicy.validatePassword(req.body.newPassword)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.');
+        if (!PasswordPolicies.validatePassword(req.body.newPassword)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.');
 
-        if (PasswordPolicy.isCommonPassword(req.body.newPassword, user)) return res.status(400).send('Password can not be commonly used passwords or personal info. Try a different one.');
+        if (PasswordPolicies.isCommonPassword(req.body.newPassword, user)) return res.status(400).send('Password can not be commonly used passwords or personal info. Try a different one.');
 
         if (req.body.newPassword !== req.body.confirmPassword) return res.status(400).send("Password and confirm password doesn't match.");
 
-        if (user.password) await PasswordPolicy.saveOldPassword(user);
+        if (user.password) await PasswordPolicies.saveOldPassword(user);
 
         user.update({ password: req.body.newPassword });
         const options = {
@@ -483,6 +497,11 @@ async function resetPassword(req, res) {
             options.subject = 'Your password has been reset'
         }
 
+        await user.update(
+            { failed_auth_attempt: 0 },
+            { where: { email: user.dataValues.email } }
+        );
+
         emailService.send(options);
 
         await resetRequest.destroy();
@@ -490,7 +509,8 @@ async function resetPassword(req, res) {
         res.sendStatus(200);
 
     } catch (error) {
-        res.status(500).send(error);
+        console.error(err);
+        res.status(500).send('Internal server error');
     }
 }
 

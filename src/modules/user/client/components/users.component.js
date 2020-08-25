@@ -33,7 +33,7 @@ export default function Users() {
         countryArr.sort((a, b) => (a.countryname > b.countryname) ? 1 : -1);
         countryArr.forEach((element, key) => {
             countryString = countryString + element.countryname;
-            (key < countryArr.length - 1) ? countryString = countryString + ', ' : countryString = countryString;
+            if (key < countryArr.length - 1) countryString = countryString + ', ';
         });
 
         return countryString;
@@ -46,8 +46,17 @@ export default function Users() {
             setCountries(response.data);
         }
         getCountries();
-
     }, []);
+
+    useEffect(() => {
+        sortWithUrlChange();
+    }, [userdata.users]);
+
+    const sortWithUrlChange = () => {
+        if (userdata.users && params.get('sort_type') && params.get('sort_col')) {
+            dispatch(cdpSort(params.get('sort_type'), params.get('sort_col')));
+        }
+    }
 
     const sortCdp = (val) => {
         if (sort.value === val) {
@@ -107,7 +116,7 @@ export default function Users() {
                                         <LinkContainer to="list?page=1"><Dropdown.Item onClick={() => getUserList(1, null)}>All</Dropdown.Item></LinkContainer>
                                         {
                                             countries.length > 0 && countries.map(country => (
-                                                <LinkContainer to={`list?page=1&country_iso2=${country.country_iso2}`} key={country.countryid}><Dropdown.Item onClick={() => getUserList(1, country.country_iso2)}>{country.countryname}</Dropdown.Item></LinkContainer>
+                                                <LinkContainer to={`list?page=1&country_iso2=${country.country_iso2}&sort_type=${sort.type}&sort_col=${sort.value}`} key={country.countryid}><Dropdown.Item onClick={() => getUserList(1, country.country_iso2)}>{country.countryname}</Dropdown.Item></LinkContainer>
                                             ))
                                         }
                                     </Dropdown.Menu>
@@ -149,7 +158,7 @@ export default function Users() {
                                                     <td>{(new Date(row.expiry_date)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                     <td>
                                                         <NavLink to={`/users/${row.createdByUser.id}`}>
-                                                            {`${row.createdByUser.first_name} ${row.createdByUser.last_name}`} 
+                                                            {`${row.createdByUser.first_name} ${row.createdByUser.last_name}`}
                                                         </NavLink>
                                                     </td>
                                                     <td>
@@ -166,10 +175,10 @@ export default function Users() {
                                         && userdata['users'] &&
                                         <div className="pagination justify-content-end align-items-center border-top p-3">
                                             <span className="cdp-text-primary font-weight-bold">{userdata.start + ' - ' + userdata.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + userdata.total}</span>
-                                            <LinkContainer to={`list?page=${userdata.page - 1}&country_iso2=${userdata.country_iso2}`}>
+                                            <LinkContainer to={`list?page=${userdata.page - 1}&country_iso2=${userdata.country_iso2}&sort_type=${sort.type}&sort_col=${sort.value}`}>
                                                 <span className="pagination-btn" onClick={() => pageLeft()} disabled={userdata.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
                                             </LinkContainer>
-                                            <LinkContainer to={`list?page=${userdata.page + 1}&country_iso2=${userdata.country_iso2}`}>
+                                            <LinkContainer to={`list?page=${userdata.page + 1}&country_iso2=${userdata.country_iso2}&sort_type=${sort.type}&sort_col=${sort.value}`}>
                                                 <span className="pagination-btn" onClick={() => pageRight()} disabled={userdata.end === userdata.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
                                             </LinkContainer>
                                         </div>

@@ -1,5 +1,6 @@
 const path = require('path');
 const bcrypt = require('bcryptjs');
+const Sequelize = require('sequelize');
 const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const HcpConsents = require('./hcp_consents.model');
@@ -65,11 +66,18 @@ const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
         type: DataTypes.ENUM,
         values: ['self_verified', 'manually_verified', 'consent_pending', 'not_verified']
     },
+    failed_auth_attempt: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    },
     created_by: {
         type: DataTypes.UUID
     },
     updated_by: {
         type: DataTypes.UUID
+    },
+    password_updated_at: {
+        type: Sequelize.DATE
     },
     reset_password_token: {
         unique: true,

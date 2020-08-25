@@ -1,6 +1,6 @@
 import { string, object, ref, array } from 'yup';
 import XRegExp from 'xregexp'
-import phoneNumber from 'awesome-phonenumber'
+// import phoneNumber from 'awesome-phonenumber'
 
 function validatePassword(password) {
     const minLength = 8;
@@ -10,7 +10,6 @@ function validatePassword(password) {
     const hasDigit = new RegExp("^(?=.*[0-9])").test(password);
     const hasSpecialCharacter = new RegExp("[!\"#$%&'\(\)\*\+,\-\.\/:;<=>\?@\[\\]\^_`\{\|\}\~]").test(password);
 
-    console.log(hasSpecialCharacter + "--");
     if (password && (password.length < minLength || password.length > maxLength || !hasUppercase || !hasLowercase || !hasDigit || !hasSpecialCharacter)) {
         return false;
     }
@@ -19,29 +18,28 @@ function validatePassword(password) {
 
 }
 
-const validatePhone = phone => {
-    if (!phone) return true
-    return phoneNumber(phone).isValid()
-}
+// const validatePhone = phone => {
+//     if (!phone) return true
+//     return phoneNumber(phone).isValid()
+// }
 
 export const loginSchema = object().shape({
     email: string()
         .email('This field should be an valid email address.')
         .required('This field must not be empty.'),
     password: string().required('This field must not be empty.'),
-    recaptchaToken: string().required('Captcha verification required.')
+    recaptchaToken: string().nullable().required('Captcha verification required.')
 });
 
 export const registerSchema = object().shape({
     first_name: string()
-        .matches(XRegExp('^\\pL+$'), 'This field only contains letters')
-        // .matches(/^[a-zA-Z]+$/, 'This field only contains letters.')
+        .matches(XRegExp('^[\\pL]+(?:\\s[\\pL]+)*$'), 'This field only contains letters')
         .min(2, 'This field must be at least 2 characters long.')
         .max(20, 'This field must be at most 20 characters long.')
         .required('This field must not be empty.'),
     last_name: string()
-        .matches(XRegExp('^\\pL+$'), 'This field only contains letters')
-        // .matches(/^[a-zA-Z]+$/, 'This field only contains letters.')
+        .matches(XRegExp('^[\\pL]+(?:\\s[\\pL]+)*$'), 'This field only contains letters')
+        // .matches(XRegExp('^\\pL+$'), 'This field only contains letters')
         .min(2, 'This field must be at least 2 characters long.')
         .max(20, 'This field must be at most 20 characters long.')
         .required('This field must not be empty.'),
@@ -52,9 +50,9 @@ export const registerSchema = object().shape({
         .matches(/^[+]+/, 'This field must start with a plus.')
         .matches(/^[+]?[ 0-9]+$/, 'Must conform to international phone number format and can only contain digits, spaces or plus.'),
     phone: string()
-        // .matches(/^[+]+/, 'This field must start with a plus.')
-        // .matches(/^[+]?[ 0-9]+$/, 'Must conform to international phone number format and can only contain digits, spaces or plus.')
-        .matches(/^[0-9]*$/, 'This field only contains digits.'),
+        .matches(/^[0-9]*$/, 'This field only contains digits.')
+        .min(4, 'This field must be at least 4 characters long.')
+        .max(15, 'This field must be at most 15 characters long.'),
         // .test('is-valid-phone', 'Must be a valid international phone number.', validatePhone),
     countries: string()
         .required('Must select at least one country'),

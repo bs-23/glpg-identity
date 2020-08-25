@@ -88,7 +88,8 @@ async function getConsents(req, res) {
 
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message));
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
 }

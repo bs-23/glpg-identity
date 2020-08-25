@@ -35,7 +35,9 @@ async function getAccessToken(req, res) {
 
         res.send(response);
     } catch (err) {
-        res.status(500).send(err);
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
     }
 }
 
@@ -44,10 +46,12 @@ async function getApplications(req, res) {
         const applications = await Application.findAll({
             attributes: ['id', 'name', 'email', 'is_active', 'slug']
         });
+
         res.json(applications);
 
-    } catch (error) {
-        res.status(500).send(err);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
     }
 }
 

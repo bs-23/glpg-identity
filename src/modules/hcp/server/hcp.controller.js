@@ -17,7 +17,7 @@ const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequel
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
-const PasswordPolicy = require(path.join(process.cwd(), "src/modules/core/server/password/password-policy.js"));
+const PasswordPolicies = require(path.join(process.cwd(), 'src/modules/core/server/password/password-policies.js'));
 
 function generateAccessToken(doc) {
     return jwt.sign({
@@ -70,9 +70,29 @@ function mapMasterDataToHcpProfile(masterData) {
     return model;
 }
 
-function generateDefaultEmailOptions(user) {
+function generateEmailOptions(emailType, applicationSlug, user) {
+    const locale = `${user.language_code}_${user.country_iso2}`;
+
+    const emailDataUrl = path.join(process.cwd(), `src/config/server/lib/email-service/email-options.json`);
+    const emailOptionsText = fs.readFileSync(emailDataUrl, 'utf8');
+    const emailOptions = JSON.parse(emailOptionsText);
+    const emailData = emailOptions[emailType];
+
+    let templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${applicationSlug}/en/${emailData.template_url}`)
+    const templateUrlInLocale = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${applicationSlug}/${locale.toLowerCase()}/${emailData.template_url}`);
+
+    if (fs.existsSync(templateUrlInLocale)) {
+        templateUrl = templateUrlInLocale;
+    }
+
+    const subject = emailData.subject[locale] || emailData.subject['en'];
+    const plaintext = emailData.plain_text[locale] || emailData.plain_text['en'];
+
     return {
         toAddresses: [user.email],
+        subject: subject,
+        templateUrl: templateUrl,
+        plaintext: plaintext,
         data: {
             firstName: user.first_name || '',
             lastName: user.last_name || '',
@@ -80,23 +100,10 @@ function generateDefaultEmailOptions(user) {
     };
 }
 
-function getTemplateUrl(fileName, applicationSlug, user) {
-    const locale = `${user.language_code}_${user.country_iso2}`;
-    const templateUrlInLocale = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${applicationSlug}/${locale.toLowerCase()}/${fileName}`);
-
-    if (fs.existsSync(templateUrlInLocale)) {
-        return templateUrlInLocale;
-    }
-
-    return path.join(process.cwd(), `src/config/server/lib/email-service/templates/${applicationSlug}/en/${fileName}`);
-}
-
 async function sendConsentConfirmationMail(user, consents, application) {
     const consentConfirmationToken = generateConsentConfirmationAccessToken(user);
-    const mailOptions = generateDefaultEmailOptions(user);
 
-    mailOptions.templateUrl = getTemplateUrl('double-opt-in-consent-confirm.html', application.slug, user);
-    mailOptions.subject = 'Thank you for registering!';
+    const mailOptions = generateEmailOptions('double-opt-in-consent-confirm', application.slug, user);
     mailOptions.data.consents = consents || [];
     mailOptions.data.link = `${application.consent_confirmation_link}?token=${consentConfirmationToken}&journey=consent_confirmation&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
@@ -104,49 +111,33 @@ async function sendConsentConfirmationMail(user, consents, application) {
 }
 
 async function sendRegistrationSuccessMail(user, application) {
-    const mailOptions = generateDefaultEmailOptions(user);
-
-    mailOptions.subject = `Congratulations your registration was successful`;
-    mailOptions.templateUrl = getTemplateUrl('registration-success.html', application.slug, user);
+    const mailOptions = generateEmailOptions('registration-success', application.slug, user);
     mailOptions.data.loginLink = `${application.login_link}?journey=login&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
 }
 
 async function sendChangePasswordSuccessMail(user, application) {
-    const mailOptions = generateDefaultEmailOptions(user);
-
-    mailOptions.subject = 'Your password has been changed.';
-    mailOptions.templateUrl = getTemplateUrl('password-reset-success.html', application.slug, user);
-
+    const mailOptions = generateEmailOptions('password-change-success', application.slug, user);
     await emailService.send(mailOptions);
 }
 
 async function sendResetPasswordSuccessMail(user, application) {
-    const mailOptions = generateDefaultEmailOptions(user);
-
-    mailOptions.subject = 'Your password has been reset';
-    mailOptions.templateUrl = getTemplateUrl('password-reset-success.html', application.slug, user);
+    const mailOptions = generateEmailOptions('password-reset-success', application.slug, user);
     mailOptions.data.loginLink = `${application.login_link}?journey=login&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
 }
 
 async function sendPasswordSetupInstructionMail(user, application) {
-    const mailOptions = generateDefaultEmailOptions(user);
-
-    mailOptions.templateUrl = getTemplateUrl('password-setup-instructions.html', application.slug, user);
-    mailOptions.subject = `Registration verified. Please setup your password`;
+    const mailOptions = generateEmailOptions('password-setup-instructions', application.slug, user);
     mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&journey=single_optin_verified&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
 }
 
 async function sendPasswordResetInstructionMail(user, application) {
-    const mailOptions = generateDefaultEmailOptions(user);
-
-    mailOptions.templateUrl = getTemplateUrl('password-reset-instructions.html', application.slug, user);
-    mailOptions.subject = `Setup Password`;
+    const mailOptions = generateEmailOptions('password-reset-instructions', application.slug, user);
     mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&journey=set_password&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
@@ -248,7 +239,8 @@ async function getHcps(req, res) {
         response.data = data;
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, 500));
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
 }
@@ -274,7 +266,8 @@ async function editHcp(req, res) {
         response.data = HcpUser;
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, 500));
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
 }
@@ -328,14 +321,15 @@ async function registrationLookup(req, res) {
 
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, 500));
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
 }
 
 async function createHcpProfile(req, res) {
     const response = new Response({}, []);
-    const { email, uuid, salutation, first_name, last_name, country_iso2, language_code, specialty_onekey } = req.body;
+    const { email, uuid, salutation, first_name, last_name, country_iso2, language_code, specialty_onekey, telephone } = req.body;
 
     if (!email || !validator.isEmail(email)) {
         response.errors.push(new CustomError('Email address is missing or invalid.', 400, 'email'));
@@ -419,6 +413,7 @@ async function createHcpProfile(req, res) {
             country_iso2: country_iso2.toLowerCase(),
             language_code: language_code.toLowerCase(),
             specialty_onekey,
+            telephone,
             application_id: req.user.id,
             individual_id_onekey: master_data.individual_id_onekey,
             created_by: req.user.id,
@@ -509,7 +504,8 @@ async function createHcpProfile(req, res) {
 
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, 500));
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
 }
@@ -552,7 +548,8 @@ async function confirmConsents(req, res) {
 
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, 500));
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
 }
@@ -615,7 +612,8 @@ async function approveHCPUser(req, res) {
 
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, 500));
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
 }
@@ -648,7 +646,8 @@ async function rejectHCPUser(req, res) {
 
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, 500));
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
 }
@@ -669,7 +668,8 @@ async function getHcpProfile(req, res) {
         response.data = getHcpViewModel(doc.dataValues);
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, 500));
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
 }
@@ -688,17 +688,24 @@ async function getHCPUserConsents(req, res) {
             return res.status(404).send(response);
         }
 
-        const userConsentIDs = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id'] });
+        const userConsents = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id', 'updated_at'] });
 
-        if (!userConsentIDs) return res.json([]);
+        if (!userConsents) return res.json([]);
 
-        const userConsents = await ConsentLocale.findAll({ include: { model: Consent, as: 'consent', attributes: ['title'] }, where: { consent_id: userConsentIDs.map(consent => consent.consent_id), locale: locale ? locale.toLowerCase() : 'en' }, attributes: ['consent_id', 'rich_text'] });
+        const userConsentDetails = await ConsentLocale.findAll({ include: { model: Consent, as: 'consent', attributes: ['title'] }, where: { consent_id: userConsents.map(consent => consent.consent_id), locale: locale ? locale.toLowerCase() : 'en' }, attributes: ['consent_id', 'rich_text'] });
 
-        response.data = userConsents.map(({ consent_id: id, rich_text, consent: { title } }) => ({ id, title, rich_text: validator.unescape(rich_text) }));
+        const consentResponse = userConsentDetails.map(({ consent_id: id, rich_text, consent: { title } }) => ({ id, title, rich_text: validator.unescape(rich_text) }));
+
+        response.data = consentResponse.map(conRes => {
+            const matchedConsent = userConsents.find(consent => consent.consent_id === conRes.id);
+            conRes.consent_given_time = matchedConsent ? matchedConsent.updated_at : null;
+            return conRes;
+        });
 
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, 500));
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
 }
@@ -721,24 +728,42 @@ async function changePassword(req, res) {
             return res.status(401).send(response);
         }
 
-        if (await PasswordPolicy.isOldPassword(new_password, doc)) return res.status(400).send('New password can not be your previously used password.');
+        if (await PasswordPolicies.minimumPasswordAge(doc.password_updated_at)) {
+            response.errors.push(new CustomError(`You cannot change password before 1 day`, 4202));
+            return res.status(400).send(response);
+        }
 
-        if (!PasswordPolicy.validatePassword(new_password)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.');
+        if (await PasswordPolicies.isOldPassword(new_password, doc)) {
+            response.errors.push(new CustomError(`New password can not be your previously used password.`, 4203));
+            return res.status(400).send(response);
+        }
 
-        if (PasswordPolicy.isCommonPassword(new_password, doc)) return res.status(400).send('Password can not be commonly used passwords or personal info. Try a different one.');
+        if (!PasswordPolicies.validatePassword(new_password)) {
+            response.errors.push(new CustomError(`Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.`, 4200));
+            return res.status(400).send(response);
+        }
 
-        if (new_password !== confirm_password) return res.status(400).send("Password and confirm password doesn't match.");
+        if (PasswordPolicies.isCommonPassword(new_password, doc)) {
+            response.errors.push(new CustomError(`Password can not be commonly used passwords or personal info. Try a different one.`, 400));
+            return res.status(400).send(response);
+        }
 
-        if (doc.password) await PasswordPolicy.saveOldPassword(doc);
+        if (new_password !== confirm_password) {
+            response.errors.push(new CustomError(`Password and confirm password doesn't match.`, 4201));
+            return res.status(400).send(response);
+        }
 
-        doc.update({ password: new_password });
+        if (doc.password) await PasswordPolicies.saveOldPassword(doc);
+
+        doc.update({ password: new_password, password_updated_at: new Date(Date.now()) });
 
         await sendChangePasswordSuccessMail(doc, req.user);
 
         response.data = 'Password changed successfully.';
         res.send(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, 500));
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
 }
@@ -754,6 +779,11 @@ async function resetPassword(req, res) {
             return res.status(404).send(response);
         }
 
+        if (await PasswordPolicies.minimumPasswordAge(doc.password_updated_at)) {
+            response.errors.push(new CustomError(`You cannot change password before 1 day`, 4202));
+            return res.status(400).send(response);
+        }
+
         if (doc.reset_password_expires < Date.now()) {
             response.errors.push(new CustomError('Password reset token has been expired. Please request again.', 4400));
             return res.status(400).send(response);
@@ -764,16 +794,27 @@ async function resetPassword(req, res) {
             return res.status(400).send(response);
         }
 
-        if (await PasswordPolicy.isOldPassword(req.body.new_password, doc)) return res.status(400).send('New password can not be your previously used password.');
+        if (await PasswordPolicies.isOldPassword(req.body.new_password, doc)) {
+            response.errors.push(new CustomError(`New password can not be your previously used password.`, 4203));
+            return res.status(400).send(response);
+        }
 
-        if (!PasswordPolicy.validatePassword(req.body.new_password)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.');
+        if (!PasswordPolicies.validatePassword(req.body.new_password)) {
+            response.errors.push(new CustomError(`Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.`, 4200));
+            return res.status(400).send(response);
+        }
 
-        if (PasswordPolicy.isCommonPassword(req.body.new_password, doc)) return res.status(400).send('Password can not be commonly used passwords or personal info. Try a different one.');
+        if (PasswordPolicies.isCommonPassword(req.body.new_password, doc)) {
+            response.errors.push(new CustomError(`Password can not be commonly used passwords or personal info. Try a different one.`, 400));
+            return res.status(400).send(response);
+        }
 
-        if (req.body.new_password !== req.body.confirm_password) return res.status(400).send("Password and confirm password doesn't match.");
+        if (req.body.new_password !== req.body.confirm_password) {
+            response.errors.push(new CustomError(`Password and confirm password doesn't match.`, 4201));
+            return res.status(400).send(response);
+        }
 
-        if (doc.password) await PasswordPolicy.saveOldPassword(doc);
-
+        if (doc.password) await PasswordPolicies.saveOldPassword(doc);
 
         if (doc.password) {
             await sendResetPasswordSuccessMail(doc, req.user);
@@ -781,12 +822,18 @@ async function resetPassword(req, res) {
             await sendRegistrationSuccessMail(doc, req.user);
         }
 
-        await doc.update({ password: req.body.new_password, reset_password_token: null, reset_password_expires: null });
+        await doc.update({ password: req.body.new_password, password_updated_at: new Date(Date.now()), reset_password_token: null, reset_password_expires: null });
+
+        await doc.update(
+            { failed_auth_attempt: 0 },
+            { where: { email: doc.dataValues.email } }
+        );
 
         response.data = 'Password reset successfully.';
         res.send(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, 500));
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
 }
@@ -813,7 +860,6 @@ async function forgetPassword(req, res) {
             return res.json(response);
         }
 
-
         const userApplication = await Application.findOne({ where: { id: doc.application_id } });
 
         if (doc.dataValues.status === 'self_verified' || doc.dataValues.status === 'manually_verified') {
@@ -830,7 +876,8 @@ async function forgetPassword(req, res) {
         res.status(400).send(response);
 
     } catch (err) {
-        response.errors.push(new CustomError(err.message, 500));
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
 }
@@ -879,7 +926,8 @@ async function getSpecialties(req, res) {
         response.data = masterDataSpecialties;
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, 500));
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
 }
@@ -904,6 +952,18 @@ async function getAccessToken(req, res) {
 
         const doc = await Hcp.findOne({ where: { email } });
 
+        if (doc && doc.dataValues.failed_auth_attempt >= 5) {
+            response.errors.push(new CustomError('Your account has been locked for consecutive failed login attempts.', 4002));
+            return res.status(401).send(response);
+        }
+
+        if (doc && (!doc.password || !doc.validPassword(password))) {
+            await doc.update(
+                { failed_auth_attempt: parseInt(doc.dataValues.failed_auth_attempt ? doc.dataValues.failed_auth_attempt : '0') + 1 },
+                { where: { email: email } }
+            );
+        }
+
         if (!doc || !doc.password || !doc.validPassword(password)) {
             response.errors.push(new CustomError('Invalid email or password.', 401));
             return res.status(401).json(response);
@@ -915,9 +975,14 @@ async function getAccessToken(req, res) {
             retention_period: '48 hours'
         }
 
+        await doc.update(
+            { failed_auth_attempt: 0 },
+            { where: { email: email } });
+
         res.json(response);
     } catch (err) {
-        response.errors.push(new CustomError(err.message, 500));
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
 }

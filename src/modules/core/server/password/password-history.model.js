@@ -13,10 +13,6 @@ const PasswordHistory = sequelize.cdpConnector.define("password_history", {
         allowNull: false,
         type: DataTypes.UUID
     },
-    application_id: {
-        allowNull: false,
-        type: DataTypes.UUID
-    },
     passwords: {
         allowNull: false,
         type: DataTypes.ARRAY(DataTypes.STRING)

@@ -4,6 +4,7 @@ import Axios from 'axios';
 import { useHistory, useLocation } from 'react-router-dom';
 import QueryString from 'query-string';
 import { useToasts } from 'react-toast-notifications';
+import { OverlayTrigger, Popover } from 'react-bootstrap';
 
 import { resetPasswordSchema } from '../user.schema';
 
@@ -13,6 +14,15 @@ export default function ResetPasswordForm() {
     const location = useLocation();
     const { token } = QueryString.parse(location.search);
     const { addToast } = useToasts();
+
+    const popoverTop = (
+        <Popover id="popover-basic">
+            <Popover.Title as="h3">Popover Top</Popover.Title>
+            <Popover.Content>
+                This is simple popover example top side.
+            </Popover.Content>
+        </Popover>
+    );
 
     return (
         <div className="app-login">
@@ -59,6 +69,11 @@ export default function ResetPasswordForm() {
                                             <Field type="text" name="username" autoComplete="username" hidden />
                                             <div className="form-group">
                                                 <label className="label-style">New Password<span className="text-danger required-field pl-1">*</span></label>
+
+                                                <OverlayTrigger trigger="click" placement="top" overlay={popoverTop}>
+                                                    <span>*</span>
+                                                </OverlayTrigger>
+
                                                 <Field
                                                     className="form-control"
                                                     type="password"
