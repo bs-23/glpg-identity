@@ -329,7 +329,7 @@ async function registrationLookup(req, res) {
 
 async function createHcpProfile(req, res) {
     const response = new Response({}, []);
-    const { email, uuid, salutation, first_name, last_name, country_iso2, language_code, specialty_onekey } = req.body;
+    const { email, uuid, salutation, first_name, last_name, country_iso2, language_code, specialty_onekey, telephone } = req.body;
 
     if (!email || !validator.isEmail(email)) {
         response.errors.push(new CustomError('Email address is missing or invalid.', 400, 'email'));
@@ -413,6 +413,7 @@ async function createHcpProfile(req, res) {
             country_iso2: country_iso2.toLowerCase(),
             language_code: language_code.toLowerCase(),
             specialty_onekey,
+            telephone,
             application_id: req.user.id,
             individual_id_onekey: master_data.individual_id_onekey,
             created_by: req.user.id,
