@@ -19,11 +19,6 @@ export default function Users() {
     const getUserList = (page = params.get('page') ? params.get('page') : 1,
         country_iso2 = params.get('country_iso2') ? params.get('country_iso2') : null) => {
         dispatch(getUsers(page, country_iso2));
-
-
-        // if (userdata && params.get('sort_type') && params.get('sort_col')) {
-        //     dispatch(cdpSort(params.get('sort_type'), params.get('sort_col')));
-        // }
     };
 
     const sortCountries = (userCountries) => {
@@ -51,9 +46,6 @@ export default function Users() {
             setCountries(response.data);
         }
         getCountries();
-
-
-
     }, []);
 
     useEffect(() => {
