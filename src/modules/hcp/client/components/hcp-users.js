@@ -249,6 +249,7 @@ export default function hcpUsers() {
                                                             <Accordion.Collapse eventKey={consent.id}>
                                                                 <Card.Body className="">
                                                                     <div>{parse(consent.rich_text)}</div>
+                                                                    <div>Consent Type: {consent.opt_type}</div>
                                                                     <div>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
                                                                 </Card.Body>
                                                             </Accordion.Collapse>
