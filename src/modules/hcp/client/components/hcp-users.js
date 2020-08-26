@@ -248,9 +248,9 @@ export default function hcpUsers() {
                                                         <Card key={consent.id} className="">
                                                             <Accordion.Collapse eventKey={consent.id}>
                                                                 <Card.Body className="">
-                                                                    <div>{parse(consent.rich_text)}</div>
-                                                                    <div>Consent Type: {consent.opt_type}</div>
-                                                                    <div>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
+                                                                <div>{parse(consent.rich_text)}</div>
+                                                                <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Consent Type:</span> {consent.opt_type} Opt-in</div>
+                                                                <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Consent Submitted Date:</span>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
                                                                 </Card.Body>
                                                             </Accordion.Collapse>
                                                         <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
