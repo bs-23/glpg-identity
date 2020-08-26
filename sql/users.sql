@@ -11,6 +11,7 @@ CREATE TABLE ciam.users
     countries character varying(255)[] COLLATE pg_catalog."default",
     permissions character varying(255)[] COLLATE pg_catalog."default",
     failed_auth_attempt integer DEFAULT 0 NOT NULL,
+    password_updated_at timestamp with time zone,
     created_by uuid,
     updated_by uuid,
     created_at timestamp with time zone NOT NULL,

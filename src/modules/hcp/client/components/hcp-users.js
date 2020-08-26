@@ -249,6 +249,7 @@ export default function hcpUsers() {
                                                             <Accordion.Collapse eventKey={consent.id}>
                                                                 <Card.Body className="">
                                                                     <div>{parse(consent.rich_text)}</div>
+                                                                    <div>Consent Type: {consent.opt_type}</div>
                                                                     <div>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
                                                                 </Card.Body>
                                                             </Accordion.Collapse>
@@ -257,7 +258,7 @@ export default function hcpUsers() {
                                                                 <i className="icon icon-arrow-down ml-2 accordion-consent__icon-down"></i>
                                                             </Accordion.Toggle>
                                                         </Card>
-                                                )}</Accordion> : <div className="p-3">The HCP has not given any consent.</div>}
+                                                )}</Accordion> : <div className="m-3 alert alert-warning">The HCP has not given any consent.</div>}
                                             </div>
                                         </div>
                                     </div>
@@ -292,7 +293,7 @@ export default function hcpUsers() {
                                                 <div className="col">
                                                     {currentUser.consents && currentUser.consents.length ?
                                                         currentUser.consents.map(consent => <div className="pb-1" key={consent.id} ><i className="icon icon-check-filled cdp-text-primary mr-2 small"></i>{ consent.title }</div>)
-                                                        : <div className="pb-1">The HCP has not given any consent.</div>}
+                                                        : <div className="alert alert-warning">The HCP has not given any consent.</div>}
                                                 </div>
                                             </div>
                                         </div>
@@ -387,7 +388,7 @@ export default function hcpUsers() {
                                                         <td>
                                                             <span>
                                                                 <Dropdown className="ml-auto dropdown-customize">
-                                                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm pb-0">
+                                                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
                                                                         {/*{currentAction.userId === row.id ? currentAction.action : 'Select an action'}*/}
                                                                     </Dropdown.Toggle>
                                                                     <Dropdown.Menu>

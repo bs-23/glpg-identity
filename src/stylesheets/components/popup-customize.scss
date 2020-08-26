@@ -1,0 +1,42 @@
+.popover {
+    &.popup-customize {
+        border-color: $secondary-color;
+        box-shadow: 0 9px 13px -7px #C5C5C5;
+
+        ul {
+        }
+
+        li {
+            color: #585F65;
+            padding-bottom: 5px;
+            font-size: 14px;
+
+            .fa-circle {
+                color: $primary-color;
+                font-size: 10px;
+                position: relative;
+                top: -2px;
+                margin-right: 8px
+            }
+        }
+    }
+
+    &-header {
+        background: $white-color;
+        border-bottom: none;
+        color: $primary-color;
+        font-size: 14px;
+        line-height: 18px;
+        font-weight: 600;
+    }
+}
+.bs-popover-top > .arrow::before, .bs-popover-auto[x-placement^="top"] > .arrow::before {
+    bottom: 0;
+    border-width: 0.5rem 0.5rem 0;
+    border-top-color: $secondary-color;
+}
+.bs-popover-top > .arrow::after, .bs-popover-auto[x-placement^="top"] > .arrow::after {
+    bottom: 1px;
+    border-width: 0.5rem 0.5rem 0;
+    border-top-color: $secondary-color;
+}
