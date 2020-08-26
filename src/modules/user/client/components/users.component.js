@@ -12,6 +12,7 @@ export default function Users() {
     const userdata = useSelector(state => state.userReducer.users);
 
     const [countries, setCountries] = useState([]);
+    const [userCountries, setUserCountries] = useState([]);
 
     const params = new URLSearchParams(window.location.search);
     const [sort, setSort] = useState({ type: 'ASC', value: null });
@@ -42,11 +43,22 @@ export default function Users() {
     useEffect(() => {
         getUserList();
         async function getCountries() {
-            const response = await axios.get('/api/countries');
-            setCountries(response.data);
+            const response = (await axios.get('/api/countries')).data;
+            const userProfile = (await axios.get('/api/users/profile')).data;
+            const userCountries = userProfile.countries;
+            setCountries(response);
+            (userProfile.type === "admin") ? setUserCountries(response) : setUserCountries(fetchUserCountries(userCountries, response));
         }
         getCountries();
     }, []);
+
+    const fetchUserCountries = (args, allCountries) => {
+        const countryList = [];
+        args.forEach(element => {
+            countryList.push(allCountries.find(x => x.country_iso2 == element));
+        });
+        return countryList;
+    }
 
     useEffect(() => {
         sortWithUrlChange();
@@ -115,7 +127,7 @@ export default function Users() {
                                     <Dropdown.Menu>
                                         <LinkContainer to="list?page=1"><Dropdown.Item onClick={() => getUserList(1, null)}>All</Dropdown.Item></LinkContainer>
                                         {
-                                            countries.length > 0 && countries.map(country => (
+                                            userCountries.length > 0 && userCountries.map(country => (
                                                 <LinkContainer to={`list?page=1&country_iso2=${country.country_iso2}&sort_type=${sort.type}&sort_col=${sort.value}`} key={country.countryid}><Dropdown.Item onClick={() => getUserList(1, country.country_iso2)}>{country.countryname}</Dropdown.Item></LinkContainer>
                                             ))
                                         }
