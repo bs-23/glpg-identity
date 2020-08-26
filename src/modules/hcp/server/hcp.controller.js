@@ -694,7 +694,7 @@ async function getHCPUserConsents(req, res) {
 
         const userConsentDetails = await ConsentLocale.findAll({ include: { model: Consent, as: 'consent', attributes: ['title'] }, where: { consent_id: userConsents.map(consent => consent.consent_id), locale: locale ? locale.toLowerCase() : 'en' }, attributes: ['consent_id', 'rich_text'] });
 
-        const consentCountries = await ConsentCountry.findAll({ where: { consent_id: userConsents.map(consent => consent.consent_id), country_iso2: doc.country_iso2 } });
+        const consentCountries = await ConsentCountry.findAll({ where: { consent_id: userConsents.map(consent => consent.consent_id), country_iso2: { [Op.or]: [ doc.country_iso2.toUpperCase(), doc.country_iso2.toLowerCase() ] } } });
 
         const consentResponse = userConsentDetails.map(({ consent_id: id, rich_text, consent: { title } }) => ({ id, title, rich_text: validator.unescape(rich_text) }));
 
