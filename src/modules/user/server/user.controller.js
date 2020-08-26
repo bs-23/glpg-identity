@@ -432,9 +432,13 @@ async function changePassword(req, res) {
             return res.status(400).send('Current Password not valid');
         }
 
+        if (await PasswordPolicies.minimumPasswordAge(user.password_updated_at)) {
+            return res.status(400).send(`You cannot change password before 1 day`);
+        }
+
         if (await PasswordPolicies.isOldPassword(newPassword, user)) return res.status(400).send('New password can not be your previously used password.');
 
-        if (!PasswordPolicies.validatePassword(newPassword)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.')
+        if (!PasswordPolicies.validatePassword(newPassword)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.');
 
         if (newPassword !== confirmPassword) return res.status(400).send('Passwords should match');
 
@@ -443,6 +447,7 @@ async function changePassword(req, res) {
         if (user.password) await PasswordPolicies.saveOldPassword(user);
 
         user.password = newPassword;
+        user.password_updated_at = new Date(Date.now());
         await user.save();
 
         res.json(formatProfile(user));
@@ -469,6 +474,10 @@ async function resetPassword(req, res) {
 
         const user = await User.findOne({ where: { id: resetRequest.user_id } });
 
+        if (await PasswordPolicies.minimumPasswordAge(user.password_updated_at)) {
+            return res.status(400).send(`You cannot change password before 1 day`);
+        }
+
         if (await PasswordPolicies.isOldPassword(req.body.newPassword, user)) return res.status(400).send('New password can not be your previously used password.');
 
         if (!PasswordPolicies.validatePassword(req.body.newPassword)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.');
@@ -479,7 +488,12 @@ async function resetPassword(req, res) {
 
         if (user.password) await PasswordPolicies.saveOldPassword(user);
 
-        user.update({ password: req.body.newPassword });
+        await user.update({
+            password: req.body.newPassword,
+            failed_auth_attempt: 0,
+            password_updated_at: new Date(Date.now())
+        });
+
         const options = {
             toAddresses: [user.email],
             data: {
@@ -496,11 +510,6 @@ async function resetPassword(req, res) {
             options.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp/password-reset.html`);
             options.subject = 'Your password has been reset'
         }
-
-        await user.update(
-            { failed_auth_attempt: 0 },
-            { where: { email: user.dataValues.email } }
-        );
 
         emailService.send(options);
 
