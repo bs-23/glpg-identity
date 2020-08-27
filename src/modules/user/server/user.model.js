@@ -1,5 +1,6 @@
 const path = require('path');
 const bcrypt = require('bcryptjs');
+const Sequelize = require('sequelize');
 const { DataTypes } = require('sequelize');
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
@@ -72,6 +73,9 @@ const User = sequelize.cdpConnector.define('users', {
     },
     expiry_date: {
         type: DataTypes.DATE
+    },
+    password_updated_at: {
+        type: Sequelize.DATE
     },
     created_by: {
         type: DataTypes.UUID,

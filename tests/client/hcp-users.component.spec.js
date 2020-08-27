@@ -150,6 +150,27 @@ describe('Hcp user component', () => {
 
     });
 
+    it('should show HCP user details modal', async () => {
+        const { debug, getByTestId, getByText, container } = render(wrapperComponent());
+        const tbody = await waitFor(() => container.querySelector('tbody'));
+        const rows = tbody.childNodes;
+        const first_row = rows[0];
+
+        const actionBtn = first_row.childNodes[9].childNodes[0].childNodes[0].childNodes[0];
+
+        fireEvent.click(actionBtn);
+
+        const profileDetailsBtn = await waitFor(() => getByText('Manage Profile'));
+
+        fireEvent.click(profileDetailsBtn);
+
+        const profileDetailsModal = await waitFor(() => getByText('Profile Details'));
+
+        const nameField = profileDetailsModal.parentNode.parentNode.lastChild.firstChild.firstChild.firstChild.firstChild;
+
+        expect(nameField.textContent).toEqual('a a');
+    });
+
     // it('should sort table data by first name', async () => {
     //     const { container, getByText } = render(wrapperComponent());
     //     const tbody = container.querySelector('tbody');
