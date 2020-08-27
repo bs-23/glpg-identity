@@ -68,9 +68,9 @@ export default function PermissionSetForm() {
         setCountries(response.data);
     }
 
-    const getServiceCategories = () => {
-        // There is currently no API endpoint for service category. So, temporarily working with static data
-        setServiceCategories([{ id: '13eedb4f-2b0b-457b-9461-f44e25bcc972', name: 'Consent Management' }]);
+    const getServiceCategories = async () => {
+        const response = await axios.get('/api/serviceCategories');
+        setServiceCategories(response.data);
     }
 
     const handleSubmit = (values, actions) => {
@@ -148,7 +148,7 @@ export default function PermissionSetForm() {
                                                             <CheckList name="countries" options={countries} idExtractor={item => item.country_iso2} labelExtractor={item => item.codbase_desc} />
                                                         </FormField>
                                                         <FormField label="Select Service Categories" name="serviceCategories">
-                                                            <CheckList name="serviceCategories" options={serviceCategories} idExtractor={item => item.id} labelExtractor={item => item.name} />
+                                                            <CheckList name="serviceCategories" options={serviceCategories} idExtractor={item => item.id} labelExtractor={item => item.title} />
                                                         </FormField>
                                                     </div>
                                                     <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting} > Submit </button>
