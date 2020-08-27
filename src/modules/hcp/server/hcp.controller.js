@@ -189,7 +189,7 @@ async function getHcps(req, res) {
             include: [{
                 model: HcpConsents,
                 as: 'hcpConsents',
-                attributes: ['consent_id'],
+                attributes: ['consent_id', 'response', 'consent_confirmed'],
             }],
             attributes: { exclude: ['password', 'created_by', 'updated_by'] },
             offset,
@@ -204,8 +204,11 @@ async function getHcps(req, res) {
             const consent_types = new Set();
 
             await Promise.all(hcp['hcpConsents'].map(async hcpConsent => {
-                const country_consent = await ConsentCountry.findOne({ where: { consent_id: hcpConsent.consent_id } });
-                consent_types.add(country_consent.opt_type);
+
+                if(hcpConsent.response && hcpConsent.consent_confirmed){
+                    const country_consent = await ConsentCountry.findOne({ where: { consent_id: hcpConsent.consent_id } });
+                    consent_types.add(country_consent.opt_type);
+                }
             }));
 
             hcp.dataValues.consent_types = [...consent_types];
@@ -688,7 +691,7 @@ async function getHCPUserConsents(req, res) {
             return res.status(404).send(response);
         }
 
-        const userConsents = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id', 'updated_at'] });
+        const userConsents = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id', 'response', 'consent_confirmed', 'updated_at'] });
 
         if (!userConsents) return res.json([]);
 
@@ -703,6 +706,7 @@ async function getHCPUserConsents(req, res) {
             const matchedConsentCountries = consentCountries.find(c => c.consent_id === conRes.id);
             conRes.consent_given_time = matchedConsent ? matchedConsent.updated_at : null;
             conRes.opt_type = matchedConsentCountries ? matchedConsentCountries.opt_type : null;
+            conRes.consent_given = matchedConsent ? matchedConsent.consent_confirmed && matchedConsent.response ? true : false : null;
             return conRes;
         });
 
