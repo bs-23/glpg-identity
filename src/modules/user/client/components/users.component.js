@@ -18,8 +18,8 @@ export default function Users() {
     const [sort, setSort] = useState({ type: 'ASC', value: null });
 
     const getUserList = (page = params.get('page') ? params.get('page') : 1,
-        country_iso2 = params.get('country_iso2') ? params.get('country_iso2') : null) => {
-        dispatch(getUsers(page, country_iso2));
+        codbase = params.get('codbase') ? params.get('codbase') : null) => {
+        dispatch(getUsers(page, codbase));
     };
 
     const sortCountries = (userCountries) => {
@@ -123,12 +123,12 @@ export default function Users() {
                                 <Dropdown className="ml-auto dropdown-customize">
                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center">
                                         <i className="icon icon-filter mr-2 mb-n1"></i> Filter by Country
-                            </Dropdown.Toggle>
+                                </Dropdown.Toggle>
                                     <Dropdown.Menu>
                                         <LinkContainer to="list?page=1"><Dropdown.Item onClick={() => getUserList(1, null)}>All</Dropdown.Item></LinkContainer>
                                         {
                                             userCountries.length > 0 && userCountries.map(country => (
-                                                <LinkContainer to={`list?page=1&country_iso2=${country.country_iso2}&sort_type=${sort.type}&sort_col=${sort.value}`} key={country.countryid}><Dropdown.Item onClick={() => getUserList(1, country.country_iso2)}>{country.countryname}</Dropdown.Item></LinkContainer>
+                                                <LinkContainer to={`list?page=1&codbase=${country.codbase}&sort_type=${sort.type}&sort_col=${sort.value}`} key={country.countryid}><Dropdown.Item onClick={() => getUserList(1, country.codbase)}>{country.codbase_desc}</Dropdown.Item></LinkContainer>
                                             ))
                                         }
                                     </Dropdown.Menu>

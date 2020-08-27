@@ -44,12 +44,12 @@ export function changePassword(data) {
     };
 }
 
-export function getUsers(page = 1, country_iso2) {
+export function getUsers(page = 1, codbase) {
     return {
         type: Types.GET_USERS,
         payload: axios({
             method: 'get',
-            url: `/api/users?page=${page}&country_iso2=${country_iso2}`,
+            url: `/api/users?page=${page}&codbase=${codbase}`,
         })
     };
 }
