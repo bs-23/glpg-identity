@@ -217,18 +217,18 @@ export default function hcpUsers() {
                                         </div>
                                         <div className="row mt-3">
                                             <div className="col-6">
-                                                <div className="mt-1 font-weight-bold">UUID &amp; OneKeyID</div>
-                                                <div className="">{currentUser.individual_id_onekey || '--'}</div>
+                                                <div className="mt-1 font-weight-bold">UUID</div>
+                                                <div className="">{currentUser.uuid || '--'}</div>
                                             </div>
                                             <div className="col-6">
-                                                <div className="mt-1 font-weight-bold">Email</div>
-                                                <div className="">{currentUser.email || '--'}</div>
+                                                <div className="mt-1 font-weight-bold">OneKeyID</div>
+                                                <div className="">{currentUser.individual_id_onekey || '--'}</div>
                                             </div>
                                         </div>
                                         <div className="row mt-3">
                                             <div className="col-6">
-                                                <div className="mt-1 font-weight-bold">Date of Registration</div>
-                                                <div className="">{ currentUser.created_at ? (new Date(currentUser.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.') : '--' }</div>
+                                                <div className="mt-1 font-weight-bold">Email</div>
+                                                <div className="">{currentUser.email || '--'}</div>
                                             </div>
                                             <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">Phone</div>
@@ -239,6 +239,10 @@ export default function hcpUsers() {
                                             <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">Country</div>
                                                 <div className="">{getCountryName(currentUser.country_iso2) || '--'}</div>
+                                            </div>
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Date of Registration</div>
+                                                <div className="">{ currentUser.created_at ? (new Date(currentUser.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.') : '--' }</div>
                                             </div>
                                         </div>
                                         <div className="row mt-4">
