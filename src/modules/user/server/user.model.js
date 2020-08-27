@@ -74,6 +74,9 @@ const User = sequelize.cdpConnector.define('users', {
     expiry_date: {
         type: DataTypes.DATE
     },
+    password_expiry_date: {
+        type: DataTypes.DATE
+    },
     password_updated_at: {
         type: Sequelize.DATE
     },
