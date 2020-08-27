@@ -138,7 +138,7 @@ async function login(req, res) {
             return res.status(401).send('Your account has been locked for consecutive failed auth attempts. Please use the Forgot Password link to unlock.');
         }
 
-        if (user && user.password_expiry_date < Date.now()) {
+        if (user && user.password_expiry_date && user.password_expiry_date < Date.now()) {
             return res.status(401).send("Password has been expired. Please reset the password.");
         }
 
