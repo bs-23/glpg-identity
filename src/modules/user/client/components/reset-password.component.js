@@ -16,10 +16,16 @@ export default function ResetPasswordForm() {
     const { addToast } = useToasts();
 
     const popoverTop = (
-        <Popover id="popover-basic">
-            <Popover.Title as="h3">Popover Top</Popover.Title>
-            <Popover.Content>
-                This is simple popover example top side.
+        <Popover id="popover-basic" className="popup-customize">
+            <Popover.Title as="h3" className=" pt-4 px-3">Password must meet the following requirement:</Popover.Title>
+            <Popover.Content className=" px-3">
+                <ul className="list-unstyled">
+                    <li><i className="fas fa-circle"></i>At least one lowercase letter</li>
+                    <li><i className="fas fa-circle"></i>At least one uppercase letter</li>
+                    <li><i className="fas fa-circle"></i>At least one number or symbol </li>
+                    <li><i className="fas fa-circle"></i>At least 8 characters</li>
+                    <li><i className="fas fa-circle"></i>Not be a common password</li>
+                </ul>
             </Popover.Content>
         </Popover>
     );
@@ -71,7 +77,7 @@ export default function ResetPasswordForm() {
                                                 <label className="label-style">New Password<span className="text-danger required-field pl-1">*</span></label>
 
                                                 <OverlayTrigger trigger="click" placement="top" overlay={popoverTop}>
-                                                    <span>*</span>
+                                                    <i class="fas fa-info-circle ml-2 cdp-text-primary" role="button"></i>
                                                 </OverlayTrigger>
 
                                                 <Field

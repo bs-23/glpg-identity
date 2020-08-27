@@ -8,13 +8,16 @@ const initialState = {
     countries: []
 };
 
-function sortItems(itms, val, type) {
-    return itms.sort(function (a, b) {
-        const count = a[val].length < b[val].length ? a[val].length : b[val].length;
+function sortItems(items, propertyName, type) {
+    if(!propertyName || propertyName === 'null') {
+        return items;
+    }
+    return items.sort(function (a, b) {
+        const count = a[propertyName].length < b[propertyName].length ? a[propertyName].length : b[propertyName].length;
         let flag = 0;
         for (let index = 0; index < count; index++) {
-            const aVal = a[val][index];
-            const bVal = b[val][index];
+            const aVal = a[propertyName][index];
+            const bVal = b[propertyName][index];
             if (aVal.toLowerCase() < bVal.toLowerCase()) {
                 flag = -1 * type;
                 break;

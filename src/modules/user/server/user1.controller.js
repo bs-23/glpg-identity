@@ -2,15 +2,17 @@ const path = require('path');
 const crypto = require('crypto');
 const { Op } = require('sequelize');
 const jwt = require('jsonwebtoken');
-const User = require('./user.model');
+const User = require('./user1.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const ResetPassword = require('./reset-password.model');
-const UserRole = require(path.join(process.cwd(), "src/modules/user/server/user-role.model"));
-const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
-const RolePermission = require(path.join(process.cwd(), "src/modules/user/server/role/role-permission.model"));
-const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
+const UserProfile = require(path.join(process.cwd(), "src/modules/user/server/user-profile.model"));
+const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/userProfile-permissionSet.model"));
+const PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permission-set.model"));
+const PermissionSet_ServiceCateory = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-serviceCategory.model"));
+const ServiceCategory = require(path.join(process.cwd(), "src/modules/user/server/permission/service-category.model"));
+
 const axios = require("axios");
 const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
 const PasswordPolicies = require(path.join(process.cwd(), "src/modules/core/server/password/password-policies.js"));
@@ -27,38 +29,51 @@ function generateAccessToken(user) {
     });
 }
 
-function getRolesPermissions(userrole) {
-    const roles = [];
+async function getProfilePermissions(profile) {
+    const profiles = [];
+    const serviceCategories = [];
 
-    if (userrole) {
-        userrole.forEach(ur => {
-            roles.push({
-                title: ur.role.name,
-                permissions: ur.role.rolePermission.map(rp => rp.permission.module)
+    if (profile.userProfile_permissionSet) {
+        for (const userProPermSet of profile.userProfile_permissionSet) {
+            const permissionServiceCategories = await PermissionSet_ServiceCateory.findAll ({
+                where: {
+                    permissionSetId: userProPermSet.permissionSet.id
+                },
+                include: [{
+                    model: ServiceCategory,
+                    as: 'serviceCategory'
+
+                }]
             });
+            permissionServiceCategories.forEach(perServiceCat => {
+                serviceCategories.push(perServiceCat.serviceCategory);
+
+            })
+          }
+
+
+
+        profiles.push({
+            title: profile.title,
+            serviceCategories: serviceCategories.map(sc => sc.slug)
         });
 
-        return roles;
+
+        return profiles;
     }
 }
 
-function getCommaSeparatedRoles(userrole) {
-    if (userrole) {
-        const roles = userrole.map(ur => ur.role.name);
-        return roles.join();
-    }
-}
 
-function formatProfile(user) {
+async function formatProfile(user) {
     const profile = {
         id: user.id,
         first_name: user.first_name,
         last_name: user.last_name,
         email: user.email,
         type: user.type,
-        roles: getRolesPermissions(user.userrole),
-        application: user.application,
-        countries: user.countries
+        profiles: await getProfilePermissions(user.userProfile),
+        application: user.applications,
+        countries: null
     };
     return profile;
 }
@@ -73,7 +88,7 @@ function formatProfileDetail(user) {
         phone: user.phone,
         last_login: user.last_login,
         expiry_date: user.expiry_date,
-        roles: getCommaSeparatedRoles(user.userrole),
+        profiles: user.userProfile.title,
         application: user.application_name,
         countries: user.countries
     };
@@ -82,13 +97,22 @@ function formatProfileDetail(user) {
 }
 
 async function attachApplicationInfoToUser(user) {
-    const userApplication = await Application.findOne({ where: { id: user.application_id } });
-    user.application = userApplication ? {
-        name: userApplication.name,
-        slug: userApplication.slug,
-        logo_link: userApplication.logo_link
-    } : null;
+
+    const applications = [];
+
+    if (user.profile) {
+        for (const userProPermSet of profile.userProfile_permissionSet) {
+            const userApplication = await Application.findOne({ where: { id: userProPermSet.permissionSet.applicationId } });
+            applications.push({
+                name: userApplication.name,
+                slug: userApplication.slug,
+                logo_link: userApplication.logo_link
+            })
+          }
+
+    user.applications = applications.length > 0 ? applications : null;
     return user;
+}
 }
 
 async function getSignedInUserProfile(req, res) {
@@ -105,9 +129,9 @@ async function login(req, res) {
     try {
         const { email, password, recaptchaToken } = req.body;
 
-        if (!recaptchaToken) {
-            return res.status(400).send('Captcha verification required.');
-        }
+        // if (!recaptchaToken) {
+        //     return res.status(400).send('Captcha verification required.');
+        // }
 
         const user = await User.findOne({
             where: {
@@ -116,18 +140,14 @@ async function login(req, res) {
                 }
             },
             include: [{
-                model: UserRole,
-                as: 'userrole',
+                model: UserProfile,
+                as: 'userProfile',
                 include: [{
-                    model: Role,
-                    as: 'role',
+                    model: UserProfile_PermissionSet,
+                    as: 'userProfile_permissionSet',
                     include: [{
-                        model: RolePermission,
-                        as: 'rolePermission',
-                        include: [{
-                            model: Permission,
-                            as: 'permission',
-                        }]
+                        model: PermissionSet,
+                        as: 'permissionSet',
 
                     }]
                 }]
@@ -151,9 +171,9 @@ async function login(req, res) {
 
         const isSiteVerified = await verifySite(recaptchaToken);
 
-        if (!isSiteVerified) {
-            return res.status(400).send('Failed captcha verification.');
-        }
+        // if (!isSiteVerified) {
+        //     return res.status(400).send('Failed captcha verification.');
+        // }
 
         res.cookie('access_token', generateAccessToken(user), {
             expires: new Date(Date.now() + 8.64e7),
@@ -169,7 +189,7 @@ async function login(req, res) {
             { where: { email: email } }
         );
 
-        res.json(formatProfile(userWithApplication));
+        res.json(await formatProfile(userWithApplication));
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -187,9 +207,7 @@ async function createUser(req, res) {
         email,
         country_code,
         phone,
-        countries,
-        roles,
-        application_id,
+        profileId,
     } = req.body;
     const phone_number = phone ? country_code + phone : '';
     const validForMonths = 6
@@ -202,8 +220,7 @@ async function createUser(req, res) {
                 first_name,
                 last_name,
                 phone: phone_number ? phone_number.replace(/\s+/g, '') : null,
-                countries,
-                application_id,
+                profileId,
                 created_by: req.user.id,
                 updated_by: req.user.id,
                 expiry_date: new Date(currentDate.setMonth(currentDate.getMonth() + validForMonths))
@@ -213,13 +230,6 @@ async function createUser(req, res) {
         if (!created) {
             return res.status(400).send('Email already exists.');
         }
-
-        roles && roles.forEach(async function (roleId) {
-            await UserRole.create({
-                roleId: roleId,
-                userId: doc.id,
-            });
-        });
 
         const logData = {
             event_type: 'CREATE',
@@ -348,18 +358,32 @@ async function getUser(req, res) {
                 id: req.params.id
             },
             include: [{
-                model: UserRole,
-                as: 'userrole',
+                model: UserProfile,
+                as: 'userProfile',
                 include: [{
-                    model: Role,
-                    as: 'role',
-                }]
+                    model: UserProfile_PermissionSet,
+                    as: 'userProfile_permissionSet',
+                    include: [{
+                        model: PermissionSet,
+                        as: 'permissionSet',
+                    }],
+                }],
             }],
         });
 
         if (!user) return res.status(404).send("User is not found or may be removed");
+        if (user.userProfile.userProfile_permissionSet) {
+            user.userProfile.userProfile_permissionSet.forEach(ps => {
 
-        const userApplication = await Application.findOne({ where: { id: user.application_id } });
+                ps.permissionSet_serviceCategory.forEach(perServiceCat => {
+
+
+                })
+
+            });
+        }
+
+        const userApplication = await Application.findOne({ where: { id: user.UserProfile.application_id } });
         user.application_name = userApplication ? userApplication.name : null;
 
         const formattedUser = formatProfileDetail(user);
@@ -432,13 +456,9 @@ async function changePassword(req, res) {
             return res.status(400).send('Current Password not valid');
         }
 
-        if (await PasswordPolicies.minimumPasswordAge(user.password_updated_at)) {
-            return res.status(400).send(`You cannot change password before 1 day`);
-        }
-
         if (await PasswordPolicies.isOldPassword(newPassword, user)) return res.status(400).send('New password can not be your previously used password.');
 
-        if (!PasswordPolicies.validatePassword(newPassword)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.');
+        if (!PasswordPolicies.validatePassword(newPassword)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.')
 
         if (newPassword !== confirmPassword) return res.status(400).send('Passwords should match');
 
@@ -447,7 +467,6 @@ async function changePassword(req, res) {
         if (user.password) await PasswordPolicies.saveOldPassword(user);
 
         user.password = newPassword;
-        user.password_updated_at = new Date(Date.now());
         await user.save();
 
         res.json(formatProfile(user));
@@ -474,10 +493,6 @@ async function resetPassword(req, res) {
 
         const user = await User.findOne({ where: { id: resetRequest.user_id } });
 
-        if (await PasswordPolicies.minimumPasswordAge(user.password_updated_at)) {
-            return res.status(400).send(`You cannot change password before 1 day`);
-        }
-
         if (await PasswordPolicies.isOldPassword(req.body.newPassword, user)) return res.status(400).send('New password can not be your previously used password.');
 
         if (!PasswordPolicies.validatePassword(req.body.newPassword)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.');
@@ -488,12 +503,7 @@ async function resetPassword(req, res) {
 
         if (user.password) await PasswordPolicies.saveOldPassword(user);
 
-        await user.update({
-            password: req.body.newPassword,
-            failed_auth_attempt: 0,
-            password_updated_at: new Date(Date.now())
-        });
-
+        user.update({ password: req.body.newPassword });
         const options = {
             toAddresses: [user.email],
             data: {
@@ -510,6 +520,11 @@ async function resetPassword(req, res) {
             options.templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp/password-reset.html`);
             options.subject = 'Your password has been reset'
         }
+
+        await user.update(
+            { failed_auth_attempt: 0 },
+            { where: { email: user.dataValues.email } }
+        );
 
         emailService.send(options);
 
