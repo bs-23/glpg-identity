@@ -1,9 +1,10 @@
 import axios from "axios";
-import { NavLink } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
-import { permissionSetCreateSchema } from "../user.schema";
+import { useSelector, useDispatch } from "react-redux";
 import { useToasts } from "react-toast-notifications";
+import { permissionSetCreateSchema } from "../user.schema";
+import { getCountries } from "../user.actions";
 
 
 const FormField = ({ label, name, type, children }) => <div className="col-12 col-sm-6">
@@ -52,20 +53,16 @@ const CheckList = ({ name, options, labelExtractor, idExtractor }) => {
         />
 }
 
-export default function PermissionSetForm() {
+export default function PermissionSetForm({ onSuccess, onError }) {
     const [applications, setApplications] = useState([]);
-    const [countries, setCountries] = useState([]);
     const [serviceCategories, setServiceCategories] = useState([]);
+    const countries = useSelector(state => state.userReducer.countries);
     const { addToast } = useToasts();
+    const dispatch = useDispatch();
 
     const getApplications = async () => {
         const response = await axios.get('/api/applications');
         setApplications(response.data);
-    }
-
-    const getCountries = async () => {
-        const response = await axios.get('/api/countries');
-        setCountries(response.data);
     }
 
     const getServiceCategories = async () => {
@@ -81,6 +78,7 @@ export default function PermissionSetForm() {
                     appearance: 'success',
                     autoDismiss: true
                 });
+                onSuccess && onSuccess();
             })
             .catch(err => {
                 const errorMessage = typeof err.response.data === 'string' ? err.response.data : err.response.statusText;
@@ -88,38 +86,23 @@ export default function PermissionSetForm() {
                     appearance: 'error',
                     autoDismiss: true
                 });
+                onError && onError();
             }).finally(() => actions.setSubmitting(false))
         actions.setSubmitting(true);
     }
 
     useEffect(() => {
         getApplications();
-        getCountries();
+        dispatch(getCountries());
         getServiceCategories();
     }, []);
 
 
     return (
-        <main className="app__content cdp-light-bg">
-            <div className="container-fluid">
-                <div className="row">
-                    <div className="col-12 px-0">
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb rounded-0">
-                                <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
-                                <li className="breadcrumb-item"><NavLink to="/users">Management of Customer Data platform</NavLink></li>
-                                {/* <li className="breadcrumb-item"><NavLink to="/users/list">CDP User List</NavLink></li> */}
-                                <li className="breadcrumb-item active"><span>Create Permission Set</span></li>
-                            </ol>
-                        </nav>
-                    </div>
-                </div>
+            <div className="">
                 <div className="row">
                     <div className="col-12">
-                        <div className="shadow-sm bg-white mb-3">
-                        <h2 className="d-flex align-items-center p-3 px-sm-4 py-sm-4 page-title light">
-                                <span className="page-title__text font-weight-bold py-3">Create New Permission Set</span>
-                            </h2>
+                        <div className="">
                             <div className="add-user p-3">
                                 <Formik
                                     initialValues={{
@@ -136,7 +119,7 @@ export default function PermissionSetForm() {
                                     {formikProps => (
                                         <Form onSubmit={formikProps.handleSubmit}>
                                             <div className="row">
-                                                <div className="col-12 col-lg-8 col-xl-6">
+                                                <div className="col-12">
                                                     <div className="row">
                                                         <FormField label="Title" type="text" name="title"/>
                                                         <FormField label="Select Application" name="application_id" >
@@ -162,6 +145,5 @@ export default function PermissionSetForm() {
                     </div>
                 </div>
             </div>
-        </main>
     )
 }
