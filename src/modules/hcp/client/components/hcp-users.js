@@ -231,7 +231,7 @@ export default function hcpUsers() {
                                                 <div className="">{currentUser.email || '--'}</div>
                                             </div>
                                             <div className="col-6">
-                                                <div className="mt-1 font-weight-bold">Phone</div>
+                                                <div className="mt-1 font-weight-bold">Phone Number</div>
                                                 <div className="">{currentUser.telephone || '--'}</div>
                                             </div>
                                         </div>
