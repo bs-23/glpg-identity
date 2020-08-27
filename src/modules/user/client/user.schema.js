@@ -103,3 +103,10 @@ export const roleSchema = object().shape({
             .min(1, 'Must select at least one permission')
             .required('Must select at least one permission')
 });
+
+export const permissionSetCreateSchema = object().shape({
+    title: string().required('This field must not be empty.'),
+    application_id: string().required('Must select at least one application'),
+    countries: string().required('Must select at least one country'),
+    serviceCategories: string().required('Must select at least one country'),
+});
