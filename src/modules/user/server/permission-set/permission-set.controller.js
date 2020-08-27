@@ -1,6 +1,8 @@
 const path = require('path');
 const PermissionSet = require('./permission-set.model');
 const PermissionSet_ServiceCategory = require('./permissionSet-serviceCategory.model');
+const ServiceCategory = require('../permission/service-category.model');
+const Application = require('../../../application/server/application.model');
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 
 async function getPermissionSets(req, res) {
@@ -8,8 +10,18 @@ async function getPermissionSets(req, res) {
         const permissionSets = await PermissionSet.findAll({
             include: [{
                 model: PermissionSet_ServiceCategory,
-                as: 'permissionSet_serviceCategory'
-            }],
+                as: 'permissionSet_serviceCategory',
+                include: [{
+                    model: ServiceCategory,
+                    as: 'serviceCategory'
+
+                }]
+            },
+            {
+                model: Application,
+                as: 'application'
+            }
+        ],
             order: [
                 ['created_at', 'ASC'],
                 ['id', 'ASC']

@@ -343,7 +343,8 @@ async function getUsers(req, res) {
                 as: 'createdByUser',
                 attributes: ['id', 'first_name', 'last_name'],
             },
-             model: UserProfile,
+            {
+                model: UserProfile,
                 as: 'userProfile',
                 include: [{
                     model: UserProfile_PermissionSet,
