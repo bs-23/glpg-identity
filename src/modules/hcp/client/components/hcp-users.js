@@ -253,8 +253,8 @@ export default function hcpUsers() {
                                                             <Accordion.Collapse eventKey={consent.id}>
                                                                 <Card.Body className="">
                                                                 <div>{parse(consent.rich_text)}</div>
-                                                                <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Consent Type:</span> {consent.opt_type} Opt-in</div>
-                                                                <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Consent Submitted Date:</span>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
+                                                                <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Consent type:</span> {consent.opt_type} Opt-in</div>
+                                                                <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Consent given date:</span>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
                                                                 </Card.Body>
                                                             </Accordion.Collapse>
                                                         <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
@@ -396,7 +396,7 @@ export default function hcpUsers() {
                                                                         {/*{currentAction.userId === row.id ? currentAction.action : 'Select an action'}*/}
                                                                     </Dropdown.Toggle>
                                                                     <Dropdown.Menu>
-                                                                        <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(row)}>Manage Profile</Dropdown.Item></LinkContainer>
+                                                                        <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(row)}>Profile</Dropdown.Item></LinkContainer>
                                                                         {/* <LinkContainer to="#"><Dropdown.Item>Edit Profile</Dropdown.Item></LinkContainer> */}
                                                                         {row.status === 'not_verified' && <LinkContainer to="#"><Dropdown.Item onClick={() => onUpdateStatus(row)}>Manage Status</Dropdown.Item></LinkContainer>}
                                                                     </Dropdown.Menu>
