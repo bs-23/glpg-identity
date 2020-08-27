@@ -138,6 +138,10 @@ async function login(req, res) {
             return res.status(401).send('Your account has been locked for consecutive failed auth attempts. Please use the Forgot Password link to unlock.');
         }
 
+        if (user && user.password_expiry_date && user.password_expiry_date < Date.now()) {
+            return res.status(401).send("Password has been expired. Please reset the password.");
+        }
+
         if (!user || !user.password || !user.validPassword(password)) {
 
             if (user && user.password) {
@@ -449,7 +453,7 @@ async function changePassword(req, res) {
         const currentDate = new Date();
         const expiryDate = new Date(currentDate.setMonth(currentDate.getMonth() + passwordValidityInMonths));
 
-        user.expiry_date = expiryDate;
+        user.password_expiry_date = expiryDate;
         user.password = newPassword;
         user.password_updated_at = new Date(Date.now());
         await user.save();
@@ -500,7 +504,7 @@ async function resetPassword(req, res) {
             password: req.body.newPassword,
             failed_auth_attempt: 0,
             password_updated_at: new Date(Date.now()),
-            expiry_date: expiryDate
+            password_expiry_date: expiryDate
         });
 
         const options = {
