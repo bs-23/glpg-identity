@@ -189,7 +189,7 @@ async function getHcps(req, res) {
             include: [{
                 model: HcpConsents,
                 as: 'hcpConsents',
-                attributes: ['consent_id'],
+                attributes: ['consent_id', 'response', 'consent_confirmed'],
             }],
             attributes: { exclude: ['password', 'created_by', 'updated_by'] },
             offset,
@@ -204,8 +204,11 @@ async function getHcps(req, res) {
             const consent_types = new Set();
 
             await Promise.all(hcp['hcpConsents'].map(async hcpConsent => {
-                const country_consent = await ConsentCountry.findOne({ where: { consent_id: hcpConsent.consent_id } });
-                consent_types.add(country_consent.opt_type);
+
+                if(hcpConsent.response && hcpConsent.consent_confirmed){
+                    const country_consent = await ConsentCountry.findOne({ where: { consent_id: hcpConsent.consent_id } });
+                    consent_types.add(country_consent.opt_type);
+                }
             }));
 
             hcp.dataValues.consent_types = [...consent_types];
