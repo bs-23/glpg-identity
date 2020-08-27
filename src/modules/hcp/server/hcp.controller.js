@@ -691,7 +691,7 @@ async function getHCPUserConsents(req, res) {
             return res.status(404).send(response);
         }
 
-        const userConsents = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id', 'updated_at'] });
+        const userConsents = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id', 'response', 'consent_confirmed', 'updated_at'] });
 
         if (!userConsents) return res.json([]);
 
@@ -706,6 +706,7 @@ async function getHCPUserConsents(req, res) {
             const matchedConsentCountries = consentCountries.find(c => c.consent_id === conRes.id);
             conRes.consent_given_time = matchedConsent ? matchedConsent.updated_at : null;
             conRes.opt_type = matchedConsentCountries ? matchedConsentCountries.opt_type : null;
+            conRes.consent_given = matchedConsent ? matchedConsent.consent_confirmed && matchedConsent.response ? true : false : null;
             return conRes;
         });
 

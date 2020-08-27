@@ -254,11 +254,11 @@ export default function hcpUsers() {
                                                                 <Card.Body className="">
                                                                 <div>{parse(consent.rich_text)}</div>
                                                                 <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Consent type:</span> <span className="text-capitalize">{consent.opt_type}</span> Opt-in</div>
-                                                                <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Consent given date:</span>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
+                                                                { consent.consent_given && <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Consent given date:</span>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div> }
                                                                 </Card.Body>
                                                             </Accordion.Collapse>
                                                         <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
-                                                            <span className="d-flex align-items-center"><i class="icon icon-check-filled cdp-text-primary mr-4 consent-check"></i> <span className="consent-summary">{consent.title}</span></span>
+                                                            <span className="d-flex align-items-center"><i class={`icon ${ consent.consent_given ? 'icon-check-filled' : 'icon-close-circle text-danger'} cdp-text-primary mr-4 consent-check`}></i> <span className="consent-summary">{consent.title}</span></span>
                                                                 <i className="icon icon-arrow-down ml-2 accordion-consent__icon-down"></i>
                                                             </Accordion.Toggle>
                                                         </Card>
@@ -296,7 +296,7 @@ export default function hcpUsers() {
                                             <div className="row pb-3">
                                                 <div className="col">
                                                     {currentUser.consents && currentUser.consents.length ?
-                                                        currentUser.consents.map(consent => <div className="pb-1" key={consent.id} ><i className="icon icon-check-filled cdp-text-primary mr-2 small"></i>{ consent.title }</div>)
+                                                        currentUser.consents.map(consent => <div className="pb-1" key={consent.id} ><i className={`icon ${ consent.consent_given ? 'icon-check-filled' : 'icon-close-circle text-danger' } cdp-text-primary mr-2 small`}></i>{ consent.title }</div>)
                                                         : <div className="alert alert-warning">The HCP has not given any consent.</div>}
                                                 </div>
                                             </div>
