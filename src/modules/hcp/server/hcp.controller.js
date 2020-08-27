@@ -918,7 +918,8 @@ async function getSpecialties(req, res) {
             masterDataSpecialties = await sequelize.datasyncConnector.query(`
             SELECT codbase, cod_id_onekey, cod_locale, cod_description
             FROM ciam.vwspecialtymaster as Specialty
-            WHERE LOWER(cod_locale) = $locale;
+            WHERE LOWER(cod_locale) = $locale
+            ORDER BY cod_description ASC;
             `, {
                 bind: {
                     locale: languageCode.toLowerCase()
