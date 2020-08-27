@@ -138,14 +138,18 @@ async function login(req, res) {
             return res.status(401).send('Your account has been locked for consecutive failed auth attempts. Please use the Forgot Password link to unlock.');
         }
 
-        if (user && (!user.password || !user.validPassword(password))) {
-            await user.update(
-                { failed_auth_attempt: parseInt(user.dataValues.failed_auth_attempt ? user.dataValues.failed_auth_attempt : '0') + 1 },
-                { where: { email: email } }
-            );
+        if (user && user.password_expiry_date && user.password_expiry_date < Date.now()) {
+            return res.status(401).send("Password has been expired. Please reset the password.");
         }
 
         if (!user || !user.password || !user.validPassword(password)) {
+
+            if (user && user.password) {
+                await user.update(
+                    { failed_auth_attempt: parseInt(user.dataValues.failed_auth_attempt ? user.dataValues.failed_auth_attempt : '0') + 1 }
+                );
+            }
+
             return res.status(401).send('Invalid email or password.');
         }
 
@@ -160,14 +164,12 @@ async function login(req, res) {
             httpOnly: true
         });
 
-        await user.update({ last_login: Date() })
+        await user.update({
+            last_login: Date(),
+            failed_auth_attempt: 0
+        });
 
-        const userWithApplication = await attachApplicationInfoToUser(user)
-
-        await user.update(
-            { failed_auth_attempt: 0 },
-            { where: { email: email } }
-        );
+        const userWithApplication = await attachApplicationInfoToUser(user);
 
         res.json(formatProfile(userWithApplication));
     } catch (err) {
@@ -446,6 +448,12 @@ async function changePassword(req, res) {
 
         if (user.password) await PasswordPolicies.saveOldPassword(user);
 
+
+        const passwordValidityInMonths = newPassword.length >= 15 ? 12 : 6;
+        const currentDate = new Date();
+        const expiryDate = new Date(currentDate.setMonth(currentDate.getMonth() + passwordValidityInMonths));
+
+        user.password_expiry_date = expiryDate;
         user.password = newPassword;
         user.password_updated_at = new Date(Date.now());
         await user.save();
@@ -488,10 +496,15 @@ async function resetPassword(req, res) {
 
         if (user.password) await PasswordPolicies.saveOldPassword(user);
 
+        const passwordValidityInMonths = req.body.newPassword.length >= 15 ? 12 : 6;
+        const currentDate = new Date();
+        const expiryDate = new Date(currentDate.setMonth(currentDate.getMonth() + passwordValidityInMonths));
+
         await user.update({
             password: req.body.newPassword,
             failed_auth_attempt: 0,
-            password_updated_at: new Date(Date.now())
+            password_updated_at: new Date(Date.now()),
+            password_expiry_date: expiryDate
         });
 
         const options = {
