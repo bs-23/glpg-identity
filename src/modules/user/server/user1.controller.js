@@ -35,7 +35,7 @@ async function getProfilePermissions(profile) {
 
     if (profile.userProfile_permissionSet) {
         for (const userProPermSet of profile.userProfile_permissionSet) {
-            const permissionServiceCategories = await PermissionSet_ServiceCateory.findAll ({
+            const permissionServiceCategories = await PermissionSet_ServiceCateory.findAll({
                 where: {
                     permissionSetId: userProPermSet.permissionSet.id
                 },
@@ -49,7 +49,7 @@ async function getProfilePermissions(profile) {
                 serviceCategories.push(perServiceCat.serviceCategory);
 
             })
-          }
+        }
 
 
 
@@ -89,35 +89,54 @@ function formatProfileDetail(user) {
         last_login: user.last_login,
         expiry_date: user.expiry_date,
         profiles: user.userProfile.title,
-        application: user.application_name,
+        application: getCommaSeparatedApplications(user.applications),
         countries: user.countries
     };
 
     return profile;
 }
 
-async function attachApplicationInfoToUser(user) {
+function getCommaSeparatedApplications(applications) {
+    if (applications) {
+        const apps = applications.map(app => app.name);
+        return apps.join();
+    }
+}
+
+async function attachApplicationCountryInfoToUser(user) {
 
     const applications = [];
+    const countries = [];
 
-    if (user.profile) {
-        for (const userProPermSet of profile.userProfile_permissionSet) {
-            const userApplication = await Application.findOne({ where: { id: userProPermSet.permissionSet.applicationId } });
-            applications.push({
-                name: userApplication.name,
-                slug: userApplication.slug,
-                logo_link: userApplication.logo_link
-            })
-          }
+    if (user.userProfile) {
+        const profilePermissionSets = user.userProfile.userProfile_permissionSet;
+        for (const userProPermSet of profilePermissionSets) {
+            if (userProPermSet.permissionSet.applicationId) {
+                const userApplication = await Application.findOne({ where: { id: userProPermSet.permissionSet.applicationId } });
+                applications.push({
+                    name: userApplication.name,
+                    slug: userApplication.slug,
+                    logo_link: userApplication.logo_link
+                })
 
-    user.applications = applications.length > 0 ? applications : null;
-    return user;
+            }
+            if (userProPermSet.permissionSet.countries) {
+                countries.push(userProPermSet.permissionSet.countries);
+            }
+
+        }
+
+        user.applications = applications.length > 0 ? applications : null;
+        user.countries = countries;
+        return user;
+    }
 }
-}
+
+
 
 async function getSignedInUserProfile(req, res) {
     try {
-        const user = await attachApplicationInfoToUser(req.user);
+        const user = await attachApplicationCountryInfoToUser(req.user);
         res.json(formatProfile(user));
     } catch (err) {
         console.error(err);
@@ -182,14 +201,14 @@ async function login(req, res) {
 
         await user.update({ last_login: Date() })
 
-        const userWithApplication = await attachApplicationInfoToUser(user)
+        const userWithApplicationCountries = await attachApplicationCountryInfoToUser(user)
 
         await user.update(
             { failed_auth_attempt: 0 },
             { where: { email: email } }
         );
 
-        res.json(await formatProfile(userWithApplication));
+        res.json(await formatProfile(userWithApplicationCountries));
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -305,6 +324,8 @@ async function getUsers(req, res) {
     const signedInId = (formatProfile(req.user)).id;
 
     try {
+
+
         const users = await User.findAll({
             where: {
                 id: { [Op.ne]: signedInId },
@@ -321,6 +342,21 @@ async function getUsers(req, res) {
                 model: User,
                 as: 'createdByUser',
                 attributes: ['id', 'first_name', 'last_name'],
+            },
+             model: UserProfile,
+                as: 'userProfile',
+                include: [{
+                    model: UserProfile_PermissionSet,
+                    as: 'userProfile_permissionSet',
+                    include: [{
+                        model: PermissionSet,
+                        as: 'permissionSet',
+                        where: {
+                            countries: country_iso2 ? { [Op.contains]: [country_iso2] } : { [Op.ne]: ["undefined"] }
+                          }
+
+                    }]
+                }]
             }],
             attributes: { exclude: ['password'] },
         });
@@ -371,20 +407,7 @@ async function getUser(req, res) {
             }],
         });
 
-        if (!user) return res.status(404).send("User is not found or may be removed");
-        if (user.userProfile.userProfile_permissionSet) {
-            user.userProfile.userProfile_permissionSet.forEach(ps => {
-
-                ps.permissionSet_serviceCategory.forEach(perServiceCat => {
-
-
-                })
-
-            });
-        }
-
-        const userApplication = await Application.findOne({ where: { id: user.UserProfile.application_id } });
-        user.application_name = userApplication ? userApplication.name : null;
+        const user = await attachApplicationCountryInfoToUser(req.user);
 
         const formattedUser = formatProfileDetail(user);
 
