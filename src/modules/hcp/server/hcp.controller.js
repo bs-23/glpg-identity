@@ -173,7 +173,7 @@ async function getHcps(req, res) {
         const country_iso2_list = req.user.type === 'admin' ? (await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry", { type: QueryTypes.SELECT })).map(i => i.country_iso2) : (await Hcp.findAll()).map(i => i.get("country_iso2"));
         const countries_ignorecase = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
 
-        
+
         const codbase_list_mapped_with_user_country_iso2_list = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => req.user.countries.includes(i.country_iso2)).map(i => i.codbase) : [];
         const country_iso2_list_for_user_countries_codbase = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => codbase_list_mapped_with_user_country_iso2_list.includes(i.codbase)).map(i => i.country_iso2) : [];
         const countries_ignorecase_for_user_countries_codbase = [].concat.apply([], country_iso2_list_for_user_countries_codbase.map(i => ignoreCaseArray(i)));
@@ -964,20 +964,26 @@ async function getAccessToken(req, res) {
 
         const doc = await Hcp.findOne({ where: { email } });
 
+        const userLockedError = new CustomError('Your account has been locked for consecutive failed login attempts.', 4002);
+
         if (doc && doc.dataValues.failed_auth_attempt >= 5) {
-            response.errors.push(new CustomError('Your account has been locked for consecutive failed login attempts.', 4002));
+            response.errors.push(userLockedError);
             return res.status(401).send(response);
         }
 
-        if (doc && (!doc.password || !doc.validPassword(password))) {
-            await doc.update(
-                { failed_auth_attempt: parseInt(doc.dataValues.failed_auth_attempt ? doc.dataValues.failed_auth_attempt : '0') + 1 },
-                { where: { email: email } }
-            );
-        }
-
         if (!doc || !doc.password || !doc.validPassword(password)) {
-            response.errors.push(new CustomError('Invalid email or password.', 401));
+
+            if (doc && doc.password) {
+                await doc.update(
+                    { failed_auth_attempt: parseInt(doc.dataValues.failed_auth_attempt ? doc.dataValues.failed_auth_attempt : '0') + 1 }
+                );
+            }
+
+            const error = doc && doc.dataValues.failed_auth_attempt >= 5
+                ? userLockedError
+                : new CustomError('Invalid email or password.', 401);
+
+            response.errors.push(error);
             return res.status(401).json(response);
         }
 

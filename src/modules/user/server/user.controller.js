@@ -157,7 +157,7 @@ async function login(req, res) {
                 );
             }
 
-            const errorMessage = user.dataValues.failed_auth_attempt >= 5
+            const errorMessage = user && user.dataValues.failed_auth_attempt >= 5
                 ? userLockedMessage
                 : 'Invalid email or password.';
 
