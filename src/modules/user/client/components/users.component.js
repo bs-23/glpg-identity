@@ -27,13 +27,13 @@ export default function Users() {
         let countryString = "";
         if (countries.length > 0 && (userCountries.length)) {
             (userCountries).map((country, key) => (
-                countryArr.push(countries.find(i => i.country_iso2 === country)).countryname)
+                countryArr.push(countries.find(i => i.country_iso2 === country)).codbase_desc)
             );
         }
 
-        countryArr.sort((a, b) => (a.countryname > b.countryname) ? 1 : -1);
+        countryArr.sort((a, b) => (a.codbase_desc > b.codbase_desc) ? 1 : -1);
         countryArr.forEach((element, key) => {
-            countryString = countryString + element.countryname;
+            countryString = countryString + element.codbase_desc;
             if (key < countryArr.length - 1) countryString = countryString + ', ';
         });
 
@@ -163,7 +163,7 @@ export default function Users() {
                                                     <td>{row.last_name}</td>
                                                     <td>{row.email}</td>
                                                     {/* <td>{countries.length > 0 && (row.countries.length) && (row.countries).map((country, key) => (
-                                                        <span key={key}>{(countries.find(i => i.country_iso2 === country)).countryname} {key < row.countries.length - 1 ? ', ' : ''}</span>
+                                                        <span key={key}>{(countries.find(i => i.country_iso2 === country)).codbase_desc} {key < row.countries.length - 1 ? ', ' : ''}</span>
                                                     ))}</td> */}
                                                     <td>{sortCountries(row.countries)}</td>
                                                     <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
