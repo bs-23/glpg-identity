@@ -373,7 +373,7 @@ async function createHcpProfile(req, res) {
         });
 
         if (!specialty_master_data.length) {
-            response.errors.push(new CustomError('specialty_onekey is invalid.', 'specialty_onekey'));
+            response.errors.push(new CustomError('specialty_onekey is invalid.', 400, 'specialty_onekey'));
         }
     }
 
