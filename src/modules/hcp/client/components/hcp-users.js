@@ -385,11 +385,11 @@ export default function hcpUsers() {
                                                         <td>{row.first_name}</td>
                                                         <td>{row.last_name}</td>
                                                         <td className="text-nowrap">
-                                                            {row.status === 'self_verified' ? <span><i className="fa fa-xs fa-circle text-success pr-2"></i>Self Verified</span> :
-                                                                row.status === 'manually_verified' ? <span><i className="fa fa-xs fa-circle text-success pr-2"></i>Manually Verified</span> :
-                                                                    row.status === 'consent_pending' ? <span><i className="fa fa-xs fa-circle text-warning pr-2"></i>Consent Pending</span> :
-                                                                        row.status === 'not_verified' ? <span><i className="fa fa-xs fa-circle text-danger pr-2"></i>Not Verified</span> :
-                                                                            row.status === 'rejected' ? <span><i className="fa fa-xs fa-circle text-danger pr-2"></i>Rejected</span> : <span></span>
+                                                            {row.status === 'self_verified' ? <span><i className="fa fa-xs fa-circle text-success pr-2 hcp-status-icon"></i>Self Verified</span> :
+                                                                row.status === 'manually_verified' ? <span><i className="fa fa-xs fa-circle text-success pr-2 hcp-status-icon"></i>Manually Verified</span> :
+                                                                    row.status === 'consent_pending' ? <span><i className="fa fa-xs fa-circle text-warning pr-2 hcp-status-icon"></i>Consent Pending</span> :
+                                                                        row.status === 'not_verified' ? <span><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Not Verified</span> :
+                                                                            row.status === 'rejected' ? <span><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Rejected</span> : <span></span>
                                                             }
                                                         </td>
                                                         <td>{row.uuid}</td>
@@ -397,8 +397,8 @@ export default function hcpUsers() {
                                                             <span>{(countries.find(i => i.country_iso2 === (row.country_iso2).toUpperCase())).codbase_desc}</span>
                                                         }</td> */}
                                                         <td>{row.specialty_description}</td>
-                                                        <td>{row.consent_types.includes('single') ? <i className="icon icon-check-filled cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger"> </i>}</td>
-                                                        <td>{row.consent_types.includes('double') ? <i className="icon icon-check-filled cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger"> </i>}</td>
+                                                        <td>{row.consent_types.includes('single') ? <i className="icon icon-check-filled cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
+                                                        <td>{row.consent_types.includes('double') ? <i className="icon icon-check-filled cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
                                                         <td>
                                                             <span>
                                                                 <Dropdown className="ml-auto dropdown-customize">
