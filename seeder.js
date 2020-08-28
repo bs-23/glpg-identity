@@ -196,32 +196,32 @@ async function init() {
 
         const consentLocales = [
             {
-                rich_text: "<p>J'accepte les Galapagos <a href='https://www.glpg.com/'>Conditions d'utilisation.</a></p>",
+                rich_text: "<p>J'accepte les Galapagos <a href='https://www.glpg.com/' target='_blank'>Conditions d'utilisation.</a></p>",
                 consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
                 locale: 'fr'
             },
             {
-                rich_text: '<p>I agree to the Galapagos <a href="https://www.glpg.com/">Terms of Service.</a></p>',
+                rich_text: '<p>I agree to the Galapagos <a href="https://www.glpg.com/" target="_blank">Terms of Service.</a></p>',
                 consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
                 locale: 'en'
             },
             {
-                rich_text: '<p>Ik ga akkoord met de Galapagos <a href="https://www.glpg.com/">Servicevoorwaarden.</a></p>',
+                rich_text: '<p>Ik ga akkoord met de Galapagos <a href="https://www.glpg.com/" target="_blank">Servicevoorwaarden.</a></p>',
                 consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
                 locale: 'nl'
             },
             {
-                rich_text: "<p>J'autorise Galapagos à m'envoyer des informations promotionnelles et environnementales concernant tous les produits et services Galapagos sur mon adresse e-mail fournie. Pour plus d'informations sur la manière dont nous traitons vos informations personnelles, veuillez consulter notre<a href='https://www.glpg.com/'>privacy notice.</a></p>",
+                rich_text: "<p>J'autorise Galapagos à m'envoyer des informations promotionnelles et environnementales concernant tous les produits et services Galapagos sur mon adresse e-mail fournie. Pour plus d'informations sur la manière dont nous traitons vos informations personnelles, veuillez consulter notre<a href='https://www.glpg.com/' target='_blank'>privacy notice.</a></p>",
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 locale: 'fr'
             },
             {
-                rich_text: '<p>I give my consent for Galapagos to send me promotional and environmental information concerning all of Galapagos products and services on my provided email address.</p> <p>For more information on how we treat your personal information please refer to our <a href="https://www.glpg.com/">privacy notice.</a></p>',
+                rich_text: '<p>I give my consent for Galapagos to send me promotional and environmental information concerning all of Galapagos products and services on my provided email address.</p> <p>For more information on how we treat your personal information please refer to our <a href="https://www.glpg.com/" target="_blank">privacy notice.</a></p>',
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 locale: 'en'
             },
             {
-                rich_text: '<p>Ik geef Galapagos mijn toestemming om mij promotionele en milieu-informatie te sturen over alle Galapagos-producten en -diensten op het door mij opgegeven e-mailadres. </p> <p> Voor meer informatie over hoe we omgaan met uw persoonlijke informatie, verwijzen wij u naar onze <a href="https://www.glpg.com/">privacyverklaring.</a></p>',
+                rich_text: '<p>Ik geef Galapagos mijn toestemming om mij promotionele en milieu-informatie te sturen over alle Galapagos-producten en -diensten op het door mij opgegeven e-mailadres. </p> <p> Voor meer informatie over hoe we omgaan met uw persoonlijke informatie, verwijzen wij u naar onze <a href="https://www.glpg.com/" target="_blank">privacyverklaring.</a></p>',
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 locale: 'nl'
             }
