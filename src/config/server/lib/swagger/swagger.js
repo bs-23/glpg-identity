@@ -14,8 +14,15 @@ const options = {
                 description: 'Local server',
             },
             {
-                url: 'http://ciam-dev-alb-2053419375.eu-central-1.elb.amazonaws.com',
+                url: 'http://cdp-dev.glpg.com',
                 description: 'Dev server',
+            },
+            {
+                url: 'http://cdp-stage.glpg.com',
+                description: 'Staging server',
+            },{
+                url: 'http://cdp.glpg.com',
+                description: 'Master server',
             }
         ],
         components: {
