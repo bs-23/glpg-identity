@@ -139,8 +139,10 @@ async function login(req, res) {
             }]
         });
 
+        const userLockedMessage = 'Your account has been locked for consecutive failed auth attempts. Please use the Forgot Password link to unlock.';
+
         if (user && user.dataValues.failed_auth_attempt >= 5) {
-            return res.status(401).send('Your account has been locked for consecutive failed auth attempts. Please use the Forgot Password link to unlock.');
+            return res.status(401).send(userLockedMessage);
         }
 
         if (user && user.password_expiry_date && user.password_expiry_date < Date.now()) {
@@ -155,7 +157,11 @@ async function login(req, res) {
                 );
             }
 
-            return res.status(401).send('Invalid email or password.');
+            const errorMessage = user.dataValues.failed_auth_attempt >= 5
+                ? userLockedMessage
+                : 'Invalid email or password.';
+
+            return res.status(401).send(errorMessage);
         }
 
         const isSiteVerified = await verifySite(recaptchaToken);
@@ -290,7 +296,7 @@ async function deleteUser(req, res) {
     }
 }
 
-async function getUsers(req, res) { 
+async function getUsers(req, res) {
 
     const page = req.query.page ? req.query.page - 1 : 0;
     if (page < 0) return res.status(404).send("page must be greater or equal 1");
