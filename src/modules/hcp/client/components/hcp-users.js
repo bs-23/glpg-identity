@@ -381,7 +381,7 @@ export default function hcpUsers() {
                                                         {row.status === 'self_verified' ? <span><i className="fa fa-xs fa-circle text-success pr-2"></i>Self Verified</span> :
                                                             row.status === 'manually_verified' ? <span><i className="fa fa-xs fa-circle text-success pr-2"></i>Manually Verified</span> :
                                                                 row.status === 'consent_pending' ? <span><i className="fa fa-xs fa-circle text-warning pr-2"></i>Consent Pending</span> :
-                                                                    row.status === 'not_verified' ? <span><i className="fa fa-xs fa-circle text-warning pr-2"></i>Not Verified</span> :
+                                                                    row.status === 'not_verified' ? <span><i className="fa fa-xs fa-circle text-danger pr-2"></i>Not Verified</span> :
                                                                         row.status === 'rejected' ? <span><i className="fa fa-xs fa-circle text-danger pr-2"></i>Rejected</span> : <span></span>
                                                             }
                                                         </td>
