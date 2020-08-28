@@ -245,6 +245,12 @@ export default function hcpUsers() {
                                                 <div className="">{ currentUser.created_at ? (new Date(currentUser.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.') : '--' }</div>
                                             </div>
                                         </div>
+                                        <div className="row mt-3">
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Status</div>
+                                                <div className="text-capitalize">{currentUser.status ? _.startCase(_.toLower(currentUser.status.replace(/_/g, ' '))) : '--'}</div>
+                                            </div>
+                                        </div>
                                         <div className="row mt-4">
                                             <div className="col accordion-consent rounded shadow-sm p-0">
                                                 <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Consents</h4>
@@ -253,7 +259,7 @@ export default function hcpUsers() {
                                                             <Accordion.Collapse eventKey={consent.id}>
                                                                 <Card.Body className="">
                                                                 <div>{parse(consent.rich_text)}</div>
-                                                                <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Consent type:</span> <span className="text-capitalize">{consent.opt_type}</span> Opt-in</div>
+                                                                <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Consent opt-in type:</span> <span className="text-capitalize">{consent.opt_type}</span></div>
                                                                 { consent.consent_given && <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Consent given date:</span>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div> }
                                                                 </Card.Body>
                                                             </Accordion.Collapse>
