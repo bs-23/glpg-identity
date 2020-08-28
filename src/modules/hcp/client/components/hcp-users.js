@@ -370,7 +370,7 @@ export default function hcpUsers() {
                                                     <th><span className={sort.value === 'last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th><span className={sort.value === 'status' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('status')}>Status<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th><span className={sort.value === 'uuid' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('uuid')}>UUID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                    <th><span >Country</span></th>
+                                                    {/* <th><span >Country</span></th> */}
                                                     <th><span className={sort.value === 'specialty_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('specialty_name')}>Specialty<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th className="consent-col">Single<br /> Opt-in</th>
                                                     <th className="consent-col">Double<br /> Opt-in</th>
@@ -393,9 +393,9 @@ export default function hcpUsers() {
                                                             }
                                                         </td>
                                                         <td>{row.uuid}</td>
-                                                        <td>{countries.length > 0 &&
+                                                        {/* <td>{countries.length > 0 &&
                                                             <span>{(countries.find(i => i.country_iso2 === (row.country_iso2).toUpperCase())).codbase_desc}</span>
-                                                        }</td>
+                                                        }</td> */}
                                                         <td>{row.specialty_description}</td>
                                                         <td>{row.consent_types.includes('single') ? <i className="icon icon-check-filled cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger"> </i>}</td>
                                                         <td>{row.consent_types.includes('double') ? <i className="icon icon-check-filled cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger"> </i>}</td>
