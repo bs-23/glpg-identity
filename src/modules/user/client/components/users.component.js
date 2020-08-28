@@ -187,10 +187,10 @@ export default function Users() {
                                         && userdata['users'] &&
                                         <div className="pagination justify-content-end align-items-center border-top p-3">
                                             <span className="cdp-text-primary font-weight-bold">{userdata.start + ' - ' + userdata.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + userdata.total}</span>
-                                            <LinkContainer to={`list?page=${userdata.page - 1}&country_iso2=${userdata.country_iso2}&sort_type=${sort.type}&sort_col=${sort.value}`}>
+                                            <LinkContainer to={`list?page=${userdata.page - 1}&codbase=${userdata.codbase}&sort_type=${sort.type}&sort_col=${sort.value}`}>
                                                 <span className="pagination-btn" onClick={() => pageLeft()} disabled={userdata.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
                                             </LinkContainer>
-                                            <LinkContainer to={`list?page=${userdata.page + 1}&country_iso2=${userdata.country_iso2}&sort_type=${sort.type}&sort_col=${sort.value}`}>
+                                            <LinkContainer to={`list?page=${userdata.page + 1}&codbase=${userdata.codbase}&sort_type=${sort.type}&sort_col=${sort.value}`}>
                                                 <span className="pagination-btn" onClick={() => pageRight()} disabled={userdata.end === userdata.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
                                             </LinkContainer>
                                         </div>
