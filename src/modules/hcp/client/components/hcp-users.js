@@ -171,8 +171,8 @@ export default function hcpUsers() {
                                                     <LinkContainer to={`list${hcps.codbase ? `?codbase=${hcps.codbase}` : ''}`}>
                                                         <Dropdown.Item className={hcps.status === null ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, null, hcps.codbase))}>All</Dropdown.Item>
                                                     </LinkContainer>
-                                                    <LinkContainer to={`list?status=self_verified&status=manually_verified${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`} disabled={isAllVerifiedStatus()}>
-                                                        <Dropdown.Item onClick={() => dispatch(getHcpProfiles(null, ['self_verified', 'manually_verified'], hcps.codbase))}>All Verified</Dropdown.Item>
+                                                    <LinkContainer to={`list?status=self_verified&status=manually_verified${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`}>
+                                                        <Dropdown.Item className={isAllVerifiedStatus() ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, ['self_verified', 'manually_verified'], hcps.codbase))}>All Verified</Dropdown.Item>
                                                     </LinkContainer>
                                                     <LinkContainer to={`list?status=self_verified${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`}>
                                                         <Dropdown.Item className={hcps.status === 'self_verified' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, 'self_verified', hcps.codbase))}>Self Verified</Dropdown.Item>
