@@ -54,10 +54,9 @@ export const registerSchema = object().shape({
         .min(4, 'This field must be at least 4 characters long.')
         .max(15, 'This field must be at most 15 characters long.'),
         // .test('is-valid-phone', 'Must be a valid international phone number.', validatePhone),
-    countries: string()
-        .required('Must select at least one country'),
-    roles: string()
-        .required('Must select at least one role')
+    profile: string()
+        .required('Must select at least one profile'),
+    permission_sets: string()
 });
 
 export const changePasswordSchema = object().shape({

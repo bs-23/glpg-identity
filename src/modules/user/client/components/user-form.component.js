@@ -1,27 +1,23 @@
 import axios from "axios";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { NavLink, useHistory } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
-import { createUser } from "../user.actions";
+import { Form, Formik, Field, ErrorMessage } from "formik";
+import { createUser, getCountries } from "../user.actions";
 import { registerSchema } from "../user.schema";
 import { useToasts } from "react-toast-notifications";
 import Dropdown from 'react-bootstrap/Dropdown';
-// const countryCodes = require('country-codes-list');
 import CountryCodes from 'country-codes-list';
 
 export default function UserForm() {
     const dispatch = useDispatch();
-    const [countries, setCountries] = useState([]);
-    const [roles, setRoles] = useState([]);
-    const [applications, setApplications] = useState([]);
-    const [selectedRoles, setSelectedRoles] = useState([]);
-    const [selectedCountries, setSelectedCountries] = useState([]);
+    const [selectedCountryCode, setSelectedCountryCode] = useState(0);
+    const [profiles, setProfiles] = useState([]);
+    const [permissionSets, setPermissionSets] = useState([]);
+    const CountryCodesObject = CountryCodes.customList('countryCode', '+{countryCallingCode}')
+    const countries = useSelector(state => state.userReducer.countries);
     const history = useHistory()
     const { addToast } = useToasts()
-    const CountryCodesObject = CountryCodes.customList('countryCode', '+{countryCallingCode}')
-    const [selectedCountryCode, setSelectedCountryCode] = useState(0);
-    
 
     const generateCountryIconPath = (country) => {
         if(country) return `/assets/flag/flag-${country.toLowerCase().replace(/ /g, "-")}.svg`;
@@ -29,55 +25,27 @@ export default function UserForm() {
     }
 
     useEffect(() => {
-        async function getCountries() {
-            const response = await axios.get('/api/countries');
-            setCountries(response.data);
+        async function getProfile() {
+            // const response = await axios.get('/api/');
+            // setProfiles(response.data);
+
+            // Using Static Values for Profile. Remove the code below and use the above code to fetch
+            // Profile once the profile api is ready
+            setProfiles([
+                { id: '1', title: 'System Admin' },
+                { id: '2', title: 'Site Admin' },
+                { id: '3', title: 'Glbal Data Stewart' },
+                { id: '4', title: 'Local Data Stewart' }
+            ]);
         }
-        async function getAppplications() {
-            const response = await axios.get('/api/applications');
-            setApplications(response.data);
+        async function getPermissionSets() {
+            const response = await axios.get('/api/permissionSets');
+            setPermissionSets(response.data);
         }
-        async function getRoles() {
-            const response = await axios.get('/api/roles');
-            setRoles(response.data);
-        }
-        getCountries();
-        getAppplications();
-        getRoles();
+        dispatch(getCountries());
+        getProfile();
+        getPermissionSets();
     }, []);
-
-    const selectRole = (role_id, alreadySelected) => {
-        if (!alreadySelected) {
-            const items = [...selectedRoles, role_id];
-            setSelectedRoles(items);
-        }
-        else {
-            const items = [...selectedRoles];
-            const idx = items.indexOf(role_id);
-            items.splice(idx, 1);
-            setSelectedRoles(items);
-        }
-    }
-
-
-    const selectCountry = (country_id, alreadySelected) => {
-        if (!alreadySelected) {
-            const items = [...selectedCountries, country_id];
-            setSelectedCountries(items);
-        }
-        else {
-            const items = [...selectedCountries];
-            const idx = items.indexOf(country_id);
-            items.splice(idx, 1);
-            setSelectedCountries(items);
-        }
-    }
-
-    // const onPhoneNumberChange = (e, changeHandler) => {
-    //     const { value: phone } = e.target;
-    //     e.target.value = phone.replace( /  +/g, ' ');
-    //     changeHandler(e);
-    // }
 
     return (
         <main className="app__content cdp-light-bg">
@@ -94,7 +62,7 @@ export default function UserForm() {
                         </nav>
                     </div>
                 </div>
-                {applications.length > 0 && countries &&
+                {countries &&
                     <div className="row">
                         <div className="col-12">
                             <div className="shadow-sm bg-white mb-3">
@@ -107,17 +75,15 @@ export default function UserForm() {
                                             first_name: "",
                                             last_name: "",
                                             email: "",
-                                            countries: [],
-                                            roles: [],
-                                            application_id: applications[0].id,
-                                            country_code: '',
-                                            phone: ''
+                                            phone: '',
+                                            profile: profiles.length > 0 ? profiles[0].id : '',
+                                            permission_sets: []
                                         }}
+                                        enableReinitialize
                                         displayName="UserForm"
                                         validationSchema={registerSchema}
                                         onSubmit={(values, actions) => {
                                             values.country_code = CountryCodesObject[countries[selectedCountryCode].country_iso2]
-                                            // console.log('=======================>', values)
                                             dispatch(createUser(values))
                                                 .then(res => {
                                                     actions.resetForm();
@@ -173,7 +139,7 @@ export default function UserForm() {
                                                                                         countries.map( (country, index) => {
                                                                                             return index === selectedCountryCode ? (
                                                                                             <Dropdown.Toggle key={index} variant="" className="p-1 pt-2 px-2 pr-0 d-flex align-items-center rounded-0">
-                                                                                                <img height="20" width="20" src={generateCountryIconPath(country.codbase_desc)} title={country.codbase_desc} /> 
+                                                                                                <img height="20" width="20" src={generateCountryIconPath(country.codbase_desc)} title={country.codbase_desc} />
                                                                                                 <span className="country-phone-code pl-1">{ CountryCodesObject[country.country_iso2] }</span>
                                                                                             </Dropdown.Toggle>) : null
                                                                                         })
@@ -181,9 +147,9 @@ export default function UserForm() {
                                                                                     <Dropdown.Menu>
                                                                                         {
                                                                                             countries.map( (country, index) => {
-                                                                                                return index === selectedCountryCode ? null : 
+                                                                                                return index === selectedCountryCode ? null :
                                                                                                 (<Dropdown.Item onClick={() => setSelectedCountryCode(index)} key={index} className="px-2 d-flex align-items-center">
-                                                                                                    <img height="20" width="20" src={generateCountryIconPath(country.codbase_desc)} title={country.codbase_desc} /> 
+                                                                                                    <img height="20" width="20" src={generateCountryIconPath(country.codbase_desc)} title={country.codbase_desc} />
                                                                                                     <span className="country-name pl-2">{ country.codbase_desc }</span>
                                                                                                     <span className="country-phone-code pl-1">{ CountryCodesObject[country.country_iso2] }</span>
                                                                                                 </Dropdown.Item>)
@@ -199,97 +165,27 @@ export default function UserForm() {
                                                                     <ErrorMessage name="phone" data-testid="phoneError" />
                                                                 </div>
                                                             </div>
-                                                            
+
                                                             </div>
                                                             <div className="col-12 col-sm-6">
                                                                 <div className="form-group">
-                                                                    <label className="font-weight-bold" htmlFor="application_id">Select Application <span className="text-danger">*</span></label>
-                                                                    <Field data-testid="application" as="select" name="application_id" className="form-control">
-                                                                        {applications.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
+                                                                    <label className="font-weight-bold" htmlFor="profile">Select a profile <span className="text-danger">*</span></label>
+                                                                    <Field as="select" name="profile" className="form-control">
+                                                                        {profiles ? profiles.map(profile => <option classname="p-2" key={profile.id} value={profile.id}>{profile.title}</option>) : null}
                                                                     </Field>
-                                                                </div>
-                                                                <div className="form-group">
-                                                                    <label className="font-weight-bold" htmlFor="countries">Select Countries <span className="text-danger">*</span></label>
-                                                                    <FieldArray
-                                                                        name="countries"
-                                                                        render={arrayHelpers => (
-                                                                            <div>
-                                                                                {
-                                                                                    countries.map(item =>
-                                                                                        <div key={item.countryid} className="custom-control custom-checkbox">
-                                                                                            <input
-                                                                                                name="countries"
-                                                                                                type="checkbox"
-                                                                                                value={item.country_iso2}
-                                                                                                className="custom-control-input"
-                                                                                                id={item.country_iso2}
-                                                                                                checked={selectedCountries.includes(item.country_iso2)}
-                                                                                                onChange={e => {
-                                                                                                    if (e.target.checked) {
-                                                                                                        arrayHelpers.push(item.country_iso2);
-                                                                                                    }
-                                                                                                    else {
-                                                                                                        const idx = countries.indexOf(c => c.country_iso2 === item.country_iso2);
-                                                                                                        arrayHelpers.remove(idx);
-                                                                                                    }
-                                                                                                }}
-                                                                                                onClick={() => { selectCountry(item.country_iso2, selectedCountries.find(s => s === item.country_iso2) ? true : false) }}
-                                                                                            />
-                                                                                            <label className="custom-control-label" for={item.country_iso2}>{item.codbase_desc}</label>
-                                                                                        </div>
-                                                                                    )
-
-                                                                                }
-                                                                            </div>
-                                                                        )}
-                                                                    />
                                                                     <div className="invalid-feedback">
-                                                                        <ErrorMessage name="countries" />
+                                                                        <ErrorMessage name="profile" />
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                             <div className="col-12 col-sm-6">
                                                                 <div className="form-group">
-                                                                    <label className="font-weight-bold" >Select Roles <span className="text-danger">*</span></label>
-                                                                    <FieldArray
-                                                                        name="roles"
-                                                                        render={arrayHelpers => (
-                                                                            <ul className="list-unstyled pl-0 py-2 mb-0">
-                                                                                {
-                                                                                    roles.map(role =>
-                                                                                        <li key={role.id} className="">
-                                                                                            <label className="d-flex justify-content-between align-items-center">
-                                                                                                <span className="switch-label">{role.name}</span>
-                                                                                                <span className="switch">
-                                                                                                    <input
-                                                                                                        name="roles"
-                                                                                                        type="checkbox"
-                                                                                                        value={role}
-                                                                                                        checked={selectedRoles.includes(role.id)}
-                                                                                                        onChange={e => {
-                                                                                                            if (e.target.checked) {
-                                                                                                                arrayHelpers.push(role.id);
-                                                                                                            }
-                                                                                                            else {
-                                                                                                                const idx = roles.indexOf(r => r.id === role.id);
-                                                                                                                arrayHelpers.remove(idx);
-                                                                                                            }
-                                                                                                        }}
-                                                                                                        onClick={() => { selectRole(role.id, selectedRoles.find(s => s === role.id) ? true : false) }}
-                                                                                                    />
-                                                                                                    <span className="slider round"></span>
-                                                                                                </span>
-                                                                                            </label>
-                                                                                        </li>
-                                                                                    )
-
-                                                                                }
-                                                                            </ul>
-                                                                        )}
-                                                                    />
-
+                                                                    <label className="font-weight-bold" htmlFor="permission_sets">Select permission sets</label>
+                                                                    <Field as="select" multiple name="permission_sets" className="form-control">
+                                                                        {permissionSets.length > 0 ? permissionSets.map(item => <option classname="p-2" key={item.id} value={item.id}>{item.title}</option>) : null}
+                                                                    </Field>
                                                                     <div className="invalid-feedback">
-                                                                        <ErrorMessage name="roles" />
+                                                                        <ErrorMessage name="permission_sets" />
                                                                     </div>
                                                                 </div>
                                                             </div>

@@ -12,7 +12,7 @@ import Roles from "./components/roles.component";
 export default function UserRoutes() {
     let { path } = useRouteMatch();
 
-    return (//PermissionSetForm
+    return (
         <Switch>
             <PrivateRoute exact path={path} component={UserManagement} module={'user'} />
             <PrivateRoute path={`${path}/create`} component={UserForm} module={'user'} />
