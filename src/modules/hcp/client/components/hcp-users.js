@@ -18,6 +18,7 @@ import parse from 'html-react-parser';
 export default function hcpUsers() {
     const dispatch = useDispatch();
     const [countries, setCountries] = useState([]);
+    const [allCountries, setAllCountries] = useState([]);
     const [show, setShow] = useState({ profileManage: false, updateStatus: false });
     const [currentAction, setCurrentAction] = useState({ userId: null, action: null });
     const [currentUser, setCurrentUser] = useState({});
@@ -48,6 +49,11 @@ export default function hcpUsers() {
     async function getCountries() {
         const response = await axios.get('/api/countries');
         setCountries(response.data);
+    }
+
+    async function getAllCountries() {
+        const response = await axios.get('/api/all_countries');
+        setAllCountries(response.data);
     }
 
     const onUpdateStatus = (user) => {
@@ -115,7 +121,8 @@ export default function hcpUsers() {
 
     useEffect(() => {
         getCountries();
-        loadHcpProfile()
+        getAllCountries();
+        loadHcpProfile();
     }, []);
 
     return (
@@ -370,7 +377,7 @@ export default function hcpUsers() {
                                                     <th><span className={sort.value === 'last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th><span className={sort.value === 'status' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('status')}>Status<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th><span className={sort.value === 'uuid' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('uuid')}>UUID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                    {/* <th><span >Country</span></th> */}
+                                                    <th><span >Country</span></th>
                                                     <th><span className={sort.value === 'specialty_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('specialty_name')}>Specialty<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th className="consent-col">Single<br /> Opt-in</th>
                                                     <th className="consent-col">Double<br /> Opt-in</th>
@@ -393,9 +400,9 @@ export default function hcpUsers() {
                                                             }
                                                         </td>
                                                         <td>{row.uuid}</td>
-                                                        {/* <td>{countries.length > 0 &&
-                                                            <span>{(countries.find(i => i.country_iso2 === (row.country_iso2).toUpperCase())).codbase_desc}</span>
-                                                        }</td> */}
+                                                        <td>{countries.length > 0 &&
+                                                            <span>{(allCountries.find(i => i.country_iso2 === (row.country_iso2).toUpperCase())).codbase_desc}</span>
+                                                        }</td>
                                                         <td>{row.specialty_description}</td>
                                                         <td>{row.consent_types.includes('single') ? <i className="icon icon-check-filled cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
                                                         <td>{row.consent_types.includes('double') ? <i className="icon icon-check-filled cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
