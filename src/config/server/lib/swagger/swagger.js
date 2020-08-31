@@ -14,14 +14,14 @@ const options = {
                 description: 'Local server',
             },
             {
-                url: 'http://cdp-dev.glpg.com',
+                url: 'https://cdp-dev.glpg.com',
                 description: 'Dev server',
             },
             {
-                url: 'http://cdp-stage.glpg.com',
+                url: 'https://cdp-stage.glpg.com',
                 description: 'Staging server',
             },{
-                url: 'http://cdp.glpg.com',
+                url: 'https://cdp.glpg.com',
                 description: 'Master server',
             }
         ],
