@@ -114,8 +114,8 @@ export default function hcpUsers() {
     }
 
     const getCountryName = (country_iso2) => {
-        if (!countries || !country_iso2) return null;
-        const country = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+        if (!allCountries || !country_iso2) return null;
+        const country = allCountries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
         return country && country.countryname;
     }
 
@@ -400,9 +400,7 @@ export default function hcpUsers() {
                                                             }
                                                         </td>
                                                         <td>{row.uuid}</td>
-                                                        <td>{countries.length > 0 &&
-                                                            <span>{(allCountries.find(i => i.country_iso2 === (row.country_iso2).toUpperCase())).codbase_desc}</span>
-                                                        }</td>
+                                                        <td><span>{getCountryName(row.country_iso2)}</span></td>
                                                         <td>{row.specialty_description}</td>
                                                         <td>{row.consent_types.includes('single') ? <i className="icon icon-check-filled cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
                                                         <td>{row.consent_types.includes('double') ? <i className="icon icon-check-filled cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
