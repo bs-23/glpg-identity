@@ -12,6 +12,9 @@ const PermissionSet = sequelize.cdpConnector.define('permission_sets', {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4
     },
+    slug: {
+        type: DataTypes.STRING
+    },
     title: {
         type: DataTypes.STRING
     },

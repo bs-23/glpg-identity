@@ -7,35 +7,49 @@ import { useCookies } from 'react-cookie';
 export default function PrivateRoute({ component: Component, module, ...rest }) {
     const [cookies] = useCookies();
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
-    const roles = loggedInUser ? loggedInUser.roles : [];
-    let permissions = [];
+    const profile = loggedInUser ? loggedInUser.profile : null;
+    let serviceCategories = [];
 
-    roles.forEach(role => {
-        const union = (a, b) => [...new Set([...a, ...b])];
-        if(role.permissions) permissions = union(permissions, role.permissions);
-    })
+    const union = (a, b) => [...new Set([...a, ...b])];
+    if (profile) {
+        profile.permissionSets.forEach(permissionSet => {
+
+
+            if (permissionSet.serviceCategories) {
+                serviceCategories = union(serviceCategories, permissionSet.serviceCategories );
+            }
+        });
+    }
+    const userPermissionSets = loggedInUser ? loggedInUser.permissionsets : [];
+    userPermissionSets.forEach(permissionSet => {
+
+        if (permissionSet.serviceCategories) {
+            serviceCategories = union(serviceCategories, permissionSet.serviceCategories );
+        }
+    });
+
 
     // alert(typeof(cookies.logged_in))
     return (
         <Route {...rest} render={props => {
             return (
-                loggedInUser ? (!module || permissions.some( module_permission => module_permission === module)) ? (
+                loggedInUser ? (!module || serviceCategories.some(module_permission => module_permission === module)) ? (
                     <>
-                        <Navbar/>
+                        <Navbar />
                         <Component {...props} />
                     </>
                 ) : (
-                    props.history.replace({
-                        pathname: "/forbidden",
-                        state: { from: props.location }
-                    })
-                ) : cookies.logged_in ? null : (
-                    <Redirect push to={{
-                        pathname: "/login",
-                        state: { from: props.location }
-                    }}/>
-                )
+                        props.history.replace({
+                            pathname: "/forbidden",
+                            state: { from: props.location }
+                        })
+                    ) : cookies.logged_in ? null : (
+                        <Redirect push to={{
+                            pathname: "/login",
+                            state: { from: props.location }
+                        }} />
+                    )
             )
-        }}/>
+        }} />
     );
 }

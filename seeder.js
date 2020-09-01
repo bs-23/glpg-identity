@@ -208,7 +208,7 @@ async function init() {
         User.findOne({ where: { email: 'glpg.cdp@gmail.com' } }).then(admin => {
 
             const permissionSet = [
-                { title: "System Admin Permission Set", created_by: admin.id, updated_by: admin.id },
+                { title: "System Admin Permission Set", slug: "system_admin", created_by: admin.id, updated_by: admin.id },
             ];
 
             PermissionSet.destroy({ truncate: { cascade: true } }).then(() => {
@@ -224,7 +224,7 @@ async function init() {
 
     function permissionSetServiceCategorySeeder(callback) {
         User.findOne({ where: { email: 'glpg.cdp@gmail.com' } }).then(admin => {
-            const permissionSet = PermissionSet.findOne({ where: { title: 'System Admin Permission Set' } });
+            const permissionSet = PermissionSet.findOne({ where: { slug: 'system_admin' } });
             const hcpServiceCategory = ServiceCategory.findOne({ where: { slug: 'hcp' } });
             const userServiceCategory = ServiceCategory.findOne({ where: { slug: 'user' } });
             const consentServiceCategory = ServiceCategory.findOne({ where: { slug: 'consent' } });
@@ -251,7 +251,7 @@ async function init() {
 
     function userProfilePermissionSetSeeder(callback) {
 
-        const permissionSet = PermissionSet.findOne({ where: { title: 'System Admin Permission Set' } });
+        const permissionSet = PermissionSet.findOne({ where: { slug: 'system_admin' } });
         const userProfile = UserProfile.findOne({ where: { slug: 'system_admin' } });
 
         Promise.all([permissionSet, userProfile]).then((values) => {

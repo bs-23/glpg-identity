@@ -6,6 +6,10 @@ const Modules = {
     HCP: {
         value: 'hcp',
         title: 'Information Management'
+    },
+    Consent: {
+        value: 'consent',
+        title: 'Consent Management'
     }
 }
 

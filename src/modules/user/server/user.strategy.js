@@ -1,12 +1,12 @@
 const path = require('path');
 const passport = require('passport');
 const { Strategy } = require('passport-jwt');
-const User = require('./user.model');
-const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
+const User = require('./user1.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
-const UserRole = require(path.join(process.cwd(), "src/modules/user/server/user-role.model"));
-const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
-const RolePermission = require(path.join(process.cwd(), "src/modules/user/server/role/role-permission.model"));
+const UserProfile = require(path.join(process.cwd(), "src/modules/user/server/user-profile.model"));
+const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/userProfile-permissionSet.model"));
+const PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permission-set.model"));
+const UserPermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/user-permissionSet.model"));
 
 module.exports = function() {
     function cookieExtractor(req) {
@@ -23,22 +23,29 @@ module.exports = function() {
     }, function(payload, done) {
         User.findOne({where: {id: payload.id},
             include: [{
-                model: UserRole,
-                as: 'userrole',
+                model: UserProfile,
+                as: 'userProfile',
                 include: [{
-                    model: Role,
-                    as: 'role',
+                    model: UserProfile_PermissionSet,
+                    as: 'userProfile_permissionSet',
                     include: [{
-                        model: RolePermission,
-                        as: 'rolePermission',
-                        include: [{
-                            model: Permission,
-                            as: 'permission',
-                        }]
+                        model: PermissionSet,
+                        as: 'permissionSet',
 
                     }]
                 }]
-            }]
+            },
+            {
+                model: UserPermissionSet,
+                as: 'user_permissionSet',
+                include: [{
+                    model: PermissionSet,
+                    as: 'permissionSet',
+
+                }]
+
+            }
+            ]
         }).then(doc => {
             if(doc) {
                 return done(null, doc);

@@ -26,17 +26,17 @@ export default function UserForm() {
 
     useEffect(() => {
         async function getProfile() {
-            // const response = await axios.get('/api/');
-            // setProfiles(response.data);
+            const response = await axios.get('/api/profiles');
+            setProfiles(response.data);
 
             // Using Static Values for Profile. Remove the code below and use the above code to fetch
             // Profile once the profile api is ready
-            setProfiles([
-                { id: '1', title: 'System Admin' },
-                { id: '2', title: 'Site Admin' },
-                { id: '3', title: 'Glbal Data Stewart' },
-                { id: '4', title: 'Local Data Stewart' }
-            ]);
+            // setProfiles([
+            //     { id: '1', title: 'System Admin' },
+            //     { id: '2', title: 'Site Admin' },
+            //     { id: '3', title: 'Glbal Data Stewart' },
+            //     { id: '4', title: 'Local Data Stewart' }
+            // ]);
         }
         async function getPermissionSets() {
             const response = await axios.get('/api/permissionSets');

@@ -12,7 +12,7 @@ const User_PermissionSet = sequelize.cdpConnector.define('users_permissionSets',
         defaultValue: DataTypes.UUIDV4
     },
     permissionSetId: {
-        allowNull: false,
+        allowNull: true,
         type: DataTypes.UUID
     },
     userId  : {
