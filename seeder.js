@@ -50,7 +50,7 @@ async function init() {
             callback();
         });
     }
-    
+
     function user1Seeder(callback) {
         User1.findOrCreate({
             where: { email: 'glpg.cdp@gmail.com' }, defaults: {

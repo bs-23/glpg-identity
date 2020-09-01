@@ -186,7 +186,7 @@ async function formatProfileDetail(user) {
         last_login: user.last_login,
         expiry_date: user.expiry_date,
         profiles: user.userProfile.title,
-        application: [0],
+        application: applicationCountriesFormatted[0],
         countries: applicationCountriesFormatted[1]
     };
 
@@ -488,8 +488,30 @@ async function getUsers(req, res) {
             attributes: { exclude: ['password'] },
         });
 
-        const totalUser = users.length;
+        const totalUser = await User.count({
+            where: {
+                id: { [Op.ne]: signedInId },
+                type: 'basic'
+            },
+            include: [
+            {
+                model: UserProfile,
+                as: 'userProfile',
+                include: [{
+                    model: UserProfile_PermissionSet,
+                    as: 'userProfile_permissionSet',
+                    include: [{
+                        model: PermissionSet,
+                        as: 'permissionSet',
+                        where: {
+                            countries: country_iso2 ? { [Op.contains]: [country_iso2] } : { [Op.ne]: ["undefined"] }
+                        }
 
+                    }]
+                }]
+            }
+        ]
+        });
         const data = {
             users: users,
             page: page + 1,
