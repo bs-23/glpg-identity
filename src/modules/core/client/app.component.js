@@ -17,6 +17,7 @@ import Dashboard from "../../user/client/components/dashboard.component";
 import { getSignedInUserProfile } from "../../user/client/user.actions";
 import UserRoutes from "../../user/client/user.routes";
 import HcpRoutes from "../../hcp/client/hcp.routes";
+import ConsentRoutes from "../../consent/client/consent.routes";
 import ForgotPassword from '../../user/client/components/forgot-password.component';
 import ResetPasswordForm from '../../user/client/components/reset-password.component';
 import { ToastProvider} from 'react-toast-notifications';
@@ -71,6 +72,8 @@ export default function App() {
                 <Route path="/users" component={UserRoutes} />
 
                 <Route path="/hcps" component={HcpRoutes} />
+
+                <Route path='/consent' component={ConsentRoutes} />
 
                 <Route path="/reset-password" component={ResetPasswordForm} />
 

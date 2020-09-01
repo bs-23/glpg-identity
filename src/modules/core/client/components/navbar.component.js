@@ -33,7 +33,6 @@ export default function Navbar() {
     const renderCountryIcons = () => {
         if(loggedInUser.countries){
             const selectedCountries = countries && countries.filter(c => loggedInUser.countries.includes(c.country_iso2) ? true : false).map(c => c.codbase_desc)
-            console.log('==========================>', selectedCountries)
             return selectedCountries.map( country => {
                 return <img key={country} height="26" width="26" src={generateCountryIconPath(country)} onError={addFallbackIcon} title={country} alt="Flag" className="ml-1" />;
             })
