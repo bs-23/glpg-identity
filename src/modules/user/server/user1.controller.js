@@ -34,7 +34,7 @@ function generateAccessToken(user) {
 
 async function getProfilePermissions(user) {
 
-    const serviceCategories = [];
+    let serviceCategories = [];
     const permissionSets = [];
     const userProfile = user.userProfile;
     let applications = [];
@@ -53,6 +53,7 @@ async function getProfilePermissions(user) {
 
                 }]
             });
+            serviceCategories = [];
             permissionServiceCategories.forEach(perServiceCat => {
                 serviceCategories.push(perServiceCat.serviceCategory);
 
@@ -119,7 +120,7 @@ async function getUserApplicationCountry(permissionSet) {
 
 async function getUserPermissions(user) {
 
-    const serviceCategories = [];
+    let serviceCategories = [];
     const userPermissionSets = user.user_permissionSet;
     const permissionSets = [];
     let applications = [];
@@ -138,6 +139,7 @@ async function getUserPermissions(user) {
 
                 }]
             });
+            serviceCategories = [];
             permissionServiceCategories.forEach(perServiceCat => {
                 serviceCategories.push(perServiceCat.serviceCategory);
 
@@ -202,8 +204,8 @@ async function getCommaSeparatedApplications(user) {
     let profile_countries = [];
     for (const userPermSet of user.user_permissionSet) {
         const applicationsCountries = await getUserApplicationCountry(userPermSet.permissionSet);
-        user_applications = applicationsCountries[0];
-        user_countries = applicationsCountries[1];
+        user_applications = user_applications.concat(applicationsCountries[0]);
+        user_countries = user_countries.concat(applicationsCountries[1])
 
     }
 
@@ -212,9 +214,8 @@ async function getCommaSeparatedApplications(user) {
         for (const userProPermSet of profilePermissionSets) {
 
             const applicationsCountries = await getUserApplicationCountry(userProPermSet.permissionSet);
-
-            profile_applications = applicationsCountries[0];
-            profile_countries = applicationsCountries[1];
+            profile_applications = profile_applications.concat(applicationsCountries[0]);
+            profile_countries = profile_countries.concat(applicationsCountries[1]);
         }
     }
 
