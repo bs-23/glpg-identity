@@ -1,5 +1,5 @@
 const passport = require('passport');
-const controller = require('./user1.controller');
+const controller = require('./user.controller');
 const { Modules } = require('../../core/server/authorization/authorization.constants');
 const { ModuleGuard } = require('../../core/server/authorization/authorization.middleware');
 

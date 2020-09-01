@@ -32,9 +32,9 @@ export default function Navbar() {
 
     const renderCountryIcons = () => {
         if(loggedInUser.countries){
-            return loggedInUser.countries.map(country_iso2 => {
-                const country = countries && countries.find(c => c.country_iso2 === country_iso2);
-                return <img key={country_iso2} height="26" width="26" src={generateCountryIconPath(country && country.countryname)} onError={addFallbackIcon} title={country ? country.countryname : country_iso2 } alt="Flag" className="ml-1" />;
+            const selectedCountries = countries && countries.filter(c => loggedInUser.countries.includes(c.country_iso2) ? true : false).map(c => c.codbase_desc)
+            return selectedCountries.map( country => {
+                return <img key={country} height="26" width="26" src={generateCountryIconPath(country)} onError={addFallbackIcon} title={country} alt="Flag" className="ml-1" />;
             })
         }
     }

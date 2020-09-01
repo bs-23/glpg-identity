@@ -1,19 +1,22 @@
 const path = require('path');
 const crypto = require('crypto');
-const { Op } = require('sequelize');
 const jwt = require('jsonwebtoken');
-const User = require('./user.model');
+const User = require('./user1.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const ResetPassword = require('./reset-password.model');
-const UserRole = require(path.join(process.cwd(), "src/modules/user/server/user-role.model"));
-const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
-const RolePermission = require(path.join(process.cwd(), "src/modules/user/server/role/role-permission.model"));
-const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
+const UserProfile = require(path.join(process.cwd(), "src/modules/user/server/user-profile.model"));
+const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/userProfile-permissionSet.model"));
+const PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permission-set.model"));
+const PermissionSet_ServiceCateory = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-serviceCategory.model"));
+const ServiceCategory = require(path.join(process.cwd(), "src/modules/user/server/permission/service-category.model"));
+const UserPermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/user-permissionSet.model"));
 const axios = require("axios");
 const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
 const PasswordPolicies = require(path.join(process.cwd(), "src/modules/core/server/password/password-policies.js"));
+const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
+const { QueryTypes, Op } = require('sequelize');
 
 function generateAccessToken(user) {
     return jwt.sign({
@@ -27,43 +30,190 @@ function generateAccessToken(user) {
     });
 }
 
-function getRolesPermissions(userrole) {
-    const roles = [];
+async function getProfilePermissions(user) {
 
-    if (userrole) {
-        userrole.forEach(ur => {
-            roles.push({
-                title: ur.role.name,
-                permissions: ur.role.rolePermission.map(rp => rp.permission.module)
+    let serviceCategories = [];
+    const permissionSets = [];
+    const userProfile = user.userProfile;
+    let applications = [];
+    let countries = [];
+
+    if (userProfile) {
+        for (const userProPermSet of userProfile.userProfile_permissionSet) {
+
+            const permissionServiceCategories = await PermissionSet_ServiceCateory.findAll({
+                where: {
+                    permissionSetId: userProPermSet.permissionSet.id
+                },
+                include: [{
+                    model: ServiceCategory,
+                    as: 'serviceCategory'
+
+                }]
+            });
+            serviceCategories = [];
+            permissionServiceCategories.forEach(perServiceCat => {
+                serviceCategories.push(perServiceCat.serviceCategory);
+
+            });
+
+            const applicationsCountries = await getUserApplicationCountry(userProPermSet.permissionSet);
+
+            applications = applicationsCountries[0];
+            countries = applicationsCountries[1];
+
+            permissionSets.push({
+                serviceCategories: serviceCategories.map(sc => sc.slug),
+                application: applications.length > 0 ? applications : null,
+                countries: countries
+            });
+
+        }
+        const profile = {
+            title: userProfile.title,
+            permissionSets: permissionSets
+        }
+
+        return profile;
+    }
+
+}
+
+async function getUserApplicationCountry(permissionSet) {
+    const applications = [];
+    let countries = [];
+    if (permissionSet.slug == 'system_admin') {
+        const userApplications = await Application.findAll();
+        userApplications.forEach(userApplication => {
+            applications.push({
+                name: userApplication.name,
+                slug: userApplication.slug,
+                logo_link: userApplication.logo_link
             });
         });
 
-        return roles;
+        const countriesDb = await sequelize.datasyncConnector.query("SELECT DISTINCT ON(codbase_desc) * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;", { type: QueryTypes.SELECT });
+        countries = countriesDb.map(c => c.country_iso2);
+    } else {
+        if (permissionSet.applicationId) {
+            const userApplication = await Application.findOne({ where: { id: permissionSet.applicationId } });
+            applications.push({
+                name: userApplication.name,
+                slug: userApplication.slug,
+                logo_link: userApplication.logo_link
+            });
+        }
+
+        if (permissionSet.countries) {
+            countries = permissionSet.countries;
+        }
+
     }
+
+    return [applications, countries];
+
+
 }
 
-function getCommaSeparatedRoles(userrole) {
-    if (userrole) {
-        const roles = userrole.map(ur => ur.role.name);
-        return roles.join();
+async function getUserPermissions(user) {
+
+    let serviceCategories = [];
+    const userPermissionSets = user.user_permissionSet;
+    const permissionSets = [];
+    let applications = [];
+    let countries = [];
+
+    if (userPermissionSets) {
+        for (const userPermSet of userPermissionSets) {
+
+            const permissionServiceCategories = await PermissionSet_ServiceCateory.findAll({
+                where: {
+                    permissionSetId: userPermSet.permissionSetId
+                },
+                include: [{
+                    model: ServiceCategory,
+                    as: 'serviceCategory'
+
+                }]
+            });
+            serviceCategories = [];
+            permissionServiceCategories.forEach(perServiceCat => {
+                serviceCategories.push(perServiceCat.serviceCategory);
+
+            });
+
+            const applicationsCountries = await getUserApplicationCountry(userPermSet.permissionSet);
+
+            applications = applicationsCountries[0];
+            countries = applicationsCountries[1];
+
+            permissionSets.push({
+                serviceCategories: serviceCategories.map(sc => sc.slug),
+                application: applications ? (applications.length > 0 ? applications : null) : null,
+                countries: countries
+            });
+        }
     }
+
+    return permissionSets;
+
 }
 
-function formatProfile(user) {
-    const profile = {
+async function getCommaSeparatedApplications(user) {
+    let all_applications = [];
+    let all_countries = [];
+    let user_applications = [];
+    let profile_applications = [];
+    let user_countries = [];
+    let profile_countries = [];
+    for (const userPermSet of user.user_permissionSet) {
+        const applicationsCountries = await getUserApplicationCountry(userPermSet.permissionSet);
+        user_applications = user_applications.concat(applicationsCountries[0]);
+        user_countries = user_countries.concat(applicationsCountries[1])
+
+    }
+
+    if (user.userProfile) {
+        const profilePermissionSets = user.userProfile.userProfile_permissionSet;
+        for (const userProPermSet of profilePermissionSets) {
+
+            const applicationsCountries = await getUserApplicationCountry(userProPermSet.permissionSet);
+            profile_applications = profile_applications.concat(applicationsCountries[0]);
+            profile_countries = profile_countries.concat(applicationsCountries[1]);
+        }
+    }
+
+
+    all_countries = [...new Set(user_countries.concat(profile_countries))];
+    all_applications = user_applications.concat(profile_applications);
+    let apps = [...new Set(all_applications.length > 0 ? all_applications.map(app => app.name) : [])];
+
+    apps = apps.join();
+
+    return [apps, all_countries];
+
+
+}
+
+function ignoreCaseArray(str) {
+    return [str.toLowerCase(), str.toUpperCase(), str.charAt(0).toLowerCase() + str.charAt(1).toUpperCase(), str.charAt(0).toUpperCase() + str.charAt(1).toLowerCase()];
+}
+
+async function formatProfile(user) {
+    const data = {
         id: user.id,
         first_name: user.first_name,
         last_name: user.last_name,
         email: user.email,
         type: user.type,
-        roles: getRolesPermissions(user.userrole),
-        application: user.application,
-        countries: user.countries
+        profile: await getProfilePermissions(user),
+        permissionsets: await getUserPermissions(user)
     };
-    return profile;
+    return data;
 }
 
-function formatProfileDetail(user) {
+async function formatProfileDetail(user) {
+    const applicationCountriesFormatted = await getCommaSeparatedApplications(user);
     const profile = {
         id: user.id,
         first_name: user.first_name,
@@ -73,28 +223,18 @@ function formatProfileDetail(user) {
         phone: user.phone,
         last_login: user.last_login,
         expiry_date: user.expiry_date,
-        roles: getCommaSeparatedRoles(user.userrole),
-        application: user.application_name,
-        countries: user.countries
+        profiles: user.userProfile.title,
+        application: applicationCountriesFormatted[0],
+        countries: applicationCountriesFormatted[1]
     };
 
     return profile;
 }
 
-async function attachApplicationInfoToUser(user) {
-    const userApplication = await Application.findOne({ where: { id: user.application_id } });
-    user.application = userApplication ? {
-        name: userApplication.name,
-        slug: userApplication.slug,
-        logo_link: userApplication.logo_link
-    } : null;
-    return user;
-}
 
 async function getSignedInUserProfile(req, res) {
     try {
-        const user = await attachApplicationInfoToUser(req.user);
-        res.json(formatProfile(user));
+        res.json(await formatProfile(req.user));
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -105,9 +245,9 @@ async function login(req, res) {
     try {
         const { email, password, recaptchaToken } = req.body;
 
-        if (!recaptchaToken) {
-            return res.status(400).send('Captcha verification required.');
-        }
+        // if (!recaptchaToken) {
+        //     return res.status(400).send('Captcha verification required.');
+        // }
 
         const user = await User.findOne({
             where: {
@@ -116,60 +256,73 @@ async function login(req, res) {
                 }
             },
             include: [{
-                model: UserRole,
-                as: 'userrole',
+                model: UserProfile,
+                as: 'userProfile',
                 include: [{
-                    model: Role,
-                    as: 'role',
+                    model: UserProfile_PermissionSet,
+                    as: 'userProfile_permissionSet',
                     include: [{
-                        model: RolePermission,
-                        as: 'rolePermission',
-                        include: [{
-                            model: Permission,
-                            as: 'permission',
-                        }]
+                        model: PermissionSet,
+                        as: 'permissionSet',
 
                     }]
                 }]
-            }]
+            },
+            {
+                model: UserPermissionSet,
+                as: 'user_permissionSet',
+                include: [{
+                    model: PermissionSet,
+                    as: 'permissionSet',
+
+                }]
+
+            }
+            ]
         });
 
+        const userLockedMessage = 'Your account has been locked for consecutive failed auth attempts. Please use the Forgot Password link to unlock.';
+
         if (user && user.dataValues.failed_auth_attempt >= 5) {
-            return res.status(401).send('Your account has been locked for consecutive failed auth attempts. Please use the Forgot Password link to unlock.');
+            return res.status(401).send(userLockedMessage);
         }
 
-        if (user && (!user.password || !user.validPassword(password))) {
-            await user.update(
-                { failed_auth_attempt: parseInt(user.dataValues.failed_auth_attempt ? user.dataValues.failed_auth_attempt : '0') + 1 },
-                { where: { email: email } }
-            );
+        if (user && user.password_expiry_date && user.password_expiry_date < Date.now()) {
+            return res.status(401).send("Password has been expired. Please reset the password.");
         }
 
         if (!user || !user.password || !user.validPassword(password)) {
-            return res.status(401).send('Invalid email or password.');
+
+            if (user && user.password) {
+                await user.update(
+                    { failed_auth_attempt: parseInt(user.dataValues.failed_auth_attempt ? user.dataValues.failed_auth_attempt : '0') + 1 }
+                );
+            }
+
+            const errorMessage = user && user.dataValues.failed_auth_attempt >= 5
+                ? userLockedMessage
+                : 'Invalid email or password.';
+
+            return res.status(401).send(errorMessage);
         }
 
         const isSiteVerified = await verifySite(recaptchaToken);
 
-        if (!isSiteVerified) {
-            return res.status(400).send('Failed captcha verification.');
-        }
+        // if (!isSiteVerified) {
+        //     return res.status(400).send('Failed captcha verification.');
+        // }
 
         res.cookie('access_token', generateAccessToken(user), {
             expires: new Date(Date.now() + 8.64e7),
             httpOnly: true
         });
 
-        await user.update({ last_login: Date() })
+        await user.update({
+            last_login: Date(),
+            failed_auth_attempt: 0
+        });
 
-        const userWithApplication = await attachApplicationInfoToUser(user)
-
-        await user.update(
-            { failed_auth_attempt: 0 },
-            { where: { email: email } }
-        );
-
-        res.json(formatProfile(userWithApplication));
+        res.json(await formatProfile(user));
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -187,9 +340,8 @@ async function createUser(req, res) {
         email,
         country_code,
         phone,
-        countries,
-        roles,
-        application_id,
+        profile,
+        permission_sets
     } = req.body;
     const phone_number = phone ? country_code + phone : '';
     const validForMonths = 6
@@ -202,24 +354,24 @@ async function createUser(req, res) {
                 first_name,
                 last_name,
                 phone: phone_number ? phone_number.replace(/\s+/g, '') : null,
-                countries,
-                application_id,
+                profileId: profile,
                 created_by: req.user.id,
                 updated_by: req.user.id,
                 expiry_date: new Date(currentDate.setMonth(currentDate.getMonth() + validForMonths))
             }
         });
 
+        permission_sets.forEach(async ps => {
+            await UserPermissionSet.create({
+                userId: doc.id,
+                permissionSetId: ps,
+            });
+
+        })
+
         if (!created) {
             return res.status(400).send('Email already exists.');
         }
-
-        roles && roles.forEach(async function (roleId) {
-            await UserRole.create({
-                roleId: roleId,
-                userId: doc.id,
-            });
-        });
 
         const logData = {
             event_type: 'CREATE',
@@ -289,17 +441,20 @@ async function getUsers(req, res) {
     if (page < 0) return res.status(404).send("page must be greater or equal 1");
 
     const limit = 15;
-    const country_iso2 = req.query.country_iso2 === 'null' ? null : req.query.country_iso2;
+    // const country_iso2 = req.query.country_iso2 === 'null' ? null : req.query.country_iso2;
+    const codbase = req.query.codbase === 'null' ? null : req.query.codbase;
     const offset = page * limit;
 
-    const signedInId = (formatProfile(req.user)).id;
+    const signedInId = (await formatProfile(req.user)).id;
+
+    const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => i.codbase === codbase).map(i => i.country_iso2);
+    const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
 
     try {
         const users = await User.findAll({
             where: {
                 id: { [Op.ne]: signedInId },
-                type: 'basic',
-                countries: country_iso2 ? { [Op.contains]: [country_iso2] } : { [Op.ne]: ["undefined"] }
+                type: 'basic'
             },
             offset,
             limit,
@@ -311,6 +466,33 @@ async function getUsers(req, res) {
                 model: User,
                 as: 'createdByUser',
                 attributes: ['id', 'first_name', 'last_name'],
+            },
+            {
+                model: UserProfile,
+                as: 'userProfile',
+                include: [{
+                    model: UserProfile_PermissionSet,
+                    as: 'userProfile_permissionSet',
+                    include: [{
+                        model: PermissionSet,
+                        as: 'permissionSet',
+                        where: {
+
+                            countries: codbase ? { [Op.overlap]: [countries_ignorecase_for_codbase] } : { [Op.ne]: ["undefined"] }
+                        }
+
+                    }]
+                }]
+            },
+            {
+                model: UserPermissionSet,
+                as: 'user_permissionSet',
+                include: [{
+                    model: PermissionSet,
+                    as: 'permissionSet',
+
+                }]
+
             }],
             attributes: { exclude: ['password'] },
         });
@@ -318,9 +500,26 @@ async function getUsers(req, res) {
         const totalUser = await User.count({
             where: {
                 id: { [Op.ne]: signedInId },
-                type: 'basic',
-                countries: country_iso2 ? { [Op.contains]: [country_iso2] } : { [Op.ne]: ["undefined"] }
+                type: 'basic'
             },
+            include: [
+                {
+                    model: UserProfile,
+                    as: 'userProfile',
+                    include: [{
+                        model: UserProfile_PermissionSet,
+                        as: 'userProfile_permissionSet',
+                        include: [{
+                            model: PermissionSet,
+                            as: 'permissionSet',
+                            where: {
+                                countries: codbase ? { [Op.overlap]: [countries_ignorecase_for_codbase] } : { [Op.ne]: ["undefined"] }
+                            }
+
+                        }]
+                    }]
+                }
+            ]
         });
 
         const data = {
@@ -330,7 +529,8 @@ async function getUsers(req, res) {
             total: totalUser,
             start: limit * page + 1,
             end: offset + limit > totalUser ? totalUser : offset + limit,
-            country_iso2: country_iso2 ? country_iso2 : null
+            // country_iso2: country_iso2 ? country_iso2 : null,
+            codbase: codbase ? codbase : null
         };
 
         res.json(data);
@@ -348,21 +548,34 @@ async function getUser(req, res) {
                 id: req.params.id
             },
             include: [{
-                model: UserRole,
-                as: 'userrole',
+                model: UserProfile,
+                as: 'userProfile',
                 include: [{
-                    model: Role,
-                    as: 'role',
+                    model: UserProfile_PermissionSet,
+                    as: 'userProfile_permissionSet',
+                    include: [{
+                        model: PermissionSet,
+                        as: 'permissionSet',
+
+                    }]
                 }]
-            }],
+            },
+            {
+                model: UserPermissionSet,
+                as: 'user_permissionSet',
+                include: [{
+                    model: PermissionSet,
+                    as: 'permissionSet',
+
+                }]
+
+            }
+            ],
         });
 
         if (!user) return res.status(404).send("User is not found or may be removed");
 
-        const userApplication = await Application.findOne({ where: { id: user.application_id } });
-        user.application_name = userApplication ? userApplication.name : null;
-
-        const formattedUser = formatProfileDetail(user);
+        const formattedUser =await  formatProfileDetail(user);
 
         res.json(formattedUser);
     }
@@ -446,11 +659,17 @@ async function changePassword(req, res) {
 
         if (user.password) await PasswordPolicies.saveOldPassword(user);
 
+
+        const passwordValidityInMonths = newPassword.length >= 15 ? 12 : 6;
+        const currentDate = new Date();
+        const expiryDate = new Date(currentDate.setMonth(currentDate.getMonth() + passwordValidityInMonths));
+
+        user.password_expiry_date = expiryDate;
         user.password = newPassword;
         user.password_updated_at = new Date(Date.now());
         await user.save();
 
-        res.json(formatProfile(user));
+        res.json(await formatProfile(user));
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -488,10 +707,15 @@ async function resetPassword(req, res) {
 
         if (user.password) await PasswordPolicies.saveOldPassword(user);
 
+        const passwordValidityInMonths = req.body.newPassword.length >= 15 ? 12 : 6;
+        const currentDate = new Date();
+        const expiryDate = new Date(currentDate.setMonth(currentDate.getMonth() + passwordValidityInMonths));
+
         await user.update({
             password: req.body.newPassword,
             failed_auth_attempt: 0,
-            password_updated_at: new Date(Date.now())
+            password_updated_at: new Date(Date.now()),
+            password_expiry_date: expiryDate
         });
 
         const options = {
