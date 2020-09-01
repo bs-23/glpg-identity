@@ -109,3 +109,8 @@ export const permissionSetCreateSchema = object().shape({
     countries: string().required('Must select at least one country'),
     serviceCategories: string().required('Must select at least one country'),
 });
+
+export const profileCreateSchema = object().shape({
+    title: string().required('This field must not be empty.'),
+    permissionSets: string().required('Must select at least one permission set'),
+});
