@@ -21,12 +21,16 @@ export default function PrivateRoute({ component: Component, module, ...rest }) 
         });
     }
     const userPermissionSets = loggedInUser ? loggedInUser.permissionsets : [];
-    userPermissionSets.forEach(permissionSet => {
+    if(userPermissionSets) {
+        userPermissionSets.forEach(permissionSet => {
 
-        if (permissionSet.serviceCategories) {
-            serviceCategories = union(serviceCategories, permissionSet.serviceCategories );
-        }
-    });
+            if (permissionSet.serviceCategories) {
+                serviceCategories = union(serviceCategories, permissionSet.serviceCategories );
+            }
+        });
+
+    }
+
 
 
     // alert(typeof(cookies.logged_in))

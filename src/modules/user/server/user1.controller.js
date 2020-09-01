@@ -59,11 +59,9 @@ async function getProfilePermissions(user) {
             });
 
             const applicationsCountries = await getUserApplicationCountry(userProPermSet.permissionSet);
-            if (applicationsCountries.length) {
+
                 applications = applicationsCountries[0];
                 countries = applicationsCountries[1];
-            }
-
 
             permissionSets.push({
                 serviceCategories: serviceCategories.map(sc => sc.slug),
@@ -82,39 +80,11 @@ async function getProfilePermissions(user) {
 
 }
 
-// async function attachApplicationCountryInfoToUser(user) {
-
-//     const applications = [];
-//     const countries = [];
-
-//     if (user.userProfile) {
-//         const profilePermissionSets = user.userProfile.userProfile_permissionSet;
-//         for (const userProPermSet of profilePermissionSets) {
-//             if (userProPermSet.permissionSet.applicationId) {
-//                 const userApplication = await Application.findOne({ where: { id: userProPermSet.permissionSet.applicationId } });
-//                 applications.push({
-//                     name: userApplication.name,
-//                     slug: userApplication.slug,
-//                     logo_link: userApplication.logo_link
-//                 })
-
-//             }
-//             if (userProPermSet.permissionSet.countries) {
-//                 countries.push(userProPermSet.permissionSet.countries);
-//             }
-
-//         }
-
-//         user.applications = applications.length > 0 ? applications : null;
-//         user.countries = countries;
-//         return user;
-//     }
-// }
 
 async function getUserApplicationCountry(permissionSet) {
     const applications = [];
     let countries = [];
-    if(permissionSet.slug == 'system_admin') {
+    if (permissionSet.slug == 'system_admin') {
         const userApplications = await Application.findAll();
         userApplications.forEach(userApplication => {
             applications.push({
@@ -141,10 +111,6 @@ async function getUserApplicationCountry(permissionSet) {
         }
 
     }
-
-
-
-
 
     return [applications, countries];
 
@@ -178,10 +144,9 @@ async function getUserPermissions(user) {
             });
 
             const applicationsCountries = await getUserApplicationCountry(userPermSet.permissionSet);
-            if (applicationsCountries.length) {
-                applications = applicationsCountries[0];
-                countries = applicationsCountries[1];
-            }
+
+            applications = applicationsCountries[0];
+            countries = applicationsCountries[1];
 
             permissionSets.push({
                 serviceCategories: serviceCategories.map(sc => sc.slug),
@@ -221,7 +186,7 @@ async function formatProfileDetail(user) {
         last_login: user.last_login,
         expiry_date: user.expiry_date,
         profiles: user.userProfile.title,
-        application: applicationCountriesFormatted[0],
+        application: [0],
         countries: applicationCountriesFormatted[1]
     };
 
@@ -237,10 +202,9 @@ async function getCommaSeparatedApplications(user) {
     let profile_countries = [];
     for (const userPermSet of user.user_permissionSet) {
         const applicationsCountries = await getUserApplicationCountry(userPermSet.permissionSet);
-        if (applicationsCountries.length) {
-            user_applications = applicationsCountries[0];
-            user_countries = applicationsCountries[1];
-        }
+        user_applications = applicationsCountries[0];
+        user_countries = applicationsCountries[1];
+
     }
 
     if (user.userProfile) {
@@ -248,17 +212,14 @@ async function getCommaSeparatedApplications(user) {
         for (const userProPermSet of profilePermissionSets) {
 
             const applicationsCountries = await getUserApplicationCountry(userProPermSet.permissionSet);
-            if (applicationsCountries) {
 
-                profile_applications = applicationsCountries[0];
-                profile_countries = applicationsCountries[1];
-
-            }
+            profile_applications = applicationsCountries[0];
+            profile_countries = applicationsCountries[1];
         }
     }
 
 
-    all_countries =[...new Set(user_countries.concat(profile_countries))] ;
+    all_countries = [...new Set(user_countries.concat(profile_countries))];
     all_applications = user_applications.concat(profile_applications);
     let apps = [...new Set(all_applications.length > 0 ? all_applications.map(app => app.name) : [])];
 
@@ -271,8 +232,7 @@ async function getCommaSeparatedApplications(user) {
 
 async function getSignedInUserProfile(req, res) {
     try {
-        // const user = await attachApplicationCountryInfoToUser(req.user);
-        res.json(formatData(req.user));
+        res.json(await formatData(req.user));
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -347,7 +307,6 @@ async function login(req, res) {
 
         await user.update({ last_login: Date() })
 
-        // const userWithApplicationCountries = await attachApplicationCountryInfoToUser(user)
 
         await user.update(
             { failed_auth_attempt: 0 },
@@ -478,7 +437,7 @@ async function getUsers(req, res) {
     const country_iso2 = req.query.country_iso2 === 'null' ? null : req.query.country_iso2;
     const offset = page * limit;
 
-    const signedInId = (formatData(req.user)).id;
+    const signedInId = (await formatData(req.user)).id;
 
     try {
 
@@ -486,8 +445,7 @@ async function getUsers(req, res) {
         const users = await User.findAll({
             where: {
                 id: { [Op.ne]: signedInId },
-                type: 'basic',
-                countries: country_iso2 ? { [Op.contains]: [country_iso2] } : { [Op.ne]: ["undefined"] }
+                type: 'basic'
             },
             offset,
             limit,
@@ -515,17 +473,22 @@ async function getUsers(req, res) {
 
                     }]
                 }]
-            }],
+            },
+            {
+                model: UserPermissionSet,
+                as: 'user_permissionSet',
+                include: [{
+                    model: PermissionSet,
+                    as: 'permissionSet',
+
+                }]
+
+            }
+        ],
             attributes: { exclude: ['password'] },
         });
 
-        const totalUser = await User.count({
-            where: {
-                id: { [Op.ne]: signedInId },
-                type: 'basic',
-                countries: country_iso2 ? { [Op.contains]: [country_iso2] } : { [Op.ne]: ["undefined"] }
-            },
-        });
+        const totalUser = users.length;
 
         const data = {
             users: users,
@@ -660,7 +623,7 @@ async function changePassword(req, res) {
         user.password = newPassword;
         await user.save();
 
-        res.json(formatData(user));
+        res.json(await formatData(user));
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
