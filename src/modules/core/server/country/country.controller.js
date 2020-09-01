@@ -12,4 +12,15 @@ async function getCountries(req, res) {
     }
 }
 
+async function getAllCountries(req, res) {
+    try {
+        const countries = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry ORDER BY codbase_desc;", { type: QueryTypes.SELECT });
+        res.json(countries);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 exports.getCountries = getCountries;
+exports.getAllCountries = getAllCountries;

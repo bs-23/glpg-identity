@@ -18,6 +18,7 @@ import parse from 'html-react-parser';
 export default function hcpUsers() {
     const dispatch = useDispatch();
     const [countries, setCountries] = useState([]);
+    const [allCountries, setAllCountries] = useState([]);
     const [show, setShow] = useState({ profileManage: false, updateStatus: false });
     const [currentAction, setCurrentAction] = useState({ userId: null, action: null });
     const [currentUser, setCurrentUser] = useState({});
@@ -48,6 +49,11 @@ export default function hcpUsers() {
     async function getCountries() {
         const response = await axios.get('/api/countries');
         setCountries(response.data);
+    }
+
+    async function getAllCountries() {
+        const response = await axios.get('/api/all_countries');
+        setAllCountries(response.data);
     }
 
     const onUpdateStatus = (user) => {
@@ -87,17 +93,17 @@ export default function hcpUsers() {
     }
 
     const isAllVerifiedStatus = () => {
-        if(Array.isArray(hcps.status)) {
+        if (Array.isArray(hcps.status)) {
             const allVerifiedStatus = ["self_verified", "manually_verified"];
             let isSubset = true;
-            allVerifiedStatus.forEach(status => { if(!hcps.status.includes(status)) isSubset = false });
+            allVerifiedStatus.forEach(status => { if (!hcps.status.includes(status)) isSubset = false });
             return isSubset && (hcps.status.length === 2);
         }
         return false;
     }
 
     const getSelectedStatus = () => {
-        if(Array.isArray(hcps.status)) return isAllVerifiedStatus() ? 'All Verified' : hcps.status.map(status => _.startCase(_.toLower(status.replace('_', ' ')))).join(', ');
+        if (Array.isArray(hcps.status)) return isAllVerifiedStatus() ? 'All Verified' : hcps.status.map(status => _.startCase(_.toLower(status.replace('_', ' ')))).join(', ');
         return hcps.status ? _.startCase(_.toLower(hcps.status.replace('_', ' '))) : 'All';
     }
 
@@ -108,14 +114,15 @@ export default function hcpUsers() {
     }
 
     const getCountryName = (country_iso2) => {
-        if(!countries || !country_iso2) return null;
-        const country = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+        if (!allCountries || !country_iso2) return null;
+        const country = allCountries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
         return country && country.countryname;
     }
 
     useEffect(() => {
         getCountries();
-        loadHcpProfile()
+        getAllCountries();
+        loadHcpProfile();
     }, []);
 
     return (
@@ -171,8 +178,8 @@ export default function hcpUsers() {
                                                     <LinkContainer to={`list${hcps.codbase ? `?codbase=${hcps.codbase}` : ''}`}>
                                                         <Dropdown.Item className={hcps.status === null ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, null, hcps.codbase))}>All</Dropdown.Item>
                                                     </LinkContainer>
-                                                    <LinkContainer to={`list?status=self_verified&status=manually_verified${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`} disabled={isAllVerifiedStatus()}>
-                                                        <Dropdown.Item onClick={() => dispatch(getHcpProfiles(null, ['self_verified', 'manually_verified'], hcps.codbase))}>All Verified</Dropdown.Item>
+                                                    <LinkContainer to={`list?status=self_verified&status=manually_verified${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`}>
+                                                        <Dropdown.Item className={isAllVerifiedStatus() ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, ['self_verified', 'manually_verified'], hcps.codbase))}>All Verified</Dropdown.Item>
                                                     </LinkContainer>
                                                     <LinkContainer to={`list?status=self_verified${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`}>
                                                         <Dropdown.Item className={hcps.status === 'self_verified' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, 'self_verified', hcps.codbase))}>Self Verified</Dropdown.Item>
@@ -217,21 +224,21 @@ export default function hcpUsers() {
                                         </div>
                                         <div className="row mt-3">
                                             <div className="col-6">
-                                                <div className="mt-1 font-weight-bold">UUID &amp; OneKeyID</div>
-                                                <div className="">{currentUser.individual_id_onekey || '--'}</div>
+                                                <div className="mt-1 font-weight-bold">UUID</div>
+                                                <div className="">{currentUser.uuid || '--'}</div>
                                             </div>
                                             <div className="col-6">
-                                                <div className="mt-1 font-weight-bold">Email</div>
-                                                <div className="">{currentUser.email || '--'}</div>
+                                                <div className="mt-1 font-weight-bold">OneKeyID</div>
+                                                <div className="">{currentUser.individual_id_onekey || '--'}</div>
                                             </div>
                                         </div>
                                         <div className="row mt-3">
                                             <div className="col-6">
-                                                <div className="mt-1 font-weight-bold">Date of Registration</div>
-                                                <div className="">{ currentUser.created_at ? (new Date(currentUser.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.') : '--' }</div>
+                                                <div className="mt-1 font-weight-bold">Email</div>
+                                                <div className="">{currentUser.email || '--'}</div>
                                             </div>
                                             <div className="col-6">
-                                                <div className="mt-1 font-weight-bold">Phone</div>
+                                                <div className="mt-1 font-weight-bold">Phone Number</div>
                                                 <div className="">{currentUser.telephone || '--'}</div>
                                             </div>
                                         </div>
@@ -240,24 +247,34 @@ export default function hcpUsers() {
                                                 <div className="mt-1 font-weight-bold">Country</div>
                                                 <div className="">{getCountryName(currentUser.country_iso2) || '--'}</div>
                                             </div>
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Date of Registration</div>
+                                                <div className="">{currentUser.created_at ? (new Date(currentUser.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.') : '--'}</div>
+                                            </div>
+                                        </div>
+                                        <div className="row mt-3">
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Status</div>
+                                                <div className="text-capitalize">{currentUser.status ? _.startCase(_.toLower(currentUser.status.replace(/_/g, ' '))) : '--'}</div>
+                                            </div>
                                         </div>
                                         <div className="row mt-4">
                                             <div className="col accordion-consent rounded shadow-sm p-0">
                                                 <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Consents</h4>
-                                                {currentUser.consents && currentUser.consents.length  ? <Accordion>{currentUser.consents.map(consent =>
-                                                        <Card key={consent.id} className="">
-                                                            <Accordion.Collapse eventKey={consent.id}>
-                                                                <Card.Body className="">
+                                                {currentUser.consents && currentUser.consents.length ? <Accordion>{currentUser.consents.map(consent =>
+                                                    <Card key={consent.id} className="">
+                                                        <Accordion.Collapse eventKey={consent.id}>
+                                                            <Card.Body className="">
                                                                 <div>{parse(consent.rich_text)}</div>
-                                                                <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Consent Type:</span> {consent.opt_type} Opt-in</div>
-                                                                <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Consent Submitted Date:</span>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
-                                                                </Card.Body>
-                                                            </Accordion.Collapse>
+                                                                <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Consent opt-in type:</span> <span className="text-capitalize">{consent.opt_type}</span></div>
+                                                                {consent.consent_given && <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Consent given date:</span>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>}
+                                                            </Card.Body>
+                                                        </Accordion.Collapse>
                                                         <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
-                                                            <span className="d-flex align-items-center"><i class="icon icon-check-filled cdp-text-primary mr-4 consent-check"></i> <span className="consent-summary">{consent.title}</span></span>
-                                                                <i className="icon icon-arrow-down ml-2 accordion-consent__icon-down"></i>
-                                                            </Accordion.Toggle>
-                                                        </Card>
+                                                            <span className="d-flex align-items-center"><i class={`icon ${consent.consent_given ? 'icon-check-filled' : 'icon-close-circle text-danger'} cdp-text-primary mr-4 consent-check`}></i> <span className="consent-summary">{consent.title}</span></span>
+                                                            <i className="icon icon-arrow-down ml-2 accordion-consent__icon-down"></i>
+                                                        </Accordion.Toggle>
+                                                    </Card>
                                                 )}</Accordion> : <div className="m-3 alert alert-warning">The HCP has not given any consent.</div>}
                                             </div>
                                         </div>
@@ -268,7 +285,7 @@ export default function hcpUsers() {
 
                                 show={show.updateStatus}
                                 onShow={getConsentsForCurrentUser}
-                                onHide={() => { setCurrentAction({ action: null, userId: null }); setShow({ ...show, updateStatus: false}) }}
+                                onHide={() => { setCurrentAction({ action: null, userId: null }); setShow({ ...show, updateStatus: false }) }}
                                 dialogClassName="modal-customize"
                                 aria-labelledby="example-custom-modal-styling-title"
                                 centered
@@ -292,7 +309,7 @@ export default function hcpUsers() {
                                             <div className="row pb-3">
                                                 <div className="col">
                                                     {currentUser.consents && currentUser.consents.length ?
-                                                        currentUser.consents.map(consent => <div className="pb-1" key={consent.id} ><i className="icon icon-check-filled cdp-text-primary mr-2 small"></i>{ consent.title }</div>)
+                                                        currentUser.consents.map(consent => <div className="pb-1" key={consent.id} ><i className={`icon ${consent.consent_given ? 'icon-check-filled' : 'icon-close-circle text-danger'} cdp-text-primary mr-2 small`}></i>{consent.title}</div>)
                                                         : <div className="alert alert-warning">The HCP has not given any consent.</div>}
                                                 </div>
                                             </div>
@@ -351,7 +368,7 @@ export default function hcpUsers() {
                             {hcps['users'] && hcps['users'].length > 0 &&
                                 <React.Fragment>
                                     <div className="shadow-sm bg-white table-responsive">
-                                    <table className="table table-hover table-sm mb-0 cdp-table cdp-table-sm">
+                                        <table className="table table-hover table-sm mb-0 cdp-table cdp-table-sm">
                                             <thead className="cdp-bg-primary text-white cdp-table__header">
                                                 <tr>
                                                     <th><span className={sort.value === 'email' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('email')}>Email<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
@@ -360,6 +377,7 @@ export default function hcpUsers() {
                                                     <th><span className={sort.value === 'last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th><span className={sort.value === 'status' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('status')}>Status<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th><span className={sort.value === 'uuid' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('uuid')}>UUID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                    <th><span >Country</span></th>
                                                     <th><span className={sort.value === 'specialty_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('specialty_name')}>Specialty<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th className="consent-col">Single<br /> Opt-in</th>
                                                     <th className="consent-col">Double<br /> Opt-in</th>
@@ -374,17 +392,18 @@ export default function hcpUsers() {
                                                         <td>{row.first_name}</td>
                                                         <td>{row.last_name}</td>
                                                         <td className="text-nowrap">
-                                                        {row.status === 'self_verified' ? <span><i className="fa fa-xs fa-circle text-success pr-2"></i>Self Verified</span> :
-                                                            row.status === 'manually_verified' ? <span><i className="fa fa-xs fa-circle text-success pr-2"></i>Manually Verified</span> :
-                                                                row.status === 'consent_pending' ? <span><i className="fa fa-xs fa-circle text-warning pr-2"></i>Consent Pending</span> :
-                                                                    row.status === 'not_verified' ? <span><i className="fa fa-xs fa-circle text-warning pr-2"></i>Not Verified</span> :
-                                                                        row.status === 'rejected' ? <span><i className="fa fa-xs fa-circle text-danger pr-2"></i>Rejected</span> : <span></span>
+                                                            {row.status === 'self_verified' ? <span><i className="fa fa-xs fa-circle text-success pr-2 hcp-status-icon"></i>Self Verified</span> :
+                                                                row.status === 'manually_verified' ? <span><i className="fa fa-xs fa-circle text-success pr-2 hcp-status-icon"></i>Manually Verified</span> :
+                                                                    row.status === 'consent_pending' ? <span><i className="fa fa-xs fa-circle text-warning pr-2 hcp-status-icon"></i>Consent Pending</span> :
+                                                                        row.status === 'not_verified' ? <span><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Not Verified</span> :
+                                                                            row.status === 'rejected' ? <span><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Rejected</span> : <span></span>
                                                             }
                                                         </td>
                                                         <td>{row.uuid}</td>
+                                                        <td><span>{getCountryName(row.country_iso2)}</span></td>
                                                         <td>{row.specialty_description}</td>
-                                                        <td>{row.consent_types.includes('single') ? <i className="icon icon-check-filled cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger"> </i> }</td>
-                                                        <td>{row.consent_types.includes('double') ? <i className="icon icon-check-filled cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger"> </i> }</td>
+                                                        <td>{row.consent_types.includes('single') ? <i className="icon icon-check-filled cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
+                                                        <td>{row.consent_types.includes('double') ? <i className="icon icon-check-filled cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
                                                         <td>
                                                             <span>
                                                                 <Dropdown className="ml-auto dropdown-customize">
@@ -392,7 +411,7 @@ export default function hcpUsers() {
                                                                         {/*{currentAction.userId === row.id ? currentAction.action : 'Select an action'}*/}
                                                                     </Dropdown.Toggle>
                                                                     <Dropdown.Menu>
-                                                                        <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(row)}>Manage Profile</Dropdown.Item></LinkContainer>
+                                                                        <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(row)}>Profile</Dropdown.Item></LinkContainer>
                                                                         {/* <LinkContainer to="#"><Dropdown.Item>Edit Profile</Dropdown.Item></LinkContainer> */}
                                                                         {row.status === 'not_verified' && <LinkContainer to="#"><Dropdown.Item onClick={() => onUpdateStatus(row)}>Manage Status</Dropdown.Item></LinkContainer>}
                                                                     </Dropdown.Menu>

@@ -1,6 +1,5 @@
 const path = require('path');
 const crypto = require('crypto');
-const { Op } = require('sequelize');
 const jwt = require('jsonwebtoken');
 const User = require('./user.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
@@ -14,6 +13,8 @@ const Permission = require(path.join(process.cwd(), "src/modules/user/server/per
 const axios = require("axios");
 const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
 const PasswordPolicies = require(path.join(process.cwd(), "src/modules/core/server/password/password-policies.js"));
+const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
+const { QueryTypes, Op } = require('sequelize');
 
 function generateAccessToken(user) {
     return jwt.sign({
@@ -47,6 +48,10 @@ function getCommaSeparatedRoles(userrole) {
         const roles = userrole.map(ur => ur.role.name);
         return roles.join();
     }
+}
+
+function ignoreCaseArray(str) {
+    return [str.toLowerCase(), str.toUpperCase(), str.charAt(0).toLowerCase() + str.charAt(1).toUpperCase(), str.charAt(0).toUpperCase() + str.charAt(1).toLowerCase()];
 }
 
 function formatProfile(user) {
@@ -134,19 +139,29 @@ async function login(req, res) {
             }]
         });
 
+        const userLockedMessage = 'Your account has been locked for consecutive failed auth attempts. Please use the Forgot Password link to unlock.';
+
         if (user && user.dataValues.failed_auth_attempt >= 5) {
-            return res.status(401).send('Your account has been locked for consecutive failed auth attempts. Please use the Forgot Password link to unlock.');
+            return res.status(401).send(userLockedMessage);
         }
 
-        if (user && (!user.password || !user.validPassword(password))) {
-            await user.update(
-                { failed_auth_attempt: parseInt(user.dataValues.failed_auth_attempt ? user.dataValues.failed_auth_attempt : '0') + 1 },
-                { where: { email: email } }
-            );
+        if (user && user.password_expiry_date && user.password_expiry_date < Date.now()) {
+            return res.status(401).send("Password has been expired. Please reset the password.");
         }
 
         if (!user || !user.password || !user.validPassword(password)) {
-            return res.status(401).send('Invalid email or password.');
+
+            if (user && user.password) {
+                await user.update(
+                    { failed_auth_attempt: parseInt(user.dataValues.failed_auth_attempt ? user.dataValues.failed_auth_attempt : '0') + 1 }
+                );
+            }
+
+            const errorMessage = user && user.dataValues.failed_auth_attempt >= 5
+                ? userLockedMessage
+                : 'Invalid email or password.';
+
+            return res.status(401).send(errorMessage);
         }
 
         const isSiteVerified = await verifySite(recaptchaToken);
@@ -160,14 +175,12 @@ async function login(req, res) {
             httpOnly: true
         });
 
-        await user.update({ last_login: Date() })
+        await user.update({
+            last_login: Date(),
+            failed_auth_attempt: 0
+        });
 
-        const userWithApplication = await attachApplicationInfoToUser(user)
-
-        await user.update(
-            { failed_auth_attempt: 0 },
-            { where: { email: email } }
-        );
+        const userWithApplication = await attachApplicationInfoToUser(user);
 
         res.json(formatProfile(userWithApplication));
     } catch (err) {
@@ -289,17 +302,21 @@ async function getUsers(req, res) {
     if (page < 0) return res.status(404).send("page must be greater or equal 1");
 
     const limit = 15;
-    const country_iso2 = req.query.country_iso2 === 'null' ? null : req.query.country_iso2;
+    // const country_iso2 = req.query.country_iso2 === 'null' ? null : req.query.country_iso2;
+    const codbase = req.query.codbase === 'null' ? null : req.query.codbase;
     const offset = page * limit;
 
     const signedInId = (formatProfile(req.user)).id;
+
+    const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => i.codbase === codbase).map(i => i.country_iso2);
+    const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
 
     try {
         const users = await User.findAll({
             where: {
                 id: { [Op.ne]: signedInId },
                 type: 'basic',
-                countries: country_iso2 ? { [Op.contains]: [country_iso2] } : { [Op.ne]: ["undefined"] }
+                countries: codbase ? { [Op.overlap]: [countries_ignorecase_for_codbase] } : { [Op.ne]: ["undefined"] }
             },
             offset,
             limit,
@@ -319,7 +336,7 @@ async function getUsers(req, res) {
             where: {
                 id: { [Op.ne]: signedInId },
                 type: 'basic',
-                countries: country_iso2 ? { [Op.contains]: [country_iso2] } : { [Op.ne]: ["undefined"] }
+                countries: codbase ? { [Op.overlap]: [countries_ignorecase_for_codbase] } : { [Op.ne]: ["undefined"] }
             },
         });
 
@@ -330,7 +347,8 @@ async function getUsers(req, res) {
             total: totalUser,
             start: limit * page + 1,
             end: offset + limit > totalUser ? totalUser : offset + limit,
-            country_iso2: country_iso2 ? country_iso2 : null
+            // country_iso2: country_iso2 ? country_iso2 : null,
+            codbase: codbase ? codbase : null
         };
 
         res.json(data);
@@ -446,6 +464,12 @@ async function changePassword(req, res) {
 
         if (user.password) await PasswordPolicies.saveOldPassword(user);
 
+
+        const passwordValidityInMonths = newPassword.length >= 15 ? 12 : 6;
+        const currentDate = new Date();
+        const expiryDate = new Date(currentDate.setMonth(currentDate.getMonth() + passwordValidityInMonths));
+
+        user.password_expiry_date = expiryDate;
         user.password = newPassword;
         user.password_updated_at = new Date(Date.now());
         await user.save();
@@ -488,10 +512,15 @@ async function resetPassword(req, res) {
 
         if (user.password) await PasswordPolicies.saveOldPassword(user);
 
+        const passwordValidityInMonths = req.body.newPassword.length >= 15 ? 12 : 6;
+        const currentDate = new Date();
+        const expiryDate = new Date(currentDate.setMonth(currentDate.getMonth() + passwordValidityInMonths));
+
         await user.update({
             password: req.body.newPassword,
             failed_auth_attempt: 0,
-            password_updated_at: new Date(Date.now())
+            password_updated_at: new Date(Date.now()),
+            password_expiry_date: expiryDate
         });
 
         const options = {

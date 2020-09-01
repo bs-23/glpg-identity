@@ -176,3 +176,21 @@ a {
         color: $primary-color-light;
     }
 }
+
+.consent-not-given {
+    position: relative;
+    top: 2px;
+
+    &:before {
+        font-size: 16px;
+    }
+}
+
+.hcp-status-icon {
+    &:before {
+        content: "\f111";
+        font-size: 10px;
+        position: relative;
+        top: -1px;
+    }
+}

@@ -162,7 +162,6 @@ async function getHcps(req, res) {
         const limit = 15;
         let status = req.query.status === undefined ? null : req.query.status;
         if (status) status = Array.isArray(status) ? status.filter(e => Hcp.rawAttributes.status.values.includes(e)) : Hcp.rawAttributes.status.values.includes(status) ? status : [];
-        //const country_iso2 = req.query.country_iso2 === undefined ? null : req.query.country_iso2;
         const codbase = req.query.codbase === undefined ? null : req.query.codbase;
         const offset = page * limit;
 
@@ -174,14 +173,18 @@ async function getHcps(req, res) {
         const country_iso2_list = req.user.type === 'admin' ? (await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry", { type: QueryTypes.SELECT })).map(i => i.country_iso2) : (await Hcp.findAll()).map(i => i.get("country_iso2"));
         const countries_ignorecase = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
 
+
+        const codbase_list_mapped_with_user_country_iso2_list = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => req.user.countries.includes(i.country_iso2)).map(i => i.codbase) : [];
+        const country_iso2_list_for_user_countries_codbase = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => codbase_list_mapped_with_user_country_iso2_list.includes(i.codbase)).map(i => i.country_iso2) : [];
+        const countries_ignorecase_for_user_countries_codbase = [].concat.apply([], country_iso2_list_for_user_countries_codbase.map(i => ignoreCaseArray(i)));
+
         const specialty_list = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwspecialtymaster", { type: QueryTypes.SELECT });
 
 
         const hcp_filter = {
             status: status === null ? { [Op.or]: ['self_verified', 'manually_verified', 'consent_pending', 'not_verified', null] } : status,
             application_id: req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
-            //country_iso2: codbase ? { [Op.or]: country_iso2_for_codbase } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : [].concat.apply([], req.user.countries.map(i => ignoreCaseArray(i)))
-            country_iso2: codbase ? { [Op.any]: [countries_ignorecase_for_codbase] } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : [].concat.apply([], req.user.countries.map(i => ignoreCaseArray(i)))
+            country_iso2: codbase ? { [Op.any]: [countries_ignorecase_for_codbase] } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : countries_ignorecase_for_user_countries_codbase
         };
 
         const hcps = await Hcp.findAll({
@@ -189,7 +192,7 @@ async function getHcps(req, res) {
             include: [{
                 model: HcpConsents,
                 as: 'hcpConsents',
-                attributes: ['consent_id'],
+                attributes: ['consent_id', 'response', 'consent_confirmed'],
             }],
             attributes: { exclude: ['password', 'created_by', 'updated_by'] },
             offset,
@@ -204,8 +207,11 @@ async function getHcps(req, res) {
             const consent_types = new Set();
 
             await Promise.all(hcp['hcpConsents'].map(async hcpConsent => {
-                const country_consent = await ConsentCountry.findOne({ where: { consent_id: hcpConsent.consent_id } });
-                consent_types.add(country_consent.opt_type);
+
+                if(hcpConsent.response && hcpConsent.consent_confirmed){
+                    const country_consent = await ConsentCountry.findOne({ where: { consent_id: hcpConsent.consent_id } });
+                    consent_types.add(country_consent.opt_type);
+                }
             }));
 
             hcp.dataValues.consent_types = [...consent_types];
@@ -231,7 +237,6 @@ async function getHcps(req, res) {
             start: limit * page + 1,
             end: offset + limit > totalUser ? totalUser : offset + limit,
             status: status ? status : null,
-            // country_iso2: country_iso2 ? country_iso2 : null,
             codbase: codbase ? codbase : null,
             countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : req.user.countries
         };
@@ -688,7 +693,7 @@ async function getHCPUserConsents(req, res) {
             return res.status(404).send(response);
         }
 
-        const userConsents = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id', 'updated_at'] });
+        const userConsents = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id', 'response', 'consent_confirmed', 'updated_at'] });
 
         if (!userConsents) return res.json([]);
 
@@ -703,6 +708,7 @@ async function getHCPUserConsents(req, res) {
             const matchedConsentCountries = consentCountries.find(c => c.consent_id === conRes.id);
             conRes.consent_given_time = matchedConsent ? matchedConsent.updated_at : null;
             conRes.opt_type = matchedConsentCountries ? matchedConsentCountries.opt_type : null;
+            conRes.consent_given = matchedConsent ? matchedConsent.consent_confirmed && matchedConsent.response ? true : false : null;
             return conRes;
         });
 
@@ -899,7 +905,8 @@ async function getSpecialties(req, res) {
         let masterDataSpecialties = await sequelize.datasyncConnector.query(`
             SELECT codbase, cod_id_onekey, cod_locale, cod_description
             FROM ciam.vwspecialtymaster as Specialty
-            WHERE LOWER(cod_locale) = $locale;
+            WHERE LOWER(cod_locale) = $locale
+            ORDER BY cod_description ASC;
             `, {
             bind: {
                 locale: locale.toLowerCase()
@@ -913,7 +920,8 @@ async function getSpecialties(req, res) {
             masterDataSpecialties = await sequelize.datasyncConnector.query(`
             SELECT codbase, cod_id_onekey, cod_locale, cod_description
             FROM ciam.vwspecialtymaster as Specialty
-            WHERE LOWER(cod_locale) = $locale;
+            WHERE LOWER(cod_locale) = $locale
+            ORDER BY cod_description ASC;
             `, {
                 bind: {
                     locale: languageCode.toLowerCase()
@@ -956,20 +964,26 @@ async function getAccessToken(req, res) {
 
         const doc = await Hcp.findOne({ where: { email } });
 
+        const userLockedError = new CustomError('Your account has been locked for consecutive failed login attempts.', 4002);
+
         if (doc && doc.dataValues.failed_auth_attempt >= 5) {
-            response.errors.push(new CustomError('Your account has been locked for consecutive failed login attempts.', 4002));
+            response.errors.push(userLockedError);
             return res.status(401).send(response);
         }
 
-        if (doc && (!doc.password || !doc.validPassword(password))) {
-            await doc.update(
-                { failed_auth_attempt: parseInt(doc.dataValues.failed_auth_attempt ? doc.dataValues.failed_auth_attempt : '0') + 1 },
-                { where: { email: email } }
-            );
-        }
-
         if (!doc || !doc.password || !doc.validPassword(password)) {
-            response.errors.push(new CustomError('Invalid email or password.', 401));
+
+            if (doc && doc.password) {
+                await doc.update(
+                    { failed_auth_attempt: parseInt(doc.dataValues.failed_auth_attempt ? doc.dataValues.failed_auth_attempt : '0') + 1 }
+                );
+            }
+
+            const error = doc && doc.dataValues.failed_auth_attempt >= 5
+                ? userLockedError
+                : new CustomError('Invalid email or password.', 401);
+
+            response.errors.push(error);
             return res.status(401).json(response);
         }
 
