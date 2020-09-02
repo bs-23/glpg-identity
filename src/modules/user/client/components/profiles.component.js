@@ -120,7 +120,7 @@ export default function ManageProfiles() {
                             <ol className="breadcrumb rounded-0 my-0">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/users">Management of Customer Data Platform</NavLink></li>
-                                <li className="breadcrumb-item active"><span>Define Profile</span></li>
+                                <li className="breadcrumb-item active"><span>Manage Profiles</span></li>
                             </ol>
                         </nav>
                     </div>
@@ -128,7 +128,7 @@ export default function ManageProfiles() {
                 <div className="row">
                     <div className="col-12 col-sm-12 pt-3">
                         <div className="d-flex justify-content-between align-items-center mb-3 mt-4">
-                            <h4 className="cdp-text-primary font-weight-bold mb-0">Define Profiles</h4>
+                            <h4 className="cdp-text-primary font-weight-bold mb-0">Manage Profiles</h4>
                             <button className="btn cdp-btn-secondary text-white ml-auto " onClick={() => setModalShow({ ...modalShow, createProfile: true })}>
                                 <i className="icon icon-plus pr-1"></i> Add New Profile
                             </button>
@@ -140,7 +140,6 @@ export default function ManageProfiles() {
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
                                             <th className="py-2">Title</th>
-                                            <th className="py-2">Slug</th>
                                             <th className="py-2">Permission Sets</th>
                                             <th className="py-2">Action</th>
                                         </tr>
@@ -149,7 +148,6 @@ export default function ManageProfiles() {
                                         {profiles.map(row => (
                                             <tr key={row.id}>
                                                 <td>{row.title}</td>
-                                                <td>{row.slug}</td>
                                                 <td>{extractPermissionSetNames(row)}</td>
                                                 <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => null}> <i className="icon icon-edit-pencil pr-2"></i>Edit Profile</button></td>
                                             </tr>

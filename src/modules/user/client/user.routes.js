@@ -9,6 +9,7 @@ import UserDetails from "./components/user-details.component";
 import PrivateRoute from "../../core/client/PrivateRoute";
 import Roles from "./components/roles.component";
 import ManageProfiles from "./components/profiles.component";
+import ManagePermissionSets from "./components/permission-sets.component";
 
 export default function UserRoutes() {
     let { path } = useRouteMatch();
@@ -16,6 +17,7 @@ export default function UserRoutes() {
     return (
         <Switch>
             <PrivateRoute exact path={path} component={UserManagement} module={'user'} />
+            <PrivateRoute path={`${path}/permission-sets`} component={ManagePermissionSets} module={'user'} />
             <PrivateRoute path={`${path}/profiles`} component={ManageProfiles} module={'user'} />
             <PrivateRoute path={`${path}/create`} component={UserForm} module={'user'} />
             <PrivateRoute path={`${path}/roles`} component={Roles} module={'user'} />
