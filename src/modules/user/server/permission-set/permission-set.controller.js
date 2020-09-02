@@ -1,4 +1,5 @@
 const path = require('path');
+const { Op } = require('sequelize');
 const PermissionSet = require('./permission-set.model');
 const PermissionSet_ServiceCategory = require('./permissionSet-serviceCategory.model');
 const ServiceCategory = require('../permission/service-category.model');
@@ -53,6 +54,7 @@ async function createPermissionSet(req, res) {
             where: { title },
             defaults: {
                 title: title,
+                slug: title.replace(/ /g, '_').toLowerCase(),
                 countries: countries,
                 applicationId: application_id,
                 created_by: req.user.id,
@@ -88,6 +90,8 @@ async function editPermissionSet(req, res) {
     const { title, countries, application_id, serviceCategories } = req.body;
 
     try {
+        if(!title.trim()) return res.status(400).send('Permission set title can not be empty.');
+
         const doc = await PermissionSet.findOne({
             where: { id: req.params.id },
             include: [{
@@ -100,16 +104,19 @@ async function editPermissionSet(req, res) {
             return res.sendStatus(400);
         }
 
+        const permSetWithSameTitle = await PermissionSet.findAll({ where: { id: { [Op.ne]: doc.id }, title }});
+
+        if(permSetWithSameTitle.length) return res.status(400).send('Permission set with the same title already exists.');
+
         await doc.update({
             title: title,
             countries: countries,
-            applicationId: applicationId,
+            applicationId: application_id,
             updated_by: req.user.id
         });
 
         doc.permissionSet_serviceCategory.forEach(async sc => {
             await sc.destroy();
-
         });
 
         serviceCategories && serviceCategories.forEach(async function (serviceCategoryId) {

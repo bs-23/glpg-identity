@@ -53,12 +53,19 @@ const CheckList = ({ name, options, labelExtractor, idExtractor }) => {
         />
 }
 
-export default function PermissionSetForm({ onSuccess, onError }) {
+export default function PermissionSetForm({ onSuccess, onError, preFill }) {
     const [applications, setApplications] = useState([]);
     const [serviceCategories, setServiceCategories] = useState([]);
     const countries = useSelector(state => state.userReducer.countries);
     const { addToast } = useToasts();
     const dispatch = useDispatch();
+
+    const formValues = {
+        title: preFill ? preFill.title : '',
+        application_id: preFill ? preFill.application_id : applications.length ? applications[0].id : '',
+        countries: preFill ? preFill.countries ? preFill.countries : [] : [],
+        serviceCategories: preFill ? preFill.serviceCategories : []
+    };
 
     const getApplications = async () => {
         const response = await axios.get('/api/applications');
@@ -71,13 +78,14 @@ export default function PermissionSetForm({ onSuccess, onError }) {
     }
 
     const handleSubmit = (values, actions) => {
-        axios.post('/api/permissionSets', values)
-            .then(() => {
-                actions.resetForm();
-                addToast('Permission set created successfully', {
+        const promise = preFill ? axios.put(`/api/permissionSets/${preFill.id}`, values) : axios.post('/api/permissionSets', values);
+        promise.then(() => {
+                const successMessage = preFill ? 'Permission set updated successfully' : 'Permission set created successfully';
+                addToast(successMessage, {
                     appearance: 'success',
                     autoDismiss: true
                 });
+                actions.resetForm();
                 onSuccess && onSuccess();
             })
             .catch(err => {
@@ -105,12 +113,7 @@ export default function PermissionSetForm({ onSuccess, onError }) {
                         <div className="">
                             <div className="add-user p-3">
                                 <Formik
-                                    initialValues={{
-                                        title: '',
-                                        application_id: applications.length ? applications[0].id : '',
-                                        countries: [],
-                                        serviceCategories: []
-                                    }}
+                                    initialValues={formValues}
                                     displayName="PermissionSetForm"
                                     validationSchema={permissionSetCreateSchema}
                                     onSubmit={handleSubmit}
