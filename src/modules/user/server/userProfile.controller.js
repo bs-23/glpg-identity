@@ -30,7 +30,7 @@ async function createProfile(req, res) {
     const { title, permissionSets } = req.body;
 
     try {
-        if(!title) return res.status(400).send('Profile title must not be empty.');
+        if(!title.trim()) return res.status(400).send('Profile title must not be empty.');
         if(!Array.isArray(permissionSets)) return res.status(400).send('Invalid format for permission sets.');
         if(!permissionSets.length) return res.status(400).send('Must provide permission sets.');
 
