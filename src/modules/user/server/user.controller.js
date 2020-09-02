@@ -1,7 +1,7 @@
 const path = require('path');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
-const User = require('./user1.model');
+const User = require('./user.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));

@@ -1,7 +1,7 @@
 const path = require('path');
 const passport = require('passport');
 const { Strategy } = require('passport-jwt');
-const User = require('./user1.model');
+const User = require('./user.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const UserProfile = require(path.join(process.cwd(), "src/modules/user/server/user-profile.model"));
 const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/userProfile-permissionSet.model"));

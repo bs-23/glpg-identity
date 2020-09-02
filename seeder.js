@@ -12,15 +12,10 @@ async function init() {
 
     const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
     const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
-    const User1 = require(path.join(process.cwd(), 'src/modules/user/server/user1.model'));
     const ConsentCategory = require(path.join(process.cwd(), 'src/modules/consent/server/consent-category.model'));
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
     const ConsentLocale = require(path.join(process.cwd(), 'src/modules/consent/server/consent-locale.model'));
     const ConsentCountry = require(path.join(process.cwd(), 'src/modules/consent/server/consent-country.model'));
-    const RolePermission = require(path.join(process.cwd(), "src/modules/user/server/role/role-permission.model"));
-    const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
-    const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
-    const UserRole = require(path.join(process.cwd(), "src/modules/user/server/user-role.model"));
     const UserProfile = require(path.join(process.cwd(), "src/modules/user/server/user-profile.model"));
     const ServiceCategory = require(path.join(process.cwd(), "src/modules/user/server/permission/service-category.model"));
     const PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permission-set.model"));
@@ -38,6 +33,8 @@ async function init() {
 
     const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
 
+
+
     function userSeeder(callback) {
         User.findOrCreate({
             where: { email: 'glpg.cdp@gmail.com' }, defaults: {
@@ -51,103 +48,7 @@ async function init() {
         });
     }
 
-    function user1Seeder(callback) {
-        User1.findOrCreate({
-            where: { email: 'glpg.cdp@gmail.com' }, defaults: {
-                first_name: 'System',
-                last_name: 'Admin',
-                password: 'P@ssword123',
-                type: 'admin'
-            }
-        }).then(function () {
-            callback();
-        });
-    }
 
-    function permissionSeeder(callback) {
-        User.findOne({ where: { email: 'glpg.cdp@gmail.com' } }).then(admin => {
-
-            const permissions = [
-                { module: Modules.USER.value, status: "active", title: Modules.USER.title, created_by: admin.id, updated_by: admin.id },
-                { module: Modules.HCP.value, status: "active", title: Modules.HCP.title, created_by: admin.id, updated_by: admin.id }
-            ];
-
-            Permission.destroy({ truncate: { cascade: true } }).then(() => {
-                Permission.bulkCreate(permissions, {
-                    returning: true,
-                    ignoreDuplicates: false
-                }).then(function () {
-                    callback();
-                });
-            });
-        });
-    }
-
-    function roleSeeder(callback) {
-        User.findOne({ where: { email: 'glpg.cdp@gmail.com' } }).then(admin => {
-            const roles = [
-                { name: 'User & HCP Manager', slug: 'user-hcp-manager', description: 'Has access to all the services', created_by: admin.id, updated_by: admin.id },
-                { name: 'User Manager', slug: 'user-manager', description: 'Has access to manage CDP users only', created_by: admin.id, updated_by: admin.id },
-                { name: 'HCP Manager', slug: 'hcp-manager', description: 'Has access to manage HCP users only', created_by: admin.id, updated_by: admin.id }
-            ];
-
-            Role.destroy({ truncate: { cascade: true } }).then(() => {
-                Role.bulkCreate(roles, {
-                    returning: true,
-                    ignoreDuplicates: false
-                }).then(function () {
-                    callback();
-                });
-            });
-        });
-    }
-
-    function rolePermissionSeeder(callback) {
-        const adminRole = Role.findOne({ where: { slug: 'user-hcp-manager' } });
-        const userManagerRole = Role.findOne({ where: { slug: 'user-manager' } });
-        const hcpManagerRole = Role.findOne({ where: { slug: 'hcp-manager' } });
-
-        const userPermission = Permission.findOne({ where: { module: 'user' } });
-        const hcpPermission = Permission.findOne({ where: { module: 'hcp' } });
-
-        Promise.all([adminRole, userManagerRole, hcpManagerRole, userPermission, hcpPermission]).then((values) => {
-            const rolePermissions = [
-                { roleId: values[0].id, permissionId: values[3].id },
-                { roleId: values[0].id, permissionId: values[4].id },
-                { roleId: values[1].id, permissionId: values[3].id },
-                { roleId: values[2].id, permissionId: values[4].id }
-            ];
-
-            RolePermission.destroy({ truncate: { cascade: true } }).then(() => {
-                RolePermission.bulkCreate(rolePermissions, {
-                    returning: true,
-                    ignoreDuplicates: false
-                }).then(function () {
-                    callback();
-                });
-            });
-        });
-    }
-
-    function userRoleSeeder(callback) {
-        const admin = User.findOne({ where: { email: 'glpg.cdp@gmail.com' } });
-        const adminRole = Role.findOne({ where: { slug: 'user-hcp-manager' } });
-
-        Promise.all([admin, adminRole]).then((values) => {
-            const userRoles = [
-                { userId: values[0].id, roleId: values[1].id }
-            ];
-
-            UserRole.destroy({ truncate: { cascade: true } }).then(() => {
-                UserRole.bulkCreate(userRoles, {
-                    returning: true,
-                    ignoreDuplicates: false
-                }).then(function () {
-                    callback();
-                });
-            });
-        });
-    }
 
     function userProfileSeeder(callback) {
         User.findOne({ where: { email: 'glpg.cdp@gmail.com' } }).then(admin => {
@@ -171,8 +72,8 @@ async function init() {
     }
 
 
-    function user1UpdateSeeder(callback) {
-        User1.findOne({
+    function userUpdateSeeder(callback) {
+        User.findOne({
             where: { email: 'glpg.cdp@gmail.com' }
         }).then(admin => {
             UserProfile.findOne({ where: { slug: 'system_admin' } }).then(sysAdminProfile => {
@@ -421,7 +322,7 @@ async function init() {
         });
     }
 
-    async.waterfall([userSeeder,user1Seeder, permissionSeeder, roleSeeder, rolePermissionSeeder, userRoleSeeder, applicationSeeder, consentSeeder, userProfileSeeder, user1UpdateSeeder, serviceCategorySeeder, permissionSetSeeder, permissionSetServiceCategorySeeder, userProfilePermissionSetSeeder], function (err) {
+    async.waterfall([userSeeder,userSeeder, applicationSeeder, consentSeeder, userProfileSeeder, userUpdateSeeder, serviceCategorySeeder, permissionSetSeeder, permissionSetServiceCategorySeeder, userProfilePermissionSetSeeder], function (err) {
         if (err) console.error(err);
         else console.info('DB seed completed!');
         process.exit();

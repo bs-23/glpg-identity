@@ -11,17 +11,22 @@ async function getPermissionSets(req, res) {
             include: [{
                 model: PermissionSet_ServiceCategory,
                 as: 'permissionSet_serviceCategory',
+                attributes: [ 'id'],
                 include: [{
                     model: ServiceCategory,
-                    as: 'serviceCategory'
+                    as: 'serviceCategory',
+                    attributes: [ 'id', 'title', 'slug' ]
 
                 }]
             },
             {
                 model: Application,
-                as: 'application'
+                as: 'application',
+                attributes: [ 'id', 'name', 'slug' ]
             }
-        ],
+            ],
+            attributes: { exclude: ['created_by', 'updated_by','created_at', 'updated_at', 'applicationId'] },
+
             order: [
                 ['created_at', 'ASC'],
                 ['id', 'ASC']
@@ -34,7 +39,7 @@ async function getPermissionSets(req, res) {
     }
 }
 
-async function createPermissionSet (req, res) {
+async function createPermissionSet(req, res) {
     try {
         const {
             title,
@@ -76,12 +81,13 @@ async function editPermissionSet(req, res) {
     const { title, countries, application_id, serviceCategories } = req.body;
 
     try {
-        const doc = await PermissionSet.findOne({ where: { id: req.params.id },
+        const doc = await PermissionSet.findOne({
+            where: { id: req.params.id },
             include: [{
                 model: PermissionSet_ServiceCategory,
                 as: 'permissionSet_serviceCategory'
             }]
-         });
+        });
 
         if (!doc) {
             return res.sendStatus(400);
@@ -91,7 +97,8 @@ async function editPermissionSet(req, res) {
             title: title,
             countries: countries,
             applicationId: applicationId,
-             updated_by: req.user.id });
+            updated_by: req.user.id
+        });
 
         doc.permissionSet_serviceCategory.forEach(async sc => {
             await sc.destroy();
@@ -108,7 +115,7 @@ async function editPermissionSet(req, res) {
         res.json(doc);
     } catch (error) {
         console.error(error);
-         res.status(500).send(error);
+        res.status(500).send(error);
     }
 }
 

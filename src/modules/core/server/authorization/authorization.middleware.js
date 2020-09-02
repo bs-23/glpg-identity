@@ -1,10 +1,6 @@
 const path = require("path");
 const passport = require('passport');
-const User = require(path.join(process.cwd(), "src/modules/user/server/user1.model"));
-const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
-const UserRole = require(path.join(process.cwd(), "src/modules/user/server/user-role.model"));
-const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
-const RolePermission = require(path.join(process.cwd(), "src/modules/user/server/role/role-permission.model"));
+const User = require(path.join(process.cwd(), "src/modules/user/server/user.model"));
 const UserProfile = require(path.join(process.cwd(), "src/modules/user/server/user-profile.model"));
 const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/userProfile-permissionSet.model"));
 const PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permission-set.model"));
