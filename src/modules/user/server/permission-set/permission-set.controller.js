@@ -47,13 +47,20 @@ async function createPermissionSet(req, res) {
             application_id,
         } = req.body;
 
-        const doc = await PermissionSet.create({
-            title: title,
-            countries: countries,
-            applicationId: application_id,
-            created_by: req.user.id,
-            updated_by: req.user.id
+        if(!title.trim()) return res.status(400).send('Permission set title can not be empty.');
+
+        const [doc, created] = await PermissionSet.findOrCreate({
+            where: { title },
+            defaults: {
+                title: title,
+                countries: countries,
+                applicationId: application_id,
+                created_by: req.user.id,
+                updated_by: req.user.id
+            }
         });
+
+        if(!created) return res.status(400).send('Permission set with the same title already exists.');
 
         req.body.serviceCategories && req.body.serviceCategories.forEach(async function (serviceCategoryId) {
             await PermissionSet_ServiceCategory.create({

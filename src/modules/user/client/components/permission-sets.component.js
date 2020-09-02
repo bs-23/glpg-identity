@@ -81,7 +81,7 @@ export default function ManagePermissionSets() {
                                                 <td>{ row.application ? row.application.name : '' }</td>
                                                 <td>{ getCountryNamesFromCodes(row.countries) }</td>
                                                 <td>{getServiceCategoryNames(row)}</td>
-                                                <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => setEdit(row)}> <i className="icon icon-edit-pencil pr-2"></i>Edit Permission Set</button></td>
+                                                <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => null}> <i className="icon icon-edit-pencil pr-2"></i>Edit Permission Set</button></td>
                                             </tr>
                                         ))}
                                     </tbody>
