@@ -8,6 +8,7 @@ export default function PrivateRoute({ component: Component, module, ...rest }) 
     const [cookies] = useCookies();
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
     const profile = loggedInUser ? loggedInUser.profile : null;
+    const role = loggedInUser ? loggedInUser.role : null;
     let serviceCategories = [];
 
     const union = (a, b) => [...new Set([...a, ...b])];
@@ -20,17 +21,15 @@ export default function PrivateRoute({ component: Component, module, ...rest }) 
             }
         });
     }
-    const userPermissionSets = loggedInUser ? loggedInUser.permissionsets : [];
-    if(userPermissionSets) {
-        userPermissionSets.forEach(permissionSet => {
+    if (role && role[0]) {
+        role[0].permissionSets.forEach(permissionSet => {
+
 
             if (permissionSet.serviceCategories) {
                 serviceCategories = union(serviceCategories, permissionSet.serviceCategories );
             }
         });
-
     }
-
 
 
     // alert(typeof(cookies.logged_in))

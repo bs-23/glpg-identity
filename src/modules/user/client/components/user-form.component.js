@@ -13,7 +13,7 @@ export default function UserForm() {
     const dispatch = useDispatch();
     const [selectedCountryCode, setSelectedCountryCode] = useState(0);
     const [profiles, setProfiles] = useState([]);
-    const [permissionSets, setPermissionSets] = useState([]);
+    const [roles, setRoles] = useState([]);
     const CountryCodesObject = CountryCodes.customList('countryCode', '+{countryCallingCode}')
     const countries = useSelector(state => state.userReducer.countries);
     const history = useHistory()
@@ -29,22 +29,16 @@ export default function UserForm() {
             const response = await axios.get('/api/profiles');
             setProfiles(response.data);
 
-            // Using Static Values for Profile. Remove the code below and use the above code to fetch
-            // Profile once the profile api is ready
-            // setProfiles([
-            //     { id: '1', title: 'System Admin' },
-            //     { id: '2', title: 'Site Admin' },
-            //     { id: '3', title: 'Glbal Data Stewart' },
-            //     { id: '4', title: 'Local Data Stewart' }
-            // ]);
         }
-        async function getPermissionSets() {
-            const response = await axios.get('/api/permissionSets');
-            setPermissionSets(response.data);
+        async function getRole() {
+            const response = await axios.get('/api/roles');
+            setRoles(response.data);
+
         }
+
         dispatch(getCountries());
         getProfile();
-        getPermissionSets();
+        getRole();
     }, []);
 
     return (
@@ -77,6 +71,7 @@ export default function UserForm() {
                                             email: "",
                                             phone: '',
                                             profile: profiles.length > 0 ? profiles[0].id : '',
+                                            role: roles.length > 0 ? roles[0].id : '',
                                             permission_sets: []
                                         }}
                                         enableReinitialize
@@ -180,12 +175,12 @@ export default function UserForm() {
                                                             </div>
                                                             <div className="col-12 col-sm-6">
                                                                 <div className="form-group">
-                                                                    <label className="font-weight-bold" htmlFor="permission_sets">Select permission sets</label>
-                                                                    <Field as="select" multiple name="permission_sets" className="form-control">
-                                                                        {permissionSets.length > 0 ? permissionSets.map(item => <option classname="p-2" key={item.id} value={item.id}>{item.title}</option>) : null}
+                                                                    <label className="font-weight-bold" htmlFor="role">Select a role <span className="text-danger">*</span></label>
+                                                                    <Field as="select" name="role" className="form-control">
+                                                                        {roles ? roles.map(role => <option classname="p-2" key={role.id} value={role.id}>{role.title}</option>) : null}
                                                                     </Field>
                                                                     <div className="invalid-feedback">
-                                                                        <ErrorMessage name="permission_sets" />
+                                                                        <ErrorMessage name="role" />
                                                                     </div>
                                                                 </div>
                                                             </div>
