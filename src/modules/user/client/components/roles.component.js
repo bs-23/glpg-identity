@@ -100,8 +100,8 @@ export default function ManageRoles() {
 
     const extractPermissionSetNames = (data) => {
         if(!data) return '';
-        if(!data.role_permissionSet || !data.role_permissionSet.length) return '';
-        return data.role_permissionSet.map(item => item.permissionSet.title).join(', ');
+        if(!data.role_ps || !data.role_ps.length) return '';
+        return data.role_ps.map(item => item.ps.title).join(', ');
     }
 
     const handleCreateRoleSuccess = () => {
@@ -119,7 +119,7 @@ export default function ManageRoles() {
         const editData = {
             id: data.id,
             title: data.title,
-            permissionssetIDs: (data.role_permissionSet || []).map(item => item.permissionSetId) };
+            permissionssetIDs: (data.role_ps || []).map(item => item.permissionSetId) };
         setRoleEditData(editData);
         setModalShow({ ...modalShow, createRole: true });
     }

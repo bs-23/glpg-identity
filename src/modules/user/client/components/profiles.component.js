@@ -100,8 +100,8 @@ export default function ManageProfiles() {
 
     const extractPermissionSetNames = (data) => {
         if(!data) return '';
-        if(!data.userProfile_permissionSet || !data.userProfile_permissionSet.length) return '';
-        return data.userProfile_permissionSet.map(item => item.permissionSet.title).join(', ');
+        if(!data.up_ps || !data.up_ps.length) return '';
+        return data.up_ps.map(item => item.ps.title).join(', ');
     }
 
     const handleCreateProfileSuccess = () => {
@@ -119,7 +119,7 @@ export default function ManageProfiles() {
         const editData = {
             id: data.id,
             title: data.title,
-            permissionssetIDs: (data.userProfile_permissionSet || []).map(item => item.permissionSetId) };
+            permissionssetIDs: (data.up_ps || []).map(item => item.permissionSetId) };
         setProfileEditData(editData);
         setModalShow({ ...modalShow, createProfile: true });
     }
