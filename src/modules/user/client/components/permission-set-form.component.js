@@ -62,7 +62,7 @@ export default function PermissionSetForm({ onSuccess, onError, preFill }) {
 
     const formValues = {
         title: preFill ? preFill.title : '',
-        application_id: preFill ? preFill.application_id : applications.length ? applications[0].id : '',
+        application_id: preFill && preFill.application_id ? preFill.application_id : applications.length ? applications[0].id : '',
         countries: preFill ? preFill.countries ? preFill.countries : [] : [],
         serviceCategories: preFill ? preFill.serviceCategories : []
     };

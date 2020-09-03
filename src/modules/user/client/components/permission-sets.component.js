@@ -96,7 +96,7 @@ export default function ManagePermissionSets() {
                                                 <td>{ row.application ? row.application.name : '' }</td>
                                                 <td>{ getCountryNamesFromCodes(row.countries) }</td>
                                                 <td>{getServiceCategoryNames(row)}</td>
-                                                <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlePermissionSetEditClick(row)}> <i className="icon icon-edit-pencil pr-2"></i>Edit Permission Set</button></td>
+                                                <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlePermissionSetEditClick(row)} disabled={row.slug === 'system_admin'}> <i className="icon icon-edit-pencil pr-2"></i>Edit Permission Set</button></td>
                                             </tr>
                                         ))}
                                     </tbody>
