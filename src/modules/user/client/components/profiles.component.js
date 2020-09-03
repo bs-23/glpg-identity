@@ -15,12 +15,14 @@ const FormField = ({ label, name, type, children }) => <div className="col-12">
 </div>
 
 
-const ProfileForm = ({ onSuccess, permissionSets }) => {
+const ProfileForm = ({ onSuccess, permissionSets, preFill }) => {
     const { addToast } = useToasts();
 
     const handleSubmit = (values, actions) => {
-        axios.post('/api/profiles', values).then(() => {
-            addToast('Successfully created new profile.', {
+        const promise = preFill ? axios.put(`/api/profiles/${preFill.id}`, values) : axios.post('/api/profiles', values);
+        promise.then(() => {
+            const successMessage = preFill ? 'Successfully updated new profile.' : 'Successfully created new profile.';
+            addToast(successMessage, {
                 appearance: 'success',
                 autoDismiss: true
             });
@@ -44,10 +46,10 @@ const ProfileForm = ({ onSuccess, permissionSets }) => {
                 <div className="add-user p-3">
                     <Formik
                         initialValues={{
-                            title: '',
-                            permissionSets: []
+                            title: preFill ? preFill.title : '',
+                            permissionSets: preFill ? Array.isArray(preFill.permissionssetIDs) ? preFill.permissionssetIDs : [] : []
                         }}
-                        displayName="PermissionSetForm"
+                        displayName="ProfileForm"
                         validationSchema={profileCreateSchema}
                         onSubmit={handleSubmit}
                         enableReinitialize
@@ -84,6 +86,7 @@ export default function ManageProfiles() {
     const [profiles, setProfiles] = useState([]);
     const [permissionSets, setPermissionSets] = useState([]);
     const [modalShow, setModalShow] = useState({ createProfile: false });
+    const [profileEditData, setProfileEditData] = useState(null);
 
     const getProfiles = async () => {
         const { data } = await axios.get('/api/profiles');
@@ -104,6 +107,20 @@ export default function ManageProfiles() {
     const handleCreateProfileSuccess = () => {
         getProfiles();
         setModalShow({ createProfile: false });
+    }
+
+    const handleProfileModalHide = () => {
+        setModalShow({ ...modalShow, createProfile: false });
+        setProfileEditData(null);
+    }
+
+    const handlepProfileEditClick = (data) => {
+        const editData = {
+            id: data.id,
+            title: data.title,
+            permissionssetIDs: (data.userProfile_permissionSet || []).map(item => item.permissionSetId) };
+        setProfileEditData(editData);
+        setModalShow({ ...modalShow, createProfile: true });
     }
 
     useEffect(() => {
@@ -149,7 +166,7 @@ export default function ManageProfiles() {
                                             <tr key={row.id}>
                                                 <td>{row.title}</td>
                                                 <td>{extractPermissionSetNames(row)}</td>
-                                                <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => null}> <i className="icon icon-edit-pencil pr-2"></i>Edit Profile</button></td>
+                                                <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlepProfileEditClick(row)}> <i className="icon icon-edit-pencil pr-2"></i>Edit Profile</button></td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -168,17 +185,17 @@ export default function ManageProfiles() {
 
                         <Modal
                             show={modalShow.createProfile}
-                            onHide={() => setModalShow({ ...modalShow, createProfile: false })}
+                            onHide={handleProfileModalHide}
                             dialogClassName="modal-90w modal-customize"
                             aria-labelledby="example-custom-modal-styling-title"
                         >
                             <Modal.Header closeButton>
                                 <Modal.Title id="example-custom-modal-styling-title">
-                                    Create New Profile
+                                    {profileEditData ? "Update Profile" : "Create New Profile"}
                                 </Modal.Title>
                             </Modal.Header>
                             <Modal.Body>
-                                <ProfileForm permissionSets={permissionSets} onSuccess={handleCreateProfileSuccess} />
+                                <ProfileForm preFill={profileEditData} permissionSets={permissionSets} onSuccess={handleCreateProfileSuccess} />
                             </Modal.Body>
                         </Modal>
 

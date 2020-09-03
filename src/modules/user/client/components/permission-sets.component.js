@@ -8,6 +8,7 @@ import PermissionSetForm from './permission-set-form.component';
 export default function ManagePermissionSets() {
     const [permissionSets, setPermissionSets] = useState([]);
     const [permissionModalShow, setPermissionModalShow] = useState(false);
+    const [permissionSetEditData, setPermissionSetEditData] = useState(null);
     const countries = useSelector(state => state.userReducer.countries);
 
     const getPermissionSets = async () => {
@@ -33,6 +34,19 @@ export default function ManagePermissionSets() {
     const handleFormSubmitSuccess = () => {
         getPermissionSets();
         setPermissionModalShow(false);
+    }
+
+    const preparePermissionSetEditData = (data) => {
+        const { id, title, countries, application } = data;
+        const serviceCategories = data.permissionSet_serviceCategory ? data.permissionSet_serviceCategory.map(item => item.serviceCategory.id ) : [];
+        const editObject = { id, title, countries, serviceCategories, application_id: application ? application.id : '' };
+        return editObject;
+    }
+
+    const handlePermissionSetEditClick = (data) => {
+        const editObject = preparePermissionSetEditData(data)
+        setPermissionSetEditData(editObject);
+        setPermissionModalShow(true);
     }
 
     useEffect(() => {
@@ -81,7 +95,7 @@ export default function ManagePermissionSets() {
                                                 <td>{ row.application ? row.application.name : '' }</td>
                                                 <td>{ getCountryNamesFromCodes(row.countries) }</td>
                                                 <td>{getServiceCategoryNames(row)}</td>
-                                                <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => setEdit(row)}> <i className="icon icon-edit-pencil pr-2"></i>Edit Permission Set</button></td>
+                                                <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlePermissionSetEditClick(row)}> <i className="icon icon-edit-pencil pr-2"></i>Edit Permission Set</button></td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -100,18 +114,18 @@ export default function ManagePermissionSets() {
 
                         <Modal
                             show={permissionModalShow}
-                            onHide={() => setPermissionModalShow(false)}
+                            onHide={() => { setPermissionModalShow(false); setPermissionSetEditData(null); }}
                             dialogClassName="modal-90w modal-customize"
                             aria-labelledby="example-custom-modal-styling-title"
                             size="lg"
                         >
                             <Modal.Header closeButton>
                                 <Modal.Title id="example-custom-modal-styling-title">
-                                    Create New Permission Set
+                                    {permissionSetEditData ? 'Update Permission Set' : 'Create New Permission Set'}
                                 </Modal.Title>
                             </Modal.Header>
                             <Modal.Body>
-                                <PermissionSetForm onSuccess={handleFormSubmitSuccess} />
+                                <PermissionSetForm onSuccess={handleFormSubmitSuccess} preFill={permissionSetEditData} />
                             </Modal.Body>
                         </Modal>
 
