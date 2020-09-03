@@ -109,7 +109,8 @@ async function editPermissionSet(req, res) {
         if(permSetWithSameTitle.length) return res.status(400).send('Permission set with the same title already exists.');
 
         await doc.update({
-            title: title,
+            title: title.trim(),
+            slug: title.trim().replace(/ /g, '_').toLowerCase(),
             countries: countries,
             applicationId: application_id,
             updated_by: req.user.id
