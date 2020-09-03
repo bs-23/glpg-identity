@@ -130,16 +130,21 @@ async function init() {
 
     function permissionSetServiceCategorySeeder(callback) {
         User.findOne({ where: { email: 'glpg.cdp@gmail.com' } }).then(admin => {
-            const permissionSet = PermissionSet.findOne({ where: { slug: 'system_admin' } });
+            const systemAdmin_permissionSet = PermissionSet.findOne({ where: { slug: 'system_admin' } });
+            const siteAdmin_permissionSet = PermissionSet.findOne({ where: { slug: 'site_admin' } });
             const hcpServiceCategory = ServiceCategory.findOne({ where: { slug: 'hcp' } });
             const userServiceCategory = ServiceCategory.findOne({ where: { slug: 'user' } });
             const consentServiceCategory = ServiceCategory.findOne({ where: { slug: 'consent' } });
 
-            Promise.all([permissionSet, hcpServiceCategory, userServiceCategory, consentServiceCategory]).then((values) => {
+            Promise.all([systemAdmin_permissionSet, siteAdmin_permissionSet, hcpServiceCategory, userServiceCategory, consentServiceCategory]).then((values) => {
                 const permissionSet_serviceCategory = [
-                    { permissionSetId: values[0].id, serviceCategoryId: values[1].id },
                     { permissionSetId: values[0].id, serviceCategoryId: values[2].id },
                     { permissionSetId: values[0].id, serviceCategoryId: values[3].id },
+                    { permissionSetId: values[0].id, serviceCategoryId: values[4].id },
+
+                    { permissionSetId: values[1].id, serviceCategoryId: values[2].id },
+                    { permissionSetId: values[1].id, serviceCategoryId: values[3].id },
+                    { permissionSetId: values[1].id, serviceCategoryId: values[4].id }
                 ];
 
                 PermissionSet_ServiceCategory.destroy({ truncate: { cascade: true } }).then(() => {
