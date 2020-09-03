@@ -38,11 +38,11 @@ async function getProfilePermissions(user) {
     let countries = [];
 
     if (userProfile) {
-        for (const userProPermSet of userProfile.userProfile_permissionSet) {
+        for (const userProPermSet of userProfile.up_ps) {
 
             const permissionServiceCategories = await PermissionSet_ServiceCateory.findAll({
                 where: {
-                    permissionSetId: userProPermSet.permissionSet.id
+                    permissionSetId: userProPermSet.ps.id
                 },
                 include: [{
                     model: ServiceCategory,
@@ -56,7 +56,7 @@ async function getProfilePermissions(user) {
 
             });
 
-            const applicationsCountries = await getUserApplicationCountry(userProPermSet.permissionSet);
+            const applicationsCountries = await getUserApplicationCountry(userProPermSet.ps);
 
             applications = applicationsCountries[0];
             countries = applicationsCountries[1];
@@ -89,10 +89,10 @@ async function getRolePermissions(user) {
 
     if (userRoles.length) {
         for (const userRole of userRoles) {
-            for (const rolePermSet of userRole.role.role_permissionSet) {
+            for (const rolePermSet of userRole.role.role_ps) {
                 const permissionServiceCategories = await PermissionSet_ServiceCateory.findAll({
                     where: {
-                        permissionSetId: rolePermSet.permissionSet.id
+                        permissionSetId: rolePermSet.ps.id
                     },
                     include: [{
                         model: ServiceCategory,
@@ -107,7 +107,7 @@ async function getRolePermissions(user) {
 
                 });
 
-                const applicationsCountries = await getUserApplicationCountry(rolePermSet.permissionSet);
+                const applicationsCountries = await getUserApplicationCountry(rolePermSet.ps);
 
                 applications = applicationsCountries[0];
                 countries = applicationsCountries[1];
@@ -178,8 +178,8 @@ async function getCommaSeparatedApplications(user) {
     let profile_countries = [];
 
     for (const userRole of user.userRoles) {
-        for (const rolePermSet of userRole.role.role_permissionSet) {
-            const applicationsCountries = await getUserApplicationCountry(rolePermSet.permissionSet);
+        for (const rolePermSet of userRole.role.role_ps) {
+            const applicationsCountries = await getUserApplicationCountry(rolePermSet.ps);
             role_applications = role_applications.concat(applicationsCountries[0]);
             role_countries = role_countries.concat(applicationsCountries[1])
 
@@ -188,10 +188,10 @@ async function getCommaSeparatedApplications(user) {
     }
 
     if (user.userProfile) {
-        const profilePermissionSets = user.userProfile.userProfile_permissionSet;
+        const profilePermissionSets = user.userProfile.up_ps;
         for (const userProPermSet of profilePermissionSets) {
 
-            const applicationsCountries = await getUserApplicationCountry(userProPermSet.permissionSet);
+            const applicationsCountries = await getUserApplicationCountry(userProPermSet.ps);
             profile_applications = profile_applications.concat(applicationsCountries[0]);
             profile_countries = profile_countries.concat(applicationsCountries[1]);
         }
@@ -239,7 +239,8 @@ async function formatProfileDetail(user) {
         expiry_date: user.expiry_date,
         profiles: user.userProfile.title,
         application: applicationCountriesFormatted[0],
-        countries: applicationCountriesFormatted[1]
+        countries: applicationCountriesFormatted[1],
+        role: user.userRoles[0].role.title
     };
 
     return profile;
@@ -269,36 +270,40 @@ async function login(req, res) {
                     [Op.iLike]: `%${email}%`
                 }
             },
-            include: [{
-                model: UserProfile,
-                as: 'userProfile',
-                include: [{
-                    model: UserProfile_PermissionSet,
-                    as: 'userProfile_permissionSet',
+            include: [
+                {
+                    model: User_Role,
+                    as: 'userRoles',
                     include: [{
-                        model: PermissionSet,
-                        as: 'permissionSet'
+                        model: Role,
+                        as: 'role',
+                        include: [{
+                            model: Role_PermissionSet,
+                            as: 'role_ps',
+                            include: [{
+                                model: PermissionSet,
+                                as: 'ps'
+
+                            }]
+                        }]
+
                     }]
-                }]
-            },
-            {
-                model: User_Role,
-                as: 'userRoles',
-                include: [{
-                    model: Role,
-                    as: 'role',
+                },
+                {
+
+                    model: UserProfile,
+                    as: 'userProfile',
                     include: [{
-                        model: Role_PermissionSet,
-                        as: 'role_permissionSet',
+                        model: UserProfile_PermissionSet,
+                        as: 'up_ps',
                         include: [{
                             model: PermissionSet,
-                            as: 'permissionSet'
+                            as: 'ps'
 
                         }]
                     }]
+                }
 
-                }]
-            }
             ]
         });
 
@@ -491,10 +496,10 @@ async function getUsers(req, res) {
                 as: 'userProfile',
                 include: [{
                     model: UserProfile_PermissionSet,
-                    as: 'userProfile_permissionSet',
+                    as: 'up_ps',
                     include: [{
                         model: PermissionSet,
-                        as: 'permissionSet',
+                        as: 'ps',
                         where: {
 
                             countries: codbase ? { [Op.overlap]: [countries_ignorecase_for_codbase] } : { [Op.ne]: ["undefined"] }
@@ -511,10 +516,10 @@ async function getUsers(req, res) {
                     as: 'role',
                     include: [{
                         model: Role_PermissionSet,
-                        as: 'role_permissionSet',
+                        as: 'role_ps',
                         include: [{
                             model: PermissionSet,
-                            as: 'permissionSet',
+                            as: 'ps',
 
                         }]
                     }]
@@ -536,10 +541,10 @@ async function getUsers(req, res) {
                     as: 'userProfile',
                     include: [{
                         model: UserProfile_PermissionSet,
-                        as: 'userProfile_permissionSet',
+                        as: 'up_ps',
                         include: [{
                             model: PermissionSet,
-                            as: 'permissionSet',
+                            as: 'ps',
                             where: {
                                 countries: codbase ? { [Op.overlap]: [countries_ignorecase_for_codbase] } : { [Op.ne]: ["undefined"] }
                             }
@@ -580,10 +585,10 @@ async function getUser(req, res) {
                 as: 'userProfile',
                 include: [{
                     model: UserProfile_PermissionSet,
-                    as: 'userProfile_permissionSet',
+                    as: 'up_ps',
                     include: [{
                         model: PermissionSet,
-                        as: 'permissionSet',
+                        as: 'ps',
 
                     }]
                 }]
@@ -596,10 +601,10 @@ async function getUser(req, res) {
                     as: 'role',
                     include: [{
                         model: Role_PermissionSet,
-                        as: 'role_permissionSet',
+                        as: 'role_ps',
                         include: [{
                             model: PermissionSet,
-                            as: 'permissionSet',
+                            as: 'ps',
 
                         }]
                     }]

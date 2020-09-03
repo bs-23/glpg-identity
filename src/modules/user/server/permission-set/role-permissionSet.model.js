@@ -27,6 +27,6 @@ const Role_PermissionSet = sequelize.cdpConnector.define('role_permissionSets', 
     updatedAt: 'updated_at'
 });
 
-Role_PermissionSet.belongsTo(PermissionSet, {as: 'permissionSet', foreignKey: 'permissionSetId'});
+Role_PermissionSet.belongsTo(PermissionSet, {as: 'ps', foreignKey: 'permissionSetId'});
 
 module.exports = Role_PermissionSet;

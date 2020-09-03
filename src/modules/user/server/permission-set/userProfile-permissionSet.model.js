@@ -27,6 +27,6 @@ const UserProfile_PermissionSet = sequelize.cdpConnector.define('userProfiles_pe
     updatedAt: 'updated_at'
 });
 
-UserProfile_PermissionSet.belongsTo(PermissionSet, {as: 'permissionSet', foreignKey: 'permissionSetId'});
+UserProfile_PermissionSet.belongsTo(PermissionSet, {as: 'ps', foreignKey: 'permissionSetId'});
 
 module.exports = UserProfile_PermissionSet;

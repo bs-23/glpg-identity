@@ -9,11 +9,11 @@ async function getProfiles(req, res) {
         const profiles = await Profile.findAll({
             include: [{
                 model: UserProfilePermissionSet,
-                as: 'userProfile_permissionSet',
+                as: 'up_ps',
                 attributes: ['permissionSetId'],
                 include: [{
                     model: PermissionSet,
-                    as: 'permissionSet',
+                    as: 'ps',
                     attributes: ['title']
                 }]
             }],
