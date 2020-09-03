@@ -81,15 +81,7 @@ async function editProfile(req, res) {
             updated_by: req.user.id
         });
 
-        await UserProfilePermissionSet.destroy({
-            where: {
-                userProfileId: foundProfile.id
-            }
-        });
-
-        const permission_sets = permissionSets.map(id => ({ userProfileId: foundProfile.id, permissionSetId: id }));
-
-        await UserProfilePermissionSet.bulkCreate(permission_sets);
+        await foundProfile.setPermission_sets(permissionSets);
 
         res.json(foundProfile);
     } catch (error) {
