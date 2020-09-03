@@ -106,6 +106,7 @@ export default function ManageProfiles() {
 
     const handleCreateProfileSuccess = () => {
         getProfiles();
+        setProfileEditData(null);
         setModalShow({ createProfile: false });
     }
 

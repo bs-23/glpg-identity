@@ -3,6 +3,7 @@ const { DataTypes } = require('sequelize');
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const Role_PermissionSet = require('../permission-set/role-permissionSet.model');
+const PermissionSet = require('../permission-set/permission-set.model');
 
 const Role = sequelize.cdpConnector.define('roles', {
     id: {
@@ -32,5 +33,6 @@ const Role = sequelize.cdpConnector.define('roles', {
 });
 
 Role.hasMany(Role_PermissionSet, {as: 'role_permissionSet', foreignKey: 'roleId', sourceKey: 'id'});
+Role.belongsToMany(PermissionSet, { through: Role_PermissionSet });
 
 module.exports = Role;

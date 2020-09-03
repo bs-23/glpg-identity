@@ -33,6 +33,7 @@ export default function ManagePermissionSets() {
 
     const handleFormSubmitSuccess = () => {
         getPermissionSets();
+        setPermissionSetEditData(null);
         setPermissionModalShow(false);
     }
 

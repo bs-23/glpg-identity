@@ -1,51 +1,132 @@
 import axios from "axios";
-import { useDispatch, useSelector } from "react-redux";
 import { NavLink } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
-import { getRoles, createRole } from "../user.actions";
-import { roleSchema } from "../user.schema";
+import { Form, Formik, Field, ErrorMessage } from "formik";
 import { useToasts } from "react-toast-notifications";
 import Modal from 'react-bootstrap/Modal';
+import { roleCreateSchema } from "../user.schema";
 
-export default function RoleForm() {
-    const [permissions, setPermissions] = useState([]);
-    const [editData, setEditData] = useState({});
-    const [selected, setselected] = useState([]);
-    const [show, setShow] = useState(false);
-    const roles = useSelector(state => state.userReducer.roles);
-    const dispatch = useDispatch();
+const FormField = ({ label, name, type, children }) => <div className="col-12">
+    <div className="form-group">
+        <label className="font-weight-bold" htmlFor="last_name">{ label }<span className="text-danger">*</span></label>
+        { children || <Field className="form-control" type={type} name={name} /> }
+        <div className="invalid-feedback"><ErrorMessage name={name} /></div>
+    </div>
+</div>
+
+
+const RoleForm = ({ onSuccess, permissionSets, preFill }) => {
     const { addToast } = useToasts();
 
-    const setEdit = (row) => {
-        const list = (row.rolePermission).map(obj => {
-            return obj.permissionId;
+    const handleSubmit = (values, actions) => {
+        const promise = preFill ? axios.put(`/api/roles/${preFill.id}`, values) : axios.post('/api/roles', values);
+        promise.then(() => {
+            const successMessage = preFill ? 'Successfully updated new role.' : 'Successfully created new role.';
+            addToast(successMessage, {
+                appearance: 'success',
+                autoDismiss: true
+            });
+            actions.resetForm();
+            onSuccess && onSuccess();
+        }).catch(err => {
+            const errorMessage = typeof err.response.data === 'string' ? err.response.data : err.response.statusText;
+            addToast(errorMessage, {
+                appearance: 'error',
+                autoDismiss: true
+            });
+        }).finally(() => {
+            actions.setSubmitting(false);
         });
-        setselected(list);
-
-        setShow(true); setEditData(row);
+        actions.setSubmitting(true);
     }
 
-    const selectPermission = (permission_id, alreadySelected) => {
-        if (!alreadySelected) {
-            const items = [...selected, permission_id];
-            setselected(items);
-        }
-        else {
-            const items = [...selected];
-            const idx = items.findIndex(i => i === permission_id);
-            items.splice(idx, 1);
-            setselected(items);
-        }
+    return <div className="row">
+        <div className="col-12">
+            <div className="">
+                <div className="add-user p-3">
+                    <Formik
+                        initialValues={{
+                            title: preFill ? preFill.title : '',
+                            permissionSets: preFill ? Array.isArray(preFill.permissionssetIDs) ? preFill.permissionssetIDs : [] : []
+                        }}
+                        displayName="RoleForm"
+                        validationSchema={roleCreateSchema}
+                        onSubmit={handleSubmit}
+                        enableReinitialize
+                    >
+                        {formikProps => (
+                            <Form onSubmit={formikProps.handleSubmit}>
+                                <div className="row">
+                                    <div className="col-12">
+                                        <div className="row">
+                                            <FormField label="Title" type="text" name="title"/>
+                                        </div>
+                                    </div>
+                                    <div className="col-12">
+                                        <div className="row">
+                                            <FormField name="permissionSets" label="Select Permission Sets">
+                                                <Field as="select" multiple name="permissionSets" className="form-control">
+                                                    {permissionSets.length > 0 ? permissionSets.map(item => <option key={item.id} value={item.id}>{item.title}</option>) : null}
+                                                </Field>
+                                            </FormField>
+                                        </div>
+                                        <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting} > Submit </button>
+                                    </div>
+                                </div>
+                            </Form>
+                        )}
+                    </Formik>
+                </div>
+            </div>
+        </div>
+    </div>
+};
+
+export default function ManageRoles() {
+    const [roles, setRoles] = useState([]);
+    const [permissionSets, setPermissionSets] = useState([]);
+    const [modalShow, setModalShow] = useState({ createRole: false });
+    const [roleEditData, setRoleEditData] = useState(null);
+
+    const getRoles = async () => {
+        const { data } = await axios.get('/api/roles');
+        setRoles(data);
+    }
+
+    const getPermissionSets = async () => {
+        const response = await axios.get('/api/permissionSets');
+        setPermissionSets(response.data);
+    }
+
+    const extractPermissionSetNames = (data) => {
+        if(!data) return '';
+        if(!data.role_permissionSet || !data.role_permissionSet.length) return '';
+        return data.role_permissionSet.map(item => item.permissionSet.title).join(', ');
+    }
+
+    const handleCreateRoleSuccess = () => {
+        getRoles();
+        setRoleEditData(null);
+        setModalShow({ ...modalShow, createRole: false });
+    }
+
+    const handleRoleModalHide = () => {
+        setRoleEditData(null);
+        setModalShow({ ...modalShow, createRole: false });
+    }
+
+    const handlepRoleEditClick = (data) => {
+        const editData = {
+            id: data.id,
+            title: data.title,
+            permissionssetIDs: (data.role_permissionSet || []).map(item => item.permissionSetId) };
+        setRoleEditData(editData);
+        setModalShow({ ...modalShow, createRole: true });
     }
 
     useEffect(() => {
-        async function getPermissions() {
-            const response = await axios.get('/api/permissions');
-            setPermissions(response.data);
-        }
-        getPermissions();
-        dispatch(getRoles());
+        getRoles();
+        getPermissionSets();
     }, []);
 
     return (
@@ -64,12 +145,37 @@ export default function RoleForm() {
                 </div>
                 <div className="row">
                     <div className="col-12 col-sm-12 pt-3">
+                        <div className="d-flex justify-content-between align-items-center mb-3 mt-4">
+                            <h4 className="cdp-text-primary font-weight-bold mb-0">Define Roles</h4>
+                            <button className="btn cdp-btn-secondary text-white ml-auto " onClick={() => setModalShow({ ...modalShow, createRole: true })}>
+                                <i className="icon icon-plus pr-1"></i> Add New Role
+                            </button>
+                        </div>
 
+                        {roles.length > 0 &&
+                            <div className="table-responsive shadow-sm bg-white">
+                                <table className="table table-hover table-sm mb-0 cdp-table">
+                                    <thead className="cdp-bg-primary text-white cdp-table__header">
+                                        <tr>
+                                            <th className="py-2">Title</th>
+                                            <th className="py-2">Permission Sets</th>
+                                            <th className="py-2">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="cdp-table__body bg-white">
+                                        {roles.map(row => (
+                                            <tr key={row.id}>
+                                                <td>{row.title}</td>
+                                                <td>{extractPermissionSetNames(row)}</td>
+                                                <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlepRoleEditClick(row)}> <i className="icon icon-edit-pencil pr-2"></i>Edit Role</button></td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
 
-
-                       
-
-                        {roles && roles.length === 0 &&
+                        {roles.length === 0 &&
                             <><div className="row justify-content-center mt-5 pt-5 mb-3">
                                 <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">
                                     <i class="icon icon-team icon-6x cdp-text-secondary"></i>
@@ -77,6 +183,23 @@ export default function RoleForm() {
                                 </div>
                             </div></>
                         }
+
+                        <Modal
+                            show={modalShow.createRole}
+                            onHide={handleRoleModalHide}
+                            dialogClassName="modal-90w modal-customize"
+                            aria-labelledby="example-custom-modal-styling-title"
+                        >
+                            <Modal.Header closeButton>
+                                <Modal.Title id="example-custom-modal-styling-title">
+                                    {roleEditData ? "Update Role" : "Create New Role"}
+                                </Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <RoleForm preFill={roleEditData} permissionSets={permissionSets} onSuccess={handleCreateRoleSuccess} />
+                            </Modal.Body>
+                        </Modal>
+
                     </div>
                 </div>
             </div>
