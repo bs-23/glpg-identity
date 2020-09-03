@@ -32,7 +32,8 @@ const Role = sequelize.cdpConnector.define('roles', {
     updatedAt: 'updated_at'
 });
 
-Role.hasMany(Role_PermissionSet, {as: 'role_permissionSet', foreignKey: 'roleId', sourceKey: 'id'});
+// Role.hasMany(Role_PermissionSet, {as: 'role_permissionSet', foreignKey: 'roleId', sourceKey: 'id'});
+Role.hasMany(Role_PermissionSet, {as: 'role_ps', foreignKey: 'roleId', sourceKey: 'id'});
 Role.belongsToMany(PermissionSet, { through: Role_PermissionSet });
 
 module.exports = Role;

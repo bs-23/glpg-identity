@@ -32,10 +32,10 @@ async function getUserWithProfiles(id) {
             as: 'userProfile',
             include: [{
                 model: UserProfile_PermissionSet,
-                as: 'userProfile_permissionSet',
+                as: 'up_ps',
                 include: [{
                     model: PermissionSet,
-                    as: 'permissionSet',
+                    as: 'ps',
 
                 }]
             }]
@@ -48,11 +48,11 @@ async function getUserWithProfiles(id) {
 async function getProfilePermissions(profile) {
     const serviceCategories = [];
 
-    if (profile.userProfile_permissionSet) {
-        for (const userProPermSet of profile.userProfile_permissionSet) {
+    if (profile.up_ps) {
+        for (const userProPermSet of profile.up_ps) {
             const permissionServiceCategories = await PermissionSet_ServiceCateory.findAll({
                 where: {
-                    permissionSetId: userProPermSet.permissionSet.id
+                    permissionSetId: userProPermSet.ps.id
                 },
                 include: [{
                     model: ServiceCategory,

@@ -113,6 +113,8 @@ async function init() {
 
             const permissionSet = [
                 { title: "System Admin Permission Set", slug: "system_admin", created_by: admin.id, updated_by: admin.id },
+                { title: "Site Admin Permission Set", slug: "site_admin", countries:["BE", "AD", "DE", "IT", "NL", "ES","IE"], created_by: admin.id, updated_by: admin.id },
+                { title: "GDS Permission Set", slug: "gds", countries:["BE", "AD", "DE", "IT", "NL", "ES","IE"], created_by: admin.id, updated_by: admin.id }
             ];
 
             PermissionSet.destroy({ truncate: { cascade: true } }).then(() => {
@@ -155,12 +157,19 @@ async function init() {
 
     function userProfilePermissionSetSeeder(callback) {
 
-        const permissionSet = PermissionSet.findOne({ where: { slug: 'system_admin' } });
-        const userProfile = UserProfile.findOne({ where: { slug: 'system_admin' } });
+        const systemAdminProfile = UserProfile.findOne({ where: { slug: 'system_admin' } });
+        const systemAdminPermissionSet = PermissionSet.findOne({ where: { slug: 'system_admin' } });
+        const sitedminProfile = UserProfile.findOne({ where: { slug: 'site_admin' } });
+        const siteAdminPermissionSet = PermissionSet.findOne({ where: { slug: 'site_admin' } });
+        const gdsPermissionSet = PermissionSet.findOne({ where: { slug: 'gds' } });
+        const gdsProfile = UserProfile.findOne({ where: { slug: 'gds' } });
 
-        Promise.all([permissionSet, userProfile]).then((values) => {
+        Promise.all([systemAdminProfile, systemAdminPermissionSet, sitedminProfile, siteAdminPermissionSet, gdsProfile, gdsPermissionSet]).then((values) => {
             const userprofile_permissionSet = [
-                { permissionSetId: values[0].id, userProfileId: values[1].id }
+                { userProfileId: values[0].id, permissionSetId: values[1].id },
+                { userProfileId: values[2].id, permissionSetId: values[3].id },
+                { userProfileId: values[4].id, permissionSetId: values[5].id }
+
             ];
 
             UserProfile_PermissionSet.destroy({ truncate: { cascade: true } }).then(() => {

@@ -32,7 +32,8 @@ const UserProfile = sequelize.cdpConnector.define('user_profiles', {
     updatedAt: 'updated_at'
 });
 
-UserProfile.hasMany(UserProfile_PermissionSet, {as: 'userProfile_permissionSet', foreignKey: 'userProfileId', sourceKey: 'id'});
+// UserProfile.hasMany(UserProfile_PermissionSet, {as: 'userProfile_permissionSet', foreignKey: 'userProfileId', sourceKey: 'id'});
+UserProfile.hasMany(UserProfile_PermissionSet, {as: 'up_ps', foreignKey: 'userProfileId', sourceKey: 'id'});
 UserProfile.belongsToMany(PermissionSet, { through: UserProfile_PermissionSet });
 
 module.exports = UserProfile;

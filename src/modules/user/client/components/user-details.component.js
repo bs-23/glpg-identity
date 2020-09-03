@@ -83,8 +83,8 @@ const UserDetails = (props) => {
                                     </div>
                                     <div className="profile-detail__row pb-0 pb-sm-2 d-block d-sm-flex">
                                         <div className="profile-detail__col-fluid pb-3 pr-0 pr-sm-3">
-                                            <span className="mr-2 d-block profile-detail__label">Roles</span>
-                                            <span className="profile-detail__value">{userInfo.roles ? userInfo.roles.replace(/,/g, ', ') : nullValueToken}</span>
+                                            <span className="mr-2 d-block profile-detail__label">Role</span>
+                                            <span className="profile-detail__value">{userInfo.role ? userInfo.role : nullValueToken}</span>
                                         </div>
                                     </div>
                                 </div>

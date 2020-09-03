@@ -9,11 +9,11 @@ async function getRoles(req, res) {
         const roles = await Role.findAll({
             include: [{
                 model: RolePermissionSet,
-                as: 'role_permissionSet',
+                as: 'role_ps',
                 attributes: ['permissionSetId'],
-                include: [{
+            include: [{
                     model: PermissionSet,
-                    as: 'permissionSet',
+                    as: 'ps',
                     attributes: ['title']
                 }]
             }],
