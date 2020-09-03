@@ -7,9 +7,9 @@ import { permissionSetCreateSchema } from "../user.schema";
 import { getCountries } from "../user.actions";
 
 
-const FormField = ({ label, name, type, children }) => <div className="col-12 col-sm-6">
+const FormField = ({ label, name, type, children, required=true }) => <div className="col-12 col-sm-6">
     <div className="form-group">
-        <label className="font-weight-bold" htmlFor="last_name">{ label }<span className="text-danger">*</span></label>
+        <label className="font-weight-bold" htmlFor="last_name">{ label }{required && <span className="text-danger">*</span>}</label>
         { children || <Field className="form-control" type={type} name={name} /> }
         <div className="invalid-feedback"><ErrorMessage name={name} /></div>
     </div>
@@ -62,7 +62,7 @@ export default function PermissionSetForm({ onSuccess, onError, preFill }) {
 
     const formValues = {
         title: preFill ? preFill.title : '',
-        application_id: preFill && preFill.application_id ? preFill.application_id : applications.length ? applications[0].id : '',
+        application_id: preFill && preFill.application_id ? preFill.application_id : '',
         countries: preFill ? preFill.countries ? preFill.countries : [] : [],
         serviceCategories: preFill ? preFill.serviceCategories : []
     };
@@ -125,15 +125,16 @@ export default function PermissionSetForm({ onSuccess, onError, preFill }) {
                                                 <div className="col-12">
                                                     <div className="row">
                                                         <FormField label="Title" type="text" name="title"/>
-                                                        <FormField label="Select Application" name="application_id" >
+                                                        <FormField label="Select Application" name="application_id" required={false} >
                                                             <Field as="select" name="application_id" className="form-control">
+                                                                <option defaultValue value={""}> Select an application </option>
                                                                 {applications.length ? applications.map(item => <option key={item.id} value={item.id}>{item.name}</option>) : null }
                                                             </Field>
                                                         </FormField>
                                                         <FormField label="Select Countries" name="countries" >
                                                             <CheckList name="countries" options={countries} idExtractor={item => item.country_iso2} labelExtractor={item => item.codbase_desc} />
                                                         </FormField>
-                                                        <FormField label="Select Service Categories" name="serviceCategories">
+                                                        <FormField label="Select Service Categories" name="serviceCategories" required={false} >
                                                             <CheckList name="serviceCategories" options={serviceCategories} idExtractor={item => item.id} labelExtractor={item => item.title} />
                                                         </FormField>
                                                     </div>

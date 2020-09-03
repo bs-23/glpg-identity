@@ -111,7 +111,7 @@ async function editPermissionSet(req, res) {
             title: title.trim(),
             slug: title.trim().replace(/ /g, '_').toLowerCase(),
             countries: countries,
-            applicationId: application_id,
+            applicationId: application_id ? application_id : null,
             updated_by: req.user.id
         });
 
