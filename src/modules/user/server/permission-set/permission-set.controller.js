@@ -115,16 +115,7 @@ async function editPermissionSet(req, res) {
             updated_by: req.user.id
         });
 
-        doc.permissionSet_serviceCategory.forEach(async sc => {
-            await sc.destroy();
-        });
-
-        serviceCategories && serviceCategories.forEach(async function (serviceCategoryId) {
-            await PermissionSet_ServiceCategory.create({
-                permissionSetId: doc.id,
-                serviceCategoryId: serviceCategoryId
-            });
-        });
+        await doc.setService_categories(serviceCategories);
 
         res.json(doc);
     } catch (error) {
