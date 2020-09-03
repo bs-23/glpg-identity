@@ -2,9 +2,9 @@ const path = require('path');
 const { DataTypes } = require('sequelize');
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
-const UserProfile_PermissionSet = require('./permission-set/userProfile-permissionSet.model');
+const Role_PermissionSet = require('../permission-set/role-permissionSet.model');
 
-const Role = sequelize.cdpConnector.define('user_profiles', {
+const Role = sequelize.cdpConnector.define('roles', {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -25,12 +25,12 @@ const Role = sequelize.cdpConnector.define('user_profiles', {
     },
 }, {
     schema: 'ciam',
-    tableName: 'user_profiles',
+    tableName: 'roles',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
 
-UserProfile.hasMany(UserProfile_PermissionSet, {as: 'userProfile_permissionSet', foreignKey: 'userProfileId', sourceKey: 'id'});
+Role.hasMany(Role_PermissionSet, {as: 'role_permissionSet', foreignKey: 'roleId', sourceKey: 'id'});
 
-module.exports = UserProfile;
+module.exports = Role;

@@ -8,10 +8,12 @@ const logService = require(path.join(process.cwd(), 'src/modules/core/server/aud
 const ResetPassword = require('./reset-password.model');
 const UserProfile = require(path.join(process.cwd(), "src/modules/user/server/user-profile.model"));
 const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/userProfile-permissionSet.model"));
+const User_Role = require(path.join(process.cwd(), "src/modules/user/server/role/user-role.model"));
+const Role_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/role-permissionSet.model"));
+const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
 const PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permission-set.model"));
 const PermissionSet_ServiceCateory = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-serviceCategory.model"));
 const ServiceCategory = require(path.join(process.cwd(), "src/modules/user/server/permission/service-category.model"));
-const UserPermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/user-permissionSet.model"));
 const axios = require("axios");
 const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
 const PasswordPolicies = require(path.join(process.cwd(), "src/modules/core/server/password/password-policies.js"));
@@ -79,6 +81,60 @@ async function getProfilePermissions(user) {
 
 }
 
+async function getRolePermissions(user) {
+
+    let serviceCategories = [];
+    const permissionSets = [];
+    let applications = [];
+    let countries = [];
+    const userRoles = user.userRoles;
+    const roles = [];
+
+    if (userRoles.length) {
+        for (const userRole of userRoles) {
+            for (const rolePermSet of userRole.role.role_permissionSet) {
+                const permissionServiceCategories = await PermissionSet_ServiceCateory.findAll({
+                    where: {
+                        permissionSetId: rolePermSet.permissionSet.id
+                    },
+                    include: [{
+                        model: ServiceCategory,
+                        as: 'serviceCategory'
+
+                    }]
+                });
+
+                serviceCategories = [];
+                permissionServiceCategories.forEach(perServiceCat => {
+                    serviceCategories.push(perServiceCat.serviceCategory);
+
+                });
+
+                const applicationsCountries = await getUserApplicationCountry(rolePermSet.permissionSet);
+
+                applications = applicationsCountries[0];
+                countries = applicationsCountries[1];
+
+                permissionSets.push({
+                    serviceCategories: serviceCategories.map(sc => sc.slug),
+                    application: applications.length > 0 ? applications : null,
+                    countries: countries
+                });
+
+            }
+
+            roles.push({
+                title: userRole.role.title,
+                permissionSets: permissionSets
+
+            })
+        }
+
+    }
+    return roles;
+
+}
+
 async function getUserApplicationCountry(permissionSet) {
     const applications = [];
     let countries = [];
@@ -115,61 +171,22 @@ async function getUserApplicationCountry(permissionSet) {
 
 }
 
-async function getUserPermissions(user) {
-
-    let serviceCategories = [];
-    const userPermissionSets = user.user_permissionSet;
-    const permissionSets = [];
-    let applications = [];
-    let countries = [];
-
-    if (userPermissionSets) {
-        for (const userPermSet of userPermissionSets) {
-
-            const permissionServiceCategories = await PermissionSet_ServiceCateory.findAll({
-                where: {
-                    permissionSetId: userPermSet.permissionSetId
-                },
-                include: [{
-                    model: ServiceCategory,
-                    as: 'serviceCategory'
-
-                }]
-            });
-            serviceCategories = [];
-            permissionServiceCategories.forEach(perServiceCat => {
-                serviceCategories.push(perServiceCat.serviceCategory);
-
-            });
-
-            const applicationsCountries = await getUserApplicationCountry(userPermSet.permissionSet);
-
-            applications = applicationsCountries[0];
-            countries = applicationsCountries[1];
-
-            permissionSets.push({
-                serviceCategories: serviceCategories.map(sc => sc.slug),
-                application: applications ? (applications.length > 0 ? applications : null) : null,
-                countries: countries
-            });
-        }
-    }
-
-    return permissionSets;
-
-}
 
 async function getCommaSeparatedApplications(user) {
     let all_applications = [];
     let all_countries = [];
-    let user_applications = [];
+    let role_applications = [];
     let profile_applications = [];
-    let user_countries = [];
+    let role_countries = [];
     let profile_countries = [];
-    for (const userPermSet of user.user_permissionSet) {
-        const applicationsCountries = await getUserApplicationCountry(userPermSet.permissionSet);
-        user_applications = user_applications.concat(applicationsCountries[0]);
-        user_countries = user_countries.concat(applicationsCountries[1])
+
+    for (const userRole of user.userRoles) {
+        for (const rolePermSet of userRole.role.role_permissionSet) {
+            const applicationsCountries = await getUserApplicationCountry(rolePermSet.permissionSet);
+            role_applications = role_applications.concat(applicationsCountries[0]);
+            role_countries = role_countries.concat(applicationsCountries[1])
+
+        }
 
     }
 
@@ -184,8 +201,8 @@ async function getCommaSeparatedApplications(user) {
     }
 
 
-    all_countries = [...new Set(user_countries.concat(profile_countries))];
-    all_applications = user_applications.concat(profile_applications);
+    all_countries = [...new Set(role_countries.concat(profile_countries))];
+    all_applications = role_applications.concat(profile_applications);
     let apps = [...new Set(all_applications.length > 0 ? all_applications.map(app => app.name) : [])];
 
     apps = apps.join();
@@ -207,7 +224,7 @@ async function formatProfile(user) {
         email: user.email,
         type: user.type,
         profile: await getProfilePermissions(user),
-        permissionsets: await getUserPermissions(user)
+        role: await getRolePermissions(user),
     };
     return data;
 }
@@ -263,20 +280,27 @@ async function login(req, res) {
                     as: 'userProfile_permissionSet',
                     include: [{
                         model: PermissionSet,
-                        as: 'permissionSet',
-
+                        as: 'permissionSet'
                     }]
                 }]
             },
             {
-                model: UserPermissionSet,
-                as: 'user_permissionSet',
+                model: User_Role,
+                as: 'userRoles',
                 include: [{
-                    model: PermissionSet,
-                    as: 'permissionSet',
+                    model: Role,
+                    as: 'role',
+                    include: [{
+                        model: Role_PermissionSet,
+                        as: 'role_permissionSet',
+                        include: [{
+                            model: PermissionSet,
+                            as: 'permissionSet'
+
+                        }]
+                    }]
 
                 }]
-
             }
             ]
         });
@@ -341,14 +365,15 @@ async function createUser(req, res) {
         country_code,
         phone,
         profile,
-        permission_sets
+        role,
     } = req.body;
+
     const phone_number = phone ? country_code + phone : '';
     const validForMonths = 6
     const currentDate = new Date()
 
     try {
-        const [doc, created] = await User.findOrCreate({
+        const [user, created] = await User.findOrCreate({
             where: { email: email.toLowerCase() },
             defaults: {
                 first_name,
@@ -361,13 +386,10 @@ async function createUser(req, res) {
             }
         });
 
-        permission_sets.forEach(async ps => {
-            await UserPermissionSet.create({
-                userId: doc.id,
-                permissionSetId: ps,
-            });
-
-        })
+        const roleData = User_Role.create({
+            userId: user.id,
+            roleId: role,
+        });
 
         if (!created) {
             return res.status(400).send('Email already exists.');
@@ -375,7 +397,7 @@ async function createUser(req, res) {
 
         const logData = {
             event_type: 'CREATE',
-            object_id: doc.id,
+            object_id: user.id,
             table_name: 'users',
             created_by: req.user.id,
             description: 'Created new CDP user',
@@ -386,7 +408,7 @@ async function createUser(req, res) {
         const expireAt = Date.now() + 3600000;
 
         const [resetRequest, reqCreated] = await ResetPassword.findOrCreate({
-            where: { user_id: doc.id },
+            where: { user_id: user.id },
             defaults: {
                 token,
                 expires_at: expireAt,
@@ -406,18 +428,18 @@ async function createUser(req, res) {
 
         const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp/password-set.html`);
         const options = {
-            toAddresses: [doc.email],
+            toAddresses: [user.email],
             templateUrl,
             subject: 'Setup password for your CDP account',
             data: {
-                name: `${doc.first_name} ${doc.last_name}` || '',
+                name: `${user.first_name} ${user.last_name}` || '',
                 link
             }
         };
 
         emailService.send(options);
 
-        res.json(doc);
+        res.json(user);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -485,14 +507,23 @@ async function getUsers(req, res) {
                 }]
             },
             {
-                model: UserPermissionSet,
-                as: 'user_permissionSet',
+                model: User_Role,
+                as: 'userRoles',
                 include: [{
-                    model: PermissionSet,
-                    as: 'permissionSet',
+                    model: Role,
+                    as: 'role',
+                    include: [{
+                        model: Role_PermissionSet,
+                        as: 'role_permissionSet',
+                        include: [{
+                            model: PermissionSet,
+                            as: 'permissionSet',
+
+                        }]
+                    }]
+
 
                 }]
-
             }],
             attributes: { exclude: ['password'] },
         });
@@ -561,21 +592,30 @@ async function getUser(req, res) {
                 }]
             },
             {
-                model: UserPermissionSet,
-                as: 'user_permissionSet',
+                model: User_Role,
+                as: 'userRoles',
                 include: [{
-                    model: PermissionSet,
-                    as: 'permissionSet',
+                    model: Role,
+                    as: 'role',
+                    include: [{
+                        model: Role_PermissionSet,
+                        as: 'role_permissionSet',
+                        include: [{
+                            model: PermissionSet,
+                            as: 'permissionSet',
+
+                        }]
+                    }]
 
                 }]
-
             }
             ],
         });
 
+
         if (!user) return res.status(404).send("User is not found or may be removed");
 
-        const formattedUser =await  formatProfileDetail(user);
+        const formattedUser = await formatProfileDetail(user);
 
         res.json(formattedUser);
     }

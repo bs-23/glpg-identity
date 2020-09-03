@@ -5,7 +5,7 @@ const Sequelize = require('sequelize');
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const UserProfile = require('./user-profile.model');
-const User_PermissionSet = require('./permission-set/user-permissionSet.model');
+const User_Role = require('./role/user-role.model');
 
 const User = sequelize.cdpConnector.define('users', {
     id: {
@@ -106,7 +106,7 @@ User.prototype.validPassword = function(password) {
 
 User.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by' });
 User.belongsTo(UserProfile, { as: 'userProfile', foreignKey: 'profileId' });
-User.hasMany(User_PermissionSet, {as: 'user_permissionSet', foreignKey: 'userId', sourceKey: 'id'});
+User.hasMany(User_Role, {as: 'userRoles', foreignKey: 'userId', sourceKey: 'id'});
 
 
 module.exports = User;

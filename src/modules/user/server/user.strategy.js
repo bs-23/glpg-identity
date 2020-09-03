@@ -6,7 +6,10 @@ const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodeca
 const UserProfile = require(path.join(process.cwd(), "src/modules/user/server/user-profile.model"));
 const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/userProfile-permissionSet.model"));
 const PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permission-set.model"));
-const UserPermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/user-permissionSet.model"));
+const User_Role = require(path.join(process.cwd(), "src/modules/user/server/role/user-role.model"));
+const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
+const Role_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/role-permissionSet.model"));
+
 
 module.exports = function() {
     function cookieExtractor(req) {
@@ -36,11 +39,20 @@ module.exports = function() {
                 }]
             },
             {
-                model: UserPermissionSet,
-                as: 'user_permissionSet',
+                model: User_Role,
+                as: 'userRoles',
                 include: [{
-                    model: PermissionSet,
-                    as: 'permissionSet',
+                    model: Role,
+                    as: 'role',
+                    include: [{
+                        model: Role_PermissionSet,
+                        as: 'role_permissionSet',
+                        include: [{
+                            model: PermissionSet,
+                            as: 'permissionSet',
+
+                        }]
+                    }]
 
                 }]
 
