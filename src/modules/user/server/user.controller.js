@@ -23,9 +23,6 @@ const { QueryTypes, Op } = require('sequelize');
 function generateAccessToken(user) {
     return jwt.sign({
         id: user.id,
-        first_name: user.last_name,
-        last_name: user.last_name,
-        email: user.email,
     }, nodecache.getValue('CDP_TOKEN_SECRET'), {
         expiresIn: '2d',
         issuer: user.id.toString()

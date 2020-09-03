@@ -6,7 +6,6 @@ const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodeca
 function generateAccessToken(doc) {
     return jwt.sign({
         id: doc.id,
-        email: doc.email,
     }, nodecache.getValue('APPLICATION_TOKEN_SECRET'), {
         expiresIn: '30d',
         issuer: doc.id.toString()

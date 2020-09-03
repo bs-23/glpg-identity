@@ -22,8 +22,6 @@ const PasswordPolicies = require(path.join(process.cwd(), 'src/modules/core/serv
 function generateAccessToken(doc) {
     return jwt.sign({
         id: doc.id,
-        uuid: doc.uuid,
-        email: doc.email
     }, nodecache.getValue('HCP_TOKEN_SECRET'), {
         expiresIn: '2d',
         issuer: doc.id.toString()
@@ -33,8 +31,6 @@ function generateAccessToken(doc) {
 function generateConsentConfirmationAccessToken(doc) {
     return jwt.sign({
         id: doc.id,
-        uuid: doc.uuid,
-        email: doc.email
     }, nodecache.getValue('CONSENT_CONFIRMATION_TOKEN_SECRET'), {
         expiresIn: '7d',
         issuer: doc.id.toString()
