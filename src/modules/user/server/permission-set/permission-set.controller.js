@@ -29,8 +29,7 @@ async function getPermissionSets(req, res) {
             attributes: { exclude: ['created_by', 'updated_by','created_at', 'updated_at', 'applicationId'] },
 
             order: [
-                ['created_at', 'ASC'],
-                ['id', 'ASC']
+                ['created_at', 'ASC']
             ]
         });
         res.json(permissionSets);
