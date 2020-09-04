@@ -86,7 +86,7 @@ async function createPermissionSet(req, res) {
                 title: title,
                 slug: title.replace(/ /g, '_').toLowerCase(),
                 countries: countries,
-                applicationId: application_id,
+                applicationId: application_id || null,
                 created_by: req.user.id,
                 updated_by: req.user.id
             }
