@@ -806,8 +806,13 @@ async function verifySite(captchaResponseToken) {
             }
         );
 
+        if (!siteverifyResponse || !siteverifyResponse.data || !siteverifyResponse.data.success) {
+            console.log(siteverifyResponse.data);
+        }
+
         return siteverifyResponse.data.success;
     } catch (error) {
+        console.error(error);
         return false;
     }
 }
