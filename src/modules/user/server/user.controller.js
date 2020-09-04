@@ -240,7 +240,7 @@ async function formatProfileDetail(user) {
         profiles: user.userProfile.title,
         application: applicationCountriesFormatted[0],
         countries: applicationCountriesFormatted[1],
-        role: user.userRoles[0].role.title
+        role: user.userRoles && user.userRoles.length ? user.userRoles[0].role.title : ''
     };
 
     return profile;
@@ -388,10 +388,12 @@ async function createUser(req, res) {
             }
         });
 
-        const roleData = User_Role.create({
-            userId: user.id,
-            roleId: role,
-        });
+        if(role) {
+            await User_Role.create({
+                userId: user.id,
+                roleId: role,
+            });
+        }
 
         if (!created) {
             return res.status(400).send('Email already exists.');

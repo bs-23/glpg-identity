@@ -56,7 +56,7 @@ export const registerSchema = object().shape({
         // .test('is-valid-phone', 'Must be a valid international phone number.', validatePhone),
     profile: string()
         .required('Must select at least one profile'),
-    permission_sets: string()
+    role: string()
 });
 
 export const changePasswordSchema = object().shape({

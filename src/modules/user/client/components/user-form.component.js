@@ -71,7 +71,7 @@ export default function UserForm() {
                                             email: "",
                                             phone: '',
                                             profile: profiles.length > 0 ? profiles[0].id : '',
-                                            role: roles.length > 0 ? roles[0].id : '',
+                                            role: '',
                                             permission_sets: []
                                         }}
                                         enableReinitialize
@@ -175,8 +175,9 @@ export default function UserForm() {
                                                             </div>
                                                             <div className="col-12 col-sm-6">
                                                                 <div className="form-group">
-                                                                    <label className="font-weight-bold" htmlFor="role">Select a role <span className="text-danger">*</span></label>
+                                                                    <label className="font-weight-bold" htmlFor="role">Select a role</label>
                                                                     <Field as="select" name="role" className="form-control">
+                                                                        <option classname="p-2" defaultValue value={""}> Select a role </option>
                                                                         {roles ? roles.map(role => <option classname="p-2" key={role.id} value={role.id}>{role.title}</option>) : null}
                                                                     </Field>
                                                                     <div className="invalid-feedback">
