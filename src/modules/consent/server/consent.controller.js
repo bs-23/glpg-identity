@@ -75,7 +75,7 @@ async function getConsents(req, res) {
                 category_title: consentLang.consent.consent_category.title,
                 country_iso2: country_iso2,
                 locale: consentLang.locale,
-                purpose: consentLang.consent.purpose
+                preference: consentLang.consent.preference
             }
         }));
 

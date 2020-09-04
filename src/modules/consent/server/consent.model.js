@@ -22,12 +22,12 @@ const Consent = sequelize.cdpConnector.define('consents', {
         allowNull: false,
         type: DataTypes.UUID
     },
-    type: {
+    legal_basis: {
         allowNull: false,
         type: DataTypes.ENUM,
-        values: ['online', 'offline'],
+        values: ['consent', 'contract'],
     },
-    purpose: {
+    preference: {
         type: DataTypes.STRING
     },
     title: {

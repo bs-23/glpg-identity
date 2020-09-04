@@ -14,7 +14,7 @@ paths:
                 - name: locale
                   in: query
                   required: false
-                  description: Locale code for which consent is to be translated.
+                  description: Case insensitive value in language_country format (e.g. nl_nl or nl_be)
                   schema:
                     type: string
             responses:
