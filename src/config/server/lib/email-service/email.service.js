@@ -53,7 +53,7 @@ async function send(options) {
                 Data: options.subject,
             },
         },
-        Source: options.fromAddress || 'glpg.cdp@gmail.com'
+        Source: options.fromAddress || 'glpg@brainstation-23.com'
     };
 
     const response = await SES.sendEmail(params).promise();
