@@ -8,7 +8,7 @@ export default function HcpRoutes() {
 
     return (
         <Switch>
-            <PrivateRoute exact path={path} component={DataPrivacyAndConsentManagement}/>
+            <PrivateRoute exact path={path} component={DataPrivacyAndConsentManagement}  module={'consent'}/>
         </Switch>
     );
 }

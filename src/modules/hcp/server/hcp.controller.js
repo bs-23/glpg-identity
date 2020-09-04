@@ -18,6 +18,13 @@ const emailService = require(path.join(process.cwd(), 'src/config/server/lib/ema
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const PasswordPolicies = require(path.join(process.cwd(), 'src/modules/core/server/password/password-policies.js'));
+const UserProfile = require(path.join(process.cwd(), "src/modules/user/server/user-profile.model"));
+const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/userProfile-permissionSet.model"));
+const User_Role = require(path.join(process.cwd(), "src/modules/user/server/role/user-role.model"));
+const Role_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/role-permissionSet.model"));
+const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
+const PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permission-set.model"));
+const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
 
 function generateAccessToken(doc) {
     return jwt.sign({
@@ -170,7 +177,11 @@ async function getHcps(req, res) {
         const countries_ignorecase = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
 
 
-        const codbase_list_mapped_with_user_country_iso2_list = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => req.user.countries.includes(i.country_iso2)).map(i => i.codbase) : [];
+
+        const userCountriesApplication = await getUserAppCountryList(req.user.id);
+        const usercountries = userCountriesApplication[1];
+        const userApplications = userCountriesApplication[0];
+        const codbase_list_mapped_with_user_country_iso2_list = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => usercountries.includes(i.country_iso2)).map(i => i.codbase) : [];
         const country_iso2_list_for_user_countries_codbase = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => codbase_list_mapped_with_user_country_iso2_list.includes(i.codbase)).map(i => i.country_iso2) : [];
         const countries_ignorecase_for_user_countries_codbase = [].concat.apply([], country_iso2_list_for_user_countries_codbase.map(i => ignoreCaseArray(i)));
 
@@ -179,7 +190,7 @@ async function getHcps(req, res) {
 
         const hcp_filter = {
             status: status === null ? { [Op.or]: ['self_verified', 'manually_verified', 'consent_pending', 'not_verified', null] } : status,
-            application_id: req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
+            application_id: req.user.type === 'admin' ? { [Op.or]: application_list } : userApplications,
             country_iso2: codbase ? { [Op.any]: [countries_ignorecase_for_codbase] } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : countries_ignorecase_for_user_countries_codbase
         };
 
@@ -204,7 +215,7 @@ async function getHcps(req, res) {
 
             await Promise.all(hcp['hcpConsents'].map(async hcpConsent => {
 
-                if(hcpConsent.response && hcpConsent.consent_confirmed){
+                if (hcpConsent.response && hcpConsent.consent_confirmed) {
                     const country_consent = await ConsentCountry.findOne({ where: { consent_id: hcpConsent.consent_id } });
                     consent_types.add(country_consent.opt_type);
                 }
@@ -695,7 +706,7 @@ async function getHCPUserConsents(req, res) {
 
         const userConsentDetails = await ConsentLocale.findAll({ include: { model: Consent, as: 'consent', attributes: ['title'] }, where: { consent_id: userConsents.map(consent => consent.consent_id), locale: locale ? locale.toLowerCase() : 'en' }, attributes: ['consent_id', 'rich_text'] });
 
-        const consentCountries = await ConsentCountry.findAll({ where: { consent_id: userConsents.map(consent => consent.consent_id), country_iso2: { [Op.or]: [ doc.country_iso2.toUpperCase(), doc.country_iso2.toLowerCase() ] } } });
+        const consentCountries = await ConsentCountry.findAll({ where: { consent_id: userConsents.map(consent => consent.consent_id), country_iso2: { [Op.or]: [doc.country_iso2.toUpperCase(), doc.country_iso2.toLowerCase()] } } });
 
         const consentResponse = userConsentDetails.map(({ consent_id: id, rich_text, consent: { title } }) => ({ id, title, rich_text: validator.unescape(rich_text) }));
 
@@ -999,6 +1010,103 @@ async function getAccessToken(req, res) {
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
+}
+
+async function getUserAppCountryList(userId) {
+
+    let all_applications = [];
+    let all_countries = [];
+    let role_applications = [];
+    let profile_applications = [];
+    let role_countries = [];
+    let profile_countries = [];
+
+    const user = await User.findOne({
+        where: {
+            id: userId
+        },
+        include: [{
+            model: UserProfile,
+            as: 'userProfile',
+            include: [{
+                model: UserProfile_PermissionSet,
+                as: 'up_ps',
+                include: [{
+                    model: PermissionSet,
+                    as: 'ps',
+
+                }]
+            }]
+        },
+        {
+            model: User_Role,
+            as: 'userRoles',
+            include: [{
+                model: Role,
+                as: 'role',
+                include: [{
+                    model: Role_PermissionSet,
+                    as: 'role_ps',
+                    include: [{
+                        model: PermissionSet,
+                        as: 'ps',
+
+                    }]
+                }]
+
+            }]
+        }
+        ],
+    });
+
+    if (user.userProfile) {
+        const profilePermissionSets = user.userProfile.up_ps;
+        for (const userProPermSet of profilePermissionSets) {
+            let applicationsCountries = await getAppCountryPermissions(userProPermSet.ps);
+            profile_applications = profile_applications.concat(applicationsCountries[0]);
+            profile_countries = profile_countries.concat(applicationsCountries[1]);
+        }
+    }
+
+    for (const userRole of user.userRoles) {
+        for (const rolePermSet of userRole.role.role_ps) {
+            let applicationsCountries = await getAppCountryPermissions(rolePermSet.ps);
+            role_applications = role_applications.concat(applicationsCountries[0]);
+            role_countries = role_countries.concat(applicationsCountries[1])
+
+        }
+
+    }
+
+    all_countries = [...new Set(role_countries.concat(profile_countries))];
+    all_applications = [...new Set(role_applications.concat(profile_applications))];
+
+    return [all_applications, all_countries];
+}
+
+async function getAppCountryPermissions(permissionSet) {
+
+    let applications = [];
+    let countries = [];
+    if (permissionSet.slug == 'system_admin') {
+        let allApplications = await Application.findAll();
+        applications = allApplications.map(a => a.id);
+        const countriesDb = await sequelize.datasyncConnector.query("SELECT DISTINCT ON(codbase_desc) * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;", { type: QueryTypes.SELECT });
+        countries = countriesDb.map(c => c.country_iso2);
+    } else {
+        if (permissionSet.applicationId) {
+            applications.push(permissionSet.applicationId);
+        }
+
+        if (permissionSet.countries) {
+            countries = permissionSet.countries;
+        }
+
+    }
+
+    return [applications, countries];
+
+
 }
 
 exports.getHcps = getHcps;
