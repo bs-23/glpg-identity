@@ -1,10 +1,26 @@
 const path = require('path');
-const { Op } = require('sequelize');
+const { Op, QueryTypes } = require('sequelize');
+const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const PermissionSet = require('./permission-set.model');
 const PermissionSet_ServiceCategory = require('./permissionSet-serviceCategory.model');
 const ServiceCategory = require('../permission/service-category.model');
 const Application = require('../../../application/server/application.model');
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
+
+const allCountries = async () => {
+    const countries = await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT });
+    return countries;
+}
+
+const allServiceCategories = async () => {
+    const serviceCategories = await ServiceCategory.findAll();
+    return serviceCategories.map(i => i.dataValues);
+}
+
+const allApplications = async () => {
+    const applications = await Application.findAll();
+    return applications.map(i => i.dataValues);
+}
 
 async function getPermissionSets(req, res) {
     try {
@@ -32,7 +48,22 @@ async function getPermissionSets(req, res) {
                 ['created_at', 'ASC']
             ]
         });
-        res.json(permissionSets);
+
+        const permissionSetList = await Promise.all(
+            permissionSets.map(async item => {
+                if(item.dataValues.slug === 'system_admin'){
+                    const countries = await allCountries();
+                    const applications = await allApplications();
+                    const serviceCategories = await allServiceCategories();
+                    item.dataValues.countries = countries.map(c => c.country_iso2);
+                    item.dataValues.application = { name: applications && applications.map(app => app.name).join(', ') };
+                    item.dataValues.permissionSet_serviceCategory = serviceCategories && serviceCategories.map(sc => ({ serviceCategory: { id: sc.id, title: sc.title, slug: sc.slug } }));
+                }
+                return item.dataValues;
+            })
+        )
+
+        res.json(permissionSetList);
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal server error');
