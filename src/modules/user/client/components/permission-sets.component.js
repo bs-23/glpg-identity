@@ -38,9 +38,9 @@ export default function ManagePermissionSets() {
     }
 
     const preparePermissionSetEditData = (data) => {
-        const { id, title, countries, application } = data;
+        const { id, title, description, countries, application } = data;
         const serviceCategories = data.permissionSet_serviceCategory ? data.permissionSet_serviceCategory.map(item => item.serviceCategory.id ) : [];
-        const editObject = { id, title, countries, serviceCategories, application_id: application ? application.id : '' };
+        const editObject = { id, title, description, countries, serviceCategories, application_id: application ? application.id : '' };
         return editObject;
     }
 
@@ -83,7 +83,8 @@ export default function ManagePermissionSets() {
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
                                             <th className="py-2">Title</th>
-                                            <th className="py-2">Application</th>
+                                            <th className="py-2">Description</th>
+                                            <th className="py-2">Applications</th>
                                             <th className="py-2">Countries</th>
                                             <th className="py-2">Service Categories</th>
                                             <th className="py-2">Action</th>
@@ -93,8 +94,9 @@ export default function ManagePermissionSets() {
                                         {permissionSets.map(row => (
                                             <tr key={row.id}>
                                                 <td>{row.title}</td>
-                                                <td>{ row.application ? row.application.name : '' }</td>
-                                                <td>{ getCountryNamesFromCodes(row.countries) }</td>
+                                                <td>{row.description}</td>
+                                                <td>{row.application ? row.application.name : ''}</td>
+                                                <td>{getCountryNamesFromCodes(row.countries)}</td>
                                                 <td>{getServiceCategoryNames(row)}</td>
                                                 <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlePermissionSetEditClick(row)} disabled={row.slug === 'system_admin'}> <i className="icon icon-edit-pencil pr-2"></i>Edit Permission Set</button></td>
                                             </tr>

@@ -58,8 +58,8 @@ async function init() {
             const userProfiles = [
                 { title: "System Admin", slug: "system_admin", created_by: admin.id, updated_by: admin.id },
                 { title: "Site Admin", slug: "site_admin", created_by: admin.id, updated_by: admin.id },
-                { title: "GDS", slug: "gds", created_by: admin.id, updated_by: admin.id },
-                { title: "LDS", slug: "lds", created_by: admin.id, updated_by: admin.id }
+                { title: "Global Data Steward", slug: "global_data_steward", created_by: admin.id, updated_by: admin.id },
+                { title: "Local Data Setward", slug: "local_data_steward", created_by: admin.id, updated_by: admin.id }
             ];
 
             UserProfile.destroy({ truncate: { cascade: true } }).then(() => {
@@ -92,8 +92,8 @@ async function init() {
 
             const serviceCategories = [
                 { title: "Information Management", slug: "hcp", created_by: admin.id, updated_by: admin.id },
-                { title: "User Management", slug: "user", created_by: admin.id, updated_by: admin.id },
-                { title: "Consent Management", slug: "consent", created_by: admin.id, updated_by: admin.id }
+                { title: "Management of Customer Data Platform", slug: "user", created_by: admin.id, updated_by: admin.id },
+                { title: "Data Privacy & Consent Management", slug: "consent", created_by: admin.id, updated_by: admin.id }
             ];
 
             ServiceCategory.destroy({ truncate: { cascade: true } }).then(() => {
@@ -167,7 +167,7 @@ async function init() {
         const sitedminProfile = UserProfile.findOne({ where: { slug: 'site_admin' } });
         const siteAdminPermissionSet = PermissionSet.findOne({ where: { slug: 'site_admin' } });
         const gdsPermissionSet = PermissionSet.findOne({ where: { slug: 'gds' } });
-        const gdsProfile = UserProfile.findOne({ where: { slug: 'gds' } });
+        const gdsProfile = UserProfile.findOne({ where: { slug: 'global_data_steward' } });
 
         Promise.all([systemAdminProfile, systemAdminPermissionSet, sitedminProfile, siteAdminPermissionSet, gdsProfile, gdsPermissionSet]).then((values) => {
             const userprofile_permissionSet = [

@@ -7,10 +7,10 @@ import { permissionSetCreateSchema } from "../user.schema";
 import { getCountries } from "../user.actions";
 
 
-const FormField = ({ label, name, type, children, required=true }) => <div className="col-12 col-sm-6">
+const FormField = ({ label, name, type, children, required=true, ...rest }) => <div className="col-12 col-sm-6">
     <div className="form-group">
         <label className="font-weight-bold" htmlFor="last_name">{ label }{required && <span className="text-danger">*</span>}</label>
-        { children || <Field className="form-control" type={type} name={name} /> }
+        { children || <Field className="form-control" type={type} name={name} {...rest} /> }
         <div className="invalid-feedback"><ErrorMessage name={name} /></div>
     </div>
 </div>
@@ -62,6 +62,7 @@ export default function PermissionSetForm({ onSuccess, onError, preFill }) {
 
     const formValues = {
         title: preFill ? preFill.title : '',
+        description: preFill ? preFill.description : '',
         application_id: preFill && preFill.application_id ? preFill.application_id : '',
         countries: preFill ? preFill.countries ? preFill.countries : [] : [],
         serviceCategories: preFill ? preFill.serviceCategories : []
@@ -131,6 +132,7 @@ export default function PermissionSetForm({ onSuccess, onError, preFill }) {
                                                                 {applications.length ? applications.map(item => <option key={item.id} value={item.id}>{item.name}</option>) : null }
                                                             </Field>
                                                         </FormField>
+                                                        <FormField label="Description" type="text" name="description" required={false} component="textarea" />
                                                         <FormField label="Select Countries" name="countries" >
                                                             <CheckList name="countries" options={countries} idExtractor={item => item.country_iso2} labelExtractor={item => item.codbase_desc} />
                                                         </FormField>

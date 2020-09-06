@@ -74,6 +74,7 @@ async function createPermissionSet(req, res) {
     try {
         const {
             title,
+            description,
             countries,
             application_id,
         } = req.body;
@@ -84,7 +85,8 @@ async function createPermissionSet(req, res) {
             where: { title },
             defaults: {
                 title: title,
-                slug: title.replace(/ /g, '_').toLowerCase(),
+                slug: title.replace(/ +/g, '_').toLowerCase(),
+                description,
                 countries: countries,
                 applicationId: application_id || null,
                 created_by: req.user.id,
@@ -117,7 +119,7 @@ async function createPermissionSet(req, res) {
 }
 
 async function editPermissionSet(req, res) {
-    const { title, countries, application_id, serviceCategories } = req.body;
+    const { title, description, countries, application_id, serviceCategories } = req.body;
 
     try {
         if(!title.trim()) return res.status(400).send('Permission set title can not be empty.');
@@ -142,6 +144,7 @@ async function editPermissionSet(req, res) {
             title: title.trim(),
             slug: title.trim().replace(/ /g, '_').toLowerCase(),
             countries: countries,
+            description,
             applicationId: application_id ? application_id : null,
             updated_by: req.user.id
         });

@@ -6,10 +6,10 @@ import { useToasts } from "react-toast-notifications";
 import Modal from 'react-bootstrap/Modal';
 import { roleCreateSchema } from "../user.schema";
 
-const FormField = ({ label, name, type, children }) => <div className="col-12">
+const FormField = ({ label, name, type, required=true, children, ...rest }) => <div className="col-12">
     <div className="form-group">
-        <label className="font-weight-bold" htmlFor="last_name">{ label }<span className="text-danger">*</span></label>
-        { children || <Field className="form-control" type={type} name={name} /> }
+        <label className="font-weight-bold" htmlFor="last_name">{ label }{required && <span className="text-danger">*</span>}</label>
+        { children || <Field className="form-control" type={type} name={name} {...rest} /> }
         <div className="invalid-feedback"><ErrorMessage name={name} /></div>
     </div>
 </div>
@@ -47,6 +47,7 @@ const RoleForm = ({ onSuccess, permissionSets, preFill }) => {
                     <Formik
                         initialValues={{
                             title: preFill ? preFill.title : '',
+                            description: preFill ? preFill.description : '',
                             permissionSets: preFill ? Array.isArray(preFill.permissionssetIDs) ? preFill.permissionssetIDs : [] : []
                         }}
                         displayName="RoleForm"
@@ -64,9 +65,14 @@ const RoleForm = ({ onSuccess, permissionSets, preFill }) => {
                                     </div>
                                     <div className="col-12">
                                         <div className="row">
+                                            <FormField label="Description" type="text" name="description" required={false} component="textarea" />
+                                        </div>
+                                    </div>
+                                    <div className="col-12">
+                                        <div className="row">
                                             <FormField name="permissionSets" label="Select Permission Sets">
                                                 <Field as="select" multiple name="permissionSets" className="form-control">
-                                                    {permissionSets.length > 0 ? permissionSets.map(item => <option key={item.id} value={item.id}>{item.title}</option>) : null}
+                                                    {permissionSets.length > 0 ? permissionSets.map(item => <option disabled={item.slug === 'system_admin'} key={item.id} value={item.id}>{item.title}</option>) : null}
                                                 </Field>
                                             </FormField>
                                         </div>
@@ -119,6 +125,7 @@ export default function ManageRoles() {
         const editData = {
             id: data.id,
             title: data.title,
+            description: data.description,
             permissionssetIDs: (data.role_ps || []).map(item => item.permissionSetId) };
         setRoleEditData(editData);
         setModalShow({ ...modalShow, createRole: true });
@@ -158,6 +165,7 @@ export default function ManageRoles() {
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
                                             <th className="py-2">Title</th>
+                                            <th className="py-2">Description</th>
                                             <th className="py-2">Permission Sets</th>
                                             <th className="py-2">Action</th>
                                         </tr>
@@ -166,6 +174,7 @@ export default function ManageRoles() {
                                         {roles.map(row => (
                                             <tr key={row.id}>
                                                 <td>{row.title}</td>
+                                                <td>{row.description}</td>
                                                 <td>{extractPermissionSetNames(row)}</td>
                                                 <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlepRoleEditClick(row)}> <i className="icon icon-edit-pencil pr-2"></i>Edit Role</button></td>
                                             </tr>

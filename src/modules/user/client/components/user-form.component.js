@@ -166,7 +166,7 @@ export default function UserForm() {
                                                                 <div className="form-group">
                                                                     <label className="font-weight-bold" htmlFor="profile">Select a profile <span className="text-danger">*</span></label>
                                                                     <Field as="select" name="profile" className="form-control">
-                                                                        {profiles ? profiles.map(profile => <option classname="p-2" key={profile.id} value={profile.id}>{profile.title}</option>) : null}
+                                                                        {profiles ? profiles.map(profile => (profile.slug !== 'system_admin' && <option classname="p-2" key={profile.id} value={profile.id}>{profile.title}</option>)) : null}
                                                                     </Field>
                                                                     <div className="invalid-feedback">
                                                                         <ErrorMessage name="profile" />
@@ -174,16 +174,16 @@ export default function UserForm() {
                                                                 </div>
                                                             </div>
                                                             <div className="col-12 col-sm-6">
-                                                                <div className="form-group">
+                                                                {roles && roles.length ? <div className="form-group">
                                                                     <label className="font-weight-bold" htmlFor="role">Select a role</label>
                                                                     <Field as="select" name="role" className="form-control">
                                                                         <option classname="p-2" defaultValue value={""}> Select a role </option>
-                                                                        {roles ? roles.map(role => <option classname="p-2" key={role.id} value={role.id}>{role.title}</option>) : null}
+                                                                        {roles ? roles.map(role => <option classname="p-2" key={role.id} value={role.id}>{role.title}</option>) : null }
                                                                     </Field>
                                                                     <div className="invalid-feedback">
                                                                         <ErrorMessage name="role" />
                                                                     </div>
-                                                                </div>
+                                                                </div> : <div className="p-4">No roles found. <NavLink to="/users/roles">Create a role</NavLink></div>}
                                                             </div>
                                                         </div>
                                                         <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" >Submit</button>

@@ -34,19 +34,19 @@ const UserManagement = () => {
                                                 <span className="d-block cdp-list-group__link-activity">5 minutes</span>
                                             </span>
                                         </NavLink>
-                                        <NavLink to="users/roles" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
-                                            <i className="icon icon-key icon-3x icon-3x cdp-list-group__icon"></i>
-                                            <span>
-                                                <strong className="mb-2 h4 d-block cdp-list-group__link-title">Define Roles</strong>
-                                                <span className="d-block cdp-list-group__link-description">Manage user roles and permissions</span>
-                                                <span className="d-block cdp-list-group__link-activity">5 - 7 minutes</span>
-                                            </span>
-                                        </NavLink>
                                         <NavLink to="users/profiles" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
                                             <i className="icon icon-key icon-3x icon-3x cdp-list-group__icon"></i>
                                             <span>
                                                 <strong className="mb-2 h4 d-block cdp-list-group__link-title">Manage Profiles</strong>
-                                                <span className="d-block cdp-list-group__link-description">Manage user profiles and permissions</span>
+                                                <span className="d-block cdp-list-group__link-description">Manage user profiles</span>
+                                                <span className="d-block cdp-list-group__link-activity">5 - 7 minutes</span>
+                                            </span>
+                                        </NavLink>
+                                        <NavLink to="users/roles" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
+                                            <i className="icon icon-key icon-3x icon-3x cdp-list-group__icon"></i>
+                                            <span>
+                                                <strong className="mb-2 h4 d-block cdp-list-group__link-title">Define Roles</strong>
+                                                <span className="d-block cdp-list-group__link-description">Manage user roles</span>
                                                 <span className="d-block cdp-list-group__link-activity">5 - 7 minutes</span>
                                             </span>
                                         </NavLink>
@@ -54,7 +54,7 @@ const UserManagement = () => {
                                             <i className="icon icon-key icon-3x icon-3x cdp-list-group__icon"></i>
                                             <span>
                                                 <strong className="mb-2 h4 d-block cdp-list-group__link-title">Manage Permission Sets</strong>
-                                                <span className="d-block cdp-list-group__link-description">Manage permission sets</span>
+                                                <span className="d-block cdp-list-group__link-description">Manage permission sets and permissions</span>
                                                 <span className="d-block cdp-list-group__link-activity">5 - 7 minutes</span>
                                             </span>
                                         </NavLink>

@@ -17,7 +17,7 @@ async function getRoles(req, res) {
                     attributes: ['title']
                 }]
             }],
-            attributes: ['id', 'title', 'slug']
+            attributes: ['id', 'title', 'slug', 'description']
         });
 
         res.json(roles);
@@ -28,7 +28,7 @@ async function getRoles(req, res) {
 }
 
 async function createRole(req, res) {
-    const { title, permissionSets } = req.body;
+    const { title, description, permissionSets } = req.body;
 
     try {
         if(!title.trim()) return res.status(400).send('Role title must not be empty.');
@@ -39,7 +39,8 @@ async function createRole(req, res) {
             where: { title },
             defaults: {
                 title: title.trim(),
-                slug: title.trim().replace(/ /g, '_').toLowerCase(),
+                slug: title.trim().replace(/ +/g, '_').toLowerCase(),
+                description,
                 created_by: req.user.id,
                 updated_by: req.user.id
             }
@@ -59,7 +60,7 @@ async function createRole(req, res) {
 }
 
 async function editRole(req, res) {
-    const { title, permissionSets } = req.body;
+    const { title, description, permissionSets } = req.body;
     const id = req.params.id;
 
     try {
@@ -77,7 +78,8 @@ async function editRole(req, res) {
 
         await foundRole.update({
             title: title.trim(),
-            slug: title.trim().replace(/ /g, '_').toLowerCase(),
+            slug: title.trim().replace(/ +/g, '_').toLowerCase(),
+            description,
             updated_by: req.user.id
         });
 
