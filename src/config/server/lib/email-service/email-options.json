@@ -2,7 +2,7 @@
     "double-opt-in-consent-confirm": {
         "subject": {
             "en": "Thank you for registering!",
-            "nl_nl": "(NL_NL) Thank you for registering!"
+            "nl_nl": "Bedankt voor uw registratie!"
         },
         "template_url": "double-opt-in-consent-confirm.html",
         "plain_text": {
@@ -13,7 +13,7 @@
     "password-reset-instructions": {
         "subject": {
             "en": "Setup Password",
-            "nl_nl": "(NL_NL) Setup Password"
+            "nl_nl": "Wachtwoord instellen"
         },
         "template_url": "password-reset-instructions.html",
         "plain_text": {
@@ -24,7 +24,7 @@
     "password-change-success": {
         "subject": {
             "en": "Your password has been changed.",
-            "nl_nl": "(NL_NL) Your password has been changed."
+            "nl_nl": "Uw wachtwoord is opnieuw ingesteld"
         },
         "template_url": "password-reset-success.html",
         "plain_text": {
@@ -46,7 +46,7 @@
     "password-setup-instructions": {
         "subject": {
             "en": "Registration verified. Please setup your password",
-            "nl_nl": "(NL_NL) Registration verified. Please setup your password"
+            "nl_nl": "Registratie geverifieerd. Stel uw wachtwoord in"
         },
         "template_url": "password-setup-instructions.html",
         "plain_text": {
@@ -57,7 +57,7 @@
     "registration-success": {
         "subject": {
             "en": "Congratulations your registration was successful",
-            "nl_nl": "(NL_NL) Congratulations your registration was successful"
+            "nl_nl": "Gefeliciteerd, uw registratie is geslaagd"
         },
         "template_url": "registration-success.html",
         "plain_text": {
