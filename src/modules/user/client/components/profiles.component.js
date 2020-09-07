@@ -70,6 +70,20 @@ const ProfileForm = ({ onSuccess, permissionSets, preFill }) => {
                                     </div>
                                     <div className="col-12">
                                         <div className="row">
+
+                                            {/*<div className="col-12">
+                                                <div className="form-group">
+                                                    <label class="font-weight-bold" for="last_name">Select Permission Sets<span class="text-danger">*</span></label>
+                                                    <label className="d-flex justify-content-between align-items-center">
+                                                        <span className="switch-label">HCP Manager</span>
+                                                        <span className="switch">
+                                                            <input name="permissionSets" type="checkbox" value="[object Object]" />
+                                                            <span className="slider round"></span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                            </div>*/}
+
                                             <FormField name="permissionSets" label="Select Permission Sets">
                                                 <Field as="select" multiple name="permissionSets" className="form-control">
                                                     {permissionSets.length > 0 ? permissionSets.map(item => <option disabled={item.slug === 'system_admin'} key={item.id} value={item.id}>{item.title}</option>) : null}
