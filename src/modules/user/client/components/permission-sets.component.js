@@ -10,6 +10,7 @@ export default function ManagePermissionSets() {
     const [permissionModalShow, setPermissionModalShow] = useState(false);
     const [permissionSetEditData, setPermissionSetEditData] = useState(null);
     const countries = useSelector(state => state.userReducer.countries);
+    const readOnlyPermissionSets = ['system_admin', 'site_admin', 'data_privacy_officer', 'gds'];
 
     const getPermissionSets = async () => {
         const response = await axios.get('/api/permissionSets');
@@ -103,7 +104,7 @@ export default function ManagePermissionSets() {
                                                 <td>{getApplicationNames(row)}</td>
                                                 <td>{getCountryNamesFromCodes(row.countries)}</td>
                                                 <td>{getServiceCategoryNames(row)}</td>
-                                                <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlePermissionSetEditClick(row)} disabled={row.slug === 'system_admin'}> <i className="icon icon-edit-pencil pr-2"></i>Edit Permission Set</button></td>
+                                                <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlePermissionSetEditClick(row)} disabled={readOnlyPermissionSets.includes(row.slug)}> <i className="icon icon-edit-pencil pr-2"></i>Edit Permission Set</button></td>
                                             </tr>
                                         ))}
                                     </tbody>

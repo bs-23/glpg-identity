@@ -55,6 +55,12 @@
                 }
 
                 &[disabled] {
+                    &:hover, &:active, &:focus, &.selected {
+                        color: $primary-color !important;
+                        background-color: transparent !important;
+                        border-color: $primary-color;
+                        opacity: 0.65;
+                    }
                 }
             }
 
@@ -73,6 +79,12 @@
                 }
 
                 &[disabled] {
+                    &:hover, &:active, &:focus, &.selected {
+                        color: $secondary-color !important;
+                        background-color: transparent !important;
+                        border-color: $secondary-color;
+                        opacity: 0.65;
+                    }
                 }
             }
 
@@ -134,7 +146,7 @@
         }
 
         &-light {
-            color: #636A70; 
+            color: #636A70;
         }
     }
 }
@@ -174,6 +186,15 @@ a {
 
     &:hover {
         color: $primary-color-light;
+    }
+
+    &.link-secondary {
+        color: $secondary-color;
+        text-decoration: underline;
+
+        &:hover {
+            text-decoration: none;
+        }
     }
 }
 

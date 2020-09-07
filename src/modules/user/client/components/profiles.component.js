@@ -1,7 +1,7 @@
 import axios from "axios";
 import { NavLink } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import { Form, Formik, Field, ErrorMessage } from "formik";
+import { Form, Formik, Field, ErrorMessage, FieldArray } from "formik";
 import { useToasts } from "react-toast-notifications";
 import Modal from 'react-bootstrap/Modal';
 import { profileCreateSchema } from "../user.schema";
@@ -14,9 +14,45 @@ const FormField = ({ label, name, type, children, required=true, ...rest }) => <
     </div>
 </div>
 
+const ToggleList = ({ name, options, labelExtractor, idExtractor }) => {
+    const isChecked = (id, arrayHelpers) => arrayHelpers.form.values[name].includes(id);
+
+    const handleChange = (e, arrayHelpers) => {
+        const optionId = e.target.value;
+        if (e.target.checked) {
+            arrayHelpers.push(optionId);
+        }
+        else {
+            const idx = arrayHelpers.form.values[name].indexOf(optionId);
+            arrayHelpers.remove(idx);
+        }
+    }
+
+    return <FieldArray
+                name={name}
+                render={arrayHelpers => (
+                    options.map(item => <label key={idExtractor(item)} className="d-flex justify-content-between align-items-center">
+                        <span className="switch-label">{labelExtractor(item)}</span>
+                        <span className="switch">
+                            <input name={name}
+                                className="custom-control-input"
+                                type="checkbox"
+                                value={idExtractor(item)}
+                                id={idExtractor(item)}
+                                checked={isChecked(idExtractor(item), arrayHelpers)}
+                                onChange={(e) => handleChange(e, arrayHelpers)}
+                                disabled={item.hasOwnProperty('disabled') ? item.disabled : false}
+                            />
+                            <span className="slider round"></span>
+                        </span>
+                    </label>)
+                )}
+            />
+}
 
 const ProfileForm = ({ onSuccess, permissionSets, preFill }) => {
     const { addToast } = useToasts();
+    const nonAssignablePermissionSet = ['system_admin'];
 
     const handleSubmit = (values, actions) => {
         const promise = preFill ? axios.put(`/api/profiles/${preFill.id}`, values) : axios.post('/api/profiles', values);
@@ -65,15 +101,13 @@ const ProfileForm = ({ onSuccess, permissionSets, preFill }) => {
                                     </div>
                                     <div className="col-12">
                                         <div className="row">
-                                            <FormField label="Description" type="text" name="description" component="textarea"/>
+                                            <FormField label="Description" type="text" name="description" component="textarea" required={false} />
                                         </div>
                                     </div>
                                     <div className="col-12">
                                         <div className="row">
                                             <FormField name="permissionSets" label="Select Permission Sets">
-                                                <Field as="select" multiple name="permissionSets" className="form-control">
-                                                    {permissionSets.length > 0 ? permissionSets.map(item => <option disabled={item.slug === 'system_admin'} key={item.id} value={item.id}>{item.title}</option>) : null}
-                                                </Field>
+                                                <ToggleList name="permissionSets" options={permissionSets.map(ps => ({...ps, disabled: nonAssignablePermissionSet.includes(ps.slug)}))} idExtractor={item => item.id} labelExtractor={item => item.title} />
                                             </FormField>
                                         </div>
                                         <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting} > Submit </button>
@@ -93,6 +127,7 @@ export default function ManageProfiles() {
     const [permissionSets, setPermissionSets] = useState([]);
     const [modalShow, setModalShow] = useState({ createProfile: false });
     const [profileEditData, setProfileEditData] = useState(null);
+    const readOnlyProfiles = ['system_admin', 'site_admin', 'global_data_steward', 'data_privacy_officer'];
 
     const getProfiles = async () => {
         const { data } = await axios.get('/api/profiles');
@@ -176,7 +211,7 @@ export default function ManageProfiles() {
                                                 <td>{row.title}</td>
                                                 <td>{row.description}</td>
                                                 <td>{extractPermissionSetNames(row)}</td>
-                                                <td><button disabled={row.slug === 'system_admin'} className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlepProfileEditClick(row)}> <i className="icon icon-edit-pencil pr-2"></i>Edit Profile</button></td>
+                                                <td><button disabled={readOnlyProfiles.includes(row.slug)} className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlepProfileEditClick(row)}> <i className="icon icon-edit-pencil pr-2"></i>Edit Profile</button></td>
                                             </tr>
                                         ))}
                                     </tbody>
