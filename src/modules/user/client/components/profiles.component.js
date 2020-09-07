@@ -65,7 +65,7 @@ const ProfileForm = ({ onSuccess, permissionSets, preFill }) => {
                                     </div>
                                     <div className="col-12">
                                         <div className="row">
-                                            <FormField label="Description" type="text" name="description" component="textarea"/>
+                                            <FormField label="Description" type="text" name="description" component="textarea" required={false} />
                                         </div>
                                     </div>
                                     <div className="col-12">
@@ -107,6 +107,7 @@ export default function ManageProfiles() {
     const [permissionSets, setPermissionSets] = useState([]);
     const [modalShow, setModalShow] = useState({ createProfile: false });
     const [profileEditData, setProfileEditData] = useState(null);
+    const readOnlyProfiles = ['system_admin', 'site_admin', 'global_data_steward', 'data_privacy_officer'];
 
     const getProfiles = async () => {
         const { data } = await axios.get('/api/profiles');
@@ -190,7 +191,7 @@ export default function ManageProfiles() {
                                                 <td>{row.title}</td>
                                                 <td>{row.description}</td>
                                                 <td>{extractPermissionSetNames(row)}</td>
-                                                <td><button disabled={row.slug === 'system_admin'} className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlepProfileEditClick(row)}> <i className="icon icon-edit-pencil pr-2"></i>Edit Profile</button></td>
+                                                <td><button disabled={readOnlyProfiles.includes(row.slug)} className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlepProfileEditClick(row)}> <i className="icon icon-edit-pencil pr-2"></i>Edit Profile</button></td>
                                             </tr>
                                         ))}
                                     </tbody>
