@@ -4,6 +4,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const Application = require('../../../application/server/application.model');
 const PermissionSet_ServiceCategory = require('./permissionSet-serviceCategory.model');
+const PermissionSet_Application = require('./permissionSet-application.model');
 const ServiceCategory = require('../permission/service-category.model');
 
 const PermissionSet = sequelize.cdpConnector.define('permission_sets', {
@@ -21,10 +22,6 @@ const PermissionSet = sequelize.cdpConnector.define('permission_sets', {
     },
     countries: {
         type: DataTypes.ARRAY(DataTypes.STRING)
-    },
-    applicationId: {
-        allowNull: true,
-        type: DataTypes.UUID
     },
     description: {
         type: DataTypes.STRING
@@ -44,7 +41,9 @@ const PermissionSet = sequelize.cdpConnector.define('permission_sets', {
 });
 
 PermissionSet.belongsTo(Application, {as: 'application', foreignKey: 'applicationId'});
-PermissionSet.hasMany(PermissionSet_ServiceCategory, {as: 'permissionSet_serviceCategory', foreignKey: 'permissionSetId', sourceKey: 'id'});
+PermissionSet.hasMany(PermissionSet_ServiceCategory, {as: 'ps_sc', foreignKey: 'permissionSetId', sourceKey: 'id'});
+PermissionSet.hasMany(PermissionSet_Application, {as: 'ps_app', foreignKey: 'permissionSetId', sourceKey: 'id'});
 PermissionSet.belongsToMany(ServiceCategory, { through: PermissionSet_ServiceCategory });
+PermissionSet.belongsToMany(Application, { through: PermissionSet_Application });
 
 module.exports = PermissionSet;

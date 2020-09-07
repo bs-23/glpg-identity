@@ -63,9 +63,9 @@ export default function PermissionSetForm({ onSuccess, onError, preFill }) {
     const formValues = {
         title: preFill ? preFill.title : '',
         description: preFill ? preFill.description : '',
-        application_id: preFill && preFill.application_id ? preFill.application_id : '',
         countries: preFill ? preFill.countries ? preFill.countries : [] : [],
-        serviceCategories: preFill ? preFill.serviceCategories : []
+        serviceCategories: preFill ? preFill.serviceCategories : [],
+        applications: preFill ? preFill.applications : []
     };
 
     const getApplications = async () => {
@@ -126,11 +126,8 @@ export default function PermissionSetForm({ onSuccess, onError, preFill }) {
                                                 <div className="col-12">
                                                     <div className="row">
                                                         <FormField label="Title" type="text" name="title"/>
-                                                        <FormField label="Select Application" name="application_id" required={false} >
-                                                            <Field as="select" name="application_id" className="form-control">
-                                                                <option defaultValue value={""}> Select an application </option>
-                                                                {applications.length ? applications.map(item => <option key={item.id} value={item.id}>{item.name}</option>) : null }
-                                                            </Field>
+                                                        <FormField label="Select Applications" name="applications" required={false} >
+                                                            <CheckList name="applications" options={applications} idExtractor={item => item.id} labelExtractor={item => item.name} />
                                                         </FormField>
                                                         <FormField label="Description" type="text" name="description" required={false} component="textarea" />
                                                         <FormField label="Select Countries" name="countries" >

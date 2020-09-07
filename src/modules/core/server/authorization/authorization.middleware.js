@@ -6,7 +6,11 @@ const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/
 const PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permission-set.model"));
 const PermissionSet_ServiceCateory = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-serviceCategory.model"));
 const ServiceCategory = require(path.join(process.cwd(), "src/modules/user/server/permission/service-category.model"));
-const UserPermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/user-permissionSet.model"));
+const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-application.model"));
+const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
+const User_Role = require(path.join(process.cwd(), "src/modules/user/server/role/user-role.model"));
+const Role_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/role-permissionSet.model"));
+const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
 
 const AdminGuard = (req, res, next) => {
     if (!req.user) return res.status(401).send('unauthorized');
@@ -27,19 +31,93 @@ const isPermitted = (module, permissions) => {
 async function getUserWithProfiles(id) {
     const userWithPermissions = await User.findOne({
         where: { id },
-        include: [{
-            model: UserProfile,
-            as: 'userProfile',
-            include: [{
-                model: UserProfile_PermissionSet,
-                as: 'up_ps',
+        include: [
+            {
+                model: User_Role,
+                as: 'userRoles',
                 include: [{
-                    model: PermissionSet,
-                    as: 'ps',
+                    model: Role,
+                    as: 'role',
+                    include: [{
+                        model: Role_PermissionSet,
+                        as: 'role_ps',
+                        include: [{
+                            model: PermissionSet,
+                            as: 'ps',
+                            include: [
+                                {
+                                    model: PermissionSet_ServiceCateory,
+                                    as: 'ps_sc',
+                                    include: [
+                                        {
+                                            model: ServiceCategory,
+                                            as: 'serviceCategory',
+
+                                        }
+                                    ]
+
+                                },
+                                {
+                                    model: PermissionSet_Application,
+                                    as: 'ps_app',
+                                    include: [
+                                        {
+                                            model: Application,
+                                            as: 'application',
+
+                                        }
+                                    ]
+
+                                }
+                            ]
+
+                        }]
+                    }]
 
                 }]
-            }]
-        }]
+            },
+            {
+
+                model: UserProfile,
+                as: 'userProfile',
+                include: [{
+                    model: UserProfile_PermissionSet,
+                    as: 'up_ps',
+                    include: [{
+                        model: PermissionSet,
+                        as: 'ps',
+                        include: [
+                            {
+                                model: PermissionSet_ServiceCateory,
+                                as: 'ps_sc',
+                                include: [
+                                    {
+                                        model: ServiceCategory,
+                                        as: 'serviceCategory',
+
+                                    }
+                                ]
+
+                            },
+                            {
+                                model: PermissionSet_Application,
+                                as: 'ps_app',
+                                include: [
+                                    {
+                                        model: Application,
+                                        as: 'application',
+
+                                    }
+                                ]
+
+                            }
+                        ]
+
+                    }]
+                }]
+            }
+
+        ]
     });
 
     return userWithPermissions;
@@ -47,35 +125,43 @@ async function getUserWithProfiles(id) {
 
 async function getProfilePermissions(profile) {
     const serviceCategories = [];
-
-    if (profile.up_ps) {
+    if (profile) {
         for (const userProPermSet of profile.up_ps) {
-            const permissionServiceCategories = await PermissionSet_ServiceCateory.findAll({
-                where: {
-                    permissionSetId: userProPermSet.ps.id
-                },
-                include: [{
-                    model: ServiceCategory,
-                    as: 'serviceCategory'
+            let permissionSet = userProPermSet.ps;
+            for (const psc of permissionSet.ps_sc) {
+                serviceCategories.push(psc.serviceCategory);
+            }
 
-                }]
-            });
-            permissionServiceCategories.forEach(perServiceCat => {
-                serviceCategories.push(perServiceCat.serviceCategory);
-
-            })
         }
 
         return serviceCategories;
     }
 }
 
+async function getRolePermissions(roles) {
+    const serviceCategories = [];
+    for (const userRole of roles) {
+        for (const rolePermSet of userRole.role.role_ps) {
+            let permissionSet = rolePermSet.ps;
+            for (const psc of permissionSet.ps_sc) {
+                serviceCategories.push(psc.serviceCategory);
+            }
+
+        }
+
+    }
+    return serviceCategories;
+
+}
+
 const ModuleGuard = (moduleName) => {
     return async function (req, res, next) {
         const user = await getUserWithProfiles(req.user.id);
         const userPermissions = await getProfilePermissions(user.userProfile);
+        const rolePermissions = await getRolePermissions(user.userRoles);
+        let all_permissions = userPermissions.concat(rolePermissions);
 
-        if (!isPermitted(moduleName, userPermissions)) {
+        if (!isPermitted(moduleName, all_permissions)) {
             return res
                 .status(403)
                 .send('Forbidden! You are not authorized to view this page');

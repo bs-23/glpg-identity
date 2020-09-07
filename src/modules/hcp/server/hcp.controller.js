@@ -25,6 +25,9 @@ const Role_PermissionSet = require(path.join(process.cwd(), "src/modules/user/se
 const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
 const PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permission-set.model"));
 const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
+const PermissionSet_ServiceCateory = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-serviceCategory.model"));
+const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-application.model"));
+const ServiceCategory = require(path.join(process.cwd(), "src/modules/user/server/permission/service-category.model"));
 
 function generateAccessToken(doc) {
     return jwt.sign({
@@ -1034,6 +1037,32 @@ async function getUserAppCountryList(userId) {
                 include: [{
                     model: PermissionSet,
                     as: 'ps',
+                    include: [
+                        {
+                            model: PermissionSet_ServiceCateory,
+                            as: 'ps_sc',
+                            include: [
+                                {
+                                    model: ServiceCategory,
+                                    as: 'serviceCategory',
+
+                                }
+                            ]
+
+                        },
+                        {
+                            model: PermissionSet_Application,
+                            as: 'ps_app',
+                            include: [
+                                {
+                                    model: Application,
+                                    as: 'application',
+
+                                }
+                            ]
+
+                        }
+                    ]
 
                 }]
             }]
@@ -1050,13 +1079,39 @@ async function getUserAppCountryList(userId) {
                     include: [{
                         model: PermissionSet,
                         as: 'ps',
+                        include: [
+                            {
+                                model: PermissionSet_ServiceCateory,
+                                as: 'ps_sc',
+                                include: [
+                                    {
+                                        model: ServiceCategory,
+                                        as: 'serviceCategory',
+
+                                    }
+                                ]
+
+                            },
+                            {
+                                model: PermissionSet_Application,
+                                as: 'ps_app',
+                                include: [
+                                    {
+                                        model: Application,
+                                        as: 'application',
+
+                                    }
+                                ]
+
+                            }
+                        ]
 
                     }]
                 }]
 
             }]
         }
-        ],
+        ]
     });
 
     if (user.userProfile) {
@@ -1094,8 +1149,12 @@ async function getAppCountryPermissions(permissionSet) {
         const countriesDb = await sequelize.datasyncConnector.query("SELECT DISTINCT ON(codbase_desc) * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;", { type: QueryTypes.SELECT });
         countries = countriesDb.map(c => c.country_iso2);
     } else {
-        if (permissionSet.applicationId) {
-            applications.push(permissionSet.applicationId);
+        if (permissionSet.ps_app) {
+            for (const ps_app of permissionSet.ps_app) {
+                applications.push(ps_app.application.id);
+
+            }
+
         }
 
         if (permissionSet.countries) {

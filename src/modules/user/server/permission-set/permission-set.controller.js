@@ -3,6 +3,7 @@ const { Op, QueryTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const PermissionSet = require('./permission-set.model');
 const PermissionSet_ServiceCategory = require('./permissionSet-serviceCategory.model');
+const PermissionSet_Application = require('./permissionSet-application.model');
 const ServiceCategory = require('../permission/service-category.model');
 const Application = require('../../../application/server/application.model');
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
@@ -27,7 +28,7 @@ async function getPermissionSets(req, res) {
         const permissionSets = await PermissionSet.findAll({
             include: [{
                 model: PermissionSet_ServiceCategory,
-                as: 'permissionSet_serviceCategory',
+                as: 'ps_sc',
                 attributes: [ 'id'],
                 include: [{
                     model: ServiceCategory,
@@ -37,12 +38,18 @@ async function getPermissionSets(req, res) {
                 }]
             },
             {
-                model: Application,
-                as: 'application',
-                attributes: [ 'id', 'name', 'slug' ]
+                model: PermissionSet_Application,
+                as: 'ps_app',
+                attributes: [ 'id'],
+                include: [{
+                    model: Application,
+                    as: 'application',
+                    attributes: [ 'id', 'name' ]
+
+                }]
             }
             ],
-            attributes: { exclude: ['created_by', 'updated_by','created_at', 'updated_at', 'applicationId'] },
+            attributes: { exclude: ['created_by', 'updated_by','created_at', 'updated_at'] },
 
             order: [
                 ['created_at', 'ASC']
@@ -56,8 +63,9 @@ async function getPermissionSets(req, res) {
                     const applications = await allApplications();
                     const serviceCategories = await allServiceCategories();
                     item.dataValues.countries = countries.map(c => c.country_iso2);
-                    item.dataValues.application = { name: applications && applications.map(app => app.name).join(', ') };
-                    item.dataValues.permissionSet_serviceCategory = serviceCategories && serviceCategories.map(sc => ({ serviceCategory: { id: sc.id, title: sc.title, slug: sc.slug } }));
+                    // item.dataValues.application = { name: applications && applications.map(app => app.name).join(', ') };
+                    item.dataValues.ps_app = applications && applications.map(app=> ({ application: { id: app.id, name: app.name} }));
+                    item.dataValues.ps_sc = serviceCategories && serviceCategories.map(sc => ({ serviceCategory: { id: sc.id, title: sc.title, slug: sc.slug } }));
                 }
                 return item.dataValues;
             })
@@ -76,7 +84,6 @@ async function createPermissionSet(req, res) {
             title,
             description,
             countries,
-            application_id,
         } = req.body;
 
         if(!title.trim()) return res.status(400).send('Permission set title can not be empty.');
@@ -88,7 +95,6 @@ async function createPermissionSet(req, res) {
                 slug: title.replace(/ +/g, '_').toLowerCase(),
                 description,
                 countries: countries,
-                applicationId: application_id || null,
                 created_by: req.user.id,
                 updated_by: req.user.id
             }
@@ -96,12 +102,13 @@ async function createPermissionSet(req, res) {
 
         if(!created) return res.status(400).send('Permission set with the same title already exists.');
 
-        req.body.serviceCategories && req.body.serviceCategories.forEach(async function (serviceCategoryId) {
-            await PermissionSet_ServiceCategory.create({
-                permissionSetId: doc.id,
-                serviceCategoryId: serviceCategoryId
-            });
-        });
+        const serviceCategories_permissionSet = req.body.serviceCategories.map(id => ({ permissionSetId: doc.id, serviceCategoryId: id }));
+
+        await PermissionSet_ServiceCategory.bulkCreate(serviceCategories_permissionSet);
+
+        const applications_permissionSet = req.body.applications.map(id => ({ permissionSetId: doc.id, applicationId: id }));
+
+        await PermissionSet_Application.bulkCreate(applications_permissionSet);
 
         await logService.log({
             event_type: 'CREATE',
@@ -119,7 +126,7 @@ async function createPermissionSet(req, res) {
 }
 
 async function editPermissionSet(req, res) {
-    const { title, description, countries, application_id, serviceCategories } = req.body;
+    const { title, description, countries, serviceCategories, applications } = req.body;
 
     try {
         if(!title.trim()) return res.status(400).send('Permission set title can not be empty.');
@@ -128,7 +135,7 @@ async function editPermissionSet(req, res) {
             where: { id: req.params.id },
             include: [{
                 model: PermissionSet_ServiceCategory,
-                as: 'permissionSet_serviceCategory'
+                as: 'ps_sc'
             }]
         });
 
@@ -145,11 +152,11 @@ async function editPermissionSet(req, res) {
             slug: title.trim().replace(/ /g, '_').toLowerCase(),
             countries: countries,
             description,
-            applicationId: application_id ? application_id : null,
             updated_by: req.user.id
         });
 
         await doc.setService_categories(serviceCategories);
+        await doc.setApplications(applications);
 
         res.json(doc);
     } catch (error) {

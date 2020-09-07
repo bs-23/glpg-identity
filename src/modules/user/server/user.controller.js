@@ -13,6 +13,7 @@ const Role_PermissionSet = require(path.join(process.cwd(), "src/modules/user/se
 const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
 const PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permission-set.model"));
 const PermissionSet_ServiceCateory = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-serviceCategory.model"));
+const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-application.model"));
 const ServiceCategory = require(path.join(process.cwd(), "src/modules/user/server/permission/service-category.model"));
 const axios = require("axios");
 const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
@@ -39,23 +40,10 @@ async function getProfilePermissions(user) {
 
     if (userProfile) {
         for (const userProPermSet of userProfile.up_ps) {
-
-            const permissionServiceCategories = await PermissionSet_ServiceCateory.findAll({
-                where: {
-                    permissionSetId: userProPermSet.ps.id
-                },
-                include: [{
-                    model: ServiceCategory,
-                    as: 'serviceCategory'
-
-                }]
-            });
-            serviceCategories = [];
-            permissionServiceCategories.forEach(perServiceCat => {
-                serviceCategories.push(perServiceCat.serviceCategory);
-
-            });
-
+            let permissionSet = userProPermSet.ps;
+            for (const psc of permissionSet.ps_sc) {
+                serviceCategories.push(psc.serviceCategory);
+            }
             const applicationsCountries = await getUserApplicationCountry(userProPermSet.ps);
 
             applications = applicationsCountries[0];
@@ -90,23 +78,10 @@ async function getRolePermissions(user) {
     if (userRoles.length) {
         for (const userRole of userRoles) {
             for (const rolePermSet of userRole.role.role_ps) {
-                const permissionServiceCategories = await PermissionSet_ServiceCateory.findAll({
-                    where: {
-                        permissionSetId: rolePermSet.ps.id
-                    },
-                    include: [{
-                        model: ServiceCategory,
-                        as: 'serviceCategory'
-
-                    }]
-                });
-
-                serviceCategories = [];
-                permissionServiceCategories.forEach(perServiceCat => {
-                    serviceCategories.push(perServiceCat.serviceCategory);
-
-                });
-
+                let permissionSet = rolePermSet.ps;
+                for (const psc of permissionSet.ps_sc) {
+                    serviceCategories.push(psc.serviceCategory);
+                }
                 const applicationsCountries = await getUserApplicationCountry(rolePermSet.ps);
 
                 applications = applicationsCountries[0];
@@ -148,13 +123,18 @@ async function getUserApplicationCountry(permissionSet) {
         const countriesDb = await sequelize.datasyncConnector.query("SELECT DISTINCT ON(codbase_desc) * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;", { type: QueryTypes.SELECT });
         countries = countriesDb.map(c => c.country_iso2);
     } else {
-        if (permissionSet.applicationId) {
-            const userApplication = await Application.findOne({ where: { id: permissionSet.applicationId } });
-            applications.push({
-                name: userApplication.name,
-                slug: userApplication.slug,
-                logo_link: userApplication.logo_link
-            });
+        if (permissionSet.ps_app) {
+            for (const ps_app of permissionSet.ps_app) {
+
+                const userApplication = ps_app.application;
+                applications.push({
+                    name: userApplication.name,
+                    slug: userApplication.slug,
+                    logo_link: userApplication.logo_link
+                });
+
+            }
+
         }
 
         if (permissionSet.countries) {
@@ -270,41 +250,90 @@ async function login(req, res) {
                     [Op.iLike]: `%${email}%`
                 }
             },
-            include: [
-                {
-                    model: User_Role,
-                    as: 'userRoles',
+            include: [{
+                model: UserProfile,
+                as: 'userProfile',
+                include: [{
+                    model: UserProfile_PermissionSet,
+                    as: 'up_ps',
                     include: [{
-                        model: Role,
-                        as: 'role',
-                        include: [{
-                            model: Role_PermissionSet,
-                            as: 'role_ps',
-                            include: [{
-                                model: PermissionSet,
-                                as: 'ps'
+                        model: PermissionSet,
+                        as: 'ps',
+                        include: [
+                            {
+                                model: PermissionSet_ServiceCateory,
+                                as: 'ps_sc',
+                                include: [
+                                    {
+                                        model: ServiceCategory,
+                                        as: 'serviceCategory',
 
-                            }]
-                        }]
+                                    }
+                                ]
+
+                            },
+                            {
+                                model: PermissionSet_Application,
+                                as: 'ps_app',
+                                include: [
+                                    {
+                                        model: Application,
+                                        as: 'application',
+
+                                    }
+                                ]
+
+                            }
+                        ]
 
                     }]
-                },
-                {
-
-                    model: UserProfile,
-                    as: 'userProfile',
+                }]
+            },
+            {
+                model: User_Role,
+                as: 'userRoles',
+                include: [{
+                    model: Role,
+                    as: 'role',
                     include: [{
-                        model: UserProfile_PermissionSet,
-                        as: 'up_ps',
+                        model: Role_PermissionSet,
+                        as: 'role_ps',
                         include: [{
                             model: PermissionSet,
-                            as: 'ps'
+                            as: 'ps',
+                            include: [
+                                {
+                                    model: PermissionSet_ServiceCateory,
+                                    as: 'ps_sc',
+                                    include: [
+                                        {
+                                            model: ServiceCategory,
+                                            as: 'serviceCategory',
+
+                                        }
+                                    ]
+
+                                },
+                                {
+                                    model: PermissionSet_Application,
+                                    as: 'ps_app',
+                                    include: [
+                                        {
+                                            model: Application,
+                                            as: 'application',
+
+                                        }
+                                    ]
+
+                                }
+                            ]
 
                         }]
                     }]
-                }
 
-            ]
+                }]
+            }
+            ],
         });
 
         const userLockedMessage = 'Your account has been locked for consecutive failed auth attempts. Please use the Forgot Password link to unlock.';
@@ -388,7 +417,7 @@ async function createUser(req, res) {
             }
         });
 
-        if(role) {
+        if (role) {
             await User_Role.create({
                 userId: user.id,
                 roleId: role,
@@ -591,6 +620,32 @@ async function getUser(req, res) {
                     include: [{
                         model: PermissionSet,
                         as: 'ps',
+                        include: [
+                            {
+                                model: PermissionSet_ServiceCateory,
+                                as: 'ps_sc',
+                                include: [
+                                    {
+                                        model: ServiceCategory,
+                                        as: 'serviceCategory',
+
+                                    }
+                                ]
+
+                            },
+                            {
+                                model: PermissionSet_Application,
+                                as: 'ps_app',
+                                include: [
+                                    {
+                                        model: Application,
+                                        as: 'application',
+
+                                    }
+                                ]
+
+                            }
+                        ]
 
                     }]
                 }]
@@ -607,6 +662,32 @@ async function getUser(req, res) {
                         include: [{
                             model: PermissionSet,
                             as: 'ps',
+                            include: [
+                                {
+                                    model: PermissionSet_ServiceCateory,
+                                    as: 'ps_sc',
+                                    include: [
+                                        {
+                                            model: ServiceCategory,
+                                            as: 'serviceCategory',
+
+                                        }
+                                    ]
+
+                                },
+                                {
+                                    model: PermissionSet_Application,
+                                    as: 'ps_app',
+                                    include: [
+                                        {
+                                            model: Application,
+                                            as: 'application',
+
+                                        }
+                                    ]
+
+                                }
+                            ]
 
                         }]
                     }]

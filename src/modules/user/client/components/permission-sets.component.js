@@ -27,8 +27,12 @@ export default function ManagePermissionSets() {
     }
 
     const getServiceCategoryNames = (data) => {
-        if(!data.permissionSet_serviceCategory) return '';
-        return data.permissionSet_serviceCategory.map(item => item.serviceCategory.title).sort().join(', ');
+        if(!data.ps_sc) return '';
+        return data.ps_sc.map(item => item.serviceCategory.title).sort().join(', ');
+    }
+    const getApplicationNames = (data) => {
+        if(!data.ps_app) return '';
+        return data.ps_app.map(item => item.application.name).sort().join(', ');
     }
 
     const handleFormSubmitSuccess = () => {
@@ -38,9 +42,10 @@ export default function ManagePermissionSets() {
     }
 
     const preparePermissionSetEditData = (data) => {
-        const { id, title, description, countries, application } = data;
-        const serviceCategories = data.permissionSet_serviceCategory ? data.permissionSet_serviceCategory.map(item => item.serviceCategory.id ) : [];
-        const editObject = { id, title, description, countries, serviceCategories, application_id: application ? application.id : '' };
+        const { id, title, description, countries } = data;
+        const serviceCategories = data.ps_sc ? data.ps_sc.map(item => item.serviceCategory.id ) : [];
+        const applications = data.ps_app ? data.ps_app.map(item => item.application.id ) : [];
+        const editObject = { id, title, description, countries, serviceCategories, applications };
         return editObject;
     }
 
@@ -95,7 +100,7 @@ export default function ManagePermissionSets() {
                                             <tr key={row.id}>
                                                 <td>{row.title}</td>
                                                 <td>{row.description}</td>
-                                                <td>{row.application ? row.application.name : ''}</td>
+                                                <td>{getApplicationNames(row)}</td>
                                                 <td>{getCountryNamesFromCodes(row.countries)}</td>
                                                 <td>{getServiceCategoryNames(row)}</td>
                                                 <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlePermissionSetEditClick(row)} disabled={row.slug === 'system_admin'}> <i className="icon icon-edit-pencil pr-2"></i>Edit Permission Set</button></td>

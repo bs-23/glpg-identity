@@ -9,6 +9,10 @@ const PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/
 const User_Role = require(path.join(process.cwd(), "src/modules/user/server/role/user-role.model"));
 const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
 const Role_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/role-permissionSet.model"));
+const PermissionSet_ServiceCateory = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-serviceCategory.model"));
+const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-application.model"));
+const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
+const ServiceCategory = require(path.join(process.cwd(), "src/modules/user/server/permission/service-category.model"));
 
 
 module.exports = function () {
@@ -38,7 +42,33 @@ module.exports = function () {
                             as: 'role_ps',
                             include: [{
                                 model: PermissionSet,
-                                as: 'ps'
+                                as: 'ps',
+                                include: [
+                                    {
+                                        model: PermissionSet_ServiceCateory,
+                                        as: 'ps_sc',
+                                        include: [
+                                            {
+                                                model: ServiceCategory,
+                                                as: 'serviceCategory',
+
+                                            }
+                                        ]
+
+                                    },
+                                    {
+                                        model: PermissionSet_Application,
+                                        as: 'ps_app',
+                                        include: [
+                                            {
+                                                model: Application,
+                                                as: 'application',
+
+                                            }
+                                        ]
+
+                                    }
+                                ]
 
                             }]
                         }]
@@ -54,7 +84,33 @@ module.exports = function () {
                         as: 'up_ps',
                         include: [{
                             model: PermissionSet,
-                            as: 'ps'
+                            as: 'ps',
+                            include: [
+                                {
+                                    model: PermissionSet_ServiceCateory,
+                                    as: 'ps_sc',
+                                    include: [
+                                        {
+                                            model: ServiceCategory,
+                                            as: 'serviceCategory',
+
+                                        }
+                                    ]
+
+                                },
+                                {
+                                    model: PermissionSet_Application,
+                                    as: 'ps_app',
+                                    include: [
+                                        {
+                                            model: Application,
+                                            as: 'application',
+
+                                        }
+                                    ]
+
+                                }
+                            ]
 
                         }]
                     }]
