@@ -52,10 +52,17 @@ async function saveOldPassword(user) {
 }
 
 function isCommonPassword(password, user) {
-    if (password.includes(user.first_name) || password.includes(user.last_name) || password.includes((user.email).split("@")[0])) return true;
+    if (password.toLowerCase().includes(user.first_name.toLowerCase())
+        || password.toLowerCase().includes(user.last_name.toLowerCase())
+        || password.toLowerCase().includes((user.email.toLowerCase()).split("@")[0]))
+        return true;
+
+    if (user.uuid && password.toLowerCase().includes(user.uuid.toLowerCase()))
+        return true;
 
     const commonPasswords = JSON.parse(fs.readFileSync('src/modules/core/server/password/common-passwords.json'));
-    if (commonPasswords.hasOwnProperty(password)) return true;
+    if (commonPasswords.hasOwnProperty(password))
+        return true;
 
     return false;
 }
