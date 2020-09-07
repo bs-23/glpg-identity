@@ -59,7 +59,8 @@ async function init() {
                 { title: "System Admin", slug: "system_admin", created_by: admin.id, updated_by: admin.id },
                 { title: "Site Admin", slug: "site_admin", created_by: admin.id, updated_by: admin.id },
                 { title: "Global Data Steward", slug: "global_data_steward", created_by: admin.id, updated_by: admin.id },
-                { title: "Local Data Setward", slug: "local_data_steward", created_by: admin.id, updated_by: admin.id }
+                { title: "Local Data Setward", slug: "local_data_steward", created_by: admin.id, updated_by: admin.id },
+                { title: "Data Privacy Officer", slug: "data_privacy_officer", created_by: admin.id, updated_by: admin.id }
             ];
 
             UserProfile.destroy({ truncate: { cascade: true } }).then(() => {
@@ -114,7 +115,8 @@ async function init() {
             const permissionSet = [
                 { title: "System Admin Permission Set", slug: "system_admin", created_by: admin.id, updated_by: admin.id },
                 { title: "Site Admin Permission Set", slug: "site_admin", countries:["BE", "AD", "DE", "IT", "NL", "ES","IE"], created_by: admin.id, updated_by: admin.id },
-                { title: "GDS Permission Set", slug: "gds", countries:["BE", "AD", "DE", "IT", "NL", "ES","IE"], created_by: admin.id, updated_by: admin.id }
+                { title: "GDS Permission Set", slug: "gds", countries:["BE", "AD", "DE", "IT", "NL", "ES","IE"], created_by: admin.id, updated_by: admin.id },
+                { title: "DPO Permission Set", slug: "data_privacy_officer", created_by: admin.id, updated_by: admin.id }
             ];
 
             PermissionSet.destroy({ truncate: { cascade: true } }).then(() => {
@@ -135,8 +137,9 @@ async function init() {
             const hcpServiceCategory = ServiceCategory.findOne({ where: { slug: 'hcp' } });
             const userServiceCategory = ServiceCategory.findOne({ where: { slug: 'user' } });
             const consentServiceCategory = ServiceCategory.findOne({ where: { slug: 'consent' } });
+            const dpo_permissionSet = PermissionSet.findOne({ where: { slug: 'data_privacy_officer' } });
 
-            Promise.all([systemAdmin_permissionSet, siteAdmin_permissionSet, hcpServiceCategory, userServiceCategory, consentServiceCategory]).then((values) => {
+            Promise.all([systemAdmin_permissionSet, siteAdmin_permissionSet, hcpServiceCategory, userServiceCategory, consentServiceCategory, dpo_permissionSet]).then((values) => {
                 const permissionSet_serviceCategory = [
                     { permissionSetId: values[0].id, serviceCategoryId: values[2].id },
                     { permissionSetId: values[0].id, serviceCategoryId: values[3].id },
@@ -144,7 +147,8 @@ async function init() {
 
                     { permissionSetId: values[1].id, serviceCategoryId: values[2].id },
                     { permissionSetId: values[1].id, serviceCategoryId: values[3].id },
-                    { permissionSetId: values[1].id, serviceCategoryId: values[4].id }
+                    { permissionSetId: values[1].id, serviceCategoryId: values[4].id },
+                    { permissionSetId: values[5].id, serviceCategoryId: values[4].id }
                 ];
 
                 PermissionSet_ServiceCategory.destroy({ truncate: { cascade: true } }).then(() => {
@@ -168,13 +172,15 @@ async function init() {
         const siteAdminPermissionSet = PermissionSet.findOne({ where: { slug: 'site_admin' } });
         const gdsPermissionSet = PermissionSet.findOne({ where: { slug: 'gds' } });
         const gdsProfile = UserProfile.findOne({ where: { slug: 'global_data_steward' } });
+        const dpoProfile = UserProfile.findOne({ where: { slug: 'data_privacy_officer' } });
+        const dpoPermissionSet = PermissionSet.findOne({ where: { slug: 'data_privacy_officer' } });
 
-        Promise.all([systemAdminProfile, systemAdminPermissionSet, sitedminProfile, siteAdminPermissionSet, gdsProfile, gdsPermissionSet]).then((values) => {
+        Promise.all([systemAdminProfile, systemAdminPermissionSet, sitedminProfile, siteAdminPermissionSet, gdsProfile, gdsPermissionSet, dpoProfile, dpoPermissionSet]).then((values) => {
             const userprofile_permissionSet = [
                 { userProfileId: values[0].id, permissionSetId: values[1].id },
                 { userProfileId: values[2].id, permissionSetId: values[3].id },
+                { userProfileId: values[6].id, permissionSetId: values[7].id },
                 { userProfileId: values[4].id, permissionSetId: values[5].id }
-
             ];
 
             UserProfile_PermissionSet.destroy({ truncate: { cascade: true } }).then(() => {
