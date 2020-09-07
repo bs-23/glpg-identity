@@ -41,7 +41,7 @@ const ToggleList = ({ name, options, labelExtractor, idExtractor }) => {
                                 id={idExtractor(item)}
                                 checked={isChecked(idExtractor(item), arrayHelpers)}
                                 onChange={(e) => handleChange(e, arrayHelpers)}
-                                disabled={item && item.disabled}
+                                disabled={item.hasOwnProperty('disabled') ? item.disabled : false}
                             />
                             <span className="slider round"></span>
                         </span>

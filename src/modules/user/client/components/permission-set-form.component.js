@@ -15,7 +15,7 @@ const FormField = ({ label, name, type, children, required=true, ...rest }) => <
     </div>
 </div>
 
-const CheckList = ({ name, options, labelExtractor, idExtractor }) => {
+const ToggleList = ({ name, options, labelExtractor, idExtractor }) => {
     const isChecked = (id, arrayHelpers) => arrayHelpers.form.values[name].includes(id);
 
     const handleChange = (e, arrayHelpers) => {
@@ -32,26 +32,25 @@ const CheckList = ({ name, options, labelExtractor, idExtractor }) => {
     return <FieldArray
                 name={name}
                 render={arrayHelpers => (
-                <div>
-                    {
-                        options.map(item =>
-                            <div key={idExtractor(item)} className="custom-control custom-checkbox">
-                                <input name={name}
-                                    className="custom-control-input"
-                                    type="checkbox"
-                                    value={idExtractor(item)}
-                                    id={idExtractor(item)}
-                                    checked={isChecked(idExtractor(item), arrayHelpers)}
-                                    onChange={(e) => handleChange(e, arrayHelpers)}
-                                />
-                                <label className="custom-control-label" for={idExtractor(item)}>{labelExtractor(item)}</label>
-                            </div>
-                        )
-                    }
-                </div>
-            )}
-        />
+                    options.map(item => <label key={idExtractor(item)} className="d-flex justify-content-between align-items-center">
+                        <span className="switch-label">{labelExtractor(item)}</span>
+                        <span className="switch">
+                            <input name={name}
+                                className="custom-control-input"
+                                type="checkbox"
+                                value={idExtractor(item)}
+                                id={idExtractor(item)}
+                                checked={isChecked(idExtractor(item), arrayHelpers)}
+                                onChange={(e) => handleChange(e, arrayHelpers)}
+                                disabled={item.hasOwnProperty('disabled') ? item.disabled : false}
+                            />
+                            <span className="slider round"></span>
+                        </span>
+                    </label>)
+                )}
+            />
 }
+
 
 export default function PermissionSetForm({ onSuccess, onError, preFill }) {
     const [applications, setApplications] = useState([]);
@@ -133,12 +132,11 @@ export default function PermissionSetForm({ onSuccess, onError, preFill }) {
                                                             </Field>
                                                         </FormField>
                                                         <FormField label="Select Service Categories" name="serviceCategories" required={false} >
-                                                            <CheckList name="serviceCategories" options={serviceCategories} idExtractor={item => item.id} labelExtractor={item => item.title} />
+                                                            <ToggleList name="serviceCategories" options={serviceCategories} idExtractor={item => item.id} labelExtractor={item => item.title} />
                                                         </FormField>
                                                         <FormField label="Select Countries" name="countries" >
-                                                            <CheckList name="countries" options={countries} idExtractor={item => item.country_iso2} labelExtractor={item => item.codbase_desc} />
+                                                            <ToggleList name="countries" options={countries} idExtractor={item => item.country_iso2} labelExtractor={item => item.codbase_desc} />
                                                         </FormField>
-                                                        
                                                         <FormField label="Description" type="text" name="description" required={false} component="textarea" />
                                                     </div>
                                                     <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting} > Submit </button>
