@@ -22,6 +22,32 @@ export default function Users() {
         dispatch(getUsers(page, codbase));
     };
 
+    const extractUserCountries = (data) => {
+        const safeGet = (object, property) => {
+            const propData = (object || {})[property];
+            return (prop) => prop ? safeGet(propData, prop) : propData;
+        };
+
+        const flatten = (array) => {
+            return Array.isArray(array) ? [].concat(...array.map(flatten)) : array;
+        }
+
+        const union = (a, b) => [...new Set([...a, ...b])];
+
+        const profile_permission_sets = safeGet(data, 'userProfile')('up_ps')();
+        const profile_countries = profile_permission_sets ? profile_permission_sets.map(pps => safeGet(pps, 'ps')('countries')()) : [];
+
+        const userRoles = safeGet(data, 'userRoles')();
+        const roles_countries = userRoles ? userRoles.map(role => {
+            const role_permission_sets = safeGet(role, 'role')('role_ps')();
+            return role_permission_sets.map(rps => safeGet(rps, 'ps')('countries')());
+        }) : [];
+
+        const userCountries = union(flatten(profile_countries), flatten(roles_countries));
+
+        return userCountries;
+    }
+
     const sortCountries = (userCountries) => {
         let countryArr = [];
         let countryString = "";
@@ -165,7 +191,7 @@ export default function Users() {
                                                     {/* <td>{countries.length > 0 && (row.countries.length) && (row.countries).map((country, key) => (
                                                         <span key={key}>{(countries.find(i => i.country_iso2 === country)).codbase_desc} {key < row.countries.length - 1 ? ', ' : ''}</span>
                                                     ))}</td> */}
-                                                    {/* <td>{sortCountries(row.countries)}</td> */}
+                                                    <td>{sortCountries(extractUserCountries(row))}</td>
                                                     <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                     <td>{(new Date(row.expiry_date)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                     <td>
