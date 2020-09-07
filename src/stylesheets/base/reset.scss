@@ -175,6 +175,15 @@ a {
     &:hover {
         color: $primary-color-light;
     }
+
+    &.link-secondary {
+        color: $secondary-color;
+        text-decoration: underline;
+
+        &:hover {
+            text-decoration: none;
+        }
+    }
 }
 
 .consent-not-given {
