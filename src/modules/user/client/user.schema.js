@@ -113,11 +113,11 @@ export const permissionSetCreateSchema = object().shape({
 export const profileCreateSchema = object().shape({
     title: string().required('This field must not be empty.'),
     permissionSets: string().required('Must select at least one permission set.'),
-    description: string()
+    description: string().nullable()
 });
 
 export const roleCreateSchema = object().shape({
     title: string().required('This field must not be empty.'),
     permissionSets: string().required('Must select at least one permission set.'),
-    description: string()
+    description: string().nullable()
 });
