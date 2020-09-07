@@ -41,6 +41,7 @@ const ToggleList = ({ name, options, labelExtractor, idExtractor }) => {
                                 id={idExtractor(item)}
                                 checked={isChecked(idExtractor(item), arrayHelpers)}
                                 onChange={(e) => handleChange(e, arrayHelpers)}
+                                disabled={item && item.disabled}
                             />
                             <span className="slider round"></span>
                         </span>
@@ -51,6 +52,7 @@ const ToggleList = ({ name, options, labelExtractor, idExtractor }) => {
 
 const ProfileForm = ({ onSuccess, permissionSets, preFill }) => {
     const { addToast } = useToasts();
+    const nonAssignablePermissionSet = ['system_admin'];
 
     const handleSubmit = (values, actions) => {
         const promise = preFill ? axios.put(`/api/profiles/${preFill.id}`, values) : axios.post('/api/profiles', values);
@@ -105,7 +107,7 @@ const ProfileForm = ({ onSuccess, permissionSets, preFill }) => {
                                     <div className="col-12">
                                         <div className="row">
                                             <FormField name="permissionSets" label="Select Permission Sets">
-                                                <ToggleList name="permissionSets" options={permissionSets} idExtractor={item => item.id} labelExtractor={item => item.title} />
+                                                <ToggleList name="permissionSets" options={permissionSets.map(ps => ({...ps, disabled: nonAssignablePermissionSet.includes(ps.slug)}))} idExtractor={item => item.id} labelExtractor={item => item.title} />
                                             </FormField>
                                         </div>
                                         <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting} > Submit </button>
