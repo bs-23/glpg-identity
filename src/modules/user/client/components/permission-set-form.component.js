@@ -169,11 +169,11 @@ export default function PermissionSetForm({ onSuccess, onError, preFill }) {
                                                                 {applications.length ? applications.map(item => <option key={item.id} value={item.id}>{item.name}</option>) : null }
                                                             </Field>
                                                         </FormField>
-                                                        <FormField label="Select Service Categories" name="serviceCategories" required={false} >
-                                                            <ToggleList name="serviceCategories" options={serviceCategories} idExtractor={item => item.id} labelExtractor={item => item.title} />
-                                                        </FormField>
                                                         <FormField label="Select Countries" name="countries" >
                                                             <CheckList name="countries" options={countries} idExtractor={item => item.country_iso2} labelExtractor={item => item.codbase_desc} />
+                                                        </FormField>
+                                                        <FormField label="Select Service Categories" name="serviceCategories" required={false} >
+                                                            <ToggleList name="serviceCategories" options={serviceCategories} idExtractor={item => item.id} labelExtractor={item => item.title} />
                                                         </FormField>
                                                         <FormField label="Description" type="text" name="description" required={false} component="textarea" />
                                                     </div>

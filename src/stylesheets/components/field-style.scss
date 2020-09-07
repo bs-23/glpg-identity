@@ -44,6 +44,7 @@ input:checked + .slider {
 
 input[disabled] + .slider {
     background: #F4F4F5;
+    cursor: default;
 
     &:before {
         background: #E9EBEC;
