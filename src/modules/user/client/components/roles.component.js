@@ -1,7 +1,7 @@
 import axios from "axios";
 import { NavLink } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import { Form, Formik, Field, ErrorMessage } from "formik";
+import { Form, Formik, Field, ErrorMessage, FieldArray } from "formik";
 import { useToasts } from "react-toast-notifications";
 import Modal from 'react-bootstrap/Modal';
 import { roleCreateSchema } from "../user.schema";
@@ -14,6 +14,40 @@ const FormField = ({ label, name, type, required=true, children, ...rest }) => <
     </div>
 </div>
 
+const ToggleList = ({ name, options, labelExtractor, idExtractor }) => {
+    const isChecked = (id, arrayHelpers) => arrayHelpers.form.values[name].includes(id);
+
+    const handleChange = (e, arrayHelpers) => {
+        const optionId = e.target.value;
+        if (e.target.checked) {
+            arrayHelpers.push(optionId);
+        }
+        else {
+            const idx = arrayHelpers.form.values[name].indexOf(optionId);
+            arrayHelpers.remove(idx);
+        }
+    }
+
+    return <FieldArray
+                name={name}
+                render={arrayHelpers => (
+                    options.map(item => <label key={idExtractor(item)} className="d-flex justify-content-between align-items-center">
+                        <span className="switch-label">{labelExtractor(item)}</span>
+                        <span className="switch">
+                            <input name={name}
+                                className="custom-control-input"
+                                type="checkbox"
+                                value={idExtractor(item)}
+                                id={idExtractor(item)}
+                                checked={isChecked(idExtractor(item), arrayHelpers)}
+                                onChange={(e) => handleChange(e, arrayHelpers)}
+                            />
+                            <span className="slider round"></span>
+                        </span>
+                    </label>)
+                )}
+            />
+}
 
 const RoleForm = ({ onSuccess, permissionSets, preFill }) => {
     const { addToast } = useToasts();
@@ -71,9 +105,7 @@ const RoleForm = ({ onSuccess, permissionSets, preFill }) => {
                                     <div className="col-12">
                                         <div className="row">
                                             <FormField name="permissionSets" label="Select Permission Sets">
-                                                <Field as="select" multiple name="permissionSets" className="form-control">
-                                                    {permissionSets.length > 0 ? permissionSets.map(item => <option disabled={item.slug === 'system_admin'} key={item.id} value={item.id}>{item.title}</option>) : null}
-                                                </Field>
+                                                <ToggleList name="permissionSets" options={permissionSets} idExtractor={item => item.id} labelExtractor={item => item.title} />
                                             </FormField>
                                         </div>
                                         <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting} > Submit </button>
