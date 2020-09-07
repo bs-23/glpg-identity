@@ -39,7 +39,7 @@ async function init() {
 
     function userSeeder(callback) {
         User.findOrCreate({
-            where: { email: 'glpg.cdp@gmail.com' }, defaults: {
+            where: { email: 'glpg@brainstation-23.com' }, defaults: {
                 first_name: 'System',
                 last_name: 'Admin',
                 password: 'P@ssword123',
@@ -53,7 +53,7 @@ async function init() {
 
 
     function userProfileSeeder(callback) {
-        User.findOne({ where: { email: 'glpg.cdp@gmail.com' } }).then(admin => {
+        User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
 
             const userProfiles = [
                 { title: "System Admin", slug: "system_admin", created_by: admin.id, updated_by: admin.id },
@@ -77,7 +77,7 @@ async function init() {
 
     function userUpdateSeeder(callback) {
         User.findOne({
-            where: { email: 'glpg.cdp@gmail.com' }
+            where: { email: 'glpg@brainstation-23.com' }
         }).then(admin => {
             UserProfile.findOne({ where: { slug: 'system_admin' } }).then(sysAdminProfile => {
                 admin.update({profileId: sysAdminProfile.id});
@@ -89,7 +89,7 @@ async function init() {
     }
 
     function serviceCategorySeeder(callback) {
-        User.findOne({ where: { email: 'glpg.cdp@gmail.com' } }).then(admin => {
+        User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
 
             const serviceCategories = [
                 { title: "Information Management", slug: "hcp", created_by: admin.id, updated_by: admin.id },
@@ -110,7 +110,7 @@ async function init() {
 
     function permissionSetSeeder(callback) {
 
-        User.findOne({ where: { email: 'glpg.cdp@gmail.com' } }).then(admin => {
+        User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
 
             const permissionSet = [
                 { title: "System Admin Permission Set", slug: "system_admin", created_by: admin.id, updated_by: admin.id },
@@ -131,7 +131,7 @@ async function init() {
     }
 
     function permissionSetServiceCategorySeeder(callback) {
-        User.findOne({ where: { email: 'glpg.cdp@gmail.com' } }).then(admin => {
+        User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
             const systemAdmin_permissionSet = PermissionSet.findOne({ where: { slug: 'system_admin' } });
             const siteAdmin_permissionSet = PermissionSet.findOne({ where: { slug: 'site_admin' } });
             const hcpServiceCategory = ServiceCategory.findOne({ where: { slug: 'hcp' } });
@@ -197,13 +197,13 @@ async function init() {
     }
 
     function applicationSeeder(callback) {
-        User.findOne({ where: { email: 'glpg.cdp@gmail.com' } }).then(admin => {
+        User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
             const applications = [
                 {
                     name: 'HCP Portal',
                     slug: convertToSlug('HCP Portal'),
                     email: 'hcp-portal@glpg.com',
-                    password: 'strong-password',
+                    password: 'P@ssword123',
                     consent_confirmation_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/consentConfirm.consent.html',
                     reset_password_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/journeyRedirect.journey.html',
                     login_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/journeyRedirect.journey.html',
@@ -215,10 +215,10 @@ async function init() {
                     name: 'BrandX',
                     slug: convertToSlug('BrandX'),
                     email: 'brandx@glpg.com',
-                    password: 'strong-password',
-                    consent_confirmation_link: 'http://jyseleca-dev.glpg.com/bin/public/glpg-brandx/consentConfirm.consent.html',
-                    reset_password_link: 'http://jyseleca-dev.glpg.com/bin/public/glpg-brandx/journeyRedirect.journey.html',
-                    login_link: 'http://jyseleca-dev.glpg.com/bin/public/glpg-brandx/journeyRedirect.journey.html',
+                    password: 'P@ssword123',
+                    consent_confirmation_link: 'https://jyseleca-dev.glpg.com/bin/public/glpg-brandx/consentConfirm.consent.html',
+                    reset_password_link: 'https://jyseleca-dev.glpg.com/bin/public/glpg-brandx/journeyRedirect.journey.html',
+                    login_link: 'https://jyseleca-dev.glpg.com/bin/public/glpg-brandx/journeyRedirect.journey.html',
                     logo_link: 'https://cdp-asset.s3.eu-central-1.amazonaws.com/brandx/logo.png',
                     created_by: admin.id,
                     updated_by: admin.id
@@ -249,54 +249,53 @@ async function init() {
                 title: 'I agree to the Galapagos Terms of Service',
                 slug: '',
                 category_id: '59953d51-2449-4b65-950f-9f88654019bb',
-                type: 'online'
+                legal_basis: 'consent'
             },
             {
                 id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 title: 'I give my consent to send me promotional email',
                 slug: '',
                 category_id: 'fe037405-c676-4d98-bd05-85008900c838',
-                type: 'online'
+                legal_basis: 'consent'
             }
         ];
 
         const consentLocales = [
             {
-                rich_text: "<p>J'accepte les Galapagos <a href='https://www.glpg.com/' target='_blank'>Conditions d'utilisation.</a></p>",
+                rich_text: "<p>Je confirme que je suis un professionnel de la santé exerçant aux Pays-Bas, et j'accepte les <a href='#' target='_blank'>Conditions d'utilisation de Jyseleca Belgique.</a></p>",
                 consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
-                locale: 'fr'
+                locale: 'fr_be'
             },
             {
-                rich_text: '<p>I agree to the Galapagos <a href="https://www.glpg.com/" target="_blank">Terms of Service.</a></p>',
+                rich_text: "<p>Ik bevestig dat ik een professionele zorgverlener ben die in Belgique werkzaam is en ik accepteer de <a href='#' target='_blank'>Gebruiksvoorwaarden</a> van Jyseleca.nl.</p>",
                 consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
-                locale: 'en'
+                locale: 'nl_be'
             },
             {
-                rich_text: '<p>Ik ga akkoord met de Galapagos <a href="https://www.glpg.com/" target="_blank">Servicevoorwaarden.</a></p>',
+                rich_text: '<p>Ik bevestig dat ik een professionele zorgverlener ben die in Nederland werkzaam is en ik accepteer de <a href="#" target="_blank">Gebruiksvoorwaarden</a> van Jyseleca.nl.</p>',
                 consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
-                locale: 'nl'
+                locale: 'nl_nl'
             },
             {
-                rich_text: "<p>J'autorise Galapagos à m'envoyer des informations promotionnelles et environnementales concernant tous les produits et services Galapagos sur mon adresse e-mail fournie. Pour plus d'informations sur la manière dont nous traitons vos informations personnelles, veuillez consulter notre<a href='https://www.glpg.com/' target='_blank'>privacy notice.</a></p>",
+                rich_text: "<p>Ik geef Jyseleca toestemming om mij via mijn e-mailadres promotie- en milieu-informatie over alle Jyseleca-producten en -diensten te sturen. <br> <br> Raadpleeg onze <a href='#' target='_blank'>privacyverklaring</a> voor meer informatie over hoe we met uw persoonsgegevens omgaan.</p>",
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
-                locale: 'fr'
+                locale: 'nl_nl'
             },
             {
-                rich_text: '<p>I give my consent for Galapagos to send me promotional and environmental information concerning all of Galapagos products and services on my provided email address.</p> <p>For more information on how we treat your personal information please refer to our <a href="https://www.glpg.com/" target="_blank">privacy notice.</a></p>',
+                rich_text: "<p>Ik geef Jyseleca toestemming om mij via mijn e-mailadres promotie- en milieu-informatie over alle Jyseleca-producten en -diensten te sturen. <br> <br> Raadpleeg onze <a href='#' target='_blank'>privacyverklaring</a> voor meer informatie over hoe we met uw persoonsgegevens omgaan.</p>",
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
-                locale: 'en'
+                locale: 'nl_be'
             },
             {
-                rich_text: '<p>Ik geef Galapagos mijn toestemming om mij promotionele en milieu-informatie te sturen over alle Galapagos-producten en -diensten op het door mij opgegeven e-mailadres. </p> <p> Voor meer informatie over hoe we omgaan met uw persoonlijke informatie, verwijzen wij u naar onze <a href="https://www.glpg.com/" target="_blank">privacyverklaring.</a></p>',
+                rich_text: "<p>Je consens à ce que Jyseleca m'envoie des informations promotionnelles et environnementales concernant tous les produits et services de Jyseleca à l'adresse mail que j'ai fournie. <br> <br> Pour obtenir de plus amples informations sur la manière dont nous traitons vos données à caractère personnel, veuillez vous référer à notre <a href='#' target='_blank'> Déclaration de confidentialité.</a></p>",
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
-                locale: 'nl'
+                locale: 'fr_be'
             }
         ];
-
         const consentCountries = [
             {
                 consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
-                country_iso2: 'fr',
+                country_iso2: 'be',
                 opt_type: 'single'
             },
             {
@@ -311,7 +310,7 @@ async function init() {
             },
             {
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
-                country_iso2: 'fr',
+                country_iso2: 'be',
                 opt_type: 'double'
             },
         ];

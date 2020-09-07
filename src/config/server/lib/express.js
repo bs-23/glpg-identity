@@ -3,6 +3,7 @@ const helmet = require('helmet');
 const hbs = require('express-hbs');
 const express = require('express');
 const config = require('../config');
+const compression = require('compression');
 const cookieParser = require('cookie-parser');
 
 const swagger = require('./swagger/swagger');
@@ -11,6 +12,7 @@ const swaggerUi = require('swagger-ui-express');
 module.exports = async function () {
     let app = express();
 
+    app.use(compression());
     app.use(helmet({contentSecurityPolicy: false}));
     app.use(cookieParser());
     app.use(express.json());

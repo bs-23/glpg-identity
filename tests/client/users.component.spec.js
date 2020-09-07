@@ -13,66 +13,68 @@ import { getSignedInUserProfile } from '../../src/modules/user/client/user.actio
 
 configure({ adapter: new Adapter() });
 
-let mockAxios;
-
-beforeAll(async () => {
-    mockAxios = new MockAdapter(axios);
-    mockAxios.onGet('/api/users/profile').reply(200, { id: '1', email: 'email@gmail.com', name: 'John Smith' })
-    await store.dispatch(getSignedInUserProfile())
-});
-
-let data
-beforeEach(() => {
-    mockAxios = new MockAdapter(axios);
-    const countries = [
-        { countryid: 0, country_iso2: 'null', countryname: '' },
-        { countryid: 1, country_iso2: 'Ireland', countryname: 'Ireland' },
-        { countryid: 2, country_iso2: 'Netherlands', countryname: 'Netherlands'},
-        { countryid: 3, country_iso2: 'Luxembourg', countryname: 'Luxembourg'},
-        { countryid: 4, country_iso2: 'Germany', countryname: 'Germany'}
-    ]
-    const limit = 3
-    data = {
-        users: [
-            { id: '1', first_name: 'John', email: 'email@gmail.com', countries: ['Ireland'], createdByUser: '1' },
-            { id: '2', first_name: 'Smith', email: 'email2@gmail.com', countries: ['Netherlands'], createdByUser: '1' },
-            { id: '3', first_name: 'Carl', email: 'email3@gmail.com', countries: ['Luxembourg'], createdByUser: '1' },
-            { id: '4', first_name: 'Johnson', email: 'email4@gmail.com', countries: ['Netherlands'], createdByUser: '1' },
-            { id: '5', first_name: 'Brandon', email: 'email5@gmail.com', countries: ['Netherlands'], createdByUser: '1' },
-        ]
-    }
-
-    mockAxios.onGet('/api/countries').reply(200, countries)
-    mockAxios.onDelete(`/api/users/1`).reply(200, { id: '1' })
-    countries.forEach(country => {
-        if (country.country_iso2 === 'null') return
-        const response = { ...data }
-        const { users: allUsers } = response
-        response.users = allUsers.filter(user => user.countries.includes(country.country_iso2))
-        mockAxios.onGet(`/api/users?page=${1}&country_iso2=${country.country_iso2}`).reply(200, response)
-    })
-    mockAxios.onGet(`/api/users?page=${1}&country_iso2=null`).reply(200, { users: data.users.slice(0, limit), page: 1, end: 3 })
-    mockAxios.onGet(`/api/users?page=${2}&country_iso2=null`).reply(200, { users: data.users.slice(limit), page: 2, end: 5 })
-})
-
 describe('Users component', () => {
+    let mockAxios;
+
+    beforeAll(async () => {
+        mockAxios = new MockAdapter(axios);
+        mockAxios.onGet('/api/users/profile').reply(200, { id: '1', email: 'email@gmail.com', first_name: 'a', last_name: 'b', application: null, countries: null, type: 'admin', roles: [{ title: 'User & HCP Manager', permissions: ['user', 'hcp'] }]});
+        await store.dispatch(getSignedInUserProfile());
+    
+        const countries = [
+            { countryid: 0, codbase: null, country_iso2: null, countryname: '', codbase_desc: 'null' },
+            { countryid: 1, codbase: 'aa',  country_iso2: 'country1', countryname: 'country1', codbase_desc: 'country1' },
+            { countryid: 2, codbase: 'bb', country_iso2: 'country2', countryname: 'country2', codbase_desc: 'country2' },
+            { countryid: 3, codbase: 'cc', country_iso2: 'country3', countryname: 'country3', codbase_desc: 'country3' },
+            { countryid: 4, codbase: 'dd', country_iso2: 'country4', countryname: 'country4', codbase_desc: 'country4' }
+        ]
+        const limit = 3
+        
+        const data = {
+            users: [
+                { id: '1', first_name: 'John', email: 'email@gmail.com', countries: ['country1'], createdByUser: '1' },
+                { id: '2', first_name: 'Smith', email: 'email2@gmail.com', countries: ['country2'], createdByUser: '1' },
+                { id: '3', first_name: 'Carl', email: 'email3@gmail.com', countries: ['country3'], createdByUser: '1' },
+                { id: '4', first_name: 'Johnson', email: 'email4@gmail.com', countries: ['country4'], createdByUser: '1' },
+                { id: '5', first_name: 'Brandon', email: 'email5@gmail.com', countries: ['country4'], createdByUser: '1' },
+            ]
+        }
+    
+        mockAxios.onGet('/api/countries').reply(200, countries)
+        
+        countries.forEach(country => {
+            if (country.codbase === 'null') return
+            const response = { ...data }
+            const { users: allUsers } = response
+            response.users = allUsers.filter(user => user.countries.includes(country.country_iso2))
+            mockAxios.onGet(`/api/users?page=${1}&codbase=${country.codbase}`).reply(200, response)
+        })
+        mockAxios.onGet(`/api/users?page=${1}&codbase=null`).reply(200, { users: data.users.slice(0, limit), page: 1, end: 3 })
+        mockAxios.onGet(`/api/users?page=${2}&codbase=null`).reply(200, { users: data.users.slice(limit), page: 2, end: 5 })
+    });
+
+    const wrapperComponent = () => (
+        <Provider store={store}>
+            <MemoryRouter>
+                <ToastProvider>
+                    <Users/>
+                </ToastProvider>
+            </MemoryRouter>
+        </Provider>
+    );
+
+
     it('Should get signed in profile', () => {
         const signedInProfile = store.getState().userReducer.loggedInUser
         expect(signedInProfile).toBeTruthy()
     })
 
     it('Should filter users based on country', async () => {
-        const { container, getByText } = render(
-            <Provider store={store}>
-                <MemoryRouter>
-                    <ToastProvider>
-                        <Users />
-                    </ToastProvider>
-                </MemoryRouter>
-            </Provider>
-        );
+        const { debug, container, getByText } = render(wrapperComponent());
+        // setTimeout
+        // debug(container);
 
-        let table
+        let table;
         await waitFor(() => {
             table = container.querySelector('table')
             expect(table).toBeTruthy()
@@ -84,11 +86,11 @@ describe('Users component', () => {
         const filter_button = getByText('Filter by Country')
         fireEvent.click(filter_button)
 
-        const country_label = getByText('Germany')
+        const country_label = getByText('country4')
         fireEvent.click(country_label)
 
         await waitFor(() => {
-            expect(container.querySelector('tbody')).toBeFalsy()
+            expect(container.querySelector('tbody')).toBeTruthy()
         })
     });
 });
