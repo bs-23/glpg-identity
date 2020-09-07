@@ -15,6 +15,44 @@ const FormField = ({ label, name, type, children, required=true, ...rest }) => <
     </div>
 </div>
 
+const CheckList = ({ name, options, labelExtractor, idExtractor }) => {
+    const isChecked = (id, arrayHelpers) => arrayHelpers.form.values[name].includes(id);
+
+    const handleChange = (e, arrayHelpers) => {
+        const optionId = e.target.value;
+        if (e.target.checked) {
+            arrayHelpers.push(optionId);
+        }
+        else {
+            const idx = arrayHelpers.form.values[name].indexOf(optionId);
+            arrayHelpers.remove(idx);
+        }
+    }
+
+    return <FieldArray
+                name={name}
+                render={arrayHelpers => (
+                <div>
+                    {
+                        options.map(item =>
+                            <div key={idExtractor(item)} className="custom-control custom-checkbox">
+                                <input name={name}
+                                    className="custom-control-input"
+                                    type="checkbox"
+                                    value={idExtractor(item)}
+                                    id={idExtractor(item)}
+                                    checked={isChecked(idExtractor(item), arrayHelpers)}
+                                    onChange={(e) => handleChange(e, arrayHelpers)}
+                                />
+                                <label className="custom-control-label" for={idExtractor(item)}>{labelExtractor(item)}</label>
+                            </div>
+                        )
+                    }
+                </div>
+            )}
+        />
+}
+
 const ToggleList = ({ name, options, labelExtractor, idExtractor }) => {
     const isChecked = (id, arrayHelpers) => arrayHelpers.form.values[name].includes(id);
 
@@ -135,7 +173,7 @@ export default function PermissionSetForm({ onSuccess, onError, preFill }) {
                                                             <ToggleList name="serviceCategories" options={serviceCategories} idExtractor={item => item.id} labelExtractor={item => item.title} />
                                                         </FormField>
                                                         <FormField label="Select Countries" name="countries" >
-                                                            <ToggleList name="countries" options={countries} idExtractor={item => item.country_iso2} labelExtractor={item => item.codbase_desc} />
+                                                            <CheckList name="countries" options={countries} idExtractor={item => item.country_iso2} labelExtractor={item => item.codbase_desc} />
                                                         </FormField>
                                                         <FormField label="Description" type="text" name="description" required={false} component="textarea" />
                                                     </div>
