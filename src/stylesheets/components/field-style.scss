@@ -42,8 +42,12 @@ input:checked + .slider {
     background-color: #144D43;
 }
 
-input:focus + .slider {
-    /*box-shadow: 0 0 1px #144D43;*/
+input[disabled] + .slider {
+    background: #F4F4F5;
+
+    &:before {
+        background: #E9EBEC;
+    }
 }
 
 input:checked + .slider:before {
