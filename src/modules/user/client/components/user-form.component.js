@@ -182,8 +182,8 @@ export default function UserForm() {
                                                                     </Field>
                                                                     <div className="invalid-feedback">
                                                                         <ErrorMessage name="role" />
-                                                                    </div>
-                                                                </div> : <div className="p-4">No roles found. <NavLink to="/users/roles">Create a role</NavLink></div>}
+                                                                </div>
+                                                            </div> : <div className="pt-sm-4 mt-sm-3">No roles found. <NavLink className="link-secondary" to="/users/roles">Create a role</NavLink></div>}
                                                             </div>
                                                         </div>
                                                         <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" >Submit</button>
