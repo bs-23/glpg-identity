@@ -6,6 +6,8 @@ const validator = require('validator');
 const ConsentLocale = require('./consent-locale.model');
 const ConsentCountry = require('./consent-country.model');
 const ConsentCategory = require('./consent-category.model');
+const HCPS = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_profile.model'));
+const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 
 async function getConsents(req, res) {
@@ -94,4 +96,44 @@ async function getConsents(req, res) {
     }
 }
 
+
+async function generateReport(req, res){
+    const response = new Response({}, []);
+
+    try{
+        const hcps = await HCPS.findAll({
+            attributes: ['email', 'first_name', 'last_name'],
+            include: [{
+                model: HcpConsents,
+                as: 'hcpConsents',
+                attributes: ['consent_id', 'response', 'consent_confirmed'],
+                include: [{
+                    model: Consent,
+                    attributes: ['preference', 'legal_basis', 'created_at'],
+                    include: [
+                    {
+                        model: ConsentCategory,
+                        attributes: ['title', 'type']
+                    },
+                    {
+                        model: ConsentCountry,
+                        as: 'consent_country',
+                        attributes: ['country_iso2', 'opt_type',]
+                    }
+                    
+                ]
+                }]
+            }],
+        });
+
+        res.json(hcps);
+    }
+    catch(err){
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
+    }
+}
+
 exports.getConsents = getConsents;
+exports.generateReport = generateReport;

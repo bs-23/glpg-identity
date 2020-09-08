@@ -34,6 +34,7 @@ const ConsentCountry = sequelize.cdpConnector.define('consent_countries', {
     updatedAt: 'updated_at'
 });
 
-ConsentCountry.belongsTo(Consent, {as: 'consent', foreignKey: 'consent_id'});
+ConsentCountry.belongsTo(Consent, { as: 'consent', foreignKey: 'consent_id' });
+Consent.hasOne(ConsentCountry, { as: 'consent_country', foreignKey: 'consent_id' });
 
 module.exports = ConsentCountry;

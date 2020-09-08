@@ -14,9 +14,9 @@ import _ from 'lodash';
 import parse from 'html-react-parser';
 
 const ConsentPerformanceReport = () => {
-    // const dispatch = useDispatch();
-    // const [countries, setCountries] = useState([]);
-    // const [allCountries, setAllCountries] = useState([]);
+    const dispatch = useDispatch();
+    const [countries, setCountries] = useState([]);
+    const [allCountries, setAllCountries] = useState([]);
     // const [show, setShow] = useState({ profileManage: false, updateStatus: false });
     // const [currentAction, setCurrentAction] = useState({ userId: null, action: null });
     // const [currentUser, setCurrentUser] = useState({});
@@ -44,15 +44,20 @@ const ConsentPerformanceReport = () => {
     //     }
     // };
 
-    // async function getCountries() {
-    //     const response = await axios.get('/api/countries');
-    //     setCountries(response.data);
-    // }
+    async function getCountries() {
+        const response = await axios.get('/api/countries');
+        setCountries(response.data);
+    }
 
-    // async function getAllCountries() {
-    //     const response = await axios.get('/api/all_countries');
-    //     setAllCountries(response.data);
-    // }
+    async function getAllCountries() {
+        const response = await axios.get('/api/all_countries');
+        setAllCountries(response.data);
+    }
+
+    async function loadReport() {
+        const response = await axios.get('/api/consent-performance-report');
+        console.log("=============================>", response);
+    }
 
     // const onUpdateStatus = (user) => {
     //     setCurrentAction({ userId: user.id, action: 'Update Status' });
@@ -117,11 +122,12 @@ const ConsentPerformanceReport = () => {
     //     return country && country.countryname;
     // }
 
-    // useEffect(() => {
-    //     getCountries();
-    //     getAllCountries();
-    //     loadHcpProfile();
-    // }, []);
+    useEffect(() => {
+        getCountries();
+        getAllCountries();
+        // loadHcpProfile();
+        loadReport();
+    }, []);
 
     return (
         <main className="app__content cdp-light-bg">
