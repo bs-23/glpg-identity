@@ -1,6 +1,7 @@
 const path = require('path');
 const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
+const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
 const ConsentCategory = sequelize.cdpConnector.define('consent_categories', {
     id: {
@@ -19,7 +20,7 @@ const ConsentCategory = sequelize.cdpConnector.define('consent_categories', {
         values: ['dm', 'mc', 'general']
     }
 }, {
-    schema: 'ciam',
+    schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
     tableName: 'consent_categories',
     timestamps: true,
     createdAt: 'created_at',

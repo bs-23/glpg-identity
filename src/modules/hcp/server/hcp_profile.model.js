@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const Sequelize = require('sequelize');
 const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
+const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const HcpConsents = require('./hcp_consents.model');
 
 const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
@@ -91,7 +92,7 @@ const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
         type: DataTypes.STRING
     }
 }, {
-    schema: 'ciam',
+    schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
     tableName: 'hcp_profiles',
     timestamps: true,
     createdAt: 'created_at',

@@ -6,9 +6,11 @@ async function init() {
 
     await config.initEnvironmentVariables();
 
+    const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
+
     const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 
-    await sequelize.cdpConnector.query('CREATE SCHEMA IF NOT EXISTS ciam');
+    await sequelize.cdpConnector.query(`CREATE SCHEMA IF NOT EXISTS ${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`);
 
     const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
     const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
@@ -37,7 +39,7 @@ async function init() {
             where: { email: 'glpg@brainstation-23.com' }, defaults: {
                 first_name: 'System',
                 last_name: 'Admin',
-                password: 'P@ssword123',
+                password: '8s297LC#WRrB',
                 type: 'admin'
             }
         }).then(function () {
@@ -143,7 +145,7 @@ async function init() {
                     name: 'HCP Portal',
                     slug: convertToSlug('HCP Portal'),
                     email: 'hcp-portal@glpg.com',
-                    password: 'P@ssword123',
+                    password: 'T2^iyH3^4C6m',
                     consent_confirmation_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/consentConfirm.consent.html',
                     reset_password_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/journeyRedirect.journey.html',
                     login_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/journeyRedirect.journey.html',
@@ -155,7 +157,7 @@ async function init() {
                     name: 'BrandX',
                     slug: convertToSlug('BrandX'),
                     email: 'brandx@glpg.com',
-                    password: 'P@ssword123',
+                    password: 'L$y62@4*rGiF',
                     consent_confirmation_link: 'https://jyseleca-dev.glpg.com/bin/public/glpg-brandx/consentConfirm.consent.html',
                     reset_password_link: 'https://jyseleca-dev.glpg.com/bin/public/glpg-brandx/journeyRedirect.journey.html',
                     login_link: 'https://jyseleca-dev.glpg.com/bin/public/glpg-brandx/journeyRedirect.journey.html',

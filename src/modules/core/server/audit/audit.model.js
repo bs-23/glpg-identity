@@ -2,6 +2,7 @@ const path = require('path');
 const { DataTypes } = require('sequelize');
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
+const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
 const Audit = sequelize.cdpConnector.define('audits', {
     id: {
@@ -35,7 +36,7 @@ const Audit = sequelize.cdpConnector.define('audits', {
         type: DataTypes.STRING
     }
 }, {
-    schema: 'ciam',
+    schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
     tableName: 'audits',
     timestamps: false
 });
