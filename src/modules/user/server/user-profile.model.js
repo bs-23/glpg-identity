@@ -18,6 +18,10 @@ const UserProfile = sequelize.cdpConnector.define('user_profiles', {
     slug: {
         type: DataTypes.STRING
     },
+    type: {
+        type: DataTypes.ENUM,
+        values: ['standard', 'custom']
+    },
     description: {
         type: DataTypes.STRING
     },

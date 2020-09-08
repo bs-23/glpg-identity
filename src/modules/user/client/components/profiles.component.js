@@ -189,7 +189,7 @@ export default function ManageProfiles() {
                     <div className="col-12 col-sm-12 pt-3">
                         <div className="d-flex justify-content-between align-items-center mb-3 mt-4">
                             <h4 className="cdp-text-primary font-weight-bold mb-0">Manage Profiles</h4>
-                            <button disabled className="btn cdp-btn-secondary text-white ml-auto " onClick={() => setModalShow({ ...modalShow, createProfile: true })}>
+                            <button hidden disabled className="btn cdp-btn-secondary text-white ml-auto " onClick={() => setModalShow({ ...modalShow, createProfile: true })}>
                                 <i className="icon icon-plus pr-1"></i> Add New Profile
                             </button>
                         </div>
@@ -200,6 +200,7 @@ export default function ManageProfiles() {
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
                                             <th className="py-2">Title</th>
+                                            <th className="py-2">Type</th>
                                             <th className="py-2">Description</th>
                                             <th className="py-2">Permission Sets</th>
                                             <th className="py-2">Action</th>
@@ -209,6 +210,7 @@ export default function ManageProfiles() {
                                         {profiles.map(row => (
                                             <tr key={row.id}>
                                                 <td>{row.title}</td>
+                                                <td className="text-capitalize">{row.type}</td>
                                                 <td>{row.description}</td>
                                                 <td>{extractPermissionSetNames(row)}</td>
                                                 <td><button disabled={readOnlyProfiles.includes(row.slug)} className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlepProfileEditClick(row)}> <i className="icon icon-edit-pencil pr-2"></i>Edit</button></td>

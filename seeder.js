@@ -56,11 +56,11 @@ async function init() {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
 
             const userProfiles = [
-                { title: "System Admin", slug: "system_admin", description: "This is the default profile for System Admin", created_by: admin.id, updated_by: admin.id },
-                { title: "Site Admin", slug: "site_admin", description: "This is the default profile for Site Admin", created_by: admin.id, updated_by: admin.id },
-                { title: "Global Data Steward", slug: "global_data_steward", description: "This is the default profile for Global Data Steward", created_by: admin.id, updated_by: admin.id },
-                { title: "Local Data Steward", slug: "local_data_steward", description: "This is the default profile for Local Data Steward", created_by: admin.id, updated_by: admin.id },
-                { title: "Data Privacy Officer", slug: "data_privacy_officer", description: "This is the default profile for Data Privacy Officer",  created_by: admin.id, updated_by: admin.id }
+                { title: "System Admin", slug: "system_admin", type: 'standard', description: "This is the default profile for System Admin", created_by: admin.id, updated_by: admin.id },
+                { title: "Site Admin", slug: "site_admin", type: 'standard', description: "This is the default profile for Site Admin", created_by: admin.id, updated_by: admin.id },
+                { title: "Global Data Steward", type: 'standard', slug: "global_data_steward", description: "This is the default profile for Global Data Steward", created_by: admin.id, updated_by: admin.id },
+                { title: "Local Data Steward", type: 'standard', slug: "local_data_steward", description: "This is the default profile for Local Data Steward", created_by: admin.id, updated_by: admin.id },
+                { title: "Data Privacy Officer", type: 'standard', slug: "data_privacy_officer", description: "This is the default profile for Data Privacy Officer",  created_by: admin.id, updated_by: admin.id }
             ];
 
             UserProfile.destroy({ truncate: { cascade: true } }).then(() => {
@@ -113,10 +113,10 @@ async function init() {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
 
             const permissionSet = [
-                { title: "System Admin Permission Set", slug: "system_admin", description: "This is the default permission set for System Admin", created_by: admin.id, updated_by: admin.id },
-                { title: "Site Admin Permission Set", slug: "site_admin", description: "This is the default permission set for Site Admin", countries:["BE", "AD", "DE", "IT", "NL", "ES","IE"], created_by: admin.id, updated_by: admin.id },
-                { title: "GDS Permission Set", slug: "gds", countries:["BE", "AD", "DE", "IT", "NL", "ES","IE"], description: "This is the default permission set for Global Data Steward", created_by: admin.id, updated_by: admin.id },
-                { title: "DPO Permission Set", slug: "data_privacy_officer", description: "This is the default permission set for Local Data Steward", created_by: admin.id, updated_by: admin.id }
+                { title: "System Admin Permission Set", slug: "system_admin", type: 'standard', description: "This is the default permission set for System Admin", created_by: admin.id, updated_by: admin.id },
+                { title: "Site Admin Permission Set", slug: "site_admin", type: 'standard', description: "This is the default permission set for Site Admin", countries:["BE", "AD", "DE", "IT", "NL", "ES","IE"], created_by: admin.id, updated_by: admin.id },
+                { title: "GDS Permission Set", slug: "gds", type: 'standard', countries:["BE", "AD", "DE", "IT", "NL", "ES","IE"], description: "This is the default permission set for Global Data Steward", created_by: admin.id, updated_by: admin.id },
+                { title: "DPO Permission Set", slug: "data_privacy_officer", type: 'standard', description: "This is the default permission set for Local Data Steward", created_by: admin.id, updated_by: admin.id }
             ];
 
             PermissionSet.destroy({ truncate: { cascade: true } }).then(() => {
