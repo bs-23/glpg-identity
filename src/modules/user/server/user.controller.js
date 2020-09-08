@@ -245,7 +245,6 @@ async function login(req, res) {
         // }
 
         const user = await User.findOne({
-
             where: {
                 email: {
                     [Op.iLike]: `%${email}%`
@@ -508,10 +507,21 @@ async function getUsers(req, res) {
 
     try {
         const users = await User.findAll({
+            where: {
+                id: { [Op.ne]: signedInId },
+                type: 'basic'
+            },
             offset,
             limit,
-            logging: true,
-            include: [
+            order: [
+                ['created_at', 'DESC'],
+                ['id', 'DESC']
+            ],
+            include: [{
+                model: User,
+                as: 'createdByUser',
+                attributes: ['id', 'first_name', 'last_name'],
+            },
             {
                 model: UserProfile,
                 as: 'userProfile',
@@ -523,7 +533,7 @@ async function getUsers(req, res) {
                         as: 'ps',
                         where: {
 
-                            countries: codbase
+                            countries: codbase ? { [Op.overlap]: [countries_ignorecase_for_codbase] } : { [Op.ne]: ["undefined"] }
                         }
 
                     }]
@@ -543,15 +553,17 @@ async function getUsers(req, res) {
                             as: 'ps',
                             where: {
 
-                                countries: codbase
+                                countries: codbase ? { [Op.overlap]: [countries_ignorecase_for_codbase] } : { [Op.ne]: ["undefined"] }
                             }
+
 
                         }]
                     }]
 
 
                 }]
-            }]
+            }],
+            attributes: { exclude: ['password'] },
         });
 
         const totalUser = await User.count({

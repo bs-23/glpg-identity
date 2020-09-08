@@ -18,11 +18,6 @@ const PermissionSet_ServiceCategory = sequelize.cdpConnector.define('permissionS
     serviceCategoryId  : {
         allowNull: false,
         type: DataTypes.UUID
-    },
-    action  : {
-        type: DataTypes.ENUM,
-        values: ['include', 'exclude'],
-        defaultValue: 'include'
     }
 }, {
     schema: 'ciam',
