@@ -3,26 +3,30 @@
         "subject": {
             "en": "Thank you for registering!",
             "nl_nl": "Bedankt voor uw registratie!",
-            "nl_be": "Bedankt voor uw registratie!"
+            "nl_be": "Bedankt voor uw registratie!",
+            "fr_be": "Merci de vous être inscrit(e)!"
         },
         "template_url": "double-opt-in-consent-confirm.html",
         "plain_text": {
             "en": "Hello [[firstName]] [[lastName]],\r\nThank you for registering on the Galapagos HCP Portal. Please confirm the consents you have provided during registration:\r\n{{consents}}\r\n{{consents-value}}\r\n{{consents-end}}\r\nWe confirm that you provided a consent to receive promotional and environmental information concerning all of Galapagos products and services on your provided email address. If you wish to withdrawal this consent you can do so at any time by clicking the unsubscribe link in future promotional materials.\r\n\r\nPlease click on the link below to start.\r\n\r\n[[link]]\r\n\r\nIf you have any further queries you can reach us at support@glpg.com. For further information on the Galapagos HCP Portal, visit our website www.glpg-pro.com\r\nYours Sincerely,\r\nThe GLPG Team",
             "nl_nl": "Hello [[firstName]] [[lastName]],\r\nThank you for registering on the Galapagos HCP Portal. Please confirm the consents you have provided during registration:\r\n{{consents}}\r\n{{consents-value}}\r\n{{consents-end}}\r\nWe confirm that you provided a consent to receive promotional and environmental information concerning all of Galapagos products and services on your provided email address. If you wish to withdrawal this consent you can do so at any time by clicking the unsubscribe link in future promotional materials.\r\n\r\nPlease click on the link below to start.\r\n\r\n[[link]]\r\n\r\nIf you have any further queries you can reach us at support@glpg.com. For further information on the Galapagos HCP Portal, visit our website www.glpg-pro.com\r\nYours Sincerely,\r\nThe GLPG Team",
-            "nl_be": "Hello [[firstName]] [[lastName]],\r\nThank you for registering on the Galapagos HCP Portal. Please confirm the consents you have provided during registration:\r\n{{consents}}\r\n{{consents-value}}\r\n{{consents-end}}\r\nWe confirm that you provided a consent to receive promotional and environmental information concerning all of Galapagos products and services on your provided email address. If you wish to withdrawal this consent you can do so at any time by clicking the unsubscribe link in future promotional materials.\r\n\r\nPlease click on the link below to start.\r\n\r\n[[link]]\r\n\r\nIf you have any further queries you can reach us at support@glpg.com. For further information on the Galapagos HCP Portal, visit our website www.glpg-pro.com\r\nYours Sincerely,\r\nThe GLPG Team"
+            "nl_be": "Hello [[firstName]] [[lastName]],\r\nThank you for registering on the Galapagos HCP Portal. Please confirm the consents you have provided during registration:\r\n{{consents}}\r\n{{consents-value}}\r\n{{consents-end}}\r\nWe confirm that you provided a consent to receive promotional and environmental information concerning all of Galapagos products and services on your provided email address. If you wish to withdrawal this consent you can do so at any time by clicking the unsubscribe link in future promotional materials.\r\n\r\nPlease click on the link below to start.\r\n\r\n[[link]]\r\n\r\nIf you have any further queries you can reach us at support@glpg.com. For further information on the Galapagos HCP Portal, visit our website www.glpg-pro.com\r\nYours Sincerely,\r\nThe GLPG Team",
+            "fr_be": "Hello [[firstName]] [[lastName]],\r\nThank you for registering on the Galapagos HCP Portal. Please confirm the consents you have provided during registration:\r\n{{consents}}\r\n{{consents-value}}\r\n{{consents-end}}\r\nWe confirm that you provided a consent to receive promotional and environmental information concerning all of Galapagos products and services on your provided email address. If you wish to withdrawal this consent you can do so at any time by clicking the unsubscribe link in future promotional materials.\r\n\r\nPlease click on the link below to start.\r\n\r\n[[link]]\r\n\r\nIf you have any further queries you can reach us at support@glpg.com. For further information on the Galapagos HCP Portal, visit our website www.glpg-pro.com\r\nYours Sincerely,\r\nThe GLPG Team"
         }
     },
     "password-reset-instructions": {
         "subject": {
             "en": "Setup Password",
             "nl_nl": "Wachtwoord instellen",
-            "nl_be": "Wachtwoord instellen"
+            "nl_be": "Wachtwoord instellen",
+            "fr_be": "Définir le mot de passe"
         },
         "template_url": "password-reset-instructions.html",
         "plain_text": {
             "en": "Hello [[firstName]] [[lastName]],\r\nPlease click the button below to setup your password on the Galapagos HCP Portal. The link will be valid for only one hour.\r\n\r\n[[link]]\r\n\r\nIf the password reset wasn't requested by you, please report the issue by replying to this mail (support@glpg.com)\r\n\r\nYours Sincerely,\r\nThe GLPG Team",
             "nl_nl": "Hello [[firstName]] [[lastName]],\r\nPlease click the button below to setup your password on the Galapagos HCP Portal. The link will be valid for only one hour.\r\n\r\n[[link]]\r\n\r\nIf the password reset wasn't requested by you, please report the issue by replying to this mail (support@glpg.com)\r\n\r\nYours Sincerely,\r\nThe GLPG Team",
-            "nl_be": "Hello [[firstName]] [[lastName]],\r\nPlease click the button below to setup your password on the Galapagos HCP Portal. The link will be valid for only one hour.\r\n\r\n[[link]]\r\n\r\nIf the password reset wasn't requested by you, please report the issue by replying to this mail (support@glpg.com)\r\n\r\nYours Sincerely,\r\nThe GLPG Team"
+            "nl_be": "Hello [[firstName]] [[lastName]],\r\nPlease click the button below to setup your password on the Galapagos HCP Portal. The link will be valid for only one hour.\r\n\r\n[[link]]\r\n\r\nIf the password reset wasn't requested by you, please report the issue by replying to this mail (support@glpg.com)\r\n\r\nYours Sincerely,\r\nThe GLPG Team",
+            "fr_be": "Hello [[firstName]] [[lastName]],\r\nPlease click the button below to setup your password on the Galapagos HCP Portal. The link will be valid for only one hour.\r\n\r\n[[link]]\r\n\r\nIf the password reset wasn't requested by you, please report the issue by replying to this mail (support@glpg.com)\r\n\r\nYours Sincerely,\r\nThe GLPG Team"
         }
     },
     "password-change-success": {
@@ -40,39 +44,45 @@
         "subject": {
             "en": "Your password has been reset",
             "nl_nl": "Uw wachtwoord is opnieuw ingesteld",
-            "nl_be": "Uw wachtwoord is opnieuw ingesteld"
+            "nl_be": "Uw wachtwoord is opnieuw ingesteld",
+            "fr_be": "Votre mot de passe a été réinitialisé"
         },
         "template_url": "password-reset-success.html",
         "plain_text": {
             "en": "Hello [[firstName]] [[lastName]],\r\nYour password has been reset successfully on the Galapagos HCP portal.\r\n\r\n[[loginLink]]\r\n\r\nIf the password reset wasn’t requested by you, please report the issue by replying to this mail support@glpg.com\r\n\r\nYours Sincerely,\r\nThe GLPG Team",
             "nl_nl": "Hello [[firstName]] [[lastName]],\r\nYour password has been reset successfully on the Galapagos HCP portal.\r\n\r\n[[loginLink]]\r\n\r\nIf the password reset wasn’t requested by you, please report the issue by replying to this mail support@glpg.com\r\n\r\nYours Sincerely,\r\nThe GLPG Team",
-            "nl_be": "Hello [[firstName]] [[lastName]],\r\nYour password has been reset successfully on the Galapagos HCP portal.\r\n\r\n[[loginLink]]\r\n\r\nIf the password reset wasn’t requested by you, please report the issue by replying to this mail support@glpg.com\r\n\r\nYours Sincerely,\r\nThe GLPG Team"
+            "nl_be": "Hello [[firstName]] [[lastName]],\r\nYour password has been reset successfully on the Galapagos HCP portal.\r\n\r\n[[loginLink]]\r\n\r\nIf the password reset wasn’t requested by you, please report the issue by replying to this mail support@glpg.com\r\n\r\nYours Sincerely,\r\nThe GLPG Team",
+            "fr_be": "Hello [[firstName]] [[lastName]],\r\nYour password has been reset successfully on the Galapagos HCP portal.\r\n\r\n[[loginLink]]\r\n\r\nIf the password reset wasn’t requested by you, please report the issue by replying to this mail support@glpg.com\r\n\r\nYours Sincerely,\r\nThe GLPG Team"
         }
     },
     "password-setup-instructions": {
         "subject": {
             "en": "Registration verified. Please setup your password",
             "nl_nl": "Registratie geverifieerd. Stel uw wachtwoord in",
-            "nl_be": "Registratie geverifieerd. Stel uw wachtwoord in"
+            "nl_be": "Registratie geverifieerd. Stel uw wachtwoord in",
+            "fr_be": "Inscription vérifiée. Veuillez définir votre mot de passe"
         },
         "template_url": "password-setup-instructions.html",
         "plain_text": {
             "en": "Hello [[firstName]] [[lastName]],\r\nThank you for registration. We have verified your information.\r\n\r\nPlease click the button below to setup your password on the Galapagos HCP Portal. The link will be valid for only one hour.\r\n\r\n[[link]]\r\n\r\nIf the password reset wasn't requested by you, please report the issue by replying to this mail (support@glpg.com)\r\n\r\nYours Sincerely,\r\nThe GLPG Team",
             "nl_nl": "Hello [[firstName]] [[lastName]],\r\nThank you for registration. We have verified your information.\r\n\r\nPlease click the button below to setup your password on the Galapagos HCP Portal. The link will be valid for only one hour.\r\n\r\n[[link]]\r\n\r\nIf the password reset wasn't requested by you, please report the issue by replying to this mail (support@glpg.com)\r\n\r\nYours Sincerely,\r\nThe GLPG Team",
-            "nl_be": "Hello [[firstName]] [[lastName]],\r\nThank you for registration. We have verified your information.\r\n\r\nPlease click the button below to setup your password on the Galapagos HCP Portal. The link will be valid for only one hour.\r\n\r\n[[link]]\r\n\r\nIf the password reset wasn't requested by you, please report the issue by replying to this mail (support@glpg.com)\r\n\r\nYours Sincerely,\r\nThe GLPG Team"
+            "nl_be": "Hello [[firstName]] [[lastName]],\r\nThank you for registration. We have verified your information.\r\n\r\nPlease click the button below to setup your password on the Galapagos HCP Portal. The link will be valid for only one hour.\r\n\r\n[[link]]\r\n\r\nIf the password reset wasn't requested by you, please report the issue by replying to this mail (support@glpg.com)\r\n\r\nYours Sincerely,\r\nThe GLPG Team",
+            "fr_be": "Hello [[firstName]] [[lastName]],\r\nThank you for registration. We have verified your information.\r\n\r\nPlease click the button below to setup your password on the Galapagos HCP Portal. The link will be valid for only one hour.\r\n\r\n[[link]]\r\n\r\nIf the password reset wasn't requested by you, please report the issue by replying to this mail (support@glpg.com)\r\n\r\nYours Sincerely,\r\nThe GLPG Team"
         }
     },
     "registration-success": {
         "subject": {
             "en": "Congratulations your registration was successful",
             "nl_nl": "Gefeliciteerd, uw registratie is geslaagd",
-            "nl_be": "Gefeliciteerd, uw registratie is geslaagd"
+            "nl_be": "Gefeliciteerd, uw registratie is geslaagd",
+            "fr_be": "Félicitations ! Votre inscription est un franc succès"
         },
         "template_url": "registration-success.html",
         "plain_text": {
             "en": "Hello [[firstName]] [[lastName]], \r\nYou have successfully created an account on Galapagos HCP Portal. \r\nClick the link to login: \r\n[[loginLink]]. \r\nIf the password reset wasn’t requested by you, please report the issue by replying to this mail support@glpg.com. \r\n Yours Sincerely,\r\nThe GLPG Team",
             "nl_nl": "Hello [[firstName]] [[lastName]], \r\nYou have successfully created an account on Galapagos HCP Portal. \r\nClick the link to login: \r\n[[loginLink]]. \r\nIf the password reset wasn’t requested by you, please report the issue by replying to this mail support@glpg.com. \r\n Yours Sincerely,\r\nThe GLPG Team",
-            "nl_be": "Hello [[firstName]] [[lastName]], \r\nYou have successfully created an account on Galapagos HCP Portal. \r\nClick the link to login: \r\n[[loginLink]]. \r\nIf the password reset wasn’t requested by you, please report the issue by replying to this mail support@glpg.com. \r\n Yours Sincerely,\r\nThe GLPG Team"
+            "nl_be": "Hello [[firstName]] [[lastName]], \r\nYou have successfully created an account on Galapagos HCP Portal. \r\nClick the link to login: \r\n[[loginLink]]. \r\nIf the password reset wasn’t requested by you, please report the issue by replying to this mail support@glpg.com. \r\n Yours Sincerely,\r\nThe GLPG Team",
+            "fr_be": "Hello [[firstName]] [[lastName]], \r\nYou have successfully created an account on Galapagos HCP Portal. \r\nClick the link to login: \r\n[[loginLink]]. \r\nIf the password reset wasn’t requested by you, please report the issue by replying to this mail support@glpg.com. \r\n Yours Sincerely,\r\nThe GLPG Team"
         }
     }
 }
