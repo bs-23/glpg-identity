@@ -6,5 +6,5 @@ const controller = require('./service-category.controller');
 
 module.exports = app => {
     app.route('/api/serviceCategories')
-        .get(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.USER.value), controller.getServiceCategories);
+        .get(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.PLATFORM.value), controller.getServiceCategories);
 };

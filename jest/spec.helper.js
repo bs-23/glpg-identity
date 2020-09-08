@@ -43,16 +43,7 @@ module.exports = {
             email: 'default-admin@cdp.com',
             password: faker.internet.password(8),
             updated_by: defaultAdminId,
-            access_token: jwt.sign(
-                {
-                    id: defaultAdminId,
-                    first_name: 'Admin',
-                    last_name: '',
-                    email: 'default-admin@cdp.com',
-                },
-                process.env.CDP_TOKEN_SECRET,
-                { expiresIn: '2d', issuer: defaultAdminId }
-            ),
+            access_token: jwt.sign({ id: defaultAdminId }, process.env.CDP_TOKEN_SECRET, { expiresIn: '2d', issuer: defaultAdminId }),
         },
         defaultUser: {
             id: defaultUserId,
@@ -64,17 +55,8 @@ module.exports = {
             expiry_date: new Date(Date.now() + 24 * 60 * 60 * 1000),
             created_by: defaultAdminId,
             updated_by: defaultAdminId,
-            access_token: jwt.sign(
-                {
-                    id: defaultUserId,
-                    first_name: 'Default User',
-                    last_name: '',
-                    email: 'default-user@cdp.com',
-                },
-                process.env.CDP_TOKEN_SECRET,
-                { expiresIn: '2d', issuer: defaultUserId }
-            ),
-        },
+            access_token: jwt.sign({ id: defaultUserId }, process.env.CDP_TOKEN_SECRET, { expiresIn: '2d', issuer: defaultUserId }),
+        }
     },
     hcp: {
         defaultUser: {
@@ -86,13 +68,14 @@ module.exports = {
             salutation: 'Mr',
             email: 'default-hcp-user@cdp.com',
             password: 'strong-password',
-            country_iso2: 'NL',
-            language_code: 'en',
+            country_iso2: 'nl',
+            language_code: 'nl',
+            locale: 'nl_nl',
             salutation: 'Mr',
             specialty_onekey: 'SP.WNL.01',
             created_by: defaultAdminId,
             updated_by: defaultAdminId,
-        },
+        }
     },
     consent: {
         demoConsentCategory: {
@@ -106,15 +89,15 @@ module.exports = {
             title: 'a',
             rich_text: '<h1>a</h1>',
             slug: 'a',
-            type: 'online',
             opt_type: 'single',
-            country_iso2: 'NL',
-            locale: 'en',
+            country_iso2: 'nl',
+            locale: 'nl_nl',
+            legal_basis: 'consent'
         },
         demoConsentLocales: {
             rich_text: '<p>I agree to the Galapagos <a href="https://www.glpg.com/">Terms of Service.</a></p>',
             consent_id: demoConsentId,
-            locale: 'en'
+            locale: 'nl_nl'
         },
         demoConsentCountry: {
             consent_id: demoConsentId,
@@ -123,8 +106,8 @@ module.exports = {
         }
     },
     permissions: [
-        { id: UserPermissionID, module: Modules.USER.value, status: "active", title: Modules.USER.title, created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" },
-        { id: HcpPermissionID, module: Modules.HCP.value, status: "active", title: Modules.HCP.title, created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
+        { id: UserPermissionID, module: Modules.PLATFORM.value, status: "active", title: Modules.PLATFORM.title, created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" },
+        { id: HcpPermissionID, module: Modules.INFORMATION.value, status: "active", title: Modules.INFORMATION.title, created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" }
     ],
     roles: [
         { id: adminRoleID, name: 'System Admin', slug: 'system-admin', description: "Has access to all the services", created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" }

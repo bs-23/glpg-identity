@@ -52,10 +52,17 @@ async function saveOldPassword(user) {
 }
 
 function isCommonPassword(password, user) {
-    if (password.includes(user.first_name) || password.includes(user.last_name) || password.includes((user.email).split("@")[0])) return true;
+    if (password.toLowerCase().includes(user.first_name.toLowerCase())
+        || password.toLowerCase().includes(user.last_name.toLowerCase())
+        || password.toLowerCase().includes((user.email.toLowerCase()).split("@")[0]))
+        return true;
+
+    if (user.uuid && password.toLowerCase().includes(user.uuid.toLowerCase()))
+        return true;
 
     const commonPasswords = JSON.parse(fs.readFileSync('src/modules/core/server/password/common-passwords.json'));
-    if (commonPasswords.hasOwnProperty(password)) return true;
+    if (commonPasswords.hasOwnProperty(password))
+        return true;
 
     return false;
 }
@@ -75,6 +82,12 @@ function validatePassword(password) {
     return true;
 }
 
+function hasValidCharacters(password) {
+    const hasValidCharacters = new RegExp("^[a-zA-Z0-9!\"#$%&'\(\)\*\+,\-\.\/:;<=>\?@\[\\]\^_`\{\|\}\~]*$").test(password);
+
+    return hasValidCharacters;
+}
+
 function minimumPasswordAge(date) {
     if (!date) return false;
     const minimumDate = new Date(new Date(date).getTime() + 60 * 60 * 24 * 1000);
@@ -89,3 +102,4 @@ exports.saveOldPassword = saveOldPassword;
 exports.isCommonPassword = isCommonPassword;
 exports.validatePassword = validatePassword;
 exports.minimumPasswordAge = minimumPasswordAge;
+exports.hasValidCharacters = hasValidCharacters;

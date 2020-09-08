@@ -222,6 +222,40 @@
     content: "\55";
 }
 
+.icon-accept:before {
+    content: "\56";
+}
+
+.icon-balance:before {
+    content: "\57";
+}
+
+.icon-data-consent-management:before {
+    content: "\58";
+}
+
+.icon-letter-in:before {
+    content: "\59";
+}
+
+.icon-manage-profile:before {
+    content: "\5a";
+}
+
+.icon-global:before {
+    content: "\30";
+}
+
+.icon-clock:before {
+    content: "\31";
+}
+
+.icon-history:before {
+    content: "\32";
+}
+
+
+
 //custome css
 $class-slug: icon- !default;
 

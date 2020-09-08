@@ -31,7 +31,7 @@ const ServiceCategory = require(path.join(process.cwd(), "src/modules/user/serve
 
 function generateAccessToken(doc) {
     return jwt.sign({
-        id: doc.id,
+        id: doc.id
     }, nodecache.getValue('HCP_TOKEN_SECRET'), {
         expiresIn: '2d',
         issuer: doc.id.toString()
@@ -40,7 +40,7 @@ function generateAccessToken(doc) {
 
 function generateConsentConfirmationAccessToken(doc) {
     return jwt.sign({
-        id: doc.id,
+        id: doc.id
     }, nodecache.getValue('CONSENT_CONFIRMATION_TOKEN_SECRET'), {
         expiresIn: '7d',
         issuer: doc.id.toString()
@@ -77,22 +77,20 @@ function mapMasterDataToHcpProfile(masterData) {
 }
 
 function generateEmailOptions(emailType, applicationSlug, user) {
-    const locale = `${user.language_code}_${user.country_iso2}`;
-
     const emailDataUrl = path.join(process.cwd(), `src/config/server/lib/email-service/email-options.json`);
     const emailOptionsText = fs.readFileSync(emailDataUrl, 'utf8');
     const emailOptions = JSON.parse(emailOptionsText);
     const emailData = emailOptions[emailType];
 
     let templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${applicationSlug}/en/${emailData.template_url}`)
-    const templateUrlInLocale = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${applicationSlug}/${locale.toLowerCase()}/${emailData.template_url}`);
+    const templateUrlInLocale = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${applicationSlug}/${user.locale.toLowerCase()}/${emailData.template_url}`);
 
     if (fs.existsSync(templateUrlInLocale)) {
         templateUrl = templateUrlInLocale;
     }
 
-    const subject = emailData.subject[locale] || emailData.subject['en'];
-    const plaintext = emailData.plain_text[locale] || emailData.plain_text['en'];
+    const subject = emailData.subject[user.locale] || emailData.subject['en'];
+    const plaintext = emailData.plain_text[user.locale] || emailData.plain_text['en'];
 
     return {
         toAddresses: [user.email],
@@ -344,7 +342,7 @@ async function registrationLookup(req, res) {
 
 async function createHcpProfile(req, res) {
     const response = new Response({}, []);
-    const { email, uuid, salutation, first_name, last_name, country_iso2, language_code, specialty_onekey, telephone } = req.body;
+    const { email, uuid, salutation, first_name, last_name, country_iso2, language_code, specialty_onekey, telephone, locale } = req.body;
 
     if (!email || !validator.isEmail(email)) {
         response.errors.push(new CustomError('Email address is missing or invalid.', 400, 'email'));
@@ -372,6 +370,10 @@ async function createHcpProfile(req, res) {
 
     if (!language_code) {
         response.errors.push(new CustomError('language_code is missing.', 400, 'language_code'));
+    }
+
+    if (!locale) {
+        response.errors.push(new CustomError('locale is missing.', 400, 'locale'));
     }
 
     if (!specialty_onekey) {
@@ -425,8 +427,9 @@ async function createHcpProfile(req, res) {
             salutation,
             first_name,
             last_name,
-            country_iso2: country_iso2.toLowerCase(),
             language_code: language_code.toLowerCase(),
+            country_iso2: country_iso2.toLowerCase(),
+            locale: locale.toLowerCase(),
             specialty_onekey,
             telephone,
             application_id: req.user.id,
@@ -452,25 +455,14 @@ async function createHcpProfile(req, res) {
 
                 const consentLocale = await ConsentLocale.findOne({
                     where: {
-                        locale: {
-                            [Op.or]: [
-                                model.language_code.toUpperCase(),
-                                model.language_code.toLowerCase(),
-                            ],
-                        },
+                        locale: model.locale.toLowerCase(),
                         consent_id: consentDetails.id
                     }
                 });
 
-
                 const consentCountry = await ConsentCountry.findOne({
                     where: {
-                        country_iso2: {
-                            [Op.or]: [
-                                model.country_iso2.toUpperCase(),
-                                model.country_iso2.toLowerCase(),
-                            ],
-                        },
+                        country_iso2: model.country_iso2.toLowerCase(),
                         consent_id: consentDetails.id
                     }
                 });
@@ -593,7 +585,7 @@ async function approveHCPUser(req, res) {
             const allConsentDetails = await ConsentLocale.findAll({
                 where: {
                     consent_id: consentIds,
-                    locale: hcpUser.language_code.toLowerCase()
+                    locale: hcpUser.locale.toLowerCase()
                 }
             });
 
@@ -763,6 +755,11 @@ async function changePassword(req, res) {
             return res.status(400).send(response);
         }
 
+        if (!PasswordPolicies.hasValidCharacters(new_password)) {
+            response.errors.push(new CustomError(`Password has one or more invalid character.`, 4200));
+            return res.status(400).send(response);
+        }
+
         if (PasswordPolicies.isCommonPassword(new_password, doc)) {
             response.errors.push(new CustomError(`Password can not be commonly used passwords or personal info. Try a different one.`, 400));
             return res.status(400).send(response);
@@ -821,6 +818,11 @@ async function resetPassword(req, res) {
 
         if (!PasswordPolicies.validatePassword(req.body.new_password)) {
             response.errors.push(new CustomError(`Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.`, 4200));
+            return res.status(400).send(response);
+        }
+
+        if (!PasswordPolicies.hasValidCharacters(req.body.new_password)) {
+            response.errors.push(new CustomError(`Password has one or more invalid character.`, 4200));
             return res.status(400).send(response);
         }
 

@@ -28,7 +28,7 @@ export default function Dashboard() {
                                     </li>
                                     <li className="pr-sm-4 pb-4 service__item">
                                         <NavLink to="/consent" className="d-block py-5 px-3 service__link">
-                                            <i className="icon icon-consent-management d-block service__icon"></i>
+                                            <i className="icon icon-data-consent-management d-block service__icon"></i>
                                             Data Privacy & Consent Management
                                         </NavLink>
                                     </li>

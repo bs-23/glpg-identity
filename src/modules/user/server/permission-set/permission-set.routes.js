@@ -6,9 +6,9 @@ const { ModuleGuard } = require(path.join(process.cwd(), 'src/modules/core/serve
 
 module.exports = app => {
     app.route('/api/permissionSets')
-        .get(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.USER.value), controller.getPermissionSets)
-        .post(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.USER.value), controller.createPermissionSet);
+        .get(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.PLATFORM.value), controller.getPermissionSets)
+        .post(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.PLATFORM.value), controller.createPermissionSet);
 
     app.route('/api/permissionSets/:id')
-        .put(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.USER.value), controller.editPermissionSet);
+        .put(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.PLATFORM.value), controller.editPermissionSet);
 };

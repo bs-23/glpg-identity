@@ -9,8 +9,8 @@ export default function HcpRoutes() {
 
     return (
         <Switch>
-            <PrivateRoute exact path={path} component={InformationManagement} module={'hcp'} />
-            <PrivateRoute path={`${path}/list`} component={HcpUsers} module={'hcp'} />
+            <PrivateRoute exact path={path} component={InformationManagement} module={'information'} />
+            <PrivateRoute path={`${path}/list`} component={HcpUsers} module={'information'} />
         </Switch>
     );
 }

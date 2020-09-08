@@ -16,14 +16,14 @@ export default function UserRoutes() {
 
     return (
         <Switch>
-            <PrivateRoute exact path={path} component={UserManagement} module={'user'} />
-            <PrivateRoute path={`${path}/permission-sets`} component={ManagePermissionSets} module={'user'} />
-            <PrivateRoute path={`${path}/profiles`} component={ManageProfiles} module={'user'} />
-            <PrivateRoute path={`${path}/create`} component={UserForm} module={'user'} />
-            <PrivateRoute path={`${path}/roles`} component={Roles} module={'user'} />
-            <PrivateRoute path={`${path}/list`} component={Users} module={'user'} />
-            <PrivateRoute path={`${path}/change-password`} component={ChangePasswordForm} module={'user'} />
-            <PrivateRoute path={`${path}/:id`} component={UserDetails} module={'user'} />
+            <PrivateRoute exact path={path} component={UserManagement} module={'platform'} />
+            <PrivateRoute path={`${path}/permission-sets`} component={ManagePermissionSets} module={'platform'} />
+            <PrivateRoute path={`${path}/profiles`} component={ManageProfiles} module={'platform'} />
+            <PrivateRoute path={`${path}/create`} component={UserForm} module={'platform'} />
+            <PrivateRoute path={`${path}/roles`} component={Roles} module={'platform'} />
+            <PrivateRoute path={`${path}/list`} component={Users} module={'platform'} />
+            <PrivateRoute path={`${path}/change-password`} component={ChangePasswordForm} module={'platform'} />
+            <PrivateRoute path={`${path}/:id`} component={UserDetails} module={'platform'} />
         </Switch>
     );
 }

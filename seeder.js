@@ -92,9 +92,9 @@ async function init() {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
 
             const serviceCategories = [
-                { title: "Information Management", slug: "hcp", created_by: admin.id, updated_by: admin.id },
-                { title: "Management of Customer Data Platform", slug: "user", created_by: admin.id, updated_by: admin.id },
-                { title: "Data Privacy & Consent Management", slug: "consent", created_by: admin.id, updated_by: admin.id }
+                { title: "Platform Manager", slug: "platform", created_by: admin.id, updated_by: admin.id },
+                { title: "Information Manager", slug: "information", created_by: admin.id, updated_by: admin.id },
+                { title: "Data Privacy Officer", slug: "privacy", created_by: admin.id, updated_by: admin.id }
             ];
 
             ServiceCategory.destroy({ truncate: { cascade: true } }).then(() => {
@@ -134,9 +134,9 @@ async function init() {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
             const systemAdmin_permissionSet = PermissionSet.findOne({ where: { slug: 'system_admin' } });
             const siteAdmin_permissionSet = PermissionSet.findOne({ where: { slug: 'site_admin' } });
-            const hcpServiceCategory = ServiceCategory.findOne({ where: { slug: 'hcp' } });
-            const userServiceCategory = ServiceCategory.findOne({ where: { slug: 'user' } });
-            const consentServiceCategory = ServiceCategory.findOne({ where: { slug: 'consent' } });
+            const hcpServiceCategory = ServiceCategory.findOne({ where: { slug: 'information' } });
+            const userServiceCategory = ServiceCategory.findOne({ where: { slug: 'platform' } });
+            const consentServiceCategory = ServiceCategory.findOne({ where: { slug: 'privacy' } });
             const dpo_permissionSet = PermissionSet.findOne({ where: { slug: 'data_privacy_officer' } });
 
             Promise.all([systemAdmin_permissionSet, siteAdmin_permissionSet, hcpServiceCategory, userServiceCategory, consentServiceCategory, dpo_permissionSet]).then((values) => {
