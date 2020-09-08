@@ -1,8 +1,8 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { Route, Redirect } from "react-router-dom";
-import Navbar from "./components/navbar.component";
 import { useCookies } from 'react-cookie';
+import { Route, Redirect } from 'react-router-dom';
+import Navbar from './components/navbar.component';
 
 export default function PrivateRoute({ component: Component, module, ...rest }) {
     const [cookies] = useCookies();
@@ -15,7 +15,6 @@ export default function PrivateRoute({ component: Component, module, ...rest }) 
         if(role.permissions) permissions = union(permissions, role.permissions);
     })
 
-    // alert(typeof(cookies.logged_in))
     return (
         <Route {...rest} render={props => {
             return (
