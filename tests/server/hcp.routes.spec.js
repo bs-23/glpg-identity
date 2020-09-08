@@ -91,7 +91,8 @@ describe('HCP Routes', () => {
                 uuid: faker.random.uuid(),
                 email: faker.internet.email(),
                 country_iso2: 'NL',
-                language_code: 'en',
+                language_code: 'nl',
+                locale: 'nl_nl',
                 salutation: 'Mr',
                 specialty_onekey: 'SP.WNL.01',
 
@@ -116,7 +117,8 @@ describe('HCP Routes', () => {
                 uuid: faker.random.uuid(),
                 email: defaultUser.email,
                 country_iso2: 'NL',
-                language_code: 'en',
+                language_code: 'nl',
+                locale: 'nl_nl',
                 salutation: 'Mr',
                 specialty_onekey: 'SP.WNL.01',
             });

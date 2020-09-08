@@ -63,6 +63,7 @@ describe('Hcp user component', () => {
 
         countries = [ { countryid: 1, country_iso2: "IE", country_iso3: "IRL", codbase: "WUK", countryname: "Ireland"} ]
         fakeAxios.onGet('/api/countries').reply(200, countries);
+        fakeAxios.onGet('/api/all_countries').reply(200, countries);
 
         fakeAxios.onPut(`/api/hcp-profiles/${1}/approve`).reply(200);
     });
@@ -129,7 +130,7 @@ describe('Hcp user component', () => {
         const rows = tbody.childNodes;
         const first_row = rows[0];
         // console.log('Something: ', first_row.childNodes[8].childNodes[0])
-        const actionBtn = first_row.childNodes[9].childNodes[0].childNodes[0].childNodes[0];
+        const actionBtn = first_row.lastChild.childNodes[0].childNodes[0].childNodes[0];
         // actionBtn.setAttribute("aria-expanded", true);
         fireEvent.click(actionBtn);
 
@@ -156,11 +157,11 @@ describe('Hcp user component', () => {
         const rows = tbody.childNodes;
         const first_row = rows[0];
 
-        const actionBtn = first_row.childNodes[9].childNodes[0].childNodes[0].childNodes[0];
+        const actionBtn = first_row.lastChild.childNodes[0].childNodes[0].childNodes[0];
 
         fireEvent.click(actionBtn);
 
-        const profileDetailsBtn = await waitFor(() => getByText('Manage Profile'));
+        const profileDetailsBtn = await waitFor(() => getByText('Profile'));
 
         fireEvent.click(profileDetailsBtn);
 

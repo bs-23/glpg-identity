@@ -5,7 +5,7 @@ const { ModuleGuard } = require('../../core/server/authorization/authorization.m
 
 module.exports = app => {
     app.route('/api/hcps')
-        .get(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.HCP.value), controller.getHcps);
+        .get(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.INFORMATION.value), controller.getHcps);
 
     app.route('/api/hcps/:id')
         .put(passport.authenticate('user-jwt', { session: false }), controller.editHcp);
@@ -35,13 +35,13 @@ module.exports = app => {
         .get(passport.authenticate('application-jwt', { session: false }), controller.getSpecialties);
 
     app.route('/api/hcp-profiles/:id/approve')
-        .put(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.HCP.value), controller.approveHCPUser);
+        .put(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.INFORMATION.value), controller.approveHCPUser);
 
     app.route('/api/hcp-profiles/:id/reject')
-        .put(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.HCP.value), controller.rejectHCPUser);
+        .put(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.INFORMATION.value), controller.rejectHCPUser);
 
     app.route('/api/hcp-profiles/:id/consents')
-        .get(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.HCP.value), controller.getHCPUserConsents);
+        .get(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.INFORMATION.value), controller.getHCPUserConsents);
 
     app.route('/api/hcp-profiles/:id')
         .get(passport.authenticate('application-jwt', { session: false }), controller.getHcpProfile)

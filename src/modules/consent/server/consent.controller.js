@@ -97,6 +97,7 @@ async function getConsents(req, res) {
 }
 
 
+
 async function generateReport(req, res){
     const response = new Response({}, []);
 
@@ -120,11 +121,14 @@ async function generateReport(req, res){
                         as: 'consent_country',
                         attributes: ['country_iso2', 'opt_type',]
                     }
-                    
                 ]
-                }]
+                }],
             }],
         });
+
+        // const consent_report = [];
+
+
 
         res.json(hcps);
     }
