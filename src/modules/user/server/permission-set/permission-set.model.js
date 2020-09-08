@@ -20,6 +20,10 @@ const PermissionSet = sequelize.cdpConnector.define('permission_sets', {
     title: {
         type: DataTypes.STRING
     },
+    type: {
+        type: DataTypes.ENUM,
+        values: ['standard', 'custom']
+    },
     countries: {
         type: DataTypes.ARRAY(DataTypes.STRING)
     },

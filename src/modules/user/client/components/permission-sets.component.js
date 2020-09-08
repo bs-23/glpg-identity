@@ -89,6 +89,7 @@ export default function ManagePermissionSets() {
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
                                             <th className="py-2">Title</th>
+                                            <th className="py-2">Type</th>
                                             <th className="py-2">Description</th>
                                             <th className="py-2">Applications</th>
                                             <th className="py-2">Countries</th>
@@ -100,6 +101,7 @@ export default function ManagePermissionSets() {
                                         {permissionSets.map(row => (
                                             <tr key={row.id}>
                                                 <td>{row.title}</td>
+                                                <td className="text-capitalize">{row.type}</td>
                                                 <td>{row.description}</td>
                                                 <td>{getApplicationNames(row)}</td>
                                                 <td>{getCountryNamesFromCodes(row.countries)}</td>
