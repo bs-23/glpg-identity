@@ -210,7 +210,7 @@ export default function ManageRoles() {
                                                 <td>{row.title}</td>
                                                 <td>{row.description}</td>
                                                 <td>{extractPermissionSetNames(row)}</td>
-                                                <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlepRoleEditClick(row)}> <i className="icon icon-edit-pencil pr-2"></i>Edit Role</button></td>
+                                                <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlepRoleEditClick(row)}> <i className="icon icon-edit-pencil pr-2"></i>Edit</button></td>
                                             </tr>
                                         ))}
                                     </tbody>

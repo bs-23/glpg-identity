@@ -105,9 +105,17 @@ export const roleSchema = object().shape({
 
 export const permissionSetCreateSchema = object().shape({
     title: string().required('This field must not be empty.'),
-    application_id: string(),//.required('Must select at least one application.'),
-    countries: string().required('Must select at least one country.'),
-    serviceCategories: string()//.required('Must select at least one service category.'),
+    applications: string(),
+    countries: string(),
+    serviceCategories: string(),
+    app_country_service: string()
+        .test('One of three required',
+            'One of the fields countries, applications or service category is required.',
+            function() {
+                const { countries, serviceCategories, applications } = this.parent;
+                return countries || serviceCategories || applications;
+            }
+        )
 });
 
 export const profileCreateSchema = object().shape({

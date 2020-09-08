@@ -102,7 +102,8 @@ export default function PermissionSetForm({ onSuccess, onError, preFill }) {
         description: preFill ? preFill.description : '',
         countries: preFill ? preFill.countries ? preFill.countries : [] : [],
         serviceCategories: preFill ? preFill.serviceCategories : [],
-        applications: preFill ? preFill.applications : []
+        applications: preFill ? preFill.applications : [],
+        app_country_service: ''
     };
 
     const getApplications = async () => {
@@ -116,7 +117,8 @@ export default function PermissionSetForm({ onSuccess, onError, preFill }) {
     }
 
     const handleSubmit = (values, actions) => {
-        const promise = preFill ? axios.put(`/api/permissionSets/${preFill.id}`, values) : axios.post('/api/permissionSets', values);
+        const { app_country_service, ...requestBody } = values;
+        const promise = preFill ? axios.put(`/api/permissionSets/${preFill.id}`, values) : axios.post('/api/permissionSets', requestBody);
         promise.then(() => {
                 const successMessage = preFill ? 'Permission set updated successfully' : 'Permission set created successfully';
                 addToast(successMessage, {
@@ -166,7 +168,7 @@ export default function PermissionSetForm({ onSuccess, onError, preFill }) {
                                                         <FormField label="Select Applications" name="applications" required={false} >
                                                             <CheckList name="applications" options={applications} idExtractor={item => item.id} labelExtractor={item => item.name} />
                                                         </FormField>
-                                                        <FormField label="Select Countries" name="countries" >
+                                                        <FormField label="Select Countries" name="countries" required={false} >
                                                             <CheckList name="countries" options={countries} idExtractor={item => item.country_iso2} labelExtractor={item => item.codbase_desc} />
                                                         </FormField>
                                                         <FormField label="Select Service Categories" name="serviceCategories" required={false} >
@@ -174,6 +176,7 @@ export default function PermissionSetForm({ onSuccess, onError, preFill }) {
                                                         </FormField>
                                                         <FormField label="Description" type="text" name="description" required={false} component="textarea" />
                                                     </div>
+                                                    <ErrorMessage name="app_country_service" >{(message) => <div className="invalid-feedback alert alert-warning" >{message}</div>}</ErrorMessage>
                                                     <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting} > Submit </button>
                                                 </div>
                                             </div>
