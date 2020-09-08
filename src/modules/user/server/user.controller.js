@@ -461,10 +461,10 @@ async function changePassword(req, res) {
 
         if (user.password) await PasswordPolicies.saveOldPassword(user);
 
-
-        const passwordValidityInMonths = newPassword.length >= 15 ? 12 : 6;
         const currentDate = new Date();
-        const expiryDate = new Date(currentDate.setMonth(currentDate.getMonth() + passwordValidityInMonths));
+        const expiryDate = newPassword.length >= 15
+            ? new Date(currentDate.setFullYear(currentDate.getFullYear() + 1))
+            : new Date(currentDate.setDate(currentDate.getDate() + 90));
 
         user.password_expiry_date = expiryDate;
         user.password = newPassword;
@@ -509,9 +509,10 @@ async function resetPassword(req, res) {
 
         if (user.password) await PasswordPolicies.saveOldPassword(user);
 
-        const passwordValidityInMonths = req.body.newPassword.length >= 15 ? 12 : 6;
         const currentDate = new Date();
-        const expiryDate = new Date(currentDate.setMonth(currentDate.getMonth() + passwordValidityInMonths));
+        const expiryDate = req.body.newPassword.length >= 15
+            ? new Date(currentDate.setFullYear(currentDate.getFullYear() + 1))
+            : new Date(currentDate.setDate(currentDate.getDate() + 90));
 
         await user.update({
             password: req.body.newPassword,
