@@ -6,6 +6,19 @@ import { useSelector, useDispatch } from 'react-redux';
 import { LinkContainer } from 'react-router-bootstrap';
 import { getUsers, cdpSort } from '../user.actions';
 
+
+const safeGet = (object, property) => {
+    const propData = (object || {})[property];
+    return (prop) => prop ? safeGet(propData, prop) : propData;
+};
+
+const flatten = (array) => {
+    return Array.isArray(array) ? [].concat(...array.map(flatten)) : array;
+}
+
+const union = (a, b) => [...new Set([...a, ...b])];
+
+
 export default function Users() {
     const dispatch = useDispatch();
 
@@ -23,17 +36,6 @@ export default function Users() {
     };
 
     const extractUserCountries = (data) => {
-        const safeGet = (object, property) => {
-            const propData = (object || {})[property];
-            return (prop) => prop ? safeGet(propData, prop) : propData;
-        };
-
-        const flatten = (array) => {
-            return Array.isArray(array) ? [].concat(...array.map(flatten)) : array;
-        }
-
-        const union = (a, b) => [...new Set([...a, ...b])];
-
         const profile_permission_sets = safeGet(data, 'userProfile')('up_ps')();
         const profile_countries = profile_permission_sets ? profile_permission_sets.map(pps => safeGet(pps, 'ps')('countries')()) : [];
 
@@ -41,6 +43,21 @@ export default function Users() {
         const roles_countries = userRoles ? userRoles.map(role => {
             const role_permission_sets = safeGet(role, 'role')('role_ps')();
             return role_permission_sets.map(rps => safeGet(rps, 'ps')('countries')());
+        }) : [];
+
+        const userCountries = union(flatten(profile_countries), flatten(roles_countries));
+
+        return userCountries;
+    }
+
+    const extracLoggedIntUserCountries = (data) => {
+        const profile_permission_sets = safeGet(data, 'profile')('permissionSets')();
+        const profile_countries = profile_permission_sets ? profile_permission_sets.map(pps => safeGet(pps, 'countries')() || []) : [];
+
+        const userRoles = safeGet(data, 'role')();
+        const roles_countries = userRoles ? userRoles.map(role => {
+            const role_permission_sets = safeGet(role, 'permissionSets')();
+            return role_permission_sets.map(rps => safeGet(rps, 'countries')() || []);
         }) : [];
 
         const userCountries = union(flatten(profile_countries), flatten(roles_countries));
@@ -71,7 +88,7 @@ export default function Users() {
         async function getCountries() {
             const response = (await axios.get('/api/countries')).data;
             const userProfile = (await axios.get('/api/users/profile')).data;
-            const userCountries = userProfile.countries;
+            const userCountries = extracLoggedIntUserCountries(userProfile);
             setCountries(response);
             (userProfile.type === "admin") ? setUserCountries(response) : setUserCountries(fetchUserCountries(userCountries, response));
         }

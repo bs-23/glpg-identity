@@ -4,6 +4,19 @@ import { useCookies } from 'react-cookie';
 import _ from 'lodash';
 import { getCountries } from '../../../user/client/user.actions'
 
+
+const safeGet = (object, property) => {
+    const propData = (object || {})[property];
+    return (prop) => prop ? safeGet(propData, prop) : propData;
+};
+
+const flatten = (array) => {
+    return Array.isArray(array) ? [].concat(...array.map(flatten)) : array;
+}
+
+const union = (a, b) => [...new Set([...a, ...b])];
+
+
 export default function Navbar() {
     const [, setCookie, removeCookie] = useCookies();
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
@@ -29,39 +42,37 @@ export default function Navbar() {
         return `/assets/flag/flag-placeholder.svg`;
     }
 
-    const extractUserCountriesAndApplications = (data) => {
-        const safeGet = (object, property) => {
-            const propData = (object || {})[property];
-            return (prop) => prop ? safeGet(propData, prop) : propData;
-        };
-
-        const flatten = (array) => {
-            return Array.isArray(array) ? [].concat(...array.map(flatten)) : array;
-        }
-
-        const union = (a, b) => [...new Set([...a, ...b])];
-
+    const extractUserCountries = (data) => {
         const profile_permission_sets = safeGet(data, 'profile')('permissionSets')();
         const profile_countries = profile_permission_sets ? profile_permission_sets.map(pps => safeGet(pps, 'countries')() || []) : [];
-        const profile_applications = profile_permission_sets ? profile_permission_sets.map(pps => pps.application || []) : [];
 
         const userRoles = safeGet(data, 'role')();
         const roles_countries = userRoles ? userRoles.map(role => {
             const role_permission_sets = safeGet(role, 'permissionSets')();
             return role_permission_sets.map(rps => safeGet(rps, 'countries')() || []);
         }) : [];
+
+        const userCountries = union(flatten(profile_countries), flatten(roles_countries));
+
+        return userCountries;
+    }
+
+    const extractUserApplications = (data) => {
+        const profile_permission_sets = safeGet(data, 'profile')('permissionSets')();
+        const profile_applications = profile_permission_sets ? profile_permission_sets.map(pps => pps.application || []) : [];
+
+        const userRoles = safeGet(data, 'role')();
         const roles_applications = userRoles ? userRoles.map(role => {
             const role_permission_sets = safeGet(role, 'permissionSets')();
             return role_permission_sets.map(rps => safeGet(rps, 'application')() || []);
         }) : [];
 
-        const userCountries = union(flatten(profile_countries), flatten(roles_countries));
         const userFlattenedApplications = [...flatten(profile_applications), ...flatten(roles_applications)];
         const userDistinctApplications = _.uniqWith(userFlattenedApplications, function(arrVal, othVal) {
             return arrVal.slug === othVal.slug;
         });
 
-        return [userCountries, userDistinctApplications];
+        return userDistinctApplications;
     }
 
     const renderCountryIcons = (userCountriesCode) => {
@@ -109,10 +120,10 @@ export default function Navbar() {
                         <div className="d-block d-sm-flex justify-content-end align-items-center">
                             {loggedInUser.type !== 'admin' && <div className="mb-2 mb-sm-0 d-flex justify-content-end align-items-center">
                                 <div className="mr-3">
-                                    {renderApplicationIcon(extractUserCountriesAndApplications(loggedInUser)[1])}
+                                    {renderApplicationIcon(extractUserApplications(loggedInUser))}
                                 </div>
                                 <div className="mr-2">
-                                    {renderCountryIcons(extractUserCountriesAndApplications(loggedInUser)[0])}
+                                    {renderCountryIcons(extractUserCountries(loggedInUser))}
                                 </div>
                             </div>}
                             <div className="mb-2 mb-sm-0 d-flex justify-content-end align-items-center">
