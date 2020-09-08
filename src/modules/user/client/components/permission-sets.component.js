@@ -88,13 +88,13 @@ export default function ManagePermissionSets() {
                                 <table className="table table-hover table-sm mb-0 cdp-table">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
-                                            <th className="py-2">Title</th>
-                                            <th className="py-2">Type</th>
-                                            <th className="py-2">Description</th>
-                                            <th className="py-2">Applications</th>
-                                            <th className="py-2">Countries</th>
-                                            <th className="py-2">Service Categories</th>
-                                            <th className="py-2">Action</th>
+                                            <th className="py-2" width="15%">Title</th>
+                                            <th className="py-2" width="10%">Type</th>
+                                            <th className="py-2" width="25%">Description</th>
+                                            <th className="py-2" width="10%">Applications</th>
+                                            <th className="py-2" width="15%">Countries</th>
+                                            <th className="py-2" width="25%">Service Categories</th>
+                                            <th className="py-2" width="10%">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
