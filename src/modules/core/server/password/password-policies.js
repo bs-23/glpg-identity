@@ -73,7 +73,7 @@ function validatePassword(password) {
     const hasUppercase = new RegExp("^(?=.*[A-Z])").test(password);
     const hasLowercase = new RegExp("^(?=.*[a-z])").test(password);
     const hasDigit = new RegExp("^(?=.*[0-9])").test(password);
-    const hasSpecialCharacter = new RegExp("[!\"#$%&'\(\)\*\+,\-\.\/:;<=>\?@\[\\]\^_`\{\|\}\~]").test(password);
+    const hasSpecialCharacter = new RegExp("[!\"#$%&'\(\)\*\+,\-\.\\\\/:;<=>\?@\[\\]\^_`\{\|\}\~]").test(password);
 
     if (password && (password.length < minLength || password.length > maxLength || !hasUppercase || !hasLowercase || !hasDigit || !hasSpecialCharacter)) {
         return false;
@@ -83,8 +83,8 @@ function validatePassword(password) {
 }
 
 function hasValidCharacters(password) {
-    const hasValidCharacters = new RegExp("^[a-zA-Z0-9!\"#$%&'\(\)\*\+,\-\.\/:;<=>\?@\[\\]\^_`\{\|\}\~]*$").test(password);
-
+    var pattern = new RegExp("^[a-zA-Z0-9!\"#$%&'\(\)\*\+,\-\.\\\\/:;<=>\?@\[\\]\^_`\{\|\}\~]*$");
+    const hasValidCharacters = pattern.test(password);
     return hasValidCharacters;
 }
 
