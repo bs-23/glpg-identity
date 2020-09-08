@@ -749,6 +749,11 @@ async function changePassword(req, res) {
             return res.status(400).send(response);
         }
 
+        if (!PasswordPolicies.hasValidCharacters(new_password)) {
+            response.errors.push(new CustomError(`Password has one or more invalid character.`, 4200));
+            return res.status(400).send(response);
+        }
+
         if (PasswordPolicies.isCommonPassword(new_password, doc)) {
             response.errors.push(new CustomError(`Password can not be commonly used passwords or personal info. Try a different one.`, 400));
             return res.status(400).send(response);
@@ -807,6 +812,11 @@ async function resetPassword(req, res) {
 
         if (!PasswordPolicies.validatePassword(req.body.new_password)) {
             response.errors.push(new CustomError(`Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.`, 4200));
+            return res.status(400).send(response);
+        }
+
+        if (!PasswordPolicies.hasValidCharacters(req.body.new_password)) {
+            response.errors.push(new CustomError(`Password has one or more invalid character.`, 4200));
             return res.status(400).send(response);
         }
 

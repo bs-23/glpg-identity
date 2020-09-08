@@ -455,16 +455,18 @@ async function changePassword(req, res) {
 
         if (!PasswordPolicies.validatePassword(newPassword)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.');
 
+        if (!PasswordPolicies.hasValidCharacters(newPassword)) return res.status(400).send('Password has one or more invalid character.');
+
         if (newPassword !== confirmPassword) return res.status(400).send('Passwords should match');
 
         if (PasswordPolicies.isCommonPassword(newPassword, user)) return res.status(400).send('Password can not be commonly used passwords or personal info. Try a different one.');
 
         if (user.password) await PasswordPolicies.saveOldPassword(user);
 
-
-        const passwordValidityInMonths = newPassword.length >= 15 ? 12 : 6;
         const currentDate = new Date();
-        const expiryDate = new Date(currentDate.setMonth(currentDate.getMonth() + passwordValidityInMonths));
+        const expiryDate = newPassword.length >= 15
+            ? new Date(currentDate.setFullYear(currentDate.getFullYear() + 1))
+            : new Date(currentDate.setDate(currentDate.getDate() + 90));
 
         user.password_expiry_date = expiryDate;
         user.password = newPassword;
@@ -503,15 +505,18 @@ async function resetPassword(req, res) {
 
         if (!PasswordPolicies.validatePassword(req.body.newPassword)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.');
 
+        if (!PasswordPolicies.hasValidCharacters(req.body.newPassword)) return res.status(400).send('Password has one or more invalid character.');
+
         if (PasswordPolicies.isCommonPassword(req.body.newPassword, user)) return res.status(400).send('Password can not be commonly used passwords or personal info. Try a different one.');
 
         if (req.body.newPassword !== req.body.confirmPassword) return res.status(400).send("Password and confirm password doesn't match.");
 
         if (user.password) await PasswordPolicies.saveOldPassword(user);
 
-        const passwordValidityInMonths = req.body.newPassword.length >= 15 ? 12 : 6;
         const currentDate = new Date();
-        const expiryDate = new Date(currentDate.setMonth(currentDate.getMonth() + passwordValidityInMonths));
+        const expiryDate = req.body.newPassword.length >= 15
+            ? new Date(currentDate.setFullYear(currentDate.getFullYear() + 1))
+            : new Date(currentDate.setDate(currentDate.getDate() + 90));
 
         await user.update({
             password: req.body.newPassword,
@@ -543,7 +548,7 @@ async function resetPassword(req, res) {
 
         res.sendStatus(200);
 
-    } catch (error) {
+    } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
     }
