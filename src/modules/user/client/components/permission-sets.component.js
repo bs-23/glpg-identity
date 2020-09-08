@@ -104,7 +104,7 @@ export default function ManagePermissionSets() {
                                                 <td>{getApplicationNames(row)}</td>
                                                 <td>{getCountryNamesFromCodes(row.countries)}</td>
                                                 <td>{getServiceCategoryNames(row)}</td>
-                                                <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlePermissionSetEditClick(row)} disabled={readOnlyPermissionSets.includes(row.slug)}> <i className="icon icon-edit-pencil pr-2"></i>Edit Permission Set</button></td>
+                                                <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlePermissionSetEditClick(row)} disabled={readOnlyPermissionSets.includes(row.slug)}> <i className="icon icon-edit-pencil pr-2"></i>Edit</button></td>
                                             </tr>
                                         ))}
                                     </tbody>

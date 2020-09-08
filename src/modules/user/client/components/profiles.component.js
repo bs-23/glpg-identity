@@ -127,7 +127,7 @@ export default function ManageProfiles() {
     const [permissionSets, setPermissionSets] = useState([]);
     const [modalShow, setModalShow] = useState({ createProfile: false });
     const [profileEditData, setProfileEditData] = useState(null);
-    const readOnlyProfiles = ['system_admin', 'site_admin', 'global_data_steward', 'data_privacy_officer'];
+    const readOnlyProfiles = ['system_admin', 'site_admin', 'global_data_steward', 'data_privacy_officer', 'local_data_steward'];
 
     const getProfiles = async () => {
         const { data } = await axios.get('/api/profiles');
@@ -189,7 +189,7 @@ export default function ManageProfiles() {
                     <div className="col-12 col-sm-12 pt-3">
                         <div className="d-flex justify-content-between align-items-center mb-3 mt-4">
                             <h4 className="cdp-text-primary font-weight-bold mb-0">Manage Profiles</h4>
-                            <button className="btn cdp-btn-secondary text-white ml-auto " onClick={() => setModalShow({ ...modalShow, createProfile: true })}>
+                            <button disabled className="btn cdp-btn-secondary text-white ml-auto " onClick={() => setModalShow({ ...modalShow, createProfile: true })}>
                                 <i className="icon icon-plus pr-1"></i> Add New Profile
                             </button>
                         </div>
@@ -211,7 +211,7 @@ export default function ManageProfiles() {
                                                 <td>{row.title}</td>
                                                 <td>{row.description}</td>
                                                 <td>{extractPermissionSetNames(row)}</td>
-                                                <td><button disabled={readOnlyProfiles.includes(row.slug)} className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlepProfileEditClick(row)}> <i className="icon icon-edit-pencil pr-2"></i>Edit Profile</button></td>
+                                                <td><button disabled={readOnlyProfiles.includes(row.slug)} className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlepProfileEditClick(row)}> <i className="icon icon-edit-pencil pr-2"></i>Edit</button></td>
                                             </tr>
                                         ))}
                                     </tbody>
