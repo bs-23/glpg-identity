@@ -413,6 +413,7 @@ async function createHcpProfile(req, res) {
             salutation,
             first_name,
             last_name,
+            language_code: language_code.toLowerCase(),
             country_iso2: country_iso2.toLowerCase(),
             locale: locale.toLowerCase(),
             specialty_onekey,
