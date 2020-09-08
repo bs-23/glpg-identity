@@ -82,6 +82,12 @@ function validatePassword(password) {
     return true;
 }
 
+function hasValidCharacters(password) {
+    const hasValidCharacters = new RegExp("^[a-zA-Z0-9!\"#$%&'\(\)\*\+,\-\.\/:;<=>\?@\[\\]\^_`\{\|\}\~]*$").test(password);
+
+    return hasValidCharacters;
+}
+
 function minimumPasswordAge(date) {
     if (!date) return false;
     const minimumDate = new Date(new Date(date).getTime() + 60 * 60 * 24 * 1000);
@@ -96,3 +102,4 @@ exports.saveOldPassword = saveOldPassword;
 exports.isCommonPassword = isCommonPassword;
 exports.validatePassword = validatePassword;
 exports.minimumPasswordAge = minimumPasswordAge;
+exports.hasValidCharacters = hasValidCharacters;

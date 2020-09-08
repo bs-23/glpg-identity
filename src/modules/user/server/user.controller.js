@@ -455,6 +455,8 @@ async function changePassword(req, res) {
 
         if (!PasswordPolicies.validatePassword(newPassword)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.');
 
+        if (!PasswordPolicies.hasValidCharacters(newPassword)) return res.status(400).send('Password has one or more invalid character.');
+
         if (newPassword !== confirmPassword) return res.status(400).send('Passwords should match');
 
         if (PasswordPolicies.isCommonPassword(newPassword, user)) return res.status(400).send('Password can not be commonly used passwords or personal info. Try a different one.');
@@ -503,6 +505,8 @@ async function resetPassword(req, res) {
 
         if (!PasswordPolicies.validatePassword(req.body.newPassword)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.');
 
+        if (!PasswordPolicies.hasValidCharacters(req.body.newPassword)) return res.status(400).send('Password has one or more invalid character.');
+
         if (PasswordPolicies.isCommonPassword(req.body.newPassword, user)) return res.status(400).send('Password can not be commonly used passwords or personal info. Try a different one.');
 
         if (req.body.newPassword !== req.body.confirmPassword) return res.status(400).send("Password and confirm password doesn't match.");
@@ -544,7 +548,7 @@ async function resetPassword(req, res) {
 
         res.sendStatus(200);
 
-    } catch (error) {
+    } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
     }
