@@ -6,6 +6,7 @@ const validator = require('validator');
 const ConsentLocale = require('./consent-locale.model');
 const ConsentCountry = require('./consent-country.model');
 const ConsentCategory = require('./consent-category.model');
+const Application = require('../../application/server/application.model');
 const HCPS = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_profile.model'));
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
@@ -104,13 +105,19 @@ async function generateReport(req, res){
     try{
         const hcps = await HCPS.findAll({
             attributes: ['email', 'first_name', 'last_name'],
-            include: [{
+            include: [
+                {
+                    model: Application,
+                    as: 'application',
+                    attributes: ['name']
+                },
+                {
                 model: HcpConsents,
                 as: 'hcpConsents',
                 attributes: ['consent_id', 'response', 'consent_confirmed'],
                 include: [{
                     model: Consent,
-                    attributes: ['preference', 'legal_basis', 'created_at'],
+                    attributes: ['preference', 'legal_basis', 'updated_at'],
                     include: [
                     {
                         model: ConsentCategory,
@@ -126,9 +133,27 @@ async function generateReport(req, res){
             }],
         });
 
-        // const consent_report = [];
+        
+        hcps.forEach( hcp => {
+            const consents = hcp.hcpConsents.map( hcpConsent => {
+                const consent = {
+                    consent_id: hcpConsent.consent_id,
+                    response: hcpConsent.response,
+                    consent_confirmed: hcpConsent.consent_confirmed,
+                    preference: hcpConsent.consent.preference,
+                    legal_basis: hcpConsent.consent.legal_basis,
+                    given_date: hcpConsent.consent.updated_at,
+                    title: hcpConsent.consent.consent_category.title,
+                    type: hcpConsent.consent.consent_category.type,
+                    country_iso2: hcpConsent.consent.consent_country.country_iso2,
+                    opt_type: hcpConsent.consent.consent_country.opt_type,
+                };
 
-
+                return consent;
+            });
+            hcp.dataValues.consents = consents;
+            delete hcp.dataValues['hcpConsents'];
+        });
 
         res.json(hcps);
     }
