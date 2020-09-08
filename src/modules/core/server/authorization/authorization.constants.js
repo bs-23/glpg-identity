@@ -1,11 +1,15 @@
 const Modules = {
-    USER: {
-        value: 'user',
-        title: 'CDP User Management'
+    PLATFORM: {
+        value: 'platform',
+        title: 'Management of Customer Data Platform'
     },
-    HCP: {
-        value: 'hcp',
+    INFORMATION: {
+        value: 'information',
         title: 'Information Management'
+    },
+    PRIVACY: {
+        value: 'privacy',
+        title: 'Data Privacy & Consent Management'
     }
 }
 

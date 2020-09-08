@@ -49,8 +49,9 @@ async function init() {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
 
             const permissions = [
-                { module: Modules.USER.value, status: "active", title: Modules.USER.title, created_by: admin.id, updated_by: admin.id },
-                { module: Modules.HCP.value, status: "active", title: Modules.HCP.title, created_by: admin.id, updated_by: admin.id }
+                { module: Modules.PLATFORM.value, status: "active", title: Modules.PLATFORM.title, created_by: admin.id, updated_by: admin.id },
+                { module: Modules.INFORMATION.value, status: "active", title: Modules.INFORMATION.title, created_by: admin.id, updated_by: admin.id },
+                { module: Modules.PRIVACY.value, status: "active", title: Modules.PRIVACY.title, created_by: admin.id, updated_by: admin.id }
             ];
 
             Permission.destroy({ truncate: { cascade: true } }).then(() => {
@@ -67,9 +68,9 @@ async function init() {
     function roleSeeder(callback) {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
             const roles = [
-                { name: 'User & HCP Manager', slug: 'user-hcp-manager', description: 'Has access to all the services', created_by: admin.id, updated_by: admin.id },
-                { name: 'User Manager', slug: 'user-manager', description: 'Has access to manage CDP users only', created_by: admin.id, updated_by: admin.id },
-                { name: 'HCP Manager', slug: 'hcp-manager', description: 'Has access to manage HCP users only', created_by: admin.id, updated_by: admin.id }
+                { name: 'Platform Manager', slug: 'platform-manager', description: 'Has access to Management of Customer Data Platform', created_by: admin.id, updated_by: admin.id },
+                { name: 'Information Manager', slug: 'information-manager', description: 'Has access to Information Management', created_by: admin.id, updated_by: admin.id },
+                { name: 'Data Privacy Officer', slug: 'dpo', description: 'Has access to Data Privacy & Consent Management', created_by: admin.id, updated_by: admin.id }
             ];
 
             Role.destroy({ truncate: { cascade: true } }).then(() => {
@@ -84,19 +85,19 @@ async function init() {
     }
 
     function rolePermissionSeeder(callback) {
-        const adminRole = Role.findOne({ where: { slug: 'user-hcp-manager' } });
-        const userManagerRole = Role.findOne({ where: { slug: 'user-manager' } });
-        const hcpManagerRole = Role.findOne({ where: { slug: 'hcp-manager' } });
+        const platformManagerRole = Role.findOne({ where: { slug: 'platform-manager' } });
+        const informationManagerRole = Role.findOne({ where: { slug: 'information-manager' } });
+        const dpoManagerRole = Role.findOne({ where: { slug: 'dpo' } });
 
-        const userPermission = Permission.findOne({ where: { module: 'user' } });
-        const hcpPermission = Permission.findOne({ where: { module: 'hcp' } });
+        const platformPermission = Permission.findOne({ where: { module: 'platform' } });
+        const informationPermission = Permission.findOne({ where: { module: 'information' } });
+        const privacyPermission = Permission.findOne({ where: { module: 'privacy' } });
 
-        Promise.all([adminRole, userManagerRole, hcpManagerRole, userPermission, hcpPermission]).then((values) => {
+        Promise.all([platformManagerRole, informationManagerRole, dpoManagerRole, platformPermission, informationPermission, privacyPermission]).then((values) => {
             const rolePermissions = [
                 { roleId: values[0].id, permissionId: values[3].id },
-                { roleId: values[0].id, permissionId: values[4].id },
-                { roleId: values[1].id, permissionId: values[3].id },
-                { roleId: values[2].id, permissionId: values[4].id }
+                { roleId: values[1].id, permissionId: values[4].id },
+                { roleId: values[2].id, permissionId: values[5].id }
             ];
 
             RolePermission.destroy({ truncate: { cascade: true } }).then(() => {
@@ -112,11 +113,16 @@ async function init() {
 
     function userRoleSeeder(callback) {
         const admin = User.findOne({ where: { email: 'glpg@brainstation-23.com' } });
-        const adminRole = Role.findOne({ where: { slug: 'user-hcp-manager' } });
 
-        Promise.all([admin, adminRole]).then((values) => {
+        const platformManagerRole = Role.findOne({ where: { slug: 'platform-manager' } });
+        const informationManagerRole = Role.findOne({ where: { slug: 'information-manager' } });
+        const dpoManagerRole = Role.findOne({ where: { slug: 'dpo' } });
+
+        Promise.all([admin, platformManagerRole, informationManagerRole, dpoManagerRole]).then((values) => {
             const userRoles = [
-                { userId: values[0].id, roleId: values[1].id }
+                { userId: values[0].id, roleId: values[1].id },
+                { userId: values[0].id, roleId: values[2].id },
+                { userId: values[0].id, roleId: values[3].id }
             ];
 
             UserRole.destroy({ truncate: { cascade: true } }).then(() => {
