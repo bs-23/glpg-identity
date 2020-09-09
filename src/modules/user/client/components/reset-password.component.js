@@ -23,7 +23,7 @@ export default function ResetPasswordForm() {
                     <li><i className="fas fa-circle"></i>At least one lowercase character (a - z)</li>
                     <li><i className="fas fa-circle"></i>At least one uppercase character (A - Z)</li>
                     <li><i className="fas fa-circle"></i>At least one number (0-9)</li>
-                    <li><i className="fas fa-circle"></i>At least one special character ({`!”#$%&’()*+,-./:;<=>?@[\]^_{|}~`})</li>
+                    <li><i className="fas fa-circle"></i>At least one special character ({`!”#$%&’()*+,-./:;<=>?@[\\\]^_{|}~`})</li>
                     <li><i className="fas fa-circle"></i>Common words and data related to your identity (e.g. name, email) are not allowed</li>
                 </ul>
             </Popover.Content>
