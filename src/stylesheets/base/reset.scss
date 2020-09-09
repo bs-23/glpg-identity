@@ -118,6 +118,10 @@
 
     &-bg-primary {
         background: $primary-color;
+
+        &-lighter {
+            background: $primary-color-light;
+        }
     }
 
     &-bg-secondary {
@@ -134,7 +138,7 @@
         }
 
         &-light {
-            color: #636A70; 
+            color: #636A70;
         }
     }
 }
@@ -193,4 +197,21 @@ a {
         position: relative;
         top: -1px;
     }
+}
+
+.btn {
+    font-weight: 500;
+}
+
+
+.font-weight-bold-light {
+    font-weight: 600;
+}
+
+.plus-minus {
+    font-size: 24px;
+    position: absolute;
+    top: 0px;
+    line-height: 20px;
+    cursor: pointer;
 }
