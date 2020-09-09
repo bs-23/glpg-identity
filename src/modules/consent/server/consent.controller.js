@@ -1,6 +1,7 @@
 const path = require('path');
 const _ = require('lodash');
-const { Op } = require('sequelize');
+const { QueryTypes, Op } = require('sequelize');
+const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const Consent = require('./consent.model');
 const validator = require('validator');
 const ConsentLocale = require('./consent-locale.model');
@@ -97,19 +98,49 @@ async function getConsents(req, res) {
     }
 }
 
+function ignoreCaseArray(str) {
+    return [str.toLowerCase(), str.toUpperCase(), str.charAt(0).toLowerCase() + str.charAt(1).toUpperCase(), str.charAt(0).toUpperCase() + str.charAt(1).toLowerCase()];
+}
 
-
-async function generateReport(req, res){
+async function getConsentsReport(req, res){
     const response = new Response({}, []);
 
     try{
+        const page = req.query.page ? req.query.page - 1 : 0;
+        const limit = 15;
+        const codbase = req.query.codbase === undefined ? '' : req.query.codbase;
+        const process_activity = req.query.process_activity === undefined ? '' : req.query.process_activity;
+        const offset = page * limit;
+
+        const application_list = (await HCPS.findAll()).map(i => i.get("application_id"));
+
+        const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => i.codbase === codbase).map(i => i.country_iso2);
+        const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
+
+        const country_iso2_list = req.user.type === 'admin' ? (await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry", { type: QueryTypes.SELECT })).map(i => i.country_iso2) : (await HCPS.findAll()).map(i => i.get("country_iso2"));
+        const countries_ignorecase = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
+
+
+        const codbase_list_mapped_with_user_country_iso2_list = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => req.user.countries.includes(i.country_iso2)).map(i => i.codbase) : [];
+        const country_iso2_list_for_user_countries_codbase = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => codbase_list_mapped_with_user_country_iso2_list.includes(i.codbase)).map(i => i.country_iso2) : [];
+        const countries_ignorecase_for_user_countries_codbase = [].concat.apply([], country_iso2_list_for_user_countries_codbase.map(i => ignoreCaseArray(i)));
+
+
+        const process_activities = (await ConsentCategory.findAll()).map(i => i.type);
+
+        const hcp_filter = {
+            application_id: req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
+            country_iso2: codbase ? { [Op.any]: [countries_ignorecase_for_codbase] } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : countries_ignorecase_for_user_countries_codbase,
+            '$hcpConsents.consent.consent_category.type$': process_activity ? { [Op.eq]: process_activity } : { [Op.or]: process_activities }
+        };
+
         const hcps = await HCPS.findAll({
-            attributes: ['email', 'first_name', 'last_name'],
+            where: hcp_filter,
             include: [
                 {
                     model: Application,
                     as: 'application',
-                    attributes: ['name']
+                    attributes: ['name'],
                 },
                 {
                 model: HcpConsents,
@@ -121,16 +152,23 @@ async function generateReport(req, res){
                     include: [
                     {
                         model: ConsentCategory,
-                        attributes: ['title', 'type']
+                        attributes: ['title', 'type'],
                     },
                     {
                         model: ConsentCountry,
                         as: 'consent_country',
-                        attributes: ['country_iso2', 'opt_type',]
+                        attributes: ['country_iso2', 'opt_type'],
                     }
                 ]
                 }],
             }],
+            attributes: ['email', 'first_name', 'last_name', 'created_at'],
+            // offset,
+            // limit,
+            order: [
+                ['created_at', 'DESC'],
+                ['id', 'ASC']
+            ]
         });
 
         
@@ -155,7 +193,27 @@ async function generateReport(req, res){
             delete hcp.dataValues['hcpConsents'];
         });
 
-        res.json(hcps);
+
+        // const totalUser = await HCPS.count({    //counting total data for pagintaion
+        //     where: hcp_filter
+        // });
+
+        const totalUser = hcps.length;
+
+        const data = {
+            users: hcps,
+            page: page + 1,
+            limit,
+            total: totalUser,
+            start: limit * page + 1,
+            end: offset + limit > totalUser ? totalUser : offset + limit,
+            codbase: codbase ? codbase : '',
+            process_activity: process_activity ? process_activity : '',
+            countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : req.user.countries
+        };
+
+        response.data = data;
+        res.json(response);
     }
     catch(err){
         console.error(err);
@@ -164,5 +222,17 @@ async function generateReport(req, res){
     }
 }
 
+async function getAllProcessActivities(req, res) {
+    try{
+        const process_activities = await ConsentCategory.findAll();
+        res.json(process_activities);
+    }
+    catch(err){
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 exports.getConsents = getConsents;
-exports.generateReport = generateReport;
+exports.getConsentsReport = getConsentsReport;
+exports.getAllProcessActivities = getAllProcessActivities;
