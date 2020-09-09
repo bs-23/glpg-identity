@@ -39,7 +39,7 @@ async function init() {
             where: { email: 'glpg@brainstation-23.com' }, defaults: {
                 first_name: 'System',
                 last_name: 'Admin',
-                password: '8s297LC#WRrB',
+                password: 'P@ssword123',
                 type: 'admin'
             }
         }).then(function () {
@@ -145,7 +145,7 @@ async function init() {
                     name: 'HCP Portal',
                     slug: convertToSlug('HCP Portal'),
                     email: 'hcp-portal@glpg.com',
-                    password: 'T2^iyH3^4C6m',
+                    password: 'P@ssword123',
                     consent_confirmation_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/consentConfirm.consent.html',
                     reset_password_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/journeyRedirect.journey.html',
                     login_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/journeyRedirect.journey.html',
@@ -157,7 +157,7 @@ async function init() {
                     name: 'BrandX',
                     slug: convertToSlug('BrandX'),
                     email: 'brandx@glpg.com',
-                    password: 'L$y62@4*rGiF',
+                    password: 'P@ssword123',
                     consent_confirmation_link: 'https://jyseleca-dev.glpg.com/bin/public/glpg-brandx/consentConfirm.consent.html',
                     reset_password_link: 'https://jyseleca-dev.glpg.com/bin/public/glpg-brandx/journeyRedirect.journey.html',
                     login_link: 'https://jyseleca-dev.glpg.com/bin/public/glpg-brandx/journeyRedirect.journey.html',
@@ -204,7 +204,7 @@ async function init() {
 
         const consentLocales = [
             {
-                rich_text: "<p>Je confirme que je suis un professionnel de la santé exerçant aux Pays-Bas, et j'accepte les <a href='#' target='_blank'>Conditions d'utilisation de Jyseleca Belgique.</a></p>",
+                rich_text: "<p>Je confirme que je suis un professionnel de la santé exerçant en Belgique, et j'accepte les <a href='#' target='_blank'>Conditions d'utilisation de Galapagos Belgique.</a></p>",
                 consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
                 locale: 'fr_be'
             },
@@ -219,17 +219,17 @@ async function init() {
                 locale: 'nl_nl'
             },
             {
-                rich_text: "<p>Ik geef Jyseleca toestemming om mij via mijn e-mailadres promotie- en milieu-informatie over alle Jyseleca-producten en -diensten te sturen. <br> <br> Raadpleeg onze <a href='#' target='_blank'>privacyverklaring</a> voor meer informatie over hoe we met uw persoonsgegevens omgaan.</p>",
+                rich_text: "<p>Ik geef Jyseleca toestemming om mij via mijn e-mailadres promotie- en milieu-informatie over alle Jyseleca-producten en -diensten te sturen. <br> <br> Raadpleeg onze <a href='#' target='_blank'>privacyverklaring</a>voor meer informatie over hoe we met uw persoonsgegevens omgaan.</p>",
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 locale: 'nl_nl'
             },
             {
-                rich_text: "<p>Ik geef Jyseleca toestemming om mij via mijn e-mailadres promotie- en milieu-informatie over alle Jyseleca-producten en -diensten te sturen. <br> <br> Raadpleeg onze <a href='#' target='_blank'>privacyverklaring</a> voor meer informatie over hoe we met uw persoonsgegevens omgaan.</p>",
+                rich_text: "<p>Ik geef Jyseleca toestemming om mij via mijn e-mailadres promotie- en milieu-informatie over alle Jyseleca-producten en -diensten te sturen. <br> <br> Raadpleeg onze <a href='#' target='_blank'>privacyverklaring</a>voor meer informatie over hoe we met uw persoonsgegevens omgaan.</p>",
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 locale: 'nl_be'
             },
             {
-                rich_text: "<p>Je consens à ce que Jyseleca m'envoie des informations promotionnelles et environnementales concernant tous les produits et services de Jyseleca à l'adresse mail que j'ai fournie. <br> <br> Pour obtenir de plus amples informations sur la manière dont nous traitons vos données à caractère personnel, veuillez vous référer à notre <a href='#' target='_blank'> Déclaration de confidentialité.</a></p>",
+                rich_text: "<p>Je consens à ce que Galapagos m'envoie des informations promotionnelles et informatives concernant tous les produits et services de Galapagos à l'adresse mail que j'ai fournie. <br> <br> Pour obtenir de plus amples informations sur la manière dont nous traitons vos données à caractère personnel, veuillez vous référer à notre <a href='#' target='_blank'>Déclaration de confidentialité.</a></p>",
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 locale: 'fr_be'
             }
