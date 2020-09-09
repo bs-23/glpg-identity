@@ -168,12 +168,13 @@ const ConsentPerformanceReport = () => {
                                                         <td>{row.application.name}</td>
                                                         <td>{row.first_name}</td>
                                                         <td>{row.last_name}</td>
-                                                        <td>{row.email}</td>
+                                                        <td><i className="icon icon-check-filled text-primary-color mr-2 cdp-text-primary"></i>{row.email}</td>
                                                         <td onClick={() => handleMark(index)}><span>{row.consents.length} Consent(s) &nbsp; +</span></td>
                                                         <td>
                                                             <span>
                                                                 <Dropdown className="ml-auto dropdown-customize">
-                                                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
+                                                                        <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle-without-icon btn-sm py-0 px-1 ">
+                                                                            <i className="icon icon-setting"></i> Action
                                                                     </Dropdown.Toggle>
                                                                     <Dropdown.Menu>
                                                                         <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(row)}>Profile</Dropdown.Item></LinkContainer> 
@@ -184,10 +185,10 @@ const ConsentPerformanceReport = () => {
                                                         </td>
                                                     </tr>
                                                     { mark.includes(index) && <tr key={row.email}>
-                                                        <td colSpan='4'>
+                                                        <td colSpan="6">
                                                         <div>
-                                                            <table className="table table-hover table-sm mb-0 cdp-table cdp-table-sm">
-                                                                <thead className="cdp-bg-primary text-white cdp-table__header">
+                                                            <table className="table table-hover table-sm mb-0 cdp-table cdp-table-sm w-75 mx-auto">
+                                                                <thead className="cdp-bg-primary-lighter text-white cdp-table__header">
                                                                     <tr>
                                                                         <th scope="col">Process Activity</th>
                                                                         <th scope="col">Consent Type</th>

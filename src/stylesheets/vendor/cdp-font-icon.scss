@@ -254,7 +254,9 @@
     content: "\32";
 }
 
-
+.icon-setting:before {
+    content: "\33";
+}
 
 //custome css
 $class-slug: icon- !default;

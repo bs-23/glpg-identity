@@ -118,6 +118,10 @@
 
     &-bg-primary {
         background: $primary-color;
+
+        &-lighter {
+            background: #547D76;
+        }
     }
 
     &-bg-secondary {
@@ -134,7 +138,7 @@
         }
 
         &-light {
-            color: #636A70; 
+            color: #636A70;
         }
     }
 }
