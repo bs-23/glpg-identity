@@ -22,6 +22,7 @@ const ConsentPerformanceReport = () => {
     // const [show, setShow] = useState({ profileManage: false, updateStatus: false });
     // const [currentAction, setCurrentAction] = useState({ userId: null, action: null });
     // const [currentUser, setCurrentUser] = useState({});
+    const [mark, setMark] = useState([]);
     const { addToast } = useToasts();
     const [sort, setSort] = useState({ type: 'ASC', value: null });
 
@@ -57,6 +58,18 @@ const ConsentPerformanceReport = () => {
             params.get('codbase') ? params.get('codbase') : '',
             params.get('process_activity') ? params.getAll('process_activity') : ''
         ));
+    }
+
+    function handleMark(id) {
+        const obj = [...mark]
+        if(obj.includes(id)){
+            const idx = obj.indexOf(id);
+            obj.splice(idx, 1);
+            setMark(obj);
+        }
+        else{
+            setMark([...obj, id]);
+        }
     }
 
     useEffect(() => {
@@ -150,13 +163,13 @@ const ConsentPerformanceReport = () => {
                                             </thead>
                                             <tbody className="cdp-table__body bg-white">
                                                 {consents_report['users'].map((row, index) => (
+                                                    <React.Fragment key={`key${index}`}>
                                                     <tr key={index}>
                                                         <td>{row.application.name}</td>
                                                         <td>{row.first_name}</td>
                                                         <td>{row.last_name}</td>
                                                         <td>{row.email}</td>
-                                                        <td><span>{row.consents.length} Consent(s) &nbsp; +</span></td>
-                                                        
+                                                        <td onClick={() => handleMark(index)}><span>{row.consents.length} Consent(s) &nbsp; +</span></td>
                                                         <td>
                                                             <span>
                                                                 <Dropdown className="ml-auto dropdown-customize">
@@ -170,6 +183,34 @@ const ConsentPerformanceReport = () => {
                                                             </span>
                                                         </td>
                                                     </tr>
+                                                    { mark.includes(index) && <tr key={row.email}>
+                                                        <td colSpan='4'>
+                                                        <div>
+                                                            <table className="table table-hover table-sm mb-0 cdp-table cdp-table-sm">
+                                                                <thead className="cdp-bg-primary text-white cdp-table__header">
+                                                                    <tr>
+                                                                        <th scope="col">Process Activity</th>
+                                                                        <th scope="col">Consent Type</th>
+                                                                        <th scope="col">Preferences</th>
+                                                                        <th scope="col">Legal Basis</th>
+                                                                        <th scope="col">Given Date</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    {row.consents.map((consent, indexx) => (<tr key={indexx}>
+                                                                        <td>{consent.title}</td>
+                                                                        <td>{consent.opt_type}</td>
+                                                                        <td>{consent.preference}</td>
+                                                                        <td>{consent.legal_basis}</td>
+                                                                        <td>{(new Date(consent.given_date)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
+                                                                    </tr>
+                                                                    ))}
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        </td>
+                                                    </tr>}
+                                                    </React.Fragment>
                                                 ))}
                                             </tbody>
                                         </table>
@@ -190,7 +231,7 @@ const ConsentPerformanceReport = () => {
                                     </div>
 
                                 </React.Fragment>
-                            /* } */}
+                            }
 
                             {consents_report['users'] && consents_report['users'].length === 0 &&
                                 <>
