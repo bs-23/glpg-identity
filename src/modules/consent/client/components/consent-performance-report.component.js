@@ -172,7 +172,7 @@ const ConsentPerformanceReport = () => {
                                                         <td>
                                                             <span className="position-relative">
                                                                 {row.consents.length} Consent(s)
-                                                                <span onClick={() => handleMark(index)} className="plus-minus pl-2 pr-2"> + </span>
+                                                                <span onClick={() => handleMark(index)} className="plus-minus pl-2 pr-2"> {mark.includes(index) ? '-' : '+'} </span>
                                                             </span>
                                                         </td>
                                                         <td>
