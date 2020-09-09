@@ -131,6 +131,8 @@ async function getConsentsReport(req, res){
         const hcp_filter = {
             application_id: req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
             country_iso2: codbase ? { [Op.any]: [countries_ignorecase_for_codbase] } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : countries_ignorecase_for_user_countries_codbase,
+            '$hcpConsents.response$': true,
+            '$hcpConsents.consent_confirmed$': true,
             '$hcpConsents.consent.consent_category.type$': process_activity ? { [Op.eq]: process_activity } : { [Op.or]: process_activities }
         };
 
