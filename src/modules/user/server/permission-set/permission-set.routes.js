@@ -10,5 +10,6 @@ module.exports = app => {
         .post(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.PLATFORM.value), controller.createPermissionSet);
 
     app.route('/api/permissionSets/:id')
+        .get(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.PLATFORM.value), controller.getPermissionSet)
         .put(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.PLATFORM.value), controller.editPermissionSet);
 };

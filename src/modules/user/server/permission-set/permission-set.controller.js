@@ -63,7 +63,6 @@ async function getPermissionSets(req, res) {
                     const applications = await allApplications();
                     const serviceCategories = await allServiceCategories();
                     item.dataValues.countries = countries.map(c => c.country_iso2);
-                    // item.dataValues.application = { name: applications && applications.map(app => app.name).join(', ') };
                     item.dataValues.ps_app = applications && applications.map(app=> ({ application: { id: app.id, name: app.name} }));
                     item.dataValues.ps_sc = serviceCategories && serviceCategories.map(sc => ({ serviceCategory: { id: sc.id, title: sc.title, slug: sc.slug } }));
                 }
@@ -72,6 +71,56 @@ async function getPermissionSets(req, res) {
         )
 
         res.json(permissionSetList);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function getPermissionSet(req, res) {
+    const id = req.params.id;
+
+    try {
+        const permissionSet = await PermissionSet.findOne({
+            where: { id },
+            include: [{
+                    model: PermissionSet_ServiceCategory,
+                    as: 'ps_sc',
+                    attributes: [ 'id'],
+                    include: [{
+                        model: ServiceCategory,
+                        as: 'serviceCategory',
+                        attributes: [ 'id', 'title', 'slug' ]
+
+                    }]
+                },
+                {
+                    model: PermissionSet_Application,
+                    as: 'ps_app',
+                    attributes: [ 'id'],
+                    include: [{
+                        model: Application,
+                        as: 'application',
+                        attributes: [ 'id', 'name' ]
+
+                    }]
+                }
+            ],
+            attributes: { exclude: ['created_by', 'updated_by','created_at', 'updated_at'] }
+        });
+
+        if(!permissionSet) return res.status(404).send('Permission set not found.');
+
+        if(permissionSet.dataValues.slug === 'system_admin'){
+            const countries = await allCountries();
+            const applications = await allApplications();
+            const serviceCategories = await allServiceCategories();
+            permissionSet.dataValues.countries = countries.map(c => c.country_iso2);
+            permissionSet.dataValues.ps_app = applications && applications.map(app=> ({ application: { id: app.id, name: app.name } }));
+            permissionSet.dataValues.ps_sc = serviceCategories && serviceCategories.map(sc => ({ serviceCategory: { id: sc.id, title: sc.title, slug: sc.slug } }));
+        }
+
+        res.json(permissionSet.dataValues);
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal server error');
@@ -169,4 +218,5 @@ async function editPermissionSet(req, res) {
 exports.getPermissionSets = getPermissionSets;
 exports.createPermissionSet = createPermissionSet;
 exports.editPermissionSet = editPermissionSet;
+exports.getPermissionSet = getPermissionSet;
 

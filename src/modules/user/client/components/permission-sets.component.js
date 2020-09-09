@@ -1,15 +1,19 @@
 import axios from "axios";
 import { useSelector } from "react-redux";
-import { NavLink } from 'react-router-dom';
+import { NavLink, Route, useRouteMatch, useHistory } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import PermissionSetForm from './permission-set-form.component';
+import PermissionSetDetails from "./permission-sets-details";
+
 
 export default function ManagePermissionSets() {
     const [permissionSets, setPermissionSets] = useState([]);
     const [permissionModalShow, setPermissionModalShow] = useState(false);
     const [permissionSetEditData, setPermissionSetEditData] = useState(null);
     const countries = useSelector(state => state.userReducer.countries);
+    const match = useRouteMatch();
+    const history = useHistory();
     const readOnlyPermissionSets = ['system_admin', 'site_admin', 'data_privacy_officer', 'gds'];
 
     const getPermissionSets = async () => {
@@ -106,7 +110,10 @@ export default function ManagePermissionSets() {
                                                 <td>{getApplicationNames(row)}</td>
                                                 <td>{getCountryNamesFromCodes(row.countries)}</td>
                                                 <td>{getServiceCategoryNames(row)}</td>
-                                                <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlePermissionSetEditClick(row)} disabled={readOnlyPermissionSets.includes(row.slug)}> <i className="icon icon-edit-pencil pr-2"></i>Edit</button></td>
+                                                <td>
+                                                    <button className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlePermissionSetEditClick(row)} disabled={readOnlyPermissionSets.includes(row.slug)}> <i className="icon icon-edit-pencil pr-2"></i>Edit</button>
+                                                    <button className="btn cdp-btn-outline-primary btn-sm" onClick={() => history.push(`${match.path}/${row.id}`)} > <i className="icon icon-edit-pencil pr-2"></i>Details</button>
+                                                </td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -122,7 +129,6 @@ export default function ManagePermissionSets() {
                                 </div>
                             </div></>
                         }
-
                         <Modal
                             show={permissionModalShow}
                             onHide={() => { setPermissionModalShow(false); setPermissionSetEditData(null); }}
@@ -139,7 +145,24 @@ export default function ManagePermissionSets() {
                                 <PermissionSetForm onSuccess={handleFormSubmitSuccess} preFill={permissionSetEditData} />
                             </Modal.Body>
                         </Modal>
-
+                        <Route path={`${match.path}/:id`} >
+                            {(props) => <Modal
+                                show={props.match && props.match.isExact}
+                                onHide={() => history.push(match.url)}
+                                dialogClassName="modal-90w modal-customize"
+                                aria-labelledby="example-custom-modal-styling-title"
+                                size="lg"
+                            >
+                                <Modal.Header closeButton>
+                                    <Modal.Title id="example-custom-modal-styling-title">
+                                        Permission Set Details
+                                    </Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                    <PermissionSetDetails id={props.match && props.match.params.id}/>
+                                </Modal.Body>
+                            </Modal>}
+                        </Route>
                     </div>
                 </div>
             </div>
