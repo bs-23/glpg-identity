@@ -21,6 +21,10 @@
         td:first-child {
             padding-left: 20px;
         }
+
+        &.no-hover-tr {
+            background: none !important;
+        }
     }
 
     th, td {
@@ -43,6 +47,18 @@
     td {
         color: #202020;
         font-size: 14px;
+    }
+
+    &-consent {
+        border: 1px solid #547D76;
+
+        thead tr:hover{
+            color: #fff;
+         }
+
+        th, td {
+            border: none !important;
+        }
     }
 
     &.table-hover tbody tr:hover {

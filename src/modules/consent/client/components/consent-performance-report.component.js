@@ -183,11 +183,11 @@ const ConsentPerformanceReport = () => {
                                                                 </Dropdown>
                                                             </span>
                                                         </td>
-                                                    </tr>
-                                                    { mark.includes(index) && <tr key={row.email}>
+                                                        </tr>
+                                                        {mark.includes(index) && <tr className="no-hover-tr" key={row.email}>
                                                         <td colSpan="6">
                                                         <div>
-                                                            <table className="table table-hover table-sm mb-0 cdp-table cdp-table-sm w-75 mx-auto">
+                                                            <table className="table table-hover table-sm mb-0 cdp-table cdp-table-consent cdp-table-sm w-75 mx-auto my-2">
                                                                 <thead className="cdp-bg-primary-lighter text-white cdp-table__header">
                                                                     <tr>
                                                                         <th scope="col">Process Activity</th>
