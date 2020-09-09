@@ -168,12 +168,17 @@ const ConsentPerformanceReport = () => {
                                                         <td>{row.application.name}</td>
                                                         <td>{row.first_name}</td>
                                                         <td>{row.last_name}</td>
-                                                        <td><i className="icon icon-check-filled text-primary-color mr-2 cdp-text-primary"></i>{row.email}</td>
-                                                        <td onClick={() => handleMark(index)}><span>{row.consents.length} Consent(s) &nbsp; +</span></td>
+                                                        <td><i className="icon icon-check-filled icon-position-bit-down text-primary-color mr-2 cdp-text-primary"></i>{row.email}</td>
+                                                        <td>
+                                                            <span className="position-relative">
+                                                                {row.consents.length} Consent(s)
+                                                                <span onClick={() => handleMark(index)} className="plus-minus pl-2 pr-2"> + </span>
+                                                            </span>
+                                                        </td>
                                                         <td>
                                                             <span>
                                                                 <Dropdown className="ml-auto dropdown-customize">
-                                                                        <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle-without-icon btn-sm py-0 px-1 ">
+                                                                        <Dropdown.Toggle variant="" className="cdp-btn-outline-primary font-weight-bold-light dropdown-toggle-without-icon btn-sm py-0 px-1 ">
                                                                             <i className="icon icon-setting"></i> Action
                                                                     </Dropdown.Toggle>
                                                                     <Dropdown.Menu>

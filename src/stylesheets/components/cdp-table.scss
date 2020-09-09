@@ -50,11 +50,11 @@
     }
 
     &-consent {
-        border: 1px solid #547D76;
+        border: 1px solid $primary-color-light;
 
-        thead tr:hover{
-            color: #fff;
-         }
+        thead tr:hover {
+            color: $white-color;
+        }
 
         th, td {
             border: none !important;
