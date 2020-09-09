@@ -20,7 +20,8 @@ const UserProfile = sequelize.cdpConnector.define('user_profiles', {
     },
     type: {
         type: DataTypes.ENUM,
-        values: ['standard', 'custom']
+        values: ['standard', 'custom'],
+        defaultValue: "custom"
     },
     description: {
         type: DataTypes.STRING
