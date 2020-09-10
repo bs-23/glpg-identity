@@ -192,6 +192,15 @@ a {
         color: $primary-color-light;
     }
 
+    &.link-with-underline {
+        text-decoration: underline;
+
+        &:hover {
+            color: $secondary-color;
+            text-decoration: none;
+        }
+    }
+
     &.link-secondary {
         color: $secondary-color;
         text-decoration: underline;
