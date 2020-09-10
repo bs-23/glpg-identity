@@ -35,8 +35,8 @@ describe('Hcp user component', () => {
         data = {
             data: {
                 users: [
-                    { id: '1', first_name: 'a', last_name: 'a', email: 'a', telephone: '1', uuid: '1', status: 'not_verified', consent_types: 'double' },
-                    { id: '2', first_name: 'b', last_name: 'b', email: 'b', telephone: '2', uuid: '2', status: 'not_verified', consent_types: 'double' }
+                    { id: '1', first_name: 'a', last_name: 'a', email: 'a', telephone: '1', uuid: '1', status: 'not_verified', opt_types: 'double-opt-in' },
+                    { id: '2', first_name: 'b', last_name: 'b', email: 'b', telephone: '2', uuid: '2', status: 'not_verified', opt_types: 'double-opt-in' }
                 ],
                 country_iso2: null,
                 end: 1,
@@ -49,7 +49,6 @@ describe('Hcp user component', () => {
             }
         };
 
-
         const status = null, country_iso2 = null;
         fakeAxios.onGet('/api/hcps').reply(200, data);
         fakeAxios.onGet('/api/hcps?page=1').reply(200, data);
@@ -58,8 +57,6 @@ describe('Hcp user component', () => {
         fakeAxios.onGet(`/api/hcps?page=${3}`).reply(200, data);
         fakeAxios.onGet('api/hcp-profiles/1/consents').reply(200, []);
         await store.dispatch(getHcpProfiles(1, status, country_iso2));
-
-
 
         countries = [ { countryid: 1, country_iso2: "IE", country_iso3: "IRL", codbase: "WUK", countryname: "Ireland"} ]
         fakeAxios.onGet('/api/countries').reply(200, countries);

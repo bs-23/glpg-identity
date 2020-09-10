@@ -238,23 +238,23 @@ async function init() {
             {
                 consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
                 country_iso2: 'be',
-                opt_type: 'single'
+                opt_type: 'single-opt-in'
             },
             {
                 consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
                 country_iso2: 'nl',
-                opt_type: 'single'
+                opt_type: 'single-opt-in'
             },
             {
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 country_iso2: 'nl',
-                opt_type: 'double'
+                opt_type: 'double-opt-in'
             },
             {
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 country_iso2: 'be',
-                opt_type: 'double'
-            },
+                opt_type: 'double-opt-in'
+            }
         ];
 
         Consent.destroy({
