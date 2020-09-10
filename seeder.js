@@ -115,10 +115,10 @@ async function init() {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
 
             const permissionSet = [
-                { title: "System Admin Permission Set", slug: "system_admin", type: 'standard', description: "This is the default permission set for System Admin", created_by: admin.id, updated_by: admin.id },
-                { title: "Site Admin Permission Set", slug: "site_admin", type: 'standard', description: "This is the default permission set for Site Admin", countries:["BE", "AD", "DE", "IT", "NL", "ES","IE"], created_by: admin.id, updated_by: admin.id },
-                { title: "GDS Permission Set", slug: "gds", type: 'standard', countries:["BE", "AD", "DE", "IT", "NL", "ES","IE"], description: "This is the default permission set for Global Data Steward", created_by: admin.id, updated_by: admin.id },
-                { title: "DPO Permission Set", slug: "data_privacy_officer", type: 'standard', description: "This is the default permission set for Local Data Steward", created_by: admin.id, updated_by: admin.id }
+                { title: "Standard System Admin Permission Set", slug: "system_admin", type: 'standard', description: "This is the default permission set for System Admin", created_by: admin.id, updated_by: admin.id },
+                { title: "Standard Site Admin Permission Set", slug: "site_admin", type: 'standard', description: "This is the default permission set for Site Admin", countries:["BE", "AD", "DE", "IT", "NL", "ES","IE"], created_by: admin.id, updated_by: admin.id },
+                { title: "Standard GDS Permission Set", slug: "gds", type: 'standard', countries:["BE", "AD", "DE", "IT", "NL", "ES","IE"], description: "This is the default permission set for Global Data Steward", created_by: admin.id, updated_by: admin.id },
+                { title: "Standard DPO Permission Set", slug: "data_privacy_officer", type: 'standard', description: "This is the default permission set for Local Data Steward", created_by: admin.id, updated_by: admin.id }
             ];
 
             PermissionSet.destroy({ truncate: { cascade: true } }).then(() => {

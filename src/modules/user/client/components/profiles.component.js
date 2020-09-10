@@ -75,6 +75,12 @@ const ProfileForm = ({ onSuccess, permissionSets, preFill }) => {
         actions.setSubmitting(true);
     }
 
+    const getToggleListOptions = () => {
+        const selectedPermissionSets = preFill ? preFill.permissionssetIDs ? preFill.permissionssetIDs : [] : [];
+        const filteredPermissionSet = permissionSets.filter(ps => selectedPermissionSets.includes(ps.id) || ps.type === 'custom');
+        return filteredPermissionSet.map(ps => ({...ps, disabled: ps.type === 'standard'}));
+    }
+
     return <div className="row">
         <div className="col-12">
             <div className="">
@@ -106,7 +112,7 @@ const ProfileForm = ({ onSuccess, permissionSets, preFill }) => {
                                     <div className="col-12">
                                         <div className="row">
                                             <FormField name="permissionSets" label="Select Permission Sets">
-                                                <ToggleList name="permissionSets" options={permissionSets.map(ps => ({...ps, disabled: ps.type === 'standard'}))} idExtractor={item => item.id} labelExtractor={item => item.title} />
+                                                <ToggleList name="permissionSets" options={getToggleListOptions()} idExtractor={item => item.id} labelExtractor={item => item.title} />
                                             </FormField>
                                         </div>
                                         <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting} > Submit </button>
