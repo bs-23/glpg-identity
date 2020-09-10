@@ -531,7 +531,7 @@ async function getUsers(req, res) {
                 ['id', 'DESC']
             ],
             offset,
-            limit : 15,
+            limit : limit,
             subQuery:false,
             include: [{
                 model: User,
