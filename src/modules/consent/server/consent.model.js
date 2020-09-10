@@ -3,6 +3,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const uniqueSlug = require('unique-slug');
 const ConsentCategory = require('./consent-category.model');
+const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
 const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
 const makeCustomSlug = (title) => {
@@ -46,7 +47,7 @@ const Consent = sequelize.cdpConnector.define('consents', {
     },
 
 }, {
-    schema: 'ciam',
+    schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
     tableName: 'consents',
     timestamps: true,
     createdAt: 'created_at',

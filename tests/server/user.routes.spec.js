@@ -218,6 +218,8 @@ describe('User Routes', () => {
         const ResetPassword = require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
 
         const user = await User.findOne({ where: { email } });
+        await user.update({ password_updated_at: new Date() - 2 * 24 * 60 * 60 * 1000 });
+
         const [doc, created] = await ResetPassword.findOrCreate({
             where: { user_id: user.id },
             defaults: {

@@ -3,6 +3,7 @@ const { DataTypes } = require('sequelize');
 const ServiceCategory = require('../permission/service-category.model');
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
+const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
 const PermissionSet_ServiceCategory = sequelize.cdpConnector.define('permissionSets_serviceCategories', {
     id: {
@@ -20,7 +21,7 @@ const PermissionSet_ServiceCategory = sequelize.cdpConnector.define('permissionS
         type: DataTypes.UUID
     }
 }, {
-    schema: 'ciam',
+    schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
     tableName: 'permissionSets_serviceCategories',
     timestamps: true,
     createdAt: 'created_at',

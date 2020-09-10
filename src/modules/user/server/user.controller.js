@@ -504,19 +504,35 @@ async function getUsers(req, res) {
 
     const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => i.codbase === codbase).map(i => i.country_iso2);
     const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
+    let countries_ignorecase_for_codbase_formatted = '{'+countries_ignorecase_for_codbase.join(", ") + '}';
+
 
     try {
+
         const users = await User.findAll({
+
             where: {
                 id: { [Op.ne]: signedInId },
-                type: 'basic'
+                type: 'basic',
+                [Op.or]: [
+                    {
+                        '$userRoles.role.role_ps.ps.countries$':  codbase ? { [Op.overlap]: countries_ignorecase_for_codbase_formatted} : { [Op.ne]: '{0}' }
+
+                    },
+                    {
+                        '$userProfile.up_ps.ps.countries$':  codbase ? { [Op.overlap]: countries_ignorecase_for_codbase_formatted} : { [Op.ne]: '{0}' }
+
+                    }
+
+                ]
             },
-            offset,
-            limit,
             order: [
                 ['created_at', 'DESC'],
                 ['id', 'DESC']
             ],
+            offset,
+            limit : 15,
+            subQuery:false,
             include: [{
                 model: User,
                 as: 'createdByUser',
@@ -531,14 +547,11 @@ async function getUsers(req, res) {
                     include: [{
                         model: PermissionSet,
                         as: 'ps',
-                        where: {
-
-                            countries: codbase ? { [Op.overlap]: [countries_ignorecase_for_codbase] } : { [Op.ne]: ["undefined"] }
-                        }
 
                     }]
                 }]
             },
+
             {
                 model: User_Role,
                 as: 'userRoles',
@@ -550,45 +563,71 @@ async function getUsers(req, res) {
                         as: 'role_ps',
                         include: [{
                             model: PermissionSet,
-                            as: 'ps',
-                            where: {
-
-                                countries: codbase ? { [Op.overlap]: [countries_ignorecase_for_codbase] } : { [Op.ne]: ["undefined"] }
-                            }
-
-
+                            as: 'ps'
                         }]
                     }]
 
 
                 }]
             }],
-            attributes: { exclude: ['password'] },
+            attributes: { exclude: ['password'] }
+
+
         });
 
         const totalUser = await User.count({
             where: {
                 id: { [Op.ne]: signedInId },
-                type: 'basic'
+                type: 'basic',
+                [Op.or]: [
+                    {
+                        '$userRoles.role.role_ps.ps.countries$':  codbase ? { [Op.overlap]: countries_ignorecase_for_codbase_formatted} : { [Op.ne]: '{0}' }
+
+                    },
+                    {
+                        '$userProfile.up_ps.ps.countries$':  codbase ? { [Op.overlap]: countries_ignorecase_for_codbase_formatted} : { [Op.ne]: '{0}' }
+
+                    }
+
+                ]
             },
-            include: [
-                {
-                    model: UserProfile,
-                    as: 'userProfile',
+            include: [{
+                model: User,
+                as: 'createdByUser',
+                attributes: ['id', 'first_name', 'last_name'],
+            },
+            {
+                model: UserProfile,
+                as: 'userProfile',
+                include: [{
+                    model: UserProfile_PermissionSet,
+                    as: 'up_ps',
                     include: [{
-                        model: UserProfile_PermissionSet,
-                        as: 'up_ps',
+                        model: PermissionSet,
+                        as: 'ps',
+
+                    }]
+                }]
+            },
+
+            {
+                model: User_Role,
+                as: 'userRoles',
+                include: [{
+                    model: Role,
+                    as: 'role',
+                    include: [{
+                        model: Role_PermissionSet,
+                        as: 'role_ps',
                         include: [{
                             model: PermissionSet,
-                            as: 'ps',
-                            where: {
-                                countries: codbase ? { [Op.overlap]: [countries_ignorecase_for_codbase] } : { [Op.ne]: ["undefined"] }
-                            }
-
+                            as: 'ps'
                         }]
                     }]
-                }
-            ]
+
+
+                }]
+            }],
         });
 
         const data = {

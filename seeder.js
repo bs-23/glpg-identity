@@ -6,9 +6,11 @@ async function init() {
 
     await config.initEnvironmentVariables();
 
+    const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
+
     const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 
-    await sequelize.cdpConnector.query('CREATE SCHEMA IF NOT EXISTS ciam');
+    await sequelize.cdpConnector.query(`CREATE SCHEMA IF NOT EXISTS ${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`);
 
     const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
     const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
@@ -262,7 +264,7 @@ async function init() {
 
         const consentLocales = [
             {
-                rich_text: "<p>Je confirme que je suis un professionnel de la santé exerçant aux Pays-Bas, et j'accepte les <a href='#' target='_blank'>Conditions d'utilisation de Jyseleca Belgique.</a></p>",
+                rich_text: "<p>Je confirme que je suis un professionnel de la santé exerçant en Belgique, et j'accepte les <a href='#' target='_blank'>Conditions d'utilisation de Galapagos Belgique.</a></p>",
                 consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
                 locale: 'fr_be'
             },
@@ -277,17 +279,17 @@ async function init() {
                 locale: 'nl_nl'
             },
             {
-                rich_text: "<p>Ik geef Jyseleca toestemming om mij via mijn e-mailadres promotie- en milieu-informatie over alle Jyseleca-producten en -diensten te sturen. <br> <br> Raadpleeg onze <a href='#' target='_blank'>privacyverklaring</a> voor meer informatie over hoe we met uw persoonsgegevens omgaan.</p>",
+                rich_text: "<p>Ik geef Jyseleca toestemming om mij via mijn e-mailadres promotie- en milieu-informatie over alle Jyseleca-producten en -diensten te sturen. <br> <br> Raadpleeg onze <a href='#' target='_blank'>privacyverklaring</a>voor meer informatie over hoe we met uw persoonsgegevens omgaan.</p>",
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 locale: 'nl_nl'
             },
             {
-                rich_text: "<p>Ik geef Jyseleca toestemming om mij via mijn e-mailadres promotie- en milieu-informatie over alle Jyseleca-producten en -diensten te sturen. <br> <br> Raadpleeg onze <a href='#' target='_blank'>privacyverklaring</a> voor meer informatie over hoe we met uw persoonsgegevens omgaan.</p>",
+                rich_text: "<p>Ik geef Jyseleca toestemming om mij via mijn e-mailadres promotie- en milieu-informatie over alle Jyseleca-producten en -diensten te sturen. <br> <br> Raadpleeg onze <a href='#' target='_blank'>privacyverklaring</a>voor meer informatie over hoe we met uw persoonsgegevens omgaan.</p>",
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 locale: 'nl_be'
             },
             {
-                rich_text: "<p>Je consens à ce que Jyseleca m'envoie des informations promotionnelles et environnementales concernant tous les produits et services de Jyseleca à l'adresse mail que j'ai fournie. <br> <br> Pour obtenir de plus amples informations sur la manière dont nous traitons vos données à caractère personnel, veuillez vous référer à notre <a href='#' target='_blank'> Déclaration de confidentialité.</a></p>",
+                rich_text: "<p>Je consens à ce que Galapagos m'envoie des informations promotionnelles et informatives concernant tous les produits et services de Galapagos à l'adresse mail que j'ai fournie. <br> <br> Pour obtenir de plus amples informations sur la manière dont nous traitons vos données à caractère personnel, veuillez vous référer à notre <a href='#' target='_blank'>Déclaration de confidentialité.</a></p>",
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 locale: 'fr_be'
             }
@@ -343,7 +345,7 @@ async function init() {
         });
     }
 
-    async.waterfall([userSeeder,userSeeder, applicationSeeder, consentSeeder, userProfileSeeder, userUpdateSeeder, serviceCategorySeeder, permissionSetSeeder, permissionSetServiceCategorySeeder, userProfilePermissionSetSeeder], function (err) {
+    async.waterfall([userSeeder,userProfileSeeder,userUpdateSeeder,serviceCategorySeeder, permissionSetSeeder,permissionSetServiceCategorySeeder, userProfilePermissionSetSeeder, applicationSeeder, consentSeeder], function (err) {
         if (err) console.error(err);
         else console.info('DB seed completed!');
         process.exit();
