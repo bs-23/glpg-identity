@@ -23,20 +23,11 @@ const Consent = sequelize.cdpConnector.define('consents', {
         allowNull: false,
         type: DataTypes.UUID
     },
-    legal_basis: {
-        allowNull: false,
-        type: DataTypes.ENUM,
-        values: ['consent', 'contract'],
-    },
-    preference: {
-        type: DataTypes.STRING
-    },
     title: {
         unique: true,
         allowNull: false,
         type: DataTypes.STRING
     },
-
     slug: {
         unique: true,
         allowNull: false,
@@ -45,7 +36,14 @@ const Consent = sequelize.cdpConnector.define('consents', {
             this.setDataValue('slug', makeCustomSlug(this.title));
         }
     },
-
+    legal_basis: {
+        allowNull: false,
+        type: DataTypes.ENUM,
+        values: ['consent', 'contract'],
+    },
+    preference: {
+        type: DataTypes.STRING
+    }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
     tableName: 'consents',

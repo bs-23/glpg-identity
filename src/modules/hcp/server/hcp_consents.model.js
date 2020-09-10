@@ -9,7 +9,7 @@ const HcpConsents = sequelize.cdpConnector.define("hcp_consents", {
         allowNull: false,
         primaryKey: true,
         type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4 
+        defaultValue: DataTypes.UUIDV4
     },
     user_id: {
         allowNull: false,
