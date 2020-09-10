@@ -18,7 +18,7 @@ const PermissionSetDetails = ({ id }) => {
     const getCountryNames = () => {
         if(!permissionDetails || !permissionDetails.countries || !countries) return nullValueToken;
         const countryNames = countries.filter(i => permissionDetails.countries.includes(i.country_iso2)).map(i => i.codbase_desc);
-        return countryNames ? countryNames.join(', ') : nullValueToken;
+        return countryNames.length ? countryNames.join(', ') : nullValueToken;
     }
 
     const getServiceCategoryNames = () => {
@@ -42,7 +42,7 @@ const PermissionSetDetails = ({ id }) => {
     useEffect(() => {
         dispatch(getCountries());
         getPermissionDetails();
-    }, [id]);
+    }, []);
 
     return <div className="profile-detail p-3 py-sm-4 px-sm-5 mb-3 mb-sm-0">
         <h2 className="profile-detail__name pb-3">{ permissionDetails ? permissionDetails.title  : '' }</h2>

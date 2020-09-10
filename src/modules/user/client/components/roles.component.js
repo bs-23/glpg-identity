@@ -1,5 +1,5 @@
 import axios from "axios";
-import { NavLink } from 'react-router-dom';
+import { NavLink,Link } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { Form, Formik, Field, ErrorMessage, FieldArray } from "formik";
 import { useToasts } from "react-toast-notifications";
@@ -141,7 +141,10 @@ export default function ManageRoles() {
     const extractPermissionSetNames = (data) => {
         if(!data) return '';
         if(!data.role_ps || !data.role_ps.length) return '';
-        return data.role_ps.map(item => item.ps.title).join(', ');
+        return data.role_ps.map((item, index) => {
+            const permSetLink = <Link to={`/users/permission-sets/${item.permissionSetId}`}>{item.ps.title}</Link>
+            return <span key={item.ps.title}>{index < data.role_ps.length-1 ? <>{permSetLink}<span>,&nbsp;</span></> : permSetLink}</span>
+        });
     }
 
     const handleCreateRoleSuccess = () => {

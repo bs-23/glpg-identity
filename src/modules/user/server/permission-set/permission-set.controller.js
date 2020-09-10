@@ -81,6 +81,8 @@ async function getPermissionSet(req, res) {
     const id = req.params.id;
 
     try {
+        if(!id) return res.status(400).send('Invalid parameter.');
+
         const permissionSet = await PermissionSet.findOne({
             where: { id },
             include: [{
