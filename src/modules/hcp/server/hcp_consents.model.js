@@ -2,6 +2,7 @@ const path = require("path");
 const { DataTypes } = require("sequelize");
 const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequelize"));
 const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
+const HcpProfile = require('./hcp_profile.model')
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
 const HcpConsents = sequelize.cdpConnector.define("hcp_consents", {
@@ -43,5 +44,9 @@ const HcpConsents = sequelize.cdpConnector.define("hcp_consents", {
 HcpConsents.belongsTo(Consent, {
     foreignKey: 'consent_id'
 });
+
+// HcpConsents.hasOne(HcpProfile, {
+//     foreignKey: 'user_'
+// });
 
 module.exports = HcpConsents;

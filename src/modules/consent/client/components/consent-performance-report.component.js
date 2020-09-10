@@ -60,18 +60,6 @@ const ConsentPerformanceReport = () => {
         ));
     }
 
-    function handleMark(id) {
-        const obj = [...mark]
-        if(obj.includes(id)){
-            const idx = obj.indexOf(id);
-            obj.splice(idx, 1);
-            setMark(obj);
-        }
-        else{
-            setMark([...obj, id]);
-        }
-    }
-
     useEffect(() => {
         getCountries();
         getAllCountries();
@@ -147,34 +135,34 @@ const ConsentPerformanceReport = () => {
                                 </div>
                             </div>
                             
-                            {consents_report['users'] && consents_report['users'].length > 0 &&
+                            {consents_report['hcp_consents'] && consents_report['hcp_consents'].length > 0 &&
                                 <React.Fragment>
                                     <div className="shadow-sm bg-white table-responsive">
                                         <table className="table table-hover table-sm mb-0 cdp-table cdp-table-sm">
                                             <thead className="cdp-bg-primary text-white cdp-table__header">
                                                 <tr>
-                                                    <th><span className={sort.value === 'company' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('company')}>Company<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th><span className={sort.value === 'first_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('first_name')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th><span className={sort.value === 'last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th><span className={sort.value === 'email' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('email')}>Email<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                    <th>Consent Details</th>
+                                                    <th><span className={sort.value === 'consent_type' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('consent_type')}>Consent Type<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                    <th><span className={sort.value === 'opt' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('opt')}>Opt<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                    <th><span className={sort.value === 'legal_basis' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('legal_basis')}>Legal Basis<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                    <th><span className={sort.value === 'preferences' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('preferences')}>Preferences<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                    <th><span className={sort.value === 'date' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('date')}>Date<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="cdp-table__body bg-white">
-                                                {consents_report['users'].map((row, index) => (
-                                                    <React.Fragment key={`key${index}`}>
+                                                {consents_report['hcp_consents'].map((row, index) => (
                                                     <tr key={index}>
-                                                        <td>{row.application.name}</td>
-                                                        <td>{row.first_name}</td>
-                                                        <td>{row.last_name}</td>
-                                                        <td><i className="icon icon-check-filled icon-position-bit-down text-primary-color mr-2 cdp-text-primary"></i>{row.email}</td>
-                                                        <td>
-                                                            <span className="position-relative">
-                                                                {row.consents.length} Consent(s)
-                                                                <span onClick={() => handleMark(index)} className="plus-minus pl-2 pr-2"> {mark.includes(index) ? '-' : '+'} </span>
-                                                            </span>
-                                                        </td>
+                                                        <td>{row.hcp_profile.first_name}</td>
+                                                        <td>{row.hcp_profile.last_name}</td>
+                                                        <td><i className="icon icon-check-filled icon-position-bit-down text-primary-color mr-2 cdp-text-primary"></i>{row.hcp_profile.email}</td>
+                                                        <td>{row.type}</td>
+                                                        <td>{row.opt_type}</td>
+                                                        <td>{row.legal_basis}</td>
+                                                        <td>{row.preferences}</td>
+                                                        <td>{(new Date(row.given_date)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                         <td>
                                                             <span>
                                                                 <Dropdown className="ml-auto dropdown-customize">
@@ -188,42 +176,14 @@ const ConsentPerformanceReport = () => {
                                                                 </Dropdown>
                                                             </span>
                                                         </td>
-                                                        </tr>
-                                                        {mark.includes(index) && <tr className="no-hover-tr" key={row.email}>
-                                                        <td colSpan="6">
-                                                        <div>
-                                                            <table className="table table-hover table-sm mb-0 cdp-table cdp-table-consent cdp-table-sm w-75 mx-auto my-2">
-                                                                <thead className="cdp-bg-primary-lighter text-white cdp-table__header">
-                                                                    <tr>
-                                                                        <th scope="col">Process Activity</th>
-                                                                        <th scope="col">Consent Type</th>
-                                                                        <th scope="col">Preferences</th>
-                                                                        <th scope="col">Legal Basis</th>
-                                                                        <th scope="col">Given Date</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    {row.consents.map((consent, indexx) => (<tr key={indexx}>
-                                                                        <td>{consent.title}</td>
-                                                                        <td>{consent.opt_type}</td>
-                                                                        <td>{consent.preference}</td>
-                                                                        <td>{consent.legal_basis}</td>
-                                                                        <td>{(new Date(consent.given_date)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
-                                                                    </tr>
-                                                                    ))}
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                        </td>
-                                                    </tr>}
-                                                    </React.Fragment>
+                                                    </tr>
                                                 ))}
                                             </tbody>
                                         </table>
                                         {((consents_report.page === 1 &&
                                             consents_report.total > consents_report.limit) ||
                                             (consents_report.page > 1))
-                                            && consents_report['users'] &&
+                                            && consents_report['hcp_consents'] &&
                                             <div className="pagination justify-content-end align-items-center border-top p-3">
                                                 <span className="cdp-text-primary font-weight-bold">{consents_report.start + ' - ' + consents_report.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + consents_report.total}</span>
                                                 <LinkContainer to={`list?page=${consents_report.page - 1}${consents_report.status ? `&status=${consents_report.status}` : ''}${consents_report.codbase ? `&codbase=${consents_report.codbase}` : ''}`}>
@@ -239,7 +199,7 @@ const ConsentPerformanceReport = () => {
                                 </React.Fragment>
                             }
 
-                            {consents_report['users'] && consents_report['users'].length === 0 &&
+                            {consents_report['hcp_consents'] && consents_report['hcp_consents'].length === 0 &&
                                 <>
                                     <div className="row justify-content-center mt-sm-5 pt-5 mb-3">
                                         <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">

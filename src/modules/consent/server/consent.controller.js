@@ -129,87 +129,89 @@ async function getConsentsReport(req, res){
         const process_activities = (await ConsentCategory.findAll()).map(i => i.type);
 
         const hcp_filter = {
-            application_id: req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
-            country_iso2: codbase ? { [Op.any]: [countries_ignorecase_for_codbase] } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : countries_ignorecase_for_user_countries_codbase,
-            '$hcpConsents.response$': true,
-            '$hcpConsents.consent_confirmed$': true,
-            '$hcpConsents.consent.consent_category.type$': process_activity ? { [Op.eq]: process_activity } : { [Op.or]: process_activities }
+            response: true,
+            consent_confirmed: true,
+            '$hcp_profile.application_id$': req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
+            '$hcp_profile.country_iso2$': codbase ? { [Op.any]: [countries_ignorecase_for_codbase] } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : countries_ignorecase_for_user_countries_codbase,
+            '$consent.consent_category.type$': process_activity ? { [Op.eq]: process_activity } : { [Op.or]: process_activities }
         };
 
-        const hcps = await HCPS.findAll({
+        const hcp_consents = await HcpConsents.findAll({
             where: hcp_filter,
+            raw: false,
             include: [
                 {
-                    model: Application,
-                    as: 'application',
-                    attributes: ['name'],
+                    model: HCPS,
+                    attributes: ['email', 'first_name', 'last_name', 'created_at'],
+                    order: [
+                        ['created_at', 'DESC'],
+                        ['id', 'ASC']
+                    ],
                 },
                 {
-                model: HcpConsents,
-                as: 'hcpConsents',
-                attributes: ['consent_id', 'response', 'consent_confirmed'],
-                include: [{
                     model: Consent,
                     attributes: ['preference', 'legal_basis', 'updated_at'],
                     include: [
-                    {
-                        model: ConsentCategory,
-                        attributes: ['title', 'type'],
-                    },
-                    {
-                        model: ConsentCountry,
-                        as: 'consent_country',
-                        attributes: ['country_iso2', 'opt_type'],
-                    }
-                ]
-                }],
-            }],
-            attributes: ['email', 'first_name', 'last_name', 'created_at'],
+                        {
+                            model: ConsentCategory,
+                            attributes: ['title', 'type'],
+                        },
+                        {
+                            model: ConsentCountry,
+                            as: 'consent_country',
+                            attributes: ['country_iso2', 'opt_type'],
+                        }
+                    ]
+                }
+            ],
+            attributes: ['consent_id', 'response', 'consent_confirmed'],
             offset,
             limit,
             subQuery: false,
-            order: [
-                ['created_at', 'DESC'],
-                ['id', 'ASC']
-            ]
         });
 
-        
-        hcps.forEach( hcp => {
-            const consents = hcp.hcpConsents.map( hcpConsent => {
-                const consent = {
-                    consent_id: hcpConsent.consent_id,
-                    response: hcpConsent.response,
-                    consent_confirmed: hcpConsent.consent_confirmed,
-                    preference: hcpConsent.consent.preference,
-                    legal_basis: hcpConsent.consent.legal_basis,
-                    given_date: hcpConsent.consent.updated_at,
-                    title: hcpConsent.consent.consent_category.title,
-                    type: hcpConsent.consent.consent_category.type,
-                    country_iso2: hcpConsent.consent.consent_country.country_iso2,
-                    opt_type: hcpConsent.consent.consent_country.opt_type,
-                };
-
-                return consent;
-            });
-            hcp.dataValues.consents = consents;
-            delete hcp.dataValues['hcpConsents'];
+        hcp_consents.forEach( hcp_consent => {
+            hcp_consent.dataValues.consent_id = hcp_consent.consent_id;
+            hcp_consent.dataValues.response = hcp_consent.response;
+            hcp_consent.dataValues.consent_confirmed = hcp_consent.consent_confirmed;
+            hcp_consent.dataValues.legal_basis = hcp_consent.consent.legal_basis;
+            hcp_consent.dataValues.given_date = hcp_consent.consent.updated_at;
+            hcp_consent.dataValues.title = hcp_consent.consent.consent_category.title;
+            hcp_consent.dataValues.type = hcp_consent.consent.consent_category.type;
+            hcp_consent.dataValues.country_iso2 = hcp_consent.consent.consent_country.country_iso2;
+            hcp_consent.dataValues.opt_type = hcp_consent.consent.consent_country.opt_type;
+            
+            delete hcp_consent.dataValues['consent'];
         });
 
-
-        // const totalUser = await HCPS.count({    //counting total data for pagintaion
-        //     where: hcp_filter
-        // });
-
-        const totalUser = hcps.length;
+        const total_consents = await HcpConsents.count({
+            where: hcp_filter,
+            include: [
+                {
+                    model: HCPS,
+                },
+                {
+                    model: Consent,
+                    include: [
+                        {
+                            model: ConsentCategory,
+                        },
+                        {
+                            model: ConsentCountry,
+                            as: 'consent_country',
+                        }
+                    ]
+                }
+            ],
+        });
 
         const data = {
-            users: hcps,
+            hcp_consents: hcp_consents,
             page: page + 1,
             limit,
-            total: totalUser,
+            total: total_consents,
             start: limit * page + 1,
-            end: offset + limit > totalUser ? totalUser : offset + limit,
+            end: offset + limit > total_consents ? total_consents : offset + limit,
             codbase: codbase ? codbase : '',
             process_activity: process_activity ? process_activity : '',
             countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : req.user.countries
