@@ -3,9 +3,10 @@ import { useSelector } from "react-redux";
 import { NavLink, Route, useRouteMatch, useHistory } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-bootstrap/Modal';
+import Dropdown from 'react-bootstrap/Dropdown';
+import { LinkContainer } from 'react-router-bootstrap';
 import PermissionSetForm from './permission-set-form.component';
 import PermissionSetDetails from "./permission-sets-details";
-
 
 export default function ManagePermissionSets() {
     const [permissionSets, setPermissionSets] = useState([]);
@@ -111,8 +112,16 @@ export default function ManagePermissionSets() {
                                                 <td>{getCountryNamesFromCodes(row.countries)}</td>
                                                 <td>{getServiceCategoryNames(row)}</td>
                                                 <td>
-                                                    <button className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlePermissionSetEditClick(row)} disabled={readOnlyPermissionSets.includes(row.slug)}> <i className="icon icon-edit-pencil pr-2"></i>Edit</button>
-                                                    <button className="btn cdp-btn-outline-primary btn-sm" onClick={() => history.push(`${match.path}/${row.id}`)} > <i className="icon icon-edit-pencil pr-2"></i>Details</button>
+                                                    {/* <button className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlePermissionSetEditClick(row)} disabled={readOnlyPermissionSets.includes(row.slug)}> <i className="icon icon-edit-pencil pr-2"></i>Edit</button>
+                                                    <button className="btn cdp-btn-outline-primary btn-sm" onClick={() => history.push(`${match.path}/${row.id}`)} > <i className="icon icon-edit-pencil pr-2"></i>Details</button> */}
+                                                    <Dropdown className="ml-auto dropdown-customize">
+                                                        <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
+                                                        </Dropdown.Toggle>
+                                                        <Dropdown.Menu>
+                                                            <LinkContainer to="#"><Dropdown.Item onClick={() => handlePermissionSetEditClick(row)}>Edit</Dropdown.Item></LinkContainer>
+                                                            <LinkContainer to={`${match.url}/${row.id}`}><Dropdown.Item onClick={() => null}>Details</Dropdown.Item></LinkContainer>
+                                                        </Dropdown.Menu>
+                                                    </Dropdown>
                                                 </td>
                                             </tr>
                                         ))}

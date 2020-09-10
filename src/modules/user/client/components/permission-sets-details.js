@@ -49,7 +49,7 @@ const PermissionSetDetails = ({ id }) => {
         <div className="profile-detail__row pb-0 pb-sm-2 d-block d-sm-flex">
             <div className="profile-detail__col pb-3 pr-0 pr-sm-3">
                 <span className="mr-2 d-block profile-detail__label">Description</span>
-                <span className="profile-detail__value text-capitalize">{permissionDetails ? permissionDetails.description : nullValueToken}</span>
+                <span className="profile-detail__value">{permissionDetails ? permissionDetails.description : nullValueToken}</span>
             </div>
             <div className="profile-detail__col pb-3">
                 <span className="mr-2 d-block profile-detail__label">Type</span>
