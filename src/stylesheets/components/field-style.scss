@@ -39,9 +39,11 @@
 }
 
 input:checked + .slider {
-    background-color: #144D43;
+    background-color: $primary-color;
 }
-
+input[disabled]:checked + .slider {
+    background: $primary-color-lighter;
+}
 input[disabled] + .slider {
     background: #F4F4F5;
     cursor: default;
