@@ -379,8 +379,8 @@ export default function hcpUsers() {
                                                     <th><span className={sort.value === 'uuid' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('uuid')}>UUID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th><span >Country</span></th>
                                                     <th><span className={sort.value === 'specialty_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('specialty_name')}>Specialty<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                    <th className="consent-col">Single Opt-In<br /> Opt-in</th>
-                                                    <th className="consent-col">Double Opt-In<br /> Opt-in</th>
+                                                    <th className="consent-col">Single<br /> Opt-In</th>
+                                                    <th className="consent-col">Double<br /> Opt-In</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
