@@ -1,6 +1,7 @@
 const path = require('path');
 const { Op, QueryTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
+const validator = require('validator');
 const PermissionSet = require('./permission-set.model');
 const PermissionSet_ServiceCategory = require('./permissionSet-serviceCategory.model');
 const PermissionSet_Application = require('./permissionSet-application.model');
@@ -81,7 +82,7 @@ async function getPermissionSet(req, res) {
     const id = req.params.id;
 
     try {
-        if(!id) return res.status(400).send('Invalid parameter.');
+        if(!id || !validator.isUUID(id)) return res.status(400).send('Invalid parameter.');
 
         const permissionSet = await PermissionSet.findOne({
             where: { id },

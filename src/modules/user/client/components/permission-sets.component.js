@@ -15,7 +15,6 @@ export default function ManagePermissionSets() {
     const countries = useSelector(state => state.userReducer.countries);
     const match = useRouteMatch();
     const history = useHistory();
-    const readOnlyPermissionSets = ['system_admin', 'site_admin', 'data_privacy_officer', 'gds'];
 
     const getPermissionSets = async () => {
         const response = await axios.get('/api/permissionSets');
@@ -118,7 +117,7 @@ export default function ManagePermissionSets() {
                                                         <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
-                                                            <LinkContainer to="#"><Dropdown.Item onClick={() => handlePermissionSetEditClick(row)}>Edit</Dropdown.Item></LinkContainer>
+                                                            <LinkContainer to="#"><Dropdown.Item disabled={row.type === 'standard'} onClick={() => handlePermissionSetEditClick(row)}>Edit</Dropdown.Item></LinkContainer>
                                                             <LinkContainer to={`${match.url}/${row.id}`}><Dropdown.Item onClick={() => null}>Details</Dropdown.Item></LinkContainer>
                                                         </Dropdown.Menu>
                                                     </Dropdown>

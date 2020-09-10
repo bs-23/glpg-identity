@@ -3,15 +3,24 @@ import Axios from 'axios';
 import { useSelector, useDispatch } from "react-redux";
 import { getCountries } from '../../../user/client/user.actions'
 
+const WarningMessage = ({ message }) => <div className="alert alert-warning">
+    {message}
+</div>
+
 const PermissionSetDetails = ({ id }) => {
     const [permissionDetails, setPermissionDetails] = useState();
+    const [notFound, setNotFound] = useState(false);
+    const [error, setError] = useState(false);
     const countries = useSelector(state => state.userReducer.countries);
     const dispatch = useDispatch();
     const nullValueToken = '--';
 
     const getPermissionDetails = async () => {
         if(!id) return;
-        const response = await Axios.get(`/api/permissionSets/${id}`);
+        const response = await Axios.get(`/api/permissionSets/${id}`)
+            .catch(err => {
+                err.response && err.response.status === 404 ? setNotFound(true) : setError(true);
+            });
         setPermissionDetails(response.data);
     }
 
@@ -43,6 +52,10 @@ const PermissionSetDetails = ({ id }) => {
         dispatch(getCountries());
         getPermissionDetails();
     }, []);
+
+    if(notFound) return <WarningMessage message="Permission set not found." />
+
+    if(error) return <WarningMessage message="Something went wrong." />
 
     return <div className="profile-detail p-3 py-sm-4 px-sm-5 mb-3 mb-sm-0">
         <h2 className="profile-detail__name pb-3">{ permissionDetails ? permissionDetails.title  : '' }</h2>
