@@ -3,6 +3,7 @@ const { DataTypes } = require('sequelize');
 const PermissionSet = require('./permission-set.model');
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
+const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
 const UserProfile_PermissionSet = sequelize.cdpConnector.define('userProfiles_permissionSets', {
     id: {
@@ -20,7 +21,7 @@ const UserProfile_PermissionSet = sequelize.cdpConnector.define('userProfiles_pe
         type: DataTypes.UUID
     }
 }, {
-    schema: 'ciam',
+    schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
     tableName: 'userProfiles_permissionSets',
     timestamps: true,
     createdAt: 'created_at',

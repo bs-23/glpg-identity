@@ -10,7 +10,7 @@ module.exports = async function() {
     const specHelper = require(path.join(process.cwd(), 'jest/spec.helper'));
     const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 
-    await sequelize.cdpConnector.query('CREATE SCHEMA IF NOT EXISTS ciam');
+    await sequelize.cdpConnector.query('CREATE SCHEMA IF NOT EXISTS cdp');
 
     const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
     const Hcp_profile = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_profile.model'));

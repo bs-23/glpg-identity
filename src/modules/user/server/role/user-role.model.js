@@ -3,6 +3,7 @@ const { DataTypes } = require('sequelize');
 const Role = require('./role.model');
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
+const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
 const User_Role = sequelize.cdpConnector.define('users_roles', {
     id: {
@@ -20,8 +21,8 @@ const User_Role = sequelize.cdpConnector.define('users_roles', {
         type: DataTypes.UUID
     }
 }, {
-    schema: 'ciam',
-    tableName: 'users_roles',
+    schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
+    tableName: 'user_roles',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'

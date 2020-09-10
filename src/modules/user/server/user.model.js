@@ -6,6 +6,7 @@ const Sequelize = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const UserProfile = require('./user-profile.model');
 const User_Role = require('./role/user-role.model');
+const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
 const User = sequelize.cdpConnector.define('users', {
     id: {
@@ -93,7 +94,7 @@ const User = sequelize.cdpConnector.define('users', {
         }
     },
 }, {
-    schema: 'ciam',
+    schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
     tableName: 'users',
     timestamps: true,
     createdAt: 'created_at',

@@ -8,6 +8,6 @@ module.exports = async function() {
 
     const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 
-    await sequelize.cdpConnector.query('DROP SCHEMA "ciam" CASCADE');
+    await sequelize.cdpConnector.query('DROP SCHEMA "cdp" CASCADE');
     await sequelize.cdpConnector.close();
 };
