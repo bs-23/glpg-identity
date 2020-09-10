@@ -254,7 +254,9 @@
     content: "\32";
 }
 
-
+.icon-setting:before {
+    content: "\33";
+}
 
 //custome css
 $class-slug: icon- !default;
@@ -280,7 +282,9 @@ $class-slug: icon- !default;
 }
 
 
-.icon.icon-plus {
+.icon.icon-plus,
+.icon-setting,
+.icon-position-bit-down {
     position: relative;
     top: 2px;
 }

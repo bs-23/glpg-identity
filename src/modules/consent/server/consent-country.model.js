@@ -1,8 +1,8 @@
 const path = require('path');
 const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
+const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const Consent = require('./consent.model');
-
 
 const ConsentCountry = sequelize.cdpConnector.define('consent_countries', {
     id: {
@@ -27,13 +27,14 @@ const ConsentCountry = sequelize.cdpConnector.define('consent_countries', {
     }
 
 }, {
-    schema: 'ciam',
+    schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
     tableName: 'consent_countries',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
 
-ConsentCountry.belongsTo(Consent, {as: 'consent', foreignKey: 'consent_id'});
+ConsentCountry.belongsTo(Consent, { as: 'consent', foreignKey: 'consent_id' });
+Consent.hasOne(ConsentCountry, { as: 'consent_country', foreignKey: 'consent_id' });
 
 module.exports = ConsentCountry;

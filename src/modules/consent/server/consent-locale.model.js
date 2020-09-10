@@ -3,6 +3,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const Consent = require('./consent.model');
 const validator = require('validator');
+const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
 const ConsentLanguage = sequelize.cdpConnector.define('consent_locales', {
     id: {
@@ -26,7 +27,7 @@ const ConsentLanguage = sequelize.cdpConnector.define('consent_locales', {
         type: DataTypes.STRING
     }
 }, {
-    schema: 'ciam',
+    schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
     tableName: 'consent_locales',
     timestamps: true,
     createdAt: 'created_at',

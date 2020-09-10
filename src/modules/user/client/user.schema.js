@@ -8,14 +8,19 @@ function validatePassword(password) {
     const hasUppercase = new RegExp("^(?=.*[A-Z])").test(password);
     const hasLowercase = new RegExp("^(?=.*[a-z])").test(password);
     const hasDigit = new RegExp("^(?=.*[0-9])").test(password);
-    const hasSpecialCharacter = new RegExp("[!\"#$%&'\(\)\*\+,\-\.\/:;<=>\?@\[\\]\^_`\{\|\}\~]").test(password);
+    const hasSpecialCharacter = new RegExp("[!\"#$%&'\(\)\*\+,\-\.\\\\/:;<=>\?@\[\\]\^_`\{\|\}\~]").test(password);
 
     if (password && (password.length < minLength || password.length > maxLength || !hasUppercase || !hasLowercase || !hasDigit || !hasSpecialCharacter)) {
         return false;
     }
 
     return true;
+}
 
+function hasValidCharacters(password) {
+    var pattern = new RegExp("^[a-zA-Z0-9!\"#$%&'\(\)\*\+,\-\.\\\\/:;<=>\?@\[\\]\^_`\{\|\}\~]*$");
+    const hasValidCharacters = pattern.test(password);
+    return hasValidCharacters;
 }
 
 // const validatePhone = phone => {
@@ -69,8 +74,10 @@ export const changePasswordSchema = object().shape({
         .min(8, 'This field must be at least 8 characters long.')
         .max(50, 'This field must be at most 50 characters long.')
         .required('This field must not be empty.')
-        .test('is-valid-password', 'Password must contain at least a digit, an uppercase, a lowercase and a special character',
-            password => validatePassword(password)),
+        .test('is-valid-password', 'Password must contain at least an uppercase, a lowercase, a digit and a special character i.e. !”#$%&’()*+,-./:;<=>?@[]^_{|}~',
+            password => validatePassword(password))
+        .test('is-valid-characters', 'Password has one or more invalid character.',
+            password => hasValidCharacters(password)),
     confirmPassword: string()
         .required('This field must not be empty.')
         .oneOf([ref('newPassword'), null], 'Passwords must match'),
@@ -82,7 +89,9 @@ export const resetPasswordSchema = object().shape({
         .max(50, 'This field must be at most 50 characters long.')
         .required('This field must not be empty.')
         .test('is-valid-password', 'Password must contain at least an uppercase, a lowercase, a digit and a special character i.e. !”#$%&’()*+,-./:;<=>?@[]^_{|}~',
-            password => validatePassword(password)),
+            password => validatePassword(password))
+        .test('is-valid-characters', 'Password has one or more invalid character. Click info icon for hints.',
+        password => hasValidCharacters(password)),
     confirmPassword: string()
         .required('This field must not be empty.')
         .oneOf([ref('newPassword'), null], 'Passwords must match'),
