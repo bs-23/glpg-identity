@@ -20,11 +20,9 @@ const ConsentPerformanceReport = () => {
     const [allCountries, setAllCountries] = useState([]);
     const [allProcessActivities, setAllProcessActivities] = useState([]);
     const [allOptTypes, setAllOptTypes] = useState([]);
-    // const [show, setShow] = useState({ profileManage: false, updateStatus: false });
-    // const [currentAction, setCurrentAction] = useState({ userId: null, action: null });
-    // const [currentUser, setCurrentUser] = useState({});
-    const [mark, setMark] = useState([]);
-    const { addToast } = useToasts();
+    const [show, setShow] = useState({ profileManage: false, updateStatus: false });
+    const [currentAction, setCurrentAction] = useState({ userId: null, action: null });
+    const [currentUser, setCurrentUser] = useState({});
     const [sort, setSort] = useState({ type: 'ASC', value: null });
 
     const consents_report = useSelector(state => state.consentReducer.consents);
@@ -67,6 +65,23 @@ const ConsentPerformanceReport = () => {
         ));
     }
 
+    const getConsentsForCurrentUser = async () => {
+        const { data } = await axios.get(`/api/hcp-profiles/${currentUser.hcp_profile.id}/consents`);
+        setCurrentUser({ ...currentUser, consents: data.data });
+    }
+
+    const onManageProfile = (user) => {
+        setCurrentAction({ userId: user.hcp_profile.id, action: 'Manage Profile' });
+        setShow({ ...show, profileManage: true });
+        setCurrentUser(user);
+    }
+
+    const getCountryName = (country_iso2) => {
+        if (!allCountries || !country_iso2) return null;
+        const country = allCountries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+        return country && country.countryname;
+    }
+
     function makeUrl(url_parameters){
         let url = '';
         if(!Array.isArray(url_parameters)) return url;
@@ -80,6 +95,15 @@ const ConsentPerformanceReport = () => {
             }
         });
         return url;
+    }
+
+    function titleCase(str) {
+        let splitStr = str.toLowerCase().split('-');
+        for (let i = 0; i < splitStr.length; i++) {
+            splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);     
+        }
+        
+        return splitStr.join(' '); 
     }
 
     useEffect(() => {
@@ -172,7 +196,7 @@ const ConsentPerformanceReport = () => {
                                                             <LinkContainer key={index} to={`consent-performance-report${makeUrl( [{ name: 'codbase', value: consents_report.codbase }, {name: 'process_activity', value: consents_report.process_activity }, { name: 'opt_type', value: item }] )}`}>
                                                                 <Dropdown.Item className={consents_report.opt_type === item ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('',  consents_report.codbase, consents_report.process_activity, item))}>
                                                                     {
-                                                                        item === consents_report.opt_type ? null : item
+                                                                        item === consents_report.opt_type ? null : titleCase(item)
                                                                     }
                                                                 </Dropdown.Item>
                                                             </LinkContainer>
@@ -184,6 +208,93 @@ const ConsentPerformanceReport = () => {
                                     }
                                 </div>
                             </div>
+
+
+                            <Modal
+                                size="lg"
+                                show={show.profileManage}
+                                onShow={getConsentsForCurrentUser}
+                                onHide={() => { setCurrentAction({ action: null, userId: null }); setShow({ ...show, profileManage: false }) }}
+                                dialogClassName="modal-customize mw-75"
+                                aria-labelledby="example-custom-modal-styling-title"
+                                centered
+                            >
+                                <Modal.Header closeButton>
+                                    <Modal.Title id="example-custom-modal-styling-title">
+                                        Profile Details
+                                    </Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                    { currentUser.hcp_profile && 
+                                    <div className="px-4 py-3">
+                                        <div className="row">
+                                            <div className="col">
+                                                <h4 className="mt-1 font-weight-bold">{`${currentUser.hcp_profile.first_name || ''} ${currentUser.hcp_profile.last_name || ''}`}</h4>
+                                                <div className="">{currentUser.hcp_profile.specialty_description}</div>
+                                            </div>
+                                        </div>
+                                        <div className="row mt-3">
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">UUID</div>
+                                                <div className="">{currentUser.hcp_profile.uuid || '--'}</div>
+                                            </div>
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">OneKeyID</div>
+                                                <div className="">{currentUser.hcp_profile.individual_id_onekey || '--'}</div>
+                                            </div>
+                                        </div>
+                                        <div className="row mt-3">
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Email</div>
+                                                <div className="">{currentUser.hcp_profile.email || '--'}</div>
+                                            </div>
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Phone Number</div>
+                                                <div className="">{currentUser.hcp_profile.telephone || '--'}</div>
+                                            </div>
+                                        </div>
+                                        <div className="row mt-3">
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Country</div>
+                                                <div className="">{getCountryName(currentUser.hcp_profile.country_iso2) || '--'}</div>
+                                            </div>
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Date of Registration</div>
+                                                <div className="">{currentUser.hcp_profile.created_at ? (new Date(currentUser.hcp_profile.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.') : '--'}</div>
+                                            </div>
+                                        </div>
+                                        <div className="row mt-3">
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Status</div>
+                                                <div className="text-capitalize">{currentUser.hcp_profile.status ? _.startCase(_.toLower(currentUser.hcp_profile.status.replace(/_/g, ' '))) : '--'}</div>
+                                            </div>
+                                        </div>
+                                        <div className="row mt-4">
+                                            <div className="col accordion-consent rounded shadow-sm p-0">
+                                                <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Consents</h4>
+                                                {currentUser.consents && currentUser.consents.length ? <Accordion>{currentUser.consents.map(consent =>
+                                                    <Card key={consent.id} className="">
+                                                        <Accordion.Collapse eventKey={consent.id}>
+                                                            <Card.Body className="">
+                                                                <div>{parse(consent.rich_text)}</div>
+                                                                <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Consent opt-in type:</span> <span className="text-capitalize">{consent.opt_type}</span></div>
+                                                                {consent.consent_given && <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Consent given date:</span>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>}
+                                                            </Card.Body>
+                                                        </Accordion.Collapse>
+                                                        <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
+                                                            <span className="d-flex align-items-center"><i class={`icon ${consent.consent_given ? 'icon-check-filled' : 'icon-close-circle text-danger'} cdp-text-primary mr-4 consent-check`}></i> <span className="consent-summary">{consent.title}</span></span>
+                                                            <i className="icon icon-arrow-down ml-2 accordion-consent__icon-down"></i>
+                                                        </Accordion.Toggle>
+                                                    </Card>
+                                                )}</Accordion> : <div className="m-3 alert alert-warning">The HCP has not given any consent.</div>}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    }
+                                </Modal.Body>
+                            </Modal>
+
+
                             
                             {consents_report['hcp_consents'] && consents_report['hcp_consents'].length > 0 &&
                                 <React.Fragment>
@@ -209,8 +320,8 @@ const ConsentPerformanceReport = () => {
                                                         <td>{row.hcp_profile.last_name}</td>
                                                         <td><i className="icon icon-check-filled icon-position-bit-down text-primary-color mr-2 cdp-text-primary"></i>{row.hcp_profile.email}</td>
                                                         <td>{row.title}</td>
-                                                        <td>{row.opt_type}</td>
-                                                        <td>{row.legal_basis}</td>
+                                                        <td>{titleCase(row.opt_type)}</td>
+                                                        <td>{titleCase(row.legal_basis)}</td>
                                                         <td>{row.preferences}</td>
                                                         <td>{(new Date(row.given_date)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                         <td>

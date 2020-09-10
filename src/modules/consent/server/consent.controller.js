@@ -144,7 +144,7 @@ async function getConsentsReport(req, res){
             include: [
                 {
                     model: HCPS,
-                    attributes: ['email', 'first_name', 'last_name', 'created_at'],
+                    attributes: { exclude: ['password', 'created_by', 'updated_by'] },
                     order: [
                         ['created_at', 'DESC'],
                         ['id', 'ASC']
