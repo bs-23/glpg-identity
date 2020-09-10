@@ -165,8 +165,9 @@ async function getConsentsReport(req, res){
                 }],
             }],
             attributes: ['email', 'first_name', 'last_name', 'created_at'],
-            // offset,
-            // limit,
+            offset,
+            limit,
+            subQuery: false,
             order: [
                 ['created_at', 'DESC'],
                 ['id', 'ASC']
