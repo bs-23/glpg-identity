@@ -167,7 +167,10 @@ async function getCommaSeparatedAppCountryPermissions(user) {
             const applicationsCountries = await getUserApplicationCountry(rolePermSet.ps);
             role_applications = role_applications.concat(applicationsCountries[0]);
             role_countries = role_countries.concat(applicationsCountries[1])
-            role_ps.push(rolePermSet.ps.title);
+            role_ps.push({
+                title: rolePermSet.ps.title,
+                type: rolePermSet.ps.type,
+            });
 
         }
 
@@ -180,7 +183,10 @@ async function getCommaSeparatedAppCountryPermissions(user) {
             const applicationsCountries = await getUserApplicationCountry(userProPermSet.ps);
             profile_applications = profile_applications.concat(applicationsCountries[0]);
             profile_countries = profile_countries.concat(applicationsCountries[1]);
-            profile_ps.push(userProPermSet.ps.title);
+            profile_ps.push({
+                title: userProPermSet.ps.title,
+                type: userProPermSet.ps.type,
+            });
         }
     }
 
