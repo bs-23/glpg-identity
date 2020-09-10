@@ -52,7 +52,6 @@ const ToggleList = ({ name, options, labelExtractor, idExtractor }) => {
 
 const ProfileForm = ({ onSuccess, permissionSets, preFill }) => {
     const { addToast } = useToasts();
-    const nonAssignablePermissionSet = ['system_admin'];
 
     const handleSubmit = (values, actions) => {
         const promise = preFill ? axios.put(`/api/profiles/${preFill.id}`, values) : axios.post('/api/profiles', values);
@@ -107,7 +106,7 @@ const ProfileForm = ({ onSuccess, permissionSets, preFill }) => {
                                     <div className="col-12">
                                         <div className="row">
                                             <FormField name="permissionSets" label="Select Permission Sets">
-                                                <ToggleList name="permissionSets" options={permissionSets.map(ps => ({...ps, disabled: nonAssignablePermissionSet.includes(ps.slug)}))} idExtractor={item => item.id} labelExtractor={item => item.title} />
+                                                <ToggleList name="permissionSets" options={permissionSets.map(ps => ({...ps, disabled: ps.type === 'standard'}))} idExtractor={item => item.id} labelExtractor={item => item.title} />
                                             </FormField>
                                         </div>
                                         <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting} > Submit </button>
@@ -127,7 +126,7 @@ export default function ManageProfiles() {
     const [permissionSets, setPermissionSets] = useState([]);
     const [modalShow, setModalShow] = useState({ createProfile: false });
     const [profileEditData, setProfileEditData] = useState(null);
-    const readOnlyProfiles = ['system_admin', 'site_admin', 'global_data_steward', 'data_privacy_officer', 'local_data_steward'];
+    const readOnlyProfiles = ['system_admin'];
 
     const getProfiles = async () => {
         const { data } = await axios.get('/api/profiles');
