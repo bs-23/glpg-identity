@@ -96,7 +96,7 @@ const UserDetails = (props) => {
                                             <span className="mr-2 d-block profile-detail__label">Permission Sets</span>
                                             <span className="profile-detail__value">
                                                 {userInfo.permissionSets && userInfo.permissionSets.length ? userInfo.permissionSets.map(ps =>
-                                                    <li key={ps.title}>{ps.title} - <span className="text-muted">{ps.type}</span></li>
+                                                    <div key={ps.title}><i className="icon icon-check-filled cdp-text-primary mr-1 small"></i> {ps.title} - <span className="text-muted small text-capitalize font-italic">{ps.type}</span></div>
                                                     ) : nullValueToken}
                                             </span>
                                         </div>
