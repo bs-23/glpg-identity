@@ -110,6 +110,7 @@ async function getConsentsReport(req, res){
         const limit = 15;
         const codbase = req.query.codbase === undefined ? '' : req.query.codbase;
         const process_activity = req.query.process_activity === undefined ? '' : req.query.process_activity;
+        const opt_type = req.query.opt_type === undefined ? '' : req.query.opt_type;
         const offset = page * limit;
 
         const application_list = (await HCPS.findAll()).map(i => i.get("application_id"));
@@ -127,18 +128,19 @@ async function getConsentsReport(req, res){
 
 
         const process_activities = (await ConsentCategory.findAll()).map(i => i.type);
+        const opt_types = [...new Set((await ConsentCountry.findAll()).map(i => i.opt_type))];
 
         const hcp_filter = {
             response: true,
             consent_confirmed: true,
             '$hcp_profile.application_id$': req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
             '$hcp_profile.country_iso2$': codbase ? { [Op.any]: [countries_ignorecase_for_codbase] } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : countries_ignorecase_for_user_countries_codbase,
-            '$consent.consent_category.type$': process_activity ? { [Op.eq]: process_activity } : { [Op.or]: process_activities }
+            '$consent.consent_category.type$': process_activity ? { [Op.eq]: process_activity } : { [Op.or]: process_activities },
+            '$consent.consent_country.opt_type$': opt_type ? { [Op.eq]: opt_type } : { [Op.or]: opt_types }
         };
 
         const hcp_consents = await HcpConsents.findAll({
             where: hcp_filter,
-            raw: false,
             include: [
                 {
                     model: HCPS,
@@ -167,7 +169,7 @@ async function getConsentsReport(req, res){
             attributes: ['consent_id', 'response', 'consent_confirmed'],
             offset,
             limit,
-            subQuery: false,
+            distinct: 'id'
         });
 
         hcp_consents.forEach( hcp_consent => {
@@ -214,6 +216,7 @@ async function getConsentsReport(req, res){
             end: offset + limit > total_consents ? total_consents : offset + limit,
             codbase: codbase ? codbase : '',
             process_activity: process_activity ? process_activity : '',
+            opt_type: opt_type ? opt_type : '',
             countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : req.user.countries
         };
 
@@ -238,6 +241,18 @@ async function getAllProcessActivities(req, res) {
     }
 }
 
+async function getAllOptTypes(req, res){
+    try{
+        const opt_types = new Set((await ConsentCountry.findAll()).map(i => i.opt_type));
+        res.json([...opt_types]);
+    }
+    catch(err){
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 exports.getConsents = getConsents;
 exports.getConsentsReport = getConsentsReport;
 exports.getAllProcessActivities = getAllProcessActivities;
+exports.getAllOptTypes = getAllOptTypes;

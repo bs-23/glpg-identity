@@ -19,6 +19,7 @@ const ConsentPerformanceReport = () => {
     const [countries, setCountries] = useState([]);
     const [allCountries, setAllCountries] = useState([]);
     const [allProcessActivities, setAllProcessActivities] = useState([]);
+    const [allOptTypes, setAllOptTypes] = useState([]);
     // const [show, setShow] = useState({ profileManage: false, updateStatus: false });
     // const [currentAction, setCurrentAction] = useState({ userId: null, action: null });
     // const [currentUser, setCurrentUser] = useState({});
@@ -29,11 +30,11 @@ const ConsentPerformanceReport = () => {
     const consents_report = useSelector(state => state.consentReducer.consents);
 
     const pageLeft = () => {
-        if (consents_report.page > 1) dispatch(getConsentReport(consents_report.page - 1, consents_report.codbase, consents_report.process_activity));
+        if (consents_report.page > 1) dispatch(getConsentReport(consents_report.page - 1, consents_report.codbase, consents_report.process_activity, consents_report.opt_type));
     };
 
     const pageRight = () => {
-        if (consents_report.end !== consents_report.total) dispatch(getConsentReport(consents_report.page + 1, consents_report.codbase, consents_report.process_activity));
+        if (consents_report.end !== consents_report.total) dispatch(getConsentReport(consents_report.page + 1, consents_report.codbase, consents_report.process_activity, consents_report.opt_type));
     };
 
     async function getCountries() {
@@ -51,19 +52,41 @@ const ConsentPerformanceReport = () => {
         setAllProcessActivities(response.data);
     }
 
+    async function getAllOptTypes(){
+        const response = await axios.get('/api/get-all-opt-types');
+        setAllOptTypes(response.data);
+    }
+
     async function loadConsentsReport() {
         const params = new URLSearchParams(window.location.search);
         dispatch(getConsentReport(
             params.get('page') ? params.get('page') : '',
             params.get('codbase') ? params.get('codbase') : '',
-            params.get('process_activity') ? params.getAll('process_activity') : ''
+            params.get('process_activity') ? params.getAll('process_activity') : '',
+            params.get('opt_type') ? params.getAll('opt_type') : ''
         ));
+    }
+
+    function makeUrl(url_parameters){
+        let url = '';
+        if(!Array.isArray(url_parameters)) return url;
+
+        
+        url_parameters.forEach( item => {
+            if(item.value){
+                if(url.length) url+='&';
+                if(url.length === 0) url+='?'
+                url+=`${item.name}=${item.value}`;
+            }
+        });
+        return url;
     }
 
     useEffect(() => {
         getCountries();
         getAllCountries();
         getAllProcessActivities();
+        getAllOptTypes();
         loadConsentsReport();
     }, []);
 
@@ -95,11 +118,13 @@ const ConsentPerformanceReport = () => {
                                                     {consents_report.codbase && (countries.find(i => i.codbase === consents_report.codbase)) ? (countries.find(i => i.codbase === consents_report.codbase)).codbase_desc : 'All'}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
-                                                    <LinkContainer to={`consent-performance-report${consents_report.process_activity ? `?process_activity=${consents_report.process_activity}` : ''}`}><Dropdown.Item className={consents_report.codbase === '' ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('', '', consents_report.process_activity))}>All</Dropdown.Item></LinkContainer>
+                                                    <LinkContainer to={`consent-performance-report${makeUrl( [{name: 'process_activity', value: consents_report.process_activity }, { name: 'opt_type', value: consents_report.opt_type }] )}`}>
+                                                        <Dropdown.Item className={consents_report.codbase === '' ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('', '', consents_report.process_activity, consents_report.opt_type))}>All</Dropdown.Item>
+                                                    </LinkContainer>
                                                     {
                                                         countries.map((item, index) => (
-                                                            <LinkContainer key={index} to={`consent-performance-report?codbase=${item.codbase}${consents_report.process_activity ? `&process_activity=${consents_report.process_activity}` : ''}`}>
-                                                                <Dropdown.Item className={consents_report.countries.includes(item.country_iso2) && consents_report.codbase === item.codbase ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('',  item.codbase, consents_report.process_activity))}>
+                                                            <LinkContainer key={index} to={`consent-performance-report${makeUrl( [{ name: 'codbase', value: item.codbase }, {name: 'process_activity', value: consents_report.process_activity }, { name: 'opt_type', value: consents_report.opt_type }] )}`}>
+                                                                <Dropdown.Item className={consents_report.countries.includes(item.country_iso2) && consents_report.codbase === item.codbase ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('',  item.codbase, consents_report.process_activity, consents_report.opt_type))}>
                                                                     {
                                                                         consents_report.countries.includes(item.country_iso2) ? item.codbase_desc : null
                                                                     }
@@ -116,13 +141,38 @@ const ConsentPerformanceReport = () => {
                                                     {consents_report.process_activity && (allProcessActivities.find(i => i.type === consents_report.process_activity)) ? (allProcessActivities.find(i => i.type === consents_report.process_activity)).title : 'All'}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
-                                                    <LinkContainer to={`consent-performance-report${consents_report.codbase ? `?codbase=${consents_report.codbase}` : ''}`}><Dropdown.Item className={consents_report.process_activity === '' ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('', consents_report.codbase, ''))}>All</Dropdown.Item></LinkContainer>
+                                                    <LinkContainer to={`consent-performance-report${makeUrl( [{name: 'codbase', value: consents_report.codbase }, { name: 'opt_type', value: consents_report.opt_type }] )}`}>
+                                                        <Dropdown.Item className={consents_report.process_activity === '' ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('', consents_report.codbase, '', consents_report.opt_type))}>All</Dropdown.Item>
+                                                    </LinkContainer>
                                                     {
                                                         allProcessActivities.map((item, index) => (
-                                                            <LinkContainer key={index} to={`consent-performance-report?${consents_report.codbase ? `codbase=${consents_report.codbase}` : ''}${`${consents_report.codbase ? '&' : ''}process_activity=${item.type}`}`}>
-                                                                <Dropdown.Item className={consents_report.process_activity === item.type ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('',  consents_report.codbase, item.type))}>
+                                                            <LinkContainer key={index} to={`consent-performance-report${makeUrl( [{ name: 'codbase', value: consents_report.codbase }, {name: 'process_activity', value: item.type }, { name: 'opt_type', value: consents_report.opt_type }] )}`}>
+                                                                <Dropdown.Item className={consents_report.process_activity === item.type ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('',  consents_report.codbase, item.type, consents_report.opt_type))}>
                                                                     {
                                                                         item.type === consents_report.process_activity ? null : item.title
+                                                                    }
+                                                                </Dropdown.Item>
+                                                            </LinkContainer>
+                                                        ))
+                                                    }
+                                                </Dropdown.Menu>
+                                            </Dropdown>
+
+                                            <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-btn-primary text-white dropdown shadow-sm">
+                                                Opt-In Type
+                                                <Dropdown.Toggle variant="" className="ml-2 bg-white rounded-0">
+                                                {consents_report.opt_type && (allOptTypes.includes(consents_report.opt_type)) ? consents_report.opt_type : 'All'}
+                                                </Dropdown.Toggle>
+                                                <Dropdown.Menu>
+                                                    <LinkContainer to={`consent-performance-report${makeUrl( [{name: 'codbase', value: consents_report.codbase }, { name: 'process_activity', value: consents_report.process_activity }] )}`}>
+                                                        <Dropdown.Item className={consents_report.opt_type === '' ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('', consents_report.codbase, consents_report.process_activity, ''))}>All</Dropdown.Item>
+                                                    </LinkContainer>
+                                                    {
+                                                        allOptTypes.map((item, index) => (
+                                                            <LinkContainer key={index} to={`consent-performance-report${makeUrl( [{ name: 'codbase', value: consents_report.codbase }, {name: 'process_activity', value: consents_report.process_activity }, { name: 'opt_type', value: item }] )}`}>
+                                                                <Dropdown.Item className={consents_report.opt_type === item ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('',  consents_report.codbase, consents_report.process_activity, item))}>
+                                                                    {
+                                                                        item === consents_report.opt_type ? null : item
                                                                     }
                                                                 </Dropdown.Item>
                                                             </LinkContainer>
@@ -158,7 +208,7 @@ const ConsentPerformanceReport = () => {
                                                         <td>{row.hcp_profile.first_name}</td>
                                                         <td>{row.hcp_profile.last_name}</td>
                                                         <td><i className="icon icon-check-filled icon-position-bit-down text-primary-color mr-2 cdp-text-primary"></i>{row.hcp_profile.email}</td>
-                                                        <td>{row.type}</td>
+                                                        <td>{row.title}</td>
                                                         <td>{row.opt_type}</td>
                                                         <td>{row.legal_basis}</td>
                                                         <td>{row.preferences}</td>
