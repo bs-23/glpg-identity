@@ -94,9 +94,9 @@ async function init() {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
 
             const serviceCategories = [
-                { title: "Platform Manager", slug: "platform", created_by: admin.id, updated_by: admin.id },
-                { title: "Information Manager", slug: "information", created_by: admin.id, updated_by: admin.id },
-                { title: "Data Privacy Officer", slug: "privacy", created_by: admin.id, updated_by: admin.id }
+                { title: "Management of Customer Data Platform", slug: "platform", created_by: admin.id, updated_by: admin.id },
+                { title: "Information Management", slug: "information", created_by: admin.id, updated_by: admin.id },
+                { title: "Data Privacy & Consent Management", slug: "privacy", created_by: admin.id, updated_by: admin.id }
             ];
 
             ServiceCategory.destroy({ truncate: { cascade: true } }).then(() => {
@@ -115,10 +115,11 @@ async function init() {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
 
             const permissionSet = [
-                { title: "Standard System Admin Permission Set", slug: "system_admin", type: 'standard', description: "This is the default permission set for System Admin", created_by: admin.id, updated_by: admin.id },
-                { title: "Standard Site Admin Permission Set", slug: "site_admin", type: 'standard', description: "This is the default permission set for Site Admin", countries:["BE", "AD", "DE", "IT", "NL", "ES","IE"], created_by: admin.id, updated_by: admin.id },
-                { title: "Standard GDS Permission Set", slug: "gds", type: 'standard', countries:["BE", "AD", "DE", "IT", "NL", "ES","IE"], description: "This is the default permission set for Global Data Steward", created_by: admin.id, updated_by: admin.id },
-                { title: "Standard DPO Permission Set", slug: "data_privacy_officer", type: 'standard', description: "This is the default permission set for Local Data Steward", created_by: admin.id, updated_by: admin.id }
+                { title: "System Admin Permission Set", slug: "system_admin", type: 'standard', description: "This is the default permission set for System Admin", created_by: admin.id, updated_by: admin.id },
+                { title: "Site Admin Permission Set", slug: "site_admin", type: 'standard', description: "This is the default permission set for Site Admin", countries:["BE", "AD", "DE", "IT", "NL", "ES","IE"], created_by: admin.id, updated_by: admin.id },
+                { title: "GDS Permission Set", slug: "gds", type: 'standard', countries:["BE", "AD", "DE", "IT", "NL", "ES","IE"], description: "This is the default permission set for Global Data Steward", created_by: admin.id, updated_by: admin.id },
+                { title: "LDS Permission Set", slug: "lds", type: 'standard', description: "This is the default permission set for Local Data Steward", created_by: admin.id, updated_by: admin.id },
+                { title: "DPO Permission Set", slug: "data_privacy_officer", type: 'standard', description: "This is the default permission set for Data Privacy Officer", created_by: admin.id, updated_by: admin.id },
             ];
 
             PermissionSet.destroy({ truncate: { cascade: true } }).then(() => {
@@ -150,7 +151,9 @@ async function init() {
                     { permissionSetId: values[1].id, serviceCategoryId: values[2].id },
                     { permissionSetId: values[1].id, serviceCategoryId: values[3].id },
                     { permissionSetId: values[1].id, serviceCategoryId: values[4].id },
-                    { permissionSetId: values[5].id, serviceCategoryId: values[4].id }
+
+                    { permissionSetId: values[5].id, serviceCategoryId: values[4].id },
+                    { permissionSetId: values[5].id, serviceCategoryId: values[2].id }
                 ];
 
                 PermissionSet_ServiceCategory.destroy({ truncate: { cascade: true } }).then(() => {
@@ -176,13 +179,16 @@ async function init() {
         const gdsProfile = UserProfile.findOne({ where: { slug: 'global_data_steward' } });
         const dpoProfile = UserProfile.findOne({ where: { slug: 'data_privacy_officer' } });
         const dpoPermissionSet = PermissionSet.findOne({ where: { slug: 'data_privacy_officer' } });
+        const ldsProfile = UserProfile.findOne({ where: { slug: 'local_data_steward' } });
+        const ldsPermissionSet = PermissionSet.findOne({ where: { slug: 'lds' } });
 
-        Promise.all([systemAdminProfile, systemAdminPermissionSet, sitedminProfile, siteAdminPermissionSet, gdsProfile, gdsPermissionSet, dpoProfile, dpoPermissionSet]).then((values) => {
+        Promise.all([systemAdminProfile, systemAdminPermissionSet, sitedminProfile, siteAdminPermissionSet, gdsProfile, gdsPermissionSet, dpoProfile, dpoPermissionSet, ldsProfile, ldsPermissionSet]).then((values) => {
             const userprofile_permissionSet = [
                 { userProfileId: values[0].id, permissionSetId: values[1].id },
                 { userProfileId: values[2].id, permissionSetId: values[3].id },
                 { userProfileId: values[6].id, permissionSetId: values[7].id },
-                { userProfileId: values[4].id, permissionSetId: values[5].id }
+                { userProfileId: values[4].id, permissionSetId: values[5].id },
+                { userProfileId: values[8].id, permissionSetId: values[9].id }
             ];
 
             UserProfile_PermissionSet.destroy({ truncate: { cascade: true } }).then(() => {

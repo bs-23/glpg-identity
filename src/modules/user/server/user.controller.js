@@ -149,19 +149,25 @@ async function getUserApplicationCountry(permissionSet) {
 }
 
 
-async function getCommaSeparatedApplications(user) {
+
+
+async function getCommaSeparatedAppCountryPermissions(user) {
     let all_applications = [];
     let all_countries = [];
     let role_applications = [];
     let profile_applications = [];
     let role_countries = [];
     let profile_countries = [];
+    let profile_ps = [];
+    let role_ps = [];
+    let all_ps = [];
 
     for (const userRole of user.userRoles) {
         for (const rolePermSet of userRole.role.role_ps) {
             const applicationsCountries = await getUserApplicationCountry(rolePermSet.ps);
             role_applications = role_applications.concat(applicationsCountries[0]);
             role_countries = role_countries.concat(applicationsCountries[1])
+            role_ps.push(rolePermSet.ps.title);
 
         }
 
@@ -174,17 +180,19 @@ async function getCommaSeparatedApplications(user) {
             const applicationsCountries = await getUserApplicationCountry(userProPermSet.ps);
             profile_applications = profile_applications.concat(applicationsCountries[0]);
             profile_countries = profile_countries.concat(applicationsCountries[1]);
+            profile_ps.push(userProPermSet.ps.title);
         }
     }
 
 
     all_countries = [...new Set(role_countries.concat(profile_countries))];
     all_applications = role_applications.concat(profile_applications);
+    all_ps = role_ps.concat(profile_ps);
     let apps = [...new Set(all_applications.length > 0 ? all_applications.map(app => app.name) : [])];
 
     apps = apps.join();
 
-    return [apps, all_countries];
+    return [apps, all_countries, all_ps];
 
 
 }
@@ -207,7 +215,7 @@ async function formatProfile(user) {
 }
 
 async function formatProfileDetail(user) {
-    const applicationCountriesFormatted = await getCommaSeparatedApplications(user);
+    const appCounPermissionFormatted = await getCommaSeparatedAppCountryPermissions(user);
     const profile = {
         id: user.id,
         first_name: user.first_name,
@@ -218,9 +226,10 @@ async function formatProfileDetail(user) {
         last_login: user.last_login,
         expiry_date: user.expiry_date,
         profiles: user.userProfile.title,
-        application: applicationCountriesFormatted[0],
-        countries: applicationCountriesFormatted[1],
-        role: user.userRoles && user.userRoles.length ? user.userRoles[0].role.title : ''
+        application: appCounPermissionFormatted[0],
+        countries: appCounPermissionFormatted[1],
+        role: user.userRoles && user.userRoles.length ? user.userRoles[0].role.title : '',
+        permissionSets: appCounPermissionFormatted[2]
     };
 
     return profile;
