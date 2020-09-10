@@ -17,7 +17,10 @@ async function getProfiles(req, res) {
                     attributes: ['title']
                 }]
             }],
-            attributes: ['id', 'title', 'slug', 'description', 'type']
+            attributes: ['id', 'title', 'slug', 'description', 'type'],
+            order: [
+                ['created_at', 'ASC']
+            ],
         });
 
         res.json(profiles);
