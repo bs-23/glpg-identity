@@ -147,7 +147,7 @@ export default function ManageProfiles() {
     const extractPermissionSetNames = (data) => {
         if(!data || !data.up_ps || !data.up_ps.length) return '';
         return data.up_ps.map((item, index) => {
-            const permSetLink = <Link to={`/users/permission-sets/${item.permissionSetId}`}>{item.ps.title}</Link>
+            const permSetLink = <Link className="link-with-underline" title="Click for Details" to={`/users/permission-sets/${item.permissionSetId}`}>{item.ps.title}</Link>
             return <span key={item.ps.title}>{index < data.up_ps.length-1 ? <>{permSetLink}<span>,&nbsp;</span></> : permSetLink}</span>
         });
     }
