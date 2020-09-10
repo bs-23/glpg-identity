@@ -15,7 +15,6 @@ const ConsentCountry = sequelize.cdpConnector.define('consent_countries', {
         allowNull: false,
         type: DataTypes.UUID
     },
-
     country_iso2: {
         allowNull: false,
         type: DataTypes.STRING
@@ -23,9 +22,8 @@ const ConsentCountry = sequelize.cdpConnector.define('consent_countries', {
     opt_type: {
         allowNull: false,
         type: DataTypes.ENUM,
-        values: ['single', 'double'],
+        values: ['single-opt-in', 'double-opt-in', 'soft-opt-in', 'opt-out'],
     }
-
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
     tableName: 'consent_countries',

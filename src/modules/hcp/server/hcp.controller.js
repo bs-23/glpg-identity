@@ -212,17 +212,17 @@ async function getHcps(req, res) {
         });
 
         await Promise.all(hcps.map(async hcp => {
-            const consent_types = new Set();
+            const opt_types = new Set();
 
             await Promise.all(hcp['hcpConsents'].map(async hcpConsent => {
 
                 if (hcpConsent.response && hcpConsent.consent_confirmed) {
                     const country_consent = await ConsentCountry.findOne({ where: { consent_id: hcpConsent.consent_id } });
-                    consent_types.add(country_consent.opt_type);
+                    opt_types.add(country_consent.opt_type);
                 }
             }));
 
-            hcp.dataValues.consent_types = [...consent_types];
+            hcp.dataValues.opt_types = [...opt_types];
             delete hcp.dataValues['hcpConsents'];
         }));
 
@@ -469,7 +469,7 @@ async function createHcpProfile(req, res) {
 
                 if (!consentLocale || !consentCountry) return;
 
-                if (consentCountry.opt_type === 'double') {
+                if (consentCountry.opt_type === 'double-opt-in') {
                     hasDoubleOptIn = true;
                 }
 
@@ -478,7 +478,7 @@ async function createHcpProfile(req, res) {
                     consent_id: consentDetails.id,
                     title: consentLocale.rich_text,
                     response: consentResponse,
-                    consent_confirmed: consentCountry.opt_type === 'double' ? false : true,
+                    consent_confirmed: consentCountry.opt_type === 'double-opt-in' ? false : true,
                     created_by: req.user.id,
                     updated_by: req.user.id
                 });
@@ -699,7 +699,7 @@ async function getHCPUserConsents(req, res) {
 
         if (!userConsents) return res.json([]);
 
-        const userConsentDetails = await ConsentLocale.findAll({ include: { model: Consent, as: 'consent', attributes: ['title'] }, where: { consent_id: userConsents.map(consent => consent.consent_id), locale: locale ? locale.toLowerCase() : 'en' }, attributes: ['consent_id', 'rich_text'] });
+        const userConsentDetails = await ConsentLocale.findAll({ include: { model: Consent, as: 'consent', attributes: ['title'] }, where: { consent_id: userConsents.map(consent => consent.consent_id), locale: locale ? locale.toLowerCase() : doc.locale }, attributes: ['consent_id', 'rich_text'] });
 
         const consentCountries = await ConsentCountry.findAll({ where: { consent_id: userConsents.map(consent => consent.consent_id), country_iso2: { [Op.or]: [doc.country_iso2.toUpperCase(), doc.country_iso2.toLowerCase()] } } });
 

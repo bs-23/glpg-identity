@@ -214,9 +214,9 @@ async function init() {
                     updated_by: admin.id
                 },
                 {
-                    name: 'BrandX',
-                    slug: convertToSlug('BrandX'),
-                    email: 'brandx@glpg.com',
+                    name: 'Jyseleca',
+                    slug: convertToSlug('Jyseleca'),
+                    email: 'jyseleca@glpg.com',
                     password: 'P@ssword123',
                     consent_confirmation_link: 'https://jyseleca-dev.glpg.com/bin/public/glpg-brandx/consentConfirm.consent.html',
                     reset_password_link: 'https://jyseleca-dev.glpg.com/bin/public/glpg-brandx/journeyRedirect.journey.html',
@@ -251,14 +251,16 @@ async function init() {
                 title: 'I agree to the Galapagos Terms of Service',
                 slug: '',
                 category_id: '59953d51-2449-4b65-950f-9f88654019bb',
-                legal_basis: 'consent'
+                legal_basis: 'consent',
+                preference: 'Galapagos Terms of Use'
             },
             {
                 id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 title: 'I give my consent to send me promotional email',
                 slug: '',
                 category_id: 'fe037405-c676-4d98-bd05-85008900c838',
-                legal_basis: 'consent'
+                legal_basis: 'consent',
+                preference: 'Promotional email marketing'
             }
         ];
 
@@ -269,52 +271,52 @@ async function init() {
                 locale: 'fr_be'
             },
             {
-                rich_text: "<p>Ik bevestig dat ik een professionele zorgverlener ben die in Belgique werkzaam is en ik accepteer de <a href='#' target='_blank'>Gebruiksvoorwaarden</a> van Jyseleca.nl.</p>",
-                consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
-                locale: 'nl_be'
-            },
-            {
-                rich_text: '<p>Ik bevestig dat ik een professionele zorgverlener ben die in Nederland werkzaam is en ik accepteer de <a href="#" target="_blank">Gebruiksvoorwaarden</a> van Jyseleca.nl.</p>',
-                consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
-                locale: 'nl_nl'
-            },
-            {
-                rich_text: "<p>Ik geef Jyseleca toestemming om mij via mijn e-mailadres promotie- en milieu-informatie over alle Jyseleca-producten en -diensten te sturen. <br> <br> Raadpleeg onze <a href='#' target='_blank'>privacyverklaring</a>voor meer informatie over hoe we met uw persoonsgegevens omgaan.</p>",
-                consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
-                locale: 'nl_nl'
-            },
-            {
-                rich_text: "<p>Ik geef Jyseleca toestemming om mij via mijn e-mailadres promotie- en milieu-informatie over alle Jyseleca-producten en -diensten te sturen. <br> <br> Raadpleeg onze <a href='#' target='_blank'>privacyverklaring</a>voor meer informatie over hoe we met uw persoonsgegevens omgaan.</p>",
-                consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
-                locale: 'nl_be'
-            },
-            {
                 rich_text: "<p>Je consens à ce que Galapagos m'envoie des informations promotionnelles et informatives concernant tous les produits et services de Galapagos à l'adresse mail que j'ai fournie. <br> <br> Pour obtenir de plus amples informations sur la manière dont nous traitons vos données à caractère personnel, veuillez vous référer à notre <a href='#' target='_blank'>Déclaration de confidentialité.</a></p>",
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 locale: 'fr_be'
+            },
+            {
+                rich_text: "<p>zorgverlener ben die in Belgie werkzaam is en ik accepteer de <a href='#' target='_blank'>Gebruiksvoorwaarden</a> van Galapagos.nl.</p>",
+                consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
+                locale: 'nl_be'
+            },
+            {
+                rich_text: "<p>Ik geef Galapagos toestemming om mij via mijn e-mailadres promotie- en milieu-informatie over alle Galapagos-producten en -diensten te sturen. <br> <br> Raadpleeg onze <a href='#' target='_blank'>privacyverklaring</a> voor meer informatie over hoe we met uw persoonsgegevens omgaan.</p>",
+                consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
+                locale: 'nl_be'
+            },
+            {
+                rich_text: '<p>Ik bevestig dat ik een professionele zorgverlener ben die in Nederland werkzaam is en ik accepteer de <a href="#" target="_blank">Gebruiksvoorwaarden</a> van galapagos.nl.</p>',
+                consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
+                locale: 'nl_nl'
+            },
+            {
+                rich_text: "<p>Ik geef galapagos toestemming om mij via mijn e-mailadres promotie- en milieu-informatie over alle galapagos-producten en -diensten te sturen. <br> <br> Raadpleeg onze <a href='#' target='_blank'>privacyverklaring</a> voor meer informatie over hoe we met uw persoonsgegevens omgaan.</p>",
+                consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
+                locale: 'nl_nl'
             }
         ];
         const consentCountries = [
             {
                 consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
                 country_iso2: 'be',
-                opt_type: 'single'
+                opt_type: 'single-opt-in'
             },
             {
                 consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
                 country_iso2: 'nl',
-                opt_type: 'single'
+                opt_type: 'single-opt-in'
             },
             {
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 country_iso2: 'nl',
-                opt_type: 'double'
+                opt_type: 'double-opt-in'
             },
             {
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 country_iso2: 'be',
-                opt_type: 'double'
-            },
+                opt_type: 'double-opt-in'
+            }
         ];
 
         Consent.destroy({

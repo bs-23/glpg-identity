@@ -89,7 +89,7 @@ module.exports = {
             title: 'a',
             rich_text: '<h1>a</h1>',
             slug: 'a',
-            opt_type: 'single',
+            opt_type: 'single-opt-in',
             country_iso2: 'nl',
             locale: 'nl_nl',
             legal_basis: 'consent'
@@ -102,7 +102,7 @@ module.exports = {
         demoConsentCountry: {
             consent_id: demoConsentId,
             country_iso2: 'nl',
-            opt_type: 'single'
+            opt_type: 'single-opt-in'
         }
     },
     permissions: [
