@@ -133,9 +133,9 @@ const ConsentPerformanceReport = () => {
                         <div>
                             <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
                                 <h4 className="cdp-text-primary font-weight-bold mb-0">Consent Performance Report</h4>
-                                <div className="d-flex pt-3 pt-sm-0">
+                                {/* <div className="d-flex pt-3 pt-sm-0">
                                     <React.Fragment>
-                                        {/* {countries && consents_report['countries'] &&
+                                        {countries && consents_report['countries'] &&
                                             <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-btn-primary text-white dropdown shadow-sm">
                                                 Country
                                                 <Dropdown.Toggle variant="" className="ml-2 bg-white rounded-0">
@@ -159,7 +159,7 @@ const ConsentPerformanceReport = () => {
                                                     }
                                                 </Dropdown.Menu>
                                             </Dropdown> 
-                                        } */}
+                                        }
 
                                         <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-btn-primary text-white dropdown shadow-sm">
                                             Process Activity
@@ -207,7 +207,7 @@ const ConsentPerformanceReport = () => {
                                             </Dropdown.Menu>
                                         </Dropdown>
                                     </React.Fragment>
-                                </div>
+                                </div> */}
                             </div>
 
 
