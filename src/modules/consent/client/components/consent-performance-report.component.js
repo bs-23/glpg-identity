@@ -323,7 +323,7 @@ const ConsentPerformanceReport = () => {
                                                         <td>{row.title}</td>
                                                         <td>{titleCase(row.opt_type)}</td>
                                                         <td>{titleCase(row.legal_basis)}</td>
-                                                        <td>{row.preferences}</td>
+                                                        <td>{row.preference}</td>
                                                         <td>{(new Date(row.given_date)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                         <td>
                                                             <span>

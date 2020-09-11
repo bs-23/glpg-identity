@@ -182,6 +182,7 @@ async function getConsentsReport(req, res){
             hcp_consent.dataValues.consent_confirmed = hcp_consent.consent_confirmed;
             hcp_consent.dataValues.legal_basis = hcp_consent.consent.legal_basis;
             hcp_consent.dataValues.given_date = hcp_consent.consent.updated_at;
+            hcp_consent.dataValues.preference = hcp_consent.consent.preference;
             hcp_consent.dataValues.title = hcp_consent.consent.consent_category.title;
             hcp_consent.dataValues.type = hcp_consent.consent.consent_category.type;
             hcp_consent.dataValues.country_iso2 = hcp_consent.consent.consent_country[0].country_iso2;
