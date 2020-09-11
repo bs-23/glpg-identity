@@ -141,8 +141,10 @@ async function init() {
             const userServiceCategory = ServiceCategory.findOne({ where: { slug: 'platform' } });
             const consentServiceCategory = ServiceCategory.findOne({ where: { slug: 'privacy' } });
             const dpo_permissionSet = PermissionSet.findOne({ where: { slug: 'data_privacy_officer' } });
+            const gds_permissionSet = PermissionSet.findOne({ where: { slug: 'gds' } });
+            const lds_permissionSet = PermissionSet.findOne({ where: { slug: 'lds' } });
 
-            Promise.all([systemAdmin_permissionSet, siteAdmin_permissionSet, hcpServiceCategory, userServiceCategory, consentServiceCategory, dpo_permissionSet]).then((values) => {
+            Promise.all([systemAdmin_permissionSet, siteAdmin_permissionSet, hcpServiceCategory, userServiceCategory, consentServiceCategory, dpo_permissionSet, gds_permissionSet, lds_permissionSet]).then((values) => {
                 const permissionSet_serviceCategory = [
                     { permissionSetId: values[0].id, serviceCategoryId: values[2].id },
                     { permissionSetId: values[0].id, serviceCategoryId: values[3].id },
@@ -153,7 +155,10 @@ async function init() {
                     { permissionSetId: values[1].id, serviceCategoryId: values[4].id },
 
                     { permissionSetId: values[5].id, serviceCategoryId: values[4].id },
-                    { permissionSetId: values[5].id, serviceCategoryId: values[2].id }
+                    { permissionSetId: values[5].id, serviceCategoryId: values[2].id },
+
+                    { permissionSetId: values[6].id, serviceCategoryId: values[2].id },
+                    { permissionSetId: values[7].id, serviceCategoryId: values[2].id }
                 ];
 
                 PermissionSet_ServiceCategory.destroy({ truncate: { cascade: true } }).then(() => {
