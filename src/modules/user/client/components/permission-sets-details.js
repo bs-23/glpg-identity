@@ -79,8 +79,8 @@ const PermissionSetDetails = ({ id }) => {
                 <span className="profile-detail__value">{getApplicationNames()}</span>
             </div>
         </div>
-        <div className="profile-detail__row pb-0 pb-sm-2 d-block d-sm-flex">
-            <div className="profile-detail__col pb-3">
+        <div className="pb-0 pb-sm-2 d-block d-sm-flex">
+            <div className="pb-3">
                 <span className="mr-2 d-block profile-detail__label">Service Categories</span>
                 <span className="profile-detail__value">{getServiceCategoryNames()}</span>
             </div>

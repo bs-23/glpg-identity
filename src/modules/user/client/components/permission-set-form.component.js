@@ -7,7 +7,7 @@ import { permissionSetCreateSchema } from "../user.schema";
 import { getCountries } from "../user.actions";
 
 
-const FormField = ({ label, name, type, children, required=true, ...rest }) => <div className="col-12 col-sm-4">
+const FormField = ({ label, name, type, children, required=true, ...rest }) => <div className="col-12 col-sm-6">
     <div className="form-group">
         <label className="font-weight-bold" htmlFor="last_name">{ label }{required && <span className="text-danger">*</span>}</label>
         { children || <Field className="form-control" type={type} name={name} {...rest} /> }
@@ -159,7 +159,7 @@ export default function PermissionSetForm({ onSuccess, onError, preFill }) {
                 <div className="row">
                     <div className="col-12">
                         <div className="">
-                            <div className="add-user p-3">
+                            <div className="add-user px-3 py-1">
                                 <Formik
                                     initialValues={formValues}
                                     displayName="PermissionSetForm"
@@ -173,15 +173,15 @@ export default function PermissionSetForm({ onSuccess, onError, preFill }) {
                                                 <div className="col-12">
                                                     <div className="row">
                                                     <FormFieldFluid label="Title" type="text" name="title"/>
-                                                        <FormField label="Select Countries" name="countries" required={false} >
-                                                            <CheckList name="countries" options={countries} idExtractor={item => item.country_iso2} labelExtractor={item => item.codbase_desc} />
-                                                        </FormField>
-                                                        <FormField label="Select Applications" name="applications" required={false} >
-                                                            <CheckList name="applications" options={applications} idExtractor={item => item.id} labelExtractor={item => item.name} />
-                                                        </FormField>
-                                                        <FormField label="Select Service Categories" name="serviceCategories" required={false} >
-                                                            <ToggleList name="serviceCategories" options={serviceCategories} idExtractor={item => item.id} labelExtractor={item => item.title} />
-                                                        </FormField>
+                                                    <FormField label="Select Countries" name="countries" required={false} >
+                                                        <CheckList name="countries" options={countries} idExtractor={item => item.country_iso2} labelExtractor={item => item.codbase_desc} />
+                                                    </FormField>
+                                                    <FormField label="Select Applications" name="applications" required={false} >
+                                                        <CheckList name="applications" options={applications} idExtractor={item => item.id} labelExtractor={item => item.name} />
+                                                    </FormField>
+                                                    <FormField label="Select Service Categories" name="serviceCategories" required={false} >
+                                                        <ToggleList name="serviceCategories" options={serviceCategories} idExtractor={item => item.id} labelExtractor={item => item.title} />
+                                                    </FormField>
                                                     <FormFieldFluid label="Description" type="text" name="description" required={false} component="textarea" />
                                                     </div>
                                                     <ErrorMessage name="app_country_service" >{(message) => <div className="invalid-feedback alert alert-warning" >{message}</div>}</ErrorMessage>
