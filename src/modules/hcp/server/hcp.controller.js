@@ -246,7 +246,7 @@ async function getHcps(req, res) {
             end: offset + limit > totalUser ? totalUser : offset + limit,
             status: status ? status : null,
             codbase: codbase ? codbase : null,
-            countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : req.user.countries
+            countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : usercountries
         };
 
         response.data = data;
