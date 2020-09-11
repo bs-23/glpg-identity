@@ -45,7 +45,7 @@ export default function Users() {
             return role_permission_sets.map(rps => safeGet(rps, 'ps')('countries')());
         }) : [];
 
-        const userCountries = union(flatten(profile_countries), flatten(roles_countries));
+        const userCountries = union(flatten(profile_countries), flatten(roles_countries)).filter(e => e);
 
         return userCountries;
     }
@@ -60,7 +60,7 @@ export default function Users() {
             return role_permission_sets.map(rps => safeGet(rps, 'countries')() || []);
         }) : [];
 
-        const userCountries = union(flatten(profile_countries), flatten(roles_countries));
+        const userCountries = union(flatten(profile_countries), flatten(roles_countries)).filter(e => e);
 
         return userCountries;
     }
