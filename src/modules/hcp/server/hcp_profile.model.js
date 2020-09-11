@@ -109,9 +109,8 @@ HcpProfile.hasMany(HcpConsents, {
     foreignKey: 'user_id'
 });
 
-HcpProfile.belongsTo(Application, {
-    as: 'application',
-    foreignKey: 'application_id'
+HcpConsents.belongsTo(HcpProfile, {
+    foreignKey: 'user_id'
 });
 
-module.exports = HcpProfile;
+module.exports = HcpProfile; 

@@ -44,4 +44,5 @@ HcpConsents.belongsTo(Consent, {
     foreignKey: 'consent_id'
 });
 
+
 module.exports = HcpConsents;

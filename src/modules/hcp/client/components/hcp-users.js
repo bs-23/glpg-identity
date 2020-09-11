@@ -156,7 +156,7 @@ export default function hcpUsers() {
                                                     <LinkContainer to={`list${hcps.status ? `?status=${hcps.status}` : ''}`}><Dropdown.Item className={hcps.codbase === null ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, hcps.status, null))}>All</Dropdown.Item></LinkContainer>
                                                     {
                                                         countries.map((item, index) => (
-                                                            <LinkContainer key={index} to={`list?${hcps.status ? `status=${hcps.status}` : ''}${`${hcps.status ? '&' : ''}codbase=${item.codbase}`}`}>
+                                                            hcps.countries.includes(item.country_iso2) && <LinkContainer key={index} to={`list?${hcps.status ? `status=${hcps.status}` : ''}${`${hcps.status ? '&' : ''}codbase=${item.codbase}`}`}>
                                                                 <Dropdown.Item className={hcps.countries.includes(item.country_iso2) && hcps.codbase === item.codbase ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, hcps.status, item.codbase))}>
                                                                     {
                                                                         hcps.countries.includes(item.country_iso2) ? item.codbase_desc : null
