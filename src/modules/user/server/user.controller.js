@@ -519,7 +519,7 @@ async function getUsers(req, res) {
 
     const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => i.codbase === codbase).map(i => i.country_iso2);
     const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
-    let countries_ignorecase_for_codbase_formatted = '{'+countries_ignorecase_for_codbase.join(", ") + '}';
+    let countries_ignorecase_for_codbase_formatted = '{' + countries_ignorecase_for_codbase.join(", ") + '}';
 
 
     try {
@@ -531,11 +531,23 @@ async function getUsers(req, res) {
                 type: 'basic',
                 [Op.or]: [
                     {
-                        '$userRoles.role.role_ps.ps.countries$':  codbase ? { [Op.overlap]: countries_ignorecase_for_codbase_formatted} : { [Op.ne]: '{0}' }
+                        '$userRoles.role.role_ps.ps.countries$': codbase ? { [Op.overlap]: countries_ignorecase_for_codbase_formatted } : {
+                            [Op.or]: [{
+                                [Op.ne]: '{0}'
+                            }, {
+                                [Op.eq]: null
+                            }]
+                        }
 
                     },
                     {
-                        '$userProfile.up_ps.ps.countries$':  codbase ? { [Op.overlap]: countries_ignorecase_for_codbase_formatted} : { [Op.ne]: '{0}' }
+                        '$userProfile.up_ps.ps.countries$': codbase ? { [Op.overlap]: countries_ignorecase_for_codbase_formatted } : {
+                            [Op.or]: [{
+                                [Op.ne]: '{0}'
+                            }, {
+                                [Op.eq]: null
+                            }]
+                        }
 
                     }
 
@@ -546,8 +558,8 @@ async function getUsers(req, res) {
                 ['id', 'DESC']
             ],
             offset,
-            limit : limit,
-            subQuery:false,
+            limit: limit,
+            subQuery: false,
             include: [{
                 model: User,
                 as: 'createdByUser',
@@ -596,11 +608,11 @@ async function getUsers(req, res) {
                 type: 'basic',
                 [Op.or]: [
                     {
-                        '$userRoles.role.role_ps.ps.countries$':  codbase ? { [Op.overlap]: countries_ignorecase_for_codbase_formatted} : { [Op.ne]: '{0}' }
+                        '$userRoles.role.role_ps.ps.countries$': codbase ? { [Op.overlap]: countries_ignorecase_for_codbase_formatted } : { [Op.ne]: '{0}' }
 
                     },
                     {
-                        '$userProfile.up_ps.ps.countries$':  codbase ? { [Op.overlap]: countries_ignorecase_for_codbase_formatted} : { [Op.ne]: '{0}' }
+                        '$userProfile.up_ps.ps.countries$': codbase ? { [Op.overlap]: countries_ignorecase_for_codbase_formatted } : { [Op.ne]: '{0}' }
 
                     }
 
