@@ -50,7 +50,7 @@ export default function Users() {
         return userCountries;
     }
 
-    const extracLoggedIntUserCountries = (data) => {
+    const extractLoggedInUserCountries = (data) => {
         const profile_permission_sets = safeGet(data, 'profile')('permissionSets')();
         const profile_countries = profile_permission_sets ? profile_permission_sets.map(pps => safeGet(pps, 'countries')() || []) : [];
 
@@ -93,7 +93,7 @@ export default function Users() {
         async function getCountries() {
             const response = (await axios.get('/api/countries')).data;
             const userProfile = (await axios.get('/api/users/profile')).data;
-            const userCountries = extracLoggedIntUserCountries(userProfile);
+            const userCountries = extractLoggedInUserCountries(userProfile);
             setCountries(response);
             (userProfile.type === "admin") ? setUserCountries(response) : setUserCountries(fetchUserCountries(userCountries, response));
         }

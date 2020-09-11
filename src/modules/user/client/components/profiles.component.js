@@ -31,8 +31,8 @@ const ToggleList = ({ name, options, labelExtractor, idExtractor }) => {
     return <FieldArray
                 name={name}
                 render={arrayHelpers => (
-                    options.map(item => <label key={idExtractor(item)} className="d-flex justify-content-between align-items-center">
-                        <span className="switch-label">{labelExtractor(item)} {item.type && <span className="text-muted small text-capitalize font-italic"> - {item.type}</span>}</span>
+                    options.map(item => <label key={idExtractor(item)} className="d-flex justify-content-between align-items-center pt-1">
+                        <span className="switch-label">{labelExtractor(item)} {item.type && <span className="text-muted small text-capitalize font-italic d-block"> Type: {item.type}</span>}</span>
                         <span className="switch">
                             <input name={name}
                                 className="custom-control-input"
@@ -132,7 +132,6 @@ export default function ManageProfiles() {
     const [permissionSets, setPermissionSets] = useState([]);
     const [modalShow, setModalShow] = useState({ createProfile: false });
     const [profileEditData, setProfileEditData] = useState(null);
-    const readOnlyProfiles = ['system_admin'];
 
     const getProfiles = async () => {
         const { data } = await axios.get('/api/profiles');
@@ -220,7 +219,7 @@ export default function ManageProfiles() {
                                                 <td className="text-capitalize">{row.type}</td>
                                                 <td>{row.description}</td>
                                                 <td>{extractPermissionSetNames(row)}</td>
-                                                <td><button disabled={readOnlyProfiles.includes(row.slug)} className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlepProfileEditClick(row)}> <i className="icon icon-edit-pencil pr-2"></i>Edit</button></td>
+                                                <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlepProfileEditClick(row)}> <i className="icon icon-edit-pencil pr-2"></i>Edit</button></td>
                                             </tr>
                                         ))}
                                     </tbody>
