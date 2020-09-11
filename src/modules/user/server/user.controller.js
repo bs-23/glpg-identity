@@ -608,11 +608,23 @@ async function getUsers(req, res) {
                 type: 'basic',
                 [Op.or]: [
                     {
-                        '$userRoles.role.role_ps.ps.countries$': codbase ? { [Op.overlap]: countries_ignorecase_for_codbase_formatted } : { [Op.ne]: '{0}' }
+                        '$userRoles.role.role_ps.ps.countries$': codbase ? { [Op.overlap]: countries_ignorecase_for_codbase_formatted } : {
+                            [Op.or]: [{
+                                [Op.ne]: '{0}'
+                            }, {
+                                [Op.eq]: null
+                            }]
+                        }
 
                     },
                     {
-                        '$userProfile.up_ps.ps.countries$': codbase ? { [Op.overlap]: countries_ignorecase_for_codbase_formatted } : { [Op.ne]: '{0}' }
+                        '$userProfile.up_ps.ps.countries$': codbase ? { [Op.overlap]: countries_ignorecase_for_codbase_formatted } : {
+                            [Op.or]: [{
+                                [Op.ne]: '{0}'
+                            }, {
+                                [Op.eq]: null
+                            }]
+                        }
 
                     }
 
