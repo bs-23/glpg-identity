@@ -70,9 +70,10 @@ export default function Users() {
         let countryString = "";
         if (countries.length > 0 && (userCountries.length)) {
             if(userCountries.length > 1 && (userCountries.length)) {
-                (userCountries).map((country, key) => (
-                    countryArr.push(countries.find(i => i.country_iso2 === country)).codbase_desc)
-                );
+                (userCountries).map((country, key) => {
+                    const matchedCountry = countries.find(i => i.country_iso2 === country);
+                    return countryArr.push(matchedCountry).codbase_desc;
+                });
             } else {
                 return countryString;
             }
@@ -81,6 +82,7 @@ export default function Users() {
 
         countryArr.sort((a, b) => (a.codbase_desc > b.codbase_desc) ? 1 : -1);
         countryArr.forEach((element, key) => {
+            if(!element) return;
             countryString = countryString + element.codbase_desc;
             if (key < countryArr.length - 1) countryString = countryString + ', ';
         });
