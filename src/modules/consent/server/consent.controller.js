@@ -1,13 +1,12 @@
 const path = require('path');
 const _ = require('lodash');
 const { QueryTypes, Op } = require('sequelize');
-const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
+const Sequelize = require('sequelize');
 const Consent = require('./consent.model');
 const validator = require('validator');
 const ConsentLocale = require('./consent-locale.model');
 const ConsentCountry = require('./consent-country.model');
 const ConsentCategory = require('./consent-category.model');
-const Application = require('../../application/server/application.model');
 const HCPS = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_profile.model'));
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
@@ -136,6 +135,7 @@ async function getConsentsReport(req, res){
             '$hcp_profile.application_id$': req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
             // '$hcp_profile.country_iso2$': codbase ? { [Op.any]: [countries_ignorecase_for_codbase] } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : countries_ignorecase_for_user_countries_codbase,
             '$consent.consent_category.type$': process_activity ? { [Op.eq]: process_activity } : { [Op.or]: process_activities },
+            '$consent.consent_country.country_iso2$': { [Op.eq]: Sequelize.col('hcp_profile.country_iso2') },
             '$consent.consent_country.opt_type$': opt_type ? { [Op.eq]: opt_type } : { [Op.or]: opt_types }
         };
 
@@ -162,6 +162,9 @@ async function getConsentsReport(req, res){
                             model: ConsentCountry,
                             as: 'consent_country',
                             attributes: ['country_iso2', 'opt_type'],
+                            // where: {
+                            //     country_iso2: Sequelize.col('hcp_consent->hcp_profile.country_iso2')
+                            // }
                         }
                     ]
                 }
@@ -169,8 +172,9 @@ async function getConsentsReport(req, res){
             attributes: ['consent_id', 'response', 'consent_confirmed'],
             offset,
             limit,
-            distinct: 'id'
+            subQuery: false,
         });
+
 
         hcp_consents.forEach( hcp_consent => {
             hcp_consent.dataValues.consent_id = hcp_consent.consent_id;
@@ -180,8 +184,8 @@ async function getConsentsReport(req, res){
             hcp_consent.dataValues.given_date = hcp_consent.consent.updated_at;
             hcp_consent.dataValues.title = hcp_consent.consent.consent_category.title;
             hcp_consent.dataValues.type = hcp_consent.consent.consent_category.type;
-            hcp_consent.dataValues.country_iso2 = hcp_consent.consent.consent_country.country_iso2;
-            hcp_consent.dataValues.opt_type = hcp_consent.consent.consent_country.opt_type;
+            hcp_consent.dataValues.country_iso2 = hcp_consent.consent.consent_country[0].country_iso2;
+            hcp_consent.dataValues.opt_type = hcp_consent.consent.consent_country[0].opt_type;
             
             delete hcp_consent.dataValues['consent'];
         });
