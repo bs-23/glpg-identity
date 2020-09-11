@@ -31,8 +31,8 @@ const ToggleList = ({ name, options, labelExtractor, idExtractor }) => {
     return <FieldArray
                 name={name}
                 render={arrayHelpers => (
-                    options.map(item => <label key={idExtractor(item)} className="d-flex justify-content-between align-items-center">
-                        <span className="switch-label">{labelExtractor(item)} {item.type && <span className="text-muted small text-capitalize font-italic"> - {item.type}</span>}</span>
+                    options.map(item => <label key={idExtractor(item)} className="d-flex justify-content-between align-items-center pt-1">
+                        <span className="switch-label">{labelExtractor(item)} {item.type && <span className="text-muted small text-capitalize font-italic d-block"> Type: {item.type}</span>}</span>
                         <span className="switch">
                             <input name={name}
                                 className="custom-control-input"
