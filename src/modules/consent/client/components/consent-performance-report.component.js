@@ -147,9 +147,10 @@ const ConsentPerformanceReport = () => {
                                                     </LinkContainer>
                                                     {
                                                         countries.map((item, index) => (
-                                                            <LinkContainer key={index} to={`consent-performance-report${makeUrl( [{ name: 'codbase', value: item.codbase }, {name: 'process_activity', value: consents_report.process_activity }, { name: 'opt_type', value: consents_report.opt_type }] )}`}>
+                                                            consents_report.countries.includes(item.country_iso2) && <LinkContainer  key={index} to={`consent-performance-report${makeUrl( [{ name: 'codbase', value: item.codbase }, {name: 'process_activity', value: consents_report.process_activity }, { name: 'opt_type', value: consents_report.opt_type }] )}`}>
                                                                 <Dropdown.Item className={consents_report.countries.includes(item.country_iso2) && consents_report.codbase === item.codbase ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('',  item.codbase, consents_report.process_activity, consents_report.opt_type))}>
                                                                     {
+                                                                        
                                                                         consents_report.countries.includes(item.country_iso2) ? item.codbase_desc : null
                                                                     }
                                                                 </Dropdown.Item>
