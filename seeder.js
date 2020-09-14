@@ -158,9 +158,9 @@ async function init() {
                     slug: convertToSlug('Jyseleca'),
                     email: 'jyseleca@glpg.com',
                     password: 'P@ssword123',
-                    consent_confirmation_link: 'https://jyseleca-dev.glpg.com/bin/public/glpg-brandx/consentConfirm.consent.html',
-                    reset_password_link: 'https://jyseleca-dev.glpg.com/bin/public/glpg-brandx/journeyRedirect.journey.html',
-                    login_link: 'https://jyseleca-dev.glpg.com/bin/public/glpg-brandx/journeyRedirect.journey.html',
+                    consent_confirmation_link: 'https://www-dev.jyseleca.nl/bin/public/glpg-brandx/consentConfirm.consent.html',
+                    reset_password_link: 'https://www-dev.jyseleca.nl/bin/public/glpg-brandx/journeyRedirect.journey.html',
+                    login_link: 'https://www-dev.jyseleca.nl/bin/public/glpg-brandx/journeyRedirect.journey.html',
                     logo_link: 'https://cdp-asset.s3.eu-central-1.amazonaws.com/brandx/logo.png',
                     created_by: admin.id,
                     updated_by: admin.id
