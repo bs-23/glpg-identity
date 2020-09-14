@@ -147,6 +147,14 @@
 
         &-secondary {
             color: $secondary-color;
+
+            &-light {
+                color: $secondary-color-light;
+            }
+
+            &-lighter {
+                color: $secondary-color-lighter;
+            }
         }
 
         &-light {
