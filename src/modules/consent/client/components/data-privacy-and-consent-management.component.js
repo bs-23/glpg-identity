@@ -30,7 +30,7 @@ const ConsentManagement = () => {
                                             <i className="icon icon-manage-profile icon-3x icon-3x cdp-list-group__icon"></i>
                                             <span>
                                                 <strong className="mb-2 h4 d-block cdp-list-group__link-title">Manage New Consent</strong>
-                                                <span className="d-block cdp-list-group__link-description">Create new consent name with define process activity (purpose) and manage translation.</span>
+                                                <span className="d-block cdp-list-group__link-description">Create new consent name with define preferences (purpose) and manage translation.</span>
                                                 <span className="d-block cdp-list-group__link-activity">within 5 - 10 minutes</span>
                                             </span>
                                         </NavLink>
@@ -54,7 +54,7 @@ const ConsentManagement = () => {
                                             <i className="fas fa-fingerprint fa-3x cdp-list-group__icon"></i>
                                             <span>
                                                 <strong className="mb-2 h4 d-block cdp-list-group__link-title">Classify Country Specific Consent with Legal Basis and Consent Type</strong>
-                                                <span className="d-block cdp-list-group__link-description">Assign Consent for each country to process activity (purpose) and based on local GDPR the relevant legal obligations (wet ink - paper versus electronic signature (DocuSign), versus double-opt-in via deeplink)</span>
+                                                <span className="d-block cdp-list-group__link-description">Assign Consent for each country to preferences (purpose) and based on local GDPR the relevant legal obligations (wet ink - paper versus electronic signature (DocuSign), versus double-opt-in via deeplink)</span>
                                                 <span className="d-block cdp-list-group__link-activity">within 2 - 5 minutes</span>
                                             </span>
                                         </NavLink>
