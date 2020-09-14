@@ -106,7 +106,7 @@ async function getConsentsReport(req, res){
 
     try{
         const page = req.query.page ? req.query.page - 1 : 0;
-        const limit = 1;
+        const limit = 30;
         const codbase = req.query.codbase === undefined ? '' : req.query.codbase;
         const process_activity = req.query.process_activity === undefined ? '' : req.query.process_activity;
         const opt_type = req.query.opt_type === undefined ? '' : req.query.opt_type;
