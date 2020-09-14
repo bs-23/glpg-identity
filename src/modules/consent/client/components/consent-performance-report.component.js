@@ -348,10 +348,10 @@ const ConsentPerformanceReport = () => {
                                             && consents_report['hcp_consents'] &&
                                             <div className="pagination justify-content-end align-items-center border-top p-3">
                                                 <span className="cdp-text-primary font-weight-bold">{consents_report.start + ' - ' + consents_report.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + consents_report.total}</span>
-                                                <LinkContainer to={`list?page=${consents_report.page - 1}${consents_report.status ? `&status=${consents_report.status}` : ''}${consents_report.codbase ? `&codbase=${consents_report.codbase}` : ''}`}>
+                                                <LinkContainer to={`consent-performance-report${makeUrl( [ { name: 'page', value: consents_report.page - 1 }, { name: 'codbase', value: consents_report.codbase }, {name: 'process_activity', value: consents_report.process_activity }, { name: 'opt_type', value: consents_report.opt_type }] )}`}>
                                                     <span className="pagination-btn" data-testid='Prev' onClick={() => pageLeft()} disabled={consents_report.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
                                                 </LinkContainer>
-                                                <LinkContainer to={`list?page=${consents_report.page + 1}${consents_report.status ? `&status=${consents_report.status}` : ''}${consents_report.codbase ? `&codbase=${consents_report.codbase}` : ''}`}>
+                                                <LinkContainer to={`consent-performance-report${makeUrl( [ { name: 'page', value: consents_report.page + 1 }, { name: 'codbase', value: consents_report.codbase }, {name: 'process_activity', value: consents_report.process_activity }, { name: 'opt_type', value: consents_report.opt_type }] )}`}>
                                                     <span className="pagination-btn" data-testid='Next' onClick={() => pageRight()} disabled={consents_report.end === consents_report.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
                                                 </LinkContainer>
                                             </div>
