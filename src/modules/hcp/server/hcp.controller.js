@@ -154,30 +154,6 @@ async function addPasswordResetTokenToUser(user) {
     await user.save();
 }
 
-function getCountriesFromReqUser(data){
-    const safeGet = (object, property) => {
-        const propData = (object || {})[property];
-        return (prop) => prop ? safeGet(propData, prop) : propData;
-    };
-    const flatten = (array) => {
-        return Array.isArray(array) ? [].concat(...array.map(flatten)) : array;
-    }
-    const union = (a, b) => [...new Set([...a, ...b])];
-
-    const profile_permission_sets = safeGet(data, 'userProfile')('up_ps')();
-    const profile_countries = profile_permission_sets ? profile_permission_sets.map(pps => safeGet(pps, 'ps')('countries')()) : [];
-
-    const userRoles = safeGet(data, 'userRoles')();
-    const roles_countries = userRoles ? userRoles.map(role => {
-        const role_permission_sets = safeGet(role, 'role')('role_ps')();
-        return role_permission_sets.map(rps => safeGet(rps, 'ps')('countries')());
-    }) : [];
-
-    const userCountries = union(flatten(profile_countries), flatten(roles_countries)).filter(e => e);
-
-    return userCountries;
-}
-
 function ignoreCaseArray(str) {
     return [str.toLowerCase(), str.toUpperCase(), str.charAt(0).toLowerCase() + str.charAt(1).toUpperCase(), str.charAt(0).toUpperCase() + str.charAt(1).toLowerCase()];
 }
@@ -261,6 +237,9 @@ async function getHcps(req, res) {
             hcp_users.push(user);
         });
 
+        const userAllAppCountryPermissions = await getUserAppCountryList(req.user.id);
+        const userAllCountryPermissions = userAllAppCountryPermissions[1];
+
         const data = {
             users: hcp_users,
             page: page + 1,
@@ -270,7 +249,7 @@ async function getHcps(req, res) {
             end: offset + limit > totalUser ? totalUser : offset + limit,
             status: status ? status : null,
             codbase: codbase ? codbase : null,
-            countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : getCountriesFromReqUser(req.user)
+            countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : userAllCountryPermissions
         };
 
         response.data = data;
