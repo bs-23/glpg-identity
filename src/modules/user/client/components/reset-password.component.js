@@ -74,7 +74,7 @@ export default function ResetPasswordForm() {
                                             <div className="form-group">
                                                 <label className="label-style">New Password<span className="text-danger required-field pl-1">*</span></label>
 
-                                                <OverlayTrigger trigger="click" placement="top" overlay={popoverTop}>
+                                                <OverlayTrigger trigger="click" rootClose placement="top" overlay={popoverTop}>
                                                     <i class="fas fa-info-circle ml-2 cdp-text-primary" role="button"></i>
                                                 </OverlayTrigger>
 

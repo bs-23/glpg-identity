@@ -1,8 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 var AWS = require('aws-sdk');
-const SES = new AWS.SES({ region });
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
+
+const SES = new AWS.SES({ region: nodecache.getValue('AWS_REGION') });
 
 AWS.config.update({
     accessKeyId: nodecache.getValue('AWS_ACCESS_KEY_ID'),
