@@ -112,6 +112,26 @@ async function getConsentsReport(req, res){
         const opt_type = req.query.opt_type === undefined ? '' : req.query.opt_type;
         const offset = page * limit;
 
+        const sortBy = req.query.sortBy ? req.query.sortBy : '';
+        const sortType = req.query.sortType ? req.query.sortType : '';
+        const order = [];
+
+        if(sortBy && sortType){
+            if(sortBy === 'first_name') order.push([HCPS, 'first_name', sortType]);
+            if(sortBy === 'last_name') order.push([HCPS, 'last_name', sortType]);
+            if(sortBy === 'email') order.push([HCPS, 'email', sortType]);
+
+            if(sortBy === 'consent_type') order.push([Consent, ConsentCategory, 'title', sortType]);
+
+            if(sortBy === 'opt_type') order.push([Consent, { model: ConsentCountry, as: 'consent_country' }, 'opt_type', sortType]);
+
+            if(sortBy === 'legal_basis') order.push([Consent, 'legal_basis', sortType]);
+            if(sortBy === 'preferences') order.push([Consent, 'preference', sortType]);
+            if(sortBy === 'date') order.push([Consent, 'updated_at', sortType]);
+        }
+        order.push([HCPS, 'created_at', 'DESC']);
+        order.push([HCPS, 'id', 'DESC']);
+
         const application_list = (await HCPS.findAll()).map(i => i.get("application_id"));
 
         // const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => i.codbase === codbase).map(i => i.country_iso2);
@@ -129,7 +149,8 @@ async function getConsentsReport(req, res){
         const process_activities = (await ConsentCategory.findAll()).map(i => i.type);
         const opt_types = [...new Set((await ConsentCountry.findAll()).map(i => i.opt_type))];
 
-        const hcp_filter = {
+
+        const consent_filter = {
             response: true,
             consent_confirmed: true,
             '$hcp_profile.application_id$': req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
@@ -140,15 +161,11 @@ async function getConsentsReport(req, res){
         };
 
         const hcp_consents = await HcpConsents.findAll({
-            where: hcp_filter,
+            where: consent_filter,
             include: [
                 {
                     model: HCPS,
                     attributes: { exclude: ['password', 'created_by', 'updated_by'] },
-                    order: [
-                        ['created_at', 'DESC'],
-                        ['id', 'ASC']
-                    ],
                 },
                 {
                     model: Consent,
@@ -162,9 +179,6 @@ async function getConsentsReport(req, res){
                             model: ConsentCountry,
                             as: 'consent_country',
                             attributes: ['country_iso2', 'opt_type'],
-                            // where: {
-                            //     country_iso2: Sequelize.col('hcp_consent->hcp_profile.country_iso2')
-                            // }
                         }
                     ]
                 }
@@ -172,6 +186,7 @@ async function getConsentsReport(req, res){
             attributes: ['consent_id', 'response', 'consent_confirmed'],
             offset,
             limit,
+            order: order,
             subQuery: false,
         });
 
@@ -192,7 +207,7 @@ async function getConsentsReport(req, res){
         });
 
         const total_consents = await HcpConsents.count({
-            where: hcp_filter,
+            where: consent_filter,
             include: [
                 {
                     model: HCPS,
@@ -222,7 +237,9 @@ async function getConsentsReport(req, res){
             codbase: codbase ? codbase : '',
             process_activity: process_activity ? process_activity : '',
             opt_type: opt_type ? opt_type : '',
-            // countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : req.user.countries
+            // countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : req.user.countries,
+            sortBy: sortBy,
+            sortType: sortType,
         };
 
         response.data = data;
