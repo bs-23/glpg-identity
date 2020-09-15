@@ -22,6 +22,11 @@ async function send(options) {
         ? transformContent(options.plaintext, options.data)
         : options.plaintext;
 
+    /**
+     * NOTE: Amazon SES does not like undefined as value
+     * So, do not send the field at all in case the value is undefined
+     * or, at least send empty string (i.e. '')
+     */
     let params = {
         Destination: {
             ToAddresses: options.toAddresses,
@@ -76,7 +81,7 @@ function buildList(listName, list, template) {
 }
 
 function transformContent(content, data) {
-    if(!content) return;
+    if(!content) return '';
 
     for (var key in data) {
         if (data.hasOwnProperty(key)) {
