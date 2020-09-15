@@ -2,25 +2,15 @@ const fs = require('fs');
 const path = require('path');
 var AWS = require('aws-sdk');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
-const region = nodecache.getValue('AWS_REGION');
-const SES = new AWS.SES({ region });
+
+const SES = new AWS.SES({ region: nodecache.getValue('AWS_REGION') });
 
 AWS.config.update({
     accessKeyId: nodecache.getValue('AWS_ACCESS_KEY_ID'),
     secretAccessKey: nodecache.getValue('AWS_SECRET_ACCESS_KEY'),
-    region
+    region: nodecache.getValue('AWS_REGION')
 });
 
-/**
- *
- * @param {string} options.templateUrl - URL of the template file to use
- * @param {string} options.template - Template content
- * @param {string} options.plaintext - Plaintext to be sent for supporting legacy clients
- * @param {string} options.fromAddress - From email address
- * @param {[string]} options.toAddresses - To email addresses
- * @param {string} options.subject - Subject line for email
- * @param {string} options.data - Values to be replaced in the template
- */
 async function send(options) {
     const template = options.template || await getTemplate(options.templateUrl);
 
@@ -32,8 +22,12 @@ async function send(options) {
         ? transformContent(options.plaintext, options.data)
         : options.plaintext;
 
-    // Create SES sendEmail params
-    var params = {
+    /**
+     * NOTE: Amazon SES does not like undefined as value
+     * So, do not send the field at all in case the value is undefined
+     * or, at least send empty string (i.e. '')
+     */
+    let params = {
         Destination: {
             ToAddresses: options.toAddresses,
         },
@@ -53,7 +47,7 @@ async function send(options) {
                 Data: options.subject,
             },
         },
-        Source: options.fromAddress || 'glpg@brainstation-23.com'
+        Source: options.fromAddress || nodecache.getValue('CDP_SENDER_EMAIL')
     };
 
     const response = await SES.sendEmail(params).promise();
@@ -66,30 +60,28 @@ async function getTemplate(templateUrl) {
 }
 
 function buildList(listName, list, template) {
-    let newTemplate = template
+    let newTemplate = template;
 
-    const startTag = `{{${listName}}}`
-    const valueTag = `{{${listName}-value}}`
-    const endTag = `{{${listName}-end}}`
+    const startTag = `{{${listName}}}`;
+    const valueTag = `{{${listName}-value}}`;
+    const endTag = `{{${listName}-end}}`;
 
-    const startTagPos = newTemplate.indexOf(startTag)
-    const contentStartPos = startTagPos + startTag.length
-    const contentEndPos = newTemplate.indexOf(endTag)
-    const endTagPos = contentEndPos + endTag.length
+    const startTagPos = newTemplate.indexOf(startTag);
+    const contentStartPos = startTagPos + startTag.length;
+    const contentEndPos = newTemplate.indexOf(endTag);
+    const endTagPos = contentEndPos + endTag.length;
 
-    const content = newTemplate.slice(contentStartPos, contentEndPos)
+    const content = newTemplate.slice(contentStartPos, contentEndPos);
 
-    let expandedContent = ''
-    list.map(value => expandedContent += content.replace(valueTag, value))
+    let expandedContent = '';
+    list.map(value => expandedContent += content.replace(valueTag, value));
 
-    newTemplate = newTemplate.slice(0, startTagPos) + expandedContent + newTemplate.slice(endTagPos)
-    return newTemplate
+    newTemplate = newTemplate.slice(0, startTagPos) + expandedContent + newTemplate.slice(endTagPos);
+    return newTemplate;
 }
 
 function transformContent(content, data) {
-    if(!content) {
-        return '';
-    }
+    if(!content) return '';
 
     for (var key in data) {
         if (data.hasOwnProperty(key)) {
@@ -101,7 +93,7 @@ function transformContent(content, data) {
             const value = `${data[key]}`;
             content = content
                 ? content.replace(replacer, value)
-                : "";
+                : '';
         }
     }
 
