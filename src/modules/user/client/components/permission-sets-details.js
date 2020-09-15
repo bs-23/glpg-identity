@@ -7,7 +7,7 @@ const WarningMessage = ({ message }) => <div className="alert alert-warning">
     {message}
 </div>
 
-const PermissionSetDetails = ({ id }) => {
+const PermissionSetDetails = ({ permissionSetId }) => {
     const [permissionDetails, setPermissionDetails] = useState();
     const [notFound, setNotFound] = useState(false);
     const [error, setError] = useState(false);
@@ -16,8 +16,8 @@ const PermissionSetDetails = ({ id }) => {
     const nullValueToken = '--';
 
     const getPermissionDetails = async () => {
-        if(!id) return;
-        const response = await Axios.get(`/api/permissionSets/${id}`)
+        if(!permissionSetId) return;
+        const response = await Axios.get(`/api/permissionSets/${permissionSetId}`)
             .catch(err => {
                 err.response && err.response.status === 404 ? setNotFound(true) : setError(true);
             });
@@ -58,15 +58,15 @@ const PermissionSetDetails = ({ id }) => {
     if(error) return <WarningMessage message="Something went wrong." />
 
     return <div className="profile-detail p-3 py-sm-4 px-sm-5 mb-3 mb-sm-0">
-        <h2 className="profile-detail__name pb-3">{ permissionDetails ? permissionDetails.title  : '' }</h2>
+        <h2 className="profile-detail__name pb-3">{ permissionDetails && permissionDetails.title ? permissionDetails.title  : '' }</h2>
         <div className="profile-detail__row pb-0 pb-sm-2 d-block d-sm-flex">
             <div className="profile-detail__col pb-3 pr-0 pr-sm-3">
                 <span className="mr-2 d-block profile-detail__label">Description</span>
-                <span className="profile-detail__value">{permissionDetails ? permissionDetails.description : nullValueToken}</span>
+                <span className="profile-detail__value">{permissionDetails && permissionDetails.description ? permissionDetails.description : nullValueToken}</span>
             </div>
             <div className="profile-detail__col pb-3">
                 <span className="mr-2 d-block profile-detail__label">Type</span>
-                <span className="profile-detail__value text-capitalize">{permissionDetails ? permissionDetails.type : nullValueToken}</span>
+                <span className="profile-detail__value text-capitalize">{permissionDetails && permissionDetails.type ? permissionDetails.type : nullValueToken}</span>
             </div>
         </div>
         <div className="profile-detail__row pb-0 pb-sm-2 d-block d-sm-flex">

@@ -1,10 +1,11 @@
 import axios from "axios";
-import { NavLink,Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { Form, Formik, Field, ErrorMessage, FieldArray } from "formik";
 import { useToasts } from "react-toast-notifications";
 import Modal from 'react-bootstrap/Modal';
 import { roleCreateSchema } from "../user.schema";
+import PermissionSetDetails from "./permission-sets-details";
 
 const FormField = ({ label, name, type, required=true, children, ...rest }) => <div className="col-12">
     <div className="form-group">
@@ -52,7 +53,6 @@ const ToggleList = ({ name, options, labelExtractor, idExtractor }) => {
 
 const RoleForm = ({ onSuccess, permissionSets, preFill }) => {
     const { addToast } = useToasts();
-    // const nonAssignablePermissionSet = ['system_admin'];
 
     const handleSubmit = (values, actions) => {
         const promise = preFill ? axios.put(`/api/roles/${preFill.id}`, values) : axios.post('/api/roles', values);
@@ -78,7 +78,6 @@ const RoleForm = ({ onSuccess, permissionSets, preFill }) => {
 
     const getPermissionSetsForToggle = () => {
         const filteredPermissonSet = permissionSets.filter(ps => ps.type === 'custom');
-        // return filteredPermissonSet.map(ps => ({...ps, disabled: nonAssignablePermissionSet.includes(ps.slug)}))
         return filteredPermissonSet;
     }
 
@@ -131,8 +130,9 @@ const RoleForm = ({ onSuccess, permissionSets, preFill }) => {
 export default function ManageRoles() {
     const [roles, setRoles] = useState([]);
     const [permissionSets, setPermissionSets] = useState([]);
-    const [modalShow, setModalShow] = useState({ createRole: false });
+    const [modalShow, setModalShow] = useState({ createRole: false, permissionSetDetails: false });
     const [roleEditData, setRoleEditData] = useState(null);
+    const [permissionSetDetailID, setPermissionSetDetailID] = useState(null);
 
     const getRoles = async () => {
         const { data } = await axios.get('/api/roles');
@@ -144,12 +144,21 @@ export default function ManageRoles() {
         setPermissionSets(response.data);
     }
 
+    const handlePermissionSetClick = (id) => {
+        setPermissionSetDetailID(id);
+        setModalShow({ ...modalShow, permissionSetDetails: true });
+    }
+
     const extractPermissionSetNames = (data) => {
         if(!data) return '';
         if(!data.role_ps || !data.role_ps.length) return '';
         return data.role_ps.map((item, index) => {
-            const permSetLink = <Link to={`/users/permission-sets/${item.permissionSetId}`}>{item.ps.title}</Link>
-            return <span key={item.ps.title}>{index < data.role_ps.length-1 ? <>{permSetLink}<span>,&nbsp;</span></> : permSetLink}</span>
+            return <React.Fragment key={item.permissionSetId}>
+                <a className="link-with-underline" onClick={() => handlePermissionSetClick(item.permissionSetId)}>
+                    {item.ps.title}
+                </a>
+                {index < data.role_ps.length-1 ? <span>,&nbsp;</span> : null}
+            </React.Fragment>
         });
     }
 
@@ -162,6 +171,11 @@ export default function ManageRoles() {
     const handleRoleModalHide = () => {
         setRoleEditData(null);
         setModalShow({ ...modalShow, createRole: false });
+    }
+
+    const handlePermissionSetDetailHide = () => {
+        setModalShow({ ...modalShow, permissionSetDetails: false });
+        setPermissionSetDetailID(null);
     }
 
     const handlepRoleEditClick = (data) => {
@@ -249,6 +263,23 @@ export default function ManageRoles() {
                             </Modal.Header>
                             <Modal.Body>
                                 <RoleForm preFill={roleEditData} permissionSets={permissionSets} onSuccess={handleCreateRoleSuccess} />
+                            </Modal.Body>
+                        </Modal>
+
+                        <Modal
+                            show={modalShow.permissionSetDetails}
+                            onHide={handlePermissionSetDetailHide}
+                            dialogClassName="modal-90w modal-customize"
+                            aria-labelledby="example-custom-modal-styling-title"
+                            size="lg"
+                        >
+                            <Modal.Header closeButton>
+                                <Modal.Title id="example-custom-modal-styling-title">
+                                    Permission Set Details
+                                </Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <PermissionSetDetails permissionSetId={permissionSetDetailID} />
                             </Modal.Body>
                         </Modal>
 

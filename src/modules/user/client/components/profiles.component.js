@@ -1,10 +1,11 @@
 import axios from "axios";
-import { NavLink, Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { Form, Formik, Field, ErrorMessage, FieldArray } from "formik";
 import { useToasts } from "react-toast-notifications";
 import Modal from 'react-bootstrap/Modal';
 import { profileCreateSchema } from "../user.schema";
+import PermissionSetDetails from "./permission-sets-details";
 
 const FormField = ({ label, name, type, children, required=true, ...rest }) => <div className="col-12">
     <div className="form-group">
@@ -130,8 +131,9 @@ const ProfileForm = ({ onSuccess, permissionSets, preFill }) => {
 export default function ManageProfiles() {
     const [profiles, setProfiles] = useState([]);
     const [permissionSets, setPermissionSets] = useState([]);
-    const [modalShow, setModalShow] = useState({ createProfile: false });
+    const [modalShow, setModalShow] = useState({ createProfile: false, permissionSetDetails: false });
     const [profileEditData, setProfileEditData] = useState(null);
+    const [permissionSetDetailID, setPermissionSetDetailID] = useState(null);
 
     const getProfiles = async () => {
         const { data } = await axios.get('/api/profiles');
@@ -143,23 +145,37 @@ export default function ManageProfiles() {
         setPermissionSets(response.data);
     }
 
+    const handlePermissionSetClick = (id) => {
+        setPermissionSetDetailID(id);
+        setModalShow({ ...modalShow, permissionSetDetails: true });
+    }
+
     const extractPermissionSetNames = (data) => {
         if(!data || !data.up_ps || !data.up_ps.length) return '';
         return data.up_ps.map((item, index) => {
-            const permSetLink = <Link className="link-with-underline" title="Click for Details" to={`/users/permission-sets/${item.permissionSetId}`}>{item.ps.title}</Link>
-            return <span key={item.ps.title}>{index < data.up_ps.length-1 ? <>{permSetLink}<span>,&nbsp;</span></> : permSetLink}</span>
+            return <React.Fragment key={item.permissionSetId}>
+                <a className="link-with-underline" key={item.permissionSetId} onClick={() => handlePermissionSetClick(item.permissionSetId)}>
+                    {item.ps.title}
+                </a>
+            {index < data.up_ps.length-1 ? <span>,&nbsp;</span> : null}
+            </React.Fragment>
         });
     }
 
     const handleCreateProfileSuccess = () => {
         getProfiles();
         setProfileEditData(null);
-        setModalShow({ createProfile: false });
+        setModalShow({ ...modalShow, createProfile: false });
     }
 
     const handleProfileModalHide = () => {
         setModalShow({ ...modalShow, createProfile: false });
         setProfileEditData(null);
+    }
+
+    const handlePermissionSetDetailHide = () => {
+        setModalShow({ ...modalShow, permissionSetDetails: false });
+        setPermissionSetDetailID(null);
     }
 
     const handlepProfileEditClick = (data) => {
@@ -252,6 +268,22 @@ export default function ManageProfiles() {
                             </Modal.Body>
                         </Modal>
 
+                        <Modal
+                            show={modalShow.permissionSetDetails}
+                            onHide={handlePermissionSetDetailHide}
+                            dialogClassName="modal-90w modal-customize"
+                            aria-labelledby="example-custom-modal-styling-title"
+                            size="lg"
+                        >
+                            <Modal.Header closeButton>
+                                <Modal.Title id="example-custom-modal-styling-title">
+                                    Permission Set Details
+                                </Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <PermissionSetDetails permissionSetId={permissionSetDetailID} />
+                            </Modal.Body>
+                        </Modal>
                     </div>
                 </div>
             </div>

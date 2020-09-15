@@ -168,7 +168,7 @@ export default function ManagePermissionSets() {
                                     </Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
-                                    <PermissionSetDetails id={props.match && props.match.params.id}/>
+                                    <PermissionSetDetails permissionSetId={props.match && props.match.params.id}/>
                                 </Modal.Body>
                             </Modal>}
                         </Route>
