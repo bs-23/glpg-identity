@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useSelector } from "react-redux";
-import { NavLink, Route, useRouteMatch, useHistory } from 'react-router-dom';
+import { NavLink, Route, useRouteMatch, useHistory, useLocation } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -15,6 +15,7 @@ export default function ManagePermissionSets() {
     const countries = useSelector(state => state.userReducer.countries);
     const match = useRouteMatch();
     const history = useHistory();
+    const location = useLocation();
 
     const getPermissionSets = async () => {
         const response = await axios.get('/api/permissionSets');
@@ -60,7 +61,13 @@ export default function ManagePermissionSets() {
         setPermissionModalShow(true);
     }
 
+    const handleCreateModalHide = () => {
+        setPermissionModalShow(false);
+        setPermissionSetEditData(null);
+    }
+
     useEffect(() => {
+        if(location.state && location.state.showCreateModal) setPermissionModalShow(true);
         getPermissionSets();
     }, []);
 
@@ -139,7 +146,7 @@ export default function ManagePermissionSets() {
                         }
                         <Modal
                             show={permissionModalShow}
-                            onHide={() => { setPermissionModalShow(false); setPermissionSetEditData(null); }}
+                            onHide={handleCreateModalHide}
                             dialogClassName="modal-90w modal-customize"
                             aria-labelledby="example-custom-modal-styling-title"
                             size="lg"

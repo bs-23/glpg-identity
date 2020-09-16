@@ -1,5 +1,5 @@
 import axios from "axios";
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { Form, Formik, Field, ErrorMessage, FieldArray } from "formik";
 import { useToasts } from "react-toast-notifications";
@@ -53,6 +53,7 @@ const ToggleList = ({ name, options, labelExtractor, idExtractor }) => {
 
 const RoleForm = ({ onSuccess, permissionSets, preFill }) => {
     const { addToast } = useToasts();
+    const [filteredPermissonSet, setFilteredPermissionSet] = useState([]);
 
     const handleSubmit = (values, actions) => {
         const promise = preFill ? axios.put(`/api/roles/${preFill.id}`, values) : axios.post('/api/roles', values);
@@ -76,10 +77,9 @@ const RoleForm = ({ onSuccess, permissionSets, preFill }) => {
         actions.setSubmitting(true);
     }
 
-    const getPermissionSetsForToggle = () => {
-        const filteredPermissonSet = permissionSets.filter(ps => ps.type === 'custom');
-        return filteredPermissonSet;
-    }
+    useEffect(() => {
+        setFilteredPermissionSet(permissionSets.filter(ps => ps.type === 'custom'));
+    }, []);
 
     return <div className="row">
         <div className="col-12">
@@ -112,10 +112,12 @@ const RoleForm = ({ onSuccess, permissionSets, preFill }) => {
                                     <div className="col-12">
                                         <div className="row">
                                             <FormField name="permissionSets" label="Select Permission Sets">
-                                                <ToggleList name="permissionSets" options={getPermissionSetsForToggle()} idExtractor={item => item.id} labelExtractor={item => item.title} />
+                                                {filteredPermissonSet.length ?
+                                                    <ToggleList name="permissionSets" options={filteredPermissonSet} idExtractor={item => item.id} labelExtractor={item => item.title} /> :
+                                                    <div>No custom permission set found. <Link to={{ pathname: "/users/permission-sets", state: { showCreateModal: true } }}  >Click here to create one.</Link></div> }
                                             </FormField>
                                         </div>
-                                        <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting} > Submit </button>
+                                        <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting || !filteredPermissonSet.length} > Submit </button>
                                     </div>
                                 </div>
                             </Form>
