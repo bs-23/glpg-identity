@@ -23,7 +23,6 @@ const ConsentPerformanceReport = () => {
     const [show, setShow] = useState({ profileManage: false, updateStatus: false });
     const [currentAction, setCurrentAction] = useState({ userId: null, action: null });
     const [currentUser, setCurrentUser] = useState({});
-    const [sort, setSort] = useState({ type: 'ASC', value: null });
 
     const consents_report = useSelector(state => state.consentReducer.consents);
 
@@ -98,6 +97,21 @@ const ConsentPerformanceReport = () => {
         });
         return url;
     }
+    
+    function getSortType(sortBy){
+        return consents_report.sortBy !== sortBy  ? 'ASC' : (consents_report.sortBy === sortBy && consents_report.sortType === 'DESC') ? 'ASC' : 'DESC';
+    }
+
+    function getUrl(sortBy){
+        return `consent-performance-report${makeUrl( [ 
+            { name: 'page', value: consents_report.page - 1 }, 
+            { name: 'codbase', value: consents_report.codbase }, 
+            { name: 'process_activity', value: consents_report.process_activity }, 
+            { name: 'opt_type', value: consents_report.opt_type }, 
+            { name: 'sortBy', value: sortBy }, 
+            { name: 'sortType', value: getSortType(sortBy) }
+        ] )}`
+    }
 
     function titleCase(str) {
         let splitStr = str.toLowerCase().split('-');
@@ -107,6 +121,9 @@ const ConsentPerformanceReport = () => {
         
         return splitStr.join(' '); 
     }
+
+
+
 
     useEffect(() => {
         getCountries();
@@ -306,20 +323,21 @@ const ConsentPerformanceReport = () => {
                                             <thead className="cdp-bg-primary text-white cdp-table__header">
                                                 <tr>
                                                     <th>
-                                                        <LinkContainer to={`consent-performance-report${makeUrl( [ { name: 'page', value: consents_report.page - 1 }, { name: 'codbase', value: consents_report.codbase }, {name: 'process_activity', value: consents_report.process_activity }, { name: 'opt_type', value: consents_report.opt_type }, { name: 'sortBy', value: 'first_name' }, { name: 'sortType', value: consents_report.sortBy !== 'first_name'  ? 'ASC' : (consents_report.sortBy === 'first_name' && consents_report.sortType === 'DESC') ? 'ASC' : 'DESC' }] )}`}>
+                                                        <LinkContainer to={getUrl('first_name')}>
                                                             <span 
                                                                 className={consents_report.sortBy === 'first_name' ? `cdp-table__col-sorting sorted ${consents_report.sortType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'first_name', consents_report.sortBy !== 'first_name'  ? 'ASC' : (consents_report.sortBy === 'first_name' && consents_report.sortType === 'DESC') ? 'ASC' : 'DESC' ))}
+                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'first_name', getSortType('first_name') ))}
                                                             >
                                                                 First Name
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
                                                         </LinkContainer>
                                                     </th>
+
                                                     <th>
-                                                        <LinkContainer to={`consent-performance-report${makeUrl( [ { name: 'page', value: consents_report.page - 1 }, { name: 'codbase', value: consents_report.codbase }, {name: 'process_activity', value: consents_report.process_activity }, { name: 'opt_type', value: consents_report.opt_type }, { name: 'sortBy', value: 'last_name' }, { name: 'sortType', value: consents_report.sortBy !== 'last_name'  ? 'ASC' : (consents_report.sortBy === 'last_name' && consents_report.sortType === 'DESC') ? 'ASC' : 'DESC' }] )}`}>
+                                                        <LinkContainer to={getUrl('last_name')}>
                                                             <span 
                                                                 className={consents_report.sortBy === 'last_name' ? `cdp-table__col-sorting sorted ${consents_report.sortType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'last_name', consents_report.sortBy !== 'last_name'  ? 'ASC' : (consents_report.sortBy === 'last_name' && consents_report.sortType === 'DESC') ? 'ASC' : 'DESC' ))}
+                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'last_name', getSortType('last_name') ))}
                                                             >
                                                                 Last Name
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -327,10 +345,10 @@ const ConsentPerformanceReport = () => {
                                                     </th>
 
                                                     <th>
-                                                        <LinkContainer to={`consent-performance-report${makeUrl( [ { name: 'page', value: consents_report.page - 1 }, { name: 'codbase', value: consents_report.codbase }, {name: 'process_activity', value: consents_report.process_activity }, { name: 'opt_type', value: consents_report.opt_type }, { name: 'sortBy', value: 'email' }, { name: 'sortType', value: consents_report.sortBy !== 'email'  ? 'ASC' : (consents_report.sortBy === 'email' && consents_report.sortType === 'DESC') ? 'ASC' : 'DESC' }] )}`}>
+                                                        <LinkContainer to={getUrl('email')}>
                                                             <span 
                                                                 className={consents_report.sortBy === 'email' ? `cdp-table__col-sorting sorted ${consents_report.sortType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'email', consents_report.sortBy !== 'email'  ? 'ASC' : (consents_report.sortBy === 'email' && consents_report.sortType === 'DESC') ? 'ASC' : 'DESC' ))}
+                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'email', getSortType('email') ))}
                                                             >
                                                                 Email
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -338,10 +356,10 @@ const ConsentPerformanceReport = () => {
                                                     </th>
 
                                                     <th>
-                                                        <LinkContainer to={`consent-performance-report${makeUrl( [ { name: 'page', value: consents_report.page - 1 }, { name: 'codbase', value: consents_report.codbase }, {name: 'process_activity', value: consents_report.process_activity }, { name: 'opt_type', value: consents_report.opt_type }, { name: 'sortBy', value: 'consent_type' }, { name: 'sortType', value: consents_report.sortBy !== 'consent_type'  ? 'ASC' : (consents_report.sortBy === 'consent_type' && consents_report.sortType === 'DESC') ? 'ASC' : 'DESC' }] )}`}>
+                                                        <LinkContainer to={getUrl('consent_type')}>
                                                             <span 
                                                                 className={consents_report.sortBy === 'consent_type' ? `cdp-table__col-sorting sorted ${consents_report.sortType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'consent_type', consents_report.sortBy !== 'consent_type'  ? 'ASC' : (consents_report.sortBy === 'consent_type' && consents_report.sortType === 'DESC') ? 'ASC' : 'DESC' ))}
+                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'consent_type', getSortType('consent_type') ))}
                                                             >
                                                                 Consent Type
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -349,10 +367,10 @@ const ConsentPerformanceReport = () => {
                                                     </th>
 
                                                     <th>
-                                                        <LinkContainer to={`consent-performance-report${makeUrl( [ { name: 'page', value: consents_report.page - 1 }, { name: 'codbase', value: consents_report.codbase }, {name: 'process_activity', value: consents_report.process_activity }, { name: 'opt_type', value: consents_report.opt_type }, { name: 'sortBy', value: 'opt_type' }, { name: 'sortType', value: consents_report.sortBy !== 'opt_type'  ? 'ASC' : (consents_report.sortBy === 'opt_type' && consents_report.sortType === 'DESC') ? 'ASC' : 'DESC' }] )}`}>
+                                                        <LinkContainer to={getUrl('opt_type')}>
                                                             <span 
                                                                 className={consents_report.sortBy === 'opt_type' ? `cdp-table__col-sorting sorted ${consents_report.sortType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'opt_type', consents_report.sortBy !== 'opt_type'  ? 'ASC' : (consents_report.sortBy === 'opt_type' && consents_report.sortType === 'DESC') ? 'ASC' : 'DESC' ))}
+                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'opt_type', getSortType('opt_type') ))}
                                                             >
                                                                 Opt Type
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -360,10 +378,10 @@ const ConsentPerformanceReport = () => {
                                                     </th>
 
                                                     <th>
-                                                        <LinkContainer to={`consent-performance-report${makeUrl( [ { name: 'page', value: consents_report.page - 1 }, { name: 'codbase', value: consents_report.codbase }, {name: 'process_activity', value: consents_report.process_activity }, { name: 'opt_type', value: consents_report.opt_type }, { name: 'sortBy', value: 'legal_basis' }, { name: 'sortType', value: consents_report.sortBy !== 'legal_basis'  ? 'ASC' : (consents_report.sortBy === 'legal_basis' && consents_report.sortType === 'DESC') ? 'ASC' : 'DESC' }] )}`}>
+                                                        <LinkContainer to={getUrl('legal_basis')}>
                                                             <span 
                                                                 className={consents_report.sortBy === 'legal_basis' ? `cdp-table__col-sorting sorted ${consents_report.sortType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'legal_basis', consents_report.sortBy !== 'legal_basis'  ? 'ASC' : (consents_report.sortBy === 'legal_basis' && consents_report.sortType === 'DESC') ? 'ASC' : 'DESC' ))}
+                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'legal_basis', getSortType('legal_basis') ))}
                                                             >
                                                                 Legal Basis
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -371,10 +389,10 @@ const ConsentPerformanceReport = () => {
                                                     </th>
 
                                                     <th>
-                                                        <LinkContainer to={`consent-performance-report${makeUrl( [ { name: 'page', value: consents_report.page - 1 }, { name: 'codbase', value: consents_report.codbase }, {name: 'process_activity', value: consents_report.process_activity }, { name: 'opt_type', value: consents_report.opt_type }, { name: 'sortBy', value: 'preferences' }, { name: 'sortType', value: consents_report.sortBy !== 'preferences'  ? 'ASC' : (consents_report.sortBy === 'preferences' && consents_report.sortType === 'DESC') ? 'ASC' : 'DESC' }] )}`}>
+                                                        <LinkContainer to={getUrl('preferences')}>
                                                             <span 
                                                                 className={consents_report.sortBy === 'preferences' ? `cdp-table__col-sorting sorted ${consents_report.sortType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'preferences', consents_report.sortBy !== 'preferences'  ? 'ASC' : (consents_report.sortBy === 'preferences' && consents_report.sortType === 'DESC') ? 'ASC' : 'DESC' ))}
+                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'preferences', getSortType('preferences') ))}
                                                             >
                                                                 Preferences
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -382,10 +400,10 @@ const ConsentPerformanceReport = () => {
                                                     </th>
 
                                                     <th>
-                                                        <LinkContainer to={`consent-performance-report${makeUrl( [ { name: 'page', value: consents_report.page - 1 }, { name: 'codbase', value: consents_report.codbase }, {name: 'process_activity', value: consents_report.process_activity }, { name: 'opt_type', value: consents_report.opt_type }, { name: 'sortBy', value: 'date' }, { name: 'sortType', value: consents_report.sortBy !== 'date'  ? 'ASC' : (consents_report.sortBy === 'date' && consents_report.sortType === 'DESC') ? 'ASC' : 'DESC' }] )}`}>
+                                                        <LinkContainer to={getUrl('date')}>
                                                             <span 
                                                                 className={consents_report.sortBy === 'date' ? `cdp-table__col-sorting sorted ${consents_report.sortType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'date', consents_report.sortBy !== 'date'  ? 'ASC' : (consents_report.sortBy === 'date' && consents_report.sortType === 'DESC') ? 'ASC' : 'DESC' ))}
+                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'date', getSortType('date') ))}
                                                             >
                                                                 Date
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -429,10 +447,28 @@ const ConsentPerformanceReport = () => {
                                             && consents_report['hcp_consents'] &&
                                             <div className="pagination justify-content-end align-items-center border-top p-3">
                                                 <span className="cdp-text-primary font-weight-bold">{consents_report.start + ' - ' + consents_report.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + consents_report.total}</span>
-                                                <LinkContainer to={`consent-performance-report${makeUrl( [ { name: 'page', value: consents_report.page - 1 }, { name: 'codbase', value: consents_report.codbase }, {name: 'process_activity', value: consents_report.process_activity }, { name: 'opt_type', value: consents_report.opt_type }, { name: 'sortBy', value: consents_report.sortBy}, { name: 'sortType', value: consents_report.sortType }] )}`}>
+                                                <LinkContainer 
+                                                    to={`consent-performance-report${makeUrl( [ 
+                                                        { name: 'page', value: consents_report.page - 1 }, 
+                                                        { name: 'codbase', value: consents_report.codbase }, 
+                                                        { name: 'process_activity', value: consents_report.process_activity }, 
+                                                        { name: 'opt_type', value: consents_report.opt_type }, 
+                                                        { name: 'sortBy', value: consents_report.sortBy }, 
+                                                        { name: 'sortType', value: consents_report.sortType }
+                                                    ] )}`}
+                                                >
                                                     <span className="pagination-btn" data-testid='Prev' onClick={() => pageLeft()} disabled={consents_report.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
                                                 </LinkContainer>
-                                                <LinkContainer to={`consent-performance-report${makeUrl( [ { name: 'page', value: consents_report.page + 1 }, { name: 'codbase', value: consents_report.codbase }, {name: 'process_activity', value: consents_report.process_activity }, { name: 'opt_type', value: consents_report.opt_type }, { name: 'sortBy', value: consents_report.sortBy}, { name: 'sortType', value: consents_report.sortType }] )}`}>
+                                                <LinkContainer 
+                                                    to={`consent-performance-report${makeUrl( [ 
+                                                        { name: 'page', value: consents_report.page + 1 }, 
+                                                        { name: 'codbase', value: consents_report.codbase }, 
+                                                        { name: 'process_activity', value: consents_report.process_activity }, 
+                                                        { name: 'opt_type', value: consents_report.opt_type }, 
+                                                        { name: 'sortBy', value: consents_report.sortBy}, 
+                                                        { name: 'sortType', value: consents_report.sortType }
+                                                    ] )}`}
+                                                >
                                                     <span className="pagination-btn" data-testid='Next' onClick={() => pageRight()} disabled={consents_report.end === consents_report.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
                                                 </LinkContainer>
                                             </div>
