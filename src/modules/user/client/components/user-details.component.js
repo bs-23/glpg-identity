@@ -193,7 +193,7 @@ const UserDetails = (props) => {
                                                                 <SelectOneToggleList name="roleId" options={roles} idExtractor={item => item.id} labelExtractor={item => item.title} />
                                                             </FormField>
                                                             </div>
-                                                            <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting} > Save Changes </button>
+                                                            <button type="submit" className="btn btn-sm  text-white cdp-btn-secondary" disabled={formikProps.isSubmitting} > Save Changes </button>
                                                         </Form>
                                                     )}
                                                 </Formik>
