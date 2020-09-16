@@ -152,7 +152,7 @@ const ConsentPerformanceReport = () => {
                         <div>
                             <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
                                 <h4 className="cdp-text-primary font-weight-bold mb-0">Consent Performance Report</h4>
-                                {/* <div className="d-flex pt-3 pt-sm-0">
+                                <div className="d-flex pt-3 pt-sm-0">
                                     <React.Fragment>
                                         {countries && consents_report['countries'] &&
                                             <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-btn-primary text-white dropdown shadow-sm">
@@ -161,12 +161,23 @@ const ConsentPerformanceReport = () => {
                                                     {consents_report.codbase && (countries.find(i => i.codbase === consents_report.codbase)) ? (countries.find(i => i.codbase === consents_report.codbase)).codbase_desc : 'All'}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
-                                                    <LinkContainer to={`consent-performance-report${makeUrl( [{name: 'process_activity', value: consents_report.process_activity }, { name: 'opt_type', value: consents_report.opt_type }] )}`}>
-                                                        <Dropdown.Item className={consents_report.codbase === '' ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('', '', consents_report.process_activity, consents_report.opt_type, , consents_report.orderBy, consents_report.orderType))}>All</Dropdown.Item>
+                                                    <LinkContainer to={`consent-performance-report${makeUrl( [
+                                                        { name: 'process_activity', value: consents_report.process_activity }, 
+                                                        { name: 'opt_type', value: consents_report.opt_type }, 
+                                                        { name: 'orderBy', value: consents_report.orderBy }, 
+                                                        { name: 'orderType', value: consents_report.orderType }
+                                                    ] )}`}>
+                                                        <Dropdown.Item className={consents_report.codbase === '' ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('', '', consents_report.process_activity, consents_report.opt_type, consents_report.orderBy, consents_report.orderType))}>All</Dropdown.Item>
                                                     </LinkContainer>
                                                     {
                                                         countries.map((item, index) => (
-                                                            consents_report.countries.includes(item.country_iso2) && <LinkContainer  key={index} to={`consent-performance-report${makeUrl( [{ name: 'codbase', value: item.codbase }, {name: 'process_activity', value: consents_report.process_activity }, { name: 'opt_type', value: consents_report.opt_type }, , { name: 'orderBy', value: consents_report.orderBy}, { name: 'orderType', value: consents_report.orderType }] )}`}>
+                                                            consents_report.countries.includes(item.country_iso2) && <LinkContainer  key={index} to={`consent-performance-report${makeUrl( [
+                                                                { name: 'codbase', value: item.codbase }, 
+                                                                { name: 'process_activity', value: consents_report.process_activity }, 
+                                                                { name: 'opt_type', value: consents_report.opt_type }, 
+                                                                { name: 'orderBy', value: consents_report.orderBy}, 
+                                                                { name: 'orderType', value: consents_report.orderType }
+                                                            ] )}`}>
                                                                 <Dropdown.Item className={consents_report.countries.includes(item.country_iso2) && consents_report.codbase === item.codbase ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('',  item.codbase, consents_report.process_activity, consents_report.opt_type, consents_report.orderBy, consents_report.orderType))}>
                                                                     {
                                                                         
@@ -180,7 +191,7 @@ const ConsentPerformanceReport = () => {
                                             </Dropdown> 
                                         }
 
-                                        <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-btn-primary text-white dropdown shadow-sm">
+                                        {/* <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-btn-primary text-white dropdown shadow-sm">
                                             Process Activity
                                             <Dropdown.Toggle variant="" className="ml-2 bg-white rounded-0">
                                                 {consents_report.process_activity && (allProcessActivities.find(i => i.type === consents_report.process_activity)) ? (allProcessActivities.find(i => i.type === consents_report.process_activity)).title : 'All'}
@@ -224,9 +235,9 @@ const ConsentPerformanceReport = () => {
                                                     ))
                                                 }
                                             </Dropdown.Menu>
-                                        </Dropdown>
+                                        </Dropdown> */}
                                     </React.Fragment>
-                                </div> */}
+                                </div>
                             </div>
 
 
