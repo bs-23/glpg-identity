@@ -15,7 +15,7 @@ export default function Users() {
     const [userCountries, setUserCountries] = useState([]);
 
     const params = new URLSearchParams(window.location.search);
-    const [sort, setSort] = useState({ type: 'ASC', value: null });
+    const [sort, setSort] = useState({ type: 'asc', value: null });
 
     const getUserList = (page = params.get('page') ? params.get('page') : 1,
         codbase = params.get('codbase') ? params.get('codbase') : null) => {
@@ -65,18 +65,18 @@ export default function Users() {
     }, [userdata.users]);
 
     const sortWithUrlChange = () => {
-        if (userdata.users && params.get('sort_type') && params.get('sort_col')) {
-            dispatch(cdpSort(params.get('sort_type'), params.get('sort_col')));
+        if (userdata.users && params.get('orderType') && params.get('orderBy')) {
+            dispatch(cdpSort(params.get('orderType'), params.get('orderBy')));
         }
     }
 
     const sortCdp = (val) => {
         if (sort.value === val) {
-            dispatch(cdpSort(sort.type === 'ASC' ? 'DESC' : 'ASC', val));
-            setSort({ type: sort.type === 'ASC' ? 'DESC' : 'ASC', value: val });
+            dispatch(cdpSort(sort.type === 'asc' ? 'desc' : 'asc', val));
+            setSort({ type: sort.type === 'asc' ? 'desc' : 'asc', value: val });
         } else {
-            dispatch(cdpSort('ASC', val));
-            setSort({ type: 'ASC', value: val });
+            dispatch(cdpSort('asc', val));
+            setSort({ type: 'asc', value: val });
         }
     };
 
@@ -128,7 +128,7 @@ export default function Users() {
                                         <LinkContainer to="list?page=1"><Dropdown.Item onClick={() => getUserList(1, null)}>All</Dropdown.Item></LinkContainer>
                                         {
                                             userCountries.length > 0 && userCountries.map(country => (
-                                                <LinkContainer to={`list?page=1&codbase=${country.codbase}&sort_type=${sort.type}&sort_col=${sort.value}`} key={country.countryid}><Dropdown.Item onClick={() => getUserList(1, country.codbase)}>{country.codbase_desc}</Dropdown.Item></LinkContainer>
+                                                <LinkContainer to={`list?page=1&codbase=${country.codbase}&orderType=${sort.type}&orderBy=${sort.value}`} key={country.countryid}><Dropdown.Item onClick={() => getUserList(1, country.codbase)}>{country.codbase_desc}</Dropdown.Item></LinkContainer>
                                             ))
                                         }
                                     </Dropdown.Menu>
@@ -187,10 +187,10 @@ export default function Users() {
                                         && userdata['users'] &&
                                         <div className="pagination justify-content-end align-items-center border-top p-3">
                                             <span className="cdp-text-primary font-weight-bold">{userdata.start + ' - ' + userdata.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + userdata.total}</span>
-                                            <LinkContainer to={`list?page=${userdata.page - 1}&codbase=${userdata.codbase}&sort_type=${sort.type}&sort_col=${sort.value}`}>
+                                            <LinkContainer to={`list?page=${userdata.page - 1}&codbase=${userdata.codbase}&orderType=${sort.type}&orderBy=${sort.value}`}>
                                                 <span className="pagination-btn" onClick={() => pageLeft()} disabled={userdata.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
                                             </LinkContainer>
-                                            <LinkContainer to={`list?page=${userdata.page + 1}&codbase=${userdata.codbase}&sort_type=${sort.type}&sort_col=${sort.value}`}>
+                                            <LinkContainer to={`list?page=${userdata.page + 1}&codbase=${userdata.codbase}&orderType=${sort.type}&orderBy=${sort.value}`}>
                                                 <span className="pagination-btn" onClick={() => pageRight()} disabled={userdata.end === userdata.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
                                             </LinkContainer>
                                         </div>
