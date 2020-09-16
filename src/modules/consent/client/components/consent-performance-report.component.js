@@ -104,7 +104,7 @@ const ConsentPerformanceReport = () => {
 
     function getUrl(orderBy){
         return `consent-performance-report${makeUrl( [ 
-            { name: 'page', value: consents_report.page - 1 }, 
+            { name: 'page', value: consents_report.page }, 
             { name: 'codbase', value: consents_report.codbase }, 
             { name: 'process_activity', value: consents_report.process_activity }, 
             { name: 'opt_type', value: consents_report.opt_type }, 
