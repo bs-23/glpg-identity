@@ -78,8 +78,8 @@ const ToggleList = ({ name, options, labelExtractor, idExtractor }) => {
     return <FieldArray
                 name={name}
                 render={arrayHelpers => (
-                    options.map(item => <label key={idExtractor(item)} className="d-flex justify-content-between align-items-center">
-                        <span className="switch-label">{labelExtractor(item)}</span>
+                    options.map(item => <label key={idExtractor(item)} className="d-flex  align-items-center">
+                        
                         <span className="switch">
                             <input name={name}
                                 className="custom-control-input"
@@ -92,6 +92,7 @@ const ToggleList = ({ name, options, labelExtractor, idExtractor }) => {
                             />
                             <span className="slider round"></span>
                         </span>
+                        <span className="switch-label text-left pl-2">{labelExtractor(item)}</span>
                     </label>)
                 )}
             />
@@ -179,9 +180,9 @@ export default function PermissionSetForm({ onSuccess, onError, preFill }) {
                                                     <FormField label="Select Applications" name="applications" required={false} >
                                                         <CheckList name="applications" options={applications} idExtractor={item => item.id} labelExtractor={item => item.name} />
                                                     </FormField>
-                                                    <FormField label="Select Service Categories" name="serviceCategories" required={false} >
+                                                    <FormFieldFluid label="Select Service Categories" name="serviceCategories" required={false} >
                                                         <ToggleList name="serviceCategories" options={serviceCategories} idExtractor={item => item.id} labelExtractor={item => item.title} />
-                                                    </FormField>
+                                                    </FormFieldFluid>
                                                     <FormFieldFluid label="Description" type="text" name="description" required={false} component="textarea" />
                                                     </div>
                                                     <ErrorMessage name="app_country_service" >{(message) => <div className="invalid-feedback alert alert-warning" >{message}</div>}</ErrorMessage>
