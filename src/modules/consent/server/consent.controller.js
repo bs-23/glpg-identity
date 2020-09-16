@@ -7,6 +7,7 @@ const validator = require('validator');
 const ConsentLocale = require('./consent-locale.model');
 const ConsentCountry = require('./consent-country.model');
 const ConsentCategory = require('./consent-category.model');
+const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const HCPS = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_profile.model'));
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
@@ -112,43 +113,60 @@ async function getConsentsReport(req, res){
         const opt_type = req.query.opt_type === undefined ? '' : req.query.opt_type;
         const offset = page * limit;
 
+        const orderBy = req.query.orderBy ? req.query.orderBy : '';
+        const orderType = req.query.orderType ? req.query.orderType : '';
+        const order = [];
+
+        if(orderBy && orderType){
+            if(orderBy === 'first_name') order.push([HCPS, 'first_name', orderType]);
+            if(orderBy === 'last_name') order.push([HCPS, 'last_name', orderType]);
+            if(orderBy === 'email') order.push([HCPS, 'email', orderType]);
+
+            if(orderBy === 'consent_type') order.push([Consent, ConsentCategory, 'title', orderType]);
+
+            if(orderBy === 'opt_type') order.push([Consent, { model: ConsentCountry, as: 'consent_country' }, 'opt_type', orderType === 'ASC' ? 'DESC' : 'ASC']);
+
+            if(orderBy === 'legal_basis') order.push([Consent, 'legal_basis', orderType]);
+            if(orderBy === 'preferences') order.push([Consent, 'preference', orderType]);
+            if(orderBy === 'date') order.push([Consent, 'updated_at', orderType]);
+        }
+        order.push([HCPS, 'created_at', 'DESC']);
+        order.push([HCPS, 'id', 'DESC']);
+
         const application_list = (await HCPS.findAll()).map(i => i.get("application_id"));
 
-        // const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => i.codbase === codbase).map(i => i.country_iso2);
-        // const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
+        const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => i.codbase === codbase).map(i => i.country_iso2);
+        const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
 
-        // const country_iso2_list = req.user.type === 'admin' ? (await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry", { type: QueryTypes.SELECT })).map(i => i.country_iso2) : (await HCPS.findAll()).map(i => i.get("country_iso2"));
-        // const countries_ignorecase = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
+        const country_iso2_list = req.user.type === 'admin' ? (await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry", { type: QueryTypes.SELECT })).map(i => i.country_iso2) : (await HCPS.findAll()).map(i => i.get("country_iso2"));
+        const countries_ignorecase = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
 
 
-        // const codbase_list_mapped_with_user_country_iso2_list = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => req.user.countries.includes(i.country_iso2)).map(i => i.codbase) : [];
-        // const country_iso2_list_for_user_countries_codbase = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => codbase_list_mapped_with_user_country_iso2_list.includes(i.codbase)).map(i => i.country_iso2) : [];
-        // const countries_ignorecase_for_user_countries_codbase = [].concat.apply([], country_iso2_list_for_user_countries_codbase.map(i => ignoreCaseArray(i)));
+        const codbase_list_mapped_with_user_country_iso2_list = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => req.user.countries.includes(i.country_iso2)).map(i => i.codbase) : [];
+        const country_iso2_list_for_user_countries_codbase = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => codbase_list_mapped_with_user_country_iso2_list.includes(i.codbase)).map(i => i.country_iso2) : [];
+        const countries_ignorecase_for_user_countries_codbase = [].concat.apply([], country_iso2_list_for_user_countries_codbase.map(i => ignoreCaseArray(i)));
 
 
         const process_activities = (await ConsentCategory.findAll()).map(i => i.type);
         const opt_types = [...new Set((await ConsentCountry.findAll()).map(i => i.opt_type))];
 
-        const hcp_filter = {
+
+        const consent_filter = {
             response: true,
             consent_confirmed: true,
             '$hcp_profile.application_id$': req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
-            // '$hcp_profile.country_iso2$': codbase ? { [Op.any]: [countries_ignorecase_for_codbase] } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : countries_ignorecase_for_user_countries_codbase,
+            '$hcp_profile.country_iso2$': codbase ? { [Op.any]: [countries_ignorecase_for_codbase] } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : countries_ignorecase_for_user_countries_codbase,
             '$consent.consent_category.type$': process_activity ? { [Op.eq]: process_activity } : { [Op.or]: process_activities },
             '$consent.consent_country.country_iso2$': { [Op.eq]: Sequelize.col('hcp_profile.country_iso2') },
             '$consent.consent_country.opt_type$': opt_type ? { [Op.eq]: opt_type } : { [Op.or]: opt_types }
         };
 
         const hcp_consents = await HcpConsents.findAll({
-            where: hcp_filter,
+            where: consent_filter,
             include: [
                 {
                     model: HCPS,
                     attributes: { exclude: ['password', 'created_by', 'updated_by'] },
-                    order: [
-                        ['created_at', 'DESC'],
-                        ['id', 'ASC']
-                    ],
                 },
                 {
                     model: Consent,
@@ -162,9 +180,6 @@ async function getConsentsReport(req, res){
                             model: ConsentCountry,
                             as: 'consent_country',
                             attributes: ['country_iso2', 'opt_type'],
-                            // where: {
-                            //     country_iso2: Sequelize.col('hcp_consent->hcp_profile.country_iso2')
-                            // }
                         }
                     ]
                 }
@@ -172,6 +187,7 @@ async function getConsentsReport(req, res){
             attributes: ['consent_id', 'response', 'consent_confirmed'],
             offset,
             limit,
+            order: order,
             subQuery: false,
         });
 
@@ -192,7 +208,7 @@ async function getConsentsReport(req, res){
         });
 
         const total_consents = await HcpConsents.count({
-            where: hcp_filter,
+            where: consent_filter,
             include: [
                 {
                     model: HCPS,
@@ -222,7 +238,9 @@ async function getConsentsReport(req, res){
             codbase: codbase ? codbase : '',
             process_activity: process_activity ? process_activity : '',
             opt_type: opt_type ? opt_type : '',
-            // countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : req.user.countries
+            countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : req.user.countries,
+            orderBy: orderBy,
+            orderType: orderType,
         };
 
         response.data = data;
