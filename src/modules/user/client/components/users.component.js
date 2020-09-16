@@ -83,7 +83,7 @@ export default function Users() {
         }
     }
 
-    const urlChange = (pageNo, codBase, sortColumn) => {
+    const urlChange = (pageNo, codBase, orderColumn) => {
         let orderType = params.get('orderType');
         const orderBy = params.get('orderBy');
         const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
