@@ -112,22 +112,22 @@ async function getConsentsReport(req, res){
         const opt_type = req.query.opt_type === undefined ? '' : req.query.opt_type;
         const offset = page * limit;
 
-        const sortBy = req.query.sortBy ? req.query.sortBy : '';
-        const sortType = req.query.sortType ? req.query.sortType : '';
+        const orderBy = req.query.orderBy ? req.query.orderBy : '';
+        const orderType = req.query.orderType ? req.query.orderType : '';
         const order = [];
 
-        if(sortBy && sortType){
-            if(sortBy === 'first_name') order.push([HCPS, 'first_name', sortType]);
-            if(sortBy === 'last_name') order.push([HCPS, 'last_name', sortType]);
-            if(sortBy === 'email') order.push([HCPS, 'email', sortType]);
+        if(orderBy && orderType){
+            if(orderBy === 'first_name') order.push([HCPS, 'first_name', orderType]);
+            if(orderBy === 'last_name') order.push([HCPS, 'last_name', orderType]);
+            if(orderBy === 'email') order.push([HCPS, 'email', orderType]);
 
-            if(sortBy === 'consent_type') order.push([Consent, ConsentCategory, 'title', sortType]);
+            if(orderBy === 'consent_type') order.push([Consent, ConsentCategory, 'title', orderType]);
 
-            if(sortBy === 'opt_type') order.push([Consent, { model: ConsentCountry, as: 'consent_country' }, 'opt_type', sortType]);
+            if(orderBy === 'opt_type') order.push([Consent, { model: ConsentCountry, as: 'consent_country' }, 'opt_type', orderType]);
 
-            if(sortBy === 'legal_basis') order.push([Consent, 'legal_basis', sortType]);
-            if(sortBy === 'preferences') order.push([Consent, 'preference', sortType]);
-            if(sortBy === 'date') order.push([Consent, 'updated_at', sortType]);
+            if(orderBy === 'legal_basis') order.push([Consent, 'legal_basis', orderType]);
+            if(orderBy === 'preferences') order.push([Consent, 'preference', orderType]);
+            if(orderBy === 'date') order.push([Consent, 'updated_at', orderType]);
         }
         order.push([HCPS, 'created_at', 'DESC']);
         order.push([HCPS, 'id', 'DESC']);
@@ -238,8 +238,8 @@ async function getConsentsReport(req, res){
             process_activity: process_activity ? process_activity : '',
             opt_type: opt_type ? opt_type : '',
             // countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : req.user.countries,
-            sortBy: sortBy,
-            sortType: sortType,
+            orderBy: orderBy,
+            orderType: orderType,
         };
 
         response.data = data;

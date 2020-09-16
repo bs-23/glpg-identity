@@ -27,11 +27,11 @@ const ConsentPerformanceReport = () => {
     const consents_report = useSelector(state => state.consentReducer.consents);
 
     const pageLeft = () => {
-        if (consents_report.page > 1) dispatch(getConsentReport(consents_report.page - 1, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, consents_report.sortBy, consents_report.sortType));
+        if (consents_report.page > 1) dispatch(getConsentReport(consents_report.page - 1, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, consents_report.orderBy, consents_report.orderType));
     };
 
     const pageRight = () => {
-        if (consents_report.end !== consents_report.total) dispatch(getConsentReport(consents_report.page + 1, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, consents_report.sortBy, consents_report.sortType));
+        if (consents_report.end !== consents_report.total) dispatch(getConsentReport(consents_report.page + 1, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, consents_report.orderBy, consents_report.orderType));
     };
 
     async function getCountries() {
@@ -61,8 +61,8 @@ const ConsentPerformanceReport = () => {
             params.get('codbase') ? params.get('codbase') : '',
             params.get('process_activity') ? params.getAll('process_activity') : '',
             params.get('opt_type') ? params.getAll('opt_type') : '',
-            params.get('sortBy') ? params.getAll('sortBy') : '',
-            params.get('sortType') ? params.getAll('sortType') : ''
+            params.get('orderBy') ? params.getAll('orderBy') : '',
+            params.get('orderType') ? params.getAll('orderType') : ''
         ));
     }
 
@@ -98,18 +98,18 @@ const ConsentPerformanceReport = () => {
         return url;
     }
     
-    function getSortType(sortBy){
-        return consents_report.sortBy !== sortBy  ? 'ASC' : (consents_report.sortBy === sortBy && consents_report.sortType === 'DESC') ? 'ASC' : 'DESC';
+    function getorderType(orderBy){
+        return consents_report.orderBy !== orderBy  ? 'ASC' : (consents_report.orderBy === orderBy && consents_report.orderType === 'DESC') ? 'ASC' : 'DESC';
     }
 
-    function getUrl(sortBy){
+    function getUrl(orderBy){
         return `consent-performance-report${makeUrl( [ 
             { name: 'page', value: consents_report.page - 1 }, 
             { name: 'codbase', value: consents_report.codbase }, 
             { name: 'process_activity', value: consents_report.process_activity }, 
             { name: 'opt_type', value: consents_report.opt_type }, 
-            { name: 'sortBy', value: sortBy }, 
-            { name: 'sortType', value: getSortType(sortBy) }
+            { name: 'orderBy', value: orderBy }, 
+            { name: 'orderType', value: getorderType(orderBy) }
         ] )}`
     }
 
@@ -162,12 +162,12 @@ const ConsentPerformanceReport = () => {
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
                                                     <LinkContainer to={`consent-performance-report${makeUrl( [{name: 'process_activity', value: consents_report.process_activity }, { name: 'opt_type', value: consents_report.opt_type }] )}`}>
-                                                        <Dropdown.Item className={consents_report.codbase === '' ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('', '', consents_report.process_activity, consents_report.opt_type, , consents_report.sortBy, consents_report.sortType))}>All</Dropdown.Item>
+                                                        <Dropdown.Item className={consents_report.codbase === '' ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('', '', consents_report.process_activity, consents_report.opt_type, , consents_report.orderBy, consents_report.orderType))}>All</Dropdown.Item>
                                                     </LinkContainer>
                                                     {
                                                         countries.map((item, index) => (
-                                                            consents_report.countries.includes(item.country_iso2) && <LinkContainer  key={index} to={`consent-performance-report${makeUrl( [{ name: 'codbase', value: item.codbase }, {name: 'process_activity', value: consents_report.process_activity }, { name: 'opt_type', value: consents_report.opt_type }, , { name: 'sortBy', value: consents_report.sortBy}, { name: 'sortType', value: consents_report.sortType }] )}`}>
-                                                                <Dropdown.Item className={consents_report.countries.includes(item.country_iso2) && consents_report.codbase === item.codbase ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('',  item.codbase, consents_report.process_activity, consents_report.opt_type, consents_report.sortBy, consents_report.sortType))}>
+                                                            consents_report.countries.includes(item.country_iso2) && <LinkContainer  key={index} to={`consent-performance-report${makeUrl( [{ name: 'codbase', value: item.codbase }, {name: 'process_activity', value: consents_report.process_activity }, { name: 'opt_type', value: consents_report.opt_type }, , { name: 'orderBy', value: consents_report.orderBy}, { name: 'orderType', value: consents_report.orderType }] )}`}>
+                                                                <Dropdown.Item className={consents_report.countries.includes(item.country_iso2) && consents_report.codbase === item.codbase ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('',  item.codbase, consents_report.process_activity, consents_report.opt_type, consents_report.orderBy, consents_report.orderType))}>
                                                                     {
                                                                         
                                                                         consents_report.countries.includes(item.country_iso2) ? item.codbase_desc : null
@@ -186,13 +186,13 @@ const ConsentPerformanceReport = () => {
                                                 {consents_report.process_activity && (allProcessActivities.find(i => i.type === consents_report.process_activity)) ? (allProcessActivities.find(i => i.type === consents_report.process_activity)).title : 'All'}
                                             </Dropdown.Toggle>
                                             <Dropdown.Menu>
-                                                <LinkContainer to={`consent-performance-report${makeUrl( [{name: 'codbase', value: consents_report.codbase }, { name: 'opt_type', value: consents_report.opt_type }, , { name: 'sortBy', value: consents_report.sortBy}, { name: 'sortType', value: consents_report.sortType }] )}`}>
+                                                <LinkContainer to={`consent-performance-report${makeUrl( [{name: 'codbase', value: consents_report.codbase }, { name: 'opt_type', value: consents_report.opt_type }, , { name: 'orderBy', value: consents_report.orderBy}, { name: 'orderType', value: consents_report.orderType }] )}`}>
                                                     <Dropdown.Item className={consents_report.process_activity === '' ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('', consents_report.codbase, '', consents_report.opt_type))}>All</Dropdown.Item>
                                                 </LinkContainer>
                                                 {
                                                     allProcessActivities.map((item, index) => (
-                                                        <LinkContainer key={index} to={`consent-performance-report${makeUrl( [{ name: 'codbase', value: consents_report.codbase }, {name: 'process_activity', value: item.type }, { name: 'opt_type', value: consents_report.opt_type }, , { name: 'sortBy', value: consents_report.sortBy}, { name: 'sortType', value: consents_report.sortType }] )}`}>
-                                                            <Dropdown.Item className={consents_report.process_activity === item.type ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('',  consents_report.codbase, item.type, consents_report.opt_type, consents_report.sortBy, consents_report.sortType))}>
+                                                        <LinkContainer key={index} to={`consent-performance-report${makeUrl( [{ name: 'codbase', value: consents_report.codbase }, {name: 'process_activity', value: item.type }, { name: 'opt_type', value: consents_report.opt_type }, , { name: 'orderBy', value: consents_report.orderBy}, { name: 'orderType', value: consents_report.orderType }] )}`}>
+                                                            <Dropdown.Item className={consents_report.process_activity === item.type ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('',  consents_report.codbase, item.type, consents_report.opt_type, consents_report.orderBy, consents_report.orderType))}>
                                                                 {
                                                                     item.type === consents_report.process_activity ? null : item.title
                                                                 }
@@ -209,13 +209,13 @@ const ConsentPerformanceReport = () => {
                                             {consents_report.opt_type && (allOptTypes.includes(consents_report.opt_type)) ? consents_report.opt_type : 'All'}
                                             </Dropdown.Toggle>
                                             <Dropdown.Menu>
-                                                <LinkContainer to={`consent-performance-report${makeUrl( [{name: 'codbase', value: consents_report.codbase }, { name: 'process_activity', value: consents_report.process_activity }, { name: 'sortBy', value: consents_report.sortBy}, { name: 'sortType', value: consents_report.sortType }] )}`}>
+                                                <LinkContainer to={`consent-performance-report${makeUrl( [{name: 'codbase', value: consents_report.codbase }, { name: 'process_activity', value: consents_report.process_activity }, { name: 'orderBy', value: consents_report.orderBy}, { name: 'orderType', value: consents_report.orderType }] )}`}>
                                                     <Dropdown.Item className={consents_report.opt_type === '' ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('', consents_report.codbase, consents_report.process_activity, ''))}>All</Dropdown.Item>
                                                 </LinkContainer>
                                                 {
                                                     allOptTypes.map((item, index) => (
-                                                        <LinkContainer key={index} to={`consent-performance-report${makeUrl( [{ name: 'codbase', value: consents_report.codbase }, {name: 'process_activity', value: consents_report.process_activity }, { name: 'opt_type', value: item }, { name: 'sortBy', value: consents_report.sortBy}, { name: 'sortType', value: consents_report.sortType }] )}`}>
-                                                            <Dropdown.Item className={consents_report.opt_type === item ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('',  consents_report.codbase, consents_report.process_activity, item, consents_report.sortBy, consents_report.sortType))}>
+                                                        <LinkContainer key={index} to={`consent-performance-report${makeUrl( [{ name: 'codbase', value: consents_report.codbase }, {name: 'process_activity', value: consents_report.process_activity }, { name: 'opt_type', value: item }, { name: 'orderBy', value: consents_report.orderBy}, { name: 'orderType', value: consents_report.orderType }] )}`}>
+                                                            <Dropdown.Item className={consents_report.opt_type === item ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('',  consents_report.codbase, consents_report.process_activity, item, consents_report.orderBy, consents_report.orderType))}>
                                                                 {
                                                                     item === consents_report.opt_type ? null : titleCase(item)
                                                                 }
@@ -325,8 +325,8 @@ const ConsentPerformanceReport = () => {
                                                     <th>
                                                         <LinkContainer to={getUrl('first_name')}>
                                                             <span 
-                                                                className={consents_report.sortBy === 'first_name' ? `cdp-table__col-sorting sorted ${consents_report.sortType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'first_name', getSortType('first_name') ))}
+                                                                className={consents_report.orderBy === 'first_name' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
+                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'first_name', getorderType('first_name') ))}
                                                             >
                                                                 First Name
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -336,8 +336,8 @@ const ConsentPerformanceReport = () => {
                                                     <th>
                                                         <LinkContainer to={getUrl('last_name')}>
                                                             <span 
-                                                                className={consents_report.sortBy === 'last_name' ? `cdp-table__col-sorting sorted ${consents_report.sortType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'last_name', getSortType('last_name') ))}
+                                                                className={consents_report.orderBy === 'last_name' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
+                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'last_name', getorderType('last_name') ))}
                                                             >
                                                                 Last Name
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -347,8 +347,8 @@ const ConsentPerformanceReport = () => {
                                                     <th>
                                                         <LinkContainer to={getUrl('email')}>
                                                             <span 
-                                                                className={consents_report.sortBy === 'email' ? `cdp-table__col-sorting sorted ${consents_report.sortType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'email', getSortType('email') ))}
+                                                                className={consents_report.orderBy === 'email' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
+                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'email', getorderType('email') ))}
                                                             >
                                                                 Email
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -358,8 +358,8 @@ const ConsentPerformanceReport = () => {
                                                     <th>
                                                         <LinkContainer to={getUrl('consent_type')}>
                                                             <span 
-                                                                className={consents_report.sortBy === 'consent_type' ? `cdp-table__col-sorting sorted ${consents_report.sortType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'consent_type', getSortType('consent_type') ))}
+                                                                className={consents_report.orderBy === 'consent_type' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
+                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'consent_type', getorderType('consent_type') ))}
                                                             >
                                                                 Consent Type
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -369,8 +369,8 @@ const ConsentPerformanceReport = () => {
                                                     <th>
                                                         <LinkContainer to={getUrl('opt_type')}>
                                                             <span 
-                                                                className={consents_report.sortBy === 'opt_type' ? `cdp-table__col-sorting sorted ${consents_report.sortType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'opt_type', getSortType('opt_type') ))}
+                                                                className={consents_report.orderBy === 'opt_type' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
+                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'opt_type', getorderType('opt_type') ))}
                                                             >
                                                                 Opt Type
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -380,8 +380,8 @@ const ConsentPerformanceReport = () => {
                                                     <th>
                                                         <LinkContainer to={getUrl('legal_basis')}>
                                                             <span 
-                                                                className={consents_report.sortBy === 'legal_basis' ? `cdp-table__col-sorting sorted ${consents_report.sortType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'legal_basis', getSortType('legal_basis') ))}
+                                                                className={consents_report.orderBy === 'legal_basis' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
+                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'legal_basis', getorderType('legal_basis') ))}
                                                             >
                                                                 Legal Basis
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -391,8 +391,8 @@ const ConsentPerformanceReport = () => {
                                                     <th>
                                                         <LinkContainer to={getUrl('preferences')}>
                                                             <span 
-                                                                className={consents_report.sortBy === 'preferences' ? `cdp-table__col-sorting sorted ${consents_report.sortType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'preferences', getSortType('preferences') ))}
+                                                                className={consents_report.orderBy === 'preferences' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
+                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'preferences', getorderType('preferences') ))}
                                                             >
                                                                 Preferences
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -402,8 +402,8 @@ const ConsentPerformanceReport = () => {
                                                     <th>
                                                         <LinkContainer to={getUrl('date')}>
                                                             <span 
-                                                                className={consents_report.sortBy === 'date' ? `cdp-table__col-sorting sorted ${consents_report.sortType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'date', getSortType('date') ))}
+                                                                className={consents_report.orderBy === 'date' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
+                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'date', getorderType('date') ))}
                                                             >
                                                                 Date
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -453,8 +453,8 @@ const ConsentPerformanceReport = () => {
                                                         { name: 'codbase', value: consents_report.codbase }, 
                                                         { name: 'process_activity', value: consents_report.process_activity }, 
                                                         { name: 'opt_type', value: consents_report.opt_type }, 
-                                                        { name: 'sortBy', value: consents_report.sortBy }, 
-                                                        { name: 'sortType', value: consents_report.sortType }
+                                                        { name: 'orderBy', value: consents_report.orderBy }, 
+                                                        { name: 'orderType', value: consents_report.orderType }
                                                     ] )}`}
                                                 >
                                                     <span className="pagination-btn" data-testid='Prev' onClick={() => pageLeft()} disabled={consents_report.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
@@ -465,8 +465,8 @@ const ConsentPerformanceReport = () => {
                                                         { name: 'codbase', value: consents_report.codbase }, 
                                                         { name: 'process_activity', value: consents_report.process_activity }, 
                                                         { name: 'opt_type', value: consents_report.opt_type }, 
-                                                        { name: 'sortBy', value: consents_report.sortBy}, 
-                                                        { name: 'sortType', value: consents_report.sortType }
+                                                        { name: 'orderBy', value: consents_report.orderBy}, 
+                                                        { name: 'orderType', value: consents_report.orderType }
                                                     ] )}`}
                                                 >
                                                     <span className="pagination-btn" data-testid='Next' onClick={() => pageRight()} disabled={consents_report.end === consents_report.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
