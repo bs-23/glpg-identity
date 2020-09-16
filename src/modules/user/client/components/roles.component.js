@@ -5,7 +5,7 @@ import { Form, Formik, Field, ErrorMessage, FieldArray } from "formik";
 import { useToasts } from "react-toast-notifications";
 import Modal from 'react-bootstrap/Modal';
 import { roleCreateSchema } from "../user.schema";
-import PermissionSetDetails from "./permission-sets-details";
+import { PermissionSetDetailsModal } from "./permission-sets-details";
 
 const FormField = ({ label, name, type, required=true, children, ...rest }) => <div className="col-12">
     <div className="form-group">
@@ -265,24 +265,11 @@ export default function ManageRoles() {
                                 <RoleForm preFill={roleEditData} permissionSets={permissionSets} onSuccess={handleCreateRoleSuccess} />
                             </Modal.Body>
                         </Modal>
-
-                        <Modal
+                        <PermissionSetDetailsModal
+                            permissionSetId={permissionSetDetailID}
                             show={modalShow.permissionSetDetails}
                             onHide={handlePermissionSetDetailHide}
-                            dialogClassName="modal-90w modal-customize"
-                            aria-labelledby="example-custom-modal-styling-title"
-                            size="lg"
-                        >
-                            <Modal.Header closeButton>
-                                <Modal.Title id="example-custom-modal-styling-title">
-                                    Permission Set Details
-                                </Modal.Title>
-                            </Modal.Header>
-                            <Modal.Body>
-                                <PermissionSetDetails permissionSetId={permissionSetDetailID} />
-                            </Modal.Body>
-                        </Modal>
-
+                        />
                     </div>
                 </div>
             </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Axios from 'axios';
+import { Modal } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { getCountries } from '../../../user/client/user.actions'
 
@@ -86,6 +87,26 @@ const PermissionSetDetails = ({ permissionSetId }) => {
             </div>
         </div>
     </div>
+}
+
+export const PermissionSetDetailsModal = ({ permissionSetId, show, onHide, ...rest }) => {
+    return <Modal
+        show={show}
+        onHide={onHide}
+        dialogClassName="modal-90w modal-customize"
+        aria-labelledby="example-custom-modal-styling-title"
+        size="lg"
+        {...rest}
+    >
+        <Modal.Header closeButton>
+            <Modal.Title id="example-custom-modal-styling-title">
+                Permission Set Details
+            </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+            <PermissionSetDetails permissionSetId={permissionSetId} />
+        </Modal.Body>
+    </Modal>
 }
 
 export default PermissionSetDetails;

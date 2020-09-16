@@ -1,11 +1,32 @@
 import axios from "axios";
 import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import { PermissionSetDetailsModal } from "./permission-sets-details";
 
 const UserDetails = (props) => {
     const [userInfo, setUserInfo] = useState({});
     const [countries, setCountries] = useState([]);
-    const nullValueToken = '--'
+    const [modalShow, setModalShow] = useState({ permissionSetDetails: false });
+    const [permissionSetDetailID, setPermissionSetDetailID] = useState(null);
+
+    const nullValueToken = '--';
+
+    const handlePermissionSetClick = (id) => {
+        setPermissionSetDetailID(id);
+        setModalShow({ ...modalShow, permissionSetDetails: true });
+    }
+
+    const handlePermissionSetDetailHide = () => {
+        setModalShow({ ...modalShow, permissionSetDetails: false });
+        setPermissionSetDetailID(null);
+    }
+
+    const renderPermissionSets = () => userInfo.permissionSets && userInfo.permissionSets.length ? userInfo.permissionSets.map(ps =>
+        <div key={ps.title} style={{ cursor: 'pointer' }} onClick={() => handlePermissionSetClick(ps.id)} className="d-flex pb-2">
+            <i className="icon icon-check-filled cdp-text-primary mr-2 small mt-1"></i>
+            <span>{ps.title} <span className="text-muted small text-capitalize font-italic d-block">Type: {ps.type}</span></span>
+        </div>
+        ) : nullValueToken
 
     useEffect(() => {
         const { id } = props.match.params;
@@ -95,12 +116,15 @@ const UserDetails = (props) => {
                                         <div className="profile-detail__col-fluid pb-3 pr-0 pr-sm-3">
                                             <span className="mr-2 d-block profile-detail__label">Permission Sets</span>
                                             <span className="profile-detail__value">
-                                                {userInfo.permissionSets && userInfo.permissionSets.length ? userInfo.permissionSets.map(ps =>
-                                                    <div key={ps.title} className="d-flex pb-2"><i className="icon icon-check-filled cdp-text-primary mr-2 small mt-1"></i> <span>{ps.title} <span className="text-muted small text-capitalize font-italic d-block">Type: {ps.type}</span></span></div>
-                                                    ) : nullValueToken}
+                                                {renderPermissionSets()}
                                             </span>
                                         </div>
                                     </div>
+                                    <PermissionSetDetailsModal
+                                        permissionSetId={permissionSetDetailID}
+                                        show={modalShow.permissionSetDetails}
+                                        onHide={handlePermissionSetDetailHide}
+                                    />
                                 </div>
                             </div>
                         </div>
