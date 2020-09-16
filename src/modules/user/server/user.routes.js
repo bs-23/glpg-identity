@@ -14,6 +14,9 @@ module.exports = app => {
 
     app.get('/api/users/profile', passport.authenticate('user-jwt', { session: false }), controller.getSignedInUserProfile);
 
+    app.route('/api/users/:id/role')
+        .put(passport.authenticate("user-jwt", { session: false }), controller.changeUserRole);
+
     app.route('/api/users/:id')
         .get(passport.authenticate("user-jwt", { session: false }), controller.getUser)
         .delete(passport.authenticate("user-jwt", { session: false }), controller.deleteUser);

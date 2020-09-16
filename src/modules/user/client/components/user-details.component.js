@@ -1,13 +1,59 @@
 import axios from "axios";
 import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import { useToasts } from "react-toast-notifications";
+import { Form, Formik, Field, ErrorMessage } from "formik";
 import { PermissionSetDetailsModal } from "./permission-sets-details";
+
+const FormField = ({ label, name, type, children, required=true, ...rest }) => <div className="col-12 col-sm-6">
+    <div className="form-group">
+        <label hidden className="font-weight-bold" htmlFor="last_name">{ label }{required && <span className="text-danger">*</span>}</label>
+        { children || <Field className="form-control" type={type} name={name} {...rest} /> }
+        <div className="invalid-feedback"><ErrorMessage name={name} /></div>
+    </div>
+</div>
+
+const SelectOneToggleList = ({ name, options, labelExtractor, idExtractor }) => {
+    const handleClick = (e, form) => {
+        const fieldName = e.target.name;
+        const fieldvalue = e.target.value;
+        if(form.values[fieldName] === fieldvalue) {
+            form.setFieldValue(fieldName, '');
+        }
+    }
+
+    return <Field
+                name={name}
+                >
+                {({ field, form }) => (
+                    options.map(item => <label key={idExtractor(item)} className="d-flex justify-content-between align-items-center">
+                        <span className="switch-label">{labelExtractor(item)}</span>
+                        <span className="switch">
+                            <input name={name}
+                                className="custom-control-input"
+                                {...field}
+                                name={name}
+                                type="radio"
+                                onClick={(e) => handleClick(e, form)}
+                                value={idExtractor(item)}
+                                id={idExtractor(item)}
+                                checked={field.value === idExtractor(item)}
+                                disabled={item.hasOwnProperty('disabled') ? item.disabled : false}
+                            />
+                            <span className="slider round"></span>
+                        </span>
+                    </label>)
+                )}
+            </Field>
+}
 
 const UserDetails = (props) => {
     const [userInfo, setUserInfo] = useState({});
     const [countries, setCountries] = useState([]);
     const [modalShow, setModalShow] = useState({ permissionSetDetails: false });
     const [permissionSetDetailID, setPermissionSetDetailID] = useState(null);
+    const [roles, setRoles] = useState([]);
+    const { addToast } = useToasts();
 
     const nullValueToken = '--';
 
@@ -28,6 +74,24 @@ const UserDetails = (props) => {
         </div>
         ) : nullValueToken
 
+    const handleSubmit = (values, actions) => {
+        axios.put(`/api/users/${userInfo.id}/role`, values).then(() => {
+            const successMessage = 'Successfully updated role.';
+            addToast(successMessage, {
+                appearance: 'success',
+                autoDismiss: true
+            });
+        }).catch(err => {
+            const errorMessage = typeof err.response.data === 'string' ? err.response.data : err.response.statusText;
+            addToast(errorMessage, {
+                appearance: 'error',
+                autoDismiss: true
+            });
+        }).finally(() => {
+            actions.setSubmitting(false);
+        })
+    };
+
     useEffect(() => {
         const { id } = props.match.params;
 
@@ -41,6 +105,12 @@ const UserDetails = (props) => {
             setCountries(response.data);
         }
 
+        async function getRoles() {
+            const response = await axios.get('/api/roles');
+            setRoles(response.data);
+        }
+
+        getRoles();
         getInfo();
         getCountries();
     }, [props]);
@@ -109,7 +179,25 @@ const UserDetails = (props) => {
                                         </div>
                                         <div className="profile-detail__col-fluid pb-3 pr-0 pr-sm-3">
                                             <span className="mr-2 d-block profile-detail__label">Role</span>
-                                            <span className="profile-detail__value">{userInfo.role ? userInfo.role : nullValueToken}</span>
+                                            <span className="profile-detail__value">
+                                                <Formik
+                                                    initialValues={{ roleId: userInfo.role ? userInfo.role.id : '' }}
+                                                    displayName="RoleReassignmentForm"
+                                                    onSubmit={handleSubmit}
+                                                    enableReinitialize
+                                                >
+                                                    {formikProps => (
+                                                        <Form onSubmit={formikProps.handleSubmit}>
+                                                            <div className="row">
+                                                            <FormField label="Reassign Roles" name="roleId" required={false} >
+                                                                <SelectOneToggleList name="roleId" options={roles} idExtractor={item => item.id} labelExtractor={item => item.title} />
+                                                            </FormField>
+                                                            </div>
+                                                            <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting} > Save Changes </button>
+                                                        </Form>
+                                                    )}
+                                                </Formik>
+                                            </span>
                                         </div>
                                     </div>
                                     <div className="profile-detail__row pb-0 pb-sm-2 d-block d-sm-flex">

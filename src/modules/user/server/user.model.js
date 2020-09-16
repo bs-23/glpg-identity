@@ -6,6 +6,7 @@ const Sequelize = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const UserProfile = require('./user-profile.model');
 const User_Role = require('./role/user-role.model');
+const Role = require('./role/role.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
 const User = sequelize.cdpConnector.define('users', {
@@ -108,6 +109,6 @@ User.prototype.validPassword = function(password) {
 User.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by' });
 User.belongsTo(UserProfile, { as: 'userProfile', foreignKey: 'profileId' });
 User.hasMany(User_Role, {as: 'userRoles', foreignKey: 'userId', sourceKey: 'id'});
-
+User.belongsToMany(Role, { through: User_Role });
 
 module.exports = User;
