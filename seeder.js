@@ -22,6 +22,7 @@ async function init() {
     const ServiceCategory = require(path.join(process.cwd(), "src/modules/user/server/permission/service-category.model"));
     const PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permission-set.model"));
     const PermissionSet_ServiceCategory = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-serviceCategory.model"));
+    const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-application.model"));
     const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/userProfile-permissionSet.model"));
     const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
     const UserRole = require(path.join(process.cwd(), "src/modules/user/server/role/user-role.model"));
@@ -94,6 +95,7 @@ async function init() {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
 
             const serviceCategories = [
+                { title: "All Service Categories", slug: "all", created_by: admin.id, updated_by: admin.id },
                 { title: "Management of Customer Data Platform", slug: "platform", created_by: admin.id, updated_by: admin.id },
                 { title: "Information Management", slug: "information", created_by: admin.id, updated_by: admin.id },
                 { title: "Data Privacy & Consent Management", slug: "privacy", created_by: admin.id, updated_by: admin.id }
@@ -115,9 +117,9 @@ async function init() {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
 
             const permissionSet = [
-                { title: "System Admin Permission Set", slug: "system_admin", type: 'standard', description: "This is the default permission set for System Admin", created_by: admin.id, updated_by: admin.id },
-                { title: "Site Admin Permission Set", slug: "site_admin", type: 'standard', description: "This is the default permission set for Site Admin", countries:["BE", "AD", "DE", "IT", "NL", "ES","IE"], created_by: admin.id, updated_by: admin.id },
-                { title: "GDS Permission Set", slug: "gds", type: 'standard', countries:["BE", "AD", "DE", "IT", "NL", "ES","IE"], description: "This is the default permission set for Global Data Steward", created_by: admin.id, updated_by: admin.id },
+                { title: "System Admin Permission Set", slug: "system_admin", type: 'standard', countries:["all"], description: "This is the default permission set for System Admin", created_by: admin.id, updated_by: admin.id },
+                { title: "Site Admin Permission Set", slug: "site_admin", type: 'standard', description: "This is the default permission set for Site Admin", countries:["all"], created_by: admin.id, updated_by: admin.id },
+                { title: "GDS Permission Set", slug: "gds", type: 'standard', countries:["all"], description: "This is the default permission set for Global Data Steward", created_by: admin.id, updated_by: admin.id },
                 { title: "LDS Permission Set", slug: "lds", type: 'standard', description: "This is the default permission set for Local Data Steward", created_by: admin.id, updated_by: admin.id },
                 { title: "DPO Permission Set", slug: "data_privacy_officer", type: 'standard', description: "This is the default permission set for Data Privacy Officer", created_by: admin.id, updated_by: admin.id },
             ];
@@ -137,6 +139,7 @@ async function init() {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
             const systemAdmin_permissionSet = PermissionSet.findOne({ where: { slug: 'system_admin' } });
             const siteAdmin_permissionSet = PermissionSet.findOne({ where: { slug: 'site_admin' } });
+            const allServiceCategory = ServiceCategory.findOne({ where: { slug: 'all' } });
             const hcpServiceCategory = ServiceCategory.findOne({ where: { slug: 'information' } });
             const userServiceCategory = ServiceCategory.findOne({ where: { slug: 'platform' } });
             const consentServiceCategory = ServiceCategory.findOne({ where: { slug: 'privacy' } });
@@ -144,15 +147,11 @@ async function init() {
             const gds_permissionSet = PermissionSet.findOne({ where: { slug: 'gds' } });
             const lds_permissionSet = PermissionSet.findOne({ where: { slug: 'lds' } });
 
-            Promise.all([systemAdmin_permissionSet, siteAdmin_permissionSet, hcpServiceCategory, userServiceCategory, consentServiceCategory, dpo_permissionSet, gds_permissionSet, lds_permissionSet]).then((values) => {
+            Promise.all([systemAdmin_permissionSet, siteAdmin_permissionSet, hcpServiceCategory, userServiceCategory, consentServiceCategory, dpo_permissionSet, gds_permissionSet, lds_permissionSet, allServiceCategory]).then((values) => {
                 const permissionSet_serviceCategory = [
-                    { permissionSetId: values[0].id, serviceCategoryId: values[2].id },
-                    { permissionSetId: values[0].id, serviceCategoryId: values[3].id },
-                    { permissionSetId: values[0].id, serviceCategoryId: values[4].id },
+                    { permissionSetId: values[0].id, serviceCategoryId: values[8].id },
 
-                    { permissionSetId: values[1].id, serviceCategoryId: values[2].id },
-                    { permissionSetId: values[1].id, serviceCategoryId: values[3].id },
-                    { permissionSetId: values[1].id, serviceCategoryId: values[4].id },
+                    { permissionSetId: values[1].id, serviceCategoryId: values[8].id },
 
                     { permissionSetId: values[5].id, serviceCategoryId: values[4].id },
                     { permissionSetId: values[5].id, serviceCategoryId: values[2].id },
@@ -213,6 +212,17 @@ async function init() {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
             const applications = [
                 {
+                    name: 'All Applications',
+                    slug: 'all',
+                    email: '',
+                    consent_confirmation_link: '',
+                    reset_password_link: '',
+                    login_link: '',
+                    logo_link: '',
+                    created_by: admin.id,
+                    updated_by: admin.id
+                },
+                {
                     name: 'HCP Portal',
                     slug: convertToSlug('HCP Portal'),
                     email: 'hcp-portal@glpg.com',
@@ -246,6 +256,29 @@ async function init() {
                     callback();
                 });
             });
+        });
+    }
+
+    function permissionSetApplicationsSeeder(callback) {
+        User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
+            const systemAdmin_permissionSet = PermissionSet.findOne({ where: { slug: 'system_admin' } });
+            const allApplications = Application.findOne({ where: { slug: 'all' } });
+
+            Promise.all([systemAdmin_permissionSet, allApplications]).then((values) => {
+                const permissionSet_applications = [
+                    { permissionSetId: values[0].id, applicationId: values[1].id },
+                ];
+
+                PermissionSet_Application.destroy({ truncate: { cascade: true } }).then(() => {
+                    PermissionSet_Application.bulkCreate(permissionSet_applications, {
+                        returning: true,
+                        ignoreDuplicates: false
+                    }).then(function () {
+                        callback();
+                    });
+                });
+            });
+
         });
     }
 
@@ -358,7 +391,7 @@ async function init() {
         });
     }
 
-    async.waterfall([userSeeder,userProfileSeeder,userUpdateSeeder,serviceCategorySeeder, permissionSetSeeder,permissionSetServiceCategorySeeder, userProfilePermissionSetSeeder, applicationSeeder, consentSeeder], function (err) {
+    async.waterfall([userSeeder,userProfileSeeder,userUpdateSeeder,serviceCategorySeeder, permissionSetSeeder, permissionSetServiceCategorySeeder, userProfilePermissionSetSeeder, applicationSeeder, permissionSetApplicationsSeeder, consentSeeder], function (err) {
         if (err) console.error(err);
         else console.info('DB seed completed!');
         process.exit();
