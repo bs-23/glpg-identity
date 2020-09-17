@@ -12,10 +12,7 @@ const swaggerUi = require('swagger-ui-express');
 module.exports = async function () {
     let app = express();
 
-    if(process.env.NODE_ENV === 'production') {
-        app.use(helmet());
-    }
-
+    app.use(helmet());
     app.use(compression());
     app.use(cookieParser());
     app.use(express.json());
