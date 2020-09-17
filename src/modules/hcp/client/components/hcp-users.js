@@ -143,35 +143,63 @@ export default function hcpUsers() {
                     <div className="col-12">
                         <div>
                             <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
-                                <h4 className="cdp-text-primary font-weight-bold mb-0">HCP Profiles</h4>
+                                <div className="d-flex align-items-center">
+                                    <h4 className="cdp-text-primary font-weight-bold mb-0 mr-4">List of HCP User</h4>
+                                    <div className="">
+                                        {/*<div>
+                                            <Dropdown>
+                                                <Dropdown.Toggle variant="" id="dropdown-basic" className="cdp-btn-outline-primary">UUID Authorities</Dropdown.Toggle>
+                                                <Dropdown.Menu>
+                                                    <Dropdown.Item className="border-bottom" href="ttps://zoeken.bigregister.nl/zoeken/kenmerken" target="_blank"><img src="/assets/logo/logo-big.svg" title="BIG Register Logo" alt="BIG Register" height="30" /></Dropdown.Item>
+                                                    <Dropdown.Item className="border-bottom" href="https://ondpanon.riziv.fgov.be/SilverPages/fr"><img src="/assets/logo/logo-inami.svg" title="INAMI Logo" alt="INAMI" height="30" /></Dropdown.Item>
+                                                    <Dropdown.Item className="border-bottom" href="https://ondpanon.riziv.fgov.be/SilverPages/nl"><img src="/assets/logo/logo-riziv.svg" title="RIZIV Logo" alt="RIZIV" height="30" /></Dropdown.Item>
+                                                    <Dropdown.Item className="" href="https://www.gmc-uk.org/registration-and-licensing/the-medical-register#searchTheRegister"><img src="/assets/logo/logo-gmc.svg" title="INAMI Logo" alt="INAMI" height="18" /></Dropdown.Item>
+                                                </Dropdown.Menu>
+                                            </Dropdown>
+                                        </div>
+                                        <div>
+                                            <a className="mr-2" href="https://zoeken.bigregister.nl/zoeken/kenmerken" target="_blank">
+                                                <img src="/assets/logo/logo-big.svg" title="BIG Register Logo" alt="BIG Register" height="50" />
+                                            </a>
+                                            <a className="mr-2" href="https://ondpanon.riziv.fgov.be/SilverPages/fr" target="_blank">
+                                                <img src="/assets/logo/logo-inami.svg" title="INAMI Logo" alt="INAMI" height="40" />
+                                            </a>
+                                            <a className="mr-2" href="https://ondpanon.riziv.fgov.be/SilverPages/nl" target="_blank">
+                                                <img src="/assets/logo/logo-riziv.svg" title="RIZIV Logo" alt="RIZIV" height="40" />
+                                            </a>
+                                            <a className="mr-2" href="https://www.gmc-uk.org/registration-and-licensing/the-medical-register#searchTheRegister" target="_blank">
+                                                <img src="/assets/logo/logo-gmc.svg" title="GMC Logo" alt="GMC ID" height="18" />
+                                            </a>
+                                        </div>*/}
+                                    </div>
+                                </div>
                                 <div className="d-flex pt-3 pt-sm-0">
                                     {countries && hcps['countries'] &&
                                         <React.Fragment>
-                                            <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-btn-primary text-white dropdown shadow-sm">
-                                                Country
-                                                <Dropdown.Toggle variant="" className="ml-2 bg-white rounded-0">
-                                                    {hcps.codbase && (countries.find(i => i.codbase === hcps.codbase)) ? (countries.find(i => i.codbase === hcps.codbase)).codbase_desc : 'All'}
-                                                </Dropdown.Toggle>
-                                                <Dropdown.Menu>
-                                                    <LinkContainer to={`list${hcps.status ? `?status=${hcps.status}` : ''}`}><Dropdown.Item className={hcps.codbase === null ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, hcps.status, null))}>All</Dropdown.Item></LinkContainer>
-                                                    {
-                                                        countries.map((item, index) => (
-                                                            hcps.countries.includes(item.country_iso2) && <LinkContainer key={index} to={`list?${hcps.status ? `status=${hcps.status}` : ''}${`${hcps.status ? '&' : ''}codbase=${item.codbase}`}`}>
-                                                                <Dropdown.Item className={hcps.countries.includes(item.country_iso2) && hcps.codbase === item.codbase ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, hcps.status, item.codbase))}>
-                                                                    {
-                                                                        hcps.countries.includes(item.country_iso2) ? item.codbase_desc : null
-                                                                    }
-                                                                </Dropdown.Item>
-                                                            </LinkContainer>
-                                                        ))
+                                        <Dropdown className="ml-auto dropdown-customize mr-2">
+                                            <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center">
+                                                <i className="icon icon-filter mr-2 mb-n1"></i> {hcps.codbase && (countries.find(i => i.codbase === hcps.codbase)) ? (countries.find(i => i.codbase === hcps.codbase)).codbase_desc : 'Filter by Country'}
+                                            </Dropdown.Toggle>
+                                            <Dropdown.Menu>
+                                                <LinkContainer to={`list${hcps.status ? `?status=${hcps.status}` : ''}`}><Dropdown.Item className={hcps.codbase === null ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, hcps.status, null))}>All</Dropdown.Item></LinkContainer>
+                                                {
+                                                    countries.map((item, index) => (
+                                                        hcps.countries.includes(item.country_iso2) && <LinkContainer key={index} to={`list?${hcps.status ? `status=${hcps.status}` : ''}${`${hcps.status ? '&' : ''}codbase=${item.codbase}`}`}>
+                                                            <Dropdown.Item className={hcps.countries.includes(item.country_iso2) && hcps.codbase === item.codbase ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, hcps.status, item.codbase))}>
+                                                                {
+                                                                    hcps.countries.includes(item.country_iso2) ? item.codbase_desc : null
+                                                                }
+                                                            </Dropdown.Item>
+                                                        </LinkContainer>
+                                                    ))
 
-                                                    }
+                                                }
                                                 </Dropdown.Menu>
                                             </Dropdown>
 
-                                            <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-btn-secondary text-white dropdown shadow-sm">
+                                        <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-bg-secondary text-white dropdown shadow-sm">
                                                 Status
-                                                <Dropdown.Toggle variant="" className="ml-2 bg-white rounded-0">
+                                                <Dropdown.Toggle variant="" className="ml-2 cdp-bg-secondary rounded-0 border-left text-white">
                                                     {getSelectedStatus()}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
