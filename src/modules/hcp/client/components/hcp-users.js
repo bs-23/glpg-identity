@@ -143,7 +143,36 @@ export default function hcpUsers() {
                     <div className="col-12">
                         <div>
                             <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
-                                <h4 className="cdp-text-primary font-weight-bold mb-0">HCP Profiles</h4>
+                                <div className="d-flex align-items-center">
+                                    <h4 className="cdp-text-primary font-weight-bold mb-0 mr-4">List of HCP User</h4>
+                                    <div className="">
+                                        {/*<div>
+                                            <Dropdown>
+                                                <Dropdown.Toggle variant="" id="dropdown-basic" className="cdp-btn-outline-primary">UUID Authorities</Dropdown.Toggle>
+                                                <Dropdown.Menu>
+                                                    <Dropdown.Item className="border-bottom" href="ttps://zoeken.bigregister.nl/zoeken/kenmerken" target="_blank"><img src="/assets/logo/logo-big.svg" title="BIG Register Logo" alt="BIG Register" height="30" /></Dropdown.Item>
+                                                    <Dropdown.Item className="border-bottom" href="https://ondpanon.riziv.fgov.be/SilverPages/fr"><img src="/assets/logo/logo-inami.svg" title="INAMI Logo" alt="INAMI" height="30" /></Dropdown.Item>
+                                                    <Dropdown.Item className="border-bottom" href="https://ondpanon.riziv.fgov.be/SilverPages/nl"><img src="/assets/logo/logo-riziv.svg" title="RIZIV Logo" alt="RIZIV" height="30" /></Dropdown.Item>
+                                                    <Dropdown.Item className="" href="https://www.gmc-uk.org/registration-and-licensing/the-medical-register#searchTheRegister"><img src="/assets/logo/logo-gmc.svg" title="INAMI Logo" alt="INAMI" height="18" /></Dropdown.Item>
+                                                </Dropdown.Menu>
+                                            </Dropdown>
+                                        </div>
+                                        <div>
+                                            <a className="mr-2" href="https://zoeken.bigregister.nl/zoeken/kenmerken" target="_blank">
+                                                <img src="/assets/logo/logo-big.svg" title="BIG Register Logo" alt="BIG Register" height="50" />
+                                            </a>
+                                            <a className="mr-2" href="https://ondpanon.riziv.fgov.be/SilverPages/fr" target="_blank">
+                                                <img src="/assets/logo/logo-inami.svg" title="INAMI Logo" alt="INAMI" height="40" />
+                                            </a>
+                                            <a className="mr-2" href="https://ondpanon.riziv.fgov.be/SilverPages/nl" target="_blank">
+                                                <img src="/assets/logo/logo-riziv.svg" title="RIZIV Logo" alt="RIZIV" height="40" />
+                                            </a>
+                                            <a className="mr-2" href="https://www.gmc-uk.org/registration-and-licensing/the-medical-register#searchTheRegister" target="_blank">
+                                                <img src="/assets/logo/logo-gmc.svg" title="GMC Logo" alt="GMC ID" height="18" />
+                                            </a>
+                                        </div>*/}
+                                    </div>
+                                </div>
                                 <div className="d-flex pt-3 pt-sm-0">
                                     {countries && hcps['countries'] &&
                                         <React.Fragment>
