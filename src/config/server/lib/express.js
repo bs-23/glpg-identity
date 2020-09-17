@@ -12,8 +12,8 @@ const swaggerUi = require('swagger-ui-express');
 module.exports = async function () {
     let app = express();
 
+    app.use(helmet());
     app.use(compression());
-    app.use(helmet({contentSecurityPolicy: false}));
     app.use(cookieParser());
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));

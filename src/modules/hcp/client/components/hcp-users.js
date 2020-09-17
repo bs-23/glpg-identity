@@ -147,31 +147,30 @@ export default function hcpUsers() {
                                 <div className="d-flex pt-3 pt-sm-0">
                                     {countries && hcps['countries'] &&
                                         <React.Fragment>
-                                            <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-btn-primary text-white dropdown shadow-sm">
-                                                Country
-                                                <Dropdown.Toggle variant="" className="ml-2 bg-white rounded-0">
-                                                    {hcps.codbase && (countries.find(i => i.codbase === hcps.codbase)) ? (countries.find(i => i.codbase === hcps.codbase)).codbase_desc : 'All'}
-                                                </Dropdown.Toggle>
-                                                <Dropdown.Menu>
-                                                    <LinkContainer to={`list${hcps.status ? `?status=${hcps.status}` : ''}`}><Dropdown.Item className={hcps.codbase === null ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, hcps.status, null))}>All</Dropdown.Item></LinkContainer>
-                                                    {
-                                                        countries.map((item, index) => (
-                                                            hcps.countries.includes(item.country_iso2) && <LinkContainer key={index} to={`list?${hcps.status ? `status=${hcps.status}` : ''}${`${hcps.status ? '&' : ''}codbase=${item.codbase}`}`}>
-                                                                <Dropdown.Item className={hcps.countries.includes(item.country_iso2) && hcps.codbase === item.codbase ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, hcps.status, item.codbase))}>
-                                                                    {
-                                                                        hcps.countries.includes(item.country_iso2) ? item.codbase_desc : null
-                                                                    }
-                                                                </Dropdown.Item>
-                                                            </LinkContainer>
-                                                        ))
+                                        <Dropdown className="ml-auto dropdown-customize mr-2">
+                                            <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center">
+                                                <i className="icon icon-filter mr-2 mb-n1"></i> {hcps.codbase && (countries.find(i => i.codbase === hcps.codbase)) ? (countries.find(i => i.codbase === hcps.codbase)).codbase_desc : 'Filter by Country'}
+                                            </Dropdown.Toggle>
+                                            <Dropdown.Menu>
+                                                <LinkContainer to={`list${hcps.status ? `?status=${hcps.status}` : ''}`}><Dropdown.Item className={hcps.codbase === null ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, hcps.status, null))}>All</Dropdown.Item></LinkContainer>
+                                                {
+                                                    countries.map((item, index) => (
+                                                        hcps.countries.includes(item.country_iso2) && <LinkContainer key={index} to={`list?${hcps.status ? `status=${hcps.status}` : ''}${`${hcps.status ? '&' : ''}codbase=${item.codbase}`}`}>
+                                                            <Dropdown.Item className={hcps.countries.includes(item.country_iso2) && hcps.codbase === item.codbase ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, hcps.status, item.codbase))}>
+                                                                {
+                                                                    hcps.countries.includes(item.country_iso2) ? item.codbase_desc : null
+                                                                }
+                                                            </Dropdown.Item>
+                                                        </LinkContainer>
+                                                    ))
 
-                                                    }
+                                                }
                                                 </Dropdown.Menu>
                                             </Dropdown>
 
-                                            <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-btn-secondary text-white dropdown shadow-sm">
+                                        <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-bg-secondary text-white dropdown shadow-sm">
                                                 Status
-                                                <Dropdown.Toggle variant="" className="ml-2 bg-white rounded-0">
+                                                <Dropdown.Toggle variant="" className="ml-2 cdp-bg-secondary rounded-0 border-left text-white">
                                                     {getSelectedStatus()}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
