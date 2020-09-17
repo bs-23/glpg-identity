@@ -5,6 +5,7 @@ const express = require('express');
 const config = require('../config');
 const compression = require('compression');
 const cookieParser = require('cookie-parser');
+const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
 const swagger = require('./swagger/swagger');
 const swaggerUi = require('swagger-ui-express');
@@ -13,6 +14,19 @@ module.exports = async function () {
     let app = express();
 
     app.use(helmet());
+    app.use(
+        helmet.contentSecurityPolicy({
+            directives: {
+                "default-src": ["'self'"],
+                "script-src": ["'self'", 'https://www.google.com', "https://www.gstatic.com"],
+                "script-src-elem": ["'self'", "https://www.google.com", "https://www.gstatic.com"],
+                "style-src": ["'self'", "'unsafe-inline'", "fonts.googleapis.com"],
+                "fontSrc": ["'self'", "fonts.googleapis.com", "fonts.gstatic.com", "data:"],
+                "frame-src": ["'self'", "https://www.google.com"],
+                "img-src": ["'self'", nodecache.getValue('IMG_SRC')]
+            },
+        })
+    );
     app.use(compression());
     app.use(cookieParser());
     app.use(express.json());

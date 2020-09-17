@@ -28,8 +28,8 @@ export default function Login() {
                                 <Formik
                                     initialValues={{
                                         email: "",
-                                        password: ""
-                                        // recaptchaToken: ""
+                                        password: "",
+                                        recaptchaToken: ""
                                     }}
                                     displayName="Login"
                                     validationSchema={loginSchema}
@@ -37,7 +37,7 @@ export default function Login() {
                                         dispatch(login({
                                             email: values.email,
                                             password: values.password,
-                                            // recaptchaToken: values.recaptchaToken
+                                            recaptchaToken: values.recaptchaToken
                                         }))
                                         .then( response => {
                                             setCookie('logged_in', true, { path: '/' });
@@ -65,7 +65,7 @@ export default function Login() {
                                                 <div className="invalid-feedback" data-testid="password-error"><ErrorMessage name="password" /></div>
                                             </div>
 
-                                            {/* { process.env.RECAPTCHA_SITE_KEY &&
+                                            { process.env.RECAPTCHA_SITE_KEY &&
                                                 <div className="form-group mt-2">
                                                     <ReCAPTCHA
                                                         sitekey={process.env.RECAPTCHA_SITE_KEY}
@@ -81,7 +81,7 @@ export default function Login() {
                                                         <div className="invalid-feedback">{formikProps.errors.recaptchaToken}</div>
                                                     )}
                                                 </div>
-                                            } */}
+                                            }
 
                                             <button type="submit" className="btn btn-block text-white app-login__btn mt-4 p-2 font-weight-bold">Sign In</button>
                                         </Form>
