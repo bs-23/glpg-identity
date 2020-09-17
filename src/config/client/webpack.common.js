@@ -22,8 +22,6 @@ function initializeEnv() {
 }
 
 module.exports = {
-    devtool: 'eval-source-map',
-
     entry: {
         app: './src/modules/core/client/main.js'
     },
