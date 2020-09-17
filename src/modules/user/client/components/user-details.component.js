@@ -69,7 +69,7 @@ const UserDetails = (props) => {
 
     const renderPermissionSets = () => userInfo.permissionSets && userInfo.permissionSets.length ? userInfo.permissionSets.map(ps =>
         <div key={ps.title} style={{ cursor: 'pointer' }} onClick={() => handlePermissionSetClick(ps.id)} className="d-flex pb-2">
-            <i className={`icon ${ ps.type === 'standard' ? 'icon-check-filled' : 'icon-check-custom' } cdp-text-primary mr-2 small mt-1`}></i>
+            <i className={`icon icon-check-filled ${ps.type === 'standard' ? 'cdp-text-primary' : 'cdp-text-secondary' }  mr-2 small mt-1`}></i>
             <span>{ps.title} <span className="text-muted small text-capitalize font-italic d-block">Type: {ps.type}</span></span>
         </div>
         ) : nullValueToken
@@ -193,7 +193,7 @@ const UserDetails = (props) => {
                                                                 <SelectOneToggleList name="roleId" options={roles} idExtractor={item => item.id} labelExtractor={item => item.title} />
                                                             </FormField>
                                                             </div>
-                                                            <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting} > Save Changes </button>
+                                                            <button type="submit" className="btn btn-sm  text-white cdp-btn-secondary" disabled={formikProps.isSubmitting} > Save Changes </button>
                                                         </Form>
                                                     )}
                                                 </Formik>
