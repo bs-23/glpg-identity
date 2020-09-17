@@ -40,14 +40,15 @@ async function getProfilePermissions(user) {
 
     if (userProfile) {
         for (const userProPermSet of userProfile.up_ps) {
-            let permissionSet = userProPermSet.ps;
-            for (const psc of permissionSet.ps_sc) {
-                serviceCategories.push(psc.serviceCategory);
-            }
+            // let permissionSet = userProPermSet.ps;
+            // for (const psc of permissionSet.ps_sc) {
+            //     serviceCategories.push(psc.serviceCategory);
+            // }
             const applicationsCountries = await getUserApplicationCountry(userProPermSet.ps);
 
             applications = applicationsCountries[0];
             countries = applicationsCountries[1];
+            serviceCategories = applicationsCountries[2];
 
             permissionSets.push({
                 serviceCategories: serviceCategories.map(sc => sc.slug),
@@ -78,14 +79,11 @@ async function getRolePermissions(user) {
     if (userRoles.length) {
         for (const userRole of userRoles) {
             for (const rolePermSet of userRole.role.role_ps) {
-                let permissionSet = rolePermSet.ps;
-                for (const psc of permissionSet.ps_sc) {
-                    serviceCategories.push(psc.serviceCategory);
-                }
                 const applicationsCountries = await getUserApplicationCountry(rolePermSet.ps);
 
                 applications = applicationsCountries[0];
                 countries = applicationsCountries[1];
+                serviceCategories = applicationsCountries[2];
 
                 permissionSets.push({
                     serviceCategories: serviceCategories.map(sc => sc.slug),
@@ -108,44 +106,52 @@ async function getRolePermissions(user) {
 }
 
 async function getUserApplicationCountry(permissionSet) {
-    const applications = [];
+    let applications = [];
     let countries = [];
-    if (permissionSet.slug == 'system_admin') {
-        const userApplications = await Application.findAll();
-        userApplications.forEach(userApplication => {
+    let serviceCategories = [];
+
+    if(permissionSet.ps_sc){
+        for (const ps_sc of permissionSet.ps_sc) {
+            const userServiceCategory = ps_sc.serviceCategory;
+            serviceCategories.push({
+                id: userServiceCategory.id,
+                title: userServiceCategory.title,
+                slug: userServiceCategory.slug
+            });
+        }
+    }
+
+    if (permissionSet.ps_app) {
+        for (const ps_app of permissionSet.ps_app) {
+            const userApplication = ps_app.application;
             applications.push({
                 name: userApplication.name,
                 slug: userApplication.slug,
                 logo_link: userApplication.logo_link
             });
-        });
-
-        const countriesDb = await sequelize.datasyncConnector.query("SELECT DISTINCT ON(codbase_desc) * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;", { type: QueryTypes.SELECT });
-        countries = countriesDb.map(c => c.country_iso2);
-    } else {
-        if (permissionSet.ps_app) {
-            for (const ps_app of permissionSet.ps_app) {
-
-                const userApplication = ps_app.application;
-                applications.push({
-                    name: userApplication.name,
-                    slug: userApplication.slug,
-                    logo_link: userApplication.logo_link
-                });
-
-            }
-
         }
-
-        if (permissionSet.countries) {
-            countries = permissionSet.countries;
-        }
-
     }
 
-    return [applications, countries];
+    if (permissionSet.countries) {
+        countries = permissionSet.countries;
+    }
 
+    if(countries.includes('all')) {
+        const countriesDb = await sequelize.datasyncConnector.query("SELECT DISTINCT ON(codbase_desc) * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;", { type: QueryTypes.SELECT });
+        countries = countriesDb.map(c => c.country_iso2);
+    }
 
+    if(applications.find(app => app.slug === 'all')) {
+        const allApplications = await Application.findAll({ where: { slug: { [Op.ne]: 'all' } }, attributes: ['name', 'slug', 'logo_link'] });
+        applications = allApplications;
+    }
+
+    if(serviceCategories.find(sc => sc.slug === 'all')) {
+        const allServiceCategories = await ServiceCategory.findAll({ where: { slug: { [Op.ne]: 'all' } }, attributes: ['id', 'title', 'slug'] });
+        serviceCategories = allServiceCategories;
+    }
+
+    return [applications, countries, serviceCategories];
 }
 
 
