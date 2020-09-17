@@ -155,8 +155,8 @@ const ConsentPerformanceReport = () => {
                                 <div className="d-flex pt-3 pt-sm-0">
                                     <React.Fragment>
                                         {countries && consents_report['countries'] &&
-                                            <Dropdown className="ml-auto dropdown-customize">
-                                                <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center">
+                                            <Dropdown className="ml-auto dropdown-customize mr-2">
+                                                <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center">
                                                     {consents_report.codbase && (countries.find(i => i.codbase === consents_report.codbase)) ? (countries.find(i => i.codbase === consents_report.codbase)).codbase_desc : (<span><i className="icon icon-filter mr-2 mb-n1"></i> Filter by Country</span>)}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
