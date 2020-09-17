@@ -15,12 +15,12 @@ const allCountries = async () => {
 }
 
 const allServiceCategories = async () => {
-    const serviceCategories = await ServiceCategory.findAll();
+    const serviceCategories = await ServiceCategory.findAll({ where: { slug: { [Op.ne]: 'all' }} });
     return serviceCategories.map(i => i.dataValues);
 }
 
 const allApplications = async () => {
-    const applications = await Application.findAll();
+    const applications = await Application.findAll({ where: { slug: { [Op.ne]: 'all' }} });
     return applications.map(i => i.dataValues);
 }
 
@@ -45,7 +45,7 @@ async function getPermissionSets(req, res) {
                 include: [{
                     model: Application,
                     as: 'application',
-                    attributes: [ 'id', 'name' ]
+                    attributes: [ 'id', 'name', 'slug' ]
 
                 }]
             }
@@ -58,16 +58,20 @@ async function getPermissionSets(req, res) {
         });
 
         const permissionSetList = await Promise.all(
-            permissionSets.map(async item => {
-                if(item.dataValues.slug === 'system_admin'){
+            permissionSets.map(async ps => {
+                if(ps.countries && ps.countries.includes('all')){
                     const countries = await allCountries();
-                    const applications = await allApplications();
-                    const serviceCategories = await allServiceCategories();
-                    item.dataValues.countries = countries.map(c => c.country_iso2);
-                    item.dataValues.ps_app = applications && applications.map(app=> ({ application: { id: app.id, name: app.name} }));
-                    item.dataValues.ps_sc = serviceCategories && serviceCategories.map(sc => ({ serviceCategory: { id: sc.id, title: sc.title, slug: sc.slug } }));
+                    ps.dataValues.countries = countries.map(c => c.country_iso2);
                 }
-                return item.dataValues;
+                if(ps.ps_sc && ps.ps_sc.find(psc => psc.serviceCategory.slug === 'all')) {
+                    const serviceCategories = await allServiceCategories();
+                    ps.dataValues.ps_sc = serviceCategories && serviceCategories.map(sc => ({ serviceCategory: { id: sc.id, title: sc.title, slug: sc.slug } }));
+                }
+                if(ps.ps_app && ps.ps_app.find(papp => papp.application.slug === 'all')) {
+                    const applications = await allApplications();
+                    ps.dataValues.ps_app = applications && applications.map(app=> ({ application: { id: app.id, name: app.name } }));
+                }
+                return ps.dataValues;
             })
         )
 
