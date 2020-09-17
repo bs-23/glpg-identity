@@ -14,6 +14,7 @@ export default function Users() {
     const userdata = useSelector(state => state.userReducer.users);
 
     const [countries, setCountries] = useState([]);
+    const [codBase, setCodBase] = useState(null);
     const [userCountries, setUserCountries] = useState([]);
 
     const params = new URLSearchParams(window.location.search);
@@ -55,6 +56,8 @@ export default function Users() {
     }, []);
 
     useEffect(() => {
+
+        setCodBase(params.get('codbase') ? params.get('codbase') : null);
         const searchObj = {};
         const searchParams = location.search.slice(1).split("&");
         searchParams.forEach(element => {
@@ -71,16 +74,6 @@ export default function Users() {
             countryList.push(allCountries.find(x => x.country_iso2 == element));
         });
         return countryList;
-    }
-
-    useEffect(() => {
-        sortWithUrlChange();
-    }, [userdata.users]);
-
-    const sortWithUrlChange = () => {
-        if (userdata.users && params.get('orderType') && params.get('orderBy')) {
-            dispatch(cdpSort(params.get('orderType'), params.get('orderBy')));
-        }
     }
 
     const urlChange = (pageNo, codBase, orderColumn) => {
@@ -159,13 +152,13 @@ export default function Users() {
                                     <table className="table table-hover table-sm mb-0 cdp-table">
                                         <thead className="cdp-bg-primary text-white cdp-table__header">
                                             <tr>
-                                                <th><span className={sort.value === 'first_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, null, 'first_name')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                <th><span className={sort.value === 'last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, null, 'last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                <th><span className={sort.value === 'email' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, null, 'email')}>Email<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className={sort.value === 'first_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'first_name')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className={sort.value === 'last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className={sort.value === 'email' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'email')}>Email<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                 <th><span className="cdp-table__col-sorting">Countries</span></th>
-                                                <th><span className={sort.value === 'created_at' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, null, 'created_at')}>Creation Date<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                <th><span className={sort.value === 'expiry_date' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, null, 'expiry_date')}>Expiry Date<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                <th><span className={sort.value === 'created_by' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, null, 'created_by')}>Created By<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className={sort.value === 'created_at' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'created_at')}>Creation Date<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className={sort.value === 'expiry_date' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'expiry_date')}>Expiry Date<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className={sort.value === 'created_by' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'created_by')}>Created By<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>

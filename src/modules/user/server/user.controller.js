@@ -320,15 +320,15 @@ async function getUsers(req, res) {
         .map(i => ignoreCaseArray(i)));
 
     try {
-        const order = [
-            ['created_at', 'DESC'],
-            ['id', 'DESC']
-        ];
+        const order = [];
 
         const columnNames = Object.keys(User.rawAttributes);
         if (orderBy && (columnNames || []).includes(orderBy)) {
-            order.splice(0, 0, [orderBy, orderType]);
+            order.push([orderBy, orderType]);
         }
+
+        order.push(['created_at', 'DESC']);
+        order.push(['id', 'DESC']);
 
         const users = await User.findAll({
             where: {
