@@ -1145,32 +1145,31 @@ async function getUserAppCountryList(userId) {
 }
 
 async function getAppCountryPermissions(permissionSet) {
-
     let applications = [];
     let countries = [];
-    if (permissionSet.slug == 'system_admin') {
-        let allApplications = await Application.findAll();
-        applications = allApplications.map(a => a.id);
+
+    if (permissionSet.ps_app) {
+        for (const ps_app of permissionSet.ps_app) {
+            const userApplication = ps_app.application;
+            if(userApplication.slug === 'all'){
+                const allApplications = await Application.findAll({ where: { slug: { [Op.ne]: 'all' } }, attributes: ['id'] });
+                applications = allApplications.map(app => app.id);
+                break;
+            }
+            applications.push(userApplication.id);
+        }
+    }
+
+    if (permissionSet.countries) {
+        countries = permissionSet.countries;
+    }
+
+    if(countries.includes('all')) {
         const countriesDb = await sequelize.datasyncConnector.query("SELECT DISTINCT ON(codbase_desc) * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;", { type: QueryTypes.SELECT });
         countries = countriesDb.map(c => c.country_iso2);
-    } else {
-        if (permissionSet.ps_app) {
-            for (const ps_app of permissionSet.ps_app) {
-                applications.push(ps_app.application.id);
-
-            }
-
-        }
-
-        if (permissionSet.countries) {
-            countries = permissionSet.countries;
-        }
-
     }
 
     return [applications, countries];
-
-
 }
 
 exports.getHcps = getHcps;
