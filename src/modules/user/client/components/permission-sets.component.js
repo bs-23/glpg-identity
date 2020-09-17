@@ -11,7 +11,7 @@ import PermissionSetDetails from "./permission-sets-details";
 export default function ManagePermissionSets() {
     const [permissionSets, setPermissionSets] = useState([]);
     const [permissionModalShow, setPermissionModalShow] = useState(false);
-    const [permissionSetEditData, setPermissionSetEditData] = useState(null);
+    const [permissionSetEditID, setPermissionSetEditID] = useState(null);
     const countries = useSelector(state => state.userReducer.countries);
     const match = useRouteMatch();
     const history = useHistory();
@@ -43,27 +43,18 @@ export default function ManagePermissionSets() {
 
     const handleFormSubmitSuccess = () => {
         getPermissionSets();
-        setPermissionSetEditData(null);
+        setPermissionSetEditID(null);
         setPermissionModalShow(false);
     }
 
-    const preparePermissionSetEditData = (data) => {
-        const { id, title, description, countries } = data;
-        const serviceCategories = data.ps_sc ? data.ps_sc.map(item => item.serviceCategory.id ) : [];
-        const applications = data.ps_app ? data.ps_app.map(item => item.application.id ) : [];
-        const editObject = { id, title, description, countries, serviceCategories, applications };
-        return editObject;
-    }
-
     const handlePermissionSetEditClick = (data) => {
-        const editObject = preparePermissionSetEditData(data)
-        setPermissionSetEditData(editObject);
+        setPermissionSetEditID(data.id);
         setPermissionModalShow(true);
     }
 
     const handleCreateModalHide = () => {
         setPermissionModalShow(false);
-        setPermissionSetEditData(null);
+        setPermissionSetEditID(null);
     }
 
     useEffect(() => {
@@ -118,8 +109,6 @@ export default function ManagePermissionSets() {
                                                 <td>{getCountryNamesFromCodes(row.countries)}</td>
                                                 <td>{getServiceCategoryNames(row)}</td>
                                                 <td>
-                                                    {/* <button className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlePermissionSetEditClick(row)} disabled={readOnlyPermissionSets.includes(row.slug)}> <i className="icon icon-edit-pencil pr-2"></i>Edit</button>
-                                                    <button className="btn cdp-btn-outline-primary btn-sm" onClick={() => history.push(`${match.path}/${row.id}`)} > <i className="icon icon-edit-pencil pr-2"></i>Details</button> */}
                                                     <Dropdown className="ml-auto dropdown-customize">
                                                         <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
                                                         </Dropdown.Toggle>
@@ -153,11 +142,11 @@ export default function ManagePermissionSets() {
                         >
                             <Modal.Header closeButton>
                                 <Modal.Title id="example-custom-modal-styling-title">
-                                    {permissionSetEditData ? 'Update Permission Set' : 'Create New Permission Set'}
+                                    {permissionSetEditID ? 'Update Permission Set' : 'Create New Permission Set'}
                                 </Modal.Title>
                             </Modal.Header>
                             <Modal.Body>
-                                <PermissionSetForm onSuccess={handleFormSubmitSuccess} preFill={permissionSetEditData} />
+                                <PermissionSetForm onSuccess={handleFormSubmitSuccess} permissionSetId={permissionSetEditID} />
                             </Modal.Body>
                         </Modal>
                         <Route path={`${match.path}/:id`} >

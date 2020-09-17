@@ -23,13 +23,22 @@ const FormFieldFluid = ({ label, name, type, children, required = true, ...rest 
     </div>
 </div>
 
-const CheckList = ({ name, options, labelExtractor, idExtractor }) => {
+const CheckList = ({ name, options, labelExtractor, idExtractor, allOptionID }) => {
     const isChecked = (id, arrayHelpers) => arrayHelpers.form.values[name].includes(id);
 
     const handleChange = (e, arrayHelpers) => {
         const optionId = e.target.value;
         if (e.target.checked) {
-            arrayHelpers.push(optionId);
+            if(allOptionID && optionId === allOptionID) {
+                arrayHelpers.form.setFieldValue(name, [optionId]);
+            }
+            else {
+                if(arrayHelpers.form.values[name].includes(allOptionID)) {
+                    const idx = arrayHelpers.form.values[name].indexOf(allOptionID);
+                    arrayHelpers.remove(idx);
+                }
+                arrayHelpers.push(optionId);
+            }
         }
         else {
             const idx = arrayHelpers.form.values[name].indexOf(optionId);
@@ -61,13 +70,22 @@ const CheckList = ({ name, options, labelExtractor, idExtractor }) => {
         />
 }
 
-const ToggleList = ({ name, options, labelExtractor, idExtractor }) => {
+const ToggleList = ({ name, options, labelExtractor, idExtractor, allOptionID }) => {
     const isChecked = (id, arrayHelpers) => arrayHelpers.form.values[name].includes(id);
-
+    console.log(allOptionID);
     const handleChange = (e, arrayHelpers) => {
         const optionId = e.target.value;
         if (e.target.checked) {
-            arrayHelpers.push(optionId);
+            if(allOptionID && optionId === allOptionID) {
+                arrayHelpers.form.setFieldValue(name, [optionId]);
+            }
+            else{
+                if(arrayHelpers.form.values[name].includes(allOptionID)) {
+                    const idx = arrayHelpers.form.values[name].indexOf(allOptionID);
+                    arrayHelpers.remove(idx);
+                }
+                arrayHelpers.push(optionId)
+            };
         }
         else {
             const idx = arrayHelpers.form.values[name].indexOf(optionId);
@@ -79,7 +97,7 @@ const ToggleList = ({ name, options, labelExtractor, idExtractor }) => {
                 name={name}
                 render={arrayHelpers => (
                     options.map(item => <label key={idExtractor(item)} className="d-flex  align-items-center">
-                        
+
                         <span className="switch">
                             <input name={name}
                                 className="custom-control-input"
@@ -99,19 +117,20 @@ const ToggleList = ({ name, options, labelExtractor, idExtractor }) => {
 }
 
 
-export default function PermissionSetForm({ onSuccess, onError, preFill }) {
+export default function PermissionSetForm({ onSuccess, onError, permissionSetId }) {
     const [applications, setApplications] = useState([]);
     const [serviceCategories, setServiceCategories] = useState([]);
+    const [permissionSet, setPermissionSet] = useState({});
     const countries = useSelector(state => state.userReducer.countries);
     const { addToast } = useToasts();
     const dispatch = useDispatch();
 
     const formValues = {
-        title: preFill ? preFill.title : '',
-        description: preFill ? preFill.description : '',
-        countries: preFill ? preFill.countries ? preFill.countries : [] : [],
-        serviceCategories: preFill ? preFill.serviceCategories : [],
-        applications: preFill ? preFill.applications : [],
+        title: permissionSet ? permissionSet.title : '',
+        description: permissionSet ? permissionSet.description : '',
+        countries: permissionSet && permissionSet.countries ? permissionSet.countries : [],
+        serviceCategories: permissionSet && permissionSet.serviceCategories ? permissionSet.serviceCategories : [],
+        applications: permissionSet && permissionSet.applications ? permissionSet.applications : [],
         app_country_service: ''
     };
 
@@ -125,11 +144,20 @@ export default function PermissionSetForm({ onSuccess, onError, preFill }) {
         setServiceCategories(response.data);
     }
 
+    const getPermissionSet = async () => {
+        const { data: permSet } = await axios.get(`/api/permissionSets/${permissionSetId}`);
+        setPermissionSet({
+            ...permSet,
+            applications: permSet.ps_app.map(app => app.application.id),
+            serviceCategories: permSet.ps_sc.map(sc => sc.serviceCategory.id),
+        });
+    }
+
     const handleSubmit = (values, actions) => {
         const { app_country_service, ...requestBody } = values;
-        const promise = preFill ? axios.put(`/api/permissionSets/${preFill.id}`, values) : axios.post('/api/permissionSets', requestBody);
+        const promise = permissionSetId ? axios.put(`/api/permissionSets/${permissionSetId}`, values) : axios.post('/api/permissionSets', requestBody);
         promise.then(() => {
-                const successMessage = preFill ? 'Permission set updated successfully' : 'Permission set created successfully';
+                const successMessage = permissionSetId ? 'Permission set updated successfully' : 'Permission set created successfully';
                 addToast(successMessage, {
                     appearance: 'success',
                     autoDismiss: true
@@ -149,11 +177,11 @@ export default function PermissionSetForm({ onSuccess, onError, preFill }) {
     }
 
     useEffect(() => {
+        if(permissionSetId) getPermissionSet();
         getApplications();
         dispatch(getCountries());
         getServiceCategories();
     }, []);
-
 
     return (
             <div className="">
@@ -175,13 +203,13 @@ export default function PermissionSetForm({ onSuccess, onError, preFill }) {
                                                     <div className="row">
                                                     <FormFieldFluid label="Title" type="text" name="title"/>
                                                     <FormField label="Select Countries" name="countries" required={false} >
-                                                        <CheckList name="countries" options={countries} idExtractor={item => item.country_iso2} labelExtractor={item => item.codbase_desc} />
+                                                        <CheckList name="countries" options={[{ country_iso2: 'all', codbase_desc: 'All Countries' }, ...countries]} idExtractor={item => item.country_iso2} labelExtractor={item => item.codbase_desc} allOptionID={'all'} />
                                                     </FormField>
                                                     <FormField label="Select Applications" name="applications" required={false} >
-                                                        <CheckList name="applications" options={applications} idExtractor={item => item.id} labelExtractor={item => item.name} />
+                                                        <CheckList name="applications" options={applications} idExtractor={item => item.id} labelExtractor={item => item.name} allOptionID={applications.find(app => app.slug === 'all') && applications.find(app => app.slug === 'all').id} />
                                                     </FormField>
                                                     <FormFieldFluid label="Select Service Categories" name="serviceCategories" required={false} >
-                                                        <ToggleList name="serviceCategories" options={serviceCategories} idExtractor={item => item.id} labelExtractor={item => item.title} />
+                                                        <ToggleList name="serviceCategories" options={serviceCategories} idExtractor={item => item.id} labelExtractor={item => item.title} allOptionID={serviceCategories.find(sc => sc.slug === 'all') && serviceCategories.find(sc => sc.slug === 'all').id}/>
                                                     </FormFieldFluid>
                                                     <FormFieldFluid label="Description" type="text" name="description" required={false} component="textarea" />
                                                     </div>
