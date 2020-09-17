@@ -32,6 +32,16 @@
                 font-size: 19px;
             }
         }
+
+        .fixed-width {
+            min-width: 195px;
+
+            &::after {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+            }
+        }
     }
 
     &-item {
