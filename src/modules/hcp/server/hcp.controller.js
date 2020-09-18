@@ -153,11 +153,12 @@ async function getHcps(req, res) {
     const response = new Response({}, []);
 
     try {
-        const page = req.query.page ? req.query.page - 1 : 0;
+        const page = req.query.page ? parseInt(req.query.page) - 1 : 0;
         const limit = 15;
         let status = req.query.status === undefined ? null : req.query.status;
         if (status) status = Array.isArray(status) ? status.filter(e => Hcp.rawAttributes.status.values.includes(e)) : Hcp.rawAttributes.status.values.includes(status) ? status : [];
-        const codbase = req.query.codbase === undefined ? null : req.query.codbase;
+
+        const codbase = req.query.codbase === 'undefined' ? null : req.query.codbase;
         const offset = page * limit;
 
         const application_list = (await Hcp.findAll()).map(i => i.get("application_id"));
@@ -182,6 +183,23 @@ async function getHcps(req, res) {
             country_iso2: codbase ? { [Op.any]: [countries_ignorecase_for_codbase] } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : countries_ignorecase_for_user_countries_codbase
         };
 
+        const orderBy = req.query.orderBy === 'null'
+            ? null
+            : req.query.orderBy;
+        const orderType = req.query.orderType === 'asc' || req.query.orderType === 'desc'
+            ? req.query.orderType
+            : 'asc';
+
+        const order = [];
+
+        const columnNames = Object.keys(Hcp.rawAttributes);
+        if (orderBy && (columnNames || []).includes(orderBy)) {
+            order.push([orderBy, orderType]);
+        }
+
+        order.push(['created_at', 'DESC']);
+        order.push(['id', 'DESC']);
+
         const hcps = await Hcp.findAll({
             where: hcp_filter,
             include: [{
@@ -192,10 +210,7 @@ async function getHcps(req, res) {
             attributes: { exclude: ['password', 'created_by', 'updated_by'] },
             offset,
             limit,
-            order: [
-                ['created_at', 'DESC'],
-                ['id', 'ASC']
-            ]
+            order: order
         });
 
         await Promise.all(hcps.map(async hcp => {
@@ -203,7 +218,7 @@ async function getHcps(req, res) {
 
             await Promise.all(hcp['hcpConsents'].map(async hcpConsent => {
 
-                if(hcpConsent.response && hcpConsent.consent_confirmed){
+                if (hcpConsent.response && hcpConsent.consent_confirmed) {
                     const country_consent = await ConsentCountry.findOne({ where: { consent_id: hcpConsent.consent_id } });
                     opt_types.add(country_consent.opt_type);
                 }
@@ -688,7 +703,7 @@ async function getHCPUserConsents(req, res) {
 
         const userConsentDetails = await ConsentLocale.findAll({ include: { model: Consent, as: 'consent', attributes: ['title'] }, where: { consent_id: userConsents.map(consent => consent.consent_id), locale: locale ? locale.toLowerCase() : doc.locale }, attributes: ['consent_id', 'rich_text'] });
 
-        const consentCountries = await ConsentCountry.findAll({ where: { consent_id: userConsents.map(consent => consent.consent_id), country_iso2: { [Op.or]: [ doc.country_iso2.toUpperCase(), doc.country_iso2.toLowerCase() ] } } });
+        const consentCountries = await ConsentCountry.findAll({ where: { consent_id: userConsents.map(consent => consent.consent_id), country_iso2: { [Op.or]: [doc.country_iso2.toUpperCase(), doc.country_iso2.toLowerCase()] } } });
 
         const consentResponse = userConsentDetails.map(({ consent_id: id, rich_text, consent: { title } }) => ({ id, title, rich_text: validator.unescape(rich_text) }));
 

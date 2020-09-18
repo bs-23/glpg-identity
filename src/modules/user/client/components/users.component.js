@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import Dropdown from 'react-bootstrap/Dropdown';
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
@@ -8,19 +8,18 @@ import { getUsers, cdpSort } from '../user.actions';
 
 export default function Users() {
     const dispatch = useDispatch();
+    const location = useLocation();
+    const history = useHistory();
 
     const userdata = useSelector(state => state.userReducer.users);
 
     const [countries, setCountries] = useState([]);
+    const [codBase, setCodBase] = useState(null);
     const [userCountries, setUserCountries] = useState([]);
 
     const params = new URLSearchParams(window.location.search);
-    const [sort, setSort] = useState({ type: 'ASC', value: null });
+    const [sort, setSort] = useState({ type: 'asc', value: null });
 
-    const getUserList = (page = params.get('page') ? params.get('page') : 1,
-        codbase = params.get('codbase') ? params.get('codbase') : null) => {
-        dispatch(getUsers(page, codbase));
-    };
 
     const sortCountries = (userCountries) => {
         let countryArr = [];
@@ -41,7 +40,6 @@ export default function Users() {
     }
 
     useEffect(() => {
-        getUserList();
         async function getCountries() {
             const response = (await axios.get('/api/countries')).data;
             const userProfile = (await axios.get('/api/users/profile')).data;
@@ -52,6 +50,19 @@ export default function Users() {
         getCountries();
     }, []);
 
+    useEffect(() => {
+
+        setCodBase(params.get('codbase') ? params.get('codbase') : null);
+        const searchObj = {};
+        const searchParams = location.search.slice(1).split("&");
+        searchParams.forEach(element => {
+            searchObj[element.split("=")[0]] = element.split("=")[1];
+        });
+        dispatch(getUsers(searchObj.page, searchObj.codbase, searchObj.orderBy, searchObj.orderType));
+        setSort({ type: params.get('orderType'), value: params.get('orderBy') });
+    }, [location]);
+
+
     const fetchUserCountries = (args, allCountries) => {
         const countryList = [];
         args.forEach(element => {
@@ -60,45 +71,23 @@ export default function Users() {
         return countryList;
     }
 
-    useEffect(() => {
-        sortWithUrlChange();
-    }, [userdata.users]);
-
-    const sortWithUrlChange = () => {
-        if (userdata.users && params.get('sort_type') && params.get('sort_col')) {
-            dispatch(cdpSort(params.get('sort_type'), params.get('sort_col')));
-        }
-    }
-
-    const sortCdp = (val) => {
-        if (sort.value === val) {
-            dispatch(cdpSort(sort.type === 'ASC' ? 'DESC' : 'ASC', val));
-            setSort({ type: sort.type === 'ASC' ? 'DESC' : 'ASC', value: val });
-        } else {
-            dispatch(cdpSort('ASC', val));
-            setSort({ type: 'ASC', value: val });
-        }
+    const urlChange = (pageNo, codBase, orderColumn) => {
+        let orderType = params.get('orderType');
+        const orderBy = params.get('orderBy');
+        const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
+        const codbase = codBase ? codBase : params.get('codbase');
+        (orderBy === orderColumn) ? (orderType === 'asc' ? orderType = 'desc' : orderType = 'asc') : orderType = 'asc';
+        const url = `?page=${page}` + (codbase && codbase !== 'null' ? `&codbase=${codbase}` : ``) + (orderType !== 'null' && orderColumn !== 'null' && orderColumn !== null ? `&orderType=${orderType}&orderBy=${orderColumn}` : ``);
+        history.push(location.pathname + url);
     };
 
-    // const onDeleteUser = id => {
-    //     if (confirm("Are you sure?")) {
-    //         dispatch(deleteUser(id)).then(res => {
-    //             addToast("User deleted successfully", {
-    //                 appearance: 'error',
-    //                 autoDismiss: true
-    //             });
-
-    //             getUserList();
-    //         });
-    //     }
-    // };
 
     const pageLeft = () => {
-        if (userdata.page > 1) getUserList(userdata.page - 1, userdata.country_iso2);
+        if (userdata.page > 1) urlChange(userdata.page - 1, userdata.codBase, params.get('orderBy'));
     };
 
     const pageRight = () => {
-        if (userdata.end !== userdata.total) getUserList(userdata.page + 1, userdata.country_iso2);
+        if (userdata.end !== userdata.total) urlChange(userdata.page + 1, userdata.codBase, params.get('orderBy'));
     };
 
     return (
@@ -122,13 +111,13 @@ export default function Users() {
                             <div className="d-flex justify-content-between align-items-center">
                                 <Dropdown className="ml-auto dropdown-customize">
                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center">
-                                        <i className="icon icon-filter mr-2 mb-n1"></i> Filter by Country
-                                </Dropdown.Toggle>
+                                        <i className="icon icon-filter mr-2 mb-n1"></i> {userdata.codbase && (countries.find(i => i.codbase === userdata.codbase)) ? (countries.find(i => i.codbase === userdata.codbase)).codbase_desc : 'Filter by Country'}
+                                    </Dropdown.Toggle>
                                     <Dropdown.Menu>
-                                        <LinkContainer to="list?page=1"><Dropdown.Item onClick={() => getUserList(1, null)}>All</Dropdown.Item></LinkContainer>
+                                        <Dropdown.Item onClick={() => urlChange(1, null, params.get('orderBy'))}>All</Dropdown.Item>
                                         {
-                                            userCountries.length > 0 && userCountries.map(country => (
-                                                <LinkContainer to={`list?page=1&codbase=${country.codbase}&sort_type=${sort.type}&sort_col=${sort.value}`} key={country.countryid}><Dropdown.Item onClick={() => getUserList(1, country.codbase)}>{country.codbase_desc}</Dropdown.Item></LinkContainer>
+                                            userCountries.length > 0 && userCountries.map((country, index) => (
+                                                <Dropdown.Item key={index} onClick={() => urlChange(1, country.codbase, params.get('orderBy'))}>{country.codbase_desc}</Dropdown.Item>
                                             ))
                                         }
                                     </Dropdown.Menu>
@@ -146,14 +135,14 @@ export default function Users() {
                                     <table className="table table-hover table-sm mb-0 cdp-table">
                                         <thead className="cdp-bg-primary text-white cdp-table__header">
                                             <tr>
-                                                <th><span className={sort.value === 'first_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => sortCdp('first_name')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                <th><span className={sort.value === 'last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => sortCdp('last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                <th><span className={sort.value === 'email' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => sortCdp('email')}>Email<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                <th><span className={sort.value === 'status' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => sortCdp('status')}>Status<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className={sort.value === 'first_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'first_name')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className={sort.value === 'last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className={sort.value === 'email' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'email')}>Email<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className={sort.value === 'status' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'status')}>Status<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                 <th><span className="cdp-table__col-sorting">Countries</span></th>
-                                                <th><span className={sort.value === 'created_at' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => sortCdp('created_at')}>Creation Date<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                <th><span className={sort.value === 'expiry_date' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => sortCdp('expiry_date')}>Expiry Date<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                <th><span className={sort.value === 'created_by' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => sortCdp('created_by')}>Created By<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className={sort.value === 'created_at' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'created_at')}>Creation Date<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className={sort.value === 'expiry_date' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'expiry_date')}>Expiry Date<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th><span className={sort.value === 'created_by' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'created_by')}>Created By<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -189,12 +178,8 @@ export default function Users() {
                                         && userdata['users'] &&
                                         <div className="pagination justify-content-end align-items-center border-top p-3">
                                             <span className="cdp-text-primary font-weight-bold">{userdata.start + ' - ' + userdata.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + userdata.total}</span>
-                                            <LinkContainer to={`list?page=${userdata.page - 1}&codbase=${userdata.codbase}&sort_type=${sort.type}&sort_col=${sort.value}`}>
-                                                <span className="pagination-btn" onClick={() => pageLeft()} disabled={userdata.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
-                                            </LinkContainer>
-                                            <LinkContainer to={`list?page=${userdata.page + 1}&codbase=${userdata.codbase}&sort_type=${sort.type}&sort_col=${sort.value}`}>
-                                                <span className="pagination-btn" onClick={() => pageRight()} disabled={userdata.end === userdata.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
-                                            </LinkContainer>
+                                            <span className="pagination-btn" onClick={() => pageLeft()} disabled={userdata.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
+                                            <span className="pagination-btn" onClick={() => pageRight()} disabled={userdata.end === userdata.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
                                         </div>
                                     }
                                 </div>
