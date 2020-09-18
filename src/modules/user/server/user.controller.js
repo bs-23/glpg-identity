@@ -163,7 +163,7 @@ async function login(req, res) {
             return res.status(401).send(errorMessage);
         }
 
-        if(user && user.status === 'inactive') return res.status(401).send('Account not active.');
+        if (user && user.status === 'inactive') return res.status(401).send('Account not active.');
 
         const isSiteVerified = await verifySite(recaptchaToken);
 
@@ -415,7 +415,7 @@ async function partialUpdateUser(req, res) {
     const partialUserData = { first_name, last_name, email, phone, type, status };
 
     try {
-        if([first_name, last_name, email].includes(null)) return res.sendStatus(400);
+        if ([first_name, last_name, email].includes(null)) return res.sendStatus(400);
 
         const user = await User.findOne({ where: { id } });
 
