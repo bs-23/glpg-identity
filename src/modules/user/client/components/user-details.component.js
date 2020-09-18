@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from 'react';
+import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
 import { NavLink } from 'react-router-dom';
 
 const UserDetails = (props) => {
@@ -85,6 +86,45 @@ const UserDetails = (props) => {
                                         <div className="profile-detail__col-fluid pb-3 pr-0 pr-sm-3">
                                             <span className="mr-2 d-block profile-detail__label">Roles</span>
                                             <span className="profile-detail__value">{userInfo.roles ? userInfo.roles.replace(/,/g, ', ') : nullValueToken}</span>
+                                        </div>
+                                        <div className="profile-detail__col-fluid pb-3 pr-0 pr-sm-3">
+                                            <span className="mr-2 d-block profile-detail__label">Status</span>
+                                            <Formik
+                                                initialValues={{
+                                                    status: userInfo.status || ''
+                                                }}
+                                                onSubmit={(values, actions) => {
+                                                    axios.patch(`/api/users/${userInfo.id}`, values).then(() => {
+                                                        actions.setStatus({ updated: true });
+                                                    }).catch(err => {
+                                                        actions.setStatus({ updated: false });
+                                                    });
+                                                    actions.setStatus({ updated: 'pending' });
+                                                }}
+                                                enableReinitialize
+                                            >
+                                                {(formikProps) => <Form onSubmit={formikProps.handleSubmit} >
+                                                    <div>
+                                                        <Field
+                                                            as="select"
+                                                            name="status"
+                                                            className="form-control"
+                                                            onChange={(e) => {
+                                                                formikProps.setFieldValue('status', e.target.value);
+                                                                formikProps.submitForm();
+                                                            }}
+                                                        >
+                                                            <option value="active">Active</option>
+                                                            <option value="inactive">Inactive</option>
+                                                        </Field>
+                                                        {formikProps.status && <div className="text-right">
+                                                            <small className="mt-1 text-muted">
+                                                                {formikProps.status.updated === true ? "Updated" : formikProps.status.updated === 'pending' ? "Updating..." : formikProps.status.updated === false ? "Update Failed" : '' }
+                                                            </small>
+                                                        </div>}
+                                                    </div>
+                                                </Form>}
+                                            </Formik>
                                         </div>
                                     </div>
                                 </div>
