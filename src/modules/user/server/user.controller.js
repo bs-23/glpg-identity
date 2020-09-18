@@ -273,7 +273,8 @@ async function createUser(req, res) {
             subject: 'Setup password for your CDP account',
             data: {
                 name: `${doc.first_name} ${doc.last_name}` || '',
-                link
+                link,
+                s3bucketUrl: nodecache.getValue('S3_BUCKET_URL')
             }
         };
 
@@ -450,7 +451,8 @@ async function sendPasswordResetLink(req, res) {
             subject: 'Password Reset Instructions',
             data: {
                 name: user.first_name + " " + user.last_name || '',
-                link
+                link,
+                s3bucketUrl: nodecache.getValue('S3_BUCKET_URL')
             }
         };
 
@@ -555,7 +557,8 @@ async function resetPassword(req, res) {
             toAddresses: [user.email],
             data: {
                 name: user.first_name + " " + user.last_name,
-                link: `${req.protocol}://${req.headers.host}/login`
+                link: `${req.protocol}://${req.headers.host}/login`,
+                s3bucketUrl: nodecache.getValue('S3_BUCKET_URL')
             }
         };
 
