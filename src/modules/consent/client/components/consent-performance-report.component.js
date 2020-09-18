@@ -157,7 +157,7 @@ const ConsentPerformanceReport = () => {
                                         {countries && consents_report['countries'] &&
                                             <Dropdown className="ml-auto dropdown-customize mr-2">
                                                 <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center">
-                                                    {consents_report.codbase && (countries.find(i => i.codbase === consents_report.codbase)) ? (countries.find(i => i.codbase === consents_report.codbase)).codbase_desc : (<span><i className="icon icon-filter mr-2 mb-n1"></i> Filter by Country</span>)}
+                                                <i className="icon icon-filter mr-2 mb-n1"></i> {consents_report.codbase && (countries.find(i => i.codbase === consents_report.codbase)) ? (countries.find(i => i.codbase === consents_report.codbase)).codbase_desc : 'Filter by Country'}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
                                                     <LinkContainer to={`consent-performance-report${makeUrl( [

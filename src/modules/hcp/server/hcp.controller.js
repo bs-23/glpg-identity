@@ -90,6 +90,7 @@ function generateEmailOptions(emailType, applicationSlug, user) {
         data: {
             firstName: user.first_name || '',
             lastName: user.last_name || '',
+            s3bucketUrl: nodecache.getValue('S3_BUCKET_URL')
         }
     };
 }

@@ -16,7 +16,8 @@ module.exports = app => {
 
     app.route('/api/users/:id')
         .get(passport.authenticate("user-jwt", { session: false }), controller.getUser)
-        .delete(passport.authenticate("user-jwt", { session: false }), controller.deleteUser);
+        .patch(passport.authenticate("user-jwt", { session: false }), controller.partialUpdateUser)
+        .delete(passport.authenticate("user-jwt", { session: false }), controller.deleteUser)
 
     app.post('/api/users/change-password', passport.authenticate('user-jwt', { session: false }), controller.changePassword);
 

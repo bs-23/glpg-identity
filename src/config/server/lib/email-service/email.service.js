@@ -67,8 +67,12 @@ function buildList(listName, list, template) {
     const endTag = `{{${listName}-end}}`;
 
     const startTagPos = newTemplate.indexOf(startTag);
-    const contentStartPos = startTagPos + startTag.length;
+    if(startTagPos === -1) return template;
+
     const contentEndPos = newTemplate.indexOf(endTag);
+    if(contentEndPos === -1) return template;
+
+    const contentStartPos = startTagPos + startTag.length;
     const endTagPos = contentEndPos + endTag.length;
 
     const content = newTemplate.slice(contentStartPos, contentEndPos);

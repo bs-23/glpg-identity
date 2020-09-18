@@ -58,6 +58,7 @@ function formatProfile(user) {
         last_name: user.last_name,
         email: user.email,
         type: user.type,
+        status: user.status,
         roles: getRolesPermissions(user.userrole),
         application: user.application,
         countries: user.countries
@@ -72,6 +73,7 @@ function formatProfileDetail(user) {
         last_name: user.last_name,
         email: user.email,
         type: user.type,
+        status: user.status,
         phone: user.phone,
         last_login: user.last_login,
         expiry_date: user.expiry_date,
@@ -105,11 +107,11 @@ async function getSignedInUserProfile(req, res) {
 
 async function login(req, res) {
     try {
-        const { email, password } = req.body;
+        const { email, password, recaptchaToken } = req.body;
 
-        // if (!recaptchaToken) {
-        //     return res.status(400).send('Captcha verification required.');
-        // }
+        if (!recaptchaToken) {
+            return res.status(400).send('Captcha verification required.');
+        }
 
         const user = await User.findOne({
             where: {
@@ -161,11 +163,13 @@ async function login(req, res) {
             return res.status(401).send(errorMessage);
         }
 
-        // const isSiteVerified = await verifySite(recaptchaToken);
+        if(user && user.status === 'inactive') return res.status(401).send('Account not active.');
 
-        // if (!isSiteVerified) {
-        //     return res.status(400).send('Failed captcha verification.');
-        // }
+        const isSiteVerified = await verifySite(recaptchaToken);
+
+        if (!isSiteVerified) {
+            return res.status(400).send('Failed captcha verification.');
+        }
 
         res.cookie('access_token', generateAccessToken(user), {
             expires: new Date(Date.now() + 8.64e7),
@@ -269,7 +273,8 @@ async function createUser(req, res) {
             subject: 'Setup password for your CDP account',
             data: {
                 name: `${doc.first_name} ${doc.last_name}` || '',
-                link
+                link,
+                s3bucketUrl: nodecache.getValue('S3_BUCKET_URL')
             }
         };
 
@@ -404,6 +409,28 @@ async function getUser(req, res) {
     }
 }
 
+async function partialUpdateUser(req, res) {
+    const id = req.params.id;
+    const { first_name, last_name, email, phone, type, status } = req.body;
+    const partialUserData = { first_name, last_name, email, phone, type, status };
+
+    try {
+        if([first_name, last_name, email].includes(null)) return res.sendStatus(400);
+
+        const user = await User.findOne({ where: { id } });
+
+        if (!user) return res.status(404).send("User is not found or may be removed");
+
+        await user.update(partialUserData);
+
+        res.json(formatProfile(user));
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 async function sendPasswordResetLink(req, res) {
     try {
         const { email } = req.body;
@@ -441,7 +468,8 @@ async function sendPasswordResetLink(req, res) {
             subject: 'Password Reset Instructions',
             data: {
                 name: user.first_name + " " + user.last_name || '',
-                link
+                link,
+                s3bucketUrl: nodecache.getValue('S3_BUCKET_URL')
             }
         };
 
@@ -546,7 +574,8 @@ async function resetPassword(req, res) {
             toAddresses: [user.email],
             data: {
                 name: user.first_name + " " + user.last_name,
-                link: `${req.protocol}://${req.headers.host}/login`
+                link: `${req.protocol}://${req.headers.host}/login`,
+                s3bucketUrl: nodecache.getValue('S3_BUCKET_URL')
             }
         };
 
@@ -607,3 +636,4 @@ exports.getUsers = getUsers;
 exports.getUser = getUser;
 exports.sendPasswordResetLink = sendPasswordResetLink;
 exports.resetPassword = resetPassword;
+exports.partialUpdateUser = partialUpdateUser;
