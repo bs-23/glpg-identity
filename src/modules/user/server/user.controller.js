@@ -105,11 +105,11 @@ async function getSignedInUserProfile(req, res) {
 
 async function login(req, res) {
     try {
-        const { email, password } = req.body;
+        const { email, password, recaptchaToken } = req.body;
 
-        // if (!recaptchaToken) {
-        //     return res.status(400).send('Captcha verification required.');
-        // }
+        if (!recaptchaToken) {
+            return res.status(400).send('Captcha verification required.');
+        }
 
         const user = await User.findOne({
             where: {
@@ -161,11 +161,11 @@ async function login(req, res) {
             return res.status(401).send(errorMessage);
         }
 
-        // const isSiteVerified = await verifySite(recaptchaToken);
+        const isSiteVerified = await verifySite(recaptchaToken);
 
-        // if (!isSiteVerified) {
-        //     return res.status(400).send('Failed captcha verification.');
-        // }
+        if (!isSiteVerified) {
+            return res.status(400).send('Failed captcha verification.');
+        }
 
         res.cookie('access_token', generateAccessToken(user), {
             expires: new Date(Date.now() + 8.64e7),
