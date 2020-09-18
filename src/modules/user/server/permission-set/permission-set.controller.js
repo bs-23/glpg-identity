@@ -140,6 +140,8 @@ async function createPermissionSet(req, res) {
             title,
             description,
             countries,
+            serviceCategories,
+            applications
         } = req.body;
 
         if(!title.trim()) return res.status(400).send('Permission set title can not be empty.');
@@ -150,7 +152,7 @@ async function createPermissionSet(req, res) {
                 title: title,
                 slug: title.replace(/ +/g, '_').toLowerCase(),
                 description,
-                countries: countries,
+                countries: countries ? countries.includes('all') ? ['all'] : countries : [],
                 created_by: req.user.id,
                 updated_by: req.user.id
             }
@@ -158,11 +160,26 @@ async function createPermissionSet(req, res) {
 
         if(!created) return res.status(400).send('Permission set with the same title already exists.');
 
-        const serviceCategories_permissionSet = req.body.serviceCategories.map(id => ({ permissionSetId: doc.id, serviceCategoryId: id }));
+        const allServiceCategoryOption = await ServiceCategory.findOne({ where: { slug: 'all' }});
+        const allApplicationOption = await Application.findOne({ where: { slug: 'all' }});
+
+        let serviceCategories_permissionSet = [];
+
+        if(allServiceCategoryOption && serviceCategories.find(id => id === allServiceCategoryOption.id)) {
+            serviceCategories_permissionSet = [{ permissionSetId: doc.id, serviceCategoryId: allServiceCategoryOption.id }];
+        }else {
+            serviceCategories_permissionSet = serviceCategories.map(id => ({ permissionSetId: doc.id, serviceCategoryId: id }));
+        }
 
         await PermissionSet_ServiceCategory.bulkCreate(serviceCategories_permissionSet);
 
-        const applications_permissionSet = req.body.applications.map(id => ({ permissionSetId: doc.id, applicationId: id }));
+        let applications_permissionSet = [];
+
+        if(allApplicationOption && applications.find(id => id === allApplicationOption.id)) {
+            applications_permissionSet = [{ permissionSetId: doc.id, applicationId: allApplicationOption.id }];
+        }else {
+            applications_permissionSet = applications.map(id => ({ permissionSetId: doc.id, applicationId: id }));
+        }
 
         await PermissionSet_Application.bulkCreate(applications_permissionSet);
 
@@ -211,8 +228,20 @@ async function editPermissionSet(req, res) {
             updated_by: req.user.id
         });
 
-        await doc.setService_categories(serviceCategories);
-        await doc.setApplications(applications);
+        const allServiceCategoryOption = await ServiceCategory.findOne({ where: { slug: 'all' }});
+        const allApplicationOption = await Application.findOne({ where: { slug: 'all' }});
+
+        if(allServiceCategoryOption && serviceCategories.includes(allServiceCategoryOption.id)){
+            await doc.setService_categories([allServiceCategoryOption.id]);
+        }else {
+            await doc.setService_categories(serviceCategories);
+        }
+
+        if(allApplicationOption && applications.includes(allApplicationOption.id)){
+            await doc.setApplications([allApplicationOption.id]);
+        }else{
+            await doc.setApplications(applications);
+        }
 
         res.json(doc);
     } catch (error) {

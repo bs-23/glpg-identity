@@ -29,8 +29,8 @@ const CheckList = ({ name, options, labelExtractor, idExtractor, allOptionID }) 
     const handleChange = (e, arrayHelpers) => {
         const optionId = e.target.value;
         if (e.target.checked) {
-            if(allOptionID && optionId === allOptionID) {
-                arrayHelpers.form.setFieldValue(name, [optionId]);
+            if(allOptionID && (optionId === allOptionID)) {
+                arrayHelpers.form.setFieldValue(name, options.map(op => idExtractor(op)));
             }
             else {
                 if(arrayHelpers.form.values[name].includes(allOptionID)) {
@@ -41,8 +41,8 @@ const CheckList = ({ name, options, labelExtractor, idExtractor, allOptionID }) 
             }
         }
         else {
-            const idx = arrayHelpers.form.values[name].indexOf(optionId);
-            arrayHelpers.remove(idx);
+            let filteredOptionIds = arrayHelpers.form.values[name].filter(id => id !== allOptionID).filter(id => id !== optionId);
+            arrayHelpers.form.setFieldValue(name, filteredOptionIds);
         }
     }
 
@@ -72,24 +72,24 @@ const CheckList = ({ name, options, labelExtractor, idExtractor, allOptionID }) 
 
 const ToggleList = ({ name, options, labelExtractor, idExtractor, allOptionID }) => {
     const isChecked = (id, arrayHelpers) => arrayHelpers.form.values[name].includes(id);
-    console.log(allOptionID);
+
     const handleChange = (e, arrayHelpers) => {
         const optionId = e.target.value;
         if (e.target.checked) {
-            if(allOptionID && optionId === allOptionID) {
-                arrayHelpers.form.setFieldValue(name, [optionId]);
+            if(allOptionID && (optionId === allOptionID)) {
+                arrayHelpers.form.setFieldValue(name, options.map(op => idExtractor(op)));
             }
             else{
                 if(arrayHelpers.form.values[name].includes(allOptionID)) {
                     const idx = arrayHelpers.form.values[name].indexOf(allOptionID);
                     arrayHelpers.remove(idx);
                 }
-                arrayHelpers.push(optionId)
+                arrayHelpers.push(optionId);
             };
         }
         else {
-            const idx = arrayHelpers.form.values[name].indexOf(optionId);
-            arrayHelpers.remove(idx);
+            let filteredOptionIds = arrayHelpers.form.values[name].filter(id => id !== allOptionID).filter(id => id !== optionId);
+            arrayHelpers.form.setFieldValue(name, filteredOptionIds);
         }
     }
 
@@ -120,17 +120,49 @@ const ToggleList = ({ name, options, labelExtractor, idExtractor, allOptionID })
 export default function PermissionSetForm({ onSuccess, onError, permissionSetId }) {
     const [applications, setApplications] = useState([]);
     const [serviceCategories, setServiceCategories] = useState([]);
-    const [permissionSet, setPermissionSet] = useState({});
+    const [permissionSet, setPermissionSet] = useState(null);
     const countries = useSelector(state => state.userReducer.countries);
     const { addToast } = useToasts();
     const dispatch = useDispatch();
 
+    const initializeServiceCategoryValues = () => {
+        if(permissionSet && permissionSet.serviceCategories){
+            const allServiceCategoryOption = serviceCategories.find(sc => sc.slug === 'all');
+            if(allServiceCategoryOption && permissionSet.serviceCategories.includes(allServiceCategoryOption.id)){
+                return serviceCategories.map(sc => sc.id);
+            }
+            return permissionSet.serviceCategories;
+        }
+        return [];
+    }
+
+    const initializeApplicationValues = () => {
+        if(permissionSet && permissionSet.applications){
+            const allApplicationOption = applications.find(app => app.slug === 'all');
+            if(allApplicationOption && permissionSet.applications.includes(allApplicationOption.id)){
+                return applications.map(sc => sc.id);
+            }
+            return permissionSet.applications;
+        }
+        return [];
+    }
+
+    const initializeCountryValues = () => {
+        if(permissionSet && permissionSet.countries) {
+            if(permissionSet.countries.includes('all')) {
+                return ['all',...countries.map(c => c.country_iso2)];
+            }
+            return permissionSet.countries;
+        }
+        return [];
+    }
+
     const formValues = {
-        title: permissionSet ? permissionSet.title : '',
-        description: permissionSet ? permissionSet.description : '',
-        countries: permissionSet && permissionSet.countries ? permissionSet.countries : [],
-        serviceCategories: permissionSet && permissionSet.serviceCategories ? permissionSet.serviceCategories : [],
-        applications: permissionSet && permissionSet.applications ? permissionSet.applications : [],
+        title: permissionSet && permissionSet.title || '',
+        description: permissionSet && permissionSet.description || '',
+        countries: initializeCountryValues(),
+        serviceCategories: initializeServiceCategoryValues(),
+        applications: initializeApplicationValues(),
         app_country_service: ''
     };
 
