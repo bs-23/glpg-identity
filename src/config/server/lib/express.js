@@ -23,7 +23,7 @@ module.exports = async function () {
                 "style-src": ["'self'", "'unsafe-inline'", "fonts.googleapis.com"],
                 "fontSrc": ["'self'", "fonts.googleapis.com", "fonts.gstatic.com", "data:"],
                 "frame-src": ["'self'", "https://www.google.com"],
-                "img-src": ["'self'", nodecache.getValue('IMG_SRC')]
+                "img-src": ["'self'", nodecache.getValue('S3_BUCKET_URL')]
             },
         })
     );
