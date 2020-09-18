@@ -430,8 +430,8 @@ export default function hcpUsers() {
                                                         <td>{row.uuid}</td>
                                                         <td><span>{getCountryName(row.country_iso2)}</span></td>
                                                         <td>{row.specialty_description}</td>
-                                                        <td>{row.opt_types.includes('single-opt-in') ? <i className="icon icon-check-filled cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
-                                                        <td>{row.opt_types.includes('double-opt-in') ? <i className="icon icon-check-filled cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
+                                                        <td>{row.opt_types.includes('single-opt-in') ? <i className="fas fa-check-circle cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
+                                                        <td>{row.opt_types.includes('double-opt-in') ? <i className="fas fa-check-circle cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
                                                         <td>
                                                             <span>
                                                                 <Dropdown className="ml-auto dropdown-customize">
