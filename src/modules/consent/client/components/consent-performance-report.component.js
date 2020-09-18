@@ -137,21 +137,10 @@ const ConsentPerformanceReport = () => {
         <main className="app__content cdp-light-bg">
             <div className="container-fluid">
                 <div className="row">
-                    <div className="col-12 px-0">
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb rounded-0">
-                                <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
-                                <li className="breadcrumb-item"><NavLink to="/consent">Data Privacy & Consent Management</NavLink></li>
-                                <li className="breadcrumb-item active"><span>Consent Performance Report</span></li>
-                            </ol>
-                        </nav>
-                    </div>
-                </div>
-                <div className="row">
                     <div className="col-12">
                         <div>
                             <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
-                                <h4 className="cdp-text-primary font-weight-bold mb-0">Consent Performance Report</h4>
+                                <h4 className="cdp-text-primary font-weight-bold mb-0">.</h4>
                                 <div className="d-flex pt-3 pt-sm-0">
                                     <React.Fragment>
                                         {countries && consents_report['countries'] &&
