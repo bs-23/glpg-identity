@@ -294,7 +294,7 @@ export default function hcpUsers() {
                                                         <Accordion.Collapse eventKey={consent.id}>
                                                             <Card.Body className="">
                                                                 <div>{parse(consent.rich_text)}</div>
-                                                                <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Consent opt-in type:</span> <span className="text-capitalize">{consent.opt_type}</span></div>
+                                                                <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Consent type:</span> <span className="text-capitalize">{consent.opt_type}</span></div>
                                                                 {consent.consent_given && <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Consent given date:</span>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>}
                                                             </Card.Body>
                                                         </Accordion.Collapse>
@@ -430,8 +430,8 @@ export default function hcpUsers() {
                                                         <td>{row.uuid}</td>
                                                         <td><span>{getCountryName(row.country_iso2)}</span></td>
                                                         <td>{row.specialty_description}</td>
-                                                        <td>{row.opt_types.includes('single-opt-in') ? <i className="icon icon-check-filled cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
-                                                        <td>{row.opt_types.includes('double-opt-in') ? <i className="icon icon-check-filled cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
+                                                        <td>{row.opt_types.includes('single-opt-in') ? <i className="fas fa-check-circle cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
+                                                        <td>{row.opt_types.includes('double-opt-in') ? <i className="fas fa-check-circle cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
                                                         <td>
                                                             <span>
                                                                 <Dropdown className="ml-auto dropdown-customize">
