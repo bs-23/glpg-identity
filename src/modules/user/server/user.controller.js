@@ -58,6 +58,7 @@ function formatProfile(user) {
         last_name: user.last_name,
         email: user.email,
         type: user.type,
+        status: user.status,
         roles: getRolesPermissions(user.userrole),
         application: user.application,
         countries: user.countries
@@ -72,6 +73,7 @@ function formatProfileDetail(user) {
         last_name: user.last_name,
         email: user.email,
         type: user.type,
+        status: user.status,
         phone: user.phone,
         last_login: user.last_login,
         expiry_date: user.expiry_date,
@@ -160,6 +162,8 @@ async function login(req, res) {
 
             return res.status(401).send(errorMessage);
         }
+
+        if(user && user.status === 'inactive') return res.status(401).send('Account not active.');
 
         const isSiteVerified = await verifySite(recaptchaToken);
 
@@ -387,6 +391,28 @@ async function getUser(req, res) {
     }
 }
 
+async function partialUpdateUser(req, res) {
+    const id = req.params.id;
+    const { first_name, last_name, email, phone, type, status } = req.body;
+    const partialUserData = { first_name, last_name, email, phone, type, status };
+
+    try {
+        if([first_name, last_name, email].includes(null)) return res.sendStatus(400);
+
+        const user = await User.findOne({ where: { id } });
+
+        if (!user) return res.status(404).send("User is not found or may be removed");
+
+        await user.update(partialUserData);
+
+        res.json(formatProfile(user));
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 async function sendPasswordResetLink(req, res) {
     try {
         const { email } = req.body;
@@ -590,3 +616,4 @@ exports.getUsers = getUsers;
 exports.getUser = getUser;
 exports.sendPasswordResetLink = sendPasswordResetLink;
 exports.resetPassword = resetPassword;
+exports.partialUpdateUser = partialUpdateUser;
