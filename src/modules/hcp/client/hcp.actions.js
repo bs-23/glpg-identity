@@ -1,18 +1,12 @@
 import axios from 'axios';
 import Types from './hcp.types';
 
-export function getHcpProfiles(page, status, codbase) {
-    const search_params = new URLSearchParams('');
-
-    page && search_params.append('page', page);
-    codbase && search_params.append('codbase', codbase);
-
-    if(status) {
-        if(Array.isArray(status)) status.forEach(item => search_params.append('status', item));
-        else search_params.append('status', status);
+export function getHcpProfiles(page = 1, status, codbase, orderBy, orderType) {
+    if (status && status.indexOf(',') !== -1) {
+        status = status.split(',');
     }
 
-    const url = `/api/hcps${search_params.toString() !== '' ? '?' + search_params.toString() : '' }`;
+    const url = `/api/hcps?page=${page}` + (status ? `&status=${status}` : '') + (codbase && codbase !== 'null' ? `&codbase=${codbase}` : '') + ((orderBy && orderType && orderBy !== 'null' && orderType !== 'null') ? `&orderBy=${orderBy}&orderType=${orderType}` : '');
 
     return {
         type: Types.GET_HCPS,

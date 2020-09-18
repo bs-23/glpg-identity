@@ -20,10 +20,6 @@ export default function Users() {
     const params = new URLSearchParams(window.location.search);
     const [sort, setSort] = useState({ type: 'asc', value: null });
 
-    const getUserList = (page = params.get('page') ? params.get('page') : 1,
-        codbase = params.get('codbase') ? params.get('codbase') : null) => {
-        dispatch(getUsers(page, codbase));
-    };
 
     const sortCountries = (userCountries) => {
         let countryArr = [];
@@ -44,7 +40,6 @@ export default function Users() {
     }
 
     useEffect(() => {
-        getUserList();
         async function getCountries() {
             const response = (await axios.get('/api/countries')).data;
             const userProfile = (await axios.get('/api/users/profile')).data;
@@ -82,29 +77,17 @@ export default function Users() {
         const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
         const codbase = codBase ? codBase : params.get('codbase');
         (orderBy === orderColumn) ? (orderType === 'asc' ? orderType = 'desc' : orderType = 'asc') : orderType = 'asc';
-        const url = `?page=${page}` + (codbase !== 'null' ? `&codbase=${codbase}` : ``) + (orderType !== 'null' && orderColumn !== 'null' ? `&orderType=${orderType}&orderBy=${orderColumn}` : ``);
+        const url = `?page=${page}` + (codbase && codbase !== 'null' ? `&codbase=${codbase}` : ``) + (orderType !== 'null' && orderColumn !== 'null' && orderColumn !== null ? `&orderType=${orderType}&orderBy=${orderColumn}` : ``);
         history.push(location.pathname + url);
     };
 
-    // const onDeleteUser = id => {
-    //     if (confirm("Are you sure?")) {
-    //         dispatch(deleteUser(id)).then(res => {
-    //             addToast("User deleted successfully", {
-    //                 appearance: 'error',
-    //                 autoDismiss: true
-    //             });
-
-    //             getUserList();
-    //         });
-    //     }
-    // };
 
     const pageLeft = () => {
-        if (userdata.page > 1) getUserList(userdata.page - 1, userdata.country_iso2);
+        if (userdata.page > 1) urlChange(userdata.page - 1, userdata.codBase, params.get('orderBy'));
     };
 
     const pageRight = () => {
-        if (userdata.end !== userdata.total) getUserList(userdata.page + 1, userdata.country_iso2);
+        if (userdata.end !== userdata.total) urlChange(userdata.page + 1, userdata.codBase, params.get('orderBy'));
     };
 
     return (
@@ -128,13 +111,13 @@ export default function Users() {
                             <div className="d-flex justify-content-between align-items-center">
                                 <Dropdown className="ml-auto dropdown-customize">
                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center">
-                                        <i className="icon icon-filter mr-2 mb-n1"></i> Filter by Country
-                                </Dropdown.Toggle>
+                                        <i className="icon icon-filter mr-2 mb-n1"></i> {userdata.codbase && (countries.find(i => i.codbase === userdata.codbase)) ? (countries.find(i => i.codbase === userdata.codbase)).codbase_desc : 'Filter by Country'}
+                                    </Dropdown.Toggle>
                                     <Dropdown.Menu>
-                                        <LinkContainer to="list?page=1"><Dropdown.Item onClick={() => getUserList(1, null)}>All</Dropdown.Item></LinkContainer>
+                                        <Dropdown.Item onClick={() => urlChange(1, null, params.get('orderBy'))}>All</Dropdown.Item>
                                         {
-                                            userCountries.length > 0 && userCountries.map(country => (
-                                                <LinkContainer to={`list?page=1&codbase=${country.codbase}&orderType=${sort.type}&orderBy=${sort.value}`} key={country.countryid}><Dropdown.Item onClick={() => getUserList(1, country.codbase)}>{country.codbase_desc}</Dropdown.Item></LinkContainer>
+                                            userCountries.length > 0 && userCountries.map((country, index) => (
+                                                <Dropdown.Item key={index} onClick={() => urlChange(1, country.codbase, params.get('orderBy'))}>{country.codbase_desc}</Dropdown.Item>
                                             ))
                                         }
                                     </Dropdown.Menu>
