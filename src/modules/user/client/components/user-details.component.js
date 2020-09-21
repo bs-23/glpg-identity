@@ -1,11 +1,13 @@
 import axios from "axios";
 import React, { useEffect, useState } from 'react';
 import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
+import { useToasts } from "react-toast-notifications";
 import { NavLink } from 'react-router-dom';
 
 const UserDetails = (props) => {
     const [userInfo, setUserInfo] = useState({});
     const [countries, setCountries] = useState([]);
+    const { addToast } = useToasts();
     const nullValueToken = '--'
 
     useEffect(() => {
@@ -95,11 +97,19 @@ const UserDetails = (props) => {
                                                 }}
                                                 onSubmit={(values, actions) => {
                                                     axios.patch(`/api/users/${userInfo.id}`, values).then(() => {
-                                                        actions.setStatus({ updated: true });
+                                                        addToast('User status changed successfully.', {
+                                                            appearance: 'success',
+                                                            autoDismiss: true
+                                                        });
                                                     }).catch(err => {
-                                                        actions.setStatus({ updated: false });
+                                                        addToast('Something went wrong. Could not change user status.', {
+                                                            appearance: 'error',
+                                                            autoDismiss: true
+                                                        });
+                                                    }).finally(() => {
+                                                        actions.setSubmitting(false);
                                                     });
-                                                    actions.setStatus({ updated: 'pending' });
+                                                    actions.setSubmitting(true);
                                                 }}
                                                 enableReinitialize
                                             >
@@ -109,19 +119,11 @@ const UserDetails = (props) => {
                                                             as="select"
                                                             name="status"
                                                             className="form-control"
-                                                            onChange={(e) => {
-                                                                formikProps.setFieldValue('status', e.target.value);
-                                                                formikProps.submitForm();
-                                                            }}
                                                         >
                                                             <option value="active">Active</option>
                                                             <option value="inactive">Inactive</option>
                                                         </Field>
-                                                        {formikProps.status && <div className="text-right">
-                                                            <small className="mt-1 text-muted">
-                                                                {formikProps.status.updated === true ? "Updated" : formikProps.status.updated === 'pending' ? "Updating..." : formikProps.status.updated === false ? "Update Failed" : '' }
-                                                            </small>
-                                                        </div>}
+                                                        <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting}>Save Changes</button>
                                                     </div>
                                                 </Form>}
                                             </Formik>
