@@ -5,7 +5,7 @@ const config = require(path.join(process.cwd(), 'src/config/server/config'));
 module.exports = async function() {
     await config.initEnvironmentVariables();
 
-    process.env.POSTGRES_CDP_DATABASE = 'ciam_test';
+    process.env.POSTGRES_CDP_DATABASE = 'cdp_test';
 
     const specHelper = require(path.join(process.cwd(), 'jest/spec.helper'));
     const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
