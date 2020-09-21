@@ -84,5 +84,20 @@
             "nl_be": "Dag [[firstName]] [[lastName]],\r\nUw account op het Merk X-portaal is aangemaakt.\r\n[[loginLink]].\r\nMet vriendelijke groeten,\r\nHet Jyseleca-team",
             "fr_be": "Bonjour [[firstName]] [[lastName]],\r\nVous avez créé avec succès un compte sur le Portail Jyseleca.\r\n[[loginLink]].\r\nSincères salutations,\r\nL’Équipe Jyseleca"
         }
+    },
+    "registration-not-verified": {
+        "subject": {
+            "en": "Registration is pending for verification",
+            "nl_nl": "Registration is pending for verification",
+            "nl_be": "Registration is pending for verification",
+            "fr_be": "Registration is pending for verification"
+        },
+        "template_url": "invalid-registration.html",
+        "plain_text": {
+            "en": "Hello [[firstName]] [[lastName]],\r\nYou have successfully created an account on Jyseleca Portal.\r\n[[loginLink]].\r\nYours Sincerely,\r\nThe Jyseleca Team",
+            "nl_nl": "Dag [[firstName]] [[lastName]],\r\nUw account op het Merk X-portaal is aangemaakt.\r\n[[loginLink]].\r\nMet vriendelijke groeten,\r\nHet Jyseleca-team",
+            "nl_be": "Dag [[firstName]] [[lastName]],\r\nUw account op het Merk X-portaal is aangemaakt.\r\n[[loginLink]].\r\nMet vriendelijke groeten,\r\nHet Jyseleca-team",
+            "fr_be": "Bonjour [[firstName]] [[lastName]],\r\nVous avez créé avec succès un compte sur le Portail Jyseleca.\r\n[[loginLink]].\r\nSincères salutations,\r\nL’Équipe Jyseleca"
+        }
     }
 }
