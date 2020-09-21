@@ -156,8 +156,7 @@ async function getHcps(req, res) {
         const page = req.query.page ? parseInt(req.query.page) - 1 : 0;
         const limit = 15;
         let status = req.query.status === undefined ? null : req.query.status;
-        if (status) status = Array.isArray(status) ? status.filter(e => Hcp.rawAttributes.status.values.includes(e)) : Hcp.rawAttributes.status.values.includes(status) ? status : [];
-
+        if (status && status.indexOf(',') !== -1) status = status.split(',');
         const codbase = req.query.codbase === 'undefined' ? null : req.query.codbase;
         const offset = page * limit;
 
