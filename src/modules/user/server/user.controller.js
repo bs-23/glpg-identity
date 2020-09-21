@@ -299,41 +299,58 @@ async function deleteUser(req, res) {
 }
 
 async function getUsers(req, res) {
-    const page = req.query.page ? req.query.page - 1 : 0;
-    if (page < 0) return res.status(404).send("page must be greater or equal 1");
-
-    const limit = 15;
-    const offset = page * limit;
-
-    const codbase = req.query.codbase === 'null' ? null : req.query.codbase;
-
-    const signedInId = (formatProfile(req.user)).id;
-
-    const orderBy = req.query.orderBy === 'null'
-        ? null
-        : req.query.orderBy;
-    const orderType = req.query.orderType === 'asc' || req.query.orderType === 'desc'
-        ? req.query.orderType
-        : 'asc';
-
-    const country_iso2_list_for_codbase =
-        (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT }))
-            .filter(i => i.codbase === codbase)
-            .map(i => i.country_iso2);
-
-    const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase
-        .map(i => ignoreCaseArray(i)));
-
     try {
+        const page = req.query.page ? req.query.page - 1 : 0;
+        if (page < 0) return res.status(404).send("page must be greater or equal 1");
+
+        const limit = 15;
+        const offset = page * limit;
+
+        const codbase = req.query.codbase === 'null' ? null : req.query.codbase;
+
+        const signedInId = (formatProfile(req.user)).id;
+
+        const orderBy = req.query.orderBy === 'null'
+            ? null
+            : req.query.orderBy;
+        const orderType = req.query.orderType === 'asc' || req.query.orderType === 'desc'
+            ? req.query.orderType
+            : 'asc';
+
+        const country_iso2_list_for_codbase =
+            (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT }))
+                .filter(i => i.codbase === codbase)
+                .map(i => i.country_iso2);
+
+        const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase
+            .map(i => ignoreCaseArray(i)));
+
+    
         const order = [];
 
-        const columnNames = Object.keys(User.rawAttributes);
-        if (orderBy && (columnNames || []).includes(orderBy)) {
-            order.push([orderBy, orderType]);
-        }
+        if(orderBy && orderType){
+            if(orderBy === 'first_name') order.push(['first_name', orderType]);
+            if(orderBy === 'last_name') order.push(['last_name', orderType]);
+            if(orderBy === 'email') order.push(['email', orderType]);
+            if(orderBy === 'status') order.push(['status', orderType]);
+            if(orderBy === 'created_at') order.push(['created_at', orderType]);
+            if(orderBy === 'expiry_date') order.push(['expiry_date', orderType]);
 
+            if(orderBy === 'created_by') {
+                order.push([{ model: User, as: 'createdByUser' }, 'first_name', orderType]);
+                order.push([{ model: User, as: 'createdByUser' }, 'last_name', orderType]);
+            }
+        }
         order.push(['created_at', 'DESC']);
         order.push(['id', 'DESC']);
+
+        // const columnNames = Object.keys(User.rawAttributes);
+        // if (orderBy && (columnNames || []).includes(orderBy)) {
+        //     order.push([orderBy, orderType]);
+        // }
+
+        // order.push(['created_at', 'DESC']);
+        // order.push(['id', 'DESC']);
 
         const users = await User.findAll({
             where: {
@@ -541,6 +558,10 @@ async function resetPassword(req, res) {
         }
 
         const user = await User.findOne({ where: { id: resetRequest.user_id } });
+
+        if (user.status === 'inactive') {
+            return res.status(403).send('User inactive.');
+        }
 
         if (await PasswordPolicies.minimumPasswordAge(user.password_updated_at)) {
             return res.status(400).send(`You cannot change password before 1 day`);
