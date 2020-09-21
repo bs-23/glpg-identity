@@ -127,6 +127,7 @@ async function sendResetPasswordSuccessMail(user, application) {
 async function sendPasswordSetupInstructionMail(user, application) {
     const mailOptions = generateEmailOptions('password-setup-instructions', application.slug, user);
     mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&journey=single_optin_verified&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
+    mailOptions.data.forgot_password_link = `${application.forgot_password_link}?journey=forgot_password&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
 }

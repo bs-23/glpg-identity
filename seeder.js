@@ -149,6 +149,7 @@ async function init() {
                     consent_confirmation_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/consentConfirm.consent.html',
                     reset_password_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/journeyRedirect.journey.html',
                     login_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/journeyRedirect.journey.html',
+                    forgot_password_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/journeyRedirect',
                     logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
                     created_by: admin.id,
                     updated_by: admin.id
@@ -161,6 +162,7 @@ async function init() {
                     consent_confirmation_link: 'https://www-dev.jyseleca.nl/bin/public/glpg-brandx/consentConfirm.consent.html',
                     reset_password_link: 'https://www-dev.jyseleca.nl/bin/public/glpg-brandx/journeyRedirect.journey.html',
                     login_link: 'https://www-dev.jyseleca.nl/bin/public/glpg-brandx/journeyRedirect.journey.html',
+                    forgot_password_link: 'https://www-dev.jyseleca.nl/bin/public/glpg-brandx/journeyRedirect',
                     logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/jyseleca/logo.png`,
                     created_by: admin.id,
                     updated_by: admin.id
