@@ -150,10 +150,10 @@ export default function hcpUsers() {
                                             <Dropdown>
                                                 <Dropdown.Toggle variant="" id="dropdown-basic" className="cdp-btn-outline-primary">UUID Authorities</Dropdown.Toggle>
                                                 <Dropdown.Menu>
-                                                    <Dropdown.Item className="border-bottom" href="ttps://zoeken.bigregister.nl/zoeken/kenmerken" target="_blank"><img src="/assets/logo/logo-big.svg" title="BIG Register Logo" alt="BIG Register" height="30" /></Dropdown.Item>
-                                                    <Dropdown.Item className="border-bottom" href="https://ondpanon.riziv.fgov.be/SilverPages/fr"><img src="/assets/logo/logo-inami.svg" title="INAMI Logo" alt="INAMI" height="30" /></Dropdown.Item>
-                                                    <Dropdown.Item className="border-bottom" href="https://ondpanon.riziv.fgov.be/SilverPages/nl"><img src="/assets/logo/logo-riziv.svg" title="RIZIV Logo" alt="RIZIV" height="30" /></Dropdown.Item>
-                                                    <Dropdown.Item className="" href="https://www.gmc-uk.org/registration-and-licensing/the-medical-register#searchTheRegister"><img src="/assets/logo/logo-gmc.svg" title="INAMI Logo" alt="INAMI" height="18" /></Dropdown.Item>
+                                                    <Dropdown.Item className="border-bottom" href="https://zoeken.bigregister.nl/zoeken/kenmerken" target="_blank"><img src="/assets/logo/logo-big.svg" title="BIG Register Logo" alt="BIG Register" height="30" /></Dropdown.Item>
+                                                    <Dropdown.Item className="border-bottom" href="https://ondpanon.riziv.fgov.be/SilverPages/fr" target="_blank"><img src="/assets/logo/logo-inami.svg" title="INAMI Logo" alt="INAMI" height="30" /></Dropdown.Item>
+                                                    <Dropdown.Item className="border-bottom" href="https://ondpanon.riziv.fgov.be/SilverPages/nl" target="_blank"><img src="/assets/logo/logo-riziv.svg" title="RIZIV Logo" alt="RIZIV" height="30" /></Dropdown.Item>
+                                                    <Dropdown.Item className="" href="https://www.gmc-uk.org/registration-and-licensing/the-medical-register#searchTheRegister" target="_blank"><img src="/assets/logo/logo-gmc.svg" title="INAMI Logo" alt="INAMI" height="18" /></Dropdown.Item>
                                                 </Dropdown.Menu>
                                             </Dropdown>
                                         </div>
