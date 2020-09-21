@@ -89,15 +89,15 @@
         "subject": {
             "en": "Registration is pending for verification",
             "nl_nl": "Registratie is in afwachting van verificatie",
-            "nl_be": "Registratie is in afwachting van verificatie",
-            "fr_be": "Registration is pending for verification"
+            "nl_be": "Uw registratie is in afwachting van verificatie",
+            "fr_be": "Votre inscription est en attente de vérification"
         },
         "template_url": "invalid-registration.html",
         "plain_text": {
             "en": "Hello [[firstName]] [[lastName]],\r\nThank you for your registration. We will verify your data and get back to you as soon as possible. If we cannot verify the provided data, we will not be able to reply to you request.\r\nYours Sincerely,\r\nThe Jyseleca Team",
             "nl_nl": "Dag [[firstName]] [[lastName]],\r\nDank u voor uw registratie. We zullen uw gegevens verifiëren en komen daar zo snel mogelijk bij u op terug. Als we de verstrekte gegevens niet kunnen bevestigen, kunnen we uw verzoek helaas niet beantwoorden.\r\nMet vriendelijke groeten,\r\nHet Jyseleca-team",
-            "nl_be": "Dag [[firstName]] [[lastName]],\r\nDank u voor uw registratie. We zullen uw gegevens verifiëren en komen daar zo snel mogelijk bij u op terug. Als we de verstrekte gegevens niet kunnen bevestigen, kunnen we uw verzoek helaas niet beantwoorden.\r\nMet vriendelijke groeten,\r\nHet Jyseleca-team",
-            "fr_be": "Hello [[firstName]] [[lastName]],\r\nThank you for your registration. We will verify your data and get back to you as soon as possible. If we cannot verify the provided data, we will not be able to reply to you request.\r\nYours Sincerely,\r\nThe Jyseleca Team"
+            "nl_be": "Dag [[firstName]] [[lastName]],\r\nBedankt voor uw registratie. We verifiëren uw gegevens en komen daar zo snel mogelijk bij u op terug.\r\nMet vriendelijke groeten,\r\nHet Jyseleca-team",
+            "fr_be": "Bonjour [[firstName]] [[lastName]],\r\nMerci pour votre inscription. Nous vérifions vos données et reviendrons vers vous dans les plus brefs délais.\r\nYours Sincerely,\r\nThe Jyseleca Team"
         }
     }
 }
