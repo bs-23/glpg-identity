@@ -112,6 +112,23 @@ export default function hcpUsers() {
         return country && country.codbase_desc;
     }
 
+    const getUuidAuthorities = (codbase) => {
+        const uuidAuthorities = [
+            { codbase: 'WBE', languageCode: 'nl', name: 'RIZIV', link: 'https://ondpanon.riziv.fgov.be/SilverPages/nl', logo: '/assets/logo/logo-big.svg', logo: '/assets/logo/logo-riziv.svg' },
+            { codbase: 'WBE', languageCode: 'fr', name: 'INAMI', link: 'https://ondpanon.riziv.fgov.be/SilverPages/fr', logo: '/assets/logo/logo-inami.svg' },
+            { codbase: 'WNL', languageCode: 'nl', name: 'BIG Register', link: 'https://zoeken.bigregister.nl/zoeken/kenmerken', logo: '/assets/logo/logo-big.svg' },
+            { codbase: 'WUK', languageCode: 'en', name: 'GMC ID', link: 'https://www.gmc-uk.org/registration-and-licensing/the-medical-register#searchTheRegister', logo: '/assets/logo/logo-gmc.svg' },
+            { codbase: 'WFR', languageCode: 'fr', name: 'RPPS', link: 'https://annuaire.sante.fr/', logo: '/assets/logo/logo-rpps.png' }
+        ]
+
+        if (codbase) {
+            const authorityByCountry = uuidAuthorities.filter(a => a.codbase.toLowerCase() === codbase.toLowerCase());
+            return authorityByCountry;
+        }
+
+        return uuidAuthorities;
+    };
+
     const urlChange = (pageNo, codBase, status, orderColumn) => {
         Array.isArray(status) ? status = 'self_verified,manually_verified' : status = status;
         let orderType = params.get('orderType');
@@ -162,31 +179,37 @@ export default function hcpUsers() {
                                 <div className="d-flex align-items-center">
                                     <h4 className="cdp-text-primary font-weight-bold mb-0 mr-4">List of HCP User</h4>
                                     <div className="">
-                                        {/*<div>
-                                            <Dropdown>
-                                                <Dropdown.Toggle variant="" id="dropdown-basic" className="cdp-btn-outline-primary">UUID Authorities</Dropdown.Toggle>
-                                                <Dropdown.Menu>
-                                                    <Dropdown.Item className="border-bottom" href="ttps://zoeken.bigregister.nl/zoeken/kenmerken" target="_blank"><img src="/assets/logo/logo-big.svg" title="BIG Register Logo" alt="BIG Register" height="30" /></Dropdown.Item>
-                                                    <Dropdown.Item className="border-bottom" href="https://ondpanon.riziv.fgov.be/SilverPages/fr"><img src="/assets/logo/logo-inami.svg" title="INAMI Logo" alt="INAMI" height="30" /></Dropdown.Item>
-                                                    <Dropdown.Item className="border-bottom" href="https://ondpanon.riziv.fgov.be/SilverPages/nl"><img src="/assets/logo/logo-riziv.svg" title="RIZIV Logo" alt="RIZIV" height="30" /></Dropdown.Item>
-                                                    <Dropdown.Item className="" href="https://www.gmc-uk.org/registration-and-licensing/the-medical-register#searchTheRegister"><img src="/assets/logo/logo-gmc.svg" title="INAMI Logo" alt="INAMI" height="18" /></Dropdown.Item>
-                                                </Dropdown.Menu>
-                                            </Dropdown>
-                                        </div>
                                         <div>
-                                            <a className="mr-2" href="https://zoeken.bigregister.nl/zoeken/kenmerken" target="_blank">
-                                                <img src="/assets/logo/logo-big.svg" title="BIG Register Logo" alt="BIG Register" height="50" />
-                                            </a>
-                                            <a className="mr-2" href="https://ondpanon.riziv.fgov.be/SilverPages/fr" target="_blank">
-                                                <img src="/assets/logo/logo-inami.svg" title="INAMI Logo" alt="INAMI" height="40" />
-                                            </a>
-                                            <a className="mr-2" href="https://ondpanon.riziv.fgov.be/SilverPages/nl" target="_blank">
-                                                <img src="/assets/logo/logo-riziv.svg" title="RIZIV Logo" alt="RIZIV" height="40" />
-                                            </a>
-                                            <a className="mr-2" href="https://www.gmc-uk.org/registration-and-licensing/the-medical-register#searchTheRegister" target="_blank">
-                                                <img src="/assets/logo/logo-gmc.svg" title="GMC Logo" alt="GMC ID" height="18" />
-                                            </a>
-                                        </div>*/}
+                                            {hcps.codbase ?
+                                                getUuidAuthorities(hcps.codbase).map(authority =>
+                                                    (
+                                                        <a key={authority.name} className="mr-2" href={authority.link} target="_blank">
+                                                            <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height="40" />
+                                                        </a>
+                                                    )
+                                                )
+                                                :
+                                                <Dropdown>
+                                                    <Dropdown.Toggle variant="" id="dropdown-basic" className="cdp-btn-outline-primary">
+                                                        UUID Authorities
+                                                    </Dropdown.Toggle>
+                                                    <Dropdown.Menu>
+                                                        {
+                                                            getUuidAuthorities().map(authority =>
+                                                                (
+                                                                    <Dropdown.Item
+                                                                        key={authority.name} className="border-bottom"
+                                                                        href={authority.link}
+                                                                        target="_blank">
+                                                                        <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height="25" />
+                                                                    </Dropdown.Item>
+                                                                )
+                                                            )
+                                                        }
+                                                    </Dropdown.Menu>
+                                                </Dropdown>
+                                            }
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="d-flex pt-3 pt-sm-0">
@@ -433,8 +456,8 @@ export default function hcpUsers() {
                                                         <td>{row.uuid}</td>
                                                         <td><span>{getCountryName(row.country_iso2)}</span></td>
                                                         <td>{row.specialty_description}</td>
-                                                        <td>{row.opt_types.includes('single-opt-in') ? <i className="icon icon-check-filled cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
-                                                        <td>{row.opt_types.includes('double-opt-in') ? <i className="icon icon-check-filled cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
+                                                        <td>{row.opt_types.includes('single-opt-in') ? <i className="fas fa-check-circle cdp-text-primary font-size-15px"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
+                                                        <td>{row.opt_types.includes('double-opt-in') ? <i className="fas fa-check-circle cdp-text-primary font-size-15px"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
                                                         <td>
                                                             <span>
                                                                 <Dropdown className="ml-auto dropdown-customize">
