@@ -128,7 +128,7 @@ async function getConsentsReport(req, res){
 
             if(orderBy === 'legal_basis') order.push([Consent, 'legal_basis', orderType]);
             if(orderBy === 'preferences') order.push([Consent, 'preference', orderType]);
-            if(orderBy === 'date') order.push([Consent, 'updated_at', orderType]);
+            if(orderBy === 'date') order.push(['updated_at', orderType]);
         }
         order.push([HCPS, 'created_at', 'DESC']);
         order.push([HCPS, 'id', 'DESC']);
@@ -184,7 +184,7 @@ async function getConsentsReport(req, res){
                     ]
                 }
             ],
-            attributes: ['consent_id', 'response', 'consent_confirmed'],
+            attributes: ['consent_id', 'response', 'consent_confirmed', 'updated_at'],
             offset,
             limit,
             order: order,
@@ -197,7 +197,7 @@ async function getConsentsReport(req, res){
             hcp_consent.dataValues.response = hcp_consent.response;
             hcp_consent.dataValues.consent_confirmed = hcp_consent.consent_confirmed;
             hcp_consent.dataValues.legal_basis = hcp_consent.consent.legal_basis;
-            hcp_consent.dataValues.given_date = hcp_consent.consent.updated_at;
+            hcp_consent.dataValues.given_date = hcp_consent.updated_at;
             hcp_consent.dataValues.preference = hcp_consent.consent.preference;
             hcp_consent.dataValues.title = hcp_consent.consent.consent_category.title;
             hcp_consent.dataValues.type = hcp_consent.consent.consent_category.type;
