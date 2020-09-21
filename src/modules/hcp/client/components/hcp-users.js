@@ -10,6 +10,7 @@ import { Form, Formik, Field, ErrorMessage } from "formik";
 import { useToasts } from 'react-toast-notifications';
 import { getHcpProfiles, hcpsSort } from '../hcp.actions';
 import { ApprovalRejectSchema } from '../hcp.schema';
+import uuidAuthorities from '../uuid-authorities.json';
 import axios from 'axios';
 
 import _ from 'lodash';
@@ -113,14 +114,6 @@ export default function hcpUsers() {
     }
 
     const getUuidAuthorities = (codbase) => {
-        const uuidAuthorities = [
-            { codbase: 'WBE', name: 'RIZIV', link: 'https://ondpanon.riziv.fgov.be/SilverPages/nl', logo: '/assets/logo/logo-big.svg', logo: '/assets/logo/logo-riziv.svg', height: 25 },
-            { codbase: 'WBE', name: 'INAMI', link: 'https://ondpanon.riziv.fgov.be/SilverPages/fr', logo: '/assets/logo/logo-inami.svg', height: 25 },
-            { codbase: 'WNL', name: 'BIG Register', link: 'https://zoeken.bigregister.nl/zoeken/kenmerken', logo: '/assets/logo/logo-big.svg', height: 25 },
-            { codbase: 'WUK', name: 'GMC ID', link: 'https://www.gmc-uk.org/registration-and-licensing/the-medical-register#searchTheRegister', logo: '/assets/logo/logo-gmc.svg', height: 25 },
-            { codbase: 'WFR', name: 'RPPS', link: 'https://annuaire.sante.fr/', logo: '/assets/logo/logo-rpps.png', height: 25 }
-        ];
-
         if (codbase) {
             const authorityByCountry = uuidAuthorities.filter(a => a.codbase.toLowerCase() === codbase.toLowerCase());
             return authorityByCountry;
