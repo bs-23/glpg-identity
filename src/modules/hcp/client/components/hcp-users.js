@@ -61,7 +61,7 @@ export default function hcpUsers() {
             appearance: 'success',
             autoDismiss: true
         })
-        loadHcpProfile()
+        loadHcpProfiles()
     }
 
     const onUpdateStatusFailure = (error) => {
@@ -72,13 +72,14 @@ export default function hcpUsers() {
         });
     }
 
-    const loadHcpProfile = () => {
-        const params = new URLSearchParams(window.location.search);
-        dispatch(getHcpProfiles(
-            params.get('page') ? params.get('page') : null,
-            params.get('status') ? params.getAll('status') : null,
-            params.get('codbase') ? params.get('codbase') : null
-        ))
+    const loadHcpProfiles = () => {
+        const searchObj = {};
+        const searchParams = location.search.slice(1).split("&");
+        searchParams.forEach(element => {
+            searchObj[element.split("=")[0]] = element.split("=")[1];
+        });
+        dispatch(getHcpProfiles(searchObj.page, searchObj.status, searchObj.codbase, searchObj.orderBy, searchObj.orderType));
+        setSort({ type: params.get('orderType'), value: params.get('orderBy') });
     };
 
     const getConsentsForCurrentUser = async () => {
@@ -139,16 +140,7 @@ export default function hcpUsers() {
     }, []);
 
     useEffect(() => {
-
-
-        const searchObj = {};
-        const searchParams = location.search.slice(1).split("&");
-        searchParams.forEach(element => {
-            searchObj[element.split("=")[0]] = element.split("=")[1];
-        });
-
-        dispatch(getHcpProfiles(searchObj.page, searchObj.status, searchObj.codbase, searchObj.orderBy, searchObj.orderType));
-        setSort({ type: params.get('orderType'), value: params.get('orderBy') });
+       loadHcpProfiles();
     }, [location]);
 
     return (
