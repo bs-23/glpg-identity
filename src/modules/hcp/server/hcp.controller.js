@@ -583,6 +583,11 @@ async function approveHCPUser(req, res) {
             return res.status(404).send(response);
         }
 
+        if(hcpUser.dataValues.status !== 'not_verified') {
+            response.errors.push(new CustomError('Invalid user status for this request.', 400));
+            return res.status(400).send(response);
+        }
+
         const userApplication = await Application.findOne({ where: { id: hcpUser.application_id } });
 
         let userConsents = await HcpConsents.findAll({ where: { [Op.and]: [{ user_id: id }, { consent_confirmed: false }] } });
@@ -645,6 +650,11 @@ async function rejectHCPUser(req, res) {
         if (!hcpUser) {
             response.errors.push(new CustomError('User does not exist.', 404));
             return res.status(404).send(response);
+        }
+
+        if(hcpUser.dataValues.status !== 'not_verified') {
+            response.errors.push(new CustomError('Invalid user status for this request.', 400));
+            return res.status(400).send(response);
         }
 
         await HcpArchives.create({ ...hcpUser.dataValues, status: 'rejected' });
