@@ -542,6 +542,10 @@ async function resetPassword(req, res) {
 
         const user = await User.findOne({ where: { id: resetRequest.user_id } });
 
+        if (user.status === 'inactive') {
+            return res.status(403).send('User inactive.');
+        }
+
         if (await PasswordPolicies.minimumPasswordAge(user.password_updated_at)) {
             return res.status(400).send(`You cannot change password before 1 day`);
         }
