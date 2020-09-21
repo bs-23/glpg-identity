@@ -163,7 +163,7 @@ async function login(req, res) {
             return res.status(401).send(errorMessage);
         }
 
-        if(user && user.status === 'inactive') return res.status(401).send('Account not active.');
+        if (user && user.status === 'inactive') return res.status(401).send('Account not active.');
 
         const isSiteVerified = await verifySite(recaptchaToken);
 
@@ -299,21 +299,42 @@ async function deleteUser(req, res) {
 }
 
 async function getUsers(req, res) {
-
     const page = req.query.page ? req.query.page - 1 : 0;
     if (page < 0) return res.status(404).send("page must be greater or equal 1");
 
     const limit = 15;
-    // const country_iso2 = req.query.country_iso2 === 'null' ? null : req.query.country_iso2;
-    const codbase = req.query.codbase === 'null' ? null : req.query.codbase;
     const offset = page * limit;
+
+    const codbase = req.query.codbase === 'null' ? null : req.query.codbase;
 
     const signedInId = (formatProfile(req.user)).id;
 
-    const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => i.codbase === codbase).map(i => i.country_iso2);
-    const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
+    const orderBy = req.query.orderBy === 'null'
+        ? null
+        : req.query.orderBy;
+    const orderType = req.query.orderType === 'asc' || req.query.orderType === 'desc'
+        ? req.query.orderType
+        : 'asc';
+
+    const country_iso2_list_for_codbase =
+        (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT }))
+            .filter(i => i.codbase === codbase)
+            .map(i => i.country_iso2);
+
+    const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase
+        .map(i => ignoreCaseArray(i)));
 
     try {
+        const order = [];
+
+        const columnNames = Object.keys(User.rawAttributes);
+        if (orderBy && (columnNames || []).includes(orderBy)) {
+            order.push([orderBy, orderType]);
+        }
+
+        order.push(['created_at', 'DESC']);
+        order.push(['id', 'DESC']);
+
         const users = await User.findAll({
             where: {
                 id: { [Op.ne]: signedInId },
@@ -322,10 +343,7 @@ async function getUsers(req, res) {
             },
             offset,
             limit,
-            order: [
-                ['created_at', 'DESC'],
-                ['id', 'DESC']
-            ],
+            order: order,
             include: [{
                 model: User,
                 as: 'createdByUser',
@@ -349,7 +367,6 @@ async function getUsers(req, res) {
             total: totalUser,
             start: limit * page + 1,
             end: offset + limit > totalUser ? totalUser : offset + limit,
-            // country_iso2: country_iso2 ? country_iso2 : null,
             codbase: codbase ? codbase : null
         };
 
@@ -398,7 +415,7 @@ async function partialUpdateUser(req, res) {
     const partialUserData = { first_name, last_name, email, phone, type, status };
 
     try {
-        if([first_name, last_name, email].includes(null)) return res.sendStatus(400);
+        if ([first_name, last_name, email].includes(null)) return res.sendStatus(400);
 
         const user = await User.findOne({ where: { id } });
 

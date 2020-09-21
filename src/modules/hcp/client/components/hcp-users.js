@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Modal from 'react-bootstrap/Modal';
 import Accordion from 'react-bootstrap/Accordion';
@@ -17,6 +17,10 @@ import parse from 'html-react-parser';
 
 export default function hcpUsers() {
     const dispatch = useDispatch();
+    const location = useLocation();
+    const history = useHistory();
+    const params = new URLSearchParams(window.location.search);
+
     const [countries, setCountries] = useState([]);
     const [allCountries, setAllCountries] = useState([]);
     const [show, setShow] = useState({ profileManage: false, updateStatus: false });
@@ -28,22 +32,11 @@ export default function hcpUsers() {
     const hcps = useSelector(state => state.hcpReducer.hcps);
 
     const pageLeft = () => {
-        if (hcps.page > 1) dispatch(getHcpProfiles(hcps.page - 1, hcps.status, hcps.codbase));
+        if (hcps.page > 1) urlChange(hcps.page - 1, hcps.codbase, hcps.status, params.get('orderBy'), params.get('orderType'));
     };
 
     const pageRight = () => {
-        if (hcps.end !== hcps.total) dispatch(getHcpProfiles(hcps.page + 1, hcps.status, hcps.codbase));
-    };
-
-
-    const sortHcp = (val) => {
-        if (sort.value === val) {
-            dispatch(hcpsSort(sort.type === 'ASC' ? 'DESC' : 'ASC', val));
-            setSort({ type: sort.type === 'ASC' ? 'DESC' : 'ASC', value: val });
-        } else {
-            dispatch(hcpsSort('ASC', val));
-            setSort({ type: 'ASC', value: val });
-        }
+        if (hcps.end !== hcps.total) urlChange(hcps.page + 1, hcps.codbase, hcps.status, params.get('orderBy'), params.get('orderType'))
     };
 
     async function getCountries() {
@@ -116,14 +109,54 @@ export default function hcpUsers() {
     const getCountryName = (country_iso2) => {
         if (!allCountries || !country_iso2) return null;
         const country = allCountries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
-        return country && country.countryname;
+        return country && country.codbase_desc;
     }
+
+    const getUuidAuthorities = (codbase) => {
+        const uuidAuthorities = [
+            { codbase: 'WBE', languageCode: 'nl', name: 'RIZIV', link: 'https://ondpanon.riziv.fgov.be/SilverPages/nl', logo: '/assets/logo/logo-big.svg', logo: '/assets/logo/logo-riziv.svg' },
+            { codbase: 'WBE', languageCode: 'fr', name: 'INAMI', link: 'https://ondpanon.riziv.fgov.be/SilverPages/fr', logo: '/assets/logo/logo-inami.svg' },
+            { codbase: 'WNL', languageCode: 'nl', name: 'BIG Register', link: 'https://zoeken.bigregister.nl/zoeken/kenmerken', logo: '/assets/logo/logo-big.svg' },
+            { codbase: 'WUK', languageCode: 'en', name: 'GMC ID', link: 'https://www.gmc-uk.org/registration-and-licensing/the-medical-register#searchTheRegister', logo: '/assets/logo/logo-gmc.svg' },
+            { codbase: 'WFR', languageCode: 'fr', name: 'RPPS', link: 'https://annuaire.sante.fr/', logo: '/assets/logo/logo-rpps.png' }
+        ]
+
+        if (codbase) {
+            const authorityByCountry = uuidAuthorities.filter(a => a.codbase.toLowerCase() === codbase.toLowerCase());
+            return authorityByCountry;
+        }
+
+        return uuidAuthorities;
+    };
+
+    const urlChange = (pageNo, codBase, status, orderColumn) => {
+        Array.isArray(status) ? status = 'self_verified,manually_verified' : status = status;
+        let orderType = params.get('orderType');
+        const orderBy = params.get('orderBy');
+        const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
+        const codbase = (codBase) ? codBase : params.get('codbase');
+        (orderBy === orderColumn) ? (orderType === 'asc' ? orderType = 'desc' : orderType = 'asc') : orderType = 'asc';
+        const url = `?page=${page}` + (codbase && codbase !== 'null' ? `&codbase=${codbase}` : ``) + (status && status !== 'null' ? `&status=${status}` : '') + (orderType !== 'null' && orderColumn !== 'null' && orderColumn !== null ? `&orderType=${orderType}&orderBy=${orderColumn}` : ``);
+        history.push(location.pathname + url);
+    };
 
     useEffect(() => {
         getCountries();
         getAllCountries();
-        loadHcpProfile();
     }, []);
+
+    useEffect(() => {
+
+
+        const searchObj = {};
+        const searchParams = location.search.slice(1).split("&");
+        searchParams.forEach(element => {
+            searchObj[element.split("=")[0]] = element.split("=")[1];
+        });
+
+        dispatch(getHcpProfiles(searchObj.page, searchObj.status, searchObj.codbase, searchObj.orderBy, searchObj.orderType));
+        setSort({ type: params.get('orderType'), value: params.get('orderBy') });
+    }, [location]);
 
     return (
         <main className="app__content cdp-light-bg">
@@ -146,81 +179,74 @@ export default function hcpUsers() {
                                 <div className="d-flex align-items-center">
                                     <h4 className="cdp-text-primary font-weight-bold mb-0 mr-4">List of HCP User</h4>
                                     <div className="">
-                                        {/*<div>
-                                            <Dropdown>
-                                                <Dropdown.Toggle variant="" id="dropdown-basic" className="cdp-btn-outline-primary">UUID Authorities</Dropdown.Toggle>
-                                                <Dropdown.Menu>
-                                                    <Dropdown.Item className="border-bottom" href="https://zoeken.bigregister.nl/zoeken/kenmerken" target="_blank"><img src="/assets/logo/logo-big.svg" title="BIG Register Logo" alt="BIG Register" height="30" /></Dropdown.Item>
-                                                    <Dropdown.Item className="border-bottom" href="https://ondpanon.riziv.fgov.be/SilverPages/fr" target="_blank"><img src="/assets/logo/logo-inami.svg" title="INAMI Logo" alt="INAMI" height="30" /></Dropdown.Item>
-                                                    <Dropdown.Item className="border-bottom" href="https://ondpanon.riziv.fgov.be/SilverPages/nl" target="_blank"><img src="/assets/logo/logo-riziv.svg" title="RIZIV Logo" alt="RIZIV" height="30" /></Dropdown.Item>
-                                                    <Dropdown.Item className="" href="https://www.gmc-uk.org/registration-and-licensing/the-medical-register#searchTheRegister" target="_blank"><img src="/assets/logo/logo-gmc.svg" title="INAMI Logo" alt="INAMI" height="18" /></Dropdown.Item>
-                                                </Dropdown.Menu>
-                                            </Dropdown>
-                                        </div>
                                         <div>
-                                            <a className="mr-2" href="https://zoeken.bigregister.nl/zoeken/kenmerken" target="_blank">
-                                                <img src="/assets/logo/logo-big.svg" title="BIG Register Logo" alt="BIG Register" height="50" />
-                                            </a>
-                                            <a className="mr-2" href="https://ondpanon.riziv.fgov.be/SilverPages/fr" target="_blank">
-                                                <img src="/assets/logo/logo-inami.svg" title="INAMI Logo" alt="INAMI" height="40" />
-                                            </a>
-                                            <a className="mr-2" href="https://ondpanon.riziv.fgov.be/SilverPages/nl" target="_blank">
-                                                <img src="/assets/logo/logo-riziv.svg" title="RIZIV Logo" alt="RIZIV" height="40" />
-                                            </a>
-                                            <a className="mr-2" href="https://www.gmc-uk.org/registration-and-licensing/the-medical-register#searchTheRegister" target="_blank">
-                                                <img src="/assets/logo/logo-gmc.svg" title="GMC Logo" alt="GMC ID" height="18" />
-                                            </a>
-                                        </div>*/}
+                                            {hcps.codbase ?
+                                                getUuidAuthorities(hcps.codbase).map(authority =>
+                                                    (
+                                                        <a key={authority.name} className="mr-2" href={authority.link} target="_blank">
+                                                            <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height="40" />
+                                                        </a>
+                                                    )
+                                                )
+                                                :
+                                                <Dropdown>
+                                                    <Dropdown.Toggle variant="" id="dropdown-basic" className="cdp-btn-outline-primary">
+                                                        UUID Authorities
+                                                    </Dropdown.Toggle>
+                                                    <Dropdown.Menu>
+                                                        {
+                                                            getUuidAuthorities().map(authority =>
+                                                                (
+                                                                    <Dropdown.Item
+                                                                        key={authority.name} className="border-bottom"
+                                                                        href={authority.link}
+                                                                        target="_blank">
+                                                                        <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height="30" />
+                                                                    </Dropdown.Item>
+                                                                )
+                                                            )
+                                                        }
+                                                    </Dropdown.Menu>
+                                                </Dropdown>
+                                            }
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="d-flex pt-3 pt-sm-0">
                                     {countries && hcps['countries'] &&
                                         <React.Fragment>
-                                        <Dropdown className="ml-auto dropdown-customize mr-2">
-                                            <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center">
-                                                <i className="icon icon-filter mr-2 mb-n1"></i> {hcps.codbase && (countries.find(i => i.codbase === hcps.codbase)) ? (countries.find(i => i.codbase === hcps.codbase)).codbase_desc : 'Filter by Country'}
-                                            </Dropdown.Toggle>
-                                            <Dropdown.Menu>
-                                                <LinkContainer to={`list${hcps.status ? `?status=${hcps.status}` : ''}`}><Dropdown.Item className={hcps.codbase === null ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, hcps.status, null))}>All</Dropdown.Item></LinkContainer>
-                                                {
-                                                    countries.map((item, index) => (
-                                                        hcps.countries.includes(item.country_iso2) && <LinkContainer key={index} to={`list?${hcps.status ? `status=${hcps.status}` : ''}${`${hcps.status ? '&' : ''}codbase=${item.codbase}`}`}>
-                                                            <Dropdown.Item className={hcps.countries.includes(item.country_iso2) && hcps.codbase === item.codbase ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, hcps.status, item.codbase))}>
+                                            <Dropdown className="ml-auto dropdown-customize mr-2">
+                                                <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center">
+                                                    <i className="icon icon-filter mr-2 mb-n1"></i> {hcps.codbase && (countries.find(i => i.codbase === hcps.codbase)) ? (countries.find(i => i.codbase === hcps.codbase)).codbase_desc : 'Filter by Country'}
+                                                </Dropdown.Toggle>
+                                                <Dropdown.Menu>
+                                                    <Dropdown.Item className={hcps.codbase === null ? 'd-none' : ''} onClick={() => urlChange(1, 'null', hcps.status, params.get('orderBy'), params.get('orderType'))}>All</Dropdown.Item>
+                                                    {
+                                                        countries.map((item, index) => (
+                                                            hcps.countries.includes(item.country_iso2) &&
+                                                            <Dropdown.Item key={index} className={hcps.countries.includes(item.country_iso2) && hcps.codbase === item.codbase ? 'd-none' : ''} onClick={() => urlChange(null, item.codbase, hcps.status, params.get('orderBy'), params.get('orderType'))}>
                                                                 {
                                                                     hcps.countries.includes(item.country_iso2) ? item.codbase_desc : null
                                                                 }
                                                             </Dropdown.Item>
-                                                        </LinkContainer>
-                                                    ))
+                                                        ))
 
-                                                }
+                                                    }
                                                 </Dropdown.Menu>
                                             </Dropdown>
 
-                                        <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-bg-secondary text-white dropdown shadow-sm">
+                                            <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-bg-secondary text-white dropdown shadow-sm">
                                                 Status
                                                 <Dropdown.Toggle variant="" className="ml-2 cdp-bg-secondary rounded-0 border-left text-white">
                                                     {getSelectedStatus()}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
-                                                    <LinkContainer to={`list${hcps.codbase ? `?codbase=${hcps.codbase}` : ''}`}>
-                                                        <Dropdown.Item className={hcps.status === null ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, null, hcps.codbase))}>All</Dropdown.Item>
-                                                    </LinkContainer>
-                                                    <LinkContainer to={`list?status=self_verified&status=manually_verified${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`}>
-                                                        <Dropdown.Item className={isAllVerifiedStatus() ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, ['self_verified', 'manually_verified'], hcps.codbase))}>All Verified</Dropdown.Item>
-                                                    </LinkContainer>
-                                                    <LinkContainer to={`list?status=self_verified${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`}>
-                                                        <Dropdown.Item className={hcps.status === 'self_verified' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, 'self_verified', hcps.codbase))}>Self Verified</Dropdown.Item>
-                                                    </LinkContainer>
-                                                    <LinkContainer to={`list?status=manually_verified${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`}>
-                                                        <Dropdown.Item className={hcps.status === 'manually_verified' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, 'manually_verified', hcps.codbase))}>Manually Verified</Dropdown.Item>
-                                                    </LinkContainer>
-                                                    <LinkContainer to={`list?status=consent_pending${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`}>
-                                                        <Dropdown.Item className={hcps.status === 'consent_pending' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, 'consent_pending', hcps.codbase))}>Consent Pending</Dropdown.Item>
-                                                    </LinkContainer>
-                                                    <LinkContainer to={`list?status=not_verified${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`}>
-                                                        <Dropdown.Item className={hcps.status === 'not_verified' ? 'd-none' : ''} onClick={() => dispatch(getHcpProfiles(null, 'not_verified', hcps.codbase))}>Not Verified</Dropdown.Item>
-                                                    </LinkContainer>
+                                                    <Dropdown.Item className={hcps.status === null ? 'd-none' : ''} onClick={() => urlChange(null, hcps.codbase, null, params.get('orderBy'), params.get('orderType'))}>All</Dropdown.Item>
+                                                    <Dropdown.Item className={isAllVerifiedStatus() ? 'd-none' : ''} onClick={() => urlChange(null, hcps.codbase, 'self_verified,manually_verified', params.get('orderBy'), params.get('orderType'))}>All Verified</Dropdown.Item>
+                                                    <Dropdown.Item className={hcps.status === 'self_verified' ? 'd-none' : ''} onClick={() => urlChange(null, hcps.codbase, 'self_verified', params.get('orderBy'), params.get('orderType'))}>Self Verified</Dropdown.Item>
+                                                    <Dropdown.Item className={hcps.status === 'manually_verified' ? 'd-none' : ''} onClick={() => urlChange(null, hcps.codbase, 'manually_verified', params.get('orderBy'), params.get('orderType'))}>Manually Verified</Dropdown.Item>
+                                                    <Dropdown.Item className={hcps.status === 'consent_pending' ? 'd-none' : ''} onClick={() => urlChange(null, hcps.codbase, 'consent_pending', params.get('orderBy'), params.get('orderType'))}>Consent Pending</Dropdown.Item>
+                                                    <Dropdown.Item className={hcps.status === 'not_verified' ? 'd-none' : ''} onClick={() => urlChange(null, hcps.codbase, 'not_verified', params.get('orderBy'), params.get('orderType'))}>Not Verified</Dropdown.Item>
                                                 </Dropdown.Menu>
                                             </Dropdown>
                                         </React.Fragment>
@@ -294,7 +320,7 @@ export default function hcpUsers() {
                                                         <Accordion.Collapse eventKey={consent.id}>
                                                             <Card.Body className="">
                                                                 <div>{parse(consent.rich_text)}</div>
-                                                                <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Consent type:</span> <span className="text-capitalize">{consent.opt_type}</span></div>
+                                                                <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Consent opt-in type:</span> <span className="text-capitalize">{consent.opt_type}</span></div>
                                                                 {consent.consent_given && <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Consent given date:</span>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>}
                                                             </Card.Body>
                                                         </Accordion.Collapse>
@@ -399,14 +425,14 @@ export default function hcpUsers() {
                                         <table className="table table-hover table-sm mb-0 cdp-table cdp-table-sm">
                                             <thead className="cdp-bg-primary text-white cdp-table__header">
                                                 <tr>
-                                                    <th><span className={sort.value === 'email' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('email')}>Email<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                    <th><span className={sort.value === 'created_at' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('created_at')}>Date of Registration<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                    <th><span className={sort.value === 'first_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('first_name')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                    <th><span className={sort.value === 'last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                    <th><span className={sort.value === 'status' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('status')}>Status<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                    <th><span className={sort.value === 'uuid' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('uuid')}>UUID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                    <th><span className={sort.value === 'email' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, hcps.codBase, hcps.status, 'email')}>Email<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                    <th><span className={sort.value === 'created_at' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, hcps.codBase, hcps.status, 'created_at')}>Date of Registration<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                    <th><span className={sort.value === 'first_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, hcps.codBase, hcps.status, 'first_name')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                    <th><span className={sort.value === 'last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, hcps.codBase, hcps.status, 'last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                    <th><span className={sort.value === 'status' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, hcps.codBase, hcps.status, 'status')}>Status<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                    <th><span className={sort.value === 'uuid' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, hcps.codBase, hcps.status, 'uuid')}>UUID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th><span >Country</span></th>
-                                                    <th><span className={sort.value === 'specialty_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => sortHcp('specialty_name')}>Specialty<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                    <th><span className={sort.value === 'specialty_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, hcps.codBase, hcps.status, 'specialty_name')}>Specialty<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th className="consent-col">Single<br /> Opt-In</th>
                                                     <th className="consent-col">Double<br /> Opt-In</th>
                                                     <th>Action</th>
@@ -430,8 +456,8 @@ export default function hcpUsers() {
                                                         <td>{row.uuid}</td>
                                                         <td><span>{getCountryName(row.country_iso2)}</span></td>
                                                         <td>{row.specialty_description}</td>
-                                                        <td>{row.opt_types.includes('single-opt-in') ? <i className="fas fa-check-circle cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
-                                                        <td>{row.opt_types.includes('double-opt-in') ? <i className="fas fa-check-circle cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
+                                                        <td>{row.opt_types.includes('single-opt-in') ? <i className="icon icon-check-filled cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
+                                                        <td>{row.opt_types.includes('double-opt-in') ? <i className="icon icon-check-filled cdp-text-primary"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
                                                         <td>
                                                             <span>
                                                                 <Dropdown className="ml-auto dropdown-customize">
@@ -456,12 +482,8 @@ export default function hcpUsers() {
                                             && hcps['users'] &&
                                             <div className="pagination justify-content-end align-items-center border-top p-3">
                                                 <span className="cdp-text-primary font-weight-bold">{hcps.start + ' - ' + hcps.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + hcps.total}</span>
-                                                <LinkContainer to={`list?page=${hcps.page - 1}${hcps.status ? `&status=${hcps.status}` : ''}${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`}>
-                                                    <span className="pagination-btn" data-testid='Prev' onClick={() => pageLeft()} disabled={hcps.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
-                                                </LinkContainer>
-                                                <LinkContainer to={`list?page=${hcps.page + 1}${hcps.status ? `&status=${hcps.status}` : ''}${hcps.codbase ? `&codbase=${hcps.codbase}` : ''}`}>
-                                                    <span className="pagination-btn" data-testid='Next' onClick={() => pageRight()} disabled={hcps.end === hcps.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
-                                                </LinkContainer>
+                                                <span className="pagination-btn" data-testid='Prev' onClick={() => pageLeft()} disabled={hcps.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
+                                                <span className="pagination-btn" data-testid='Next' onClick={() => pageRight()} disabled={hcps.end === hcps.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
                                             </div>
                                         }
                                     </div>
