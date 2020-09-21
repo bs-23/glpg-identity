@@ -117,6 +117,11 @@ async function sendChangePasswordSuccessMail(user, application) {
     await emailService.send(mailOptions);
 }
 
+async function sendRegistrationNotVerifiedMail(user, application) {
+    const mailOptions = generateEmailOptions('registration-not-verified', application.slug, user);
+    await emailService.send(mailOptions);
+}
+
 async function sendResetPasswordSuccessMail(user, application) {
     const mailOptions = generateEmailOptions('password-reset-success', application.slug, user);
     mailOptions.data.loginLink = `${application.login_link}?journey=login&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
@@ -496,6 +501,10 @@ async function createHcpProfile(req, res) {
         await hcpUser.save();
 
         response.data = getHcpViewModel(hcpUser.dataValues);
+
+        if(hcpUser.dataValues.status === 'not_verified') {
+            await sendRegistrationNotVerifiedMail(hcpUser.dataValues, req.user);
+        }
 
         if (hcpUser.dataValues.status === 'consent_pending') {
             const unconfirmedConsents = consentArr.filter(consent => !consent.consent_confirmed);
