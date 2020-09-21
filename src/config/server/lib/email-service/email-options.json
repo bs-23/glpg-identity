@@ -88,9 +88,9 @@
     "registration-not-verified": {
         "subject": {
             "en": "Registration is pending for verification",
-            "nl_nl": "Gefeliciteerd, uw registratie is geslaagd",
-            "nl_be": "Gefeliciteerd, uw registratie is geslaagd",
-            "fr_be": "Félicitations ! Votre inscription est un franc succès"
+            "nl_nl": "Registration is pending for verification",
+            "nl_be": "Registration is pending for verification",
+            "fr_be": "Registration is pending for verification"
         },
         "template_url": "invalid-registration.html",
         "plain_text": {
