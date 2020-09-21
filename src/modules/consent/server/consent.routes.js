@@ -7,6 +7,9 @@ module.exports = app => {
     
     app.route('/api/consent-performance-report')
         .get(passport.authenticate('user-jwt', { session: false }), controller.getConsentsReport);
+
+    app.route('/api/datasync-consent-performance-report')
+        .get(passport.authenticate('user-jwt', { session: false }), controller.getDatasyncConsentsReport);
     
     app.route('/api/get-all-process-activities')
         .get(passport.authenticate('user-jwt', { session: false }), controller.getAllProcessActivities);

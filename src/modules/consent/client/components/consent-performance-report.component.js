@@ -122,7 +122,10 @@ const ConsentPerformanceReport = () => {
         return splitStr.join(' '); 
     }
 
-
+    async function test(){
+        const {data} = await axios.get('/api/datasync-consent-performance-report')
+        console.log('=====================>', data);
+    }
 
 
     useEffect(() => {
@@ -131,6 +134,8 @@ const ConsentPerformanceReport = () => {
         getAllProcessActivities();
         getAllOptTypes();
         loadConsentsReport();
+        test();
+        
     }, []);
 
     return (

@@ -253,6 +253,40 @@ async function getConsentsReport(req, res){
     }
 }
 
+async function getDatasyncConsentsReport(req, res){
+    // const response = new Response({}, []);
+    try{
+        const hcp_consents = await sequelize.datasyncConnector.query(
+            `SELECT 
+                content_type, 
+                opt_type, 
+                capture_datetime, 
+                onekeyid, 
+                country_code,
+                double_opt_in, 
+                uuid_mixed, 
+                firstname, 
+                lastname, 
+                email_1 
+            FROM 
+                ciam.vw_veeva_consent_master 
+            left join ciam.vwhcpmaster 
+                on ciam.vwhcpmaster.individual_id_onekey = ciam.vw_veeva_consent_master.onekeyid
+            offset 0
+            limit 30;`
+            , { type: QueryTypes.SELECT });
+        
+        
+
+        res.json(hcp_consents);
+    }
+    catch(err){
+        // console.error(err);
+        // response.errors.push(new CustomError('Internal server error', 500));
+        // res.status(500).send(response);
+    }
+}
+
 async function getAllProcessActivities(req, res) {
     try{
         const process_activities = await ConsentCategory.findAll();
@@ -277,5 +311,6 @@ async function getAllOptTypes(req, res){
 
 exports.getConsents = getConsents;
 exports.getConsentsReport = getConsentsReport;
+exports.getDatasyncConsentsReport = getDatasyncConsentsReport;
 exports.getAllProcessActivities = getAllProcessActivities;
 exports.getAllOptTypes = getAllOptTypes;
