@@ -310,7 +310,7 @@ async function registrationLookup(req, res) {
     }
 
     try {
-        const profileByEmail = await Hcp.findOne({ where: { email } });
+        const profileByEmail = await Hcp.findOne({ where: where(fn('lower', col('email')), fn('lower', email)) });
         const profileByUUID = await Hcp.findOne({ where: { uuid } });
 
         if (profileByEmail) {
@@ -403,7 +403,7 @@ async function createHcpProfile(req, res) {
     }
 
     try {
-        const isEmailExists = await Hcp.findOne({ where: { email: req.body.email } });
+        const isEmailExists = await Hcp.findOne({ where: where(fn('lower', col('email')), fn('lower', email)) });
         const isUUIDExists = await Hcp.findOne({ where: { uuid: req.body.uuid } });
 
         if (isEmailExists) {
@@ -429,7 +429,7 @@ async function createHcpProfile(req, res) {
         }
 
         const model = {
-            email,
+            email: email.toLowerCase(),
             uuid,
             salutation,
             first_name,
@@ -754,7 +754,7 @@ async function changePassword(req, res) {
     }
 
     try {
-        const doc = await Hcp.findOne({ where: { email: email } });
+        const doc = await Hcp.findOne({ where: where(fn('lower', col('email')), fn('lower', email)) });
 
         if (!doc || !doc.validPassword(current_password)) {
             response.errors.push(new CustomError('Invalid credentials.', 401));
