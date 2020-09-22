@@ -14,6 +14,9 @@ module.exports = app => {
     app.route('/api/get-all-process-activities')
         .get(passport.authenticate('user-jwt', { session: false }), controller.getAllProcessActivities);
 
-        app.route('/api/get-all-opt-types')
+    app.route('/api/get-all-opt-types')
         .get(passport.authenticate('user-jwt', { session: false }), controller.getAllOptTypes);
+
+    app.route('/api/consents/:id')
+        .get(passport.authenticate('user-jwt', { session: false }), controller.getUserConsents);
 };

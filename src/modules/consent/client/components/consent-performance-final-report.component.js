@@ -1,24 +1,13 @@
 import { NavLink } from 'react-router-dom';
-import Dropdown from 'react-bootstrap/Dropdown';
-import Modal from 'react-bootstrap/Modal';
-import Accordion from 'react-bootstrap/Accordion';
-import Card from 'react-bootstrap/Card';
 import Tabs from 'react-bootstrap/Tabs'
 import Tab from 'react-bootstrap/Tab'
 import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from 'react-redux';
-import { LinkContainer } from 'react-router-bootstrap';
-import { Form, Formik, Field, ErrorMessage } from "formik";
-import { useToasts } from 'react-toast-notifications';
-import axios from 'axios';
 
 import _ from 'lodash';
-import parse from 'html-react-parser';
-import { getConsentReport } from '../consent.action';
 import ConsentPerformanceReport from './consent-performance-report.component';
+import VeevaConsentPerformanceReport from './veeva-consent-performance-report.component';
 
-const ConsentsList = () => {
-    
+const ConsentPerformanceFinalReport = () => {
     return (
         <main className="app__content cdp-light-bg">
             <div className="container-fluid">
@@ -49,7 +38,7 @@ const ConsentsList = () => {
                         <ConsentPerformanceReport/>
                     </Tab>
                     <Tab eventKey="veeva" title="Veeva CRM">
-                        <ConsentPerformanceReport/>
+                        <VeevaConsentPerformanceReport/>
                     </Tab>
                 </Tabs>
 
@@ -60,4 +49,4 @@ const ConsentsList = () => {
 }
 
 
-export default ConsentsList;
+export default ConsentPerformanceFinalReport;

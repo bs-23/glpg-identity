@@ -12,7 +12,7 @@ import axios from 'axios';
 
 import _ from 'lodash';
 import parse from 'html-react-parser';
-import { getConsentReport } from '../consent.action';
+import { getVeevaConsentReport } from '../consent.action';
 
 const ConsentPerformanceReport = () => {
     const dispatch = useDispatch();
@@ -24,14 +24,14 @@ const ConsentPerformanceReport = () => {
     const [currentAction, setCurrentAction] = useState({ userId: null, action: null });
     const [currentUser, setCurrentUser] = useState({});
 
-    const consents_report = useSelector(state => state.consentReducer.consents);
+    const consents_report = useSelector(state => state.consentReducer.veeva_consents);
 
     const pageLeft = () => {
-        if (consents_report.page > 1) dispatch(getConsentReport(consents_report.page - 1, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, consents_report.orderBy, consents_report.orderType));
+        if (consents_report.page > 1) dispatch(getVeevaConsentReport(consents_report.page - 1, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, consents_report.orderBy, consents_report.orderType));
     };
 
     const pageRight = () => {
-        if (consents_report.end !== consents_report.total) dispatch(getConsentReport(consents_report.page + 1, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, consents_report.orderBy, consents_report.orderType));
+        if (consents_report.end !== consents_report.total) dispatch(getVeevaConsentReport(consents_report.page + 1, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, consents_report.orderBy, consents_report.orderType));
     };
 
     async function getCountries() {
@@ -56,7 +56,7 @@ const ConsentPerformanceReport = () => {
 
     async function loadConsentsReport() {
         const params = new URLSearchParams(window.location.search);
-        dispatch(getConsentReport(
+        dispatch(getVeevaConsentReport(
             params.get('page') ? params.get('page') : '',
             params.get('codbase') ? params.get('codbase') : '',
             params.get('process_activity') ? params.getAll('process_activity') : '',
@@ -67,12 +67,12 @@ const ConsentPerformanceReport = () => {
     }
 
     const getConsentsForCurrentUser = async () => {
-        const { data } = await axios.get(`/api/hcp-profiles/${currentUser.hcp_profile.id}/consents`);
+        const { data } = await axios.get(`/api/consents/${currentUser.onekeyid}`);
         setCurrentUser({ ...currentUser, consents: data.data });
     }
 
     const onManageProfile = (user) => {
-        setCurrentAction({ userId: user.hcp_profile.id, action: 'Manage Profile' });
+        setCurrentAction({ userId: user.onekeyid, action: 'Manage Profile' });
         setShow({ ...show, profileManage: true });
         setCurrentUser(user);
     }
@@ -122,6 +122,7 @@ const ConsentPerformanceReport = () => {
         return splitStr.join(' '); 
     }
 
+
     useEffect(() => {
         getCountries();
         getAllCountries();
@@ -152,7 +153,7 @@ const ConsentPerformanceReport = () => {
                                                         { name: 'orderBy', value: consents_report.orderBy }, 
                                                         { name: 'orderType', value: consents_report.orderType }
                                                     ] )}`}>
-                                                        <Dropdown.Item className={consents_report.codbase === '' ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('', '', consents_report.process_activity, consents_report.opt_type, consents_report.orderBy, consents_report.orderType))}>All</Dropdown.Item>
+                                                        <Dropdown.Item className={consents_report.codbase === '' ? 'd-none' : ''} onClick={() => dispatch(getVeevaConsentReport('', '', consents_report.process_activity, consents_report.opt_type, consents_report.orderBy, consents_report.orderType))}>All</Dropdown.Item>
                                                     </LinkContainer>
                                                     {
                                                         countries.map((item, index) => (
@@ -163,7 +164,7 @@ const ConsentPerformanceReport = () => {
                                                                 { name: 'orderBy', value: consents_report.orderBy}, 
                                                                 { name: 'orderType', value: consents_report.orderType }
                                                             ] )}`}>
-                                                                <Dropdown.Item className={consents_report.countries.includes(item.country_iso2) && consents_report.codbase === item.codbase ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('',  item.codbase, consents_report.process_activity, consents_report.opt_type, consents_report.orderBy, consents_report.orderType))}>
+                                                                <Dropdown.Item className={consents_report.countries.includes(item.country_iso2) && consents_report.codbase === item.codbase ? 'd-none' : ''} onClick={() => dispatch(getVeevaConsentReport('',  item.codbase, consents_report.process_activity, consents_report.opt_type, consents_report.orderBy, consents_report.orderType))}>
                                                                     {
                                                                         
                                                                         consents_report.countries.includes(item.country_iso2) ? item.codbase_desc : null
@@ -241,48 +242,48 @@ const ConsentPerformanceReport = () => {
                                     </Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
-                                    { currentUser.hcp_profile && 
+                                    { currentUser && 
                                     <div className="px-4 py-3">
                                         <div className="row">
                                             <div className="col">
-                                                <h4 className="mt-1 font-weight-bold">{`${currentUser.hcp_profile.first_name || ''} ${currentUser.hcp_profile.last_name || ''}`}</h4>
-                                                <div className="">{currentUser.hcp_profile.specialty_description}</div>
+                                                <h4 className="mt-1 font-weight-bold">{`${currentUser.first_name || ''} ${currentUser.last_name || ''}`}</h4>
+                                                <div className="">{currentUser.specialty_description}</div>
                                             </div>
                                         </div>
                                         <div className="row mt-3">
                                             <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">UUID</div>
-                                                <div className="">{currentUser.hcp_profile.uuid || '--'}</div>
+                                                <div className="">{currentUser.uuid_mixed || '--'}</div>
                                             </div>
                                             <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">OneKeyID</div>
-                                                <div className="">{currentUser.hcp_profile.individual_id_onekey || '--'}</div>
+                                                <div className="">{currentUser.onekeyid || '--'}</div>
                                             </div>
                                         </div>
                                         <div className="row mt-3">
                                             <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">Email</div>
-                                                <div className="">{currentUser.hcp_profile.email || '--'}</div>
+                                                <div className="">{currentUser.email || '--'}</div>
                                             </div>
                                             <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">Phone Number</div>
-                                                <div className="">{currentUser.hcp_profile.telephone || '--'}</div>
+                                                <div className="">{currentUser.telephone || '--'}</div>
                                             </div>
                                         </div>
                                         <div className="row mt-3">
                                             <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">Country</div>
-                                                <div className="">{getCountryName(currentUser.hcp_profile.country_iso2) || '--'}</div>
+                                                <div className="">{getCountryName(currentUser.country_code) || '--'}</div>
                                             </div>
                                             <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">Date of Registration</div>
-                                                <div className="">{currentUser.hcp_profile.created_at ? (new Date(currentUser.hcp_profile.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.') : '--'}</div>
+                                                <div className="">{currentUser.given_date ? (new Date(currentUser.given_date)).toLocaleDateString('en-GB').replace(/\//g, '.') : '--'}</div>
                                             </div>
                                         </div>
                                         <div className="row mt-3">
                                             <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">Status</div>
-                                                <div className="text-capitalize">{currentUser.hcp_profile.status ? _.startCase(_.toLower(currentUser.hcp_profile.status.replace(/_/g, ' '))) : '--'}</div>
+                                                <div className="text-capitalize">{currentUser.status ? _.startCase(_.toLower(currentUser.status.replace(/_/g, ' '))) : '--'}</div>
                                             </div>
                                         </div>
                                         <div className="row mt-4">
@@ -294,11 +295,11 @@ const ConsentPerformanceReport = () => {
                                                             <Card.Body className="">
                                                                 <div>{parse(consent.rich_text)}</div>
                                                                 <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Consent opt-in type:</span> <span className="text-capitalize">{consent.opt_type}</span></div>
-                                                                {consent.consent_given && <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Consent given date:</span>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>}
+                                                                <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Consent given date:</span>{(new Date(consent.given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
                                                             </Card.Body>
                                                         </Accordion.Collapse>
                                                         <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
-                                                            <span className="d-flex align-items-center"><i class={`icon ${consent.consent_given ? 'icon-check-filled' : 'icon-close-circle text-danger'} cdp-text-primary mr-4 consent-check`}></i> <span className="consent-summary">{consent.title}</span></span>
+                                                            <span className="d-flex align-items-center"><i class={`icon icon-check-filled cdp-text-primary mr-4 consent-check`}></i> <span className="consent-summary">{consent.rich_text}</span></span>
                                                             <i className="icon icon-arrow-down ml-2 accordion-consent__icon-down"></i>
                                                         </Accordion.Toggle>
                                                     </Card>
@@ -412,9 +413,9 @@ const ConsentPerformanceReport = () => {
                                             <tbody className="cdp-table__body bg-white">
                                                 {consents_report['hcp_consents'].map((row, index) => (
                                                     <tr key={index}>
-                                                        <td>{row.hcp_profile.first_name}</td>
-                                                        <td>{row.hcp_profile.last_name}</td>
-                                                        <td><i className="icon icon-check-filled icon-position-bit-down text-primary-color mr-2 cdp-text-primary"></i>{row.hcp_profile.email}</td>
+                                                        <td>{row.first_name}</td>
+                                                        <td>{row.last_name}</td>
+                                                        <td><i className="icon icon-check-filled icon-position-bit-down text-primary-color mr-2 cdp-text-primary"></i>{row.email}</td>
                                                         <td>{row.title}</td>
                                                         <td>{titleCase(row.opt_type)}</td>
                                                         <td>{titleCase(row.legal_basis)}</td>
