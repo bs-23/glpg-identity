@@ -161,32 +161,32 @@ export default function hcpUsers() {
                     <div className="col-12">
                         <div>
                             <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
-                                <div className="d-flex align-items-center">
-                                    <h4 className="cdp-text-primary font-weight-bold mb-0 mr-4">List of HCP User</h4>
+                                <div className="d-flex align-items-center justify-content-between">
+                                    <h4 className="cdp-text-primary font-weight-bold mb-0 mr-sm-4 mr-1">List of HCP User</h4>
                                     <div className="">
                                         <div>
                                             {hcps.codbase ?
                                                 getUuidAuthorities(hcps.codbase).map(authority =>
                                                     (
-                                                        <a key={authority.name} className="mr-2" href={authority.link} target="_blank">
-                                                            <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height="40" />
+                                                        <a key={authority.name} className="mr-3" href={authority.link} target="_blank">
+                                                            <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height={authority.heightSingle} />
                                                         </a>
                                                     )
                                                 )
                                                 :
                                                 <Dropdown>
-                                                    <Dropdown.Toggle variant="" id="dropdown-basic" className="cdp-btn-outline-primary">
+                                                    <Dropdown.Toggle variant="" id="dropdown-basic" className="cdp-btn-outline-primary px-sm-3 px-2">
                                                         UUID Authorities
                                                     </Dropdown.Toggle>
-                                                    <Dropdown.Menu>
+                                                    <Dropdown.Menu className="dropdown-menu__no-hover py-0">
                                                         {
                                                             getUuidAuthorities().map(authority =>
                                                                 (
                                                                     <Dropdown.Item
-                                                                        key={authority.name} className="border-bottom"
+                                                                        key={authority.name} className="border-bottom py-2 px-3"
                                                                         href={authority.link}
                                                                         target="_blank">
-                                                                        <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height="25" />
+                                                                        <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height={authority.height} />
                                                                     </Dropdown.Item>
                                                                 )
                                                             )
