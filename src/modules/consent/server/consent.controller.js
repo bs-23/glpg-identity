@@ -254,8 +254,18 @@ async function getConsentsReport(req, res){
 }
 
 async function getDatasyncConsentsReport(req, res){
-    // const response = new Response({}, []);
+    const response = new Response({}, []);
+
     try{
+        const page = req.query.page ? req.query.page - 1 : 0;
+        const limit = 30;
+        const codbase = req.query.codbase === undefined ? '' : req.query.codbase;
+        // const process_activity = req.query.process_activity === undefined ? '' : req.query.process_activity;
+        // const opt_type = req.query.opt_type === undefined ? '' : req.query.opt_type;
+        const offset = page * limit;
+
+        // const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => i.codbase === codbase).map(i => i.country_iso2);
+
         const hcp_consents = await sequelize.datasyncConnector.query(
             `SELECT 
                 content_type, 
@@ -270,20 +280,46 @@ async function getDatasyncConsentsReport(req, res){
                 email_1 
             FROM 
                 ciam.vw_veeva_consent_master 
-            left join ciam.vwhcpmaster 
+            LEFT JOIN ciam.vwhcpmaster 
                 on ciam.vwhcpmaster.individual_id_onekey = ciam.vw_veeva_consent_master.onekeyid
-            offset 0
-            limit 30;`
+            
+            offset ${offset}
+            limit ${limit};`
             , { type: QueryTypes.SELECT });
         
+        const total_consents = (await sequelize.datasyncConnector.query(
+            `SELECT 
+                COUNT(*)
+            FROM 
+                ciam.vw_veeva_consent_master 
+            left join ciam.vwhcpmaster 
+                on ciam.vwhcpmaster.individual_id_onekey = ciam.vw_veeva_consent_master.onekeyid;`
+            , { type: QueryTypes.SELECT }))[0];
         
+    
+        const data = {
+            hcp_consents: hcp_consents,
+            page: page + 1,
+            limit,
+            total: total_consents.count,
+            start: limit * page + 1,
+            end: offset + limit > total_consents ? total_consents : offset + limit,
+            // codbase: codbase ? codbase : '',
+            // process_activity: process_activity ? process_activity : '',
+            // opt_type: opt_type ? opt_type : '',
+            // countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : req.user.countries,
+            // orderBy: orderBy,
+            // orderType: orderType,
+        };
 
-        res.json(hcp_consents);
+
+        response.data = data;
+        res.json(response);
     }
     catch(err){
-        // console.error(err);
-        // response.errors.push(new CustomError('Internal server error', 500));
-        // res.status(500).send(response);
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
     }
 }
 
