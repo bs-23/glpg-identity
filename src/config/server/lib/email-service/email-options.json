@@ -8,10 +8,10 @@
         },
         "template_url": "double-opt-in-consent-confirm.html",
         "plain_text": {
-            "en": "Hello [[firstName]] [[lastName]],\r\nThank you for registering on the Galapagos HCP Portal.\r\nWe confirm that you provided a consent to receive promotional and environmental information concerning all of Galapagos products and services on your provided email address. If you wish to withdrawal this consent you can do so at any time by clicking the unsubscribe link in future promotional materials.\r\n\r\nFor more information on how we treat your personal information please refer to our privacy notice.\r\n\r\nPlease click on the link below to start.\r\n\r\n[[link]]\r\n\r\nYours Sincerely,\r\nThe Jyseleca Team",
-            "nl_nl": "Dag [[firstName]] [[lastName]],\r\nBedankt voor uw registratie op het Jyseleca-portaal. \r\nWe bevestigen dat u toestemming hebt gegeven om promotie- en milieu-informatie te ontvangen over alle Galapagos-producten en -diensten op uw opgegeven e-mailadres. Als u deze toestemming wilt intrekken, kunt u dat te allen tijde doen door op de uitschrijflink in toekomstig promotiemateriaal te klikken.\r\n\r\nRaadpleeg onze privacyverklaring voor meer informatie over hoe we met uw persoonsgegevens omgaan.\r\n\r\nKlik op de knop hieronder om te beginnen.\r\n\r\n[[link]]\r\n\r\nMet vriendelijke groeten,\r\nHet Jyseleca-team",
-            "nl_be": "Dag [[firstName]] [[lastName]],\r\nBedankt voor uw registratie op het Jyseleca-portaal. \r\nWe bevestigen dat u toestemming hebt gegeven om promotie- en milieu-informatie te ontvangen over alle Galapagos-producten en -diensten op uw opgegeven e-mailadres. Als u deze toestemming wilt intrekken, kunt u dat te allen tijde doen door op de uitschrijflink in toekomstig promotiemateriaal te klikken.\r\n\r\nRaadpleeg onze privacyverklaring voor meer informatie over hoe we met uw persoonlijke gegevens omgaan.\r\n\r\nKlik op de knop hieronder om te beginnen.\r\n\r\n[[link]]\r\n\r\nMet vriendelijke groeten,\r\nHet Jyseleca-team",
-            "fr_be": "Bonjour [[firstName]] [[lastName]],\r\nMerci pour votre inscription sur le Portail Jyseleca. \r\nNous confirmons que vous avez consenti à recevoir des informations promotionnelles et informative concernant tous les produits et services de Galapagos sur l'adresse mail que vous avez fournie. Si vous souhaitez retirer ce consentement, vous pouvez le faire à tout moment en cliquant sur le lien de désinscription que vous trouverez dans tout futur matériel promotionnel.\r\n\r\nPour obtenir de plus amples informations sur la manière dont nous traitons vos données à caractère personnel, veuillez vous référer à notre Déclaration de confidentialité.\r\n\r\nVeuillez cliquer sur le bouton ci-dessous pour commencer.\r\n\r\n[[link]]\r\n\r\nSincères salutations,\r\nL’Équipe Jyseleca"
+            "en": "Hello [[firstName]] [[lastName]],\r\nThank you for registering on the Jyseleca Website.\r\nWe confirm that you provided a consent to receive promotional and environmental information concerning all of Galapagos products and services on your provided email address. If you wish to withdrawal this consent you can do so at any time by clicking the unsubscribe link in future promotional materials.\r\n\r\nFor more information on how we treat your personal information please refer to our privacy notice.\r\n\r\nPlease click on the link below to start.\r\n\r\n[[link]]\r\n\r\nYours Sincerely,\r\nThe Jyseleca Team",
+            "nl_nl": "Dag [[firstName]] [[lastName]],\r\nBedankt voor uw registratie op het Jyseleca Website. \r\nWe bevestigen dat u toestemming hebt gegeven om promotie- en milieu-informatie te ontvangen over alle Galapagos-producten en -diensten op uw opgegeven e-mailadres. Als u deze toestemming wilt intrekken, kunt u dat te allen tijde doen door op de uitschrijflink in toekomstig promotiemateriaal te klikken.\r\n\r\nRaadpleeg onze privacyverklaring voor meer informatie over hoe we met uw persoonsgegevens omgaan.\r\n\r\nKlik op de knop hieronder om te beginnen.\r\n\r\n[[link]]\r\n\r\nMet vriendelijke groeten,\r\nHet Jyseleca-team",
+            "nl_be": "Dag [[firstName]] [[lastName]],\r\nBedankt voor uw registratie op het Jyseleca Website. \r\nWe bevestigen dat u toestemming hebt gegeven om promotie- en milieu-informatie te ontvangen over alle Galapagos-producten en -diensten op uw opgegeven e-mailadres. Als u deze toestemming wilt intrekken, kunt u dat te allen tijde doen door op de uitschrijflink in toekomstig promotiemateriaal te klikken.\r\n\r\nRaadpleeg onze privacyverklaring voor meer informatie over hoe we met uw persoonlijke gegevens omgaan.\r\n\r\nKlik op de knop hieronder om te beginnen.\r\n\r\n[[link]]\r\n\r\nMet vriendelijke groeten,\r\nHet Jyseleca-team",
+            "fr_be": "Bonjour [[firstName]] [[lastName]],\r\nMerci pour votre inscription sur le Jyseleca Website. \r\nNous confirmons que vous avez consenti à recevoir des informations promotionnelles et informative concernant tous les produits et services de Galapagos sur l'adresse mail que vous avez fournie. Si vous souhaitez retirer ce consentement, vous pouvez le faire à tout moment en cliquant sur le lien de désinscription que vous trouverez dans tout futur matériel promotionnel.\r\n\r\nPour obtenir de plus amples informations sur la manière dont nous traitons vos données à caractère personnel, veuillez vous référer à notre Déclaration de confidentialité.\r\n\r\nVeuillez cliquer sur le bouton ci-dessous pour commencer.\r\n\r\n[[link]]\r\n\r\nSincères salutations,\r\nL’Équipe Jyseleca"
         }
     },
     "password-reset-instructions": {
@@ -23,10 +23,10 @@
         },
         "template_url": "password-reset-instructions.html",
         "plain_text": {
-            "en": "Hello [[firstName]] [[lastName]],\r\nPlease click the button below to setup your password on the Galapagos HCP Portal. The link will be valid for only one hour.\r\n\r\n[[link]]\r\n\r\nYours Sincerely,\r\nThe Jyseleca Team",
-            "nl_nl": "Dag [[firstName]] [[lastName]],\r\nKlik op onderstaande link om uw wachtwoord op het Jyseleca-portaal aan te maken. De link zal slechts één uur geldig zijn.\r\n\r\n[[link]]\r\n\r\nMet vriendelijke groeten,\r\nHet Jyseleca-team",
-            "nl_be": "Dag [[firstName]] [[lastName]],\r\nKlik op onderstaande link om uw wachtwoord op het Jyseleca-portaal aan te maken. De link zal slechts één uur geldig zijn.\r\n\r\n[[link]]\r\n\r\nMet vriendelijke groeten,\r\nHet Jyseleca-team",
-            "fr_be": "Bonjour [[firstName]] [[lastName]],\r\nCliquez sur le bouton ci-dessous pour définir le mot de passe sur le Portail Jyseleca.Le lien ne sera valide qu’une heure.\r\n\r\n[[link]]\r\n\r\nSincères salutations,\r\nL’Équipe Jyseleca"
+            "en": "Hello [[firstName]] [[lastName]],\r\nPlease click the button below to setup your password on the Jyseleca Website. The link will be valid for only one hour.\r\n\r\n[[link]]\r\n\r\nYours Sincerely,\r\nThe Jyseleca Team",
+            "nl_nl": "Dag [[firstName]] [[lastName]],\r\nKlik op onderstaande link om uw wachtwoord op het Jyseleca Website aan te maken. De link zal slechts één uur geldig zijn.\r\n\r\n[[link]]\r\n\r\nMet vriendelijke groeten,\r\nHet Jyseleca-team",
+            "nl_be": "Dag [[firstName]] [[lastName]],\r\nKlik op onderstaande link om uw wachtwoord op het Jyseleca Website aan te maken. De link zal slechts één uur geldig zijn.\r\n\r\n[[link]]\r\n\r\nMet vriendelijke groeten,\r\nHet Jyseleca-team",
+            "fr_be": "Bonjour [[firstName]] [[lastName]],\r\nCliquez sur le bouton ci-dessous pour définir le mot de passe sur le Jyseleca Website. Le lien ne sera valide qu’une heure.\r\n\r\n[[link]]\r\n\r\nSincères salutations,\r\nL’Équipe Jyseleca"
         }
     },
     "password-change-success": {
@@ -36,8 +36,8 @@
         },
         "template_url": "password-reset-success.html",
         "plain_text": {
-            "en": "Hello [[firstName]] [[lastName]],\r\nYour password has been reset successfully on the Galapagos HCP portal.\r\n\r\n[[loginLink]]\r\n\r\nIf the password reset wasn’t requested by you, please report the issue by replying to this mail support@glpg.com\r\n\r\nYours Sincerely,\r\nThe GLPG Team",
-            "nl_nl": "(NL_NL) Hello [[firstName]] [[lastName]],\r\nYour password has been reset successfully on the Galapagos HCP portal.\r\n\r\n[[loginLink]]\r\n\r\nIf the password reset wasn’t requested by you, please report the issue by replying to this mail support@glpg.com\r\n\r\nYours Sincerely,\r\nThe GLPG Team"
+            "en": "Hello [[firstName]] [[lastName]],\r\nYour password has been reset successfully on the Jyseleca Website.\r\n\r\n[[loginLink]]\r\n\r\nIf the password reset wasn’t requested by you, please report the issue by replying to this mail support@glpg.com\r\n\r\nYours Sincerely,\r\nThe GLPG Team",
+            "nl_nl": "(NL_NL) Hello [[firstName]] [[lastName]],\r\nYour password has been reset successfully on the Jyseleca Website.\r\n\r\n[[loginLink]]\r\n\r\nIf the password reset wasn’t requested by you, please report the issue by replying to this mail support@glpg.com\r\n\r\nYours Sincerely,\r\nThe GLPG Team"
         }
     },
     "password-reset-success": {
@@ -49,10 +49,10 @@
         },
         "template_url": "password-reset-success.html",
         "plain_text": {
-            "en": "Hello [[firstName]] [[lastName]],\r\nYour password has been reset successfully on the Galapagos HCP portal.\r\n\r\n[[loginLink]]\r\n\r\nYours Sincerely,\r\nThe Jyseleca Team",
-            "nl_nl": "Dag [[firstName]] [[lastName]],\r\nUw wachtwoord is opnieuw ingesteld op het Jyseleca-portaal.\r\n\r\n[[loginLink]]\r\n\r\nMet vriendelijke groeten,\r\nHet Jyseleca-team",
-            "nl_be": "Dag [[firstName]] [[lastName]],\r\nUw wachtwoord is opnieuw ingesteld op het Jyseleca-portaal.\r\n\r\n[[loginLink]]\r\n\r\nMet vriendelijke groeten,\r\nHet Jyseleca-team",
-            "fr_be": "Bonjour [[firstName]] [[lastName]],\r\nVotre mot de passe a été réinitialisé avec succès sur le Portail Jyseleca.\r\n\r\n[[loginLink]]\r\n\r\nSincères salutations,\r\nL’Équipe Jyseleca"
+            "en": "Hello [[firstName]] [[lastName]],\r\nYour password has been reset successfully on the Jyseleca Website.\r\n\r\n[[loginLink]]\r\n\r\nYours Sincerely,\r\nThe Jyseleca Team",
+            "nl_nl": "Dag [[firstName]] [[lastName]],\r\nUw wachtwoord is opnieuw ingesteld op het Jyseleca Website.\r\n\r\n[[loginLink]]\r\n\r\nMet vriendelijke groeten,\r\nHet Jyseleca-team",
+            "nl_be": "Dag [[firstName]] [[lastName]],\r\nUw wachtwoord is opnieuw ingesteld op het Jyseleca Website.\r\n\r\n[[loginLink]]\r\n\r\nMet vriendelijke groeten,\r\nHet Jyseleca-team",
+            "fr_be": "Bonjour [[firstName]] [[lastName]],\r\nVotre mot de passe a été réinitialisé avec succès sur le Jyseleca Website.\r\n\r\n[[loginLink]]\r\n\r\nSincères salutations,\r\nL’Équipe Jyseleca"
         }
     },
     "password-setup-instructions": {
@@ -64,10 +64,10 @@
         },
         "template_url": "password-setup-instructions.html",
         "plain_text": {
-            "en": "Hello [[firstName]] [[lastName]],\r\nThank you for registration. We have verified your information.\r\n\r\nPlease click the button below to setup your password on the Galapagos HCP Portal. The link will be valid for only one hour.\r\n\r\n[[link]]\r\n\r\n\r\n\r\nAfter one hour please request another link via Password forgotten ([[forgot_password_link]]).\r\n\r\nYours Sincerely,\r\nThe Jyseleca Team",
-            "nl_nl": "Dag [[firstName]] [[lastName]],\r\nBedankt voor uw registratie. Wij hebben uw gegevens gecontroleerd.\r\n\r\nKlik op de knop hieronder om uw wachtwoord in te stellen op het Jyseleca-portaal. De link zal slechts één uur geldig zijn.\r\n\r\n[[link]]\r\n\r\n\r\n\r\nNa één uur kunt u een nieuw wachtwoord aanvragen via Wachtwoord vergeten ([[forgot_password_link]]).\r\n\r\nMet vriendelijke groeten,\r\nHet Jyseleca-team",
-            "nl_be": "Dag [[firstName]] [[lastName]],\r\nBedankt voor uw registratie. Wij hebben uw gegevens gecontroleerd.\r\n\r\nKlik op de knop hieronder om uw wachtwoord in te stellen op het Jyseleca-portaal. De link zal slechts één uur geldig zijn.\r\n\r\n[[link]]\r\n\r\n\r\n\r\nIndien deze link is vervallen, kunt u een nieuw wachtwoord aanvragen door op de link Wachtwoord vergeten te klikken ([[forgot_password_link]]).\r\n\r\nMet vriendelijke groeten,\r\nHet Jyseleca-team",
-            "fr_be": "Bonjour [[firstName]] [[lastName]],\r\nMerci de vous être inscrit(e). Nous avons analysé vos informations.\r\n\r\nCliquez sur le bouton ci-dessous pour définir le mot de passe sur le Portail Jyseleca. Le lien ne sera valide qu’une heure.\r\n\r\n[[link]]\r\n\r\n\r\n\r\nSi ce lien a expiré, vous pouvez demander un nouveau mot de passe en cliquant sur le lien Mot de passe oublié ([[forgot_password_link]]).\r\n\r\nSincères salutations,\r\nL’Équipe Jyseleca"
+            "en": "Hello [[firstName]] [[lastName]],\r\nThank you for registration. We have verified your information.\r\n\r\nPlease click the button below to setup your password on the Jyseleca Website. The link will be valid for only one hour.\r\n\r\n[[link]]\r\n\r\n\r\n\r\nAfter one hour please request another link via Password forgotten ([[forgot_password_link]]).\r\n\r\nYours Sincerely,\r\nThe Jyseleca Team",
+            "nl_nl": "Dag [[firstName]] [[lastName]],\r\nBedankt voor uw registratie. Wij hebben uw gegevens gecontroleerd.\r\n\r\nKlik op de knop hieronder om uw wachtwoord in te stellen op het Jyseleca Website. De link zal slechts één uur geldig zijn.\r\n\r\n[[link]]\r\n\r\n\r\n\r\nNa één uur kunt u een nieuw wachtwoord aanvragen via Wachtwoord vergeten ([[forgot_password_link]]).\r\n\r\nMet vriendelijke groeten,\r\nHet Jyseleca-team",
+            "nl_be": "Dag [[firstName]] [[lastName]],\r\nBedankt voor uw registratie. Wij hebben uw gegevens gecontroleerd.\r\n\r\nKlik op de knop hieronder om uw wachtwoord in te stellen op het Jyseleca Website. De link zal slechts één uur geldig zijn.\r\n\r\n[[link]]\r\n\r\n\r\n\r\nIndien deze link is vervallen, kunt u een nieuw wachtwoord aanvragen door op de link Wachtwoord vergeten te klikken ([[forgot_password_link]]).\r\n\r\nMet vriendelijke groeten,\r\nHet Jyseleca-team",
+            "fr_be": "Bonjour [[firstName]] [[lastName]],\r\nMerci de vous être inscrit(e). Nous avons analysé vos informations.\r\n\r\nCliquez sur le bouton ci-dessous pour définir le mot de passe sur le Jyseleca Website. Le lien ne sera valide qu’une heure.\r\n\r\n[[link]]\r\n\r\n\r\n\r\nSi ce lien a expiré, vous pouvez demander un nouveau mot de passe en cliquant sur le lien Mot de passe oublié ([[forgot_password_link]]).\r\n\r\nSincères salutations,\r\nL’Équipe Jyseleca"
         }
     },
     "registration-success": {
@@ -79,10 +79,10 @@
         },
         "template_url": "registration-success.html",
         "plain_text": {
-            "en": "Hello [[firstName]] [[lastName]],\r\nYou have successfully created an account on Jyseleca Portal.\r\n[[loginLink]].\r\nYours Sincerely,\r\nThe Jyseleca Team",
-            "nl_nl": "Dag [[firstName]] [[lastName]],\r\nUw account op het Merk X-portaal is aangemaakt.\r\n[[loginLink]].\r\nMet vriendelijke groeten,\r\nHet Jyseleca-team",
-            "nl_be": "Dag [[firstName]] [[lastName]],\r\nUw account op het Merk X-portaal is aangemaakt.\r\n[[loginLink]].\r\nMet vriendelijke groeten,\r\nHet Jyseleca-team",
-            "fr_be": "Bonjour [[firstName]] [[lastName]],\r\nVous avez créé avec succès un compte sur le Portail Jyseleca.\r\n[[loginLink]].\r\nSincères salutations,\r\nL’Équipe Jyseleca"
+            "en": "Hello [[firstName]] [[lastName]],\r\nYou have successfully created an account on Jyseleca Website.\r\n[[loginLink]].\r\nYours Sincerely,\r\nThe Jyseleca Team",
+            "nl_nl": "Dag [[firstName]] [[lastName]],\r\nUw account op het Jyseleca Website is aangemaakt.\r\n[[loginLink]].\r\nMet vriendelijke groeten,\r\nHet Jyseleca-team",
+            "nl_be": "Dag [[firstName]] [[lastName]],\r\nUw account op het Jyseleca Website is aangemaakt.\r\n[[loginLink]].\r\nMet vriendelijke groeten,\r\nHet Jyseleca-team",
+            "fr_be": "Bonjour [[firstName]] [[lastName]],\r\nVous avez créé avec succès un compte sur le Jyseleca Website.\r\n[[loginLink]].\r\nSincères salutations,\r\nL’Équipe Jyseleca"
         }
     },
     "registration-not-verified": {
