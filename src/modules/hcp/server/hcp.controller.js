@@ -997,7 +997,9 @@ async function getAccessToken(req, res) {
             return res.status(400).json(response);
         }
 
-        const doc = await Hcp.findOne({ where: { email } });
+        const doc = await Hcp.findOne({
+            where: where(fn('lower', col('email')), fn('lower', email))
+        });
 
         const userLockedError = new CustomError('Your account has been locked for consecutive failed login attempts.', 4002);
 
