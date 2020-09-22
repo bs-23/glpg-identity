@@ -30,7 +30,7 @@ function hasValidCharacters(password) {
 
 export const loginSchema = object().shape({
     email: string()
-        .email('This field should be an valid email address.')
+        .email('This field should be a valid email address.')
         .required('This field must not be empty.'),
     password: string().required('This field must not be empty.'),
     recaptchaToken: string().nullable().required('Captcha verification required.')
@@ -49,7 +49,7 @@ export const registerSchema = object().shape({
         .max(20, 'This field must be at most 20 characters long.')
         .required('This field must not be empty.'),
     email: string()
-        .email('This field should be an valid email address.')
+        .email('This field should be a valid email address.')
         .required('This field must not be empty.'),
     country_code: string()
         .matches(/^[+]+/, 'This field must start with a plus.')
@@ -99,7 +99,7 @@ export const resetPasswordSchema = object().shape({
 
 export const forgotPasswordSchema = object().shape({
     email: string()
-        .email('This field should be an valid email address.')
+        .email('This field should be a valid email address.')
         .required('This field must not be empty.'),
 });
 
