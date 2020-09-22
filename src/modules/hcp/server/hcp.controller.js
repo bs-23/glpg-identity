@@ -4,7 +4,7 @@ const _ = require('lodash');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const validator = require('validator');
-const { QueryTypes, Op } = require('sequelize');
+const { QueryTypes, Op, where, col, fn } = require('sequelize');
 const Hcp = require('./hcp_profile.model');
 const HcpArchives = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_archives.model'));
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
@@ -896,7 +896,9 @@ async function forgetPassword(req, res) {
             return res.status(400).send(response);
         }
 
-        const doc = await Hcp.findOne({ where: { email } });
+        const doc = await Hcp.findOne({
+            where: where(fn('lower', col('email')), fn('lower', email))
+        });
 
         if (!doc) {
             response.data = 'Successfully sent password reset email.';

@@ -14,7 +14,7 @@ const axios = require("axios");
 const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
 const PasswordPolicies = require(path.join(process.cwd(), "src/modules/core/server/password/password-policies.js"));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
-const { QueryTypes, Op } = require('sequelize');
+const { QueryTypes, Op, where, col, fn } = require('sequelize');
 
 function generateAccessToken(user) {
     return jwt.sign({
@@ -325,7 +325,7 @@ async function getUsers(req, res) {
         const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase
             .map(i => ignoreCaseArray(i)));
 
-    
+
         const order = [];
 
         if(orderBy && orderType){
@@ -452,7 +452,9 @@ async function sendPasswordResetLink(req, res) {
     try {
         const { email } = req.body;
 
-        const user = await User.findOne({ where: { email } });
+        const user = await User.findOne({
+            where: where(fn('lower', col('email')), fn('lower', email))
+        });
 
         if (!user) {
             return res.json({ message: 'An email has been sent to the provided email with further instructions.' });
