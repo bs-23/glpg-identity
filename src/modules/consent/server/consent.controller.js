@@ -265,8 +265,14 @@ async function getDatasyncConsentsReport(req, res){
         const offset = page * limit;
 
         const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => i.codbase === codbase).map(i => i.country_iso2);
+        let countries = ``;
+        country_iso2_list_for_codbase.forEach( (i, index) => {
+            if(index) countries += ', ';
+            countries += `'${i}'`;
+        });
+
         const country_iso2_list = req.user.type === 'admin' ? (await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry", { type: QueryTypes.SELECT })).map(i => i.country_iso2) : req.user.countries;
-        // WHERE ciam.vw_veeva_consent_master.country_code = ANY(${country_iso2_list_for_codbase})
+        
 
         const orderBy = req.query.orderBy ? req.query.orderBy : '';
         const orderType = req.query.orderType ? req.query.orderType : '';
@@ -298,6 +304,8 @@ async function getDatasyncConsentsReport(req, res){
                 channel_value
             FROM 
                 ciam.vw_veeva_consent_master
+            WHERE 
+                ciam.vw_veeva_consent_master.country_code = ANY(array[${countries}])
             ORDER BY
                 ${sortBy} ${orderType}
             offset ${offset}
@@ -308,7 +316,9 @@ async function getDatasyncConsentsReport(req, res){
             `SELECT 
                 COUNT(*)
             FROM 
-                ciam.vw_veeva_consent_master;`
+                ciam.vw_veeva_consent_master
+            WHERE 
+                ciam.vw_veeva_consent_master.country_code = ANY(array[${countries}]);`
             , { type: QueryTypes.SELECT }))[0];
         
         
