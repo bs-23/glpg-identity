@@ -119,11 +119,12 @@ const UserDetails = (props) => {
                                                             as="select"
                                                             name="status"
                                                             className="form-control cdp-border-primary"
+                                                            disabled={userInfo.type === 'admin'}
                                                         >
                                                             <option value="active">Active</option>
                                                             <option value="inactive">Inactive</option>
                                                         </Field>
-                                                        <button type="submit" className="btn btn-block text-white cdp-btn-secondary btn-sm mt-4 p-2" disabled={formikProps.isSubmitting}>Save Changes</button>
+                                                        <button type="submit" className="btn btn-block text-white cdp-btn-secondary btn-sm mt-4 p-2" disabled={formikProps.isSubmitting || userInfo.type === 'admin'}>Save Changes</button>
                                                     </div>
                                                 </Form>}
                                             </Formik>
