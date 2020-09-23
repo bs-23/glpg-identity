@@ -21,9 +21,15 @@ module.exports = async function () {
                 "script-src": ["'self'", 'https://www.google.com', "https://www.gstatic.com"],
                 "script-src-elem": ["'self'", "https://www.google.com", "https://www.gstatic.com"],
                 "style-src": ["'self'", "'unsafe-inline'", "fonts.googleapis.com"],
-                "fontSrc": ["'self'", "fonts.googleapis.com", "fonts.gstatic.com", "data:"],
+                "font-src": ["'self'", "fonts.googleapis.com", "fonts.gstatic.com", "data:"],
                 "frame-src": ["'self'", "https://www.google.com"],
-                "img-src": ["'self'", "data:", nodecache.getValue('S3_BUCKET_URL')]
+                "img-src": ["'self'", "data:", nodecache.getValue('S3_BUCKET_URL')],
+                "frame-ancestors": ["'self'"],
+                "base-uri": ["'self'"],
+                "block-all-mixed-content": [],
+                "object-src": ["'none'"],
+                "script-src-attr": ["'self'"],
+                "upgrade-insecure-requests": []
             },
         })
     );
