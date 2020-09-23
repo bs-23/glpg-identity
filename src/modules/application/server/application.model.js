@@ -43,6 +43,10 @@ const Application = sequelize.cdpConnector.define('applications', {
         allowNull: false,
         type: DataTypes.STRING,
     },
+    forgot_password_link: {
+        allowNull: false,
+        type: DataTypes.STRING,
+    },
     login_link: {
         allowNull: false,
         type: DataTypes.STRING

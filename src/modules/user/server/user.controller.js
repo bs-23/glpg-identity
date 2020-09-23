@@ -19,7 +19,7 @@ const axios = require("axios");
 const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
 const PasswordPolicies = require(path.join(process.cwd(), "src/modules/core/server/password/password-policies.js"));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
-const { QueryTypes, Op } = require('sequelize');
+const { QueryTypes, Op, where, col, fn } = require('sequelize');
 
 function generateAccessToken(user) {
     return jwt.sign({
@@ -76,7 +76,7 @@ async function getRolePermissions(user) {
     const userRoles = user.userRoles;
     const roles = [];
 
-    if (userRoles.length) {
+    if (userRoles && userRoles.length) {
         for (const userRole of userRoles) {
             for (const rolePermSet of userRole.role.role_ps) {
                 const applicationsCountries = await getUserApplicationCountry(rolePermSet.ps);
@@ -224,6 +224,10 @@ async function formatProfile(user) {
         type: user.type,
         profile: await getProfilePermissions(user),
         role: await getRolePermissions(user),
+        status: user.status,
+        // roles: getRolesPermissions(user.userrole),
+        // application: user.application,
+        // countries: user.countries
     };
     return data;
 }
@@ -236,6 +240,7 @@ async function formatProfileDetail(user) {
         last_name: user.last_name,
         email: user.email,
         type: user.type,
+        status: user.status,
         phone: user.phone,
         last_login: user.last_login,
         expiry_date: user.expiry_date,
@@ -270,7 +275,7 @@ async function login(req, res) {
         const user = await User.findOne({
             where: {
                 email: {
-                    [Op.iLike]: `%${email}%`
+                    [Op.iLike]: `${email}`
                 }
             },
             include: [{
@@ -360,6 +365,8 @@ async function login(req, res) {
         });
 
         const userLockedMessage = 'Your account has been locked for consecutive failed auth attempts. Please use the Forgot Password link to unlock.';
+
+        if (user && user.status === 'inactive') return res.status(401).send('Account not active.');
 
         if (user && user.dataValues.failed_auth_attempt >= 5) {
             return res.status(401).send(userLockedMessage);
@@ -489,7 +496,8 @@ async function createUser(req, res) {
             subject: 'Setup password for your CDP account',
             data: {
                 name: `${user.first_name} ${user.last_name}` || '',
-                link
+                link,
+                s3bucketUrl: nodecache.getValue('S3_BUCKET_URL')
             }
         };
 
@@ -514,26 +522,65 @@ async function deleteUser(req, res) {
 }
 
 async function getUsers(req, res) {
-
-    const page = req.query.page ? req.query.page - 1 : 0;
-    if (page < 0) return res.status(404).send("page must be greater or equal 1");
-
-    const limit = 15;
-    // const country_iso2 = req.query.country_iso2 === 'null' ? null : req.query.country_iso2;
-    const codbase = req.query.codbase === 'null' ? null : req.query.codbase;
-    const offset = page * limit;
-
-    const signedInId = (await formatProfile(req.user)).id;
-
-    const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => i.codbase === codbase).map(i => i.country_iso2);
-    const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
-    let countries_ignorecase_for_codbase_formatted = '{' + countries_ignorecase_for_codbase.join(", ") + '}';
-
-
     try {
+        const page = req.query.page ? req.query.page - 1 : 0;
+        if (page < 0) return res.status(404).send("page must be greater or equal 1");
+
+        const limit = 15;
+        const offset = page * limit;
+
+        const codbase = req.query.codbase === 'null' ? null : req.query.codbase;
+
+        const signedInId = (await formatProfile(req.user)).id;
+
+        const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => i.codbase === codbase).map(i => i.country_iso2);
+        const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
+        let countries_ignorecase_for_codbase_formatted = '{' + countries_ignorecase_for_codbase.join(", ") + '}';
+
+        // const signedInId = (formatProfile(req.user)).id;
+
+        const orderBy = req.query.orderBy === 'null'
+            ? null
+            : req.query.orderBy;
+        const orderType = req.query.orderType === 'asc' || req.query.orderType === 'desc'
+            ? req.query.orderType
+            : 'asc';
+
+        // const country_iso2_list_for_codbase =
+        //     (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT }))
+        //         .filter(i => i.codbase === codbase)
+        //         .map(i => i.country_iso2);
+
+        // const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase
+        //     .map(i => ignoreCaseArray(i)));
+
+        const order = [];
+
+        if(orderBy && orderType){
+            if(orderBy === 'first_name') order.push(['first_name', orderType]);
+            if(orderBy === 'last_name') order.push(['last_name', orderType]);
+            if(orderBy === 'email') order.push(['email', orderType]);
+            if(orderBy === 'status') order.push(['status', orderType]);
+            if(orderBy === 'created_at') order.push(['created_at', orderType]);
+            if(orderBy === 'expiry_date') order.push(['expiry_date', orderType]);
+
+            if(orderBy === 'created_by') {
+                order.push([{ model: User, as: 'createdByUser' }, 'first_name', orderType]);
+                order.push([{ model: User, as: 'createdByUser' }, 'last_name', orderType]);
+            }
+        }
+        order.push(['created_at', 'DESC']);
+        order.push(['id', 'DESC']);
+
+        // const columnNames = Object.keys(User.rawAttributes);
+        // if (orderBy && (columnNames || []).includes(orderBy)) {
+        //     order.push([orderBy, orderType]);
+        // }
+
+        // order.push(['created_at', 'DESC']);
+        // order.push(['id', 'DESC']);
 
         const users = await User.findAll({
-
             where: {
                 id: { [Op.ne]: signedInId },
                 type: 'basic',
@@ -561,12 +608,9 @@ async function getUsers(req, res) {
 
                 ]
             },
-            order: [
-                ['created_at', 'DESC'],
-                ['id', 'DESC']
-            ],
             offset,
-            limit: limit,
+            limit,
+            order: order,
             subQuery: false,
             include: [{
                 model: User,
@@ -606,8 +650,6 @@ async function getUsers(req, res) {
                 }]
             }],
             attributes: { exclude: ['password'] }
-
-
         });
 
         const totalUser = await User.count({
@@ -684,12 +726,10 @@ async function getUsers(req, res) {
             total: totalUser,
             start: limit * page + 1,
             end: offset + limit > totalUser ? totalUser : offset + limit,
-            // country_iso2: country_iso2 ? country_iso2 : null,
             codbase: codbase ? codbase : null
         };
 
         res.json(data);
-
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -801,11 +841,35 @@ async function getUser(req, res) {
     }
 }
 
+async function partialUpdateUser(req, res) {
+    const id = req.params.id;
+    const { first_name, last_name, email, phone, type, status } = req.body;
+    const partialUserData = { first_name, last_name, email, phone, type, status };
+
+    try {
+        if ([first_name, last_name, email].includes(null)) return res.sendStatus(400);
+
+        const user = await User.findOne({ where: { id } });
+
+        if (!user) return res.status(404).send("User is not found or may be removed");
+
+        await user.update(partialUserData);
+
+        res.json(formatProfile(user));
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 async function sendPasswordResetLink(req, res) {
     try {
         const { email } = req.body;
 
-        const user = await User.findOne({ where: { email } });
+        const user = await User.findOne({
+            where: where(fn('lower', col('email')), fn('lower', email))
+        });
 
         if (!user) {
             return res.json({ message: 'An email has been sent to the provided email with further instructions.' });
@@ -838,7 +902,8 @@ async function sendPasswordResetLink(req, res) {
             subject: 'Password Reset Instructions',
             data: {
                 name: user.first_name + " " + user.last_name || '',
-                link
+                link,
+                s3bucketUrl: nodecache.getValue('S3_BUCKET_URL')
             }
         };
 
@@ -911,6 +976,10 @@ async function resetPassword(req, res) {
 
         const user = await User.findOne({ where: { id: resetRequest.user_id } });
 
+        if (user.status === 'inactive') {
+            return res.status(403).send('User inactive.');
+        }
+
         if (await PasswordPolicies.minimumPasswordAge(user.password_updated_at)) {
             return res.status(400).send(`You cannot change password before 1 day`);
         }
@@ -943,7 +1012,8 @@ async function resetPassword(req, res) {
             toAddresses: [user.email],
             data: {
                 name: user.first_name + " " + user.last_name,
-                link: `${req.protocol}://${req.headers.host}/login`
+                link: `${req.protocol}://${req.headers.host}/login`,
+                s3bucketUrl: nodecache.getValue('S3_BUCKET_URL')
             }
         };
 
@@ -1024,3 +1094,4 @@ exports.getUser = getUser;
 exports.sendPasswordResetLink = sendPasswordResetLink;
 exports.resetPassword = resetPassword;
 exports.changeUserRole = changeUserRole;
+exports.partialUpdateUser = partialUpdateUser;

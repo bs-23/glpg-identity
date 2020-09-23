@@ -4,7 +4,7 @@ const _ = require('lodash');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const validator = require('validator');
-const { QueryTypes, Op } = require('sequelize');
+const { QueryTypes, Op, where, col, fn } = require('sequelize');
 const Hcp = require('./hcp_profile.model');
 const HcpArchives = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_archives.model'));
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
@@ -100,6 +100,7 @@ function generateEmailOptions(emailType, applicationSlug, user) {
         data: {
             firstName: user.first_name || '',
             lastName: user.last_name || '',
+            s3bucketUrl: nodecache.getValue('S3_BUCKET_URL')
         }
     };
 }
@@ -126,6 +127,11 @@ async function sendChangePasswordSuccessMail(user, application) {
     await emailService.send(mailOptions);
 }
 
+async function sendRegistrationNotVerifiedMail(user, application) {
+    const mailOptions = generateEmailOptions('registration-not-verified', application.slug, user);
+    await emailService.send(mailOptions);
+}
+
 async function sendResetPasswordSuccessMail(user, application) {
     const mailOptions = generateEmailOptions('password-reset-success', application.slug, user);
     mailOptions.data.loginLink = `${application.login_link}?journey=login&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
@@ -136,6 +142,7 @@ async function sendResetPasswordSuccessMail(user, application) {
 async function sendPasswordSetupInstructionMail(user, application) {
     const mailOptions = generateEmailOptions('password-setup-instructions', application.slug, user);
     mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&journey=single_optin_verified&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
+    mailOptions.data.forgot_password_link = `${application.forgot_password_link}?journey=forgot_password&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
 }
@@ -162,11 +169,11 @@ async function getHcps(req, res) {
     const response = new Response({}, []);
 
     try {
-        const page = req.query.page ? req.query.page - 1 : 0;
+        const page = req.query.page ? parseInt(req.query.page) - 1 : 0;
         const limit = 15;
         let status = req.query.status === undefined ? null : req.query.status;
-        if (status) status = Array.isArray(status) ? status.filter(e => Hcp.rawAttributes.status.values.includes(e)) : Hcp.rawAttributes.status.values.includes(status) ? status : [];
-        const codbase = req.query.codbase === undefined ? null : req.query.codbase;
+        if (status && status.indexOf(',') !== -1) status = status.split(',');
+        const codbase = req.query.codbase === 'undefined' ? null : req.query.codbase;
         const offset = page * limit;
 
         const application_list = (await Hcp.findAll()).map(i => i.get("application_id"));
@@ -195,6 +202,23 @@ async function getHcps(req, res) {
             country_iso2: codbase ? { [Op.any]: [countries_ignorecase_for_codbase] } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : countries_ignorecase_for_user_countries_codbase
         };
 
+        const orderBy = req.query.orderBy === 'null'
+            ? null
+            : req.query.orderBy;
+        const orderType = req.query.orderType === 'asc' || req.query.orderType === 'desc'
+            ? req.query.orderType
+            : 'asc';
+
+        const order = [];
+
+        const columnNames = Object.keys(Hcp.rawAttributes);
+        if (orderBy && (columnNames || []).includes(orderBy)) {
+            order.push([orderBy, orderType]);
+        }
+
+        order.push(['created_at', 'DESC']);
+        order.push(['id', 'DESC']);
+
         const hcps = await Hcp.findAll({
             where: hcp_filter,
             include: [{
@@ -205,10 +229,7 @@ async function getHcps(req, res) {
             attributes: { exclude: ['password', 'created_by', 'updated_by'] },
             offset,
             limit,
-            order: [
-                ['created_at', 'DESC'],
-                ['id', 'ASC']
-            ]
+            order: order
         });
 
         await Promise.all(hcps.map(async hcp => {
@@ -306,7 +327,7 @@ async function registrationLookup(req, res) {
     }
 
     try {
-        const profileByEmail = await Hcp.findOne({ where: { email } });
+        const profileByEmail = await Hcp.findOne({ where: where(fn('lower', col('email')), fn('lower', email)) });
         const profileByUUID = await Hcp.findOne({ where: { uuid } });
 
         if (profileByEmail) {
@@ -399,7 +420,7 @@ async function createHcpProfile(req, res) {
     }
 
     try {
-        const isEmailExists = await Hcp.findOne({ where: { email: req.body.email } });
+        const isEmailExists = await Hcp.findOne({ where: where(fn('lower', col('email')), fn('lower', email)) });
         const isUUIDExists = await Hcp.findOne({ where: { uuid: req.body.uuid } });
 
         if (isEmailExists) {
@@ -425,7 +446,7 @@ async function createHcpProfile(req, res) {
         }
 
         const model = {
-            email,
+            email: email.toLowerCase(),
             uuid,
             salutation,
             first_name,
@@ -497,6 +518,10 @@ async function createHcpProfile(req, res) {
         await hcpUser.save();
 
         response.data = getHcpViewModel(hcpUser.dataValues);
+
+        if (hcpUser.dataValues.status === 'not_verified') {
+            await sendRegistrationNotVerifiedMail(hcpUser.dataValues, req.user);
+        }
 
         if (hcpUser.dataValues.status === 'consent_pending') {
             const unconfirmedConsents = consentArr.filter(consent => !consent.consent_confirmed);
@@ -576,6 +601,11 @@ async function approveHCPUser(req, res) {
             return res.status(404).send(response);
         }
 
+        if (hcpUser.dataValues.status !== 'not_verified') {
+            response.errors.push(new CustomError('Invalid user status for this request.', 400));
+            return res.status(400).send(response);
+        }
+
         const userApplication = await Application.findOne({ where: { id: hcpUser.application_id } });
 
         let userConsents = await HcpConsents.findAll({ where: { [Op.and]: [{ user_id: id }, { consent_confirmed: false }] } });
@@ -638,6 +668,11 @@ async function rejectHCPUser(req, res) {
         if (!hcpUser) {
             response.errors.push(new CustomError('User does not exist.', 404));
             return res.status(404).send(response);
+        }
+
+        if (hcpUser.dataValues.status !== 'not_verified') {
+            response.errors.push(new CustomError('Invalid user status for this request.', 400));
+            return res.status(400).send(response);
         }
 
         await HcpArchives.create({ ...hcpUser.dataValues, status: 'rejected' });
@@ -736,7 +771,7 @@ async function changePassword(req, res) {
     }
 
     try {
-        const doc = await Hcp.findOne({ where: { email: email } });
+        const doc = await Hcp.findOne({ where: where(fn('lower', col('email')), fn('lower', email)) });
 
         if (!doc || !doc.validPassword(current_password)) {
             response.errors.push(new CustomError('Invalid credentials.', 401));
@@ -878,7 +913,9 @@ async function forgetPassword(req, res) {
             return res.status(400).send(response);
         }
 
-        const doc = await Hcp.findOne({ where: { email } });
+        const doc = await Hcp.findOne({
+            where: where(fn('lower', col('email')), fn('lower', email))
+        });
 
         if (!doc) {
             response.data = 'Successfully sent password reset email.';
@@ -977,7 +1014,9 @@ async function getAccessToken(req, res) {
             return res.status(400).json(response);
         }
 
-        const doc = await Hcp.findOne({ where: { email } });
+        const doc = await Hcp.findOne({
+            where: where(fn('lower', col('email')), fn('lower', email))
+        });
 
         const userLockedError = new CustomError('Your account has been locked for consecutive failed login attempts.', 4002);
 

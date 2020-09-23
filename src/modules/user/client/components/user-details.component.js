@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom';
 import { useToasts } from "react-toast-notifications";
+import { NavLink } from 'react-router-dom';
 import { Form, Formik, Field, ErrorMessage } from "formik";
 import { PermissionSetDetailsModal } from "./permission-sets-details";
 
@@ -206,6 +206,46 @@ const UserDetails = (props) => {
                                             <span className="profile-detail__value">
                                                 {renderPermissionSets()}
                                             </span>
+                                        </div>
+                                        <div className="profile-detail__col-fluid pb-3 pr-0 pr-sm-3">
+                                            <span className="mr-2 d-block profile-detail__label">Status</span>
+                                            <Formik
+                                                initialValues={{
+                                                    status: userInfo.status || ''
+                                                }}
+                                                onSubmit={(values, actions) => {
+                                                    axios.patch(`/api/users/${userInfo.id}`, values).then(() => {
+                                                        addToast('User status changed successfully.', {
+                                                            appearance: 'success',
+                                                            autoDismiss: true
+                                                        });
+                                                    }).catch(err => {
+                                                        addToast('Something went wrong. Could not change user status.', {
+                                                            appearance: 'error',
+                                                            autoDismiss: true
+                                                        });
+                                                    }).finally(() => {
+                                                        actions.setSubmitting(false);
+                                                    });
+                                                    actions.setSubmitting(true);
+                                                }}
+                                                enableReinitialize
+                                            >
+                                                {(formikProps) => <Form onSubmit={formikProps.handleSubmit} >
+                                                    <div>
+                                                        <Field
+                                                            as="select"
+                                                            name="status"
+                                                            className="form-control cdp-border-primary"
+                                                            disabled={userInfo.type === 'admin'}
+                                                        >
+                                                            <option value="active">Active</option>
+                                                            <option value="inactive">Inactive</option>
+                                                        </Field>
+                                                        <button type="submit" className="btn btn-block text-white cdp-btn-secondary btn-sm mt-4 p-2" disabled={formikProps.isSubmitting || userInfo.type === 'admin'}>Save Changes</button>
+                                                    </div>
+                                                </Form>}
+                                            </Formik>
                                         </div>
                                     </div>
                                     <PermissionSetDetailsModal

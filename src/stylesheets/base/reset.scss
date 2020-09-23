@@ -161,9 +161,25 @@
             color: #636A70;
         }
     }
+
+    &-border {
+        &-primary {
+            border: 1px solid $primary-color;
+        }
+
+        &-secondary {
+            border: 1px solid $secondary-color;
+        }
+    }
 }
 
+.text-dark {
+    color: $gray-base !important;
+}
 
+.font-size-15px {
+    font-size: 15px;
+}
 .page-title {
     color: $primary-color;
 
