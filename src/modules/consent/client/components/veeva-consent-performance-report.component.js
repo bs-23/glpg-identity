@@ -149,29 +149,15 @@ const ConsentPerformanceReport = () => {
                 <div className="row">
                     <div className="col-12">
                         <div>
-                            <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
-                                <h4 className="cdp-text-primary font-weight-bold mb-0">Consent Performance Report</h4>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="row">
-                    <div className="col-12 px-0">
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb rounded-0">
-                                <li className="breadcrumb-item"><NavLink to="/consent/cdp-consent-performance-report">Customer Data Platform</NavLink></li>
-                                <li className="breadcrumb-item"><NavLink to="/consent/veeva-consent-performance-report">Veeva CRM</NavLink></li>
-                            </ol>
-                        </nav>
-                    </div>
-                </div>
-                
-                <div className="row">
-                    <div className="col-12">
-                        <div>
-                            <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
-                                <h4 className="cdp-text-primary font-weight-bold mb-0">.</h4>
+                            <div className="d-sm-flex justify-content-between align-items-center mb-0 mt-4">
+                                <div>
+                                    <h4 className="cdp-text-primary font-weight-bold mb-4">Consent Performance Report</h4>
+                                    <div>
+                                        <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/consent/cdp-consent-performance-report">Customer Data Platform</NavLink>
+                                        <NavLink className="custom-tab px-4 py-3 cdp-border-primary" to="/consent/veeva-consent-performance-report"><img alt="Veeva CRM LOGO" src="/assets/logo/logo-veevacrm.svg" height="13" /></NavLink>
+                                    </div>
+                                </div>
+                               
                                 <div className="d-flex pt-3 pt-sm-0">
                                     <React.Fragment>
                                         {countries && consents_report['countries'] &&

@@ -221,3 +221,24 @@ a {
     line-height: 20px;
     cursor: pointer;
 }
+
+
+.custom-tab {
+    border: 1px solid $primary-color;
+    display: inline-block;
+    position: relative;
+    bottom: -2px;
+    text-decoration: none !important;
+    font-weight: bold;
+    padding-top: 0.7rem !important;
+    padding-bottom: .7rem !important;
+
+    &:hover {
+        background: #EEF2F2;
+    }
+
+    &.active {
+        background: $primary-color !important;
+        color: $white-color;
+    }
+}
