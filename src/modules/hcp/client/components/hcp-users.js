@@ -33,11 +33,11 @@ export default function hcpUsers() {
     const hcps = useSelector(state => state.hcpReducer.hcps);
 
     const pageLeft = () => {
-        if (hcps.page > 1) urlChange(hcps.page - 1, hcps.codbase, hcps.status, params.get('orderBy'), params.get('orderType'));
+        if (hcps.page > 1) urlChange(hcps.page - 1, hcps.codbase, hcps.status, params.get('orderBy'), params.get('orderType'), true);
     };
 
     const pageRight = () => {
-        if (hcps.end !== hcps.total) urlChange(hcps.page + 1, hcps.codbase, hcps.status, params.get('orderBy'), params.get('orderType'))
+        if (hcps.end !== hcps.total) urlChange(hcps.page + 1, hcps.codbase, hcps.status, params.get('orderBy'), params.get('orderType'), true);
     };
 
     async function getCountries() {
@@ -123,13 +123,13 @@ export default function hcpUsers() {
         return uuidAuthorities;
     };
 
-    const urlChange = (pageNo, codBase, status, orderColumn) => {
+    const urlChange = (pageNo, codBase, status, orderColumn, pageChange = false) => {
         Array.isArray(status) ? status = 'self_verified,manually_verified' : status = status;
         let orderType = params.get('orderType');
         const orderBy = params.get('orderBy');
         const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
         const codbase = (codBase) ? codBase : params.get('codbase');
-        if (pageNo.toString() === params.get('page')) {
+        if (!pageChange) {
             (orderBy === orderColumn) ? (orderType === 'asc' ? orderType = 'desc' : orderType = 'asc') : orderType = 'asc';
         }
         const url = `?page=${page}` + (codbase && codbase !== 'null' ? `&codbase=${codbase}` : ``) + (status && status !== 'null' ? `&status=${status}` : '') + (orderType !== 'null' && orderColumn !== 'null' && orderColumn !== null ? `&orderType=${orderType}&orderBy=${orderColumn}` : ``);

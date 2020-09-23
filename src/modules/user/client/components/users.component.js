@@ -71,12 +71,12 @@ export default function Users() {
         return countryList;
     }
 
-    const urlChange = (pageNo, codBase, orderColumn) => {
+    const urlChange = (pageNo, codBase, orderColumn, pageChange = false) => {
         let orderType = params.get('orderType');
         const orderBy = params.get('orderBy');
         const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
         const codbase = codBase ? codBase : params.get('codbase');
-        if (pageNo.toString() === params.get('page')) {
+        if (!pageChange) {
             (orderBy === orderColumn) ? (orderType === 'asc' ? orderType = 'desc' : orderType = 'asc') : orderType = 'asc';
         }
         const url = `?page=${page}` + (codbase && codbase !== 'null' ? `&codbase=${codbase}` : ``) + (orderType !== 'null' && orderColumn !== 'null' && orderColumn !== null ? `&orderType=${orderType}&orderBy=${orderColumn}` : ``);
@@ -85,11 +85,11 @@ export default function Users() {
 
 
     const pageLeft = () => {
-        if (userdata.page > 1) urlChange(userdata.page - 1, userdata.codBase, params.get('orderBy'));
+        if (userdata.page > 1) urlChange(userdata.page - 1, userdata.codBase, params.get('orderBy'), true);
     };
 
     const pageRight = () => {
-        if (userdata.end !== userdata.total) urlChange(userdata.page + 1, userdata.codBase, params.get('orderBy'));
+        if (userdata.end !== userdata.total) urlChange(userdata.page + 1, userdata.codBase, params.get('orderBy'), true);
     };
 
     return (
