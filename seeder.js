@@ -203,6 +203,14 @@ async function init() {
                 category_id: 'fe037405-c676-4d98-bd05-85008900c838',
                 legal_basis: 'consent',
                 preference: 'Promotional email marketing'
+            },
+            {
+                id: '2b9fa7f9-2c1e-4621-a091-5e4bf539b875',
+                title: 'I declare that the information is complete and accurate',
+                slug: '',
+                category_id: '59953d51-2449-4b65-950f-9f88654019bb',
+                legal_basis: 'consent',
+                preference: ''
             }
         ];
 
@@ -236,8 +244,14 @@ async function init() {
                 rich_text: "<p>Ik geef Galapagos toestemming om mij via mijn e-mailadres promotie- en milieu-informatie over alle Galapagos-producten en -diensten te sturen. <br> <br> Raadpleeg onze <a href='https://www.glpg.com/nederland/privacyverklaring' target='_blank'>privacyverklaring</a> voor meer informatie over hoe we met uw persoonsgegevens omgaan.</p>",
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 locale: 'nl_nl'
+            },
+            {
+                rich_text: "<p>U verklaart dat de ingevulde gegevens uw persoonlijke gegevens zijn en dat de informatie volledig en accuraat is. Uw gegevens mogen in geen geval gedeeld worden met derden om die derden toegang te verlenen aan huidige website. U moet Galapagos onmiddellijk op de hoogte brengen van elk bekend of vermoed niet-geautoriseerd gebruik van uw persoonlijke gegevens inzake de toegang tot deze website.</p>",
+                consent_id: '2b9fa7f9-2c1e-4621-a091-5e4bf539b875',
+                locale: 'nl_nl'
             }
         ];
+
         const consentCountries = [
             {
                 consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
