@@ -33,14 +33,25 @@ const ConsentPerformanceFinalReport = () => {
                     </div>
                 </div>
 
-                <Tabs defaultActiveKey="cdp" id="consent_report">
+                <div className="row">
+                    <div className="col-12 px-0">
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb rounded-0">
+                                <li className="breadcrumb-item"><NavLink to="/consent/cdp-consent-performance-report">Customer Data Platform</NavLink></li>
+                                <li className="breadcrumb-item"><NavLink to="/consent/veeva-consent-performance-report">Veeva CRM</NavLink></li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+
+                {/* <Tabs defaultActiveKey="cdp" id="consent_report">
                     <Tab eventKey="cdp" title="Customer Data Platform">
                         <ConsentPerformanceReport/>
                     </Tab>
                     <Tab eventKey="veeva" title="Veeva CRM">
                         <VeevaConsentPerformanceReport/>
                     </Tab>
-                </Tabs>
+                </Tabs> */}
 
 
             </div>
