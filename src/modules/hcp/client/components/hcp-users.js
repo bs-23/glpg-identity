@@ -33,11 +33,11 @@ export default function hcpUsers() {
     const hcps = useSelector(state => state.hcpReducer.hcps);
 
     const pageLeft = () => {
-        if (hcps.page > 1) urlChange(hcps.page - 1, hcps.codbase, hcps.status, params.get('orderBy'), params.get('orderType'));
+        if (hcps.page > 1) urlChange(hcps.page - 1, hcps.codbase, hcps.status, params.get('orderBy'), params.get('orderType'), true);
     };
 
     const pageRight = () => {
-        if (hcps.end !== hcps.total) urlChange(hcps.page + 1, hcps.codbase, hcps.status, params.get('orderBy'), params.get('orderType'))
+        if (hcps.end !== hcps.total) urlChange(hcps.page + 1, hcps.codbase, hcps.status, params.get('orderBy'), params.get('orderType'), true);
     };
 
     async function getCountries() {
@@ -123,13 +123,15 @@ export default function hcpUsers() {
         return uuidAuthorities;
     };
 
-    const urlChange = (pageNo, codBase, status, orderColumn) => {
+    const urlChange = (pageNo, codBase, status, orderColumn, pageChange = false) => {
         Array.isArray(status) ? status = 'self_verified,manually_verified' : status = status;
         let orderType = params.get('orderType');
         const orderBy = params.get('orderBy');
         const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
         const codbase = (codBase) ? codBase : params.get('codbase');
-        (orderBy === orderColumn) ? (orderType === 'asc' ? orderType = 'desc' : orderType = 'asc') : orderType = 'asc';
+        if (!pageChange) {
+            (orderBy === orderColumn) ? (orderType === 'asc' ? orderType = 'desc' : orderType = 'asc') : orderType = 'asc';
+        }
         const url = `?page=${page}` + (codbase && codbase !== 'null' ? `&codbase=${codbase}` : ``) + (status && status !== 'null' ? `&status=${status}` : '') + (orderType !== 'null' && orderColumn !== 'null' && orderColumn !== null ? `&orderType=${orderType}&orderBy=${orderColumn}` : ``);
         history.push(location.pathname + url);
     };
@@ -140,7 +142,7 @@ export default function hcpUsers() {
     }, []);
 
     useEffect(() => {
-       loadHcpProfiles();
+        loadHcpProfiles();
     }, [location]);
 
     return (
@@ -161,32 +163,32 @@ export default function hcpUsers() {
                     <div className="col-12">
                         <div>
                             <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
-                                <div className="d-flex align-items-center">
-                                    <h4 className="cdp-text-primary font-weight-bold mb-0 mr-4">List of HCP User</h4>
+                                <div className="d-flex align-items-center justify-content-between">
+                                    <h4 className="cdp-text-primary font-weight-bold mb-0 mr-sm-4 mr-1">List of HCP User</h4>
                                     <div className="">
                                         <div>
                                             {hcps.codbase ?
                                                 getUuidAuthorities(hcps.codbase).map(authority =>
                                                     (
-                                                        <a key={authority.name} className="mr-2" href={authority.link} target="_blank">
-                                                            <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height="40" />
+                                                        <a key={authority.name} className="mr-3" href={authority.link} target="_blank">
+                                                            <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height={authority.heightSingle} />
                                                         </a>
                                                     )
                                                 )
                                                 :
                                                 <Dropdown>
-                                                    <Dropdown.Toggle variant="" id="dropdown-basic" className="cdp-btn-outline-primary">
+                                                    <Dropdown.Toggle variant="" id="dropdown-basic" className="cdp-btn-outline-primary px-sm-3 px-2">
                                                         UUID Authorities
                                                     </Dropdown.Toggle>
-                                                    <Dropdown.Menu>
+                                                    <Dropdown.Menu className="dropdown-menu__no-hover py-0">
                                                         {
                                                             getUuidAuthorities().map(authority =>
                                                                 (
                                                                     <Dropdown.Item
-                                                                        key={authority.name} className="border-bottom"
+                                                                        key={authority.name} className="border-bottom py-2 px-3"
                                                                         href={authority.link}
                                                                         target="_blank">
-                                                                        <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height="25" />
+                                                                        <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height={authority.height} />
                                                                     </Dropdown.Item>
                                                                 )
                                                             )

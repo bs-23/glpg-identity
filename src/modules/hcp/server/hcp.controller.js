@@ -4,7 +4,7 @@ const _ = require('lodash');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const validator = require('validator');
-const { QueryTypes, Op } = require('sequelize');
+const { QueryTypes, Op, where, col, fn } = require('sequelize');
 const Hcp = require('./hcp_profile.model');
 const HcpArchives = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_archives.model'));
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
@@ -310,7 +310,7 @@ async function registrationLookup(req, res) {
     }
 
     try {
-        const profileByEmail = await Hcp.findOne({ where: { email } });
+        const profileByEmail = await Hcp.findOne({ where: where(fn('lower', col('email')), fn('lower', email)) });
         const profileByUUID = await Hcp.findOne({ where: { uuid } });
 
         if (profileByEmail) {
@@ -403,7 +403,7 @@ async function createHcpProfile(req, res) {
     }
 
     try {
-        const isEmailExists = await Hcp.findOne({ where: { email: req.body.email } });
+        const isEmailExists = await Hcp.findOne({ where: where(fn('lower', col('email')), fn('lower', email)) });
         const isUUIDExists = await Hcp.findOne({ where: { uuid: req.body.uuid } });
 
         if (isEmailExists) {
@@ -429,7 +429,7 @@ async function createHcpProfile(req, res) {
         }
 
         const model = {
-            email,
+            email: email.toLowerCase(),
             uuid,
             salutation,
             first_name,
@@ -502,7 +502,7 @@ async function createHcpProfile(req, res) {
 
         response.data = getHcpViewModel(hcpUser.dataValues);
 
-        if(hcpUser.dataValues.status === 'not_verified') {
+        if (hcpUser.dataValues.status === 'not_verified') {
             await sendRegistrationNotVerifiedMail(hcpUser.dataValues, req.user);
         }
 
@@ -584,6 +584,11 @@ async function approveHCPUser(req, res) {
             return res.status(404).send(response);
         }
 
+        if (hcpUser.dataValues.status !== 'not_verified') {
+            response.errors.push(new CustomError('Invalid user status for this request.', 400));
+            return res.status(400).send(response);
+        }
+
         const userApplication = await Application.findOne({ where: { id: hcpUser.application_id } });
 
         let userConsents = await HcpConsents.findAll({ where: { [Op.and]: [{ user_id: id }, { consent_confirmed: false }] } });
@@ -646,6 +651,11 @@ async function rejectHCPUser(req, res) {
         if (!hcpUser) {
             response.errors.push(new CustomError('User does not exist.', 404));
             return res.status(404).send(response);
+        }
+
+        if (hcpUser.dataValues.status !== 'not_verified') {
+            response.errors.push(new CustomError('Invalid user status for this request.', 400));
+            return res.status(400).send(response);
         }
 
         await HcpArchives.create({ ...hcpUser.dataValues, status: 'rejected' });
@@ -744,7 +754,7 @@ async function changePassword(req, res) {
     }
 
     try {
-        const doc = await Hcp.findOne({ where: { email: email } });
+        const doc = await Hcp.findOne({ where: where(fn('lower', col('email')), fn('lower', email)) });
 
         if (!doc || !doc.validPassword(current_password)) {
             response.errors.push(new CustomError('Invalid credentials.', 401));
@@ -886,7 +896,9 @@ async function forgetPassword(req, res) {
             return res.status(400).send(response);
         }
 
-        const doc = await Hcp.findOne({ where: { email } });
+        const doc = await Hcp.findOne({
+            where: where(fn('lower', col('email')), fn('lower', email))
+        });
 
         if (!doc) {
             response.data = 'Successfully sent password reset email.';
@@ -985,7 +997,9 @@ async function getAccessToken(req, res) {
             return res.status(400).json(response);
         }
 
-        const doc = await Hcp.findOne({ where: { email } });
+        const doc = await Hcp.findOne({
+            where: where(fn('lower', col('email')), fn('lower', email))
+        });
 
         const userLockedError = new CustomError('Your account has been locked for consecutive failed login attempts.', 4002);
 
