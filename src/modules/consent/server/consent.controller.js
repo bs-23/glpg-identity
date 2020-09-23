@@ -265,15 +265,8 @@ async function getDatasyncConsentsReport(req, res){
         const offset = page * limit;
 
         const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => i.codbase === codbase).map(i => i.country_iso2);
-        let countries = ``;
-        country_iso2_list_for_codbase.forEach( (i, index) => {
-            if(index) countries += ', ';
-            countries += `'${i}'`;
-        });
-
         const country_iso2_list = req.user.type === 'admin' ? (await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry", { type: QueryTypes.SELECT })).map(i => i.country_iso2) : req.user.countries;
         
-
         const orderBy = req.query.orderBy ? req.query.orderBy : '';
         const orderType = req.query.orderType ? req.query.orderType : '';
         let sortBy = 'content_type';
@@ -305,12 +298,18 @@ async function getDatasyncConsentsReport(req, res){
             FROM 
                 ciam.vw_veeva_consent_master
             WHERE 
-                ciam.vw_veeva_consent_master.country_code = ANY(array[${countries}])
+                ciam.vw_veeva_consent_master.country_code = ANY($countries)
             ORDER BY
                 ${sortBy} ${orderType}
             offset ${offset}
             limit ${limit};`
-            , { logging: console.log, type: QueryTypes.SELECT });
+            , { 
+                bind: { 
+                    countries: codbase ? country_iso2_list_for_codbase : country_iso2_list
+                },
+                logging: console.log, 
+                type: QueryTypes.SELECT 
+            });
         
         const total_consents = (await sequelize.datasyncConnector.query(
             `SELECT 
@@ -318,8 +317,13 @@ async function getDatasyncConsentsReport(req, res){
             FROM 
                 ciam.vw_veeva_consent_master
             WHERE 
-                ciam.vw_veeva_consent_master.country_code = ANY(array[${countries}]);`
-            , { type: QueryTypes.SELECT }))[0];
+            ciam.vw_veeva_consent_master.country_code = ANY($countries);`
+            , { 
+                bind: { 
+                    countries: codbase ? country_iso2_list_for_codbase : country_iso2_list
+                },
+                type: QueryTypes.SELECT 
+            }))[0];
         
         
         hcp_consents.forEach( hcp_consent => {
