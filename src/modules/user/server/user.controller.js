@@ -116,7 +116,7 @@ async function login(req, res) {
         const user = await User.findOne({
             where: {
                 email: {
-                    [Op.iLike]: `%${email}%`
+                    [Op.iLike]: `${email}`
                 }
             },
             include: [{
@@ -140,6 +140,8 @@ async function login(req, res) {
 
         const userLockedMessage = 'Your account has been locked for consecutive failed auth attempts. Please use the Forgot Password link to unlock.';
 
+        if (user && user.status === 'inactive') return res.status(401).send('Account not active.');
+
         if (user && user.dataValues.failed_auth_attempt >= 5) {
             return res.status(401).send(userLockedMessage);
         }
@@ -162,8 +164,6 @@ async function login(req, res) {
 
             return res.status(401).send(errorMessage);
         }
-
-        if (user && user.status === 'inactive') return res.status(401).send('Account not active.');
 
         const isSiteVerified = await verifySite(recaptchaToken);
 
