@@ -14,7 +14,7 @@ import _ from 'lodash';
 import parse from 'html-react-parser';
 import { getConsentReport } from '../consent.action';
 
-const ConsentPerformanceReport = () => {
+const CdpConsentPerformanceReport = () => {
     const dispatch = useDispatch();
     const [countries, setCountries] = useState([]);
     const [allCountries, setAllCountries] = useState([]);
@@ -103,7 +103,7 @@ const ConsentPerformanceReport = () => {
     }
 
     function getUrl(orderBy){
-        return `cdp-consent-performance-report${makeUrl( [ 
+        return `/consent/consent-performance-report/cdp${makeUrl( [ 
             { name: 'page', value: consents_report.page - 1 }, 
             { name: 'codbase', value: consents_report.codbase }, 
             { name: 'process_activity', value: consents_report.process_activity }, 
@@ -151,8 +151,8 @@ const ConsentPerformanceReport = () => {
                                 <div>
                                     <h4 className="cdp-text-primary font-weight-bold mb-4">Consent Performance Report</h4>
                                     <div>
-                                        <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/consent/cdp-consent-performance-report">Customer Data Platform</NavLink>
-                                        <NavLink className="custom-tab px-4 py-3 cdp-border-primary" to="/consent/veeva-consent-performance-report"><img alt="Veeva CRM LOGO" src="/assets/logo/logo-veevacrm.svg" height="13" /></NavLink>
+                                        <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/consent/consent-performance-report/cdp">Customer Data Platform</NavLink>
+                                        <NavLink className="custom-tab px-4 py-3 cdp-border-primary" to="/consent/consent-performance-report/veeva-crm"><img alt="Veeva CRM LOGO" src="/assets/logo/logo-veevacrm.svg" height="13" /></NavLink>
                                     </div>
                                 </div>
                                 <div className="d-flex pt-3 pt-sm-0">
@@ -163,7 +163,7 @@ const ConsentPerformanceReport = () => {
                                                 <i className="icon icon-filter mr-2 mb-n1"></i> {consents_report.codbase && (countries.find(i => i.codbase === consents_report.codbase)) ? (countries.find(i => i.codbase === consents_report.codbase)).codbase_desc : 'Filter by Country'}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
-                                                    <LinkContainer to={`cdp-consent-performance-report${makeUrl( [
+                                                    <LinkContainer to={`/consent/consent-performance-report/cdp${makeUrl( [
                                                         { name: 'process_activity', value: consents_report.process_activity }, 
                                                         { name: 'opt_type', value: consents_report.opt_type }, 
                                                         { name: 'orderBy', value: consents_report.orderBy }, 
@@ -173,7 +173,7 @@ const ConsentPerformanceReport = () => {
                                                     </LinkContainer>
                                                     {
                                                         countries.map((item, index) => (
-                                                            consents_report.countries.includes(item.country_iso2) && <LinkContainer  key={index} to={`cdp-consent-performance-report${makeUrl( [
+                                                            consents_report.countries.includes(item.country_iso2) && <LinkContainer  key={index} to={`/consent/consent-performance-report/cdp${makeUrl( [
                                                                 { name: 'codbase', value: item.codbase }, 
                                                                 { name: 'process_activity', value: consents_report.process_activity }, 
                                                                 { name: 'opt_type', value: consents_report.opt_type }, 
@@ -461,7 +461,7 @@ const ConsentPerformanceReport = () => {
                                             <div className="pagination justify-content-end align-items-center border-top p-3">
                                                 <span className="cdp-text-primary font-weight-bold">{consents_report.start + ' - ' + consents_report.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + consents_report.total}</span>
                                                 <LinkContainer 
-                                                    to={`cdp-consent-performance-report${makeUrl( [ 
+                                                    to={`/consent/consent-performance-report/cdp${makeUrl( [ 
                                                         { name: 'page', value: consents_report.page - 1 }, 
                                                         { name: 'codbase', value: consents_report.codbase }, 
                                                         { name: 'process_activity', value: consents_report.process_activity }, 
@@ -473,7 +473,7 @@ const ConsentPerformanceReport = () => {
                                                     <span className="pagination-btn" data-testid='Prev' onClick={() => pageLeft()} disabled={consents_report.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
                                                 </LinkContainer>
                                                 <LinkContainer 
-                                                    to={`cdp-consent-performance-report${makeUrl( [ 
+                                                    to={`/consent/consent-performance-report/cdp${makeUrl( [ 
                                                         { name: 'page', value: consents_report.page + 1 }, 
                                                         { name: 'codbase', value: consents_report.codbase }, 
                                                         { name: 'process_activity', value: consents_report.process_activity }, 
@@ -510,4 +510,4 @@ const ConsentPerformanceReport = () => {
 }
 
 
-export default ConsentPerformanceReport;
+export default CdpConsentPerformanceReport;

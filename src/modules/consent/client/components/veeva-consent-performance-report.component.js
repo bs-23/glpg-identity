@@ -103,7 +103,7 @@ const ConsentPerformanceReport = () => {
     }
 
     function getUrl(orderBy){
-        return `veeva-consent-performance-report${makeUrl( [ 
+        return `/consent/consent-performance-report/veeva-crm${makeUrl( [ 
             { name: 'page', value: consents_report.page - 1 }, 
             { name: 'codbase', value: consents_report.codbase }, 
             { name: 'process_activity', value: consents_report.process_activity }, 
@@ -153,8 +153,8 @@ const ConsentPerformanceReport = () => {
                                 <div>
                                     <h4 className="cdp-text-primary font-weight-bold mb-4">Consent Performance Report</h4>
                                     <div>
-                                        <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/consent/cdp-consent-performance-report">Customer Data Platform</NavLink>
-                                        <NavLink className="custom-tab px-4 py-3 cdp-border-primary" to="/consent/veeva-consent-performance-report"><img alt="Veeva CRM LOGO" src="/assets/logo/logo-veevacrm.svg" height="13" /></NavLink>
+                                        <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/consent/consent-performance-report/cdp">Customer Data Platform</NavLink>
+                                        <NavLink className="custom-tab px-4 py-3 cdp-border-primary" to="/consent/consent-performance-report/veeva-crm"><img alt="Veeva CRM LOGO" src="/assets/logo/logo-veevacrm.svg" height="13" /></NavLink>
                                     </div>
                                 </div>
                                
@@ -166,7 +166,7 @@ const ConsentPerformanceReport = () => {
                                                 <i className="icon icon-filter mr-2 mb-n1"></i> {consents_report.codbase && (countries.find(i => i.codbase === consents_report.codbase)) ? (countries.find(i => i.codbase === consents_report.codbase)).codbase_desc : 'Filter by Country'}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
-                                                    <LinkContainer to={`veeva-consent-performance-report${makeUrl( [
+                                                    <LinkContainer to={`/consent/consent-performance-report/veeva-crm${makeUrl( [
                                                         { name: 'process_activity', value: consents_report.process_activity }, 
                                                         { name: 'opt_type', value: consents_report.opt_type }, 
                                                         { name: 'orderBy', value: consents_report.orderBy }, 
@@ -176,7 +176,7 @@ const ConsentPerformanceReport = () => {
                                                     </LinkContainer>
                                                     {
                                                         countries.map((item, index) => (
-                                                            consents_report.countries.includes(item.country_iso2) && <LinkContainer  key={index} to={`cdp-consent-performance-report${makeUrl( [
+                                                            consents_report.countries.includes(item.country_iso2) && <LinkContainer  key={index} to={`/consent/consent-performance-report/veeva-crm${makeUrl( [
                                                                 { name: 'codbase', value: item.codbase }, 
                                                                 { name: 'process_activity', value: consents_report.process_activity }, 
                                                                 { name: 'opt_type', value: consents_report.opt_type }, 
@@ -284,27 +284,13 @@ const ConsentPerformanceReport = () => {
                                                 <div className="mt-1 font-weight-bold">Email</div>
                                                 <div className="">{currentUser.email || '--'}</div>
                                             </div>
-                                            <div className="col-6">
-                                                <div className="mt-1 font-weight-bold">Phone Number</div>
-                                                <div className="">{currentUser.telephone || '--'}</div>
-                                            </div>
-                                        </div>
-                                        <div className="row mt-3">
+
                                             <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">Country</div>
                                                 <div className="">{getCountryName(currentUser.country_code) || '--'}</div>
                                             </div>
-                                            <div className="col-6">
-                                                <div className="mt-1 font-weight-bold">Date of Registration</div>
-                                                <div className="">{currentUser.given_date ? (new Date(currentUser.given_date)).toLocaleDateString('en-GB').replace(/\//g, '.') : '--'}</div>
-                                            </div>
                                         </div>
-                                        <div className="row mt-3">
-                                            <div className="col-6">
-                                                <div className="mt-1 font-weight-bold">Status</div>
-                                                <div className="text-capitalize">{currentUser.status ? _.startCase(_.toLower(currentUser.status.replace(/_/g, ' '))) : '--'}</div>
-                                            </div>
-                                        </div>
+                                        
                                         <div className="row mt-4">
                                             <div className="col accordion-consent rounded shadow-sm p-0">
                                                 <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Consents</h4>
@@ -464,7 +450,7 @@ const ConsentPerformanceReport = () => {
                                             <div className="pagination justify-content-end align-items-center border-top p-3">
                                                 <span className="cdp-text-primary font-weight-bold">{consents_report.start + ' - ' + consents_report.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + consents_report.total}</span>
                                                 <LinkContainer 
-                                                    to={`veeva-consent-performance-report${makeUrl( [ 
+                                                    to={`/consent/consent-performance-report/veeva-crm${makeUrl( [ 
                                                         { name: 'page', value: consents_report.page - 1 }, 
                                                         { name: 'codbase', value: consents_report.codbase }, 
                                                         { name: 'process_activity', value: consents_report.process_activity }, 
@@ -476,7 +462,7 @@ const ConsentPerformanceReport = () => {
                                                     <span className="pagination-btn" data-testid='Prev' onClick={() => pageLeft()} disabled={consents_report.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
                                                 </LinkContainer>
                                                 <LinkContainer 
-                                                    to={`veeva-consent-performance-report${makeUrl( [ 
+                                                    to={`/consent/consent-performance-report/veeva-crm${makeUrl( [ 
                                                         { name: 'page', value: consents_report.page + 1 }, 
                                                         { name: 'codbase', value: consents_report.codbase }, 
                                                         { name: 'process_activity', value: consents_report.process_activity }, 
