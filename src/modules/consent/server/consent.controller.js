@@ -268,6 +268,23 @@ async function getDatasyncConsentsReport(req, res){
         const country_iso2_list = req.user.type === 'admin' ? (await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry", { type: QueryTypes.SELECT })).map(i => i.country_iso2) : req.user.countries;
         // WHERE ciam.vw_veeva_consent_master.country_code = ANY(${country_iso2_list_for_codbase})
 
+        const orderBy = req.query.orderBy ? req.query.orderBy : '';
+        const orderType = req.query.orderType ? req.query.orderType : '';
+        let sortBy = 'content_type';
+
+        if(orderBy && orderType){
+            if(orderBy === 'first_name') sortBy = 'ciam.vwhcpmaster.firstname';
+            if(orderBy === 'last_name') sortBy = 'ciam.vwhcpmaster.lastname';
+            if(orderBy === 'email') sortBy = 'ciam.vw_veeva_consent_master.channel_value';
+            // if(orderBy === 'consent_type') order.push([Consent, ConsentCategory, 'title', orderType]);
+
+            if(orderBy === 'opt_type') sortBy = 'ciam.vw_veeva_consent_master.opt_type';
+
+            // if(orderBy === 'legal_basis') order.push([Consent, 'legal_basis', orderType]);
+            if(orderBy === 'preferences') sortBy = 'ciam.vw_veeva_consent_master.content_type';
+            if(orderBy === 'date') sortBy = 'ciam.vw_veeva_consent_master.capture_datetime';
+        }
+
         const hcp_consents = await sequelize.datasyncConnector.query(
             `SELECT 
                 content_type, 
@@ -287,7 +304,8 @@ async function getDatasyncConsentsReport(req, res){
                 ciam.vw_veeva_consent_master 
             LEFT JOIN ciam.vwhcpmaster 
                 on ciam.vwhcpmaster.individual_id_onekey = ciam.vw_veeva_consent_master.onekeyid
-            
+            ORDER BY
+                ${sortBy} ${orderType}
             offset ${offset}
             limit ${limit};`
             , { logging: console.log, type: QueryTypes.SELECT });
@@ -330,8 +348,8 @@ async function getDatasyncConsentsReport(req, res){
             // process_activity: process_activity ? process_activity : '',
             // opt_type: opt_type ? opt_type : '',
             countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : req.user.countries,
-            // orderBy: orderBy,
-            // orderType: orderType,
+            orderBy: orderBy,
+            orderType: orderType,
         };
 
 
