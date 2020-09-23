@@ -273,8 +273,7 @@ async function getDatasyncConsentsReport(req, res){
         let sortBy = 'content_type';
 
         if(orderBy && orderType){
-            if(orderBy === 'first_name') sortBy = 'ciam.vwhcpmaster.firstname';
-            if(orderBy === 'last_name') sortBy = 'ciam.vwhcpmaster.lastname';
+            if(orderBy === 'name') sortBy = 'ciam.vw_veeva_consent_master.account_name';
             if(orderBy === 'email') sortBy = 'ciam.vw_veeva_consent_master.channel_value';
             // if(orderBy === 'consent_type') order.push([Consent, ConsentCategory, 'title', orderType]);
 
@@ -287,6 +286,7 @@ async function getDatasyncConsentsReport(req, res){
 
         const hcp_consents = await sequelize.datasyncConnector.query(
             `SELECT 
+                account_name,
                 content_type, 
                 opt_type, 
                 capture_datetime, 
@@ -295,15 +295,9 @@ async function getDatasyncConsentsReport(req, res){
                 country_code,
                 double_opt_in, 
                 uuid_mixed, 
-                phone,
-                telephone,
-                firstname, 
-                lastname, 
                 channel_value
             FROM 
-                ciam.vw_veeva_consent_master 
-            LEFT JOIN ciam.vwhcpmaster 
-                on ciam.vwhcpmaster.individual_id_onekey = ciam.vw_veeva_consent_master.onekeyid
+                ciam.vw_veeva_consent_master
             ORDER BY
                 ${sortBy} ${orderType}
             offset ${offset}
@@ -314,13 +308,12 @@ async function getDatasyncConsentsReport(req, res){
             `SELECT 
                 COUNT(*)
             FROM 
-                ciam.vw_veeva_consent_master 
-            left join ciam.vwhcpmaster 
-                on ciam.vwhcpmaster.individual_id_onekey = ciam.vw_veeva_consent_master.onekeyid;`
+                ciam.vw_veeva_consent_master;`
             , { type: QueryTypes.SELECT }))[0];
         
         
         hcp_consents.forEach( hcp_consent => {
+            hcp_consent.name = hcp_consent.account_name;
             hcp_consent.first_name = hcp_consent.firstname;
             hcp_consent.last_name = hcp_consent.lastname;
             hcp_consent.email = hcp_consent.channel_value;
@@ -329,6 +322,7 @@ async function getDatasyncConsentsReport(req, res){
             hcp_consent.preference = hcp_consent.content_type;
             hcp_consent.given_date = hcp_consent.capture_datetime;
             
+            delete hcp_consent['account_name'];
             delete hcp_consent['firstname'];
             delete hcp_consent['lastname'];
             delete hcp_consent['channel_value'];
@@ -400,7 +394,8 @@ async function getUserConsents(req, res) {
 
         userConsents.forEach(consent => {
             consent.id = ++id;
-            consent.rich_text = consent.default_consent_text_vod ? consent.default_consent_text_vod : '';
+            consent.title = consent.default_consent_text_vod ? consent.default_consent_text_vod : '';
+            consent.rich_text = consent.disclaimer_text_vod ? consent.disclaimer_text_vod : '';
             consent.given_time = consent.capture_datetime;
             consent.opt_type = consent.opt_type === 'Opt_In_vod' ? consent.double_opt_in ? 'double-opt-in' : 'single-opt-in' : 'opt-out';
         });

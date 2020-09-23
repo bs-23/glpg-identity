@@ -304,7 +304,7 @@ const ConsentPerformanceReport = () => {
                                                             </Card.Body>
                                                         </Accordion.Collapse>
                                                         <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
-                                                            <span className="d-flex align-items-center"><i class={`icon icon-check-filled cdp-text-primary mr-4 consent-check`}></i> <span className="consent-summary">{consent.rich_text}</span></span>
+                                                            <span className="d-flex align-items-center"><i class={`icon icon-check-filled cdp-text-primary mr-4 consent-check`}></i> <span className="consent-summary">{consent.title}</span></span>
                                                             <i className="icon icon-arrow-down ml-2 accordion-consent__icon-down"></i>
                                                         </Accordion.Toggle>
                                                     </Card>
@@ -325,23 +325,12 @@ const ConsentPerformanceReport = () => {
                                             <thead className="cdp-bg-primary text-white cdp-table__header">
                                                 <tr>
                                                     <th>
-                                                        <LinkContainer to={getUrl('first_name')}>
+                                                        <LinkContainer to={getUrl('name')}>
                                                             <span 
-                                                                className={consents_report.orderBy === 'first_name' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getVeevaConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'first_name', getorderType('first_name') ))}
+                                                                className={consents_report.orderBy === 'name' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
+                                                                onClick={() => dispatch(getVeevaConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'name', getorderType('name') ))}
                                                             >
-                                                                First Name
-                                                            <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
-                                                        </LinkContainer>
-                                                    </th>
-
-                                                    <th>
-                                                        <LinkContainer to={getUrl('last_name')}>
-                                                            <span 
-                                                                className={consents_report.orderBy === 'last_name' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getVeevaConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'last_name', getorderType('last_name') ))}
-                                                            >
-                                                                Last Name
+                                                                Name
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
                                                         </LinkContainer>
                                                     </th>
@@ -418,8 +407,7 @@ const ConsentPerformanceReport = () => {
                                             <tbody className="cdp-table__body bg-white">
                                                 {consents_report['hcp_consents'].map((row, index) => (
                                                     <tr key={index}>
-                                                        <td>{row.first_name}</td>
-                                                        <td>{row.last_name}</td>
+                                                        <td>{row.name}</td>
                                                         <td><i className="icon icon-check-filled icon-position-bit-down text-primary-color mr-2 cdp-text-primary"></i>{row.email}</td>
                                                         <td>{row.title}</td>
                                                         <td>{titleCase(row.opt_type)}</td>
