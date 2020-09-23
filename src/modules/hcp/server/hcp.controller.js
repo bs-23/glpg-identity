@@ -502,7 +502,7 @@ async function createHcpProfile(req, res) {
 
         response.data = getHcpViewModel(hcpUser.dataValues);
 
-        if(hcpUser.dataValues.status === 'not_verified') {
+        if (hcpUser.dataValues.status === 'not_verified') {
             await sendRegistrationNotVerifiedMail(hcpUser.dataValues, req.user);
         }
 
@@ -584,7 +584,7 @@ async function approveHCPUser(req, res) {
             return res.status(404).send(response);
         }
 
-        if(hcpUser.dataValues.status !== 'not_verified') {
+        if (hcpUser.dataValues.status !== 'not_verified') {
             response.errors.push(new CustomError('Invalid user status for this request.', 400));
             return res.status(400).send(response);
         }
@@ -653,7 +653,7 @@ async function rejectHCPUser(req, res) {
             return res.status(404).send(response);
         }
 
-        if(hcpUser.dataValues.status !== 'not_verified') {
+        if (hcpUser.dataValues.status !== 'not_verified') {
             response.errors.push(new CustomError('Invalid user status for this request.', 400));
             return res.status(400).send(response);
         }
