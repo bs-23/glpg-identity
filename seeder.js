@@ -241,13 +241,13 @@ async function init() {
                 locale: 'nl_nl'
             },
             {
-                rich_text: "<p>Ik geef Galapagos toestemming om mij via mijn e-mailadres promotie- en milieu-informatie over alle Galapagos-producten en -diensten te sturen. <br> <br> Raadpleeg onze <a href='https://www.glpg.com/nederland/privacyverklaring' target='_blank'>privacyverklaring</a> voor meer informatie over hoe we met uw persoonsgegevens omgaan.</p>",
-                consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
+                rich_text: "<p>Ik verklaar dat de ingevulde gegevens mijn persoonlijke gegevens zijn en dat de informatie volledig en accuraat is. Ik verklaar dat ik mijn gegevens niet zal delen met derden om die derden toegang te verlenen tot de huidige website. Ik zal Galapagos onmiddellijk op de hoogte brengen van elk bekend of vermoed niet-geautoriseerd gebruik van mijn persoonlijke gegevens inzake de toegang tot deze website.</p>",
+                consent_id: '2b9fa7f9-2c1e-4621-a091-5e4bf539b875',
                 locale: 'nl_nl'
             },
             {
-                rich_text: "<p>U verklaart dat de ingevulde gegevens uw persoonlijke gegevens zijn en dat de informatie volledig en accuraat is. Uw gegevens mogen in geen geval gedeeld worden met derden om die derden toegang te verlenen aan huidige website. U moet Galapagos onmiddellijk op de hoogte brengen van elk bekend of vermoed niet-geautoriseerd gebruik van uw persoonlijke gegevens inzake de toegang tot deze website.</p>",
-                consent_id: '2b9fa7f9-2c1e-4621-a091-5e4bf539b875',
+                rich_text: "<p>Ik ontvang graag informatieve en promotionele communicatie via e-mail over de producten, diensten en andere ontwikkelingen van Galapagos. <br> <br> Raadpleeg onze <a href='https://www.glpg.com/nederland/privacyverklaring' target='_blank'>privacyverklaring</a> voor meer informatie over hoe we met uw persoonsgegevens omgaan.</p>",
+                consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 locale: 'nl_nl'
             }
         ];
@@ -276,7 +276,7 @@ async function init() {
             {
                 consent_id: '2b9fa7f9-2c1e-4621-a091-5e4bf539b875',
                 country_iso2: 'nl',
-                opt_type: 'single-opt-in'
+                opt_type: 'double-opt-in'
             }
         ];
 
