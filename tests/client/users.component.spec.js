@@ -20,37 +20,52 @@ describe('Users component', () => {
         mockAxios = new MockAdapter(axios);
         mockAxios.onGet('/api/users/profile').reply(200, { id: '1', email: 'email@gmail.com', first_name: 'a', last_name: 'b', application: null, countries: null, type: 'admin', roles: [{ title: 'User & HCP Manager', permissions: ['user', 'hcp'] }]});
         await store.dispatch(getSignedInUserProfile());
-    
+
         const countries = [
             { countryid: 0, codbase: null, country_iso2: null, countryname: '', codbase_desc: 'null' },
-            { countryid: 1, codbase: 'aa',  country_iso2: 'country1', countryname: 'country1', codbase_desc: 'country1' },
-            { countryid: 2, codbase: 'bb', country_iso2: 'country2', countryname: 'country2', codbase_desc: 'country2' },
-            { countryid: 3, codbase: 'cc', country_iso2: 'country3', countryname: 'country3', codbase_desc: 'country3' },
-            { countryid: 4, codbase: 'dd', country_iso2: 'country4', countryname: 'country4', codbase_desc: 'country4' }
+            { countryid: 1, codbase: 'aa',  country_iso2: 'country1', countryname: 'countryName1', codbase_desc: 'countryDesc1' },
+            { countryid: 2, codbase: 'bb', country_iso2: 'country2', countryname: 'countryName2', codbase_desc: 'countryDesc2' },
+            { countryid: 3, codbase: 'cc', country_iso2: 'country3', countryname: 'countryName3', codbase_desc: 'countryDesc3' },
+            { countryid: 4, codbase: 'dd', country_iso2: 'country4', countryname: 'countryName4', codbase_desc: 'countryDesc4' }
         ]
-        const limit = 3
-        
-        const data = {
-            users: [
-                { id: '1', first_name: 'John', email: 'email@gmail.com', countries: ['country1'], createdByUser: '1' },
-                { id: '2', first_name: 'Smith', email: 'email2@gmail.com', countries: ['country2'], createdByUser: '1' },
-                { id: '3', first_name: 'Carl', email: 'email3@gmail.com', countries: ['country3'], createdByUser: '1' },
-                { id: '4', first_name: 'Johnson', email: 'email4@gmail.com', countries: ['country4'], createdByUser: '1' },
-                { id: '5', first_name: 'Brandon', email: 'email5@gmail.com', countries: ['country4'], createdByUser: '1' },
+
+        mockAxios.onGet('/api/countries').reply(200, countries)
+
+        const userList = {
+            "users":[
+                {
+                    "id":"e00f1ad7-8dec-402d-b1eb-b3507a4d84ac",
+                    "first_name":"First Name",
+                    "last_name":"Last Name",
+                    "email":"email@gmail.com",
+                    "countries":["country1"],
+                    "createdByUser":{}
+                },
+                {
+                    "id":"d0a3e77d-d78b-432e-8c7d-b85124071c9b",
+                    "first_name":"First Name",
+                    "last_name":"Last Name",
+                    "email":"email@gmail.com",
+                    "countries":["country2"],
+                    "createdByUser":{}
+                }],
+        }
+
+        const filteredUserList = {
+            "users":[
+                {
+                    "id":"e00f1ad7-8dec-402d-b1eb-b3507a4d84ac",
+                    "first_name":"First Name",
+                    "last_name":"Last Name",
+                    "email":"email@gmail.com",
+                    "countries":["country1"],
+                    "createdByUser":{}
+                },
             ]
         }
-    
-        mockAxios.onGet('/api/countries').reply(200, countries)
-        
-        countries.forEach(country => {
-            if (country.codbase === 'null') return
-            const response = { ...data }
-            const { users: allUsers } = response
-            response.users = allUsers.filter(user => user.countries.includes(country.country_iso2))
-            mockAxios.onGet(`/api/users?page=${1}&codbase=${country.codbase}`).reply(200, response)
-        })
-        mockAxios.onGet(`/api/users?page=${1}&codbase=null`).reply(200, { users: data.users.slice(0, limit), page: 1, end: 3 })
-        mockAxios.onGet(`/api/users?page=${2}&codbase=null`).reply(200, { users: data.users.slice(limit), page: 2, end: 5 })
+
+        mockAxios.onGet('api/users?page=1&codbase=aa&orderBy=undefined&orderType=undefined').reply(200, filteredUserList);
+        mockAxios.onGet("/api/users?page=1&orderBy=undefined&orderType=undefined").reply(200, userList);
     });
 
     const wrapperComponent = () => (
@@ -70,9 +85,7 @@ describe('Users component', () => {
     })
 
     it('Should filter users based on country', async () => {
-        const { debug, container, getByText } = render(wrapperComponent());
-        // setTimeout
-        // debug(container);
+        const { debug, container, getAllByText, getByText } = render(wrapperComponent());
 
         let table;
         await waitFor(() => {
@@ -81,12 +94,12 @@ describe('Users component', () => {
         })
 
         const tbody = container.querySelector('tbody')
-        expect(tbody.childNodes.length).toBe(3)
+        expect(tbody.childNodes.length).toBe(2)
 
         const filter_button = getByText('Filter by Country')
         fireEvent.click(filter_button)
 
-        const country_label = getByText('country4')
+        const country_label = getAllByText('countryDesc1')[0]
         fireEvent.click(country_label)
 
         await waitFor(() => {
