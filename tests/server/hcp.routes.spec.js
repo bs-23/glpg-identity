@@ -11,6 +11,9 @@ const { defaultApplication, users: { defaultAdmin } } = specHelper;
 let appInstance;
 let request;
 
+// Increasing timeout limit
+jest.setTimeout(20000);
+
 beforeAll(async () => {
     const config = require(path.join(process.cwd(), 'src/config/server/config'));
     await config.initEnvironmentVariables();
@@ -186,7 +189,7 @@ describe('HCP Routes', () => {
 
     it('Should get hcp users data', async () => {
         const response = await request
-            .get('/api/hcps/?page=1&status=approved')
+            .get('/api/hcps/?page=1&status=self_verified')
             .set('Cookie', [`access_token=${defaultAdmin.access_token}`]);
 
         expect(response.statusCode).toBe(200);

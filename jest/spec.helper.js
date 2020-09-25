@@ -20,13 +20,14 @@ module.exports = {
     defaultApplication: {
         id: defaultApplicationId,
         name: faker.company.companyName(),
-        slug: 'hcp-portal',
-        email: 'hcp-portal@glpg.com',
+        slug: 'jyseleca',
+        email: 'jyseleca@glpg.com',
         password: 'strong-password',
         consent_confirmation_link: 'a',
         reset_password_link: 'a',
         login_link: 'a',
         logo_link: 'a',
+        forgot_password_link: '',
         created_by: defaultAdminId,
         updated_by: defaultAdminId,
         access_token: jwt.sign({

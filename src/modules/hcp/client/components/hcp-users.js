@@ -419,7 +419,7 @@ export default function hcpUsers() {
                                                     <th><span className={sort.value === 'status' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, hcps.codBase, hcps.status, 'status')}>Status<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th><span className={sort.value === 'uuid' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, hcps.codBase, hcps.status, 'uuid')}>UUID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                                     <th><span >Country</span></th>
-                                                    <th><span className={sort.value === 'specialty_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, hcps.codBase, hcps.status, 'specialty_name')}>Specialty<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                    <th><span>Specialty</span></th>
                                                     <th className="consent-col">Single<br /> Opt-In</th>
                                                     <th className="consent-col">Double<br /> Opt-In</th>
                                                     <th>Action</th>

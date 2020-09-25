@@ -149,7 +149,7 @@ async function init() {
                     consent_confirmation_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/consentConfirm.consent.html',
                     reset_password_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/journeyRedirect.journey.html',
                     login_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/journeyRedirect.journey.html',
-                    forgot_password_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/journeyRedirect',
+                    forgot_password_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/journeyRedirect.journey.html',
                     logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
                     created_by: admin.id,
                     updated_by: admin.id
@@ -162,7 +162,7 @@ async function init() {
                     consent_confirmation_link: 'https://www-dev.jyseleca.nl/bin/public/glpg-brandx/consentConfirm.consent.html',
                     reset_password_link: 'https://www-dev.jyseleca.nl/bin/public/glpg-brandx/journeyRedirect.journey.html',
                     login_link: 'https://www-dev.jyseleca.nl/bin/public/glpg-brandx/journeyRedirect.journey.html',
-                    forgot_password_link: 'https://www-dev.jyseleca.nl/bin/public/glpg-brandx/journeyRedirect',
+                    forgot_password_link: 'https://www-dev.jyseleca.nl/bin/public/glpg-brandx/journeyRedirect.journey.html',
                     logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/jyseleca/logo.png`,
                     created_by: admin.id,
                     updated_by: admin.id
@@ -203,6 +203,14 @@ async function init() {
                 category_id: 'fe037405-c676-4d98-bd05-85008900c838',
                 legal_basis: 'consent',
                 preference: 'Promotional email marketing'
+            },
+            {
+                id: '2b9fa7f9-2c1e-4621-a091-5e4bf539b875',
+                title: 'I declare that the information is complete and accurate',
+                slug: '',
+                category_id: '59953d51-2449-4b65-950f-9f88654019bb',
+                legal_basis: 'consent',
+                preference: ''
             }
         ];
 
@@ -228,21 +236,32 @@ async function init() {
                 locale: 'nl_be'
             },
             {
-                rich_text: "<p>Ik bevestig dat ik een professionele zorgverlener ben die in Nederland werkzaam is en ik accepteer de <a href='https://www.glpg.com/nederland/disclaimer' target='_blank'>Gebruiksvoorwaarden</a> van Galapagos.nl.</p>",
+                rich_text: "<p>Ik bevestig dat ik een professionele zorgverlener ben die in Nederland werkzaam is en ik accepteer de <a href='https://www.jyseleca.nl/nl/static-pages/terms-of-use.html' target='_blank'>Gebruiksvoorwaarden</a> van Galapagos.nl.</p>",
                 consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
                 locale: 'nl_nl'
             },
             {
-                rich_text: "<p>Ik geef Galapagos toestemming om mij via mijn e-mailadres promotie- en milieu-informatie over alle Galapagos-producten en -diensten te sturen. <br> <br> Raadpleeg onze <a href='https://www.glpg.com/nederland/privacyverklaring' target='_blank'>privacyverklaring</a> voor meer informatie over hoe we met uw persoonsgegevens omgaan.</p>",
+                rich_text: "<p>Ik verklaar dat de ingevulde gegevens mijn persoonlijke gegevens zijn en dat de informatie volledig en accuraat is. Ik verklaar dat ik mijn gegevens niet zal delen met derden om die derden toegang te verlenen tot de huidige website. Ik zal Galapagos onmiddellijk op de hoogte brengen van elk bekend of vermoed niet-geautoriseerd gebruik van mijn persoonlijke gegevens inzake de toegang tot deze website.</p>",
+                consent_id: '2b9fa7f9-2c1e-4621-a091-5e4bf539b875',
+                locale: 'nl_nl'
+            },
+            {
+                rich_text: "<p>Ik ontvang graag informatieve en promotionele communicatie via e-mail over de producten, diensten en andere ontwikkelingen van Galapagos. <br> <br> Raadpleeg onze <a href='https://www.jyseleca.nl/nl/static-pages/privacy-policy.html' target='_blank'>privacyverklaring</a> voor meer informatie over hoe we met uw persoonsgegevens omgaan.</p>",
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 locale: 'nl_nl'
             }
         ];
+
         const consentCountries = [
             {
                 consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
                 country_iso2: 'be',
                 opt_type: 'single-opt-in'
+            },
+            {
+                consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
+                country_iso2: 'be',
+                opt_type: 'double-opt-in'
             },
             {
                 consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
@@ -255,8 +274,8 @@ async function init() {
                 opt_type: 'double-opt-in'
             },
             {
-                consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
-                country_iso2: 'be',
+                consent_id: '2b9fa7f9-2c1e-4621-a091-5e4bf539b875',
+                country_iso2: 'nl',
                 opt_type: 'double-opt-in'
             }
         ];
