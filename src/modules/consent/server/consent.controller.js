@@ -267,6 +267,8 @@ async function getDatasyncConsentsReport(req, res){
         // const opt_type = req.query.opt_type === undefined ? '' : req.query.opt_type;
         const offset = page * limit;
 
+        const [, userPermittedCountries] = await getUserPermissions(req.user.id);
+
         async function getCountryIso2(){
             if(req.user.type === 'admin'){
                 const all_country_iso2_list = (await sequelize.datasyncConnector.query(
@@ -283,7 +285,7 @@ async function getDatasyncConsentsReport(req, res){
                     `SELECT * FROM ciam.vwcountry where ciam.vwcountry.country_iso2 = ANY($countries);`,
                     {
                         bind: {
-                            countries: req.user.countries
+                            countries: userPermittedCountries
                         },
                         type: QueryTypes.SELECT
                     }
