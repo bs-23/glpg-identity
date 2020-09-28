@@ -28,7 +28,7 @@
         "name": "GMC ID",
         "link": "https://www.gmc-uk.org/registration-and-licensing/the-medical-register#searchTheRegister",
         "logo": "/assets/logo/logo-gmc.svg",
-        "height": 12,
+        "height": 14,
         "heightSingle": 18
     },
     {
@@ -36,8 +36,31 @@
         "name": "RPPS",
         "link": "https://annuaire.sante.fr/",
         "logo": "/assets/logo/logo-rpps.png",
-        "height": 12,
+        "height": 14,
         "heightSingle": 18
-
+    },
+    {
+        "codbase": "WDE",
+        "name": "Bundesärztekammer",
+        "link": "https://www.bundesaerztekammer.de/service/arztsuche/",
+        "logo": "/assets/logo/logo-bundesaerztekammer.png",
+        "height": 35,
+        "heightSingle": 40
+    },
+    {
+        "codbase": "WIT",
+        "name": "Studio Legale Metta",
+        "link": "https://www.studiolegalemetta.com/en/italian-tax-code-codice-fiscale/",
+        "logo": "/assets/logo/logo-studio-legale-metta.png",
+        "height": 28,
+        "heightSingle": 30
+    },
+    {
+        "codbase": "WES",
+        "name": "OMC",
+        "link": "http://cgcom.vuds-omc.es/",
+        "logo": "/assets/logo/logo-omc.png",
+        "height": 28,
+        "heightSingle": 30
     }
 ]

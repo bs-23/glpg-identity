@@ -21,6 +21,7 @@ const User = require(path.join(process.cwd(), 'src/modules/user/server/user.mode
 const PermissionSet_ServiceCateory = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-serviceCategory.model"));
 const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-application.model"));
 const ServiceCategory = require(path.join(process.cwd(), "src/modules/user/server/permission/service-category.model"));
+const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model.js'));
 
 async function getConsents(req, res) {
     const response = new Response({}, []);
@@ -270,6 +271,169 @@ async function getConsentsReport(req, res){
     }
 }
 
+async function getDatasyncConsentsReport(req, res){
+    const response = new Response({}, []);
+
+    try{
+        const page = req.query.page ? req.query.page - 1 : 0;
+        const limit = 30;
+        const codbase = req.query.codbase === undefined ? '' : req.query.codbase;
+        // const process_activity = req.query.process_activity === undefined ? '' : req.query.process_activity;
+        // const opt_type = req.query.opt_type === undefined ? '' : req.query.opt_type;
+        const offset = page * limit;
+
+        async function getCountryIso2(){
+            if(req.user.type === 'admin'){
+                const all_country_iso2_list = (await sequelize.datasyncConnector.query(
+                    `SELECT * FROM ciam.vwcountry`,
+                    {
+                        type: QueryTypes.SELECT
+                    }
+                )).map(i => i.country_iso2);
+
+                return all_country_iso2_list;
+            }
+            else{
+                const user_codbase_list_for_iso2 = (await sequelize.datasyncConnector.query(
+                    `SELECT * FROM ciam.vwcountry where ciam.vwcountry.country_iso2 = ANY($countries);`,
+                    {
+                        bind: {
+                            countries: req.user.countries
+                        },
+                        type: QueryTypes.SELECT
+                    }
+                )).map(i => i.codbase);
+
+                const user_country_iso2_list = (await sequelize.datasyncConnector.query(
+                    `SELECT * FROM ciam.vwcountry where ciam.vwcountry.codbase = ANY($codbases);`,
+                    {
+                        bind: {
+                            codbases : user_codbase_list_for_iso2
+                        },
+                        type: QueryTypes.SELECT
+                    }
+                )).map(i => i.country_iso2);
+
+                return user_country_iso2_list;
+            }
+        }
+
+        const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(
+            `SELECT * FROM ciam.vwcountry WHERE ciam.vwcountry.codbase = '${codbase}';`,
+            {
+                logging: console.log,
+                type: QueryTypes.SELECT
+            }
+        )).map(i => i.country_iso2);
+
+        // const country_iso2_list = req.user.type === 'admin' ? (await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry", { type: QueryTypes.SELECT })).map(i => i.country_iso2) : user_country_iso2_list;
+        // const country_iso2_list = req.user.type === 'admin' ? (await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry", { type: QueryTypes.SELECT })).map(i => i.country_iso2) : user_country_iso2_list;
+        const country_iso2_list = await getCountryIso2();
+
+        const orderBy = req.query.orderBy ? req.query.orderBy : '';
+        const orderType = req.query.orderType ? req.query.orderType : '';
+        let sortBy = 'content_type';
+
+        if(orderBy && orderType){
+            if(orderBy === 'name') sortBy = 'ciam.vw_veeva_consent_master.account_name';
+            if(orderBy === 'email') sortBy = 'ciam.vw_veeva_consent_master.channel_value';
+            // if(orderBy === 'consent_type') order.push([Consent, ConsentCategory, 'title', orderType]);
+
+            if(orderBy === 'opt_type') sortBy = 'ciam.vw_veeva_consent_master.opt_type';
+
+            // if(orderBy === 'legal_basis') order.push([Consent, 'legal_basis', orderType]);
+            if(orderBy === 'preferences') sortBy = 'ciam.vw_veeva_consent_master.content_type';
+            if(orderBy === 'date') sortBy = 'ciam.vw_veeva_consent_master.capture_datetime';
+        }
+
+        const hcp_consents = await sequelize.datasyncConnector.query(
+            `SELECT
+                account_name,
+                content_type,
+                opt_type,
+                capture_datetime,
+                onekeyid,
+                uuid_mixed,
+                country_code,
+                double_opt_in,
+                uuid_mixed,
+                channel_value
+            FROM
+                ciam.vw_veeva_consent_master
+            WHERE
+                ciam.vw_veeva_consent_master.country_code = ANY($countries)
+            ORDER BY
+                ${sortBy} ${orderType}
+            offset ${offset}
+            limit ${limit};`
+            , {
+                bind: {
+                    countries: codbase ? country_iso2_list_for_codbase : country_iso2_list
+                },
+                logging: console.log,
+                type: QueryTypes.SELECT
+            });
+
+        const total_consents = (await sequelize.datasyncConnector.query(
+            `SELECT
+                COUNT(*)
+            FROM
+                ciam.vw_veeva_consent_master
+            WHERE
+            ciam.vw_veeva_consent_master.country_code = ANY($countries);`
+            , {
+                bind: {
+                    countries: codbase ? country_iso2_list_for_codbase : country_iso2_list
+                },
+                type: QueryTypes.SELECT
+            }))[0];
+
+
+        hcp_consents.forEach( hcp_consent => {
+            hcp_consent.name = hcp_consent.account_name;
+            hcp_consent.first_name = hcp_consent.firstname;
+            hcp_consent.last_name = hcp_consent.lastname;
+            hcp_consent.email = hcp_consent.channel_value;
+            hcp_consent.opt_type = hcp_consent.opt_type === 'Opt_In_vod' ? hcp_consent.double_opt_in ? 'double-opt-in' : 'single-opt-in' : 'opt-out';
+            hcp_consent.legal_basis = 'consent';
+            hcp_consent.preference = hcp_consent.content_type;
+            hcp_consent.given_date = hcp_consent.capture_datetime;
+
+            delete hcp_consent['account_name'];
+            delete hcp_consent['firstname'];
+            delete hcp_consent['lastname'];
+            delete hcp_consent['channel_value'];
+            delete hcp_consent['content_type'];
+            delete hcp_consent['capture_datetime'];
+            delete hcp_consent['double_opt_in'];
+        });
+
+        const data = {
+            hcp_consents: hcp_consents,
+            page: page + 1,
+            limit,
+            total: total_consents.count,
+            start: limit * page + 1,
+            end: offset + limit > total_consents ? total_consents : offset + limit,
+            codbase: codbase ? codbase : '',
+            // process_activity: process_activity ? process_activity : '',
+            // opt_type: opt_type ? opt_type : '',
+            countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : req.user.countries,
+            orderBy: orderBy,
+            orderType: orderType,
+        };
+
+
+        response.data = data;
+        res.json(response);
+    }
+    catch(err){
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
+    }
+}
+
 async function getAllProcessActivities(req, res) {
     try{
         const process_activities = await ConsentCategory.findAll();
@@ -441,11 +605,42 @@ async function getAppCountryPermissions(permissionSet) {
     }
 
     return [applications, countries];
+}
 
+async function getUserConsents(req, res) {
+    const response = new Response({}, []);
 
+    try {
+        const userConsents = await sequelize.datasyncConnector.query(`
+            SELECT *
+            FROM ciam.vw_veeva_consent_master
+            where ciam.vw_veeva_consent_master.onekeyid = '${req.params.id}';`, { type: QueryTypes.SELECT });
+
+        if (!userConsents) return res.json([]);
+
+        let id = 0;
+
+        userConsents.forEach(consent => {
+            consent.id = ++id;
+            consent.title = consent.default_consent_text_vod ? consent.default_consent_text_vod : '';
+            consent.rich_text = consent.disclaimer_text_vod ? consent.disclaimer_text_vod : '';
+            consent.given_time = consent.capture_datetime;
+            consent.opt_type = consent.opt_type === 'Opt_In_vod' ? consent.double_opt_in ? 'double-opt-in' : 'single-opt-in' : 'opt-out';
+        });
+
+        response.data = userConsents;
+
+        res.json(response);
+    } catch (err) {
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
+    }
 }
 
 exports.getConsents = getConsents;
 exports.getConsentsReport = getConsentsReport;
+exports.getDatasyncConsentsReport = getDatasyncConsentsReport;
 exports.getAllProcessActivities = getAllProcessActivities;
 exports.getAllOptTypes = getAllOptTypes;
+exports.getUserConsents = getUserConsents;
