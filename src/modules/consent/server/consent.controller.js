@@ -11,17 +11,7 @@ const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequel
 const HCPS = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_profile.model'));
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
-const UserProfile = require(path.join(process.cwd(), "src/modules/user/server/user-profile.model"));
-const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/userProfile-permissionSet.model"));
-const User_Role = require(path.join(process.cwd(), "src/modules/user/server/role/user-role.model"));
-const Role_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/role-permissionSet.model"));
-const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
-const PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permission-set.model"));
-const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
-const PermissionSet_ServiceCateory = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-serviceCategory.model"));
-const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-application.model"));
-const ServiceCategory = require(path.join(process.cwd(), "src/modules/user/server/permission/service-category.model"));
-const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model.js'));
+const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/user/server/permission/permissions.js'));
 
 async function getConsents(req, res) {
     const response = new Response({}, []);
@@ -144,6 +134,10 @@ async function getConsentsReport(req, res){
         order.push([HCPS, 'created_at', 'DESC']);
         order.push([HCPS, 'id', 'DESC']);
 
+        const userCountriesApplication = await getUserPermissions(req.user.id);
+        const userPermittedCountries = userCountriesApplication[1];
+        const userPermittedApplications = userCountriesApplication[0].map(app => app.id);
+
         const application_list = (await HCPS.findAll()).map(i => i.get("application_id"));
 
         const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => i.codbase === codbase).map(i => i.country_iso2);
@@ -152,25 +146,18 @@ async function getConsentsReport(req, res){
         const country_iso2_list = req.user.type === 'admin' ? (await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry", { type: QueryTypes.SELECT })).map(i => i.country_iso2) : (await HCPS.findAll()).map(i => i.get("country_iso2"));
         const countries_ignorecase = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
 
-
-        const codbase_list_mapped_with_user_country_iso2_list = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => req.user.countries.includes(i.country_iso2)).map(i => i.codbase) : [];
+        const codbase_list_mapped_with_user_country_iso2_list = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => userPermittedCountries.includes(i.country_iso2)).map(i => i.codbase) : [];
         const country_iso2_list_for_user_countries_codbase = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => codbase_list_mapped_with_user_country_iso2_list.includes(i.codbase)).map(i => i.country_iso2) : [];
         const countries_ignorecase_for_user_countries_codbase = [].concat.apply([], country_iso2_list_for_user_countries_codbase.map(i => ignoreCaseArray(i)));
 
-        const userCountriesApplication = await getUserAppCountryList(req.user.id);
-        const usercountries = userCountriesApplication[1];
-        const userPermittedApplications = userCountriesApplication[0];
-
-
         const process_activities = (await ConsentCategory.findAll()).map(i => i.type);
         const opt_types = [...new Set((await ConsentCountry.findAll()).map(i => i.opt_type))];
-
 
         const consent_filter = {
             response: true,
             consent_confirmed: true,
             '$hcp_profile.application_id$': req.user.type === 'admin' ? { [Op.or]: application_list } : userPermittedApplications,
-            // '$hcp_profile.country_iso2$': codbase ? { [Op.any]: [countries_ignorecase_for_codbase] } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : countries_ignorecase_for_user_countries_codbase,
+            '$hcp_profile.country_iso2$': codbase ? { [Op.any]: [countries_ignorecase_for_codbase] } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : countries_ignorecase_for_user_countries_codbase,
             '$consent.consent_category.type$': process_activity ? { [Op.eq]: process_activity } : { [Op.or]: process_activities },
             '$consent.consent_country.country_iso2$': { [Op.eq]: Sequelize.col('hcp_profile.country_iso2') },
             '$consent.consent_country.opt_type$': opt_type ? { [Op.eq]: opt_type } : { [Op.or]: opt_types }
@@ -206,7 +193,6 @@ async function getConsentsReport(req, res){
             subQuery: false,
         });
 
-
         hcp_consents.forEach( hcp_consent => {
             hcp_consent.dataValues.consent_id = hcp_consent.consent_id;
             hcp_consent.dataValues.response = hcp_consent.response;
@@ -216,9 +202,8 @@ async function getConsentsReport(req, res){
             hcp_consent.dataValues.preference = hcp_consent.consent.preference;
             hcp_consent.dataValues.title = hcp_consent.consent.consent_category.title;
             hcp_consent.dataValues.type = hcp_consent.consent.consent_category.type;
-            // hcp_consent.dataValues.country_iso2 = hcp_consent.consent.consent_country.country_iso2;
-            // hcp_consent.dataValues.opt_type = hcp_consent.consent.consent_country.opt_type;
-
+            hcp_consent.dataValues.country_iso2 = hcp_consent.consent.consent_country.country_iso2;
+            hcp_consent.dataValues.opt_type = hcp_consent.consent.consent_country.opt_type;
             hcp_consent.dataValues.country_iso2 = hcp_consent.consent.consent_country[0].country_iso2;
             hcp_consent.dataValues.opt_type = hcp_consent.consent.consent_country[0].opt_type;
 
@@ -256,7 +241,7 @@ async function getConsentsReport(req, res){
             codbase: codbase ? codbase : '',
             process_activity: process_activity ? process_activity : '',
             opt_type: opt_type ? opt_type : '',
-            countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : req.user.countries,
+            countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : userPermittedCountries,
             orderBy: orderBy,
             orderType: orderType,
         };
@@ -454,157 +439,6 @@ async function getAllOptTypes(req, res){
         console.error(err);
         res.status(500).send('Internal server error');
     }
-}
-
-async function getUserAppCountryList(userId) {
-
-    let all_applications = [];
-    let all_countries = [];
-    let role_applications = [];
-    let profile_applications = [];
-    let role_countries = [];
-    let profile_countries = [];
-
-    const user = await User.findOne({
-        where: {
-            id: userId
-        },
-        include: [{
-            model: UserProfile,
-            as: 'userProfile',
-            include: [{
-                model: UserProfile_PermissionSet,
-                as: 'up_ps',
-                include: [{
-                    model: PermissionSet,
-                    as: 'ps',
-                    include: [
-                        {
-                            model: PermissionSet_ServiceCateory,
-                            as: 'ps_sc',
-                            include: [
-                                {
-                                    model: ServiceCategory,
-                                    as: 'serviceCategory',
-
-                                }
-                            ]
-
-                        },
-                        {
-                            model: PermissionSet_Application,
-                            as: 'ps_app',
-                            include: [
-                                {
-                                    model: Application,
-                                    as: 'application',
-
-                                }
-                            ]
-
-                        }
-                    ]
-
-                }]
-            }]
-        },
-        {
-            model: User_Role,
-            as: 'userRoles',
-            include: [{
-                model: Role,
-                as: 'role',
-                include: [{
-                    model: Role_PermissionSet,
-                    as: 'role_ps',
-                    include: [{
-                        model: PermissionSet,
-                        as: 'ps',
-                        include: [
-                            {
-                                model: PermissionSet_ServiceCateory,
-                                as: 'ps_sc',
-                                include: [
-                                    {
-                                        model: ServiceCategory,
-                                        as: 'serviceCategory',
-
-                                    }
-                                ]
-
-                            },
-                            {
-                                model: PermissionSet_Application,
-                                as: 'ps_app',
-                                include: [
-                                    {
-                                        model: Application,
-                                        as: 'application',
-
-                                    }
-                                ]
-
-                            }
-                        ]
-
-                    }]
-                }]
-
-            }]
-        }
-        ]
-    });
-
-    if (user.userProfile) {
-        const profilePermissionSets = user.userProfile.up_ps;
-        for (const userProPermSet of profilePermissionSets) {
-            let applicationsCountries = await getAppCountryPermissions(userProPermSet.ps);
-            profile_applications = profile_applications.concat(applicationsCountries[0]);
-            profile_countries = profile_countries.concat(applicationsCountries[1]);
-        }
-    }
-
-    for (const userRole of user.userRoles) {
-        for (const rolePermSet of userRole.role.role_ps) {
-            let applicationsCountries = await getAppCountryPermissions(rolePermSet.ps);
-            role_applications = role_applications.concat(applicationsCountries[0]);
-            role_countries = role_countries.concat(applicationsCountries[1])
-
-        }
-
-    }
-
-    all_countries = [...new Set(role_countries.concat(profile_countries))];
-    all_applications = [...new Set(role_applications.concat(profile_applications))];
-
-    return [all_applications, all_countries];
-}
-
-async function getAppCountryPermissions(permissionSet) {
-
-    let applications = [];
-    let countries = [];
-    if (permissionSet.slug == 'system_admin') {
-        let allApplications = await Application.findAll();
-        applications = allApplications.map(a => a.id);
-        const countriesDb = await sequelize.datasyncConnector.query("SELECT DISTINCT ON(codbase_desc) * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;", { type: QueryTypes.SELECT });
-        countries = countriesDb.map(c => c.country_iso2);
-    } else {
-        if (permissionSet.ps_app) {
-            for (const ps_app of permissionSet.ps_app) {
-                applications.push(ps_app.application.id);
-
-            }
-
-        }
-
-        if (permissionSet.countries) {
-            countries = permissionSet.countries;
-        }
-
-    }
-
-    return [applications, countries];
 }
 
 async function getUserConsents(req, res) {
