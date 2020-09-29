@@ -154,9 +154,6 @@ async function getUserApplicationCountry(permissionSet) {
     return [applications, countries, serviceCategories];
 }
 
-
-
-
 async function getCommaSeparatedAppCountryPermissions(user) {
     let all_applications = [];
     let all_countries = [];
@@ -841,10 +838,11 @@ async function getUser(req, res) {
     }
 }
 
-async function partialUpdateUser(req, res) {
+async function updateUserDetails(req, res) {
     const id = req.params.id;
-    const { first_name, last_name, email, phone, type, status } = req.body;
+    const { first_name, last_name, email, phone, type, status, roleId } = req.body;
     const partialUserData = { first_name, last_name, email, phone, type, status };
+    const userRoles = roleId ? [roleId] : [];
 
     try {
         if ([first_name, last_name, email].includes(null)) return res.sendStatus(400);
@@ -854,6 +852,8 @@ async function partialUpdateUser(req, res) {
         if (!user) return res.status(404).send("User is not found or may be removed");
 
         await user.update(partialUserData);
+
+        await user.setRoles(userRoles);
 
         res.json(formatProfile(user));
     }
@@ -1038,25 +1038,6 @@ async function resetPassword(req, res) {
     }
 }
 
-async function changeUserRole(req, res) {
-    const id = req.params.id;
-    const { roleId } = req.body;
-    const userRoles = roleId ? [roleId] : [];
-
-    try {
-        const user = await User.findOne({ where: { id }, include: { model: User_Role, as: 'userRoles' }});
-
-        if(!user) return res.status(404).send('User not found.');
-
-        await user.setRoles(userRoles);
-
-        res.sendStatus(200);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Internal server error');
-    }
-}
-
 async function verifySite(captchaResponseToken) {
     try {
         const secretKey = nodecache.getValue('RECAPTCHA_SECRET_KEY');
@@ -1093,5 +1074,4 @@ exports.getUsers = getUsers;
 exports.getUser = getUser;
 exports.sendPasswordResetLink = sendPasswordResetLink;
 exports.resetPassword = resetPassword;
-exports.changeUserRole = changeUserRole;
-exports.partialUpdateUser = partialUpdateUser;
+exports.updateUserDetails = updateUserDetails;

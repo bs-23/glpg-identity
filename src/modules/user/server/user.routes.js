@@ -14,12 +14,9 @@ module.exports = app => {
 
     app.get('/api/users/profile', passport.authenticate('user-jwt', { session: false }), controller.getSignedInUserProfile);
 
-    app.route('/api/users/:id/role')
-        .put(passport.authenticate("user-jwt", { session: false }), controller.changeUserRole);
-
     app.route('/api/users/:id')
         .get(passport.authenticate("user-jwt", { session: false }), controller.getUser)
-        .patch(passport.authenticate("user-jwt", { session: false }), controller.partialUpdateUser)
+        .patch(passport.authenticate("user-jwt", { session: false }), controller.updateUserDetails)
         .delete(passport.authenticate("user-jwt", { session: false }), controller.deleteUser)
 
     app.post('/api/users/change-password', passport.authenticate('user-jwt', { session: false }), controller.changePassword);
