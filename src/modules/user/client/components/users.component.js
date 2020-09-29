@@ -51,7 +51,6 @@ export default function Users() {
     }, []);
 
     useEffect(() => {
-
         setCodBase(params.get('codbase') ? params.get('codbase') : null);
         const searchObj = {};
         const searchParams = location.search.slice(1).split("&");
@@ -59,7 +58,7 @@ export default function Users() {
             searchObj[element.split("=")[0]] = element.split("=")[1];
         });
         dispatch(getUsers(searchObj.page, searchObj.codbase, searchObj.orderBy, searchObj.orderType));
-        setSort({ type: params.get('orderType'), value: params.get('orderBy') });
+        setSort({ type: params.get('orderType') || 'asc', value: params.get('orderBy') });
     }, [location]);
 
 
@@ -76,10 +75,16 @@ export default function Users() {
         const orderBy = params.get('orderBy');
         const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
         const codbase = codBase ? codBase : params.get('codbase');
+
         if (!pageChange) {
             (orderBy === orderColumn) ? (orderType === 'asc' ? orderType = 'desc' : orderType = 'asc') : orderType = 'asc';
         }
-        const url = `?page=${page}` + (codbase && codbase !== 'null' ? `&codbase=${codbase}` : ``) + (orderType !== 'null' && orderColumn !== 'null' && orderColumn !== null ? `&orderType=${orderType}&orderBy=${orderColumn}` : ``);
+
+        const url = `?page=${page}`
+            + (codbase && codbase !== 'null' ? `&codbase=${codbase}` : '')
+            + (orderColumn && orderColumn !== 'null' ? `&orderBy=${orderColumn}` : '')
+            + (orderType && orderType !== 'null' ? `&orderType=${orderType}` : '');
+
         history.push(location.pathname + url);
     };
 

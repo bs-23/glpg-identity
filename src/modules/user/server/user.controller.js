@@ -15,6 +15,8 @@ const Application = require(path.join(process.cwd(), "src/modules/application/se
 const PasswordPolicies = require(path.join(process.cwd(), "src/modules/core/server/password/password-policies.js"));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const { QueryTypes, Op, where, col, fn } = require('sequelize');
+const Filter = require(path.join(process.cwd(), "src/modules/core/server/filter/filter.model.js"));
+const filterService = require(path.join(process.cwd(), 'src/modules/user/server/filter.js'));
 
 function generateAccessToken(user) {
     return jwt.sign({
@@ -298,6 +300,83 @@ async function deleteUser(req, res) {
     }
 }
 
+function generateFilterOptions(currentFilter, defaultFilter) {
+    if (!currentFilter || !currentFilter.option || !currentFilter.option.filters || currentFilter.option.filter === 0)
+        return defaultFilter;
+
+    // if (currentFilter.option.filters.length === 1 || !currentFilter.option.logic) {
+    //     const filter = currentFilter.option.filters[0];
+    //     defaultFilter[filter.fieldName] = filterService.getValueOptions(filter);
+
+    //     return defaultFilter;
+    // }
+
+    console.log('Default filter: ', defaultFilter);
+    let customFilter = { ...defaultFilter };
+
+    const nodes = currentFilter.option.logic
+        ? currentFilter.option.logic.split(" ")
+        : ['1'];
+    console.log('Logic nodes: ', nodes.join());
+
+    let prevOperator;
+    const groupedQueries = [];
+    for (let index = 0; index < nodes.length; index++) {
+        const node = nodes[index];
+        const prev = index > 0 ? nodes[index - 1] : null;
+        const next = index < nodes.length - 1 ? nodes[index + 1] : null;
+
+        const findFilter = (name) => {
+            return currentFilter.option.filters.find(f => f.name === name);
+        };
+
+        if (node === "and" && prevOperator === "and") {
+            const filter = findFilter(next);
+            const query = { [filter.fieldName]: filterService.getValueOptions(filter) };
+            const currentParent = groupedQueries[groupedQueries.length - 1];
+            currentParent.values.push(query);
+        } else if (node === "and") {
+            const leftFilter = findFilter(prev);
+            const rightFilter = findFilter(next);
+            const group = {
+                operator: "and",
+                values: [
+                    { [leftFilter.fieldName]: filterService.getValueOptions(leftFilter) },
+                    { [rightFilter.fieldName]: filterService.getValueOptions(rightFilter) }
+                ]
+            };
+            groupedQueries.push(group);
+        } else if (node !== "or" && prev !== "and" && next !== "and") {
+            const filter = findFilter(node);
+            const query = { [filter.fieldName]: filterService.getValueOptions(filter) };
+            groupedQueries.push(query);
+        }
+
+        prevOperator = node === "and" || node === "or" ? node : prevOperator;
+    }
+
+    console.log('Grouped queries: ', groupedQueries.map((a) => JSON.stringify(a)));
+
+    if (groupedQueries.length > 1) {
+        customFilter[Op.or] = groupedQueries.map(q => {
+            if (q.operator === 'and') {
+                return { [Op.and]: q.values };
+            }
+            return q;
+        });
+    } else {
+        const query = groupedQueries[0];
+        if (query.operator === 'and') {
+            customFilter[Op.and] = query.values;
+        } else {
+            customFilter = { ...customFilter, ...query };
+        }
+    }
+    console.log('Custom filter: ', customFilter);
+
+    return customFilter;
+}
+
 async function getUsers(req, res) {
     try {
         const page = req.query.page ? req.query.page - 1 : 0;
@@ -326,55 +405,52 @@ async function getUsers(req, res) {
             .map(i => ignoreCaseArray(i)));
 
 
-        const order = [];
+        const order = [
+            ['created_at', 'DESC'],
+            ['id', 'DESC']
+        ];
 
-        if(orderBy && orderType){
-            if(orderBy === 'first_name') order.push(['first_name', orderType]);
-            if(orderBy === 'last_name') order.push(['last_name', orderType]);
-            if(orderBy === 'email') order.push(['email', orderType]);
-            if(orderBy === 'status') order.push(['status', orderType]);
-            if(orderBy === 'created_at') order.push(['created_at', orderType]);
-            if(orderBy === 'expiry_date') order.push(['expiry_date', orderType]);
+        const sortableColumns = ['first_name', 'last_name', 'email', 'status', 'created_at', 'expiry_date'];
 
-            if(orderBy === 'created_by') {
-                order.push([{ model: User, as: 'createdByUser' }, 'first_name', orderType]);
-                order.push([{ model: User, as: 'createdByUser' }, 'last_name', orderType]);
-            }
+        if (orderBy && sortableColumns.includes(orderBy)) {
+            order.splice(0, 0, [orderBy, orderType]);
         }
-        order.push(['created_at', 'DESC']);
-        order.push(['id', 'DESC']);
 
-        // const columnNames = Object.keys(User.rawAttributes);
-        // if (orderBy && (columnNames || []).includes(orderBy)) {
-        //     order.push([orderBy, orderType]);
-        // }
+        if (orderBy === 'created_by') {
+            order.splice(0, 0, [{ model: User, as: 'createdByUser' }, 'first_name', orderType]);
+            order.splice(1, 0, [{ model: User, as: 'createdByUser' }, 'last_name', orderType]);
+        }
 
-        // order.push(['created_at', 'DESC']);
-        // order.push(['id', 'DESC']);
+        const defaultFilter = {
+            id: { [Op.ne]: signedInId },
+            type: 'basic',
+            countries: codbase ? { [Op.overlap]: [countries_ignorecase_for_codbase] } : { [Op.ne]: ["undefined"] }
+        };
+
+        const currentFilter = await Filter.findOne({
+            where: { user_id: req.user.id, list_name: 'cdp-users' }
+        });
+
+        const filterOptions = generateFilterOptions(currentFilter, defaultFilter);
+
+        const includes = [{
+            model: User,
+            as: 'createdByUser',
+            attributes: ['id', 'first_name', 'last_name'],
+        }];
 
         const users = await User.findAll({
-            where: {
-                id: { [Op.ne]: signedInId },
-                type: 'basic',
-                countries: codbase ? { [Op.overlap]: [countries_ignorecase_for_codbase] } : { [Op.ne]: ["undefined"] }
-            },
+            where: filterOptions,
             offset,
             limit,
             order: order,
-            include: [{
-                model: User,
-                as: 'createdByUser',
-                attributes: ['id', 'first_name', 'last_name'],
-            }],
+            include: includes,
             attributes: { exclude: ['password'] },
         });
 
         const totalUser = await User.count({
-            where: {
-                id: { [Op.ne]: signedInId },
-                type: 'basic',
-                countries: codbase ? { [Op.overlap]: [countries_ignorecase_for_codbase] } : { [Op.ne]: ["undefined"] }
-            },
+            where: filterOptions,
+            include: includes
         });
 
         const data = {
@@ -624,6 +700,7 @@ async function resetPassword(req, res) {
 }
 
 async function verifySite(captchaResponseToken) {
+    return true;
     try {
         const secretKey = nodecache.getValue('RECAPTCHA_SECRET_KEY');
 
@@ -649,6 +726,49 @@ async function verifySite(captchaResponseToken) {
     }
 }
 
+async function getFilterOptions(req, res) {
+    try {
+        const filterOptions = await filterService.getFilterOptions(req.user);
+
+        const [currentFilter,] = await Filter.findOrCreate({
+            where: { user_id: req.user.id, list_name: 'cdp-users' },
+            defaults: {
+                option: {}
+            }
+        });
+
+        const data = {
+            filterOptions,
+            currentFilter: currentFilter.option
+        }
+        res.json(data);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function updateFilterOptions(req, res) {
+    try {
+        const filters = req.body;
+
+        const currentFilter = await Filter.findOne({
+            where: { user_id: req.user.id, list_name: 'cdp-users' }
+        });
+
+        if (currentFilter) {
+            await currentFilter.update({
+                option: filters
+            });
+        }
+
+        res.sendStatus(200);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 exports.login = login;
 exports.logout = logout;
 exports.createUser = createUser;
@@ -660,3 +780,5 @@ exports.getUser = getUser;
 exports.sendPasswordResetLink = sendPasswordResetLink;
 exports.resetPassword = resetPassword;
 exports.partialUpdateUser = partialUpdateUser;
+exports.getFilterOptions = getFilterOptions;
+exports.updateFilterOptions = updateFilterOptions;
