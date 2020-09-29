@@ -223,7 +223,7 @@ async function editPermissionSet(req, res) {
         await doc.update({
             title: title.trim(),
             slug: title.trim().replace(/ /g, '_').toLowerCase(),
-            countries: countries,
+            countries: countries ? countries.includes('all') ? ['all'] : countries : [],
             description,
             updated_by: req.user.id
         });
