@@ -845,7 +845,9 @@ async function updateUserDetails(req, res) {
     const userRoles = roleId ? [roleId] : [];
 
     try {
-        if ([first_name, last_name, email].includes(null)) return res.sendStatus(400);
+        if([first_name, last_name, email].includes(null)) return res.sendStatus(400);
+
+        if(req.user.id === id) return res.sendStatus(403);
 
         const user = await User.findOne({ where: { id } });
 
