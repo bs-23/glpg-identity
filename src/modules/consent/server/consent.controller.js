@@ -270,39 +270,27 @@ async function getDatasyncConsentsReport(req, res){
         const [, userPermittedCountries] = await getUserPermissions(req.user.id);
 
         async function getCountryIso2(){
-            if(req.user.type === 'admin'){
-                const all_country_iso2_list = (await sequelize.datasyncConnector.query(
-                    `SELECT * FROM ciam.vwcountry`,
-                    {
-                        type: QueryTypes.SELECT
-                    }
-                )).map(i => i.country_iso2);
+            const user_codbase_list_for_iso2 = (await sequelize.datasyncConnector.query(
+                `SELECT * FROM ciam.vwcountry where ciam.vwcountry.country_iso2 = ANY($countries);`,
+                {
+                    bind: {
+                        countries: userPermittedCountries
+                    },
+                    type: QueryTypes.SELECT
+                }
+            )).map(i => i.codbase);
 
-                return all_country_iso2_list;
-            }
-            else{
-                const user_codbase_list_for_iso2 = (await sequelize.datasyncConnector.query(
-                    `SELECT * FROM ciam.vwcountry where ciam.vwcountry.country_iso2 = ANY($countries);`,
-                    {
-                        bind: {
-                            countries: userPermittedCountries
-                        },
-                        type: QueryTypes.SELECT
-                    }
-                )).map(i => i.codbase);
+            const user_country_iso2_list = (await sequelize.datasyncConnector.query(
+                `SELECT * FROM ciam.vwcountry where ciam.vwcountry.codbase = ANY($codbases);`,
+                {
+                    bind: {
+                        codbases : user_codbase_list_for_iso2
+                    },
+                    type: QueryTypes.SELECT
+                }
+            )).map(i => i.country_iso2);
 
-                const user_country_iso2_list = (await sequelize.datasyncConnector.query(
-                    `SELECT * FROM ciam.vwcountry where ciam.vwcountry.codbase = ANY($codbases);`,
-                    {
-                        bind: {
-                            codbases : user_codbase_list_for_iso2
-                        },
-                        type: QueryTypes.SELECT
-                    }
-                )).map(i => i.country_iso2);
-
-                return user_country_iso2_list;
-            }
+            return user_country_iso2_list;
         }
 
         const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(
@@ -313,8 +301,7 @@ async function getDatasyncConsentsReport(req, res){
             }
         )).map(i => i.country_iso2);
 
-        // const country_iso2_list = req.user.type === 'admin' ? (await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry", { type: QueryTypes.SELECT })).map(i => i.country_iso2) : user_country_iso2_list;
-        // const country_iso2_list = req.user.type === 'admin' ? (await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry", { type: QueryTypes.SELECT })).map(i => i.country_iso2) : user_country_iso2_list;
+
         const country_iso2_list = await getCountryIso2();
 
         const orderBy = req.query.orderBy ? req.query.orderBy : '';
