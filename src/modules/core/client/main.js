@@ -6,12 +6,13 @@ import { CookiesProvider } from 'react-cookie';
 
 import store from "./store";
 import App from "./app.component";
+import IdleTimer from './idle-timer.component';
 
 ReactDOM.render(
     <CookiesProvider>
-        <Provider store={store}>
+        <Provider store={store}> 
             <BrowserRouter>
-                <App/>
+                <IdleTimer/>
             </BrowserRouter>
         </Provider>
     </CookiesProvider>,

@@ -9091,6 +9091,11 @@ react-google-recaptcha@^2.1.0:
     prop-types "^15.5.0"
     react-async-script "^1.1.1"
 
+react-idle-timer@^4.3.6:
+  version "4.3.6"
+  resolved "https://registry.yarnpkg.com/react-idle-timer/-/react-idle-timer-4.3.6.tgz#bdf56cee6ccc8c144ece18d152b3e304e13f3fa2"
+  integrity sha512-sJS4w123E4HkuM/l3j8FTVl0St6ghGA22Ich/Nz/luJSM4MEA6PvSwEBaAXLx3uCLB1fK7CACjvB4ozW3uWuCA==
+
 react-is@^16.12.0, react-is@^16.13.1, react-is@^16.3.2, react-is@^16.6.0, react-is@^16.7.0, react-is@^16.8.1, react-is@^16.8.6, react-is@^16.9.0:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
