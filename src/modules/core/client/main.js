@@ -5,14 +5,13 @@ import { BrowserRouter } from "react-router-dom";
 import { CookiesProvider } from 'react-cookie';
 
 import store from "./store";
-import App from "./app.component";
-import IdleTimer from './idle-timer.component';
+import AuthLayout from './auth-layout';
 
 ReactDOM.render(
     <CookiesProvider>
         <Provider store={store}> 
             <BrowserRouter>
-                <IdleTimer/>
+                <AuthLayout/>
             </BrowserRouter>
         </Provider>
     </CookiesProvider>,
