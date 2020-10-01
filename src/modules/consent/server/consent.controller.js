@@ -191,7 +191,6 @@ async function getConsentsReport(req, res){
             subQuery: false,
         });
 
-
         hcp_consents.forEach( hcp_consent => {
             hcp_consent.dataValues.consent_id = hcp_consent.consent_id;
             hcp_consent.dataValues.response = hcp_consent.response;
@@ -358,7 +357,7 @@ async function getDatasyncConsentsReport(req, res){
             }))[0];
         
         
-        hcp_consents.forEach( hcp_consent => {
+        hcp_consents.forEach( hcp_consent => { 
             hcp_consent.name = hcp_consent.account_name;
             hcp_consent.first_name = hcp_consent.firstname;
             hcp_consent.last_name = hcp_consent.lastname;
@@ -373,8 +372,8 @@ async function getDatasyncConsentsReport(req, res){
             delete hcp_consent['lastname'];
             delete hcp_consent['channel_value'];
             delete hcp_consent['content_type'];
-            delete hcp_consent['capture_datetime']; 
-            delete hcp_consent['double_opt_in']; 
+            delete hcp_consent['capture_datetime'];
+            delete hcp_consent['double_opt_in'];
         });
     
         const data = {
