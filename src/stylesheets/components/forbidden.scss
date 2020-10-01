@@ -1,20 +1,72 @@
 .forbidden {
     background: $light-bg-color;
 
+
+
     &__panel {
         border-radius: 16px;
+        position: relative;
+    }
+
+    &__app-logo {
+        position: absolute;
+        left: 36px;
+        top: 45px;
     }
 
     &__header {
-        color: $secondary-color;
-        font-size: 120px;
     }
 
     &__subheader {
-        color: $primary-color;
+        color: $secondary-color;
+        font-size: 60px;
     }
 
     &__text {
-        color: $primary-color;
+        color: #585F65;
+        font-size: 18px;
+    }
+
+    @media (max-width: $screen-lg-desktop) {
+        &__page-not-found {
+            height: 250px !important;
+        }
+    }
+
+    @media (max-width: $screen-desktop) {
+        &__page-not-found {
+            height: 200px !important;
+        }
+    }
+
+
+    @media (max-width: $screen-tablet) {
+        &__page-not-found {
+            height: 150px !important;
+        }
+    }
+
+    @media (max-width: $screen-phone) {
+        &__app-logo {
+            position: absolute;
+            left: 14px;
+            top: 18px;
+
+            img {
+                height: 50px;
+            }
+        }
+
+        &__subheader {
+            font-size: 36px;
+            margin-top: 20px;
+        }
+
+        &__text {
+        }
+
+        &__page-not-found {
+            height: 100px !important;
+        }
     }
 }
