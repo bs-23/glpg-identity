@@ -5,13 +5,13 @@ import { BrowserRouter } from "react-router-dom";
 import { CookiesProvider } from 'react-cookie';
 
 import store from "./store";
-import App from "./app.component";
+import AuthLayout from './auth-layout';
 
 ReactDOM.render(
     <CookiesProvider>
-        <Provider store={store}>
+        <Provider store={store}> 
             <BrowserRouter>
-                <App/>
+                <AuthLayout/>
             </BrowserRouter>
         </Provider>
     </CookiesProvider>,
