@@ -12,7 +12,9 @@ module.exports = app => {
         .get(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.PLATFORM.value), controller.getUsers)
         .post(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.PLATFORM.value), controller.createUser);
 
-    app.get('/api/users/profile', passport.authenticate('user-jwt', { session: false }), controller.getSignedInUserProfile);
+    app.route('/api/users/profile')
+        .get(passport.authenticate('user-jwt', { session: false }), controller.getSignedInUserProfile)
+        .put(passport.authenticate('user-jwt', { session: false }), controller.updateSignedInUserProfile)
 
     app.route('/api/users/:id')
         .get(passport.authenticate("user-jwt", { session: false }), controller.getUser)

@@ -1,16 +1,40 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
+import { useToasts } from 'react-toast-notifications';
 
-import { changePassword } from '../user.actions';
-import { changePasswordSchema } from '../user.schema';
+import { changePassword } from '../../user.actions';
+import { changePasswordSchema } from '../../user.schema';
 
 export default function ChangePasswordForm() {
     const dispatch = useDispatch();
+    const { addToast } = useToasts();
+
+    const formSubmitHandler = async (values, actions) => {
+        actions.setSubmitting(true);
+        try{
+            await dispatch(changePassword(values));
+            addToast('Password changed successfully', {
+                appearance: 'success',
+                autoDismiss: true
+            });
+        }catch(err){
+            const errorMessage = typeof err.response.data === 'string'
+                ? err.response.data
+                : err.response.statusText;
+            addToast(errorMessage, {
+                appearance: 'error',
+                autoDismiss: true
+            });
+        }finally{
+            actions.setSubmitting(false);
+            actions.resetForm();
+        }
+    }
 
     return (
         <div className="container">
-            <h3>Change Password</h3> 
+            <h3>Change Password</h3>
 
             <Formik
                 initialValues={{
@@ -20,12 +44,7 @@ export default function ChangePasswordForm() {
                 }}
                 displayName="ChangePassword"
                 validationSchema={changePasswordSchema}
-                onSubmit={(values, actions) => {
-                    dispatch(changePassword(values));
-                    actions.resetForm();
-
-                    actions.setSubmitting(false);
-                }}
+                onSubmit={formSubmitHandler}
             >
                 {formikProps => (
                     <Form onSubmit={formikProps.handleSubmit}>

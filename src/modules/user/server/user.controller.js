@@ -1,6 +1,7 @@
 const path = require('path');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
+const validator = require('validator');
 const User = require('./user.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
@@ -57,6 +58,7 @@ function formatProfile(user) {
         first_name: user.first_name,
         last_name: user.last_name,
         email: user.email,
+        phone: user.phone,
         type: user.type,
         status: user.status,
         roles: getRolesPermissions(user.userrole),
@@ -83,6 +85,14 @@ function formatProfileDetail(user) {
     };
 
     return profile;
+}
+
+var trimRequestBody = function(reqBody){
+    Object.keys(reqBody).forEach(key => {
+        if(typeof reqBody[key] === 'string')
+            reqBody[key] = reqBody[key].trim();
+    });
+    return reqBody;
 }
 
 async function attachApplicationInfoToUser(user) {
@@ -426,6 +436,38 @@ async function getUser(req, res) {
     }
 }
 
+async function updateSignedInUserProfile(req, res) {
+    const updatedProfileData = trimRequestBody(req.body);
+    let { first_name, last_name, email, phone } = updatedProfileData;
+    const signedInUser = req.user;
+
+    try {
+        if(!first_name || !last_name || !email) return res.status(400).send("Missing required fields.");
+        if(!validator.isEmail(email)) return res.status(400).send("Invalid email.");
+
+        const doesEmailExist = await User.findOne({
+            where: {
+                id: { [Op.ne]: signedInUser.id },
+                email: { [Op.iLike]: `${email}` } }
+            }
+        );
+
+        if(doesEmailExist) return res.status(400).send("Email already exists.");
+
+        await signedInUser.update({
+            first_name,
+            last_name,
+            email,
+            phone
+        });
+
+        res.json(formatProfile(signedInUser));
+    }catch(err){
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 async function partialUpdateUser(req, res) {
     const id = req.params.id;
     const { first_name, last_name, email, phone, type, status } = req.body;
@@ -437,6 +479,15 @@ async function partialUpdateUser(req, res) {
         const user = await User.findOne({ where: { id } });
 
         if (!user) return res.status(404).send("User is not found or may be removed");
+
+        const doesEmailExist = await User.findOne({
+            where: {
+                id: { [Op.ne]: id },
+                email: { [Op.iLike]: `${email}` } }
+            }
+        );
+
+        if(doesEmailExist) return res.status(400).send("Email already exists.");
 
         await user.update(partialUserData);
 
@@ -660,3 +711,4 @@ exports.getUser = getUser;
 exports.sendPasswordResetLink = sendPasswordResetLink;
 exports.resetPassword = resetPassword;
 exports.partialUpdateUser = partialUpdateUser;
+exports.updateSignedInUserProfile = updateSignedInUserProfile;

@@ -11,6 +11,17 @@ export function getSignedInUserProfile() {
     };
 }
 
+export function updateSignedInUserProfile(data) {
+    return {
+        type: Types.UPDATE_PROFILE,
+        payload: axios({
+            method: 'put',
+            url: '/api/users/profile',
+            data
+        })
+    };
+}
+
 export function login(data) {
     return {
         type: Types.LOGIN,
