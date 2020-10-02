@@ -15,6 +15,8 @@ const demoConsentId = '3bb2057b-3006-4c87-9ce1-166bd291e86f';
 const UserPermissionID = 'e31e7b72-8dd9-43cf-a2b2-823963bfad45';
 const HcpPermissionID = 'bd2b3849-a1a0-40ab-900a-346926edc572';
 const adminRoleID = '1ffe73e9-7922-4640-ba0c-3628b3358aa8';
+const hcpValidUserId = '1ffe73e9-7922-4640-ba0c-3628b3358ab8';
+const hcpInvalidUserId = '1ffe73e9-7922-4640-ba0c-3628b3358ba8';
 
 module.exports = {
     defaultApplication: {
@@ -76,6 +78,30 @@ module.exports = {
             specialty_onekey: 'SP.WNL.01',
             created_by: defaultAdminId,
             updated_by: defaultAdminId,
+        },
+        userWithValidUUID: {
+            id: hcpValidUserId,
+            first_name: faker.name.lastName(),
+            last_name: faker.name.firstName(),
+            uuid: '99912495001',
+            email: faker.internet.email(),
+            country_iso2: 'NL',
+            language_code: 'nl',
+            locale: 'nl_nl',
+            salutation: 'Mr',
+            specialty_onekey: 'SP.WNL.01',
+        },
+        userWithInvalidUUID: {
+            id: hcpInvalidUserId,
+            first_name: faker.name.lastName(),
+            last_name: faker.name.firstName(),
+            uuid: faker.random.uuid(),
+            email: faker.internet.email(),
+            country_iso2: 'NL',
+            language_code: 'nl',
+            locale: 'nl_nl',
+            salutation: 'Mr',
+            specialty_onekey: 'SP.WNL.01',
         }
     },
     consent: {
@@ -88,23 +114,36 @@ module.exports = {
             id: demoConsentId,
             category_id: demoConsentCategoryId,
             title: 'a',
-            rich_text: '<h1>a</h1>',
-            slug: 'a',
-            opt_type: 'single-opt-in',
+            slug: 'a-3c2569b2',
+            legal_basis: 'consent',
+            preference: '',
             country_iso2: 'nl',
-            locale: 'nl_nl',
-            legal_basis: 'consent'
-        },
-        demoConsentLocales: {
-            rich_text: '<p>I agree to the Galapagos <a href="https://www.glpg.com/">Terms of Service.</a></p>',
-            consent_id: demoConsentId,
             locale: 'nl_nl'
         },
-        demoConsentCountry: {
-            consent_id: demoConsentId,
-            country_iso2: 'nl',
-            opt_type: 'single-opt-in'
-        }
+        demoConsentLocales: [
+            {
+                rich_text: '<p>I agree to the Galapagos <a href="https://www.glpg.com/">Terms of Service.</a></p>',
+                consent_id: demoConsentId,
+                locale: 'nl_nl'
+            },
+            {
+                rich_text: '<p>I agree to the Galapagos <a href="https://www.glpg.com/">Terms of Service.</a></p>',
+                consent_id: demoConsentId,
+                locale: 'nl_be'
+            }
+        ],
+        demoConsentCountry: [
+            {
+                consent_id: demoConsentId,
+                country_iso2: 'nl',
+                opt_type: 'single-opt-in'
+            },
+            {
+                consent_id: demoConsentId,
+                country_iso2: 'be',
+                opt_type: 'double-opt-in'
+            }
+        ]
     },
     permissions: [
         { id: UserPermissionID, module: Modules.PLATFORM.value, status: "active", title: Modules.PLATFORM.title, created_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385", updated_by: "7a6492f0-022a-40ab-9b51-d1faf5d74385" },

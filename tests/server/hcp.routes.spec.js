@@ -4,14 +4,15 @@ const supertest = require('supertest');
 
 const specHelper = require(path.join(process.cwd(), 'jest/spec.helper'));
 const app = require(path.join(process.cwd(), 'src/config/server/lib/express'));
+const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 
-const { defaultUser } = specHelper.hcp;
+const { defaultUser, userWithInvalidUUID, userWithValidUUID } = specHelper.hcp;
 const { defaultApplication, users: { defaultAdmin } } = specHelper;
+const { demoConsent } = specHelper.consent;
 
 let appInstance;
 let request;
 
-// Increasing timeout limit
 jest.setTimeout(20000);
 
 beforeAll(async () => {
@@ -83,32 +84,6 @@ describe('HCP Routes', () => {
 
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveProperty('data');
-    });
-
-    it('Should create a new HCP profile', async () => {
-        const response = await request.post('/api/hcp-profiles')
-            .set('Authorization', 'bearer ' + defaultApplication.access_token)
-            .send({
-                first_name: faker.name.lastName(),
-                last_name: faker.name.firstName(),
-                uuid: faker.random.uuid(),
-                email: faker.internet.email(),
-                country_iso2: 'NL',
-                language_code: 'nl',
-                locale: 'nl_nl',
-                salutation: 'Mr',
-                specialty_onekey: 'SP.WNL.01',
-
-                consents: [
-                    { "827cc68d-a92d-4939-a9b6-d373321d23bb": true },
-                    { "827cc68d-a92d-4939-a9b6-d373321d23bb": true },
-                    { "827cc68d-a92d-4939-a9b6-d373321d23bb": true }
-                ]
-            });
-
-        expect(response.statusCode).toBe(200);
-        expect(response.body).toHaveProperty('data');
-        expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
     it('Should not create a new HCP profile with existing email or uuid', async () => {
@@ -224,4 +199,274 @@ describe('HCP Routes', () => {
 
         expect(response.statusCode).toBe(204);
     });
+
+    describe('HCP Registration Journeys', () => {
+        let HCPModel;
+        let HCPConsents;
+        let emailData;
+        let singleOptInConsent;
+        let doubleOptInConsent;
+        let getConsentConfirmationToken;
+        let getNumberOfConfirmedUnconfirmedConsents;
+
+        beforeAll(() => {
+            jest.spyOn(emailService, 'send').mockImplementation((options) => {
+                emailData = options;
+                return Promise.resolve();
+            });
+
+            HCPModel = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_profile.model.js'));
+            HCPConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model.js'));
+
+            singleOptInConsent =  {
+                locale: 'nl_nl',
+                country_iso2: 'nl',
+                consents: [
+                    { [demoConsent.slug] : true }
+                ]
+            }
+
+            doubleOptInConsent = {
+                locale: 'nl_be',
+                country_iso2: 'be',
+                consents: [
+                    { [demoConsent.slug] : true }
+                ]
+            }
+
+            getConsentConfirmationToken = (consentConfirmLink) => {
+                const consentConfirmationLink = consentConfirmLink;
+                const startIndexOfConsentConfirmToken = consentConfirmationLink.indexOf("?token=") + "?token=".length;
+                const endIndexOfConsentConfirmToken = consentConfirmationLink.indexOf("&journey=consent_confirmation");
+                const consentConfirmationToken = consentConfirmationLink.substring(startIndexOfConsentConfirmToken, endIndexOfConsentConfirmToken);
+                return consentConfirmationToken;
+            }
+
+            getNumberOfConfirmedUnconfirmedConsents = async (userID) => {
+                const hcpUserConsents = await HCPConsents.findAll({
+                    where: {
+                        user_id: userID
+                    }
+                });
+
+                const numberOfConfirmedConsents = hcpUserConsents.filter(c => c.consent_confirmed === true).length;
+                const numberOfUnConfirmedConsents = hcpUserConsents.filter(c => c.consent_confirmed === false).length;
+
+                return [numberOfConfirmedConsents, numberOfUnConfirmedConsents];
+            }
+        });
+
+        describe('Valid UUID Single Opt In', () => {
+            beforeAll(async (done) => {
+                await HCPModel.destroy({ where: {} });
+                await HCPConsents.destroy({ where: {} });
+                done();
+            });
+
+            it('Should create a new HCP profile with valid UUID', async () => {
+                const response = await request.post('/api/hcp-profiles')
+                    .set('Authorization', 'bearer ' + defaultApplication.access_token)
+                    .send({
+                        ...userWithValidUUID,
+                        ...singleOptInConsent
+                    });
+
+                const hcpUserID = response.body.data.id;
+                const [numberOfConfirmedConsents, numberOfUnConfirmedConsents] = await getNumberOfConfirmedUnconfirmedConsents(hcpUserID);
+
+                expect(numberOfConfirmedConsents).toBe(1);
+                expect(numberOfUnConfirmedConsents).toBe(0);
+
+                expect(response.statusCode).toBe(200);
+                expect(response.body).toHaveProperty('data');
+                expect(response.body.data.status).toBe('self_verified');
+                expect(response.body.data).toHaveProperty('password_reset_token');
+                expect(response.res.headers['content-type']).toMatch('application/json');
+            });
+
+            it('Should reset password of HCP', async () => {
+                const hcp = await HCPModel.findOne({ where: { email: userWithValidUUID.email.toLowerCase() } });
+
+                const response = await request.put(`/api/hcp-profiles/reset-password?token=${hcp.reset_password_token}`)
+                    .set('Authorization', 'bearer ' + defaultApplication.access_token)
+                    .send({
+                        new_password: 'P@ssword123',
+                        confirm_password: 'P@ssword123'
+                    });
+
+                expect(response.statusCode).toBe(200);
+            })
+        });
+
+        describe('Valid UUID Double Opt In', () => {
+            beforeAll(async (done) => {
+                await HCPModel.destroy({ where: {} });
+                await HCPConsents.destroy({ where: {} });
+                done();
+            });
+
+            it('Should create a new HCP user', async () => {
+                const response = await request.post('/api/hcp-profiles')
+                    .set('Authorization', 'bearer ' + defaultApplication.access_token)
+                    .send({
+                        ...userWithValidUUID,
+                        ...doubleOptInConsent
+                    });
+
+                const hcpUserID = response.body.data.id;
+                const [numberOfConfirmedConsents, numberOfUnConfirmedConsents] = await getNumberOfConfirmedUnconfirmedConsents(hcpUserID);
+
+                expect(numberOfConfirmedConsents).toBe(0);
+                expect(numberOfUnConfirmedConsents).toBe(1);
+
+                expect(response.statusCode).toBe(200);
+                expect(response.body).toHaveProperty('data');
+                expect(response.body.data.status).toBe('consent_pending');
+                expect(response.body.data).not.toHaveProperty('password_reset_token');
+                expect(response.res.headers['content-type']).toMatch('application/json');
+            });
+
+            it('Should confirm consents of HCP user', async () => {
+                const consentConfirmationToken = getConsentConfirmationToken(emailData.data.link);
+
+                const response = await request.post('/api/hcp-profiles/confirm-consents')
+                    .set('Authorization', 'bearer ' + defaultApplication.access_token)
+                    .send({ token: consentConfirmationToken });
+
+                const hcpUserID = response.body.data.id;
+                const [numberOfConfirmedConsents, numberOfUnConfirmedConsents] = await getNumberOfConfirmedUnconfirmedConsents(hcpUserID);
+
+                expect(numberOfConfirmedConsents).toBe(1);
+                expect(numberOfUnConfirmedConsents).toBe(0);
+
+                expect(response.statusCode).toBe(200);
+                expect(response.body).toHaveProperty('data');
+                expect(response.body.data.status).toBe('self_verified');
+                expect(response.body.data).toHaveProperty('password_reset_token');
+                expect(response.res.headers['content-type']).toMatch('application/json');
+            });
+        })
+
+        describe('Invalid UUID Single Opt In', () => {
+            beforeAll(async (done) => {
+                await HCPModel.destroy({ where: {} });
+                await HCPConsents.destroy({ where: {} });
+                done();
+            });
+
+            it('Should create a new HCP user', async () => {
+                const response = await request.post('/api/hcp-profiles')
+                    .set('Authorization', 'bearer ' + defaultApplication.access_token)
+                    .send({
+                        ...userWithInvalidUUID,
+                        ...singleOptInConsent
+                    });
+
+                const hcpUserID = response.body.data.id;
+                const [numberOfConfirmedConsents, numberOfUnConfirmedConsents] = await getNumberOfConfirmedUnconfirmedConsents(hcpUserID);
+
+                expect(numberOfConfirmedConsents).toBe(1);
+                expect(numberOfUnConfirmedConsents).toBe(0);
+
+                expect(response.statusCode).toBe(200);
+                expect(response.body).toHaveProperty('data');
+                expect(response.body.data.status).toBe('not_verified');
+                expect(response.res.headers['content-type']).toMatch('application/json');
+            });
+
+            it('Should approve not verified HCP user', async () => {
+                const hcp = await HCPModel.findOne({ where: { email: userWithInvalidUUID.email.toLowerCase() }});
+
+                const response = await request.put(`/api/hcp-profiles/${hcp.id}/approve`)
+                    .set('Cookie', [`access_token=${defaultAdmin.access_token}`])
+
+                expect(response.statusCode).toBe(200);
+                expect(response.body).toHaveProperty('data');
+                expect(response.body.data.status).toBe('manually_verified');
+                expect(response.res.headers['content-type']).toMatch('application/json');
+            });
+
+            it('Should reject not verified HCP user', async () => {
+                await HCPModel.destroy({ where: {} });
+
+                const { body: { data: hcp }} = await request.post('/api/hcp-profiles')
+                    .set('Authorization', 'bearer ' + defaultApplication.access_token)
+                    .send({
+                        ...userWithInvalidUUID,
+                        ...singleOptInConsent
+                    });
+
+                const response = await request.put(`/api/hcp-profiles/${hcp.id}/reject`)
+                    .set('Cookie', [`access_token=${defaultAdmin.access_token}`])
+
+                const doesHCPExistInDB = await HCPModel.findOne({ where: { id: hcp.id } });
+
+                expect(doesHCPExistInDB).toBeFalsy();
+
+                expect(response.statusCode).toBe(200);
+                expect(response.body).toHaveProperty('data');
+                expect(response.res.headers['content-type']).toMatch('application/json');
+            });
+        })
+
+        describe('Invalid UUID Double Opt In', () => {
+            beforeAll(async (done) => {
+                await HCPModel.destroy({ where: {} });
+                await HCPConsents.destroy({ where: {} });
+                done();
+            });
+
+            it('Should create a new HCP user', async () => {
+                const response = await request.post('/api/hcp-profiles')
+                    .set('Authorization', 'bearer ' + defaultApplication.access_token)
+                    .send({
+                        ...userWithInvalidUUID,
+                        ...doubleOptInConsent
+                    });
+
+                const hcpUserID = response.body.data.id;
+                const [numberOfConfirmedConsents, numberOfUnConfirmedConsents] = await getNumberOfConfirmedUnconfirmedConsents(hcpUserID);
+
+                expect(numberOfConfirmedConsents).toBe(0);
+                expect(numberOfUnConfirmedConsents).toBe(1);
+
+                expect(response.statusCode).toBe(200);
+                expect(response.body).toHaveProperty('data');
+                expect(response.body.data.status).toBe('not_verified');
+                expect(response.res.headers['content-type']).toMatch('application/json');
+            });
+
+            it('Should approve not verified HCP user', async () => {
+                const hcp = await HCPModel.findOne({ where: { email: userWithInvalidUUID.email.toLowerCase() }});
+
+                const response = await request.put(`/api/hcp-profiles/${hcp.id}/approve`)
+                    .set('Cookie', [`access_token=${defaultAdmin.access_token}`])
+
+                expect(response.statusCode).toBe(200);
+                expect(response.body).toHaveProperty('data');
+                expect(response.body.data.status).toBe('consent_pending');
+                expect(response.res.headers['content-type']).toMatch('application/json');
+            });
+
+            it('Should confirm consents of HCP user', async () => {
+                const consentConfirmationToken = getConsentConfirmationToken(emailData.data.link);
+
+                const response = await request.post('/api/hcp-profiles/confirm-consents')
+                    .set('Authorization', 'bearer ' + defaultApplication.access_token)
+                    .send({ token: consentConfirmationToken });
+
+                const hcpUserID = response.body.data.id;
+                const [numberOfConfirmedConsents, numberOfUnConfirmedConsents] = await getNumberOfConfirmedUnconfirmedConsents(hcpUserID);
+
+                expect(numberOfConfirmedConsents).toBe(1);
+                expect(numberOfUnConfirmedConsents).toBe(0);
+
+                expect(response.statusCode).toBe(200);
+                expect(response.body).toHaveProperty('data');
+                expect(response.body.data.status).toBe('manually_verified');
+                expect(response.body.data).toHaveProperty('password_reset_token');
+                expect(response.res.headers['content-type']).toMatch('application/json');
+            });
+        })
+    })
 });
