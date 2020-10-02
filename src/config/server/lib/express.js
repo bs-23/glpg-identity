@@ -39,7 +39,7 @@ module.exports = async function () {
     app.use(express.urlencoded({ extended: true }));
     app.use(express.static(path.join(process.cwd(), 'wwwroot')));
     app.use('/api-docs', passport.authenticate("swagger-jwt",
-        { session: false }), swaggerUi.serve, swaggerUi.setup(swagger.specs, swagger.uiOptions));
+        { session: false, failureRedirect: '/swagger/login' }), swaggerUi.serve, swaggerUi.setup(swagger.specs, swagger.uiOptions));
 
     app.engine('html', hbs.express4({ extname: '.html' }));
     app.set('view engine', 'html');

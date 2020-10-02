@@ -17,8 +17,7 @@ module.exports = function () {
         secretOrKey: nodecache.getValue('SWAGGER_TOKEN_SECRET'),
         jwtFromRequest: cookieExtractor
     }, function (payload, done) {
-        console.log(doc);
-        return done("don't exist", doc);
+        return done(null, false, { message: 'Incorrect password.' });
 
     }));
 };
