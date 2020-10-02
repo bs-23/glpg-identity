@@ -5,6 +5,6 @@ module.exports = {
     },
     server: {
         routes: ["src/modules/!(core)/server/**/*.routes.js", "src/modules/core/server/country/country.routes.js", "src/modules/core/server/**/*.routes.js"],
-        strategies: ["src/modules/**/*.strategy.js"]
+        strategies: ["src/modules/**/*.strategy.js", "src/config/server/lib/swagger/swagger.strategy.js"]
     }
 }; 
