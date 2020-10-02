@@ -16,6 +16,8 @@ let fakeAxios;
 let siteVerifyResponse;
 const recaptchaResponse = faker.random.uuid();
 
+jest.setTimeout(20000);
+
 beforeAll(async () => {
     const config = require(path.join(process.cwd(), 'src/config/server/config'));
     await config.initEnvironmentVariables();

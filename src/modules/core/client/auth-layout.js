@@ -25,9 +25,5 @@ export default function (props) {
     debounce: 500
   })
  
-  return (
-    <div>
-        <App/>
-    </div>
-  )
+  return <App/>
 }
