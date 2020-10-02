@@ -20,7 +20,7 @@ async function send(options) {
 
     const plaintext = options.data
         ? transformContent(options.plaintext, options.data)
-        : options.plaintext;
+        : options.plaintext || '';
 
     /**
      * NOTE: Amazon SES does not like undefined as value
