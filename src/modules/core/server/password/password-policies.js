@@ -12,8 +12,8 @@ async function isOldPassword(newPassword, user) {
         }
 
         if (oldPasswords !== null) {
-            const isOldPassword = oldPasswords.passwords.find(p => bcrypt.compareSync(newPassword, p));
-            return !!isOldPassword;
+            const isOneOfPreviousPasswords = oldPasswords.passwords.find(p => bcrypt.compareSync(newPassword, p));
+            return !!isOneOfPreviousPasswords;
         }
 
         return false;
@@ -84,8 +84,8 @@ function validatePassword(password) {
 
 function hasValidCharacters(password) {
     var pattern = new RegExp("^[a-zA-Z0-9!\"#$%&'\(\)\*\+,\-\.\\\\/:;<=>\?@\[\\]\^_`\{\|\}\~]*$");
-    const hasValidCharacters = pattern.test(password);
-    return hasValidCharacters;
+    const containsValidCharacters = pattern.test(password);
+    return containsValidCharacters;
 }
 
 function minimumPasswordAge(date) {
