@@ -168,23 +168,50 @@ async function getHcps(req, res) {
 
         const application_list = (await Hcp.findAll()).map(i => i.get("application_id"));
 
-        const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => i.codbase === codbase).map(i => i.country_iso2);
-        const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
+        async function getCountryIso2(){
+            const user_codbase_list_for_iso2 = (await sequelize.datasyncConnector.query(
+                `SELECT * FROM ciam.vwcountry where ciam.vwcountry.country_iso2 = ANY($countries);`, 
+                { 
+                    bind: { 
+                        countries: req.user.countries
+                    }, 
+                    type: QueryTypes.SELECT 
+                }
+            )).map(i => i.codbase);
 
-        const country_iso2_list = req.user.type === 'admin' ? (await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry", { type: QueryTypes.SELECT })).map(i => i.country_iso2) : (await Hcp.findAll()).map(i => i.get("country_iso2"));
-        const countries_ignorecase = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
+            const user_country_iso2_list = (await sequelize.datasyncConnector.query(
+                `SELECT * FROM ciam.vwcountry where ciam.vwcountry.codbase = ANY($codbases);`,
+                {
+                    bind: {
+                        codbases : user_codbase_list_for_iso2
+                    },
+                    type: QueryTypes.SELECT
+                }
+            )).map(i => i.country_iso2);
 
+            return user_country_iso2_list;
+        }
 
-        const codbase_list_mapped_with_user_country_iso2_list = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => req.user.countries.includes(i.country_iso2)).map(i => i.codbase) : [];
-        const country_iso2_list_for_user_countries_codbase = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => codbase_list_mapped_with_user_country_iso2_list.includes(i.codbase)).map(i => i.country_iso2) : [];
-        const countries_ignorecase_for_user_countries_codbase = [].concat.apply([], country_iso2_list_for_user_countries_codbase.map(i => ignoreCaseArray(i)));
+        const country_iso2_list = await getCountryIso2();
+        const ignorecase_of_country_iso2_list = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
+
+        const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(
+            `SELECT * FROM ciam.vwcountry WHERE ciam.vwcountry.codbase = '${codbase}';`, 
+            {
+                logging: console.log,
+                type: QueryTypes.SELECT 
+            }
+        )).map(i => i.country_iso2);
+
+        const selected_iso2_list_for_codbase = country_iso2_list_for_codbase.filter(i => country_iso2_list.includes(i));
+        const ignorecase_of_selected_iso2_list_for_codbase = [].concat.apply([], selected_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
 
         const specialty_list = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwspecialtymaster", { type: QueryTypes.SELECT });
 
         const hcp_filter = {
             status: status === null ? { [Op.or]: ['self_verified', 'manually_verified', 'consent_pending', 'not_verified', null] } : status,
             application_id: req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
-            country_iso2: codbase ? { [Op.any]: [countries_ignorecase_for_codbase] } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : countries_ignorecase_for_user_countries_codbase
+            country_iso2: codbase ? { [Op.any]: [ignorecase_of_selected_iso2_list_for_codbase] } : { [Op.any]: [ignorecase_of_country_iso2_list] },
         };
 
         const orderBy = req.query.orderBy === 'null'
@@ -252,7 +279,7 @@ async function getHcps(req, res) {
             end: offset + limit > totalUser ? totalUser : offset + limit,
             status: status ? status : null,
             codbase: codbase ? codbase : null,
-            countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : req.user.countries
+            countries: req.user.countries
         };
 
         response.data = data;

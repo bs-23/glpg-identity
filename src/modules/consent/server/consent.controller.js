@@ -382,7 +382,7 @@ async function getDatasyncConsentsReport(req, res){
             limit,
             total: total_consents.count,
             start: limit * page + 1,
-            end: offset + limit > total_consents ? total_consents : offset + limit,
+            end: offset + limit > total_consents.count ? total_consents.count : offset + limit,
             codbase: codbase ? codbase : '',
             // process_activity: process_activity ? process_activity : '',
             // opt_type: opt_type ? opt_type : '',
