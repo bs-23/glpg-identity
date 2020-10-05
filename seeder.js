@@ -226,7 +226,7 @@ async function init() {
                 locale: 'fr_be'
             },
             {
-                rich_text: "<p>Je consens à ce que Galapagos m'envoie des informations promotionnelles et environnementales concernant tous les produits et services de Galapgos à l'adresse mail que j'ai fournie. <br> <br> Pour obtenir de plus amples informations sur la manière dont nous traitons vos données à caractère personnel, veuillez vous référer à notre <a href='#' target='_blank'>Déclaration de confidentialité</a></p>",
+                rich_text: "<p>Je consens à ce que Galapagos m'envoie des informations promotionnelles et environnementales concernant tous les produits et services de Galapgos à l'adresse mail que j'ai fournie. <br> <br> Pour obtenir de plus amples informations sur la manière dont nous traitons vos données à caractère personnel, veuillez vous référer à notre <a href='#' target='_blank'>Déclaration de confidentialité</a>.</p>",
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 locale: 'fr_be'
             },
