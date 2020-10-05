@@ -5,19 +5,21 @@ const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodeca
 
 module.exports = function () {
     function cookieExtractor(req) {
-        let token = null;
+        let token;
         if (req && req.cookies) {
-            token = req.cookies['access_token'];
+            token = req.cookies['swagger_access_token'];
         }
         return token;
     }
 
     passport.use('swagger-jwt', new Strategy({
-        passReqToCallback: true,
         secretOrKey: nodecache.getValue('SWAGGER_TOKEN_SECRET'),
         jwtFromRequest: cookieExtractor
     }, function (payload, done) {
+        const username = nodecache.getValue('SWAGGER_USERNAME')
+        if(payload.username === username) {
+            return done(null, payload);
+        }
         return done(null, false, { message: 'Incorrect password.' });
-
     }));
 };
