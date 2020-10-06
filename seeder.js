@@ -169,9 +169,9 @@ async function init() {
             ];
 
             const applicationDomains = [
-                { application_id: 'c2c6ec0e-b296-48b4-8f3f-c5ea2f899cc8', country_iso2: 'nl', domain: 'http://172.16.229.25:4503' },
-                { application_id: '9c290d6e-9090-4589-9fae-8e60be393249', country_iso2: 'nl', domain: 'www-dev.jyseleca.nl' },
-                { application_id: '9c290d6e-9090-4589-9fae-8e60be393249', country_iso2: 'be', domain: 'products-dev.glpg.com' }
+                { application_id: '3252888b-530a-441b-8358-3e423dbce08a', country_iso2: 'nl', domain: 'http://172.16.229.25:4503' },
+                { application_id: 'a7959308-7ec5-4090-94ff-2367113a454d', country_iso2: 'nl', domain: 'www-dev.jyseleca.nl' },
+                { application_id: 'a7959308-7ec5-4090-94ff-2367113a454d', country_iso2: 'be', domain: 'products-dev.glpg.com' }
             ];
 
             Application.destroy({ truncate: { cascade: true } }).then(() => {
