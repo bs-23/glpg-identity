@@ -33,6 +33,12 @@ export function login(data) {
     };
 }
 
+export function clearLoggedInUser() {
+    return {
+        type: Types.CLEAR_LOGGED_IN_USER
+    };
+}
+
 export function createUser(data) {
     return {
         type: Types.CREATE_USER,

@@ -2,22 +2,39 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { useToasts } from 'react-toast-notifications';
+import axios from 'axios';
+import { useCookies } from 'react-cookie';
 
-import { changePassword } from '../../user.actions';
+import { changePassword, clearLoggedInUser } from '../../user.actions';
 import { changePasswordSchema } from '../../user.schema';
+import { useHistory } from 'react-router-dom';
 
 export default function ChangePasswordForm() {
     const dispatch = useDispatch();
+    const history = useHistory();
     const { addToast } = useToasts();
+    const [, , removeCookie] = useCookies();
+
+    const timeBeforeLogout = 3000;
+
+    const handleLogout = () => {
+        dispatch(clearLoggedInUser());
+        axios.get('/api/logout');
+        removeCookie('logged_in', { path: '/' });
+        history.replace('/');
+    }
 
     const formSubmitHandler = async (values, actions) => {
         actions.setSubmitting(true);
         try{
             await dispatch(changePassword(values));
-            addToast('Password changed successfully', {
+            addToast('Password changed successfully. Logging out the user.', {
                 appearance: 'success',
                 autoDismiss: true
             });
+            setTimeout(() => {
+                handleLogout();
+            }, timeBeforeLogout);
         }catch(err){
             const errorMessage = typeof err.response.data === 'string'
                 ? err.response.data
