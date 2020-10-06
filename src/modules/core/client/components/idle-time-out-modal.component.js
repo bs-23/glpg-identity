@@ -15,7 +15,7 @@ export const IdleTimeOutModal = ({showModal, handleClose, handleLogout, remainin
                 </div>
             </Modal.Body>
             <Modal.Footer>
-                <Button onClick={handleLogout}  className="btn btn-secondary border-0">
+                <Button onClick={handleLogout} variant="link" className="cdp-btn-link-secondary border-0">
                     Sign out
                 </Button>
 
