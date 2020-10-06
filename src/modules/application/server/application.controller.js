@@ -2,14 +2,84 @@ const path = require('path');
 const jwt = require('jsonwebtoken');
 const Application = require('./application.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
+const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 
 function generateAccessToken(doc) {
     return jwt.sign({
         id: doc.id,
     }, nodecache.getValue('APPLICATION_TOKEN_SECRET'), {
-        expiresIn: '30d',
+        expiresIn: '2h',
         issuer: doc.id.toString()
     });
+}
+
+function generateRefreshToken(doc) {
+    return jwt.sign({
+        id: doc.id,
+    }, nodecache.getValue('APPLICATION_REFRESH_SECRET'), {
+        expiresIn: '1d',
+        issuer: doc.id.toString()
+    });
+}
+
+async function getToken(req, res) {
+    const response = new Response({}, []);
+
+    try {
+        let application;
+        const { grant_type, username, password, refresh_token } = req.body;
+
+        if(!grant_type) {
+            response.errors.push(new CustomError('grant_type is missing.', 400, 'grant_type'));
+        }
+
+        if(grant_type && grant_type !== 'password' && grant_type !== 'refresh_token') {
+            response.errors.push(new CustomError('The requested grant_type is not supported.', 400, 'grant_type'));
+        }
+
+        if(grant_type === 'password') {
+            if(!username || !password) {
+                response.errors.push(new CustomError('The request is missing required parameters.', 400));
+            } else {
+                application = await Application.findOne({ where: { email: username } });
+
+                if (!application || !application.validPassword(password)) {
+                    response.errors.push(new CustomError('Invalid username or password.', 401));
+                }
+            }
+        }
+
+        if(grant_type === 'refresh_token') {
+            if(!refresh_token) {
+                response.errors.push(new CustomError('refresh_token is missing.', 400, 'refresh_token'));
+            } else {
+                const decoded = jwt.verify(refresh_token, nodecache.getValue('APPLICATION_REFRESH_SECRET'));
+                application = await Application.findOne({ where: { id: decoded.id } });
+
+                if(application.refresh_token !== refresh_token) {
+                    response.errors.push(new CustomError('The refresh_token is invalid or expired.', 4401));
+                }
+            }
+        }
+
+        if (response.errors.length) return res.status(400).send(response);
+
+        const new_refresh_token = generateRefreshToken(application);
+        await application.update({ refresh_token: new_refresh_token });
+
+        response.data = {
+            token_type: 'bearer',
+            access_token: generateAccessToken(application),
+            expires_in: '7200000',
+            refresh_token: new_refresh_token
+        };
+
+        res.send(response);
+    } catch (err) {
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
+    }
 }
 
 async function getAccessToken(req, res) {
@@ -55,5 +125,6 @@ async function getApplications(req, res) {
     }
 }
 
+exports.getToken = getToken;
 exports.getAccessToken = getAccessToken;
 exports.getApplications = getApplications;

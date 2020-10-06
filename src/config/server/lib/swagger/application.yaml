@@ -38,3 +38,52 @@ paths:
                                         type: string
                 401:
                     description: Invalid email or password.
+
+    /api/applications/token:
+        post:
+            tags:
+                - applications
+            summary: Get Access Token Response for accessing CDP services.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                username:
+                                    type: string
+                                password:
+                                    type: string
+                                grant_type:
+                                    type: string
+                                refresh_token:
+                                    type: string
+                            required:
+                                - username
+                                - password
+                                - grant_type
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: object
+                                properties:
+                                    token_type:
+                                        type: string
+                                    access_token:
+                                        type: string
+                                    expires_in:
+                                        type: string
+                                    refresh_token:
+                                        type: string
+                400:
+                    description: The request is missing required parameters.
+                401:
+                    description: Invalid email or password.
+                4400:
+                    description: The access_token is invalid or expired.
+                4401:
+                    description: The refresh_token is invalid or expired.
