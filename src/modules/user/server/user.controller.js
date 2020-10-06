@@ -63,7 +63,9 @@ function formatProfile(user) {
         status: user.status,
         roles: getRolesPermissions(user.userrole),
         application: user.application,
-        countries: user.countries
+        countries: user.countries,
+        last_login: user.last_login,
+        expiry_date: user.expiry_date,
     };
     return profile;
 }
@@ -587,6 +589,20 @@ async function changePassword(req, res) {
         user.password = newPassword;
         user.password_updated_at = new Date(Date.now());
         await user.save();
+
+        const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp/password-change-success.html`);
+        const options = {
+            toAddresses: [user.email],
+            templateUrl,
+            subject: 'Your password has been changed',
+            data: {
+                name: user.first_name + " " + user.last_name || '',
+                link: `${req.protocol}://${req.headers.host}/login`,
+                s3bucketUrl: nodecache.getValue('S3_BUCKET_URL')
+            }
+        };
+
+        await emailService.send(options);
 
         res.json(formatProfile(user));
     } catch (err) {

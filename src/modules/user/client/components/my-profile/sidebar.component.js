@@ -1,25 +1,24 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
-const MenuItem = ({ id, label, onClick, isSelected }) =>
+const MenuItem = ({ id, label, onClick, isSelected, toUrl }) =>
     <div id={id} className={`nav-item font-weight-bold ${isSelected ? 'bg-info' : 'bg-light'}`} onClick={onClick} >
-        <div className="nav-link">{label}</div>
+        <Link to={toUrl} className="nav-link">{label}</Link>
     </div>
 
-const Sidebar = ({ menuItems, idExtractor }) => {
+const Sidebar = ({ menuItems, idExtractor, header }) => {
     const [selectedMenuItemID, setSelectedMenuItemID] = useState(null);
 
     const onMenuItemSelect = (event, onClick) => {
-        const menuItemID = event.target.id;
-        const menuItems = menuItems.map(item => idExtractor(item));
+        const allMenuItemIDs = menuItems.map(item => idExtractor(item));
+        let currentElement = event.target;
 
-        // let currentElement = event.target;
+        while(currentElement.parentNode && !allMenuItemIDs.includes(currentElement.id)){
+            currentElement = currentElement.parentNode;
+        }
 
-        // while(currentElement.parentNode && !menuItems.includes(currentElement.id)){
-        //     currentElement = currentElement.parentNode;
-        // }
-
-        setSelectedMenuItemID(menuItemID);
-        onClick();
+        setSelectedMenuItemID(currentElement.id);
+        onClick && onClick();
     }
 
     useEffect(() => {
@@ -27,13 +26,15 @@ const Sidebar = ({ menuItems, idExtractor }) => {
     }, []);
 
     return <aside className="my-2">
+            <h4 className="pb-2">{header}</h4>
         {menuItems && menuItems.map(item =>
             <MenuItem
                 key={idExtractor(item)}
                 id={idExtractor(item)}
                 label={item.label}
-                onClick={e => onMenuItemSelect(e, item.onClick)}
+                toUrl={item.toUrl}
                 isSelected={idExtractor(item) === selectedMenuItemID}
+                onClick={e => onMenuItemSelect(e, item.onClick)}
             />)}
     </aside>
 }
