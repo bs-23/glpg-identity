@@ -100,14 +100,14 @@ async function sendConsentConfirmationMail(user, consents, application) {
 
     const mailOptions = generateEmailOptions('double-opt-in-consent-confirm', application.slug, user);
     mailOptions.data.consents = consents || [];
-    mailOptions.data.link = `${application.consent_confirmation_link}?token=${consentConfirmationToken}&journey=consent_confirmation&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
+    mailOptions.data.link = `${user.domain}${application.consent_confirmation_path}?token=${consentConfirmationToken}&journey=consent_confirmation&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
 }
 
 async function sendRegistrationSuccessMail(user, application) {
     const mailOptions = generateEmailOptions('registration-success', application.slug, user);
-    mailOptions.data.loginLink = `${application.login_link}?journey=login&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
+    mailOptions.data.loginLink = `${user.domain}${application.journey_redirect_path}?journey=login&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
 }
@@ -124,22 +124,22 @@ async function sendRegistrationNotVerifiedMail(user, application) {
 
 async function sendResetPasswordSuccessMail(user, application) {
     const mailOptions = generateEmailOptions('password-reset-success', application.slug, user);
-    mailOptions.data.loginLink = `${application.login_link}?journey=login&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
+    mailOptions.data.loginLink = `${user.domain}${application.journey_redirect_path}?journey=login&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
 }
 
 async function sendPasswordSetupInstructionMail(user, application) {
     const mailOptions = generateEmailOptions('password-setup-instructions', application.slug, user);
-    mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&journey=single_optin_verified&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
-    mailOptions.data.forgot_password_link = `${application.forgot_password_link}?journey=forgot_password&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
+    mailOptions.data.link = `${user.domain}${application.journey_redirect_path}?token=${user.reset_password_token}&journey=single_optin_verified&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
+    mailOptions.data.forgot_password_link = `${user.domain}${application.journey_redirect_path}?journey=forgot_password&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
 }
 
 async function sendPasswordResetInstructionMail(user, application) {
     const mailOptions = generateEmailOptions('password-reset-instructions', application.slug, user);
-    mailOptions.data.link = `${application.reset_password_link}?token=${user.reset_password_token}&journey=set_password&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
+    mailOptions.data.link = `${user.domain}${application.journey_redirect_path}?token=${user.reset_password_token}&journey=set_password&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
 }
@@ -170,12 +170,11 @@ async function getHcps(req, res) {
 
         async function getCountryIso2(){
             const user_codbase_list_for_iso2 = (await sequelize.datasyncConnector.query(
-                `SELECT * FROM ciam.vwcountry where ciam.vwcountry.country_iso2 = ANY($countries);`, 
-                { 
-                    bind: { 
+                `SELECT * FROM ciam.vwcountry where ciam.vwcountry.country_iso2 = ANY($countries);`, {
+                    bind: {
                         countries: req.user.countries
-                    }, 
-                    type: QueryTypes.SELECT 
+                    },
+                    type: QueryTypes.SELECT
                 }
             )).map(i => i.codbase);
 
@@ -196,10 +195,10 @@ async function getHcps(req, res) {
         const ignorecase_of_country_iso2_list = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
 
         const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(
-            `SELECT * FROM ciam.vwcountry WHERE ciam.vwcountry.codbase = '${codbase}';`, 
+            `SELECT * FROM ciam.vwcountry WHERE ciam.vwcountry.codbase = '${codbase}';`,
             {
                 logging: console.log,
-                type: QueryTypes.SELECT 
+                type: QueryTypes.SELECT
             }
         )).map(i => i.country_iso2);
 
@@ -467,6 +466,7 @@ async function createHcpProfile(req, res) {
             telephone,
             application_id: req.user.id,
             individual_id_onekey: master_data.individual_id_onekey,
+            domain: req.get('host'),
             created_by: req.user.id,
             updated_by: req.user.id
         };
