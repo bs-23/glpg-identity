@@ -437,30 +437,35 @@ const ConsentPerformanceReport = () => {
                                             && consents_report['hcp_consents'] &&
                                             <div className="pagination justify-content-end align-items-center border-top p-3">
                                                 <span className="cdp-text-primary font-weight-bold">{consents_report.start + ' - ' + consents_report.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + consents_report.total}</span>
-                                                <LinkContainer 
-                                                    to={`/consent/consent-performance-report/veeva-crm${makeUrl( [ 
-                                                        { name: 'page', value: consents_report.page - 1 }, 
-                                                        { name: 'codbase', value: consents_report.codbase }, 
-                                                        { name: 'process_activity', value: consents_report.process_activity }, 
-                                                        { name: 'opt_type', value: consents_report.opt_type }, 
-                                                        { name: 'orderBy', value: consents_report.orderBy }, 
-                                                        { name: 'orderType', value: consents_report.orderType }
-                                                    ] )}`}
-                                                >
-                                                    <span className="pagination-btn" data-testid='Prev' onClick={() => pageLeft()} disabled={consents_report.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
-                                                </LinkContainer>
-                                                <LinkContainer 
-                                                    to={`/consent/consent-performance-report/veeva-crm${makeUrl( [ 
-                                                        { name: 'page', value: consents_report.page + 1 }, 
-                                                        { name: 'codbase', value: consents_report.codbase }, 
-                                                        { name: 'process_activity', value: consents_report.process_activity }, 
-                                                        { name: 'opt_type', value: consents_report.opt_type }, 
-                                                        { name: 'orderBy', value: consents_report.orderBy}, 
-                                                        { name: 'orderType', value: consents_report.orderType }
-                                                    ] )}`}
-                                                >
-                                                    <span className="pagination-btn" data-testid='Next' onClick={() => pageRight()} disabled={consents_report.end === consents_report.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
-                                                </LinkContainer>
+                                                {
+                                                    consents_report.page <= 1 ? (<span className="pagination-btn" data-testid='Prev' disabled={consents_report.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>) : (<LinkContainer 
+                                                        to={`/consent/consent-performance-report/veeva-crm${makeUrl( [ 
+                                                            { name: 'page', value: consents_report.page - 1 }, 
+                                                            { name: 'codbase', value: consents_report.codbase }, 
+                                                            { name: 'process_activity', value: consents_report.process_activity }, 
+                                                            { name: 'opt_type', value: consents_report.opt_type }, 
+                                                            { name: 'orderBy', value: consents_report.orderBy }, 
+                                                            { name: 'orderType', value: consents_report.orderType }
+                                                        ] )}`}
+                                                    >
+                                                        <span className="pagination-btn" data-testid='Prev' onClick={() => pageLeft()}><i className="icon icon-arrow-down ml-2 prev"></i></span>
+                                                    </LinkContainer>)
+                                                }
+
+                                                {
+                                                    consents_report.end === consents_report.total ? (<span className="pagination-btn" data-testid='Next' disabled={consents_report.end === consents_report.total}><i className="icon icon-arrow-down ml-2 next"></i></span>) : (<LinkContainer 
+                                                        to={`/consent/consent-performance-report/veeva-crm${makeUrl( [ 
+                                                            { name: 'page', value: consents_report.page + 1 }, 
+                                                            { name: 'codbase', value: consents_report.codbase }, 
+                                                            { name: 'process_activity', value: consents_report.process_activity }, 
+                                                            { name: 'opt_type', value: consents_report.opt_type }, 
+                                                            { name: 'orderBy', value: consents_report.orderBy}, 
+                                                            { name: 'orderType', value: consents_report.orderType }
+                                                        ] )}`}
+                                                    >
+                                                        <span className="pagination-btn" data-testid='Next' onClick={() => pageRight()} ><i className="icon icon-arrow-down ml-2 next"></i></span>
+                                                    </LinkContainer>)
+                                                }
                                             </div>
                                         }
                                     </div>

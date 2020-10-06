@@ -8,7 +8,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Form, Formik, Field, ErrorMessage } from "formik";
 import { useToasts } from 'react-toast-notifications';
-import { getHcpProfiles, hcpsSort } from '../hcp.actions';
+import { getHcpProfiles } from '../hcp.actions';
 import { ApprovalRejectSchema } from '../hcp.schema';
 import uuidAuthorities from '../uuid-authorities.json';
 import axios from 'axios';
@@ -25,7 +25,6 @@ export default function hcpUsers() {
     const [countries, setCountries] = useState([]);
     const [allCountries, setAllCountries] = useState([]);
     const [show, setShow] = useState({ profileManage: false, updateStatus: false });
-    const [currentAction, setCurrentAction] = useState({ userId: null, action: null });
     const [currentUser, setCurrentUser] = useState({});
     const { addToast } = useToasts();
     const [sort, setSort] = useState({ type: 'ASC', value: null });
@@ -33,11 +32,11 @@ export default function hcpUsers() {
     const hcps = useSelector(state => state.hcpReducer.hcps);
 
     const pageLeft = () => {
-        if (hcps.page > 1) urlChange(hcps.page - 1, hcps.codbase, hcps.status, params.get('orderBy'), params.get('orderType'), true);
+        if (hcps.page > 1) urlChange(hcps.page - 1, hcps.codbase, hcps.status, params.get('orderBy'), true);
     };
 
     const pageRight = () => {
-        if (hcps.end !== hcps.total) urlChange(hcps.page + 1, hcps.codbase, hcps.status, params.get('orderBy'), params.get('orderType'), true);
+        if (hcps.end !== hcps.total) urlChange(hcps.page + 1, hcps.codbase, hcps.status, params.get('orderBy'), true);
     };
 
     async function getCountries() {
@@ -51,7 +50,6 @@ export default function hcpUsers() {
     }
 
     const onUpdateStatus = (user) => {
-        setCurrentAction({ userId: user.id, action: 'Update Status' });
         setCurrentUser(user);
         setShow({ ...show, updateStatus: true });
     }
@@ -103,7 +101,6 @@ export default function hcpUsers() {
     }
 
     const onManageProfile = (user) => {
-        setCurrentAction({ userId: user.id, action: 'Manage Profile' });
         setShow({ ...show, profileManage: true });
         setCurrentUser(user);
     }
@@ -124,7 +121,7 @@ export default function hcpUsers() {
     };
 
     const urlChange = (pageNo, codBase, status, orderColumn, pageChange = false) => {
-        Array.isArray(status) ? status = 'self_verified,manually_verified' : status = status;
+        if(Array.isArray(status)) status = 'self_verified,manually_verified';
         let orderType = params.get('orderType');
         const orderBy = params.get('orderBy');
         const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
@@ -245,7 +242,7 @@ export default function hcpUsers() {
                                 size="lg"
                                 show={show.profileManage}
                                 onShow={getConsentsForCurrentUser}
-                                onHide={() => { setCurrentAction({ action: null, userId: null }); setShow({ ...show, profileManage: false }) }}
+                                onHide={() => { setShow({ ...show, profileManage: false }) }}
                                 dialogClassName="modal-customize mw-75"
                                 aria-labelledby="example-custom-modal-styling-title"
                                 centered
@@ -326,7 +323,7 @@ export default function hcpUsers() {
 
                                 show={show.updateStatus}
                                 onShow={getConsentsForCurrentUser}
-                                onHide={() => { setCurrentAction({ action: null, userId: null }); setShow({ ...show, updateStatus: false }) }}
+                                onHide={() => { setShow({ ...show, updateStatus: false }) }}
                                 dialogClassName="modal-customize"
                                 aria-labelledby="example-custom-modal-styling-title"
                                 centered
@@ -376,7 +373,6 @@ export default function hcpUsers() {
                                                 actions.setSubmitting(false);
                                                 actions.resetForm();
                                                 setShow({ ...show, updateStatus: false });
-                                                setCurrentAction({ action: null, userId: null });
                                             }}
                                         >
                                             {formikProps => (
@@ -449,7 +445,6 @@ export default function hcpUsers() {
                                                             <span>
                                                                 <Dropdown className="ml-auto dropdown-customize">
                                                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
-                                                                        {/*{currentAction.userId === row.id ? currentAction.action : 'Select an action'}*/}
                                                                     </Dropdown.Toggle>
                                                                     <Dropdown.Menu>
                                                                         <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(row)}>Profile</Dropdown.Item></LinkContainer>
