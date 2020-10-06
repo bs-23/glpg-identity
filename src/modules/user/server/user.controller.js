@@ -442,6 +442,7 @@ async function updateSignedInUserProfile(req, res) {
     const updatedProfileData = trimRequestBody(req.body);
     let { first_name, last_name, email, phone } = updatedProfileData;
     const signedInUser = req.user;
+    const currentEmail = req.user.email;
 
     try {
         if(!first_name || !last_name || !email) return res.status(400).send("Missing required fields.");
@@ -462,6 +463,27 @@ async function updateSignedInUserProfile(req, res) {
             email,
             phone
         });
+
+        const hasEmailChanged = currentEmail.toLowerCase() !== email.toLowerCase();
+
+        if(hasEmailChanged) {
+            const link = `${req.protocol}://${req.headers.host}/login`;
+            const currentUserFullName = req.user.first_name + " " + req.user.last_name;
+
+            const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp/email-change-success.html`);
+            const options = {
+                toAddresses: [currentEmail],
+                templateUrl,
+                subject: 'Your email has been changed',
+                data: {
+                    name: currentUserFullName || '',
+                    link,
+                    s3bucketUrl: nodecache.getValue('S3_BUCKET_URL')
+                }
+            };
+
+            await emailService.send(options);
+        }
 
         res.json(formatProfile(signedInUser));
     }catch(err){

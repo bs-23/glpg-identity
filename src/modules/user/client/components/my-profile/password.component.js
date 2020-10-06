@@ -18,8 +18,8 @@ export default function ChangePasswordForm() {
     const timeBeforeLogout = 3000;
 
     const handleLogout = () => {
-        dispatch(clearLoggedInUser());
         axios.get('/api/logout');
+        dispatch(clearLoggedInUser());
         removeCookie('logged_in', { path: '/' });
         history.replace('/');
     }
@@ -75,11 +75,11 @@ export default function ChangePasswordForm() {
                                 autoComplete="username"
                                 hidden
                             />
+                            <label className="font-weight-bold" htmlFor="currentPassword">Current Password <span className="text-danger">*</span></label>
                             <Field
                                 className="form-control"
                                 type="password"
                                 name="currentPassword"
-                                placeholder="Current Password"
                                 data-testid="currentPassword"
                                 autoComplete="current-password"
                             />
@@ -89,11 +89,11 @@ export default function ChangePasswordForm() {
                         </div>
 
                         <div className="form-group">
+                            <label className="font-weight-bold" htmlFor="newPassword">New Password <span className="text-danger">*</span></label>
                             <Field
                                 className="form-control"
                                 type="password"
                                 name="newPassword"
-                                placeholder="New Password"
                                 data-testid="newPassword"
                                 autoComplete="new-password"
                             />
@@ -103,11 +103,11 @@ export default function ChangePasswordForm() {
                         </div>
 
                         <div className="form-group">
+                            <label className="font-weight-bold" htmlFor="confirmPassword">Confirm Password <span className="text-danger">*</span></label>
                             <Field
                                 className="form-control"
                                 type="password"
                                 name="confirmPassword"
-                                placeholder="Confirm New Password"
                                 autoComplete="current-password"
                                 data-testid="confirmPassword"
                                 autoComplete="new-password"
