@@ -91,6 +91,10 @@ const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
     },
     reset_password_expires: {
         type: DataTypes.STRING
+    },
+    domain: {
+        allowNull: false,
+        type: DataTypes.STRING
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
@@ -113,4 +117,4 @@ HcpConsents.belongsTo(HcpProfile, {
     foreignKey: 'user_id'
 });
 
-module.exports = HcpProfile; 
+module.exports = HcpProfile;
