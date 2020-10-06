@@ -143,7 +143,7 @@ async function init() {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
             const applications = [
                 {
-                    id: 'c2c6ec0e-b296-48b4-8f3f-c5ea2f899cc8',
+                    id: '3252888b-530a-441b-8358-3e423dbce08a',
                     name: 'HCP Portal',
                     slug: convertToSlug('HCP Portal'),
                     email: 'hcp-portal@glpg.com',
@@ -155,7 +155,7 @@ async function init() {
                     updated_by: admin.id
                 },
                 {
-                    id: '9c290d6e-9090-4589-9fae-8e60be393249',
+                    id: 'a7959308-7ec5-4090-94ff-2367113a454d',
                     name: 'Jyseleca',
                     slug: convertToSlug('Jyseleca'),
                     email: 'jyseleca@glpg.com',
