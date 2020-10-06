@@ -21,7 +21,7 @@ export default function ChangePasswordForm() {
         axios.get('/api/logout');
         dispatch(clearLoggedInUser());
         removeCookie('logged_in', { path: '/' });
-        history.replace('/');
+        window.location = "/";
     }
 
     const formSubmitHandler = async (values, actions) => {

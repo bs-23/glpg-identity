@@ -485,7 +485,8 @@ async function updateSignedInUserProfile(req, res) {
             await emailService.send(options);
         }
 
-        res.json(formatProfile(signedInUser));
+        const signedInUserWithApplicationDetails = await attachApplicationInfoToUser(signedInUser);
+        res.json(formatProfile(signedInUserWithApplicationDetails));
     }catch(err){
         console.error(err);
         res.status(500).send('Internal server error');
