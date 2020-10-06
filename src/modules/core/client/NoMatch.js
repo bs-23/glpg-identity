@@ -11,7 +11,7 @@ export default function NoMatch() {
                             <a href="/" className="forbidden__app-logo"><img alt="CDP LOGO" src="/assets/CDP.png" height="64" /></a>
                             <h2 className="forbidden__header pb-3"><img className="forbidden__page-not-found" alt="Page Not Found" src="/assets/images/page_not_found.svg" height="266" /></h2>
                             <h4 className="forbidden__subheader font-weight-bold pb-3">Page Not Found!</h4>
-                            <p className="forbidden__text pb-5">We are sorry! but the page you requested cannot be found.</p>
+                            <p className="forbidden__text pb-5 font-weight-bold">We are sorry! but the page you requested cannot be found.</p>
                             <NavLink to="/" className="btn cdp-btn-secondary text-white px-5 py-2">Back to Dashboard</NavLink>
                         </div>
                     </div>
