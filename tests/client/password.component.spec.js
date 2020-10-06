@@ -7,8 +7,9 @@ import { Provider } from 'react-redux';
 import store from '../../src/modules/core/client/store.js';
 import axios from 'axios'
 import MockAdapter from 'axios-mock-adapter'
-import PasswordForm from '../../src/modules/user/client/components/password.component';
+import PasswordForm from '../../src/modules/user/client/components/my-profile/password.component';
 import { login } from '../../src/modules/user/client/user.actions';
+import { ToastProvider } from 'react-toast-notifications';
 
 configure({ adapter: new Adapter() });
 
@@ -33,11 +34,13 @@ describe('PasswordForm component', () => {
     const userSlice = () => store.getState().userReducer;
 
     const wrapperComponent = () => (
-        <Provider store={store}>
-            <MemoryRouter>
-                <PasswordForm/> 
-            </MemoryRouter>
-        </Provider>
+        <ToastProvider>
+            <Provider store={store}>
+                <MemoryRouter>
+                    <PasswordForm/>
+                </MemoryRouter>
+            </Provider>
+        </ToastProvider>
     );
 
     it('Should render the PasswordForm component', () => {
@@ -63,6 +66,6 @@ describe('PasswordForm component', () => {
 
         expect(current_password.value).toEqual('strong-passworD12@');
         expect(new_password.value).toEqual('P@ssword123');
-        expect(confirm_password.value).toEqual('P@ssword123'); 
+        expect(confirm_password.value).toEqual('P@ssword123');
     });
 });
