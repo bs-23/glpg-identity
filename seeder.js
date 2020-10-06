@@ -13,6 +13,7 @@ async function init() {
     await sequelize.cdpConnector.query(`CREATE SCHEMA IF NOT EXISTS ${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`);
 
     const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
+    const ApplicationDomain = require(path.join(process.cwd(), 'src/modules/application/server/application-domain.model'));
     const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
     const ConsentCategory = require(path.join(process.cwd(), 'src/modules/consent/server/consent-category.model'));
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
@@ -142,6 +143,7 @@ async function init() {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
             const applications = [
                 {
+                    id: 'c2c6ec0e-b296-48b4-8f3f-c5ea2f899cc8',
                     name: 'HCP Portal',
                     slug: convertToSlug('HCP Portal'),
                     email: 'hcp-portal@glpg.com',
@@ -153,6 +155,7 @@ async function init() {
                     updated_by: admin.id
                 },
                 {
+                    id: '9c290d6e-9090-4589-9fae-8e60be393249',
                     name: 'Jyseleca',
                     slug: convertToSlug('Jyseleca'),
                     email: 'jyseleca@glpg.com',
@@ -165,12 +168,23 @@ async function init() {
                 }
             ];
 
+            const applicationDomains = [
+                { application_id: 'c2c6ec0e-b296-48b4-8f3f-c5ea2f899cc8', country_iso2: 'nl', domain: 'http://172.16.229.25:4503' },
+                { application_id: '9c290d6e-9090-4589-9fae-8e60be393249', country_iso2: 'nl', domain: 'www-dev.jyseleca.nl' },
+                { application_id: '9c290d6e-9090-4589-9fae-8e60be393249', country_iso2: 'be', domain: 'products-dev.glpg.com' }
+            ];
+
             Application.destroy({ truncate: { cascade: true } }).then(() => {
                 Application.bulkCreate(applications, {
                     returning: true,
                     ignoreDuplicates: false
                 }).then(function () {
-                    callback();
+                    ApplicationDomain.bulkCreate(applicationDomains, {
+                        returning: true,
+                        ignoreDuplicates: false
+                    }).then(function () {
+                        callback();
+                    });
                 });
             });
         });

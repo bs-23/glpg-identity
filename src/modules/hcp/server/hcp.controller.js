@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const validator = require('validator');
 const { QueryTypes, Op, where, col, fn } = require('sequelize');
 const Hcp = require('./hcp_profile.model');
+const ApplicationDomain = require('../../application/server/application-domain.model');
 const HcpArchives = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_archives.model'));
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
@@ -66,14 +67,14 @@ function mapMasterDataToHcpProfile(masterData) {
     return model;
 }
 
-function generateEmailOptions(emailType, applicationSlug, user) {
+async function generateEmailOptions(emailType, application, user) {
     const emailDataUrl = path.join(process.cwd(), `src/config/server/lib/email-service/email-options.json`);
     const emailOptionsText = fs.readFileSync(emailDataUrl, 'utf8');
     const emailOptions = JSON.parse(emailOptionsText);
     const emailData = emailOptions[emailType];
 
-    let templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${applicationSlug}/en/${emailData.template_url}`)
-    const templateUrlInLocale = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${applicationSlug}/${user.locale.toLowerCase()}/${emailData.template_url}`);
+    let templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/en/${emailData.template_url}`)
+    const templateUrlInLocale = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/${user.locale.toLowerCase()}/${emailData.template_url}`);
 
     if (fs.existsSync(templateUrlInLocale)) {
         templateUrl = templateUrlInLocale;
@@ -82,11 +83,14 @@ function generateEmailOptions(emailType, applicationSlug, user) {
     const subject = emailData.subject[user.locale] || emailData.subject['en'];
     const plaintext = emailData.plain_text[user.locale] || emailData.plain_text['en'];
 
+    const { domain } = await ApplicationDomain.findOne({ where: { application_id: application.id, country_iso2: user.country_iso2 }});
+
     return {
         toAddresses: [user.email],
         subject: subject,
         templateUrl: templateUrl,
         plaintext: plaintext,
+        domain,
         data: {
             firstName: user.first_name || '',
             lastName: user.last_name || '',
@@ -98,48 +102,48 @@ function generateEmailOptions(emailType, applicationSlug, user) {
 async function sendConsentConfirmationMail(user, consents, application) {
     const consentConfirmationToken = generateConsentConfirmationAccessToken(user);
 
-    const mailOptions = generateEmailOptions('double-opt-in-consent-confirm', application.slug, user);
+    const mailOptions = await generateEmailOptions('double-opt-in-consent-confirm', application, user);
     mailOptions.data.consents = consents || [];
-    mailOptions.data.link = `${user.domain}${application.consent_confirmation_path}?token=${consentConfirmationToken}&journey=consent_confirmation&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
+    mailOptions.data.link = `${mailOptions.domain}${application.consent_confirmation_path}?token=${consentConfirmationToken}&journey=consent_confirmation&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
 }
 
 async function sendRegistrationSuccessMail(user, application) {
-    const mailOptions = generateEmailOptions('registration-success', application.slug, user);
-    mailOptions.data.loginLink = `${user.domain}${application.journey_redirect_path}?journey=login&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
+    const mailOptions = await generateEmailOptions('registration-success', application, user);
+    mailOptions.data.loginLink = `${mailOptions.domain}${application.journey_redirect_path}?journey=login&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
 }
 
 async function sendChangePasswordSuccessMail(user, application) {
-    const mailOptions = generateEmailOptions('password-change-success', application.slug, user);
+    const mailOptions = await generateEmailOptions('password-change-success', application, user);
     await emailService.send(mailOptions);
 }
 
 async function sendRegistrationNotVerifiedMail(user, application) {
-    const mailOptions = generateEmailOptions('registration-not-verified', application.slug, user);
+    const mailOptions = await generateEmailOptions('registration-not-verified', application, user);
     await emailService.send(mailOptions);
 }
 
 async function sendResetPasswordSuccessMail(user, application) {
-    const mailOptions = generateEmailOptions('password-reset-success', application.slug, user);
-    mailOptions.data.loginLink = `${user.domain}${application.journey_redirect_path}?journey=login&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
+    const mailOptions = await generateEmailOptions('password-reset-success', application, user);
+    mailOptions.data.loginLink = `${mailOptions.domain}${application.journey_redirect_path}?journey=login&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
 }
 
 async function sendPasswordSetupInstructionMail(user, application) {
-    const mailOptions = generateEmailOptions('password-setup-instructions', application.slug, user);
-    mailOptions.data.link = `${user.domain}${application.journey_redirect_path}?token=${user.reset_password_token}&journey=single_optin_verified&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
-    mailOptions.data.forgot_password_link = `${user.domain}${application.journey_redirect_path}?journey=forgot_password&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
+    const mailOptions = await generateEmailOptions('password-setup-instructions', application, user);
+    mailOptions.data.link = `${mailOptions.domain}${application.journey_redirect_path}?token=${user.reset_password_token}&journey=single_optin_verified&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
+    mailOptions.data.forgot_password_link = `${mailOptions.domain}${application.journey_redirect_path}?journey=forgot_password&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
 }
 
 async function sendPasswordResetInstructionMail(user, application) {
-    const mailOptions = generateEmailOptions('password-reset-instructions', application.slug, user);
-    mailOptions.data.link = `${user.domain}${application.journey_redirect_path}?token=${user.reset_password_token}&journey=set_password&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
+    const mailOptions = await generateEmailOptions('password-reset-instructions', application, user);
+    mailOptions.data.link = `${mailOptions.domain}${application.journey_redirect_path}?token=${user.reset_password_token}&journey=set_password&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
 }
@@ -466,7 +470,6 @@ async function createHcpProfile(req, res) {
             telephone,
             application_id: req.user.id,
             individual_id_onekey: master_data.individual_id_onekey,
-            domain: req.get('origin'),
             created_by: req.user.id,
             updated_by: req.user.id
         };
