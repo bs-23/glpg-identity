@@ -1,5 +1,6 @@
 const path = require('path');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
 async function login(req, res) {
@@ -10,22 +11,18 @@ async function login(req, res) {
             return res.status(400).send('Password required.');
         }
 
-        const swaggerPassword = nodecache.getValue('SWAGGER_PASSWORD');
-
-        if(password !== swaggerPassword) {
+        if(!bcrypt.compareSync(password, nodecache.getValue('SWAGGER_PASSWORD'))) {
             return res.status(401).send('Wrong password.');
         }
 
-        const swaggerUsername = nodecache.getValue('SWAGGER_USERNAME');
         const accessToken = jwt.sign({
-            username: swaggerUsername
+            id: nodecache.getValue('SWAGGER_ID')
         }, nodecache.getValue('SWAGGER_TOKEN_SECRET'), {
             expiresIn: '1d',
-            issuer: swaggerUsername
+            issuer: nodecache.getValue('SWAGGER_ID')
         });
 
         res.cookie('swagger_access_token', accessToken, {
-            expires: new Date(Date.now() + 8.64e7),
             httpOnly: true
         });
 

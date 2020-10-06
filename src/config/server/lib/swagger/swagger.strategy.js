@@ -16,10 +16,9 @@ module.exports = function () {
         secretOrKey: nodecache.getValue('SWAGGER_TOKEN_SECRET'),
         jwtFromRequest: cookieExtractor
     }, function (payload, done) {
-        const username = nodecache.getValue('SWAGGER_USERNAME')
-        if(payload.username === username) {
-            return done(null, payload);
-        }
+            if (payload.id === nodecache.getValue('SWAGGER_ID')) {
+                return done(null, payload);
+            }
         return done(null, false, { message: 'Incorrect password.' });
     }));
 };
