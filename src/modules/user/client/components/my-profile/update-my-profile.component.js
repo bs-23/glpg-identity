@@ -83,10 +83,10 @@ const UpdateMyProfile = () => {
                     enableReinitialize
                 >
                     {formikProps => (
-                        <Form onSubmit={formikProps.handleSubmit}>
-                            <h4>My Profile</h4>
+                <Form onSubmit={formikProps.handleSubmit}>
+                    <h4 className="border-bottom pb-3 pt-2">My Profile</h4>
                             <div className="row my-3">
-                                <div className="col-12 col-lg-8 col-xl-6">
+                                <div className="col-12 col-lg-8">
                                     <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">

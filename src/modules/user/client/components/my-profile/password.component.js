@@ -34,7 +34,7 @@ export default function ChangePasswordForm() {
 
     return (
         <div className="my-2">
-            <h4>Change Password</h4>
+            <h4 className="border-bottom pb-3 pt-2">Change Password</h4>
 
             <Formik
                 initialValues={{
@@ -100,7 +100,7 @@ export default function ChangePasswordForm() {
                             </div>
                         </div>
 
-                        <button type="submit" className="btn btn-info" disabled={formikProps.isSubmitting}>
+                        <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting}>
                             Submit
                         </button>
                     </Form>
