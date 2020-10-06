@@ -41,7 +41,7 @@ export default function SwaggerLogin() {
                                     {formikProps => (
                                         <Form onSubmit={formikProps.handleSubmit}>
                                             <div className="form-group">
-                                                <label className="label-style">Password</label>
+                                                <label className="label-style">Password <span className="text-danger">*</span></label>
                                                 <Field className="form-control" data-testid="password" type="password" name="password" autoComplete="current-password" />
                                             </div>
 
