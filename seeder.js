@@ -146,10 +146,8 @@ async function init() {
                     slug: convertToSlug('HCP Portal'),
                     email: 'hcp-portal@glpg.com',
                     password: 'P@ssword123',
-                    consent_confirmation_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/consentConfirm.consent.html',
-                    reset_password_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/journeyRedirect.journey.html',
-                    login_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/journeyRedirect.journey.html',
-                    forgot_password_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/journeyRedirect.journey.html',
+                    consent_confirmation_path: '/bin/public/glpg-hcpportal/consentConfirm.consent.html',
+                    journey_redirect_path: '/bin/public/glpg-hcpportal/journeyRedirect.journey.html',
                     logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
                     created_by: admin.id,
                     updated_by: admin.id
@@ -159,10 +157,8 @@ async function init() {
                     slug: convertToSlug('Jyseleca'),
                     email: 'jyseleca@glpg.com',
                     password: 'P@ssword123',
-                    consent_confirmation_link: 'https://www-dev.jyseleca.nl/bin/public/glpg-brandx/consentConfirm.consent.html',
-                    reset_password_link: 'https://www-dev.jyseleca.nl/bin/public/glpg-brandx/journeyRedirect.journey.html',
-                    login_link: 'https://www-dev.jyseleca.nl/bin/public/glpg-brandx/journeyRedirect.journey.html',
-                    forgot_password_link: 'https://www-dev.jyseleca.nl/bin/public/glpg-brandx/journeyRedirect.journey.html',
+                    consent_confirmation_path: '/bin/public/glpg-brandx/consentConfirm.consent.html',
+                    journey_redirect_path: '/bin/public/glpg-brandx/journeyRedirect.journey.html',
                     logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/jyseleca/logo.png`,
                     created_by: admin.id,
                     updated_by: admin.id
@@ -226,7 +222,7 @@ async function init() {
                 locale: 'fr_be'
             },
             {
-                rich_text: "<p>Je consens à ce que Galapagos m'envoie des informations promotionnelles et environnementales concernant tous les produits et services de Galapgos à l'adresse mail que j'ai fournie. <br> <br> Pour obtenir de plus amples informations sur la manière dont nous traitons vos données à caractère personnel, veuillez vous référer à notre <a href='#' target='_blank'>Déclaration de confidentialité</a>.</p>",
+                rich_text: "<p>Je consens à ce que Galapagos m'envoie des informations promotionnelles et environnementales concernant tous les produits et services de Galapagos à l'adresse mail que j'ai fournie. <br> <br> Pour obtenir de plus amples informations sur la manière dont nous traitons vos données à caractère personnel, veuillez vous référer à notre <a href='#' target='_blank'>Déclaration de confidentialité</a>.</p>",
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 locale: 'fr_be'
             },
