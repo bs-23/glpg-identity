@@ -43,8 +43,10 @@ export default function (props) {
         setCookie('logged_in', '', { path: '/' });
         removeCookie('logged_in');
         
-        axios.get('/api/logout')
-        return <Redirect to="/api/logout" />;
+        // axios.get('/api/logout');
+        // history.push('/login');
+
+        document.getElementById('logout').click();
     }
 
     const { getRemainingTime, getLastActiveTime } = useIdleTimer({
@@ -77,11 +79,14 @@ export default function (props) {
             <App/>
 
             <IdleTimeOutModal 
-                showModal={info.showModal} 
+                showModal={window.location.pathname !== '/login' && info.showModal} 
                 handleClose={handleClose}
                 handleLogout={handleLogout}
                 remainingTime={remainingTime}
             />
+
+            <a href="/api/logout" id='logout' hidden></a>
+
         </>
     )
 }
