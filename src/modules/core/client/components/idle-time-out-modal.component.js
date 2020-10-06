@@ -13,18 +13,22 @@ export const IdleTimeOutModal = ({showModal, handleClose, handleLogout, remainin
     });
 
     return (
-        <Modal show={showModal} onHide={handleClose}>
-            <Modal.Header closeButton>
-            <Modal.Title>You Have Been Idle!</Modal.Title>
-            <Modal.Title>{time}</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>You Will Get Timed Out. You want to stay?</Modal.Body>
+        <Modal show={showModal} onHide={handleClose} centered>
+            <Modal.Body >
+                <div className="text-center">
+                    <div className="my-3">
+                        <img alt="stop clock" src="/assets/images/stop-clock.svg" height="150" />
+                    </div>
+                    <p className="pt-2">Your session is about to expire</p>
+                    <p>You will be logged out in <strong>{time}</strong> seconds</p>
+                </div>
+            </Modal.Body>
             <Modal.Footer>
-            <Button variant="danger" onClick={handleLogout}>
+                <Button onClick={handleLogout} className="btn btn-secondary border-0">
                 Logout
             </Button>
-            <Button variant="primary" onClick={handleClose}>
-                Stay
+            <Button onClick={handleClose} className="btn cdp-btn-primary border-0">
+                Continue Session
             </Button>
             </Modal.Footer>
         </Modal>
