@@ -466,7 +466,7 @@ async function createHcpProfile(req, res) {
             telephone,
             application_id: req.user.id,
             individual_id_onekey: master_data.individual_id_onekey,
-            domain: req.get('host'),
+            domain: req.get('origin'),
             created_by: req.user.id,
             updated_by: req.user.id
         };
