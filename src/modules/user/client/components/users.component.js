@@ -3,8 +3,7 @@ import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import Dropdown from 'react-bootstrap/Dropdown';
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { LinkContainer } from 'react-router-bootstrap';
-import { getUsers, cdpSort } from '../user.actions';
+import { getUsers } from '../user.actions';
 
 export default function Users() {
     const dispatch = useDispatch();
@@ -21,11 +20,11 @@ export default function Users() {
     const [sort, setSort] = useState({ type: 'asc', value: null });
 
 
-    const sortCountries = (userCountries) => {
+    const sortCountries = (user_countries) => {
         let countryArr = [];
         let countryString = "";
-        if (countries.length > 0 && (userCountries.length)) {
-            (userCountries).map((country, key) => (
+        if (countries.length > 0 && (user_countries.length)) {
+            (user_countries).map((country, key) => (
                 countryArr.push(countries.find(i => i.country_iso2 === country)).codbase_desc)
             );
         }
@@ -43,9 +42,8 @@ export default function Users() {
         async function getCountries() {
             const response = (await axios.get('/api/countries')).data;
             const userProfile = (await axios.get('/api/users/profile')).data;
-            const userCountries = userProfile.countries;
             setCountries(response);
-            (userProfile.type === "admin") ? setUserCountries(response) : setUserCountries(fetchUserCountries(userCountries, response));
+            (userProfile.type === "admin") ? setUserCountries(response) : setUserCountries(fetchUserCountries(userProfile.countries, response));
         }
         getCountries();
     }, []);
@@ -71,11 +69,11 @@ export default function Users() {
         return countryList;
     }
 
-    const urlChange = (pageNo, codBase, orderColumn, pageChange = false) => {
+    const urlChange = (pageNo, country_codbase, orderColumn, pageChange = false) => {
         let orderType = params.get('orderType');
         const orderBy = params.get('orderBy');
         const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
-        const codbase = codBase ? codBase : params.get('codbase');
+        const codbase = country_codbase ? country_codbase : params.get('codbase');
         if (!pageChange) {
             (orderBy === orderColumn) ? (orderType === 'asc' ? orderType = 'desc' : orderType = 'asc') : orderType = 'asc';
         }

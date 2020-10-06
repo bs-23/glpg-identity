@@ -19,8 +19,8 @@ function validatePassword(password) {
 
 function hasValidCharacters(password) {
     var pattern = new RegExp("^[a-zA-Z0-9!\"#$%&'\(\)\*\+,\-\.\\\\/:;<=>\?@\[\\]\^_`\{\|\}\~]*$");
-    const hasValidCharacters = pattern.test(password);
-    return hasValidCharacters;
+    const containsValidCharacters = pattern.test(password);
+    return containsValidCharacters;
 }
 
 // const validatePhone = phone => {

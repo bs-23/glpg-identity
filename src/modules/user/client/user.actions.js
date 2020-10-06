@@ -62,7 +62,7 @@ export function changePassword(data) {
 }
 
 export function getUsers(page = 1, codbase, orderBy, orderType) {
-    const url = `/api/users?page=${page}` + (codbase ? `&codbase=${codbase}` : '') + (orderBy !== 'null' & orderType !== 'null' ? `&orderBy=${orderBy}&orderType=${orderType}` : '');
+    const url = `/api/users?page=${page}` + (codbase ? `&codbase=${codbase}` : '') + (orderBy !== 'null' && orderType !== 'null' ? `&orderBy=${orderBy}&orderType=${orderType}` : '');
     return {
         type: Types.GET_USERS,
         payload: axios({
