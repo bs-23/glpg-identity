@@ -8,7 +8,7 @@ module.exports = {
             "src/modules/!(core)/server/**/*.routes.js",
             "src/modules/core/server/country/country.routes.js",
             "src/modules/core/server/**/*.routes.js",
-            "src/modules/swagger/server/swagger.controller.js"
+            "src/config/server/lib/swagger/swagger.controller.js"
         ],
         strategies: [
             "src/modules/**/*.strategy.js",

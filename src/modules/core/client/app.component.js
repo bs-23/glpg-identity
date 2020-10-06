@@ -21,7 +21,7 @@ import HcpRoutes from "../../hcp/client/hcp.routes";
 import ConsentRoutes from "../../consent/client/consent.routes";
 import ForgotPassword from '../../user/client/components/forgot-password.component';
 import ResetPasswordForm from '../../user/client/components/reset-password.component';
-import SwaggerLogin from '../../swagger/client/swagger-login.component';
+import SwaggerLogin from '../../../config/server/lib/swagger/swagger-login.component';
 
 let refCount = 0;
 
