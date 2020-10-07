@@ -45,7 +45,7 @@ export default function (props) {
     }
 
     const { getRemainingTime, getLastActiveTime } = useIdleTimer({
-        timeout: 1000 * 10,
+        timeout: 1000 * 60 * 14,
         onIdle: handleOnIdle,
         onActive: handleOnActive,
         onAction: handleOnAction,
