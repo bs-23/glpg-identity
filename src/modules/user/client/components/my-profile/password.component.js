@@ -2,27 +2,22 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { useToasts } from 'react-toast-notifications';
-import axios from 'axios';
 import { useCookies } from 'react-cookie';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
 
-import { changePassword, clearLoggedInUser } from '../../user.actions';
+import { changePassword } from '../../user.actions';
 import { changePasswordSchema } from '../../user.schema';
-import { useHistory } from 'react-router-dom';
 
 export default function ChangePasswordForm() {
     const dispatch = useDispatch();
-    const history = useHistory();
     const { addToast } = useToasts();
     const [, , removeCookie] = useCookies();
 
     const timeBeforeLogout = 3000;
 
     const handleLogout = () => {
-        axios.get('/api/logout');
-        dispatch(clearLoggedInUser());
+        window.location = "/api/logout";
         removeCookie('logged_in', { path: '/' });
-        window.location = "/";
     };
 
     const popoverTop = (
