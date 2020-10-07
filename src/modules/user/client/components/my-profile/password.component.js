@@ -118,7 +118,7 @@ export default function ChangePasswordForm() {
                         </div>
 
                         <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting}>
-                            Submit
+                            Save Changes
                         </button>
                     </Form>
                 )}

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useIdleTimer } from 'react-idle-timer';
 import { useCookies } from 'react-cookie';
-import { IdleTimeOutModal } from './components/Idle-time-out-modal.component';
+import { IdleTimeOutModal } from './components/idle-time-out-modal.component';
 import App from './app.component';
- 
+
 export default function (props) {
     const [info, setInfo] = useState({
         showModal: false,
@@ -18,12 +18,12 @@ export default function (props) {
         const obj = {...info, showModal: true};
         setInfo(obj);
     }
- 
+
     const handleOnActive = event => {
         // console.log('user is active', event);
         // console.log('time remaining', getRemainingTime());
     }
- 
+
     const handleOnAction = event => {
         // console.log('user did something', event)
         // console.log('time remaining', getRemainingTime());
@@ -33,11 +33,11 @@ export default function (props) {
         const obj = {...info, showModal: false }
         setInfo(obj);
     }
-  
+
     function handleLogout() {
         setCookie('logged_in', '', { path: '/' });
         removeCookie('logged_in');
-        
+
         // axios.get('/api/logout');
         // history.push('/login');
 
@@ -54,7 +54,7 @@ export default function (props) {
 
     const [remainingTime, setRemainingTime] = useState(59);
 
-    
+
 
     useEffect(() => {
         setTimeout(() => {
@@ -68,13 +68,13 @@ export default function (props) {
             else setRemainingTime(59);
         }, 1000);
     });
- 
+
     return (
         <>
             <App/>
 
-            <IdleTimeOutModal 
-                showModal={window.location.pathname !== '/login' && info.showModal} 
+            <IdleTimeOutModal
+                showModal={window.location.pathname !== '/login' && info.showModal}
                 handleClose={handleClose}
                 handleLogout={handleLogout}
                 remainingTime={remainingTime}
