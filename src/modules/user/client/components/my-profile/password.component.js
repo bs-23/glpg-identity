@@ -67,8 +67,8 @@ export default function ChangePasswordForm() {
     }
 
     return (
-        <div className="my-2">
-            <h4 className="border-bottom pb-3 pt-2">Change Password</h4>
+        <div className="px-3 py-2 bg-white shadow-sm rounded">
+            <h4 className="border-bottom pb-3 pt-2"><i className="fas fa-lock mr-2"></i>Change Password</h4>
             <div className="row my-3">
                 <div className="col-12 col-lg-8">
                     <Formik

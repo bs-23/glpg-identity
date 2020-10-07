@@ -74,7 +74,7 @@ const UpdateMyProfile = () => {
         activateCountryCodeFromPhone(myProfileInfo.phone);
     }, [myProfileInfo, countries])
 
-    return <div className="my-2">
+    return <div className="px-3 py-2 bg-white shadow-sm rounded">
                 <Formik
                     initialValues={initialFormValues}
                     displayName="UpdateMyProfileForm"
@@ -84,7 +84,7 @@ const UpdateMyProfile = () => {
                 >
                     {formikProps => (
                 <Form onSubmit={formikProps.handleSubmit}>
-                    <h4 className="border-bottom pb-3 pt-2">My Profile</h4>
+                    <h4 className="border-bottom pb-3 pt-2"><i className="far fa-user mr-2"></i>My Profile</h4>
                             <div className="row my-3">
                                 <div className="col-12 col-lg-8">
                                     <div className="row">
