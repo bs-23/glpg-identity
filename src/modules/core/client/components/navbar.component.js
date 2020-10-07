@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useCookies } from 'react-cookie';
 import { getCountries } from '../../../user/client/user.actions'
+import { useHistory } from "react-router-dom";
 // import Dropdown from 'react-bootstrap/Dropdown';
 
 export default function Navbar() {
@@ -10,6 +11,7 @@ export default function Navbar() {
     const countries = useSelector(state => state.userReducer.countries);
     const { first_name, last_name } = loggedInUser;
     const dispatch = useDispatch()
+    const history = useHistory();
 
     useEffect(() => {
         dispatch(getCountries())
@@ -46,6 +48,10 @@ export default function Navbar() {
         }
     }
 
+    const myProfileClickHandler = () => {
+        history.push('/users/my-profile');
+    }
+
     return (
         <header className="app__header py-1 shadow-sm">
             <div className="container-fluid">
@@ -80,7 +86,7 @@ export default function Navbar() {
                                 </div>
                             </div>}
                             <div className="mb-2 mb-sm-0 d-flex justify-content-end align-items-center">
-                                <button className="mr-2 btn cdp-btn-secondary text-white"><i className="icon icon-user-round mr-1 app__header-icon-user d-none d-sm-inline-block"></i> <span className="">{first_name + " " + last_name}</span></button>
+                                <button className="mr-2 btn cdp-btn-secondary text-white" onClick={myProfileClickHandler}><i className="icon icon-user-round mr-1 app__header-icon-user d-none d-sm-inline-block"></i> <span className="">{first_name + " " + last_name}</span></button>
                                 <a className="btn cdp-btn-outline-primary d-flex align-items-center" onClick={handleLogOut} href="/api/logout"><i className="icon icon-logout mr-1 app__header-icon-logout"></i>Sign out</a>
                             </div>
                         </div>

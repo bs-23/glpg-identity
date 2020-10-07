@@ -112,3 +112,17 @@ export const roleSchema = object().shape({
             .min(1, 'Must select at least one permission')
             .required('Must select at least one permission')
 });
+
+export const updateMyProfileSchema = object().shape({
+    first_name: string()
+        .required('This field must not be empty.'),
+    last_name: string()
+        .required('This field must not be empty.'),
+    email: string()
+        .email('This field should be a valid email address.')
+        .required('This field must not be empty.'),
+    phone: string()
+        .matches(/^[0-9]*$/, 'This field only contains digits.')
+        .min(4, 'This field must be at least 4 characters long.')
+        .max(15, 'This field must be at most 15 characters long.')
+})

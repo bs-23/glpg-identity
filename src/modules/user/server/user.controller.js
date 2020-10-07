@@ -1,6 +1,7 @@
 const path = require('path');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
+const validator = require('validator');
 const User = require('./user.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
@@ -57,11 +58,14 @@ function formatProfile(user) {
         first_name: user.first_name,
         last_name: user.last_name,
         email: user.email,
+        phone: user.phone,
         type: user.type,
         status: user.status,
         roles: getRolesPermissions(user.userrole),
         application: user.application,
-        countries: user.countries
+        countries: user.countries,
+        last_login: user.last_login,
+        expiry_date: user.expiry_date,
     };
     return profile;
 }
@@ -83,6 +87,14 @@ function formatProfileDetail(user) {
     };
 
     return profile;
+}
+
+var trimRequestBody = function(reqBody){
+    Object.keys(reqBody).forEach(key => {
+        if(typeof reqBody[key] === 'string')
+            reqBody[key] = reqBody[key].trim();
+    });
+    return reqBody;
 }
 
 async function attachApplicationInfoToUser(user) {
@@ -151,7 +163,6 @@ async function login(req, res) {
         }
 
         if (!user || !user.password || !user.validPassword(password)) {
-
             if (user && user.password) {
                 await user.update(
                     { failed_auth_attempt: parseInt(user.dataValues.failed_auth_attempt ? user.dataValues.failed_auth_attempt : '0') + 1 }
@@ -287,17 +298,6 @@ async function createUser(req, res) {
     }
 }
 
-async function deleteUser(req, res) {
-    try {
-        await User.destroy({ where: { id: req.params.id } });
-
-        res.json({ id: req.params.id });
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Internal server error');
-    }
-}
-
 async function getUsers(req, res) {
     try {
         const page = req.query.page ? req.query.page - 1 : 0;
@@ -317,40 +317,34 @@ async function getUsers(req, res) {
             ? req.query.orderType
             : 'asc';
 
-        const country_iso2_list_for_codbase =
-            (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT }))
-                .filter(i => i.codbase === codbase)
-                .map(i => i.country_iso2);
+        const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`
+            SELECT * FROM ciam.vwcountry
+            WHERE codbase = $codbase
+            `, {
+            bind: {
+                codbase: codbase || ''
+            },
+            type: QueryTypes.SELECT
+        })).map(c => c.country_iso2);
 
         const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase
             .map(i => ignoreCaseArray(i)));
 
+        const order = [
+            ['created_at', 'DESC'],
+            ['id', 'DESC']
+        ];
 
-        const order = [];
+        const sortableColumns = ['first_name', 'last_name', 'email', 'status', 'created_at', 'expiry_date'];
 
-        if(orderBy && orderType){
-            if(orderBy === 'first_name') order.push(['first_name', orderType]);
-            if(orderBy === 'last_name') order.push(['last_name', orderType]);
-            if(orderBy === 'email') order.push(['email', orderType]);
-            if(orderBy === 'status') order.push(['status', orderType]);
-            if(orderBy === 'created_at') order.push(['created_at', orderType]);
-            if(orderBy === 'expiry_date') order.push(['expiry_date', orderType]);
-
-            if(orderBy === 'created_by') {
-                order.push([{ model: User, as: 'createdByUser' }, 'first_name', orderType]);
-                order.push([{ model: User, as: 'createdByUser' }, 'last_name', orderType]);
-            }
+        if (orderBy && sortableColumns.includes(orderBy)) {
+            order.splice(0, 0, [orderBy, orderType]);
         }
-        order.push(['created_at', 'DESC']);
-        order.push(['id', 'DESC']);
 
-        // const columnNames = Object.keys(User.rawAttributes);
-        // if (orderBy && (columnNames || []).includes(orderBy)) {
-        //     order.push([orderBy, orderType]);
-        // }
-
-        // order.push(['created_at', 'DESC']);
-        // order.push(['id', 'DESC']);
+        if (orderBy === 'created_by') {
+            order.splice(0, 0, [{ model: User, as: 'createdByUser' }, 'first_name', orderType]);
+            order.splice(1, 0, [{ model: User, as: 'createdByUser' }, 'last_name', orderType]);
+        }
 
         const users = await User.findAll({
             where: {
@@ -426,6 +420,61 @@ async function getUser(req, res) {
     }
 }
 
+async function updateSignedInUserProfile(req, res) {
+    const updatedProfileData = trimRequestBody(req.body);
+    let { first_name, last_name, email, phone } = updatedProfileData;
+    const signedInUser = req.user;
+    const currentEmail = req.user.email;
+
+    try {
+        if(!first_name || !last_name || !email) return res.status(400).send("Missing required fields.");
+        if(!validator.isEmail(email)) return res.status(400).send("Invalid email.");
+
+        const doesEmailExist = await User.findOne({
+            where: {
+                id: { [Op.ne]: signedInUser.id },
+                email: { [Op.iLike]: `${email}` } }
+            }
+        );
+
+        if(doesEmailExist) return res.status(400).send("Email already exists.");
+
+        await signedInUser.update({
+            first_name,
+            last_name,
+            email: email.toLowerCase(),
+            phone
+        });
+
+        const hasEmailChanged = currentEmail.toLowerCase() !== email.toLowerCase();
+
+        if(hasEmailChanged) {
+            const link = `${req.protocol}://${req.headers.host}/login`;
+            const currentUserFullName = req.user.first_name + " " + req.user.last_name;
+
+            const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp/email-change-success.html`);
+            const options = {
+                toAddresses: [currentEmail],
+                templateUrl,
+                subject: 'Your email has been changed',
+                data: {
+                    name: currentUserFullName || '',
+                    link,
+                    s3bucketUrl: nodecache.getValue('S3_BUCKET_URL')
+                }
+            };
+
+            await emailService.send(options);
+        }
+
+        const signedInUserWithApplicationDetails = await attachApplicationInfoToUser(signedInUser);
+        res.json(formatProfile(signedInUserWithApplicationDetails));
+    }catch(err){
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 async function partialUpdateUser(req, res) {
     const id = req.params.id;
     const { first_name, last_name, email, phone, type, status } = req.body;
@@ -437,6 +486,15 @@ async function partialUpdateUser(req, res) {
         const user = await User.findOne({ where: { id } });
 
         if (!user) return res.status(404).send("User is not found or may be removed");
+
+        const doesEmailExist = await User.findOne({
+            where: {
+                id: { [Op.ne]: id },
+                email: { [Op.iLike]: `${email}` } }
+            }
+        );
+
+        if(doesEmailExist) return res.status(400).send("Email already exists.");
 
         await user.update(partialUserData);
 
@@ -536,6 +594,20 @@ async function changePassword(req, res) {
         user.password = newPassword;
         user.password_updated_at = new Date(Date.now());
         await user.save();
+
+        const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp/password-change-success.html`);
+        const options = {
+            toAddresses: [user.email],
+            templateUrl,
+            subject: 'Your password has been changed',
+            data: {
+                name: user.first_name + " " + user.last_name || '',
+                link: `${req.protocol}://${req.headers.host}/login`,
+                s3bucketUrl: nodecache.getValue('S3_BUCKET_URL')
+            }
+        };
+
+        await emailService.send(options);
 
         res.json(formatProfile(user));
     } catch (err) {
@@ -639,7 +711,7 @@ async function verifySite(captchaResponseToken) {
         );
 
         if (!siteverifyResponse || !siteverifyResponse.data || !siteverifyResponse.data.success) {
-            console.log(siteverifyResponse.data);
+            console.error(siteverifyResponse.data);
         }
 
         return siteverifyResponse.data.success;
@@ -654,9 +726,9 @@ exports.logout = logout;
 exports.createUser = createUser;
 exports.getSignedInUserProfile = getSignedInUserProfile;
 exports.changePassword = changePassword;
-exports.deleteUser = deleteUser;
 exports.getUsers = getUsers;
 exports.getUser = getUser;
 exports.sendPasswordResetLink = sendPasswordResetLink;
 exports.resetPassword = resetPassword;
 exports.partialUpdateUser = partialUpdateUser;
+exports.updateSignedInUserProfile = updateSignedInUserProfile;

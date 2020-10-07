@@ -202,7 +202,7 @@ async function getConsentsReport(req, res){
             hcp_consent.dataValues.type = hcp_consent.consent.consent_category.type;
             hcp_consent.dataValues.country_iso2 = hcp_consent.consent.consent_country[0].country_iso2;
             hcp_consent.dataValues.opt_type = hcp_consent.consent.consent_country[0].opt_type;
-            
+
             delete hcp_consent.dataValues['consent'];
         });
 
@@ -265,12 +265,12 @@ async function getDatasyncConsentsReport(req, res){
 
         async function getCountryIso2(){
             const user_codbase_list_for_iso2 = (await sequelize.datasyncConnector.query(
-                `SELECT * FROM ciam.vwcountry where ciam.vwcountry.country_iso2 = ANY($countries);`, 
-                { 
-                    bind: { 
+                `SELECT * FROM ciam.vwcountry where ciam.vwcountry.country_iso2 = ANY($countries);`,
+                {
+                    bind: {
                         countries: req.user.countries
-                    }, 
-                    type: QueryTypes.SELECT 
+                    },
+                    type: QueryTypes.SELECT
                 }
             )).map(i => i.codbase);
 
@@ -288,14 +288,14 @@ async function getDatasyncConsentsReport(req, res){
         }
 
         const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(
-            `SELECT * FROM ciam.vwcountry WHERE ciam.vwcountry.codbase = '${codbase}';`, 
+            `SELECT * FROM ciam.vwcountry WHERE ciam.vwcountry.codbase = '${codbase}';`,
             {
                 logging: console.log,
-                type: QueryTypes.SELECT 
+                type: QueryTypes.SELECT
             }
         )).map(i => i.country_iso2);
 
-        
+
         const country_iso2_list = await getCountryIso2();
 
         const orderBy = req.query.orderBy ? req.query.orderBy : '';
@@ -315,49 +315,49 @@ async function getDatasyncConsentsReport(req, res){
         }
 
         const hcp_consents = await sequelize.datasyncConnector.query(
-            `SELECT 
+            `SELECT
                 account_name,
-                content_type, 
-                opt_type, 
-                capture_datetime, 
-                onekeyid, 
+                content_type,
+                opt_type,
+                capture_datetime,
+                onekeyid,
                 uuid_mixed,
                 country_code,
-                double_opt_in, 
-                uuid_mixed, 
+                double_opt_in,
+                uuid_mixed,
                 channel_value
-            FROM 
+            FROM
                 ciam.vw_veeva_consent_master
-            WHERE 
+            WHERE
                 ciam.vw_veeva_consent_master.country_code = ANY($countries)
             ORDER BY
                 ${sortBy} ${orderType}
             offset ${offset}
             limit ${limit};`
-            , { 
-                bind: { 
+            , {
+                bind: {
                     countries: codbase ? country_iso2_list_for_codbase : country_iso2_list
                 },
-                logging: console.log, 
-                type: QueryTypes.SELECT 
+                logging: console.log,
+                type: QueryTypes.SELECT
             });
-        
+
         const total_consents = (await sequelize.datasyncConnector.query(
-            `SELECT 
+            `SELECT
                 COUNT(*)
-            FROM 
+            FROM
                 ciam.vw_veeva_consent_master
-            WHERE 
+            WHERE
             ciam.vw_veeva_consent_master.country_code = ANY($countries);`
-            , { 
-                bind: { 
+            , {
+                bind: {
                     countries: codbase ? country_iso2_list_for_codbase : country_iso2_list
                 },
-                type: QueryTypes.SELECT 
+                type: QueryTypes.SELECT
             }))[0];
-        
-        
-        hcp_consents.forEach( hcp_consent => { 
+
+
+        hcp_consents.forEach( hcp_consent => {
             hcp_consent.name = hcp_consent.account_name;
             hcp_consent.first_name = hcp_consent.firstname;
             hcp_consent.last_name = hcp_consent.lastname;
@@ -366,7 +366,7 @@ async function getDatasyncConsentsReport(req, res){
             hcp_consent.legal_basis = 'consent';
             hcp_consent.preference = hcp_consent.content_type;
             hcp_consent.given_date = hcp_consent.capture_datetime;
-            
+
             delete hcp_consent['account_name'];
             delete hcp_consent['firstname'];
             delete hcp_consent['lastname'];
@@ -375,7 +375,7 @@ async function getDatasyncConsentsReport(req, res){
             delete hcp_consent['capture_datetime'];
             delete hcp_consent['double_opt_in'];
         });
-    
+
         const data = {
             hcp_consents: hcp_consents,
             page: page + 1,
@@ -429,8 +429,8 @@ async function getUserConsents(req, res) {
 
     try {
         const userConsents = await sequelize.datasyncConnector.query(`
-            SELECT * 
-            FROM ciam.vw_veeva_consent_master 
+            SELECT *
+            FROM ciam.vw_veeva_consent_master
             where ciam.vw_veeva_consent_master.onekeyid = '${req.params.id}';`, { type: QueryTypes.SELECT });
 
         if (!userConsents) return res.json([]);
