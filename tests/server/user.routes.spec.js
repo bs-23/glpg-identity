@@ -152,27 +152,6 @@ describe('User Routes', () => {
         expect(response.statusCode).toBe(200);
     });
 
-    it('Should delete an user', async () => {
-        const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
-
-        const id = faker.random.uuid();
-
-        await User.create({
-            id,
-            first_name: faker.name.firstName(),
-            last_name: faker.name.lastName(),
-            email: faker.internet.email(),
-            password: faker.internet.password(8),
-            application_id: specHelper.defaultApplication.id,
-        });
-
-        const response = await request
-            .delete(`/api/users/${id}`)
-            .set('Cookie', [`access_token=${defaultUser.access_token}`]);
-
-        expect(response.statusCode).toBe(200);
-    });
-
     it('Should get password reset token with valid email', async () => {
         jest.spyOn(emailService, 'send').mockImplementation(() => Promise.resolve())
 

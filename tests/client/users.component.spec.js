@@ -64,8 +64,8 @@ describe('Users component', () => {
             ]
         }
 
-        mockAxios.onGet('api/users?page=1&codbase=aa&orderBy=undefined&orderType=undefined').reply(200, filteredUserList);
-        mockAxios.onGet("/api/users?page=1&orderBy=undefined&orderType=undefined").reply(200, userList);
+        mockAxios.onGet('api/users?page=1&codbase=aa').reply(200, filteredUserList);
+        mockAxios.onGet("/api/users?page=1").reply(200, userList);
     });
 
     const wrapperComponent = () => (
