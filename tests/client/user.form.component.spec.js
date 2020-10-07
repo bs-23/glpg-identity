@@ -81,8 +81,6 @@ describe('UserForm component', () => {
             fireEvent.click(roleBtn);
         });
 
-        // console.log("=======================>", countryBtn, "      ", countryBtn.textContent)
-
         expect(first_name.value).toEqual('a');
         expect(last_name.value).toEqual('a');
         expect(email.value).toEqual('a');

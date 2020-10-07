@@ -21,7 +21,7 @@ export default function UserForm() {
     const { addToast } = useToasts()
     const CountryCodesObject = CountryCodes.customList('countryCode', '+{countryCallingCode}')
     const [selectedCountryCode, setSelectedCountryCode] = useState(0);
-    
+
 
     const generateCountryIconPath = (country) => {
         if(country) return `/assets/flag/flag-${country.toLowerCase().replace(/ /g, "-")}.svg`;
@@ -116,8 +116,7 @@ export default function UserForm() {
                                         displayName="UserForm"
                                         validationSchema={registerSchema}
                                         onSubmit={(values, actions) => {
-                                            values.country_code = CountryCodesObject[countries[selectedCountryCode].country_iso2]
-                                            // console.log('=======================>', values)
+                                            values.country_code = CountryCodesObject[countries[selectedCountryCode].country_iso2];
                                             dispatch(createUser(values))
                                                 .then(res => {
                                                     actions.resetForm();
@@ -173,7 +172,7 @@ export default function UserForm() {
                                                                                         countries.map( (country, index) => {
                                                                                             return index === selectedCountryCode ? (
                                                                                             <Dropdown.Toggle key={index} variant="" className="p-1 pt-2 px-2 pr-0 d-flex align-items-center rounded-0">
-                                                                                                <img height="20" width="20" src={generateCountryIconPath(country.codbase_desc)} title={country.codbase_desc} /> 
+                                                                                                <img height="20" width="20" src={generateCountryIconPath(country.codbase_desc)} title={country.codbase_desc} />
                                                                                                 <span className="country-phone-code pl-1">{ CountryCodesObject[country.country_iso2] }</span>
                                                                                             </Dropdown.Toggle>) : null
                                                                                         })
@@ -181,9 +180,9 @@ export default function UserForm() {
                                                                                     <Dropdown.Menu>
                                                                                         {
                                                                                             countries.map( (country, index) => {
-                                                                                                return index === selectedCountryCode ? null : 
+                                                                                                return index === selectedCountryCode ? null :
                                                                                                 (<Dropdown.Item onClick={() => setSelectedCountryCode(index)} key={index} className="px-2 d-flex align-items-center">
-                                                                                                    <img height="20" width="20" src={generateCountryIconPath(country.codbase_desc)} title={country.codbase_desc} /> 
+                                                                                                    <img height="20" width="20" src={generateCountryIconPath(country.codbase_desc)} title={country.codbase_desc} />
                                                                                                     <span className="country-name pl-2">{ country.codbase_desc }</span>
                                                                                                     <span className="country-phone-code pl-1">{ CountryCodesObject[country.country_iso2] }</span>
                                                                                                 </Dropdown.Item>)
@@ -199,7 +198,7 @@ export default function UserForm() {
                                                                     <ErrorMessage name="phone" data-testid="phoneError" />
                                                                 </div>
                                                             </div>
-                                                            
+
                                                             </div>
                                                             <div className="col-12 col-sm-6">
                                                                 <div className="form-group">
