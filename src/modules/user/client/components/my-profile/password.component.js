@@ -2,27 +2,22 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { useToasts } from 'react-toast-notifications';
-import axios from 'axios';
 import { useCookies } from 'react-cookie';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
 
-import { changePassword, clearLoggedInUser } from '../../user.actions';
+import { changePassword } from '../../user.actions';
 import { changePasswordSchema } from '../../user.schema';
-import { useHistory } from 'react-router-dom';
 
 export default function ChangePasswordForm() {
     const dispatch = useDispatch();
-    const history = useHistory();
     const { addToast } = useToasts();
     const [, , removeCookie] = useCookies();
 
     const timeBeforeLogout = 3000;
 
     const handleLogout = () => {
-        axios.get('/api/logout');
-        dispatch(clearLoggedInUser());
+        window.location = "/api/logout";
         removeCookie('logged_in', { path: '/' });
-        window.location = "/";
     };
 
     const popoverTop = (
@@ -67,8 +62,8 @@ export default function ChangePasswordForm() {
     }
 
     return (
-        <div className="my-2">
-            <h4 className="border-bottom pb-3 pt-2">Change Password</h4>
+        <div className="px-3 py-2 bg-white shadow-sm rounded">
+            <h4 className="border-bottom pb-3 pt-2"><i className="fas fa-lock mr-2"></i>Change Password</h4>
             <div className="row my-3">
                 <div className="col-12 col-lg-8">
                     <Formik

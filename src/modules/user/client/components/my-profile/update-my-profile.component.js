@@ -17,18 +17,32 @@ const UpdateMyProfile = () => {
 
     const CountryCodesObject = CountryCodes.customList('countryCode', '+{countryCallingCode}');
 
-    const activateCountryCodeFromPhone = (phone) => {
-        if(!phone) return;
+    const getDatasyncCountryIndexFromPhone = (phone) => {
+        if(!phone) return -1;
         const phoneNumber = new PhoneNumber(phone);
         const phoneNumberCountryISO = phoneNumber.getRegionCode();
         const countryIndex = countries.findIndex(c => c.country_iso2.toLowerCase() === (phoneNumberCountryISO || '').toLowerCase());
+        return countryIndex;
+    }
+
+    const activateCountryCodeFlagFromPhone = (phone) => {
+        if(!phone) return;
+        const countryIndex = getDatasyncCountryIndexFromPhone(phone);
         setSelectedCountryCode(countryIndex);
     }
 
     const getPhoneNumberWithoutCountryCode = (phone) => {
         if(!phone) return '';
-        const phoneNumberInNationalFormat = PhoneNumber(phone).getNumber('significant');
-        return phoneNumberInNationalFormat || phone;
+
+        const countryIdx = getDatasyncCountryIndexFromPhone(phone);
+        if(countryIdx < 0) return phone;
+
+        const countryCodeForPhoneNumber = CountryCodesObject[countries[countryIdx].country_iso2];
+        let phoneWithoutCountryCodeStartingIdx = phone.indexOf(countryCodeForPhoneNumber);
+        phoneWithoutCountryCodeStartingIdx = phoneWithoutCountryCodeStartingIdx + countryCodeForPhoneNumber.length;
+        const phoneWithoutCountryCode = phone.substr(phoneWithoutCountryCodeStartingIdx)
+
+        return phoneWithoutCountryCode;
     }
 
     const initialFormValues = {
@@ -71,10 +85,10 @@ const UpdateMyProfile = () => {
     }
 
     useEffect(() => {
-        activateCountryCodeFromPhone(myProfileInfo.phone);
+        activateCountryCodeFlagFromPhone(myProfileInfo.phone);
     }, [myProfileInfo, countries])
 
-    return <div className="my-2">
+    return <div className="px-3 py-2 bg-white shadow-sm rounded">
                 <Formik
                     initialValues={initialFormValues}
                     displayName="UpdateMyProfileForm"
@@ -84,7 +98,7 @@ const UpdateMyProfile = () => {
                 >
                     {formikProps => (
                 <Form onSubmit={formikProps.handleSubmit}>
-                    <h4 className="border-bottom pb-3 pt-2">My Profile</h4>
+                    <h4 className="border-bottom pb-3 pt-2"><i className="far fa-user mr-2"></i>My Profile</h4>
                             <div className="row my-3">
                                 <div className="col-12 col-lg-8">
                                     <div className="row">

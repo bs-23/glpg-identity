@@ -22,30 +22,33 @@ const MyProfile = () => {
         }
     ];
 
-    return <div className="my-profile"><div className="container-fluid">
-        <div className="row">
-            <div className="col-12 px-0">
-                <nav aria-label="breadcrumb">
-                    <ol className="breadcrumb rounded-0">
-                        <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
-                        <li className="breadcrumb-item active"><span>My Profile</span></li>
-                    </ol>
-                </nav>
-            </div>
-        </div>
-    </div>
-        <div className="container">
-            <div className="row">
-                <div className="col-12 col-sm-4 position-relative">
-                    <Sidebar header={userFullName} menuItems={sideBarItems} idExtractor={(item) => item.label} />
-                </div>
-                <div className="col-12 col-sm-8">
-                    <Route exact path={routeMatch.url} component={UpdateMyProfile} />
-                    <Route exact path={`${routeMatch.url}/change-password`} component={ChangePasswordForm} />
+    return <div className="app__content cdp-light-bg">
+        <div className="my-profile w-100">
+            <div className="container-fluid">
+                <div className="row">
+                    <div className="col-12 px-0">
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb rounded-0">
+                                <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
+                                <li className="breadcrumb-item active"><span>My Profile</span></li>
+                            </ol>
+                        </nav>
+                    </div>
                 </div>
             </div>
+            <div className="container">
+                <div className="row py-3">
+                    <div className="col-12 col-sm-4 position-relative">
+                        <Sidebar header={userFullName} menuItems={sideBarItems} idExtractor={(item) => item.label} />
+                    </div>
+                    <div className="col-12 col-sm-8">
+                        <Route exact path={routeMatch.url} component={UpdateMyProfile} />
+                        <Route exact path={`${routeMatch.url}/change-password`} component={ChangePasswordForm} />
+                    </div>
+                </div>
+            </div>
         </div>
-        </div>
+        </div> 
 }
 
 export default MyProfile;

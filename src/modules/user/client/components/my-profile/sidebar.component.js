@@ -16,8 +16,8 @@ const Sidebar = ({ menuItems, idExtractor, header }) => {
         if(selectedMenu) setSelectedMenuItemID(idExtractor(selectedMenu));
     }, [location]);
 
-    return <aside className="my-2 border rounded my-profile__sidebar shadow-sm">
-        <h4 className="py-2 px-3">{header}</h4>
+    return <aside className="border rounded my-profile__sidebar shadow-sm bg-white mb-3">
+        <h4 className="pt-3 pb-2 px-3">{header}</h4>
         {menuItems && menuItems.map(item =>
             <MenuItem
                 key={idExtractor(item)}
