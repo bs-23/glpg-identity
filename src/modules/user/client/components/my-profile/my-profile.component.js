@@ -14,11 +14,13 @@ const MyProfile = () => {
     const sideBarItems = [
         {
             label: "My Profile",
-            toUrl: "/users/my-profile"
+            toUrl: "/users/my-profile",
+            iconClass: "far fa-user mr-2"
         },
         {
             label: "Change Password",
-            toUrl: "/users/my-profile/change-password"
+            toUrl: "/users/my-profile/change-password",
+            iconClass: "fas fa-lock mr-2"
         }
     ];
 
@@ -48,7 +50,7 @@ const MyProfile = () => {
                 </div>
             </div>
         </div>
-        </div> 
+        </div>
 }
 
 export default MyProfile;

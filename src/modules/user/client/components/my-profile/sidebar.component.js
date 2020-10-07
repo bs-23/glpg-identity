@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-const MenuItem = ({ id, label, onClick, isSelected, toUrl }) =>
+const MenuItem = ({ id, label, onClick, isSelected, toUrl, iconClass }) =>
     <div id={id} className={`nav-item ${isSelected ? 'my-profile__menu selected' : 'my-profile__menu'}`} onClick={onClick} >
-        <Link to={toUrl} className="nav-link border-top">{label}</Link>
+        <Link to={toUrl} className="nav-link border-top"><i className={iconClass} />{label}</Link>
     </div>
 
 const Sidebar = ({ menuItems, idExtractor, header }) => {
@@ -24,6 +24,7 @@ const Sidebar = ({ menuItems, idExtractor, header }) => {
                 id={idExtractor(item)}
                 label={item.label}
                 toUrl={item.toUrl}
+                iconClass={item.iconClass}
                 isSelected={idExtractor(item) === selectedMenuItemID}
             />)}
     </aside>
