@@ -1,7 +1,9 @@
 .forbidden {
     background: $light-bg-color;
 
-
+    .row {
+        flex: 1 0 100%;
+    }
 
     &__panel {
         border-radius: 16px;
@@ -10,8 +12,8 @@
 
     &__app-logo {
         position: absolute;
-        left: 36px;
-        top: 45px;
+        left: 20px;
+        top: 30px;
     }
 
     &__header {
