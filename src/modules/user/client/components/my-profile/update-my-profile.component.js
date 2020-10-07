@@ -90,7 +90,7 @@ const UpdateMyProfile = () => {
                                     <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
-                                                <label className="font-weight-bold" htmlFor="first_name">First Name <span className="text-danger">*</span></label>
+                                                <label className="font-weight-bold-light" htmlFor="first_name">First Name <span className="text-danger">*</span></label>
                                                 <Field data-testid="first_name" className="form-control" type="name" name="first_name" />
                                                 <div className="invalid-feedback" data-testid="firstNameError"><ErrorMessage name="first_name" /></div>
                                             </div>
@@ -99,7 +99,7 @@ const UpdateMyProfile = () => {
                                     <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
-                                                <label className="font-weight-bold" htmlFor="last_name">Last Name <span className="text-danger">*</span></label>
+                                                <label className="font-weight-bold-light" htmlFor="last_name">Last Name <span className="text-danger">*</span></label>
                                                 <Field data-testid="last_name" className="form-control" type="name" name="last_name" />
                                                 <div className="invalid-feedback" data-testid="lastNameError"><ErrorMessage name="last_name" /></div>
                                             </div>
@@ -108,7 +108,7 @@ const UpdateMyProfile = () => {
                                     <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
-                                                <label className="font-weight-bold" htmlFor="email">Email <span className="text-danger">*</span></label>
+                                                <label className="font-weight-bold-light" htmlFor="email">Email <span className="text-danger">*</span></label>
                                                 <Field data-testid="email" className="form-control" type="email" name="email" autoComplete="username" />
                                                 <div className="invalid-feedback" data-testid="emailError"><ErrorMessage name="email" /></div>
                                             </div>
@@ -117,7 +117,7 @@ const UpdateMyProfile = () => {
                                     <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
-                                                <label className="font-weight-bold" htmlFor="phone">Phone Number</label>
+                                                <label className="font-weight-bold-light" htmlFor="phone">Phone Number</label>
                                                 <div className="phone-list">
                                                     <div className="input-group phone-input">
                                                         <span className="input-group-btn">
@@ -157,7 +157,7 @@ const UpdateMyProfile = () => {
                                     <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
-                                                <label className="font-weight-bold" htmlFor="status">Status<span className="text-danger"></span></label>
+                                                <label className="font-weight-bold-light" htmlFor="status">Status<span className="text-danger"></span></label>
                                                 <Field
                                                     as="select"
                                                     name="status"
@@ -173,7 +173,7 @@ const UpdateMyProfile = () => {
                                     <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
-                                                <label className="font-weight-bold" htmlFor="countries">Countries<span className="text-danger"></span></label>
+                                                <label className="font-weight-bold-light" htmlFor="countries">Countries<span className="text-danger"></span></label>
                                                 {getCodbaseDescriptionsFromISOCodes((myProfileInfo || {}).countries).map(country => <div key={country} className="custom-control custom-checkbox">
                                                     <input
                                                         name="countries"
@@ -191,7 +191,7 @@ const UpdateMyProfile = () => {
                                     <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
-                                                <label className="font-weight-bold" htmlFor="roles">Roles<span className="text-danger"></span></label>
+                                                <label className="font-weight-bold-light" htmlFor="roles">Roles<span className="text-danger"></span></label>
                                                 <ul className="list-unstyled pl-0 py-2 mb-0">
                                                     {myProfileInfo && myProfileInfo.roles && myProfileInfo.roles.map(role => <li key={role.title} className="">
                                                         <label className="d-flex justify-content-between align-items-center">
@@ -209,7 +209,7 @@ const UpdateMyProfile = () => {
                                     {myProfileInfo && myProfileInfo.application && <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
-                                                <label className="font-weight-bold" htmlFor="applications">Applications<span className="text-danger"></span></label>
+                                                <label className="font-weight-bold-light" htmlFor="applications">Applications<span className="text-danger"></span></label>
                                                 <ul className="list-unstyled pl-0 py-2 mb-0">
                                                     <li key={myProfileInfo.application.name} className="">
                                                         <label className="d-flex justify-content-between align-items-center">
@@ -227,7 +227,7 @@ const UpdateMyProfile = () => {
                                     <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
-                                                <label className="font-weight-bold" htmlFor="last-login">Last Login</label>
+                                                <label className="font-weight-bold-light" htmlFor="last-login">Last Login</label>
                                                 <Field data-testid="last-login" className="form-control" type="text" name="last-login" disabled value={new Date(myProfileInfo.last_login).toLocaleDateString('en-GB').replace(/\//g, '.')} />
                                             </div>
                                         </div>
@@ -235,7 +235,7 @@ const UpdateMyProfile = () => {
                                     <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
-                                                <label className="font-weight-bold" htmlFor="expiry-date">Expiry Date</label>
+                                                <label className="font-weight-bold-light" htmlFor="expiry-date">Expiry Date</label>
                                                 <Field data-testid="expiry-date" className="form-control" type="text" name="expiry-date" disabled value={new Date(myProfileInfo.expiry_date).toLocaleDateString('en-GB').replace(/\//g, '.')} />
                                             </div>
                                         </div>
