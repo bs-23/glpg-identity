@@ -63,11 +63,11 @@ const UpdateMyProfile = () => {
         actions.setSubmitting(false);
     }
 
-    const getCountryNamesFromISOCodes = (countryISOCodes) => {
+    const getCodbaseDescriptionsFromISOCodes = (countryISOCodes) => {
         if(!countryISOCodes) return [];
         const filteredCountries = countries.filter(i => myProfileInfo.countries.includes(i.country_iso2))
-        const countryNames = filteredCountries.map(i => i.codbase_desc);
-        return countryNames;
+        const codbaseDescriptions = filteredCountries.map(i => i.codbase_desc);
+        return codbaseDescriptions;
     }
 
     useEffect(() => {
@@ -174,7 +174,7 @@ const UpdateMyProfile = () => {
                                         <div className="col-12">
                                             <div className="form-group">
                                                 <label className="font-weight-bold" htmlFor="countries">Countries<span className="text-danger"></span></label>
-                                                {getCountryNamesFromISOCodes((myProfileInfo || {}).countries).map(country => <div key={country} className="custom-control custom-checkbox">
+                                                {getCodbaseDescriptionsFromISOCodes((myProfileInfo || {}).countries).map(country => <div key={country} className="custom-control custom-checkbox">
                                                     <input
                                                         name="countries"
                                                         type="checkbox"
@@ -206,11 +206,11 @@ const UpdateMyProfile = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="row">
+                                    {myProfileInfo && myProfileInfo.application && <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
                                                 <label className="font-weight-bold" htmlFor="applications">Applications<span className="text-danger"></span></label>
-                                                {myProfileInfo && myProfileInfo.application && <ul className="list-unstyled pl-0 py-2 mb-0">
+                                                <ul className="list-unstyled pl-0 py-2 mb-0">
                                                     <li key={myProfileInfo.application.name} className="">
                                                         <label className="d-flex justify-content-between align-items-center">
                                                             <span className="switch-label">{myProfileInfo.application.name}</span>
@@ -220,10 +220,10 @@ const UpdateMyProfile = () => {
                                                             </span>
                                                         </label>
                                                     </li>
-                                                </ul>}
+                                                </ul>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div>}
                                     <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
