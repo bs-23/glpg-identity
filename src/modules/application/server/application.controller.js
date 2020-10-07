@@ -45,6 +45,11 @@ async function getToken(req, res) {
 
                 if (!application || !application.validPassword(password)) {
                     response.errors.push(new CustomError('Invalid username or password.', 401));
+                } else {
+                    const new_refresh_token = generateRefreshToken(application);
+                    await application.update({ refresh_token: new_refresh_token });
+
+                    response.data.refresh_token = new_refresh_token;
                 }
             }
         }
@@ -53,25 +58,27 @@ async function getToken(req, res) {
             if(!refresh_token) {
                 response.errors.push(new CustomError('refresh_token is missing.', 400, 'refresh_token'));
             } else {
-                const decoded = jwt.verify(refresh_token, nodecache.getValue('APPLICATION_REFRESH_SECRET'));
-                application = await Application.findOne({ where: { id: decoded.id } });
+                try {
+                    const decoded = jwt.verify(refresh_token, nodecache.getValue('APPLICATION_REFRESH_SECRET'));
+                    application = await Application.findOne({ where: { id: decoded.id } });
 
-                if(application.refresh_token !== refresh_token) {
-                    response.errors.push(new CustomError('The refresh_token is invalid or expired.', 4401));
+                    if(application.refresh_token !== refresh_token) {
+                        response.errors.push(new CustomError('The refresh_token is invalid.', 4401));
+                    }
+                } catch(err) {
+                    console.error(err);
+                    response.errors.push(new CustomError('The refresh_token is expired.', 4401));
                 }
             }
         }
 
         if (response.errors.length) return res.status(400).send(response);
 
-        const new_refresh_token = generateRefreshToken(application);
-        await application.update({ refresh_token: new_refresh_token });
-
         response.data = {
+            ...response.data,
             token_type: 'bearer',
             access_token: generateAccessToken(application),
-            expires_in: '7200000',
-            refresh_token: new_refresh_token
+            expires_in: '7200000'
         };
 
         res.send(response);
