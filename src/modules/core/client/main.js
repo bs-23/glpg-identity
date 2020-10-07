@@ -13,7 +13,7 @@ ReactDOM.render(
         <Provider store={store}>
             <BrowserRouter>
                 <App/>
-                <IdleTimeOutModal/>
+                <IdleTimeOutModal show={false}/>
             </BrowserRouter>
         </Provider>
     </CookiesProvider>,

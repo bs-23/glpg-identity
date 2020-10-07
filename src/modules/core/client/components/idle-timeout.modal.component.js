@@ -5,9 +5,9 @@ import { useLocation } from 'react-router-dom';
 import { useIdleTimer } from 'react-idle-timer';
 import React, { useEffect, useState } from 'react';
 
-export default function IdleTimeOutModalComponent() {
+export default function IdleTimeOutModalComponent(props) {
     const location = useLocation();
-    const [show, setShow] = useState(false);
+    const [show, setShow] = useState(props.show);
     const [, setCookie, removeCookie] = useCookies();
 
     const handleShow = () => setShow(true);
@@ -17,11 +17,11 @@ export default function IdleTimeOutModalComponent() {
         setCookie('logged_in', '', { path: '/' });
         removeCookie('logged_in');
 
-        window.location = '/api/logout';
+        window.location.assign('/api/logout');
     };
 
     useIdleTimer({
-        timeout: 1000 * 60 * 14,
+        timeout: 1000 * 10 ,
         onIdle: handleShow,
         debounce: 500
     });
