@@ -26,7 +26,6 @@ export default function SwaggerLogin() {
                                     displayName="Swagger Login"
                                     onSubmit={(values, actions) => {
                                         Axios.post('/swagger/login', values).then(() => {
-                                            setCookie('logged_in_swagger', true, { path: '/' });
                                             location.href = '/api-docs'
                                         }).catch(error => {
                                             addToast(error.response.data, {

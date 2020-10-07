@@ -199,9 +199,7 @@ async function getHcps(req, res) {
         const ignorecase_of_country_iso2_list = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
 
         const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(
-            `SELECT * FROM ciam.vwcountry WHERE ciam.vwcountry.codbase = '${codbase}';`,
-            {
-                logging: console.log,
+            `SELECT * FROM ciam.vwcountry WHERE ciam.vwcountry.codbase = '${codbase}';`, {
                 type: QueryTypes.SELECT
             }
         )).map(i => i.country_iso2);

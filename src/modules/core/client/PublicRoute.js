@@ -1,7 +1,7 @@
 import React from "react";
 import { useCookies } from 'react-cookie';
 import { useSelector } from "react-redux";
-import { StaticRouter as Router, Route, Redirect } from "react-router-dom";
+import { Route, Redirect } from "react-router-dom";
 
 export default function PublicRoute({ component: Component, ...rest }) {
     const [cookies] = useCookies();
@@ -9,16 +9,12 @@ export default function PublicRoute({ component: Component, ...rest }) {
     if (window.location.pathname === '/swagger/login') {
         if (cookies.logged_in_swagger === 'true') {
             window.location.href = '/api-docs';
-            return;
+            return null;
         } else {
             return (
                 <Route {...rest} render={props => {
-                    return (
-                        (
-                            <Component {...props}/>
-                        )
-                    )
-                }}/>
+                    return <Component {...props} />;
+                }} />
             )
         }
     }

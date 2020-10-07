@@ -18,22 +18,33 @@ beforeAll(async () => {
 });
 
 describe('Application Routes', () => {
-    it('Should get 401 Unauthorized http status code with invalid credentials', async () => {
+    it('Should get 401 Unauthorized error for invalid credential', async () => {
         const response = await request.post('/api/applications/generate-token').send({
             email: faker.internet.email(),
-            password: faker.internet.password(),
+            password: faker.internet.password()
         });
 
         expect(response.statusCode).toBe(401);
     });
 
-    it('Should get access token with valid email and password', async () => {
-        const response = await request.post('/api/applications/generate-token').send({
-            email: defaultApplication.email,
+    it('Should get access_token and refresh_token for valid username and password', async () => {
+        const response = await request.post('/api/applications/token').send({
+            username: defaultApplication.email,
             password: defaultApplication.password,
+            grant_type: 'password'
         });
 
         expect(response.statusCode).toBe(200);
+        expect(response.res.headers['content-type']).toMatch('application/json');
+    });
+
+    it('Should receive an error to refresh an access_token for an invalid refresh_token', async () => {
+        const response = await request.post('/api/applications/token').send({
+            grant_type: 'refresh_token',
+            refresh_token: 'xxx-yyy-zzz'
+        });
+
+        expect(response.statusCode).toBe(400);
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
 });

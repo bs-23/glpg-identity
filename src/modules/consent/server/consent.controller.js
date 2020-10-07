@@ -288,9 +288,7 @@ async function getDatasyncConsentsReport(req, res){
         }
 
         const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(
-            `SELECT * FROM ciam.vwcountry WHERE ciam.vwcountry.codbase = '${codbase}';`,
-            {
-                logging: console.log,
+            `SELECT * FROM ciam.vwcountry WHERE ciam.vwcountry.codbase = '${codbase}';`, {
                 type: QueryTypes.SELECT
             }
         )).map(i => i.country_iso2);
@@ -338,7 +336,6 @@ async function getDatasyncConsentsReport(req, res){
                 bind: {
                     countries: codbase ? country_iso2_list_for_codbase : country_iso2_list
                 },
-                logging: console.log,
                 type: QueryTypes.SELECT
             });
 
