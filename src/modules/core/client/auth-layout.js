@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useIdleTimer } from 'react-idle-timer';
 import { useCookies } from 'react-cookie';
-import { useLocation, useHistory, Redirect } from 'react-router-dom';
-import axios from 'axios';
 import { IdleTimeOutModal } from './components/Idle-time-out-modal.component';
 import App from './app.component';
  
@@ -13,9 +11,6 @@ export default function (props) {
     });
     const [, setCookie, removeCookie] = useCookies();
 
-    const location = useLocation();
-    const history = useHistory();
-
     const handleOnIdle = event => {
         console.log('user is idle', event)
         console.log('last active', getLastActiveTime())
@@ -25,13 +20,13 @@ export default function (props) {
     }
  
     const handleOnActive = event => {
-        console.log('user is active', event);
-        console.log('time remaining', getRemainingTime());
+        // console.log('user is active', event);
+        // console.log('time remaining', getRemainingTime());
     }
  
     const handleOnAction = event => {
-        console.log('user did something', event)
-        console.log('time remaining', getRemainingTime());
+        // console.log('user did something', event)
+        // console.log('time remaining', getRemainingTime());
     }
 
     function handleClose() {
@@ -86,7 +81,6 @@ export default function (props) {
             />
 
             <a href="/api/logout" id='logout' hidden></a>
-
         </>
     )
 }
