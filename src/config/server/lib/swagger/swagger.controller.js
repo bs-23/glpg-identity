@@ -18,12 +18,17 @@ async function login(req, res) {
         const accessToken = jwt.sign({
             id: nodecache.getValue('SWAGGER_ID')
         }, nodecache.getValue('SWAGGER_TOKEN_SECRET'), {
-            expiresIn: '2d',
+            expiresIn: '1d',
             issuer: nodecache.getValue('SWAGGER_ID')
         });
 
         res.cookie('swagger_access_token', accessToken, {
             httpOnly: true
+        });
+
+        res.cookie('logged_in_swagger', 'true', {
+            maxAge: 86400000, // 1 Day
+            httpOnly: false
         });
 
         res.sendStatus(200);
