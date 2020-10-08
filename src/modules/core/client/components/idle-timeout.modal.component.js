@@ -22,7 +22,7 @@ export default function IdleTimeOutModalComponent(props) {
     };
 
     useIdleTimer({
-        timeout: 1000 * 10,
+        timeout: 1000 * 60 * 14,
         onIdle: handleShow,
         debounce: 500
     });
