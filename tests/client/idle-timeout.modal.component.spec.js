@@ -18,7 +18,6 @@ configure({ adapter: new Adapter() });
 describe('Idle time out component', () => {
     let mockAxios;
     let savedUser;
-    const oldWindowLocation = window.location;
 
     beforeEach( async () => {        
         mockAxios = new MockAdapter(axios);
@@ -31,27 +30,6 @@ describe('Idle time out component', () => {
             email: 'test@gmail.com',
             password: 'test'
         }));
-    });
-
-    beforeAll(() => {
-        delete window.location
-
-        window.location = Object.defineProperties(
-            {},
-            {
-            ...Object.getOwnPropertyDescriptors(oldWindowLocation),
-            assign: {
-                configurable: true,
-                value: jest.fn(),
-            },
-            },
-        )
-    });
-
-    afterAll(() => {
-        // restore `window.location` to the original `jsdom`
-        // `Location` object
-        window.location = oldWindowLocation;
     });
 
     const userSlice = () => store.getState().userReducer;
@@ -73,16 +51,6 @@ describe('Idle time out component', () => {
 
     it('should set user', async () => {
         expect(userSlice().loggedInUser).toEqual(savedUser);
-    });
-
-    it('should log out manually', async () => {
-        render(wrapperComponent());
-        const logout = screen.getByText('Logout');
-        await waitFor(() => {
-            fireEvent.click(logout);
-        });
-
-        expect(window.location.assign).toHaveBeenCalledWith('/api/logout');
     });
 
     it('should check text contents of the modal', async () => {

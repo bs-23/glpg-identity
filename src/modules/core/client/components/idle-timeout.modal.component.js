@@ -4,24 +4,25 @@ import { useCookies } from 'react-cookie';
 import { useLocation } from 'react-router-dom';
 import { useIdleTimer } from 'react-idle-timer';
 import React, { useEffect, useState } from 'react';
+import { useSelector } from "react-redux";
 
 export default function IdleTimeOutModalComponent(props) {
     const location = useLocation();
     const [show, setShow] = useState(props.show);
-    const [, setCookie, removeCookie] = useCookies();
+    const [cookies, setCookie, removeCookie] = useCookies();
 
-    const handleShow = () => setShow(true);
+    const handleShow = () => (location.pathname !== '/login' && location.pathname !== '/swagger/login' && location.pathname != '/api-docs/') ? setShow(true) : setShow(false);
     const handleClose = () => setShow(false);
 
     const handleLogout = () => {
+        if(cookies.logged_in) window.location.href = '/api/logout';
+
         setCookie('logged_in', '', { path: '/' });
         removeCookie('logged_in');
-
-        window.location.assign('/api/logout');
     };
 
     useIdleTimer({
-        timeout: 1000 * 60 * 14,
+        timeout: 1000 * 10,
         onIdle: handleShow,
         debounce: 500
     });
@@ -42,7 +43,7 @@ export default function IdleTimeOutModalComponent(props) {
     });
 
     return (
-        <Modal show={location.pathname !== '/login' && show} onHide={handleClose} centered backdrop="static" keyboard={false}>
+        <Modal show={show} onHide={handleClose} centered backdrop="static" keyboard={false}>
             <Modal.Body >
                 <div className="text-center">
                     <div className="my-3">
