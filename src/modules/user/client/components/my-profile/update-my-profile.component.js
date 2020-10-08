@@ -53,7 +53,7 @@ const UpdateMyProfile = () => {
         last_name: myProfileInfo && myProfileInfo.last_name,
         email: myProfileInfo && myProfileInfo.email,
         phone: myProfileInfo && getPhoneNumberWithoutCountryCode(myProfileInfo.phone),
-        isCountryFlagActive: myProfileInfo && isCountryDetectedFromPhone(myProfileInfo.phone)
+        isCountryFlagActive: myProfileInfo && (myProfileInfo.phone === '' || isCountryDetectedFromPhone(myProfileInfo.phone))
     }
 
     const generateCountryIconPath = (country) => {
@@ -108,6 +108,7 @@ const UpdateMyProfile = () => {
 
         if(isCountryFlagActive) {
             setFieldValue('phone', currentPhoneValue);
+            setFieldValue('isCountryFlagActive', true);
         }else{
             const wasCountryFoundForPhoneCountryCode = getDatasyncCountryIndexFromPhone(currentPhoneValue) >= 0 ? true : false;
             setFieldValue('phone', getPhoneNumberWithoutCountryCode(currentPhoneValue));

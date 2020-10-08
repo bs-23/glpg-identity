@@ -127,7 +127,7 @@ export const updateMyProfileSchema = object().shape({
             .min(4, 'This field must be at least 4 characters long.')
             .max(15, 'This field must be at most 15 characters long.'),
         otherwise: string().matches(/^[+0-9]*$/, 'This field only contains digits or plus.')
-            .min(8, 'This field must be at least 8 characters long.')
+            .min(7, 'This field must be at least 7 characters long.')
             .max(19, 'This field must be at most 19 characters long.'),
     })
 
