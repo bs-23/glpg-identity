@@ -4,7 +4,6 @@ import { useCookies } from 'react-cookie';
 import { useLocation } from 'react-router-dom';
 import { useIdleTimer } from 'react-idle-timer';
 import React, { useEffect, useState } from 'react';
-import { useSelector } from "react-redux";
 
 export default function IdleTimeOutModalComponent(props) {
     const location = useLocation();
