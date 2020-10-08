@@ -288,8 +288,10 @@ async function getDatasyncConsentsReport(req, res){
         }
 
         const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(
-            `SELECT * FROM ciam.vwcountry WHERE ciam.vwcountry.codbase = '${codbase}';`, {
-                type: QueryTypes.SELECT
+            `SELECT * FROM ciam.vwcountry WHERE ciam.vwcountry.codbase = $codbase;`,
+            {
+                type: QueryTypes.SELECT,
+                bind: { codbase: codbase }
             }
         )).map(i => i.country_iso2);
 
@@ -297,7 +299,7 @@ async function getDatasyncConsentsReport(req, res){
         const country_iso2_list = await getCountryIso2();
 
         const orderBy = req.query.orderBy ? req.query.orderBy : '';
-        const orderType = req.query.orderType ? req.query.orderType : '';
+        const orderType = req.query.orderType && req.query.orderType.toLowerCase() === "desc" ? "DESC" : "ASC";
         let sortBy = 'content_type';
 
         if(orderBy && orderType){
@@ -330,11 +332,13 @@ async function getDatasyncConsentsReport(req, res){
                 ciam.vw_veeva_consent_master.country_code = ANY($countries)
             ORDER BY
                 ${sortBy} ${orderType}
-            offset ${offset}
-            limit ${limit};`
+            offset $offset
+            limit $limit;`
             , {
                 bind: {
-                    countries: codbase ? country_iso2_list_for_codbase : country_iso2_list
+                    countries: codbase ? country_iso2_list_for_codbase : country_iso2_list,
+                    offset: offset,
+                    limit: limit
                 },
                 type: QueryTypes.SELECT
             });
@@ -423,12 +427,18 @@ async function getAllOptTypes(req, res){
 
 async function getUserConsents(req, res) {
     const response = new Response({}, []);
+    const userOneKeyID = req.params.id;
 
     try {
         const userConsents = await sequelize.datasyncConnector.query(`
             SELECT *
             FROM ciam.vw_veeva_consent_master
-            where ciam.vw_veeva_consent_master.onekeyid = '${req.params.id}';`, { type: QueryTypes.SELECT });
+            where ciam.vw_veeva_consent_master.onekeyid = $userOneKeyID;`,
+            {
+                bind: { userOneKeyID: userOneKeyID },
+                type: QueryTypes.SELECT
+            }
+        );
 
         if (!userConsents) return res.json([]);
 
