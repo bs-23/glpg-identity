@@ -18,15 +18,6 @@ beforeAll(async () => {
 });
 
 describe('Application Routes', () => {
-    it('Should get 401 Unauthorized error for invalid credential', async () => {
-        const response = await request.post('/api/applications/generate-token').send({
-            email: faker.internet.email(),
-            password: faker.internet.password()
-        });
-
-        expect(response.statusCode).toBe(401);
-    });
-
     it('Should get access_token and refresh_token for valid username and password', async () => {
         const response = await request.post('/api/applications/token').send({
             username: defaultApplication.email,
