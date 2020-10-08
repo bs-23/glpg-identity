@@ -1,6 +1,5 @@
 import React from 'react';
 import { render, waitFor, fireEvent } from '@testing-library/react';
-import { renderHook } from '@testing-library/react-hooks';
 import { configure, shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import { Provider } from 'react-redux';
@@ -13,7 +12,6 @@ import IdleTimeout from '../../src/modules/core/client/components/idle-timeout.m
 import { act } from 'react-dom/test-utils';
 import { screen } from '@testing-library/dom'
 import { login } from '../../src/modules/user/client/user.actions';
-import sinon from 'sinon';
 
 configure({ adapter: new Adapter() });
 
