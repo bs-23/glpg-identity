@@ -219,7 +219,7 @@ const UpdateMyProfile = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="row">
+                                    {myProfileInfo && myProfileInfo.countries && <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
                                                 <label className="font-weight-bold-light" htmlFor="countries">Countries<span className="text-danger"></span></label>
@@ -236,13 +236,13 @@ const UpdateMyProfile = () => {
                                                 </div>)}
                                             </div>
                                         </div>
-                                    </div>
-                                    <div className="row">
+                                    </div>}
+                                    {myProfileInfo && myProfileInfo.roles && myProfileInfo.roles.length > 0 && <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
                                                 <label className="font-weight-bold-light" htmlFor="roles">Roles<span className="text-danger"></span></label>
                                                 <ul className="list-unstyled pl-0 py-2 mb-0">
-                                                    {myProfileInfo && myProfileInfo.roles && myProfileInfo.roles.map(role => <li key={role.title} className="">
+                                                    {myProfileInfo.roles.map(role => <li key={role.title} className="">
                                                         <label className="d-flex justify-content-between align-items-center">
                                                             <span className="switch-label">{role.title}</span>
                                                             <span className="switch">
@@ -254,7 +254,7 @@ const UpdateMyProfile = () => {
                                                 </ul>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div>}
                                     {myProfileInfo && myProfileInfo.application && <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
@@ -277,18 +277,18 @@ const UpdateMyProfile = () => {
                                         <div className="col-12">
                                             <div className="form-group">
                                                 <label className="font-weight-bold-light" htmlFor="last-login">Last Login</label>
-                                                <Field data-testid="last-login" className="form-control" type="text" name="last-login" disabled value={new Date(myProfileInfo.last_login).toLocaleDateString('en-GB').replace(/\//g, '.')} />
+                                                <Field data-testid="last-login" className="form-control" type="text" name="last-login" disabled value={myProfileInfo.last_login ? new Date(myProfileInfo.last_login).toLocaleDateString('en-GB').replace(/\//g, '.') : ''} />
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="row">
+                                    {myProfileInfo && myProfileInfo.type !== 'admin' && <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
                                                 <label className="font-weight-bold-light" htmlFor="expiry-date">Expiry Date</label>
-                                                <Field data-testid="expiry-date" className="form-control" type="text" name="expiry-date" disabled value={new Date(myProfileInfo.expiry_date).toLocaleDateString('en-GB').replace(/\//g, '.')} />
+                                                <Field data-testid="expiry-date" className="form-control" type="text" name="expiry-date" disabled value={myProfileInfo.expiry_date ? new Date(myProfileInfo.expiry_date).toLocaleDateString('en-GB').replace(/\//g, '.') : ''} />
                                             </div>
                                         </div>
-                                    </div>
+                                    </div>}
                                     <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" >Update</button>
                                 </div>
                             </div>
