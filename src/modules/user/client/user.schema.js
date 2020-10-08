@@ -121,8 +121,14 @@ export const updateMyProfileSchema = object().shape({
     email: string()
         .email('This field should be a valid email address.')
         .required('This field must not be empty.'),
-    phone: string()
-        .matches(/^[0-9]*$/, 'This field only contains digits.')
-        .min(4, 'This field must be at least 4 characters long.')
-        .max(15, 'This field must be at most 15 characters long.')
+    phone: string().when('isCountryFlagActive', {
+        is: true,
+        then: string().matches(/^[0-9]*$/, 'This field only contains digits.')
+            .min(4, 'This field must be at least 4 characters long.')
+            .max(15, 'This field must be at most 15 characters long.'),
+        otherwise: string().matches(/^[+0-9]*$/, 'This field only contains digits or plus.')
+            .min(8, 'This field must be at least 8 characters long.')
+            .max(19, 'This field must be at most 19 characters long.'),
+    })
+
 })

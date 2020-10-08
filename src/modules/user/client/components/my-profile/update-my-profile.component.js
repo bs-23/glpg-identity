@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Formik, Field, ErrorMessage, FieldArray } from "formik";
+import { Form, Formik, Field, ErrorMessage } from "formik";
 import { useSelector, useDispatch } from 'react-redux';
 import Dropdown from 'react-bootstrap/Dropdown';
 import CountryCodes from 'country-codes-list';
@@ -25,6 +25,10 @@ const UpdateMyProfile = () => {
         return countryIndex;
     }
 
+    const isCountryDetectedFromPhone = (phone) => {
+        return getDatasyncCountryIndexFromPhone(phone) >= 0;
+    }
+
     const activateCountryCodeFlagFromPhone = (phone) => {
         if(!phone) return;
         const countryIndex = getDatasyncCountryIndexFromPhone(phone);
@@ -40,8 +44,7 @@ const UpdateMyProfile = () => {
         const countryCodeForPhoneNumber = CountryCodesObject[countries[countryIdx].country_iso2];
         let phoneWithoutCountryCodeStartingIdx = phone.indexOf(countryCodeForPhoneNumber);
         phoneWithoutCountryCodeStartingIdx = phoneWithoutCountryCodeStartingIdx + countryCodeForPhoneNumber.length;
-        const phoneWithoutCountryCode = phone.substr(phoneWithoutCountryCodeStartingIdx)
-
+        const phoneWithoutCountryCode = phone.substr(phoneWithoutCountryCodeStartingIdx);
         return phoneWithoutCountryCode;
     }
 
@@ -49,7 +52,8 @@ const UpdateMyProfile = () => {
         first_name: myProfileInfo && myProfileInfo.first_name,
         last_name: myProfileInfo && myProfileInfo.last_name,
         email: myProfileInfo && myProfileInfo.email,
-        phone: myProfileInfo && getPhoneNumberWithoutCountryCode(myProfileInfo.phone)
+        phone: myProfileInfo && getPhoneNumberWithoutCountryCode(myProfileInfo.phone),
+        isCountryFlagActive: myProfileInfo && isCountryDetectedFromPhone(myProfileInfo.phone)
     }
 
     const generateCountryIconPath = (country) => {
@@ -59,10 +63,16 @@ const UpdateMyProfile = () => {
 
     const formSubmitHandler = async (values, actions) => {
         try{
-            const countryCodeForPhoneNumber = CountryCodesObject[countries[selectedCountryCode].country_iso2];
+            const matchedCountry = countries[selectedCountryCode];
+            let countryCodeForPhoneNumber = '';
+            if(matchedCountry) countryCodeForPhoneNumber = CountryCodesObject[matchedCountry.country_iso2];
             const phone = values.phone ? countryCodeForPhoneNumber + values.phone : '';
-            const formData = { ...values, phone }
+
+            delete values.isCountryFlagActive;
+
+            const formData = { ...values, phone };
             await dispatch(updateSignedInUserProfile(formData));
+
             addToast('Profile updated successfully', {
                 appearance: 'success',
                 autoDismiss: true
@@ -82,6 +92,28 @@ const UpdateMyProfile = () => {
         const filteredCountries = countries.filter(i => myProfileInfo.countries.includes(i.country_iso2))
         const codbaseDescriptions = filteredCountries.map(i => i.codbase_desc);
         return codbaseDescriptions;
+    }
+
+    const handleCountryFlagClick = (index, formikProps) => {
+        const { setFieldValue } = formikProps;
+        setFieldValue('isCountryFlagActive', true);
+        setSelectedCountryCode(index);
+    }
+
+    const handlePhoneFieldChange = (e, formikProps) => {
+        const currentPhoneValue = e.target.value;
+        const { setFieldValue } = formikProps;
+
+        const isCountryFlagActive = selectedCountryCode >= 0 && selectedCountryCode < countries.length;
+
+        if(isCountryFlagActive) {
+            setFieldValue('phone', currentPhoneValue);
+        }else{
+            const wasCountryFoundForPhoneCountryCode = getDatasyncCountryIndexFromPhone(currentPhoneValue) >= 0 ? true : false;
+            setFieldValue('phone', getPhoneNumberWithoutCountryCode(currentPhoneValue));
+            setFieldValue('isCountryFlagActive', wasCountryFoundForPhoneCountryCode);
+            activateCountryCodeFlagFromPhone(currentPhoneValue);
+        }
     }
 
     useEffect(() => {
@@ -137,19 +169,21 @@ const UpdateMyProfile = () => {
                                                         <span className="input-group-btn">
                                                             <Dropdown>
                                                                 {
-                                                                    countries.map( (country, index) => {
-                                                                        return index === selectedCountryCode ? (
-                                                                        <Dropdown.Toggle key={index} variant="" className="p-1 pt-2 px-2 pr-0 d-flex align-items-center rounded-0">
-                                                                            <img height="20" width="20" src={generateCountryIconPath(country.codbase_desc)} title={country.codbase_desc} />
-                                                                            <span className="country-phone-code pl-1">{ CountryCodesObject[country.country_iso2] }</span>
-                                                                        </Dropdown.Toggle>) : null
-                                                                    })
+                                                                    selectedCountryCode >= 0 && selectedCountryCode < countries.length
+                                                                        ? <Dropdown.Toggle  variant="" className="p-1 pt-2 px-2 pr-0 d-flex align-items-center rounded-0">
+                                                                            <img height="20" width="20" src={generateCountryIconPath(countries[selectedCountryCode].codbase_desc)} title={countries[selectedCountryCode].codbase_desc} />
+                                                                            <span className="country-phone-code pl-1">{ CountryCodesObject[countries[selectedCountryCode].country_iso2] }</span>
+                                                                            </Dropdown.Toggle>
+                                                                        : <Dropdown.Toggle variant="" className="p-1 pt-2 px-2 pr-0 d-flex align-items-center rounded-0">
+                                                                            <img height="20" width="20" src={generateCountryIconPath()} title="Unknown Country" />
+                                                                            <span className="country-phone-code pl-1">xxxx</span>
+                                                                            </Dropdown.Toggle>
                                                                 }
                                                                 <Dropdown.Menu>
                                                                     {
                                                                         countries.map( (country, index) => {
                                                                             return index === selectedCountryCode ? null :
-                                                                            (<Dropdown.Item onClick={() => setSelectedCountryCode(index)} key={index} className="px-2 d-flex align-items-center">
+                                                                            (<Dropdown.Item onClick={() => handleCountryFlagClick(index, formikProps)} key={index} className="px-2 d-flex align-items-center">
                                                                                 <img height="20" width="20" src={generateCountryIconPath(country.codbase_desc)} title={country.codbase_desc} />
                                                                                 <span className="country-name pl-2">{ country.codbase_desc }</span>
                                                                                 <span className="country-phone-code pl-1">{ CountryCodesObject[country.country_iso2] }</span>
@@ -159,7 +193,7 @@ const UpdateMyProfile = () => {
                                                                 </Dropdown.Menu>
                                                             </Dropdown>
                                                         </span>
-                                                        <Field data-testid="phone" className="form-control rounded" type="text" name="phone" />
+                                                        <Field data-testid="phone" className="form-control rounded" type="text" name="phone" onChange={(e) => handlePhoneFieldChange(e, formikProps)} />
                                                     </div>
                                                 </div>
                                             </div>
