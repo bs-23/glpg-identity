@@ -6,8 +6,6 @@ import { Route, Redirect } from "react-router-dom";
 export default function PublicRoute({ component: Component, ...rest }) {
     const [cookies] = useCookies();
 
-    
-
     if (window.location.pathname === '/swagger/login') {
         if (cookies.logged_in_swagger === 'true') {
             window.location.href = '/api-docs';
@@ -23,7 +21,7 @@ export default function PublicRoute({ component: Component, ...rest }) {
 
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
 
-    console.log('===============> may come', cookies.logged_in, 'check', loggedInUser, Component)
+    // console.log('===============> may come', cookies.logged_in, 'check', loggedInUser, Component)
 
     return (
         <Route {...rest} render={props => {

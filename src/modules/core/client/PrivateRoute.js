@@ -9,12 +9,13 @@ export default function PrivateRoute({ component: Component, module, ...rest }) 
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
     const roles = loggedInUser ? loggedInUser.roles : [];
     let permissions = [];
-    console.log('==================> here comes', cookies.logged_in, ' check', loggedInUser, Component, typeof localStorage.getItem('logged_in'));
+    
+    // console.log('==================> here comes', cookies.logged_in, ' check', loggedInUser, Component, typeof localStorage.getItem('logged_in'));
 
     roles.forEach(role => {
         const union = (a, b) => [...new Set([...a, ...b])];
         if(role.permissions) permissions = union(permissions, role.permissions);
-    })
+    });
 
     return (
         <Route {...rest} render={props => {
