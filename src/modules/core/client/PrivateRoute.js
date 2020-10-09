@@ -9,7 +9,7 @@ export default function PrivateRoute({ component: Component, module, ...rest }) 
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
     const roles = loggedInUser ? loggedInUser.roles : [];
     let permissions = [];
-    console.log('==================> here comes', cookies.logged_in, ' check', loggedInUser, Component);
+    console.log('==================> here comes', cookies.logged_in, ' check', loggedInUser, Component, typeof localStorage.getItem('logged_in'));
 
     roles.forEach(role => {
         const union = (a, b) => [...new Set([...a, ...b])];
@@ -29,7 +29,8 @@ export default function PrivateRoute({ component: Component, module, ...rest }) 
                         pathname: "/forbidden",
                         state: { from: props.location }
                     })
-                ) : ( <Redirect push to={{
+                ) : localStorage.getItem('logged_in') ? null : ( 
+                    <Redirect push to={{
                         pathname: "/login",
                         state: { from: props.location }
                     }}/>
