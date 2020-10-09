@@ -124,10 +124,13 @@ export default function hcpUsers() {
         if(Array.isArray(status)) status = 'self_verified,manually_verified';
         let orderType = params.get('orderType');
         const orderBy = params.get('orderBy');
-        const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
+        // const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
+        let page = pageNo ? pageNo : 1;
         const codbase = (codBase) ? codBase : params.get('codbase');
         if (!pageChange) {
             (orderBy === orderColumn) ? (orderType === 'asc' ? orderType = 'desc' : orderType = 'asc') : orderType = 'asc';
+            page = (params.get('page') ? params.get('page') : 1);
+
         }
         const url = `?page=${page}` + (codbase && codbase !== 'null' ? `&codbase=${codbase}` : ``) + (status && status !== 'null' ? `&status=${status}` : '') + (orderType !== 'null' && orderColumn !== 'null' && orderColumn !== null ? `&orderType=${orderType}&orderBy=${orderColumn}` : ``);
         history.push(location.pathname + url);
