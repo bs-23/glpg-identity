@@ -124,13 +124,10 @@ export default function hcpUsers() {
         if(Array.isArray(status)) status = 'self_verified,manually_verified';
         let orderType = params.get('orderType');
         const orderBy = params.get('orderBy');
-        // const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
-        let page = pageNo ? pageNo : 1;
+        const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
         const codbase = (codBase) ? codBase : params.get('codbase');
         if (!pageChange) {
             (orderBy === orderColumn) ? (orderType === 'asc' ? orderType = 'desc' : orderType = 'asc') : orderType = 'asc';
-            page = (params.get('page') ? params.get('page') : 1);
-
         }
         const url = `?page=${page}` + (codbase && codbase !== 'null' ? `&codbase=${codbase}` : ``) + (status && status !== 'null' ? `&status=${status}` : '') + (orderType !== 'null' && orderColumn !== 'null' && orderColumn !== null ? `&orderType=${orderType}&orderBy=${orderColumn}` : ``);
         history.push(location.pathname + url);
@@ -211,7 +208,7 @@ export default function hcpUsers() {
                                                     {
                                                         countries.map((item, index) => (
                                                             hcps.countries.includes(item.country_iso2) &&
-                                                            <Dropdown.Item key={index} className={hcps.countries.includes(item.country_iso2) && hcps.codbase === item.codbase ? 'd-none' : ''} onClick={() => urlChange(null, item.codbase, hcps.status, params.get('orderBy'), params.get('orderType'))}>
+                                                            <Dropdown.Item key={index} className={hcps.countries.includes(item.country_iso2) && hcps.codbase === item.codbase ? 'd-none' : ''} onClick={() => urlChange(1, item.codbase, hcps.status, params.get('orderBy'), params.get('orderType'))}>
                                                                 {
                                                                     hcps.countries.includes(item.country_iso2) ? item.codbase_desc : null
                                                                 }
@@ -228,12 +225,12 @@ export default function hcpUsers() {
                                                     {getSelectedStatus()}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
-                                                    <Dropdown.Item className={hcps.status === null ? 'd-none' : ''} onClick={() => urlChange(null, hcps.codbase, null, params.get('orderBy'), params.get('orderType'))}>All</Dropdown.Item>
-                                                    <Dropdown.Item className={isAllVerifiedStatus() ? 'd-none' : ''} onClick={() => urlChange(null, hcps.codbase, 'self_verified,manually_verified', params.get('orderBy'), params.get('orderType'))}>All Verified</Dropdown.Item>
-                                                    <Dropdown.Item className={hcps.status === 'self_verified' ? 'd-none' : ''} onClick={() => urlChange(null, hcps.codbase, 'self_verified', params.get('orderBy'), params.get('orderType'))}>Self Verified</Dropdown.Item>
-                                                    <Dropdown.Item className={hcps.status === 'manually_verified' ? 'd-none' : ''} onClick={() => urlChange(null, hcps.codbase, 'manually_verified', params.get('orderBy'), params.get('orderType'))}>Manually Verified</Dropdown.Item>
-                                                    <Dropdown.Item className={hcps.status === 'consent_pending' ? 'd-none' : ''} onClick={() => urlChange(null, hcps.codbase, 'consent_pending', params.get('orderBy'), params.get('orderType'))}>Consent Pending</Dropdown.Item>
-                                                    <Dropdown.Item className={hcps.status === 'not_verified' ? 'd-none' : ''} onClick={() => urlChange(null, hcps.codbase, 'not_verified', params.get('orderBy'), params.get('orderType'))}>Not Verified</Dropdown.Item>
+                                                    <Dropdown.Item className={hcps.status === null ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, null, params.get('orderBy'), params.get('orderType'))}>All</Dropdown.Item>
+                                                    <Dropdown.Item className={isAllVerifiedStatus() ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, 'self_verified,manually_verified', params.get('orderBy'), params.get('orderType'))}>All Verified</Dropdown.Item>
+                                                    <Dropdown.Item className={hcps.status === 'self_verified' ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, 'self_verified', params.get('orderBy'), params.get('orderType'))}>Self Verified</Dropdown.Item>
+                                                    <Dropdown.Item className={hcps.status === 'manually_verified' ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, 'manually_verified', params.get('orderBy'), params.get('orderType'))}>Manually Verified</Dropdown.Item>
+                                                    <Dropdown.Item className={hcps.status === 'consent_pending' ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, 'consent_pending', params.get('orderBy'), params.get('orderType'))}>Consent Pending</Dropdown.Item>
+                                                    <Dropdown.Item className={hcps.status === 'not_verified' ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, 'not_verified', params.get('orderBy'), params.get('orderType'))}>Not Verified</Dropdown.Item>
                                                 </Dropdown.Menu>
                                             </Dropdown>
                                         </React.Fragment>
