@@ -25,7 +25,8 @@ module.exports = {
         slug: 'jyseleca',
         email: 'jyseleca@glpg.com',
         password: 'strong-password',
-        consent_confirmation_link: 'a',
+        consent_confirmation_path: 'a',
+        journey_redirect_path: 'a',
         reset_password_link: 'a',
         login_link: 'a',
         logo_link: 'a',
@@ -37,6 +38,18 @@ module.exports = {
             email: 'hcp-portal@glpg.com',
         }, process.env.APPLICATION_TOKEN_SECRET, { expiresIn: '30d', issuer: defaultApplicationId }),
     },
+    defaultApplicationDomain : [
+        {
+            application_id: defaultApplicationId,
+            domain: 'https://wwww.example.com/',
+            country_iso2: 'be'
+        },
+        {
+            application_id: defaultApplicationId,
+            domain: 'https://wwww.example.com/',
+            country_iso2: 'nl'
+        }
+    ],
     users: {
         defaultAdmin: {
             id: defaultAdminId,
@@ -46,6 +59,7 @@ module.exports = {
             email: 'default-admin@cdp.com',
             password: faker.internet.password(8),
             updated_by: defaultAdminId,
+            countries: ['BE','AD','DE','IT','NL','ES','IE'],
             access_token: jwt.sign({ id: defaultAdminId }, process.env.CDP_TOKEN_SECRET, { expiresIn: '2d', issuer: defaultAdminId }),
         },
         defaultUser: {
@@ -78,6 +92,7 @@ module.exports = {
             specialty_onekey: 'SP.WNL.01',
             created_by: defaultAdminId,
             updated_by: defaultAdminId,
+            domain: 'http://www.example.com'
         },
         userWithValidUUID: {
             id: hcpValidUserId,
@@ -90,6 +105,7 @@ module.exports = {
             locale: 'nl_nl',
             salutation: 'Mr',
             specialty_onekey: 'SP.WNL.01',
+            domain: 'http://www.example.com',
         },
         userWithInvalidUUID: {
             id: hcpInvalidUserId,
@@ -102,6 +118,7 @@ module.exports = {
             locale: 'nl_nl',
             salutation: 'Mr',
             specialty_onekey: 'SP.WNL.01',
+            domain: 'http://www.example.com',
         }
     },
     consent: {

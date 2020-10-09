@@ -45,6 +45,11 @@ input:checked + .slider {
 input[disabled]:checked + .slider {
     background: $primary-color-lighter;
 }
+
+input[disabled]:checked + .slider {
+    background: $primary-color-lighter;
+}
+
 input[disabled] + .slider {
     background: #F4F4F5;
     cursor: default;
@@ -52,6 +57,10 @@ input[disabled] + .slider {
     &:before {
         background: #E9EBEC;
     }
+}
+
+input:focus + .slider {
+    /*box-shadow: 0 0 1px #144D43;*/
 }
 
 input:checked + .slider:before {
@@ -84,6 +93,16 @@ input:checked + .slider:before {
     border-color: $primary-color !important;
     background-color: $primary-color !important;
 }
+
+.custom-control-input[disabled]:checked ~ .custom-control-label::before {
+    border-color: $primary-color-lighter !important;
+    background-color: $primary-color-lighter !important;
+}
+
+.custom-control-input[disabled]:checked ~ .custom-control-label {
+    color: #333;
+}
+
 .custom-checkbox .custom-control-input:focus ~ .custom-control-label::before {
     box-shadow: none !important;
 }

@@ -3,8 +3,7 @@ import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import Dropdown from 'react-bootstrap/Dropdown';
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { LinkContainer } from 'react-router-bootstrap';
-import { getUsers, cdpSort } from '../user.actions';
+import { getUsers } from '../user.actions';
 
 
 const safeGet = (object, property) => {
@@ -64,19 +63,13 @@ export default function Users() {
         return userCountries;
     }
 
-    const sortCountries = (userCountries) => {
+    const sortCountries = (user_countries) => {
         let countryArr = [];
         let countryString = "";
-        if (countries.length > 0 && (userCountries.length)) {
-            if(userCountries.length > 0 && (userCountries.length)) {
-                (userCountries).map((country, key) => {
-                    const matchedCountry = countries.find(i => i.country_iso2 === country);
-                    return countryArr.push(matchedCountry).codbase_desc;
-                });
-            } else {
-                return countryString;
-            }
-
+        if (countries.length > 0 && (user_countries.length)) {
+            (user_countries).map((country, key) => (
+                countryArr.push(countries.find(i => i.country_iso2 === country)).codbase_desc)
+            );
         }
 
         countryArr.sort((a, b) => (a.codbase_desc > b.codbase_desc) ? 1 : -1);
@@ -95,13 +88,13 @@ export default function Users() {
             const userProfile = (await axios.get('/api/users/profile')).data;
             const userCountries = extractLoggedInUserCountries(userProfile);
             setCountries(response);
-            (userProfile.type === "admin") ? setUserCountries(response) : setUserCountries(fetchUserCountries(userCountries, response));
+            // (userProfile.type === "admin") ? setUserCountries(response) : setUserCountries(fetchUserCountries(userProfile.countries, response));
+            (userProfile.type === "admin") ? setUserCountries(response) : setUserCountries(userCountries);
         }
         getCountries();
     }, []);
 
     useEffect(() => {
-
         setCodBase(params.get('codbase') ? params.get('codbase') : null);
         const searchObj = {};
         const searchParams = location.search.slice(1).split("&");
@@ -109,7 +102,7 @@ export default function Users() {
             searchObj[element.split("=")[0]] = element.split("=")[1];
         });
         dispatch(getUsers(searchObj.page, searchObj.codbase, searchObj.orderBy, searchObj.orderType));
-        setSort({ type: params.get('orderType'), value: params.get('orderBy') });
+        setSort({ type: params.get('orderType') || 'asc', value: params.get('orderBy') });
     }, [location]);
 
 
@@ -121,15 +114,29 @@ export default function Users() {
         return countryList;
     }
 
-    const urlChange = (pageNo, codBase, orderColumn, pageChange = false) => {
+    const urlChange = (pageNo, country_codbase, orderColumn, pageChange = false) => {
         let orderType = params.get('orderType');
         const orderBy = params.get('orderBy');
         const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
-        const codbase = codBase ? codBase : params.get('codbase');
+        const codbase = country_codbase ? country_codbase : params.get('codbase');
+
         if (!pageChange) {
-            (orderBy === orderColumn) ? (orderType === 'asc' ? orderType = 'desc' : orderType = 'asc') : orderType = 'asc';
+            if (orderBy && !orderType) {
+                orderType = 'asc'
+            }
+
+            (orderBy === orderColumn)
+                ? (orderType === 'asc'
+                    ? orderType = 'desc'
+                    : orderType = 'asc')
+                : orderType = 'asc';
         }
-        const url = `?page=${page}` + (codbase && codbase !== 'null' ? `&codbase=${codbase}` : ``) + (orderType !== 'null' && orderColumn !== 'null' && orderColumn !== null ? `&orderType=${orderType}&orderBy=${orderColumn}` : ``);
+
+        const url = `?page=${page}`
+            + (codbase && codbase !== 'null' ? `&codbase=${codbase}` : '')
+            + (orderColumn && orderColumn !== 'null' ? `&orderBy=${orderColumn}` : '')
+            + (orderColumn && orderType && orderType !== 'null' ? `&orderType=${orderType}` : '');
+
         history.push(location.pathname + url);
     };
 
@@ -166,7 +173,9 @@ export default function Users() {
                                         <i className="icon icon-filter mr-2 mb-n1"></i> {userdata.codbase && (countries.find(i => i.codbase === userdata.codbase)) ? (countries.find(i => i.codbase === userdata.codbase)).codbase_desc : 'Filter by Country'}
                                     </Dropdown.Toggle>
                                     <Dropdown.Menu>
-                                        <Dropdown.Item onClick={() => urlChange(1, 'null', params.get('orderBy'))}>All</Dropdown.Item>
+                                        {
+                                            userdata.codbase && <Dropdown.Item onClick={() => urlChange(1, 'null', params.get('orderBy'))}>All</Dropdown.Item>
+                                        }
                                         {
                                             userCountries.length > 0 && userCountries.map((country, index) => (
                                                 country.codbase !== userdata.codbase && <Dropdown.Item key={index} onClick={() => urlChange(1, country.codbase, params.get('orderBy'))}>{country.codbase_desc}</Dropdown.Item>
@@ -205,9 +214,6 @@ export default function Users() {
                                                     <td>{row.last_name}</td>
                                                     <td>{row.email}</td>
                                                     <td className="text-capitalize">{row.status}</td>
-                                                    {/* <td>{countries.length > 0 && (row.countries.length) && (row.countries).map((country, key) => (
-                                                        <span key={key}>{(countries.find(i => i.country_iso2 === country)).codbase_desc} {key < row.countries.length - 1 ? ', ' : ''}</span>
-                                                    ))}</td> */}
                                                     <td>{sortCountries(extractUserCountries(row))}</td>
                                                     <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                     <td>{(new Date(row.expiry_date)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
@@ -218,7 +224,6 @@ export default function Users() {
                                                     </td>
                                                     <td>
                                                         <NavLink to={`/users/${row.id}`} className="btn cdp-btn-outline-primary btn-sm"><i class="icon icon-user mr-2"></i>Profile</NavLink>
-                                                        {/* <button onClick={() => onDeleteUser(row.id)} className="btn btn-outline-danger btn-sm"><i class="far fa-trash-alt mr-2"></i> Delete</button> */}
                                                     </td>
                                                 </tr>
                                             ))}

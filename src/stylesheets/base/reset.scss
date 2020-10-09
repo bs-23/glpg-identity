@@ -122,6 +122,16 @@
                 }
             }
         }
+
+        &-link {
+            &-secondary {
+                color: $secondary-color !important;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
     }
 
     &-light-bg {

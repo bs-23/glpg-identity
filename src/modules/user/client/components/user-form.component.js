@@ -16,8 +16,9 @@ export default function UserForm() {
     const [roles, setRoles] = useState([]);
     const CountryCodesObject = CountryCodes.customList('countryCode', '+{countryCallingCode}')
     const countries = useSelector(state => state.userReducer.countries);
-    const history = useHistory()
-    const { addToast } = useToasts()
+    const history = useHistory();
+    const { addToast } = useToasts();
+
 
     const generateCountryIconPath = (country) => {
         if(country) return `/assets/flag/flag-${country.toLowerCase().replace(/ /g, "-")}.svg`;
@@ -77,7 +78,7 @@ export default function UserForm() {
                                         displayName="UserForm"
                                         validationSchema={registerSchema}
                                         onSubmit={(values, actions) => {
-                                            values.country_code = CountryCodesObject[countries[selectedCountryCode].country_iso2]
+                                            values.country_code = CountryCodesObject[countries[selectedCountryCode].country_iso2];
                                             dispatch(createUser(values))
                                                 .then(res => {
                                                     actions.resetForm();

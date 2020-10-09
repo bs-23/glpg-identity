@@ -11,6 +11,17 @@ export function getSignedInUserProfile() {
     };
 }
 
+export function updateSignedInUserProfile(data) {
+    return {
+        type: Types.UPDATE_PROFILE,
+        payload: axios({
+            method: 'put',
+            url: '/api/users/profile',
+            data
+        })
+    };
+}
+
 export function login(data) {
     return {
         type: Types.LOGIN,
@@ -45,7 +56,11 @@ export function changePassword(data) {
 }
 
 export function getUsers(page = 1, codbase, orderBy, orderType) {
-    const url = `/api/users?page=${page}` + (codbase ? `&codbase=${codbase}` : '') + (orderBy !== 'null' & orderType !== 'null' ? `&orderBy=${orderBy}&orderType=${orderType}` : '');
+    const url = `/api/users?page=${page}`
+        + (codbase ? `&codbase=${codbase}` : '')
+        + (orderBy && orderBy !== 'null' ? `&orderBy=${orderBy}` : '')
+        + (orderType && orderType !== 'null' ? `&orderType=${orderType}` : '');
+
     return {
         type: Types.GET_USERS,
         payload: axios({

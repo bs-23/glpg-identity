@@ -56,6 +56,14 @@
         "heightSingle": 30
     },
     {
+        "codbase": "WIT",
+        "name": "MEF",
+        "link": "https://www.mef.gov.it/en/index.html",
+        "logo": "/assets/logo/logo-mef.svg",
+        "height": 35,
+        "heightSingle": 35
+    },
+    {
         "codbase": "WES",
         "name": "OMC",
         "link": "http://cgcom.vuds-omc.es/",
