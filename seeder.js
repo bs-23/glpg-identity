@@ -241,12 +241,12 @@ async function init() {
                 locale: 'fr_be'
             },
             {
-                rich_text: "<p>Deze website is strikt bedoeld voor geneesheren en niet voor verplegers/verpleegsters en/of het grote publiek. U verklaart uitdrukkelijk dat u een geneesheer bent in de zin van artikel 3 van de wet betreffende de uitoefening van de gezondheidszorgberoepen.</p>",
+                rich_text: "<p>Deze website is strikt bedoeld voor geneesheren en niet voor verpleegkundigen en/of het grote publiek. U verklaart uitdrukkelijk dat u een geneesheer bent in de zin van artikel 3 van de wet betreffende de uitoefening van de gezondheidszorgberoepen.</p>",
                 consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
                 locale: 'nl_be'
             },
             {
-                rich_text: "<p>U verklaart dat de ingevulde gegevens uw persoonlijke gegevens zijn en dat de informatie volledig en accuraat is. Uw gegevens mogen in geen geval gedeeld worden met derden om die derden toegang te verlenen aan huidige website. U moet Galapagos onmiddellijk op de hoogte brengen van elk bekend of vermoed niet-geautoriseerd gebruik van uw persoonlijke gegevens inzake de toegang tot deze website.</p>",
+                rich_text: "<p>U verklaart dat de ingevulde gegevens uw persoonlijke gegevens zijn en dat de informatie volledig en accuraat is. Uw gegevens mogen in geen geval gedeeld worden met derden om die derden toegang te verlenen aan huidige website. U moet Galapagos onmiddellijk op de hoogte brengen van elk bekend of vermoeden van niet-geautoriseerd gebruik van uw persoonlijke gegevens inzake de toegang tot deze website.</p>",
                 consent_id: '2b9fa7f9-2c1e-4621-a091-5e4bf539b875',
                 locale: 'nl_be'
             },
@@ -276,12 +276,12 @@ async function init() {
             {
                 consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
                 country_iso2: 'be',
-                opt_type: 'single-opt-in'
+                opt_type: 'double-opt-in'
             },
             {
                 consent_id: '2b9fa7f9-2c1e-4621-a091-5e4bf539b875',
                 country_iso2: 'be',
-                opt_type: 'double-opt-in'
+                opt_type: 'single-opt-in'
             },
             {
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
