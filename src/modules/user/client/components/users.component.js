@@ -89,7 +89,7 @@ export default function Users() {
             const userCountries = extractLoggedInUserCountries(userProfile);
             setCountries(response);
             // (userProfile.type === "admin") ? setUserCountries(response) : setUserCountries(fetchUserCountries(userProfile.countries, response));
-            (userProfile.type === "admin") ? setUserCountries(response) : setUserCountries(userCountries);
+            (userProfile.type === "admin") ? setUserCountries(response) : setUserCountries(fetchUserCountries(userCountries, response));
         }
         getCountries();
     }, []);
