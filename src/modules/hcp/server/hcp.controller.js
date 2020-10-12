@@ -261,7 +261,7 @@ async function getHcps(req, res) {
             await Promise.all(hcp['hcpConsents'].map(async hcpConsent => {
 
                 if (hcpConsent.response && hcpConsent.consent_confirmed) {
-                    const country_consent = await ConsentCountry.findOne({ where: { consent_id: hcpConsent.consent_id } });
+                    const country_consent = await ConsentCountry.findOne({ where: { consent_id: hcpConsent.consent_id, country_iso2: hcp.country_iso2 } });
                     opt_types.add(country_consent.opt_type);
                 }
             }));
