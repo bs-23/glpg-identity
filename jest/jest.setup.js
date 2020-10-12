@@ -15,6 +15,7 @@ module.exports = async function() {
     const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
     const Hcp_profile = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_profile.model'));
     const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
+    const ApplicationDomain = require(path.join(process.cwd(), 'src/modules/application/server/application-domain.model.js'));
     const ConsentCategory = require(path.join(process.cwd(), 'src/modules/consent/server/consent-category.model'));
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
     const ConsentLocale = require(path.join(process.cwd(), 'src/modules/consent/server/consent-locale.model'));
@@ -25,6 +26,7 @@ module.exports = async function() {
     require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
     require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
     require(path.join(process.cwd(), 'src/modules/core/server/password/password-history.model'));
+    require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_archives.model.js'));
     const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
     const RolePermission = require(path.join(process.cwd(), "src/modules/user/server/role/role-permission.model"));
     const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
@@ -33,17 +35,18 @@ module.exports = async function() {
     await sequelize.cdpConnector.sync();
 
     await Application.create(specHelper.defaultApplication);
+    await ApplicationDomain.bulkCreate(specHelper.defaultApplicationDomain, { returning: true, ignoreDuplicates: false });
     await User.create(specHelper.users.defaultAdmin);
     await User.create(specHelper.users.defaultUser);
     await Hcp_profile.create(specHelper.hcp.defaultUser);
     await ConsentCategory.create(specHelper.consent.demoConsentCategory);
     await Consent.create(specHelper.consent.demoConsent);
-    await ConsentLocale.create(specHelper.consent.demoConsentLocales);
-    await ConsentCountry.create(specHelper.consent.demoConsentCountry);
-    await Permission.bulkCreate(specHelper.permissions, { returning: true, ignoreDuplicates: false })
-    await Role.bulkCreate(specHelper.roles, { returning: true, ignoreDuplicates: false })
-    await RolePermission.bulkCreate(specHelper.rolePermissions, { returning: true, ignoreDuplicates: false })
-    await UserRole.bulkCreate(specHelper.userRoles.defaultAdmin, { returning: true, ignoreDuplicates: false })
-    await UserRole.bulkCreate(specHelper.userRoles.defaultUser, { returning: true, ignoreDuplicates: false })
+    await ConsentLocale.bulkCreate(specHelper.consent.demoConsentLocales, { returning: true, ignoreDuplicates: false });
+    await ConsentCountry.bulkCreate(specHelper.consent.demoConsentCountry, { returning: true, ignoreDuplicates: false });
+    await Permission.bulkCreate(specHelper.permissions, { returning: true, ignoreDuplicates: false });
+    await Role.bulkCreate(specHelper.roles, { returning: true, ignoreDuplicates: false });
+    await RolePermission.bulkCreate(specHelper.rolePermissions, { returning: true, ignoreDuplicates: false });
+    await UserRole.bulkCreate(specHelper.userRoles.defaultAdmin, { returning: true, ignoreDuplicates: false });
+    await UserRole.bulkCreate(specHelper.userRoles.defaultUser, { returning: true, ignoreDuplicates: false });
     // await Userpermission.bulkCreate(specHelper.userPermissions.defaultUser, { returning: true, ignoreDuplicates: false })
 };

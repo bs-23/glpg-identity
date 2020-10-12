@@ -1,9 +1,9 @@
 paths:
-    /api/applications/generate-token:
+    /api/applications/token:
         post:
             tags:
                 - applications
-            summary: Get access_token for accessing CDP services.
+            summary: Get Access Token Response for accessing CDP services.
             requestBody:
                 required: true
                 content:
@@ -11,13 +11,18 @@ paths:
                         schema:
                             type: object
                             properties:
-                                email:
+                                username:
                                     type: string
                                 password:
                                     type: string
+                                grant_type:
+                                    type: string
+                                refresh_token:
+                                    type: string
                             required:
-                              - email
-                              - password
+                                - username
+                                - password
+                                - grant_type
             responses:
                 200:
                     description: The request has succeeded.
@@ -26,15 +31,19 @@ paths:
                             schema:
                                 type: object
                                 properties:
-                                    id:
-                                        type: string
-                                    name:
-                                        type: string
-                                    email:
+                                    token_type:
                                         type: string
                                     access_token:
                                         type: string
-                                    retention_period:
+                                    expires_in:
                                         type: string
+                                    refresh_token:
+                                        type: string
+                400:
+                    description: The request is missing required parameters.
                 401:
                     description: Invalid email or password.
+                4400:
+                    description: The access_token is invalid or expired.
+                4401:
+                    description: The refresh_token is invalid or expired.

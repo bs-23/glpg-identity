@@ -1,0 +1,35 @@
+.my-profile {
+    &__sidebar {
+        position: sticky;
+        top: 15px;
+    }
+
+    &__menu {
+        a {
+            color: #333;
+            font-size: 16px;
+            border-left: 2px solid $white-color;
+
+            &:hover {
+                background: #F6F8FA;
+            }
+        }
+
+        &.selected {
+            a {
+                border-left: 2px solid $secondary-color;
+            }
+        }
+    }
+
+    .switch-label {
+        font-weight: normal;
+    }
+
+    @media (max-width: $screen-phone) {
+        &__sidebar {
+            position: relative;
+            top: 0px;
+        }
+    }
+}

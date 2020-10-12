@@ -13,6 +13,7 @@ async function init() {
     await sequelize.cdpConnector.query(`CREATE SCHEMA IF NOT EXISTS ${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`);
 
     const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
+    const ApplicationDomain = require(path.join(process.cwd(), 'src/modules/application/server/application-domain.model'));
     const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
     const ConsentCategory = require(path.join(process.cwd(), 'src/modules/consent/server/consent-category.model'));
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
@@ -143,31 +144,35 @@ async function init() {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
             const applications = [
                 {
+                    id: '3252888b-530a-441b-8358-3e423dbce08a',
                     name: 'HCP Portal',
                     slug: convertToSlug('HCP Portal'),
                     email: 'hcp-portal@glpg.com',
                     password: 'P@ssword123',
-                    consent_confirmation_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/consentConfirm.consent.html',
-                    reset_password_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/journeyRedirect.journey.html',
-                    login_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/journeyRedirect.journey.html',
-                    forgot_password_link: 'http://172.16.229.25:4503/bin/public/glpg-hcpportal/journeyRedirect.journey.html',
+                    consent_confirmation_path: '/bin/public/glpg-hcpportal/consentConfirm.consent.html',
+                    journey_redirect_path: '/bin/public/glpg-hcpportal/journeyRedirect.journey.html',
                     logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
                     created_by: admin.id,
                     updated_by: admin.id
                 },
                 {
+                    id: 'a7959308-7ec5-4090-94ff-2367113a454d',
                     name: 'Jyseleca',
                     slug: convertToSlug('Jyseleca'),
                     email: 'jyseleca@glpg.com',
                     password: 'P@ssword123',
-                    consent_confirmation_link: 'https://www-dev.jyseleca.nl/bin/public/glpg-brandx/consentConfirm.consent.html',
-                    reset_password_link: 'https://www-dev.jyseleca.nl/bin/public/glpg-brandx/journeyRedirect.journey.html',
-                    login_link: 'https://www-dev.jyseleca.nl/bin/public/glpg-brandx/journeyRedirect.journey.html',
-                    forgot_password_link: 'https://www-dev.jyseleca.nl/bin/public/glpg-brandx/journeyRedirect.journey.html',
+                    consent_confirmation_path: '/bin/public/glpg-brandx/consentConfirm.consent.html',
+                    journey_redirect_path: '/bin/public/glpg-brandx/journeyRedirect.journey.html',
                     logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/jyseleca/logo.png`,
                     created_by: admin.id,
                     updated_by: admin.id
                 }
+            ];
+
+            const applicationDomains = [
+                { application_id: '3252888b-530a-441b-8358-3e423dbce08a', country_iso2: 'nl', domain: 'http://172.16.229.25:4503' },
+                { application_id: 'a7959308-7ec5-4090-94ff-2367113a454d', country_iso2: 'nl', domain: 'www-dev.jyseleca.nl' },
+                { application_id: 'a7959308-7ec5-4090-94ff-2367113a454d', country_iso2: 'be', domain: 'products-dev.glpg.com' }
             ];
 
             Application.destroy({ truncate: { cascade: true } }).then(() => {
@@ -175,7 +180,12 @@ async function init() {
                     returning: true,
                     ignoreDuplicates: false
                 }).then(function () {
-                    callback();
+                    ApplicationDomain.bulkCreate(applicationDomains, {
+                        returning: true,
+                        ignoreDuplicates: false
+                    }).then(function () {
+                        callback();
+                    });
                 });
             });
         });
@@ -217,22 +227,32 @@ async function init() {
 
         const consentLocales = [
             {
-                rich_text: "<p>Je confirme que je suis un professionnel de la santé exerçant en Belgique, et j'accepte les <a href='#' target='_blank'>Conditions d'utilisation de Galapagos Belgique.</a></p>",
+                rich_text: "<p>Ce site est strictement destiné aux médecins et non aux infirmie(è)r(es) et / ou au grand public. Vous déclarez explicitement être médecin au sens de l'article 3 de la loi sur l’art de guérir.</p>",
                 consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
                 locale: 'fr_be'
             },
             {
-                rich_text: "<p>Je consens à ce que Galapagos m'envoie des informations promotionnelles et informatives concernant tous les produits et services de Galapagos à l'adresse mail que j'ai fournie. <br> <br> Pour obtenir de plus amples informations sur la manière dont nous traitons vos données à caractère personnel, veuillez vous référer à notre <a href='#' target='_blank'>Déclaration de confidentialité.</a></p>",
+                rich_text: "<p>Vous déclarez que les données saisies sont vos données personnelles et que les informations sont complètes et exactes. En aucun cas, vos données ne peuvent être partagées avec des tiers pour permettre à ces tiers d'accéder au présent site. Vous devez immédiatement informer Galapagos de toute utilisation non autorisée connue ou soupçonnée de vos informations personnelles dans le cadre de l'accès à ce site.</p>",
+                consent_id: '2b9fa7f9-2c1e-4621-a091-5e4bf539b875',
+                locale: 'fr_be'
+            },
+            {
+                rich_text: "<p>Je consens à ce que Galapagos m'envoie des informations promotionnelles et environnementales concernant tous les produits et services de Galapagos à l'adresse mail que j'ai fournie. <br> <br> Pour obtenir de plus amples informations sur la manière dont nous traitons vos données à caractère personnel, veuillez vous référer à notre <a href='#' target='_blank'>Déclaration de confidentialité</a>.</p>",
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 locale: 'fr_be'
             },
             {
-                rich_text: "<p>zorgverlener ben die in Belgie werkzaam is en ik accepteer de <a href='#' target='_blank'>Gebruiksvoorwaarden</a> van Galapagos.nl.</p>",
+                rich_text: "<p>Deze website is strikt bedoeld voor geneesheren en niet voor verpleegkundigen en/of het grote publiek. U verklaart uitdrukkelijk dat u een geneesheer bent in de zin van artikel 3 van de wet betreffende de uitoefening van de gezondheidszorgberoepen.</p>",
                 consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
                 locale: 'nl_be'
             },
             {
-                rich_text: "<p>Ik geef Galapagos toestemming om mij via mijn e-mailadres promotie- en milieu-informatie over alle Galapagos-producten en -diensten te sturen. <br> <br> Raadpleeg onze <a href='#' target='_blank'>privacyverklaring</a> voor meer informatie over hoe we met uw persoonsgegevens omgaan.</p>",
+                rich_text: "<p>U verklaart dat de ingevulde gegevens uw persoonlijke gegevens zijn en dat de informatie volledig en accuraat is. Uw gegevens mogen in geen geval gedeeld worden met derden om die derden toegang te verlenen aan huidige website. U moet Galapagos onmiddellijk op de hoogte brengen van elk bekend of vermoeden van niet-geautoriseerd gebruik van uw persoonlijke gegevens inzake de toegang tot deze website.</p>",
+                consent_id: '2b9fa7f9-2c1e-4621-a091-5e4bf539b875',
+                locale: 'nl_be'
+            },
+            {
+                rich_text: "<p>Ik ontvang graag informatieve en promotionele communicatie via e-mail over de producten, diensten en andere ontwikkelingen van Galapagos. <br> <br> Raadpleeg onze <a href='https://www.glpg.com/nederland/privacyverklaring' target='_blank'>privacyverklaring</a> voor meer informatie over hoe we met uw persoonsgegevens omgaan.</p>",
                 consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                 locale: 'nl_be'
             },
@@ -256,6 +276,11 @@ async function init() {
         const consentCountries = [
             {
                 consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
+                country_iso2: 'be',
+                opt_type: 'double-opt-in'
+            },
+            {
+                consent_id: '2b9fa7f9-2c1e-4621-a091-5e4bf539b875',
                 country_iso2: 'be',
                 opt_type: 'single-opt-in'
             },

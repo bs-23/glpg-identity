@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Switch, Route } from "react-router-dom";
 import { useCookies } from 'react-cookie';
+import { ToastProvider} from 'react-toast-notifications';
 
 import "bootstrap/scss/bootstrap";
 import "@fortawesome/fontawesome-free/css/all.css";
@@ -20,7 +21,7 @@ import HcpRoutes from "../../hcp/client/hcp.routes";
 import ConsentRoutes from "../../consent/client/consent.routes";
 import ForgotPassword from '../../user/client/components/forgot-password.component';
 import ResetPasswordForm from '../../user/client/components/reset-password.component';
-import { ToastProvider} from 'react-toast-notifications';
+import SwaggerLogin from '../../../config/server/lib/swagger/swagger-login.component';
 
 let refCount = 0;
 
@@ -64,6 +65,8 @@ export default function App() {
     return (
         <ToastProvider placement="top-center" autoDismissTimeout={2500} >
             <Switch>
+
+                <PublicRoute path="/swagger" component={SwaggerLogin} />
 
                 <PublicRoute path="/login" component={Login} />
 

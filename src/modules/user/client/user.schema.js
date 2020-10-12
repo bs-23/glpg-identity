@@ -19,8 +19,8 @@ function validatePassword(password) {
 
 function hasValidCharacters(password) {
     var pattern = new RegExp("^[a-zA-Z0-9!\"#$%&'\(\)\*\+,\-\.\\\\/:;<=>\?@\[\\]\^_`\{\|\}\~]*$");
-    const hasValidCharacters = pattern.test(password);
-    return hasValidCharacters;
+    const containsValidCharacters = pattern.test(password);
+    return containsValidCharacters;
 }
 
 // const validatePhone = phone => {
@@ -112,3 +112,30 @@ export const roleSchema = object().shape({
             .min(1, 'Must select at least one permission')
             .required('Must select at least one permission')
 });
+
+export const updateMyProfileSchema = object().shape({
+    first_name: string()
+        .matches(XRegExp('^[\\pL]+(?:\\s[\\pL]+)*$'), 'This field only contains letters')
+        .min(2, 'This field must be at least 2 characters long.')
+        .max(20, 'This field must be at most 20 characters long.')
+        .required('This field must not be empty.'),
+    last_name: string()
+        .matches(XRegExp('^[\\pL]+(?:\\s[\\pL]+)*$'), 'This field only contains letters')
+        // .matches(XRegExp('^\\pL+$'), 'This field only contains letters')
+        .min(2, 'This field must be at least 2 characters long.')
+        .max(20, 'This field must be at most 20 characters long.')
+        .required('This field must not be empty.'),
+    email: string()
+        .email('This field should be a valid email address.')
+        .required('This field must not be empty.'),
+    phone: string().when('isCountryFlagActive', {
+        is: true,
+        then: string().matches(/^[0-9]*$/, 'This field only contains digits.')
+            .min(4, 'This field must be at least 4 characters long.')
+            .max(15, 'This field must be at most 15 characters long.'),
+        otherwise: string().matches(/^[+0-9]*$/, 'This field only contains digits or plus.')
+            .min(7, 'This field must be at least 7 characters long.')
+            .max(19, 'This field must be at most 19 characters long.'),
+    })
+
+})

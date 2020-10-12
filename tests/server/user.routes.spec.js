@@ -16,6 +16,8 @@ let fakeAxios;
 let siteVerifyResponse;
 const recaptchaResponse = faker.random.uuid();
 
+jest.setTimeout(20000);
+
 beforeAll(async () => {
     const config = require(path.join(process.cwd(), 'src/config/server/config'));
     await config.initEnvironmentVariables();
@@ -146,27 +148,6 @@ describe('User Routes', () => {
         const response = await request
             .get('/api/users')
             .set('Cookie', [`access_token=${defaultAdmin.access_token}`]);
-
-        expect(response.statusCode).toBe(200);
-    });
-
-    it('Should delete an user', async () => {
-        const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
-
-        const id = faker.random.uuid();
-
-        await User.create({
-            id,
-            first_name: faker.name.firstName(),
-            last_name: faker.name.lastName(),
-            email: faker.internet.email(),
-            password: faker.internet.password(8),
-            application_id: specHelper.defaultApplication.id,
-        });
-
-        const response = await request
-            .delete(`/api/users/${id}`)
-            .set('Cookie', [`access_token=${defaultUser.access_token}`]);
 
         expect(response.statusCode).toBe(200);
     });

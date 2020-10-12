@@ -126,7 +126,6 @@ describe('Hcp user component', () => {
         const tbody = await waitFor(() => container.querySelector('tbody'));
         const rows = tbody.childNodes;
         const first_row = rows[0];
-        // console.log('Something: ', first_row.childNodes[8].childNodes[0])
         const actionBtn = first_row.lastChild.childNodes[0].childNodes[0].childNodes[0];
         // actionBtn.setAttribute("aria-expanded", true);
         fireEvent.click(actionBtn);

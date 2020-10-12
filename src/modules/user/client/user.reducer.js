@@ -48,6 +48,12 @@ export default function reducer(state = initialState, action) {
                 loggedInUser: action.payload.data
             };
         }
+        case Types.UPDATE_PROFILE_FULFILLED: {
+            return {
+                ...state,
+                loggedInUser: action.payload.data
+            };
+        }
         case Types.GET_USERS_FULFILLED: {
             return {
                 ...state,
