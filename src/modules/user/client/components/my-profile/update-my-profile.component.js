@@ -84,6 +84,9 @@ const UpdateMyProfile = () => {
                 autoDismiss: true
             });
         }
+        finally{
+            actions.resetForm();
+        }
         actions.setSubmitting(false);
     }
 
