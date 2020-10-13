@@ -35,8 +35,9 @@ export default function Login() {
                                     validationSchema={loginSchema}
                                     onSubmit={(values, actions) => {
                                         dispatch(login({
-                                            email: values.email,
+                                            username: values.email,
                                             password: values.password,
+                                            grant_type: 'password',
                                             recaptchaToken: values.recaptchaToken
                                         }))
                                         .then( response => {

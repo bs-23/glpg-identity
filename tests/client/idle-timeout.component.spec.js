@@ -8,7 +8,7 @@ import { BrowserRouter } from 'react-router-dom';
 import MockAdapter from 'axios-mock-adapter'
 import { ToastProvider } from 'react-toast-notifications';
 import store from '../../src/modules/core/client/store.js';
-import IdleTimeout from '../../src/modules/core/client/components/idle-timeout.modal.component';
+import IdleTimeout from '../../src/modules/core/client/components/idle-timeout.component';
 import { act } from 'react-dom/test-utils';
 import { screen } from '@testing-library/dom'
 import { login } from '../../src/modules/user/client/user.actions';
@@ -19,7 +19,7 @@ describe('Idle time out component', () => {
     let mockAxios;
     let savedUser;
 
-    beforeEach( async () => {        
+    beforeEach( async () => {
         mockAxios = new MockAdapter(axios);
 
         savedUser = { name: 'a', email: 'test@gmail.com'};
@@ -55,7 +55,7 @@ describe('Idle time out component', () => {
 
     it('should check text contents of the modal', async () => {
         render(wrapperComponent());
-        
+
         const logout = screen.getByText('Logout');
         expect(logout).toBeTruthy();
         expect(logout.textContent).toEqual('Logout');
@@ -69,6 +69,6 @@ describe('Idle time out component', () => {
 
         await waitFor(() => {
             fireEvent.click(StayLoggedIn);
-        }); 
+        });
     });
 });
