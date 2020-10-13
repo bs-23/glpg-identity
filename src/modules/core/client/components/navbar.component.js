@@ -22,7 +22,7 @@ export default function Navbar() {
         setCookie('logged_in', '', { path: '/' });
         removeCookie('logged_in');
 
-        localStorage.removeItem('logged_in');
+        // localStorage.removeItem('logged_in');
     }
 
     const addFallbackIcon = (e) => {

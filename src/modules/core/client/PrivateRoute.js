@@ -38,7 +38,7 @@ export default function PrivateRoute({ component: Component, module, ...rest }) 
                         pathname: "/forbidden",
                         state: { from: props.location }
                     })
-                ) : localStorage.getItem('logged_in') ? null : ( 
+                ) : cookies.logged_in ? null : ( 
                     <Redirect push to={{
                         pathname: "/login",
                         state: { from: props.location }
