@@ -17,12 +17,21 @@ const PasswordPolicies = require(path.join(process.cwd(), "src/modules/core/serv
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const { QueryTypes, Op, where, col, fn } = require('sequelize');
 
-function generateAccessToken(user) {
+function generateAccessToken(doc) {
     return jwt.sign({
-        id: user.id
+        id: doc.id
     }, nodecache.getValue('CDP_TOKEN_SECRET'), {
+        expiresIn: '1h',
+        issuer: doc.id.toString()
+    });
+}
+
+function generateRefreshToken(doc) {
+    return jwt.sign({
+        id: doc.id,
+    }, nodecache.getValue('CDP_REFRESH_SECRET'), {
         expiresIn: '1d',
-        issuer: user.id.toString()
+        issuer: doc.id.toString()
     });
 }
 
@@ -119,73 +128,93 @@ async function getSignedInUserProfile(req, res) {
 
 async function login(req, res) {
     try {
-        const { email, password, recaptchaToken } = req.body;
+        let user;
+        const { username, password, recaptchaToken, grant_type, refresh_token } = req.body;
 
-        if (!recaptchaToken) {
-            return res.status(400).send('Captcha verification required.');
+        if(!grant_type) return res.status(400).send('Invalid grant_type.');
+
+        if(grant_type && grant_type !== 'password' && grant_type !== 'refresh_token') {
+            return res.status(400).send('The requested grant_type is not supported.')
         }
 
-        const user = await User.findOne({
-            where: {
-                email: {
-                    [Op.iLike]: `${email}`
-                }
-            },
-            include: [{
-                model: UserRole,
-                as: 'userrole',
-                include: [{
-                    model: Role,
-                    as: 'role',
-                    include: [{
-                        model: RolePermission,
-                        as: 'rolePermission',
-                        include: [{
-                            model: Permission,
-                            as: 'permission',
-                        }]
+        if(grant_type === 'password') {
+            if(!username || !password || !recaptchaToken) return res.status(400).send('Invalid credentials.');
 
-                    }]
-                }]
-            }]
-        });
+            const isSiteVerified = await verifySite(recaptchaToken);
 
-        const userLockedMessage = 'Your account has been locked for consecutive failed auth attempts. Please use the Forgot Password link to unlock.';
-
-        if (user && user.status === 'inactive') return res.status(401).send('Account not active.');
-
-        if (user && user.dataValues.failed_auth_attempt >= 5) {
-            return res.status(401).send(userLockedMessage);
-        }
-
-        if (user && user.password_expiry_date && user.password_expiry_date < Date.now()) {
-            return res.status(401).send("Password has been expired. Please reset the password.");
-        }
-
-        if (!user || !user.password || !user.validPassword(password)) {
-            if (user && user.password) {
-                await user.update(
-                    { failed_auth_attempt: parseInt(user.dataValues.failed_auth_attempt ? user.dataValues.failed_auth_attempt : '0') + 1 }
-                );
+            if (!isSiteVerified) {
+                return res.status(400).send('Failed captcha verification.');
             }
 
-            const errorMessage = user && user.dataValues.failed_auth_attempt >= 5
-                ? userLockedMessage
-                : 'Invalid email or password.';
+            user = await User.findOne({
+                where: {
+                    email: {
+                        [Op.iLike]: `${username}`
+                    }
+                },
+                include: [{
+                    model: UserRole,
+                    as: 'userrole',
+                    include: [{
+                        model: Role,
+                        as: 'role',
+                        include: [{
+                            model: RolePermission,
+                            as: 'rolePermission',
+                            include: [{
+                                model: Permission,
+                                as: 'permission'
+                            }]
+                        }]
+                    }]
+                }]
+            });
 
-            return res.status(401).send(errorMessage);
+            const userLockedMessage = 'Your account has been locked for consecutive failed auth attempts. Please use the Forgot Password link to unlock.';
+
+            if (!user || !user.validPassword(password)) {
+                if (user) {
+                    await user.update({ failed_auth_attempt: user.dataValues.failed_auth_attempt + 1 });
+                }
+
+                const errorMessage = user && user.dataValues.failed_auth_attempt >= 5
+                    ? userLockedMessage
+                    : 'Invalid username or password.';
+
+                return res.status(401).send(errorMessage);
+            }
+
+            if (user && user.status === 'inactive') return res.status(401).send('Account not active.');
+
+            if (user && user.dataValues.failed_auth_attempt >= 5) {
+                return res.status(401).send(userLockedMessage);
+            }
+
+            if (user && user.password_expiry_date && user.password_expiry_date < Date.now()) {
+                return res.status(401).send('Password has been expired. Please reset the password.');
+            }
+
+            await user.update({ refresh_token: generateRefreshToken(user) });
         }
 
-        const isSiteVerified = await verifySite(recaptchaToken);
+        if(grant_type === 'refresh_token') {
+            if(!refresh_token) return res.status(401).send('The refresh token is invalid or expired.');
 
-        if (!isSiteVerified) {
-            return res.status(400).send('Failed captcha verification.');
+            try {
+                const decoded = jwt.verify(refresh_token, nodecache.getValue('REFRESH_SECRET'));
+                user = await User.findOne({ where: { id: decoded.id }});
+
+                if(user.refresh_token !== refresh_token) {
+                    return res.status(401).send('The refresh token is invalid or expired.');
+                }
+            } catch(err) {
+                console.log(err);
+                return res.status(401).send('The refresh token is invalid or expired.');
+            }
         }
 
-        res.cookie('access_token', generateAccessToken(user), {
-            expires: new Date(Date.now() + 8.64e7),
-            httpOnly: true
-        });
+        res.cookie('access_token', generateAccessToken(user), { httpOnly: true, sameSite: true, signed: true });
+        res.cookie('refresh_token', user.refresh_token, { httpOnly: true, sameSite: true, signed: true });
 
         await user.update({
             last_login: Date(),
@@ -202,7 +231,8 @@ async function login(req, res) {
 }
 
 async function logout(req, res) {
-    res.clearCookie('access_token').redirect('/');
+    res.clearCookie('access_token');
+    res.clearCookie('refresh_token').redirect('/');
 }
 
 async function createUser(req, res) {
