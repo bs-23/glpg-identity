@@ -21,7 +21,14 @@ export default function PublicRoute({ component: Component, ...rest }) {
 
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
 
-    // console.log('===============> may come', cookies.logged_in, 'check', loggedInUser, Component)
+    // const obj = {
+    //     cookie: cookies.logged_in,
+    //     loggedInUser,
+    //     local_storage: localStorage.getItem('logged_in'),
+    //     Component
+    // }
+    // console.log('==================> may come here', obj);
+    // alert('ok2')
 
     return (
         <Route {...rest} render={props => {
