@@ -42,7 +42,6 @@ export default function Login() {
                                         }))
                                         .then( response => {
                                             setCookie('logged_in', true, { path: '/' });
-                                            // localStorage.setItem("logged_in", true);
                                         })
                                         .catch(error => {
                                             addToast(error.response.data, {

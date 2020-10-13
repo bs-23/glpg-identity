@@ -21,8 +21,6 @@ export default function Navbar() {
         // alert('clicked auto');
         setCookie('logged_in', '', { path: '/' });
         removeCookie('logged_in');
-
-        // localStorage.removeItem('logged_in');
     }
 
     const addFallbackIcon = (e) => {
