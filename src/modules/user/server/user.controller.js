@@ -140,12 +140,6 @@ async function login(req, res) {
         if(grant_type === 'password') {
             if(!username || !password || !recaptchaToken) return res.status(400).send('Invalid credentials.');
 
-            const isSiteVerified = await verifySite(recaptchaToken);
-
-            if (!isSiteVerified) {
-                return res.status(400).send('Failed captcha verification.');
-            }
-
             user = await User.findOne({
                 where: {
                     email: {
@@ -192,6 +186,12 @@ async function login(req, res) {
 
             if (user && user.password_expiry_date && user.password_expiry_date < Date.now()) {
                 return res.status(401).send('Password has been expired. Please reset the password.');
+            }
+
+            const isSiteVerified = await verifySite(recaptchaToken);
+
+            if (!isSiteVerified) {
+                return res.status(400).send('Failed captcha verification.');
             }
 
             await user.update({ refresh_token: generateRefreshToken(user) });

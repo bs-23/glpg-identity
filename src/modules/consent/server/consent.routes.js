@@ -21,4 +21,7 @@ module.exports = app => {
 
     app.route('/api/consents/:id')
         .get(CDPAuthStrategy, controller.getUserConsents);
+
+    app.route('/api/cdp-consents')
+        .get(CDPAuthStrategy, controller.getCdpConsents);
 };

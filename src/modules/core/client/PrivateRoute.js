@@ -15,15 +15,6 @@ export default function PrivateRoute({ component: Component, module, ...rest }) 
         const union = (a, b) => [...new Set([...a, ...b])];
         if(role.permissions) permissions = union(permissions, role.permissions);
     });
-    
-    // const obj = {
-    //     cookie: cookies.logged_in,
-    //     loggedInUser,
-    //     local_storage: localStorage.getItem('logged_in'),
-    //     Component
-    // }
-    // console.log('==================> here comes', obj);
-    // alert('ok1')
 
     return (
         <Route {...rest} render={props => {
@@ -38,7 +29,7 @@ export default function PrivateRoute({ component: Component, module, ...rest }) 
                         pathname: "/forbidden",
                         state: { from: props.location }
                     })
-                ) : localStorage.getItem('logged_in') ? null : ( 
+                ) : cookies.logged_in ? null : ( 
                     <Redirect push to={{
                         pathname: "/login",
                         state: { from: props.location }
