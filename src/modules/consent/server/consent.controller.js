@@ -518,7 +518,54 @@ async function getCdpConsents(req, res) {
 
 async function createConsent(req, res) {
     try {
+        const { category_id, title, legal_basis, is_active, preference, translations } = req.body;
 
+        if (!category_id || !title || !legal_basis) {
+            return res.status(400).send('Invalid request.');
+        }
+
+        const [consent, created] = await Consent.findOrCreate({
+            where: {
+                title
+            },
+            defaults: {
+                category_id,
+                title,
+                slug: title,
+                legal_basis,
+                is_active,
+                preference
+            },
+            attributes: { exclude: ['created_at', 'updated_at'] }
+        });
+
+        if (!created && consent) {
+            return res.status(400).send('Consent already exists.');
+        }
+
+        if (translations && created) {
+            await Promise.all(translations
+                .filter(translation => translation.locale && translation.rich_text)
+                .map(async (translation) => {
+                    const [consentTransation, translationCreated] = await ConsentLanguage.findOrCreate({
+                        where: {
+                            consent_id: consent.id,
+                            locale: translation.locale
+                        },
+                        defaults: {
+                            ...translation,
+                            consent_id: consent.id
+                        }
+                    });
+                })
+            );
+        }
+
+        const data = { ...consent.dataValues };
+        delete data.updated_at;
+        delete data.created_at;
+
+        res.json(data);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -568,4 +615,5 @@ exports.getAllOptTypes = getAllOptTypes;
 exports.getUserConsents = getUserConsents;
 exports.getConsentCatogories = getConsentCatogories;
 exports.getCdpConsents = getCdpConsents;
+exports.createConsent = createConsent;
 exports.assignConsentToCountry = assignConsentToCountry;
