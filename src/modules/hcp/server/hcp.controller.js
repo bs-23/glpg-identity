@@ -99,11 +99,15 @@ async function generateEmailOptions(emailType, application, user) {
     };
 }
 
-async function sendConsentConfirmationMail(user, consents, application) {
+async function sendConsentConfirmationMail(user, application) {
+    const mailOptions = await generateEmailOptions('consent-confirmation', application, user);
+    await emailService.send(mailOptions);
+}
+
+async function sendDoubleOptInConsentConfirmationMail(user, application) {
     const consentConfirmationToken = generateConsentConfirmationAccessToken(user);
 
     const mailOptions = await generateEmailOptions('double-opt-in-consent-confirm', application, user);
-    mailOptions.data.consents = consents || [];
     mailOptions.data.link = `${mailOptions.domain}${application.consent_confirmation_path}?token=${consentConfirmationToken}&journey=consent_confirmation&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
@@ -538,14 +542,12 @@ async function createHcpProfile(req, res) {
         }
 
         if (hcpUser.dataValues.status === 'consent_pending') {
-            const unconfirmedConsents = consentArr.filter(consent => !consent.consent_confirmed);
-            const consentTitles = unconfirmedConsents.map(consent => validator.unescape(consent.title));
-
-            await sendConsentConfirmationMail(hcpUser.dataValues, consentTitles, req.user);
+            await sendDoubleOptInConsentConfirmationMail(hcpUser.dataValues, req.user);
         }
 
         if (hcpUser.dataValues.status === 'self_verified') {
             await addPasswordResetTokenToUser(hcpUser);
+            await sendConsentConfirmationMail(hcpUser.dataValues, req.user);
 
             response.data.password_reset_token = hcpUser.dataValues.reset_password_token;
             response.data.retention_period = '1 hour';
@@ -625,7 +627,6 @@ async function approveHCPUser(req, res) {
         let userConsents = await HcpConsents.findAll({ where: { [Op.and]: [{ user_id: id }, { consent_confirmed: false }] } });
 
         let hasDoubleOptIn = false;
-        const consentTitles = [];
 
         if (userConsents && userConsents.length) {
             const consentIds = userConsents.map(consent => consent.consent_id)
@@ -638,7 +639,6 @@ async function approveHCPUser(req, res) {
 
             if (allConsentDetails && allConsentDetails.length) {
                 hasDoubleOptIn = true;
-                allConsentDetails.forEach(consent => consentTitles.push(validator.unescape(consent.rich_text)));
             }
         }
 
@@ -646,7 +646,7 @@ async function approveHCPUser(req, res) {
         await hcpUser.save();
 
         if (hcpUser.dataValues.status === 'consent_pending') {
-            await sendConsentConfirmationMail(hcpUser, consentTitles, userApplication);
+            await sendDoubleOptInConsentConfirmationMail(hcpUser, userApplication);
         }
 
         if (hcpUser.dataValues.status === 'manually_verified') {
