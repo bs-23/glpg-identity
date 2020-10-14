@@ -1,10 +1,11 @@
-const passport = require('passport');
+const path = require("path");
 const controller = require('./country.controller');
+const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.middleware'));
 
 module.exports = app => {
     app.route('/api/countries')
-        .get(passport.authenticate('user-jwt', { session: false }), controller.getCountries);
-    
+        .get(CDPAuthStrategy, controller.getCountries);
+
     app.route('/api/all_countries')
-        .get(passport.authenticate('user-jwt', { session: false }), controller.getAllCountries);
+        .get(CDPAuthStrategy, controller.getAllCountries);
 };

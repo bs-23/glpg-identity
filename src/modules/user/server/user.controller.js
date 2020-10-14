@@ -762,3 +762,4 @@ exports.sendPasswordResetLink = sendPasswordResetLink;
 exports.resetPassword = resetPassword;
 exports.partialUpdateUser = partialUpdateUser;
 exports.updateSignedInUserProfile = updateSignedInUserProfile;
+exports.generateAccessToken = generateAccessToken;

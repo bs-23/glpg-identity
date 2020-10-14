@@ -52,6 +52,21 @@ axios.interceptors.response.use(response => {
     return Promise.reject(error);
 });
 
+axios.interceptors.response.use(
+    response => response,
+    error => {
+        const currentPage = window.location.pathname;
+
+        if (error.response.status === 401 && currentPage !== '/login') {
+            localStorage.removeItem('logged_in');
+            window.location = "/login";
+            return Promise.reject();
+        }
+
+        return Promise.reject(error);
+    }
+);
+
 export default function App() {
     const dispatch = useDispatch();
     const [, , removeCookie] = useCookies();

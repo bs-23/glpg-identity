@@ -1,14 +1,16 @@
 const passport = require('passport');
+const path = require('path');
 const controller = require('./hcp.controller');
 const { Modules } = require('../../core/server/authorization/authorization.constants');
 const { ModuleGuard } = require('../../core/server/authorization/authorization.middleware');
+const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.middleware'));
 
 module.exports = app => {
     app.route('/api/hcps')
-        .get(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.INFORMATION.value), controller.getHcps);
+        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getHcps);
 
     app.route('/api/hcps/:id')
-        .put(passport.authenticate('user-jwt', { session: false }), controller.editHcp);
+        .put(CDPAuthStrategy, controller.editHcp);
 
     app.route('/api/hcp-profiles/registration-lookup')
         .post(passport.authenticate('application-jwt', { session: false }), controller.registrationLookup);
@@ -35,13 +37,13 @@ module.exports = app => {
         .get(passport.authenticate('application-jwt', { session: false }), controller.getSpecialties);
 
     app.route('/api/hcp-profiles/:id/approve')
-        .put(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.INFORMATION.value), controller.approveHCPUser);
+        .put(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.approveHCPUser);
 
     app.route('/api/hcp-profiles/:id/reject')
-        .put(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.INFORMATION.value), controller.rejectHCPUser);
+        .put(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.rejectHCPUser);
 
     app.route('/api/hcp-profiles/:id/consents')
-        .get(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.INFORMATION.value), controller.getHCPUserConsents);
+        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getHCPUserConsents);
 
     app.route('/api/hcp-profiles/:id')
         .get(passport.authenticate('application-jwt', { session: false }), controller.getHcpProfile)
