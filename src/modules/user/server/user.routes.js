@@ -1,7 +1,8 @@
 const path = require("path");
 const controller = require('./user.controller');
 const { Modules } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
-const { ModuleGuard, CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.middleware'));
+const { ModuleGuard } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.middleware'));
+const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/user/server/user-authentication.middleware.js'));
 
 module.exports = app => {
     app.post('/api/login', controller.login);
