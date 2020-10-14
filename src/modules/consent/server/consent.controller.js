@@ -469,6 +469,18 @@ async function getUserConsents(req, res) {
     }
 }
 
+async function getConsentCatogories(req, res) {
+    try {
+        const consentCategories = await ConsentCategory.findAll({
+            attributes: { exclude: ['created_at', 'updated_at'] }
+        });
+        res.json(consentCategories);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 async function getCdpConsents(req, res) {
     try {
         let { translations, category } = req.query;
@@ -498,6 +510,15 @@ async function getCdpConsents(req, res) {
         }));
 
         res.json(consents);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function createConsent(req, res) {
+    try {
+
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -545,5 +566,6 @@ exports.getDatasyncConsentsReport = getDatasyncConsentsReport;
 exports.getAllProcessActivities = getAllProcessActivities;
 exports.getAllOptTypes = getAllOptTypes;
 exports.getUserConsents = getUserConsents;
+exports.getConsentCatogories = getConsentCatogories;
 exports.getCdpConsents = getCdpConsents;
 exports.assignConsentToCountry = assignConsentToCountry;
