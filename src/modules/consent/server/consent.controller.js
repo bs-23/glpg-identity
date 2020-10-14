@@ -508,6 +508,10 @@ async function assignConsentToCountry(req, res) {
     try {
         const { consent_id, country_iso2, opt_type } = req.body;
 
+        if (!consent_id || !country_iso2 || !opt_type) {
+            return res.status(400).send('Invalid request.');
+        }
+
         const [countryConsent, created] = await ConsentCountry.findOrCreate({
             where: {
                 consent_id,
@@ -529,7 +533,6 @@ async function assignConsentToCountry(req, res) {
         }
 
         res.json(countryConsent);
-
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
