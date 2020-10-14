@@ -414,9 +414,9 @@ components:
                     type: string
                 status:
                     type: string
-                telephone
+                telephone:
                     type: string
-                birthdate
+                birthdate:
                     type: string
         resetHcpPassword:
             type: object
