@@ -504,33 +504,31 @@ async function getCdpConsents(req, res) {
     }
 }
 
-async function consentCountryManagement(req, res) {
+async function assignConsentToCountry(req, res) {
     try {
         const { consent_id, country_iso2, opt_type } = req.body;
 
-        const consent = ConsentCountry.findOne({
+        const [countryConsent, created] = await ConsentCountry.findOrCreate({
             where: {
-                consent_id: consent_id,
-                country_iso2: country_iso2,
-                opt_type: opt_type
+                consent_id,
+                country_iso2
+            },
+            defaults: {
+                consent_id,
+                country_iso2,
+                opt_type
             }
         });
 
-        if (consent) {
-            return res.status(404).send("Already exists");
+        if (!created && countryConsent) {
+            await countryConsent.update({
+                consent_id,
+                country_iso2,
+                opt_type
+            });
         }
 
-        const [doc, created] = await ConsentCountry.upsert({
-            consent_id,
-            country_iso2,
-            opt_type
-        });
-
-        if (!created) {
-            return res.status(404).send("");
-        }
-
-        res.json(doc);
+        res.json(countryConsent);
 
     } catch (err) {
         console.error(err);
@@ -545,4 +543,4 @@ exports.getAllProcessActivities = getAllProcessActivities;
 exports.getAllOptTypes = getAllOptTypes;
 exports.getUserConsents = getUserConsents;
 exports.getCdpConsents = getCdpConsents;
-exports.consentCountryManagement = consentCountryManagement;
+exports.assignConsentToCountry = assignConsentToCountry;

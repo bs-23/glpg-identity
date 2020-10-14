@@ -24,5 +24,5 @@ module.exports = app => {
         .get(passport.authenticate('user-jwt', { session: false }), controller.getCdpConsents);
 
     app.route('/api/consent/country')
-        .post(passport.authenticate('user-jwt', { session: false }), controller.consentCountryManagement);
+        .post(passport.authenticate('user-jwt', { session: false }), controller.assignConsentToCountry);
 };
