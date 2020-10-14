@@ -204,7 +204,8 @@ async function init() {
                 slug: '',
                 category_id: '59953d51-2449-4b65-950f-9f88654019bb',
                 legal_basis: 'consent',
-                preference: 'Galapagos Terms of Use'
+                preference: 'Galapagos Terms of Use',
+                is_active: true
             },
             {
                 id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
@@ -212,7 +213,8 @@ async function init() {
                 slug: '',
                 category_id: 'fe037405-c676-4d98-bd05-85008900c838',
                 legal_basis: 'consent',
-                preference: 'Promotional email marketing'
+                preference: 'Promotional email marketing',
+                is_active: true
             },
             {
                 id: '2b9fa7f9-2c1e-4621-a091-5e4bf539b875',
@@ -220,7 +222,8 @@ async function init() {
                 slug: '',
                 category_id: '59953d51-2449-4b65-950f-9f88654019bb',
                 legal_basis: 'consent',
-                preference: ''
+                preference: '',
+                is_active: true
             }
         ];
 

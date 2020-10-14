@@ -41,6 +41,10 @@ const Consent = sequelize.cdpConnector.define('consents', {
         type: DataTypes.ENUM,
         values: ['consent', 'contract'],
     },
+    is_active: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
     preference: {
         type: DataTypes.STRING
     }
