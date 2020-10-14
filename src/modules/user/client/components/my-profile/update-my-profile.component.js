@@ -92,7 +92,7 @@ const UpdateMyProfile = () => {
 
     const getCodbaseDescriptionsFromISOCodes = (countryISOCodes) => {
         if(!countryISOCodes) return [];
-        const filteredCountries = countries.filter(i => myProfileInfo.countries.includes(i.country_iso2))
+        const filteredCountries = countries.filter(i => countryISOCodes.includes(i.country_iso2))
         const codbaseDescriptions = filteredCountries.map(i => i.codbase_desc);
         return codbaseDescriptions;
     }

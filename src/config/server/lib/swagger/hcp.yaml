@@ -414,6 +414,10 @@ components:
                     type: string
                 status:
                     type: string
+                telephone:
+                    type: string
+                birthdate:
+                    type: string
         resetHcpPassword:
             type: object
             properties:

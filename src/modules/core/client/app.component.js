@@ -22,6 +22,7 @@ import ConsentRoutes from "../../consent/client/consent.routes";
 import ForgotPassword from '../../user/client/components/forgot-password.component';
 import ResetPasswordForm from '../../user/client/components/reset-password.component';
 import SwaggerLogin from '../../../config/server/lib/swagger/swagger-login.component';
+import store from './store';
 
 let refCount = 0;
 
@@ -51,6 +52,20 @@ axios.interceptors.response.use(response => {
     setLoading(false);
     return Promise.reject(error);
 });
+
+axios.interceptors.response.use(
+    response => response,
+    error => {
+        const loggedInUser = store.getState().userReducer.loggedInUser;
+
+        if (error.response.status === 401 && loggedInUser) {
+            localStorage.removeItem('logged_in');
+            window.location = "/login";
+        }
+
+        return Promise.reject(error);
+    }
+);
 
 export default function App() {
     const dispatch = useDispatch();
