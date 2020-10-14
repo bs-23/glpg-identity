@@ -201,7 +201,7 @@ async function login(req, res) {
             if(!refresh_token) return res.status(401).send('The refresh token is invalid or expired.');
 
             try {
-                const decoded = jwt.verify(refresh_token, nodecache.getValue('REFRESH_SECRET'));
+                const decoded = jwt.verify(refresh_token, nodecache.getValue('CDP_REFRESH_SECRET'));
                 user = await User.findOne({ where: { id: decoded.id }});
 
                 if(user.refresh_token !== refresh_token) {
