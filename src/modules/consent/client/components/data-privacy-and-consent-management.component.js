@@ -26,7 +26,7 @@ const ConsentManagement = () => {
                             <div className="row">
                                 <div className="col-12">
                                     <div className="list-group cdp-list-group">
-                                        <NavLink to="#" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link disabled">
+                                        <NavLink to="/consent/list" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
                                             <i className="icon icon-manage-profile icon-3x icon-3x cdp-list-group__icon"></i>
                                             <span>
                                                 <strong className="mb-2 h4 d-block cdp-list-group__link-title">Manage New Consent</strong>
@@ -42,7 +42,7 @@ const ConsentManagement = () => {
                                                 <span className="d-block cdp-list-group__link-activity">within 5 - 10 minutes</span>
                                             </span>
                                         </NavLink>
-                                        <NavLink to="#" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link disabled">
+                                        <NavLink to="#" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
                                             <i className="icon icon-global icon-3x cdp-list-group__icon"></i>
                                             <span>
                                                 <strong className="mb-2 h4 d-block cdp-list-group__link-title">Assign Consent to Country</strong>
