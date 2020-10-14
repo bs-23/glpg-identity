@@ -16,7 +16,41 @@ const CdpConsents = () => {
                         </nav>
                     </div>
                 </div>
-                <h1>CDP Consents</h1>
+                <div className="row">
+                    <div className="col-12">
+                        <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
+                            <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">CDP Consents</h4>
+                            <div className="d-flex justify-content-between align-items-center"></div>
+                        </div>
+
+                        <div className="table-responsive shadow-sm bg-white">
+                            <table className="table table-hover table-sm mb-0 cdp-table">
+                                <thead className="cdp-bg-primary text-white cdp-table__header">
+                                    <tr>
+                                        <th>Consent Type</th>
+                                        <th>Opt-In Type</th>
+                                        <th>Preference</th>
+                                        <th>Consent Detail</th>
+                                        <th>Created By</th>
+                                        <th>Created Date</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="cdp-table__body bg-white">
+                                    <tr>
+                                        <td>Medical</td>
+                                        <td>Single Opt-In</td>
+                                        <td>Galapagos Terms of Use</td>
+                                        <td>I give my consent to send me promotional email</td>
+                                        <td>System Admin</td>
+                                        <td>10.10.2020</td>
+                                        <td>Action</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
     );
