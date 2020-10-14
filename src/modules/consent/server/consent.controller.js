@@ -26,13 +26,15 @@ async function getConsents(req, res) {
 
         locale = locale || 'en';
 
-        const consentCountries = await ConsentCountry.findAll({where: {
-            country_iso2: {
-                [Op.or]: [
-                    country_iso2.toUpperCase(),
-                    country_iso2.toLowerCase()
-                ]
-            }}, include: [{
+        const consentCountries = await ConsentCountry.findAll({
+            where: {
+                country_iso2: {
+                    [Op.or]: [
+                        country_iso2.toUpperCase(),
+                        country_iso2.toLowerCase()
+                    ]
+                }
+            }, include: [{
                 model: Consent,
                 as: 'consent',
                 include: [{
@@ -42,14 +44,16 @@ async function getConsents(req, res) {
         });
 
         const consentLocales = await Promise.all(consentCountries.map(async consentCountry => {
-            return await ConsentLocale.findAll({where: {
-                consent_id: consentCountry.consent_id,
-                locale: {
-                    [Op.or]: [
-                        locale.toUpperCase(),
-                        locale.toLowerCase()
-                    ]
-                }}, include: [{
+            return await ConsentLocale.findAll({
+                where: {
+                    consent_id: consentCountry.consent_id,
+                    locale: {
+                        [Op.or]: [
+                            locale.toUpperCase(),
+                            locale.toLowerCase()
+                        ]
+                    }
+                }, include: [{
                     model: Consent,
                     as: 'consent',
                     include: [{
@@ -59,23 +63,25 @@ async function getConsents(req, res) {
             });
         }));
 
-        const result = await Promise.all(_.flatten(consentLocales).map( async consentLang => {
-            const consentCountry = await ConsentCountry.findOne({where: {
-                country_iso2: {
-                    [Op.or]: [
-                        country_iso2.toUpperCase(),
-                        country_iso2.toLowerCase()
-                    ]
-                },
-                consent_id : consentLang.consent_id
-            }});
+        const result = await Promise.all(_.flatten(consentLocales).map(async consentLang => {
+            const consentCountry = await ConsentCountry.findOne({
+                where: {
+                    country_iso2: {
+                        [Op.or]: [
+                            country_iso2.toUpperCase(),
+                            country_iso2.toLowerCase()
+                        ]
+                    },
+                    consent_id: consentLang.consent_id
+                }
+            });
 
             return {
                 id: consentLang.consent.id,
                 title: consentLang.consent.title,
                 rich_text: validator.unescape(consentLang.rich_text),
                 slug: consentLang.consent.slug,
-                opt_type: consentCountry.opt_type ,
+                opt_type: consentCountry.opt_type,
                 category: consentLang.consent.consent_category.type,
                 category_title: consentLang.consent.consent_category.title,
                 country_iso2: country_iso2,
@@ -84,7 +90,7 @@ async function getConsents(req, res) {
             }
         }));
 
-        if(!result || !result.length) {
+        if (!result || !result.length) {
             response.data = [];
             return res.status(204).send(response);
         }
@@ -103,10 +109,10 @@ function ignoreCaseArray(str) {
     return [str.toLowerCase(), str.toUpperCase(), str.charAt(0).toLowerCase() + str.charAt(1).toUpperCase(), str.charAt(0).toUpperCase() + str.charAt(1).toLowerCase()];
 }
 
-async function getConsentsReport(req, res){
+async function getConsentsReport(req, res) {
     const response = new Response({}, []);
 
-    try{
+    try {
         const page = req.query.page ? req.query.page - 1 : 0;
         const limit = 30;
         const codbase = req.query.codbase === undefined ? '' : req.query.codbase;
@@ -118,18 +124,18 @@ async function getConsentsReport(req, res){
         const orderType = req.query.orderType ? req.query.orderType : '';
         const order = [];
 
-        if(orderBy && orderType){
-            if(orderBy === 'first_name') order.push([HCPS, 'first_name', orderType]);
-            if(orderBy === 'last_name') order.push([HCPS, 'last_name', orderType]);
-            if(orderBy === 'email') order.push([HCPS, 'email', orderType]);
+        if (orderBy && orderType) {
+            if (orderBy === 'first_name') order.push([HCPS, 'first_name', orderType]);
+            if (orderBy === 'last_name') order.push([HCPS, 'last_name', orderType]);
+            if (orderBy === 'email') order.push([HCPS, 'email', orderType]);
 
-            if(orderBy === 'consent_type') order.push([Consent, ConsentCategory, 'title', orderType]);
+            if (orderBy === 'consent_type') order.push([Consent, ConsentCategory, 'title', orderType]);
 
-            if(orderBy === 'opt_type') order.push([Consent, { model: ConsentCountry, as: 'consent_country' }, 'opt_type', orderType === 'ASC' ? 'DESC' : 'ASC']);
+            if (orderBy === 'opt_type') order.push([Consent, { model: ConsentCountry, as: 'consent_country' }, 'opt_type', orderType === 'ASC' ? 'DESC' : 'ASC']);
 
-            if(orderBy === 'legal_basis') order.push([Consent, 'legal_basis', orderType]);
-            if(orderBy === 'preferences') order.push([Consent, 'preference', orderType]);
-            if(orderBy === 'date') order.push(['updated_at', orderType]);
+            if (orderBy === 'legal_basis') order.push([Consent, 'legal_basis', orderType]);
+            if (orderBy === 'preferences') order.push([Consent, 'preference', orderType]);
+            if (orderBy === 'date') order.push(['updated_at', orderType]);
         }
         order.push([HCPS, 'created_at', 'DESC']);
         order.push([HCPS, 'id', 'DESC']);
@@ -192,7 +198,7 @@ async function getConsentsReport(req, res){
             subQuery: false,
         });
 
-        hcp_consents.forEach( hcp_consent => {
+        hcp_consents.forEach(hcp_consent => {
             hcp_consent.dataValues.consent_id = hcp_consent.consent_id;
             hcp_consent.dataValues.response = hcp_consent.response;
             hcp_consent.dataValues.consent_confirmed = hcp_consent.consent_confirmed;
@@ -246,17 +252,17 @@ async function getConsentsReport(req, res){
         response.data = data;
         res.json(response);
     }
-    catch(err){
+    catch (err) {
         console.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
 }
 
-async function getDatasyncConsentsReport(req, res){
+async function getDatasyncConsentsReport(req, res) {
     const response = new Response({}, []);
 
-    try{
+    try {
         const page = req.query.page ? req.query.page - 1 : 0;
         const limit = 30;
         const codbase = req.query.codbase === undefined ? '' : req.query.codbase;
@@ -264,7 +270,7 @@ async function getDatasyncConsentsReport(req, res){
         // const opt_type = req.query.opt_type === undefined ? '' : req.query.opt_type;
         const offset = page * limit;
 
-        async function getCountryIso2(){
+        async function getCountryIso2() {
             const user_codbase_list_for_iso2 = (await sequelize.datasyncConnector.query(
                 `SELECT * FROM ciam.vwcountry where ciam.vwcountry.country_iso2 = ANY($countries);`,
                 {
@@ -279,7 +285,7 @@ async function getDatasyncConsentsReport(req, res){
                 `SELECT * FROM ciam.vwcountry where ciam.vwcountry.codbase = ANY($codbases);`,
                 {
                     bind: {
-                        codbases : user_codbase_list_for_iso2
+                        codbases: user_codbase_list_for_iso2
                     },
                     type: QueryTypes.SELECT
                 }
@@ -303,16 +309,16 @@ async function getDatasyncConsentsReport(req, res){
         const orderType = req.query.orderType && req.query.orderType.toLowerCase() === "desc" ? "DESC" : "ASC";
         let sortBy = 'content_type';
 
-        if(orderBy && orderType){
-            if(orderBy === 'name') sortBy = 'ciam.vw_veeva_consent_master.account_name';
-            if(orderBy === 'email') sortBy = 'ciam.vw_veeva_consent_master.channel_value';
+        if (orderBy && orderType) {
+            if (orderBy === 'name') sortBy = 'ciam.vw_veeva_consent_master.account_name';
+            if (orderBy === 'email') sortBy = 'ciam.vw_veeva_consent_master.channel_value';
             // if(orderBy === 'consent_type') order.push([Consent, ConsentCategory, 'title', orderType]);
 
-            if(orderBy === 'opt_type') sortBy = 'ciam.vw_veeva_consent_master.opt_type';
+            if (orderBy === 'opt_type') sortBy = 'ciam.vw_veeva_consent_master.opt_type';
 
             // if(orderBy === 'legal_basis') order.push([Consent, 'legal_basis', orderType]);
-            if(orderBy === 'preferences') sortBy = 'ciam.vw_veeva_consent_master.content_type';
-            if(orderBy === 'date') sortBy = 'ciam.vw_veeva_consent_master.capture_datetime';
+            if (orderBy === 'preferences') sortBy = 'ciam.vw_veeva_consent_master.content_type';
+            if (orderBy === 'date') sortBy = 'ciam.vw_veeva_consent_master.capture_datetime';
         }
 
         const hcp_consents = await sequelize.datasyncConnector.query(
@@ -359,7 +365,7 @@ async function getDatasyncConsentsReport(req, res){
             }))[0];
 
 
-        hcp_consents.forEach( hcp_consent => {
+        hcp_consents.forEach(hcp_consent => {
             hcp_consent.name = hcp_consent.account_name;
             hcp_consent.first_name = hcp_consent.firstname;
             hcp_consent.last_name = hcp_consent.lastname;
@@ -397,7 +403,7 @@ async function getDatasyncConsentsReport(req, res){
         response.data = data;
         res.json(response);
     }
-    catch(err){
+    catch (err) {
         console.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
@@ -405,22 +411,22 @@ async function getDatasyncConsentsReport(req, res){
 }
 
 async function getAllProcessActivities(req, res) {
-    try{
+    try {
         const process_activities = await ConsentCategory.findAll();
         res.json(process_activities);
     }
-    catch(err){
+    catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
     }
 }
 
-async function getAllOptTypes(req, res){
-    try{
+async function getAllOptTypes(req, res) {
+    try {
         const opt_types = new Set((await ConsentCountry.findAll()).map(i => i.opt_type));
         res.json([...opt_types]);
     }
-    catch(err){
+    catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
     }
@@ -498,6 +504,40 @@ async function getCdpConsents(req, res) {
     }
 }
 
+async function consentCountryManagement(req, res) {
+    try {
+        const { consent_id, country_iso2, opt_type } = req.body;
+
+        const consent = ConsentCountry.findOne({
+            where: {
+                consent_id: consent_id,
+                country_iso2: country_iso2,
+                opt_type: opt_type
+            }
+        });
+
+        if (consent) {
+            return res.status(404).send("Already exists");
+        }
+
+        const [doc, created] = await ConsentCountry.upsert({
+            consent_id,
+            country_iso2,
+            opt_type
+        });
+
+        if (!created) {
+            return res.status(404).send("");
+        }
+
+        res.json(doc);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 exports.getConsents = getConsents;
 exports.getConsentsReport = getConsentsReport;
 exports.getDatasyncConsentsReport = getDatasyncConsentsReport;
@@ -505,3 +545,4 @@ exports.getAllProcessActivities = getAllProcessActivities;
 exports.getAllOptTypes = getAllOptTypes;
 exports.getUserConsents = getUserConsents;
 exports.getCdpConsents = getCdpConsents;
+exports.consentCountryManagement = consentCountryManagement;

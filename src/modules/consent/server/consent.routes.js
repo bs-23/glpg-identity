@@ -22,4 +22,7 @@ module.exports = app => {
 
     app.route('/api/cdp-consents')
         .get(passport.authenticate('user-jwt', { session: false }), controller.getCdpConsents);
+
+    app.route('/api/consent/country')
+        .post(passport.authenticate('user-jwt', { session: false }), controller.consentCountryManagement);
 };
