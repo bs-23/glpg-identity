@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { NavLink } from 'react-router-dom';
 import { getCdpConsents } from '../consent.action';
 import { useSelector, useDispatch } from 'react-redux';
+import Dropdown from 'react-bootstrap/Dropdown';
 
 const CdpConsents = () => {
     const dispatch = useDispatch();
@@ -37,31 +38,44 @@ const CdpConsents = () => {
                     <div className="col-12">
                         <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
                             <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">CDP Consents</h4>
-                            <div className="d-flex justify-content-between align-items-center"></div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a class="btn cdp-btn-secondary text-white ml-2" href="">
+                                    <i class="icon icon-plus pr-1"></i> Create new consent
+                                </a>
+                            </div>
                         </div>
 
                         <div className="table-responsive shadow-sm bg-white">
                             <table className="table table-hover table-sm mb-0 cdp-table">
                                 <thead className="cdp-bg-primary text-white cdp-table__header">
                                     <tr>
+                                        <th>Consent Title</th>
+                                        <th>Available Translation</th>
                                         <th>Consent Type</th>
-                                        <th>Opt-In Type</th>
                                         <th>Preference</th>
-                                        <th>Consent Detail</th>
+                                        <th>Status</th>
                                         <th>Created By</th>
                                         <th>Created Date</th>
-                                        <th>Action</th> 
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody className="cdp-table__body bg-white">
                                     <tr>
-                                        <td>Medical</td>
-                                        <td>Single Opt-In</td>
-                                        <td>Galapagos Terms of Use</td>
                                         <td>I give my consent to send me promotional email</td>
+                                        <td>NL_NL, BE_NL</td>
+                                        <td>Medical</td>
+                                        <td>Galapagos Terms of Use</td>
+                                        <td>Active</td>
                                         <td>System Admin</td>
                                         <td>10.10.2020</td>
-                                        <td>Action</td>
+                                        <td><Dropdown className="ml-auto dropdown-customize">
+                                            <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center">
+                                            </Dropdown.Toggle>
+                                            <Dropdown.Menu>
+                                                <Dropdown.Item>Edit Consent</Dropdown.Item>
+                                                <Dropdown.Item>Consent Detail</Dropdown.Item>
+                                            </Dropdown.Menu>
+                                        </Dropdown></td>
                                     </tr>
                                 </tbody>
                             </table>
