@@ -164,6 +164,8 @@ async function login(req, res) {
                 }]
             });
 
+            if (user && user.status === 'inactive') return res.status(401).send('Account not active.');
+
             const userLockedMessage = 'Your account has been locked for consecutive failed auth attempts. Please use the Forgot Password link to unlock.';
 
             if (!user || !user.validPassword(password)) {
@@ -177,8 +179,6 @@ async function login(req, res) {
 
                 return res.status(401).send(errorMessage);
             }
-
-            if (user && user.status === 'inactive') return res.status(401).send('Account not active.');
 
             if (user && user.dataValues.failed_auth_attempt >= 5) {
                 return res.status(401).send(userLockedMessage);
@@ -201,7 +201,7 @@ async function login(req, res) {
             if(!refresh_token) return res.status(401).send('The refresh token is invalid or expired.');
 
             try {
-                const decoded = jwt.verify(refresh_token, nodecache.getValue('REFRESH_SECRET'));
+                const decoded = jwt.verify(refresh_token, nodecache.getValue('CDP_REFRESH_SECRET'));
                 user = await User.findOne({ where: { id: decoded.id }});
 
                 if(user.refresh_token !== refresh_token) {
