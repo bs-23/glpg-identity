@@ -4,6 +4,8 @@ import { getCdpConsents } from '../consent.action';
 import { useSelector, useDispatch } from 'react-redux';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Modal from 'react-bootstrap/Modal';
+import Accordion from 'react-bootstrap/Accordion';
+import Card from 'react-bootstrap/Card';
 
 const CdpConsents = () => {
     const dispatch = useDispatch();
@@ -134,7 +136,28 @@ const CdpConsents = () => {
                         <div className="row mt-4">
                             <div className="col accordion-consent rounded shadow-sm p-0">
                                 <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Available Translation	</h4>
-                               
+                                <Accordion defaultActiveKey="0">
+                                    <Card>
+                                        <Card.Header>
+                                            <Accordion.Toggle as={Card.Header} variant="link" eventKey="0">
+                                                NL_NL
+      </Accordion.Toggle>
+                                        </Card.Header>
+                                        <Accordion.Collapse eventKey="0">
+                                            <Card.Body>NL_NL text</Card.Body>
+                                        </Accordion.Collapse>
+                                    </Card>
+                                    <Card>
+                                        <Card.Header>
+                                            <Accordion.Toggle as={Card.Header}variant="link" eventKey="1">
+                                                BE_NL
+      </Accordion.Toggle>
+                                        </Card.Header>
+                                        <Accordion.Collapse eventKey="1">
+                                            <Card.Body>BE_NL text</Card.Body>
+                                        </Accordion.Collapse>
+                                    </Card>
+                                </Accordion>
                             </div>
                         </div>
                     </div>
