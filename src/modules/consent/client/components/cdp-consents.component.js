@@ -3,10 +3,12 @@ import { NavLink } from 'react-router-dom';
 import { getCdpConsents } from '../consent.action';
 import { useSelector, useDispatch } from 'react-redux';
 import Dropdown from 'react-bootstrap/Dropdown';
+import Modal from 'react-bootstrap/Modal';
 
 const CdpConsents = () => {
     const dispatch = useDispatch();
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
+    const [lgShow, setLgShow] = useState(false);
 
     async function loadCdpConsents() {
         const params = new URLSearchParams(window.location.search);
@@ -69,11 +71,11 @@ const CdpConsents = () => {
                                         <td>System Admin</td>
                                         <td>10.10.2020</td>
                                         <td><Dropdown className="ml-auto dropdown-customize">
-                                            <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center">
+                                            <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
                                             </Dropdown.Toggle>
                                             <Dropdown.Menu>
                                                 <Dropdown.Item>Edit Consent</Dropdown.Item>
-                                                <Dropdown.Item>Consent Detail</Dropdown.Item>
+                                                <Dropdown.Item onClick={() => setLgShow(true)}>Consent Detail</Dropdown.Item>
                                             </Dropdown.Menu>
                                         </Dropdown></td>
                                     </tr>
@@ -83,6 +85,61 @@ const CdpConsents = () => {
                     </div>
                 </div>
             </div>
+            <Modal
+                size="lg"
+                centered
+                show={lgShow}
+                onHide={() => setLgShow(false)}
+                aria-labelledby="example-modal-sizes-title-lg"
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title id="example-modal-sizes-title-lg">
+                        Consent detail
+                </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="px-4 py-3">
+                        <div className="row">
+                            <div className="col">
+                                <h4 className="mt-1 font-weight-bold">Consent Title	</h4>
+                                <div className="">I give my consent to send me promotional email</div>
+                            </div>
+                        </div>
+                        <div className="row mt-3">
+                            <div className="col-6">
+                                <div className="mt-1 font-weight-bold">Consent Type</div>
+                                <div className="">Medical</div>
+                            </div>
+                            <div className="col-6">
+                                <div className="mt-1 font-weight-bold">Preference</div>
+                                <div className="">Galapagos Terms of Use</div>
+                            </div>
+                        </div>
+                        <div className="row mt-3">
+                            <div className="col-6">
+                                <div className="mt-1 font-weight-bold">Status</div>
+                                <div className="">Active</div>
+                            </div>
+                            <div className="col-6">
+                                <div className="mt-1 font-weight-bold">Created By</div>
+                                <div className="">System Admin</div>
+                            </div>
+                        </div>
+                        <div className="row mt-3">
+                            <div className="col-6">
+                                <div className="mt-1 font-weight-bold">Ctreated Date</div>
+                                <div className="">20.102020</div>
+                            </div>
+                        </div>
+                        <div className="row mt-4">
+                            <div className="col accordion-consent rounded shadow-sm p-0">
+                                <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Available Translation	</h4>
+                               
+                            </div>
+                        </div>
+                    </div>
+                </Modal.Body>
+            </Modal>
         </main>
     );
 }
