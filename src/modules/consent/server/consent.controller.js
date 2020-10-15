@@ -524,6 +524,12 @@ async function createConsent(req, res) {
             return res.status(400).send('Invalid request.');
         }
 
+        const consentCategory = await ConsentCategory.findOne({ where: { id: category_id } });
+
+        if (!consentCategory) {
+            return res.status(400).send('Invalid Consent Category Id.');
+        }
+
         const [consent, created] = await Consent.findOrCreate({
             where: {
                 title
@@ -540,10 +546,13 @@ async function createConsent(req, res) {
         });
 
         if (!created && consent) {
-            return res.status(400).send('Consent already exists.');
+            return res.status(400).send('Consent with same Title already exists.');
         }
 
+        const data = { ...consent.dataValues };
+
         if (translations && created) {
+            data.translations = [];
             await Promise.all(translations
                 .filter(translation => translation.locale && translation.rich_text)
                 .map(async (translation) => {
@@ -557,15 +566,93 @@ async function createConsent(req, res) {
                             consent_id: consent.id
                         }
                     });
+
+                    if (translationCreated) {
+                        data.translations.push(consentTransation);
+                    } else {
+                        console.error('Create Translation failed: ', translation);
+                    }
                 })
             );
         }
 
-        const data = { ...consent.dataValues };
-        delete data.updated_at;
-        delete data.created_at;
-
         res.json(data);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function updateConsent(req, res) {
+    try {
+        const { id, category_id, title, legal_basis, is_active, preference, translations } = req.body;
+
+        if (!id) {
+            return res.status(400).send('Invalid request.');
+        }
+
+        if (category_id) {
+            const consentCategory = await ConsentCategory.findOne({ where: { id: category_id } });
+
+            if (!consentCategory) {
+                return res.status(400).send('Invalid Consent Category Id.');
+            }
+        }
+
+        if (title) {
+            const consentWithSameTitle = await Consent.findOne({
+                where: {
+                    title: title,
+                    id: { [Op.ne]: id }
+                }
+            });
+
+            if (consentWithSameTitle) {
+                return res.status(400).send('Another Consent with same Title exists.');
+            }
+        }
+
+        const consent = await Consent.findOne({ where: { id: id } });
+
+        if (!consent) {
+            return res.status(404).send('Consent does not exist.');
+        }
+
+        await consent.update({
+            category_id,
+            title,
+            slug: title,
+            legal_basis,
+            is_active,
+            preference
+        });
+
+        if (translations) {
+            await Promise.all(translations
+                .filter(translation => translation.locale && translation.rich_text)
+                .map(async (translation) => {
+                    const [consentTransation, translationCreated] = await ConsentLanguage.findOrCreate({
+                        where: {
+                            consent_id: consent.id,
+                            locale: translation.locale
+                        },
+                        defaults: {
+                            ...translation,
+                            consent_id: consent.id
+                        }
+                    });
+
+                    if (consentTransation || !translationCreated) {
+                        await consentTransation.update({
+                            locale: translation.locale,
+                            rich_text: translation.rich_text
+                        });
+                    }
+                })
+            );
+        }
+
+        res.sendStatus(200);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -616,4 +703,5 @@ exports.getUserConsents = getUserConsents;
 exports.getConsentCatogories = getConsentCatogories;
 exports.getCdpConsents = getCdpConsents;
 exports.createConsent = createConsent;
+exports.updateConsent = updateConsent;
 exports.assignConsentToCountry = assignConsentToCountry;
