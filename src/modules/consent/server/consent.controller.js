@@ -724,6 +724,12 @@ async function assignConsentToCountry(req, res) {
             return res.status(400).send('Invalid request.');
         }
 
+        const consent = await Consent.findOne({ where: { id: consent_id } });
+
+        if (!consent) {
+            return res.status(400).send('Consent not found.');
+        }
+
         const [countryConsent, created] = await ConsentCountry.findOrCreate({
             where: {
                 consent_id,
@@ -751,6 +757,23 @@ async function assignConsentToCountry(req, res) {
     }
 }
 
+async function deleteCountryConsent(req, res) {
+    try {
+        const id = req.params.id;
+
+        if (!id) {
+            return res.status(400).send('Invalid request.');
+        }
+
+        await ConsentCountry.destroy({ where: { id } });
+
+        res.sendStatus(200);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 exports.getConsents = getConsents;
 exports.getConsentsReport = getConsentsReport;
 exports.getDatasyncConsentsReport = getDatasyncConsentsReport;
@@ -764,3 +787,4 @@ exports.createConsent = createConsent;
 exports.deleteCdpConsent = deleteCdpConsent;
 exports.updateCdpConsent = updateCdpConsent;
 exports.assignConsentToCountry = assignConsentToCountry;
+exports.deleteCountryConsent = deleteCountryConsent;
