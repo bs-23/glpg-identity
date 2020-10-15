@@ -32,6 +32,7 @@ module.exports = app => {
         .post(CDPAuthStrategy, controller.createConsent);
 
     app.route('/api/consent/country')
+        .get(CDPAuthStrategy, controller.getCountryConsents)
         .post(CDPAuthStrategy, controller.assignConsentToCountry);
 
     app.route('/api/consent/country/:id')
