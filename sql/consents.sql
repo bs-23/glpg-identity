@@ -3,6 +3,7 @@ CREATE TABLE ciam.consents
     id uuid NOT NULL,
     category_id uuid NOT NULL,
     legal_basis ciam.enum_consents_legal_basis NOT NULL,
+    is_active boolean DEFAULT false,
     preference character varying(255) COLLATE pg_catalog."default",
     title character varying(255) COLLATE pg_catalog."default" NOT NULL,
     slug character varying(255) COLLATE pg_catalog."default" NOT NULL,

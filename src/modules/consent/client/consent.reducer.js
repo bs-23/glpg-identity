@@ -3,6 +3,7 @@ import Types from "./consent.types";
 const initialState = {
     consents: {},
     veeva_consents: {},
+    cdp_consents: {},
 };
 
 export default function reducer(state = initialState, action) {
@@ -18,6 +19,13 @@ export default function reducer(state = initialState, action) {
             return {
                 ...state,
                 veeva_consents: action.payload.data.data
+            }
+        }
+
+        case Types.GET_CDP_CONSENTS_FULFILLED: {
+            return {
+                ...state,
+                cdp_consents: action.payload.data
             }
         }
     }

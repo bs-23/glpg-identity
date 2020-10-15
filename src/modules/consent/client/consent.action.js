@@ -44,4 +44,21 @@ export function getVeevaConsentReport(page, codbase, process_activity, opt_type,
     };
 }
 
+export function getCdpConsents(translations, category){
+    const search_params = new URLSearchParams('');
+
+    translations && search_params.append('translations', translations);
+    category && search_params.append('category', category);
+
+    const url = `/api/cdp-consents${search_params.toString() !== '' ? '?' + search_params.toString() : '' }`;
+
+    return {
+        type: Types.GET_CDP_CONSENTS,
+        payload: axios({
+            method: 'get',
+            url
+        })
+    };
+}
+
 
