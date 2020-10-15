@@ -617,8 +617,9 @@ async function createConsent(req, res) {
 
 async function updateCdpConsent(req, res) {
     try {
-        const { id, category_id, title, legal_basis, is_active, preference, translations } = req.body;
+        const {category_id, title, legal_basis, is_active, preference, translations } = req.body;
 
+        const id = req.params.id;
         if (!id) {
             return res.status(400).send('Invalid request.');
         }
