@@ -615,7 +615,7 @@ async function createConsent(req, res) {
     }
 }
 
-async function updateConsent(req, res) {
+async function updateCdpConsent(req, res) {
     try {
         const { id, category_id, title, legal_basis, is_active, preference, translations } = req.body;
 
@@ -688,6 +688,33 @@ async function updateConsent(req, res) {
     }
 }
 
+async function deleteCdpConsent(req, res) {
+    try {
+        if (!req.params.id) {
+            return res.status(400).send('Invalid request.');
+        }
+
+        const consent = await Consent.findOne({
+            where: {
+                id: req.params.id
+            }
+        });
+
+        if (!consent) {
+            res.status(404).send('Consent not found');
+        }
+
+        await ConsentCountry.destroy({ where: { consent_id: consent.id } });
+        await ConsentLanguage.destroy({ where: { consent_id: consent.id } });
+        await consent.destroy();
+
+        res.sendStatus(200);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 async function assignConsentToCountry(req, res) {
     try {
         const { consent_id, country_iso2, opt_type } = req.body;
@@ -733,5 +760,6 @@ exports.getConsentCatogories = getConsentCatogories;
 exports.getCdpConsents = getCdpConsents;
 exports.getCdpConsent = getCdpConsent;
 exports.createConsent = createConsent;
-exports.updateConsent = updateConsent;
+exports.deleteCdpConsent = deleteCdpConsent;
+exports.updateCdpConsent = updateCdpConsent;
 exports.assignConsentToCountry = assignConsentToCountry;

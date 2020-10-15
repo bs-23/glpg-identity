@@ -23,12 +23,13 @@ module.exports = app => {
         .get(CDPAuthStrategy, controller.getUserConsents);
 
     app.route('/api/cdp-consents/:id')
-        .get(CDPAuthStrategy, controller.getCdpConsent);
+        .get(CDPAuthStrategy, controller.getCdpConsent)
+        .delete(CDPAuthStrategy, controller.deleteCdpConsent);
 
     app.route('/api/cdp-consents')
         .get(CDPAuthStrategy, controller.getCdpConsents)
         .post(CDPAuthStrategy, controller.createConsent)
-        .put(CDPAuthStrategy, controller.updateConsent);
+        .put(CDPAuthStrategy, controller.updateCdpConsent);
 
     app.route('/api/consent/country')
         .post(CDPAuthStrategy, controller.assignConsentToCountry);
