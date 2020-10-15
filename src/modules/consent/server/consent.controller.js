@@ -516,6 +516,38 @@ async function getCdpConsents(req, res) {
     }
 }
 
+async function getCdpConsent(req, res) {
+    try {
+        if (!req.params.id) {
+            return res.status(400).send('Invalid request.');
+        }
+
+        const consent = await Consent.findOne({
+            where: {
+                id: req.params.id
+            }
+        });
+
+        if (!consent) {
+            res.status(404).send('Consent not found');
+        }
+
+        const data = { ...consent.dataValues };
+
+        const translations = await ConsentLanguage.findAll({
+            where: { consent_id: consent.id },
+            attributes: { exclude: ['consent_id', 'created_at', 'updated_at'] }
+        })
+
+        data.translations = translations;
+
+        res.json(data);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 async function createConsent(req, res) {
     try {
         const { category_id, title, legal_basis, is_active, preference, translations } = req.body;
@@ -593,7 +625,6 @@ async function updateConsent(req, res) {
 
         if (category_id) {
             const consentCategory = await ConsentCategory.findOne({ where: { id: category_id } });
-
             if (!consentCategory) {
                 return res.status(400).send('Invalid Consent Category Id.');
             }
@@ -606,7 +637,6 @@ async function updateConsent(req, res) {
                     id: { [Op.ne]: id }
                 }
             });
-
             if (consentWithSameTitle) {
                 return res.status(400).send('Another Consent with same Title exists.');
             }
@@ -615,7 +645,7 @@ async function updateConsent(req, res) {
         const consent = await Consent.findOne({ where: { id: id } });
 
         if (!consent) {
-            return res.status(404).send('Consent does not exist.');
+            return res.status(404).send('Consent not found.');
         }
 
         await consent.update({
@@ -626,6 +656,8 @@ async function updateConsent(req, res) {
             is_active,
             preference
         });
+
+        await ConsentLanguage.destroy({ where: { consent_id: consent.id } });
 
         if (translations) {
             await Promise.all(translations
@@ -642,11 +674,8 @@ async function updateConsent(req, res) {
                         }
                     });
 
-                    if (consentTransation || !translationCreated) {
-                        await consentTransation.update({
-                            locale: translation.locale,
-                            rich_text: translation.rich_text
-                        });
+                    if (!translationCreated) {
+                        console.error('Create Translation failed: ', translation);
                     }
                 })
             );
@@ -702,6 +731,7 @@ exports.getAllOptTypes = getAllOptTypes;
 exports.getUserConsents = getUserConsents;
 exports.getConsentCatogories = getConsentCatogories;
 exports.getCdpConsents = getCdpConsents;
+exports.getCdpConsent = getCdpConsent;
 exports.createConsent = createConsent;
 exports.updateConsent = updateConsent;
 exports.assignConsentToCountry = assignConsentToCountry;
