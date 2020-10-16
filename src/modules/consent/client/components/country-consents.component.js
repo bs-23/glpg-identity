@@ -1,11 +1,46 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
 import { NavLink } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Modal from 'react-bootstrap/Modal';
 import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
 
+import { getCountryConsents } from '../consent.action';
+
 const CountryConsents = () => {
+    const dispatch = useDispatch();
+    const [countryConsent, setCountryConsent] = useState([]);
+    const country_consents = useSelector(state => state.consentReducer.country_consents).reduce(
+        (grouped, current) => {
+            const existing = grouped.find(g => g.country_iso2 === current.country_iso2);
+            if (existing) {
+                existing.consents.push({
+                    ...current.consent,
+                    opt_type: current.opt_type
+                });
+            } else {
+                grouped.push({
+                    country_iso2: current.country_iso2,
+                    consents: [{
+                        ...current.consent,
+                        opt_type: current.opt_type
+                    }]
+                });
+            }
+            return grouped;
+        }
+        , []
+    );
+
+    async function loadCountryConsents() {
+        dispatch(getCountryConsents());
+    }
+
+    useEffect(() => {
+        loadCountryConsents();
+    }, []);
+
     return (
         <main className="app__content cdp-light-bg h-100">
             <div className="container-fluid">
@@ -21,6 +56,29 @@ const CountryConsents = () => {
                     </div>
                 </div>
                 <div className="row">
+
+                    {/* {
+                        country_consents.map((countryConsent, index) =>
+                            (
+                                <div key={index}>
+                                    <ul >{countryConsent.country_iso2}---------------</ul>
+                                    {
+                                        countryConsent.consents.map((consent, i) =>
+                                            (
+                                                <span key={i}>{consent.opt_type}===========</span>
+                                            )
+                                        )
+                                    }
+                                </div>
+                            )
+                        )
+                    } */}
+
+
+
+
+
+
                     <div className="col-12">
                         <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
                             <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Country Consents</h4>
@@ -57,7 +115,7 @@ const CountryConsents = () => {
                                     </tr>
                                 </tbody>
                             </table>
-                            
+
                         </div>
 
                         <div className="table-responsive shadow-sm bg-white mb-3">

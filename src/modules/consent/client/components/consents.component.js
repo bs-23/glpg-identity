@@ -18,9 +18,7 @@ const Consents = () => {
         dispatch(getCdpConsents(true, true));
     }
 
-    const getConsentsForCurrentUser = (row) => {
-        // const { data } = await axios.get(`/api/hcp-profiles/${currentUser.id}/consents`);
-        // setCurrentUser({ ...currentUser, consents: data.data });
+    const getConsents = (row) => {
         setConsent(row);
         setLgShow(true);
     }
@@ -92,7 +90,7 @@ const Consents = () => {
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu>
                                                         <Dropdown.Item>Edit Consent</Dropdown.Item>
-                                                        <Dropdown.Item onClick={() => getConsentsForCurrentUser(row)}>Consent Detail</Dropdown.Item>
+                                                        <Dropdown.Item onClick={() => getConsents(row)}>Consent Detail</Dropdown.Item>
                                                     </Dropdown.Menu>
                                                 </Dropdown></td>
                                             </tr>
