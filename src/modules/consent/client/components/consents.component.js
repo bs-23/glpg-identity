@@ -7,7 +7,7 @@ import Modal from 'react-bootstrap/Modal';
 import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
 
-const CdpConsents = () => {
+const Consents = () => {
     const dispatch = useDispatch();
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
     const [lgShow, setLgShow] = useState(false);
@@ -57,7 +57,7 @@ const CdpConsents = () => {
                             </div>
                         </div>
 
-                        {cdp_consents && cdp_consents.length > 0 && 
+                        {cdp_consents && cdp_consents.length > 0 &&
                             <div className="table-responsive shadow-sm bg-white">
                                 <table className="table table-hover table-sm mb-0 cdp-table">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
@@ -179,4 +179,4 @@ const CdpConsents = () => {
     );
 }
 
-export default CdpConsents;
+export default Consents;

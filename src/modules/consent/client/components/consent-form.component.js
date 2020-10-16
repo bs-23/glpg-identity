@@ -1,7 +1,7 @@
 import React from "react";
 import { NavLink } from 'react-router-dom';
 
-const CreateCdpConsent = () => {
+const ConsentForm = () => {
 
     return (
         <main className="app__content cdp-light-bg h-100">
@@ -29,9 +29,9 @@ const CreateCdpConsent = () => {
                     </div>
                 </div>
             </div>
-            
+
         </main>
     );
 }
 
-export default CreateCdpConsent;
+export default ConsentForm;
