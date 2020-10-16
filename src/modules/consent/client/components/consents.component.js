@@ -15,11 +15,7 @@ const Consents = () => {
     const [consent, setConsent] = useState({});
 
     async function loadCdpConsents() {
-        const params = new URLSearchParams(window.location.search);
-        dispatch(getCdpConsents(
-            params.get('translations') ? params.get('translations') : '',
-            params.get('category') ? params.get('category') : ''
-        ));
+        dispatch(getCdpConsents(true, true));
     }
 
     const getConsentsForCurrentUser = (row) => {
@@ -31,7 +27,7 @@ const Consents = () => {
 
     function getLocales(translations){
         if(translations){
-            const locales = translations.map(item => item.locale);
+            const locales = translations.map(item => item.locale.toUpperCase());
             return locales.join(', ');
         }
         return '';
@@ -167,7 +163,7 @@ const Consents = () => {
                                                 </Accordion.Toggle>
                                             </Card.Header>
                                             <Accordion.Collapse eventKey="0">
-                                                <Card.Body>{parse(translation.rich_text || '')}</Card.Body>
+                                                <Card.Body><div>{parse(`${translation.rich_text}`)}</div></Card.Body>
                                             </Accordion.Collapse>
                                         </Card>
                                     </Accordion>
