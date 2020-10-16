@@ -31,36 +31,62 @@ const CountryConsents = () => {
                             </div>
                         </div>
 
-                        <div className="table-responsive shadow-sm bg-white">
-                            <table className="table table-hover table-sm mb-0 cdp-table">
-                                <thead className="cdp-bg-primary text-white cdp-table__header">
+                        <div className="table-responsive shadow-sm bg-white mb-3">
+                            <table className="table table-hover table-sm mb-0 cdp-table mb-2">
+                                <thead className="bg-light cdp-table__header">
                                     <tr>
-                                        <th>Country</th>
+                                        <th colSpan="4"><div className="d-flex align-items-center"><img alt="CDP LOGO" src="/assets/flag/flag-netherlands.svg" height="18" className="mr-2" /> Netherlands</div></th>
+                                    </tr>
+                                </thead>
+                                <thead className="cdp-table__header">
+                                    <tr>
                                         <th>Consent Title</th>
                                         <th>Available Translation</th>
                                         <th>Opt Type</th>
-                                        <th>Status</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody className="cdp-table__body bg-white">
                                     <tr>
-                                        <td>Netherlands</td>
                                         <td>I give my consent to send me promotional email</td>
                                         <td>NL_NL, BE_NL</td>
                                         <td>Single Opt-In</td>
-                                        <td>Active</td>
-                                        <td><Dropdown className="ml-auto dropdown-customize">
-                                            <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
-                                            </Dropdown.Toggle>
-                                            <Dropdown.Menu>
-                                                <Dropdown.Item>Edit country consents</Dropdown.Item>
-                                                <Dropdown.Item>Consent Detail</Dropdown.Item>
-                                            </Dropdown.Menu>
-                                        </Dropdown></td>
+                                        <td>
+                                            <a href="#" className="btn btn-link">Edit</a> | <a href="#" className="btn btn-link text-danger">Delete</a>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
+                            
+                        </div>
+
+                        <div className="table-responsive shadow-sm bg-white mb-3">
+                            <table className="table table-hover table-sm mb-0 cdp-table mb-2">
+                                <thead className="bg-light cdp-table__header">
+                                    <tr>
+                                        <th colSpan="4"><div className="d-flex align-items-center"><img alt="CDP LOGO" src="/assets/flag/flag-belgium.svg" className="mr-2" height="18" /> Belgium</div></th>
+                                    </tr>
+                                </thead>
+                                <thead className="cdp-table__header">
+                                    <tr>
+                                        <th>Consent Title</th>
+                                        <th>Available Translation</th>
+                                        <th>Opt Type</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="cdp-table__body bg-white">
+                                    <tr>
+                                        <td>I give my consent to send me promotional email</td>
+                                        <td>NL_NL, BE_NL</td>
+                                        <td>Single Opt-In</td>
+                                        <td>
+                                            <a href="#" className="btn btn-link">Edit</a> | <a href="#" className="btn btn-link text-danger">Delete</a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
                         </div>
                     </div>
                 </div>
