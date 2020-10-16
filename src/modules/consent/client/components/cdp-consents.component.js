@@ -49,41 +49,45 @@ const CdpConsents = () => {
                             </div>
                         </div>
 
-                        <div className="table-responsive shadow-sm bg-white">
-                            <table className="table table-hover table-sm mb-0 cdp-table">
-                                <thead className="cdp-bg-primary text-white cdp-table__header">
-                                    <tr>
-                                        <th>Consent Title</th>
-                                        <th>Available Translation</th>
-                                        <th>Consent Type</th>
-                                        <th>Preference</th>
-                                        <th>Status</th>
-                                        <th>Created By</th>
-                                        <th>Created Date</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="cdp-table__body bg-white">
-                                    <tr>
-                                        <td>I give my consent to send me promotional email</td>
-                                        <td>NL_NL, BE_NL</td>
-                                        <td>Medical</td>
-                                        <td>Galapagos Terms of Use</td>
-                                        <td>Active</td>
-                                        <td>System Admin</td>
-                                        <td>10.10.2020</td>
-                                        <td><Dropdown className="ml-auto dropdown-customize">
-                                            <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
-                                            </Dropdown.Toggle>
-                                            <Dropdown.Menu>
-                                                <Dropdown.Item>Edit Consent</Dropdown.Item>
-                                                <Dropdown.Item onClick={() => setLgShow(true)}>Consent Detail</Dropdown.Item>
-                                            </Dropdown.Menu>
-                                        </Dropdown></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                        {cdp_consents && cdp_consents.length > 0 && 
+                            <div className="table-responsive shadow-sm bg-white">
+                                <table className="table table-hover table-sm mb-0 cdp-table">
+                                    <thead className="cdp-bg-primary text-white cdp-table__header">
+                                        <tr>
+                                            <th>Consent Title</th>
+                                            <th>Available Translation</th>
+                                            <th>Consent Type</th>
+                                            <th>Preference</th>
+                                            <th>Status</th>
+                                            <th>Created By</th>
+                                            <th>Created Date</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="cdp-table__body bg-white">
+                                        {cdp_consents.map((row, index) => (
+                                            <tr>
+                                                <td>{row.title}</td>
+                                                <td>NL_NL, BE_NL</td>
+                                                <td>Medical</td>
+                                                <td>{row.preference}</td>
+                                                <td>{row.is_active ? 'Active' : 'Inactive'}</td>
+                                                <td>System Admin</td>
+                                                <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
+                                                <td><Dropdown className="ml-auto dropdown-customize">
+                                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
+                                                    </Dropdown.Toggle>
+                                                    <Dropdown.Menu>
+                                                        <Dropdown.Item>Edit Consent</Dropdown.Item>
+                                                        <Dropdown.Item onClick={() => setLgShow(true)}>Consent Detail</Dropdown.Item>
+                                                    </Dropdown.Menu>
+                                                </Dropdown></td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
