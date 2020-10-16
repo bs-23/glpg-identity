@@ -532,7 +532,12 @@ async function getCdpConsent(req, res) {
         const consent = await Consent.findOne({
             where: {
                 id: req.params.id
-            }
+            },
+            include: [{
+                model: User,
+                as: 'createdByUser',
+                attributes: ['id', 'first_name', 'last_name'],
+            }]
         });
 
         if (!consent) {
