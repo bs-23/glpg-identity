@@ -25,9 +25,9 @@ const CountryConsents = () => {
                         <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
                             <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Country Consents</h4>
                             <div class="d-flex justify-content-between align-items-center">
-                                <a class="btn cdp-btn-secondary text-white ml-2" href="">
-                                    <i class="icon icon-plus pr-1"></i> Create country consent
-                                </a>
+                                <NavLink to="/consent/country/create" className="btn cdp-btn-secondary text-white ml-2">
+                                    <i className="icon icon-plus pr-1"></i> Create country consent
+                                </NavLink>
                             </div>
                         </div>
 
@@ -65,7 +65,7 @@ const CountryConsents = () => {
                     </div>
                 </div>
             </div>
-            
+
         </main>
     );
 }
