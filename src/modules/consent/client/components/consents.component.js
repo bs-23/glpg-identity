@@ -157,7 +157,7 @@ const Consents = () => {
                                         <Card>
                                             <Card.Header>
                                                 <Accordion.Toggle as={Card.Header} variant="link" eventKey="0">
-                                                    {translation.locale}
+                                                    {translation.locale.toUpperCase()}
                                                 </Accordion.Toggle>
                                             </Card.Header>
                                             <Accordion.Collapse eventKey="0">
