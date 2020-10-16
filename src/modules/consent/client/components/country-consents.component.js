@@ -1,11 +1,23 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Modal from 'react-bootstrap/Modal';
 import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
+import CreateCountryConsent from './create-country-consent.component';
+import { useSelector, useDispatch } from 'react-redux';
+import { getCdpConsents } from '../consent.action';
+
 
 const CountryConsents = () => {
+    const [show, setShow] = useState(false);
+    const dispatch = useDispatch();
+    const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
+
+    useEffect(() => {
+        dispatch(getCdpConsents(null, null));
+    }, []);
+
     return (
         <main className="app__content cdp-light-bg h-100">
             <div className="container-fluid">
@@ -22,12 +34,16 @@ const CountryConsents = () => {
                 </div>
                 <div className="row">
                     <div className="col-12">
+                        {cdp_consents && cdp_consents.length > 0 && cdp_consents.map(x => {
+                            <span>{x.title}</span>
+                        })}
                         <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
                             <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Country Consents</h4>
                             <div class="d-flex justify-content-between align-items-center">
-                                <NavLink to="/consent/country/create" className="btn cdp-btn-secondary text-white ml-2">
+                                <button onClick={() => setShow(true)} className="btn cdp-btn-secondary text-white ml-2">
                                     <i className="icon icon-plus pr-1"></i> Create country consent
-                                </NavLink>
+                                </button>
+                                {cdp_consents && <CreateCountryConsent changeShow={(val) => setShow(val)} consents={cdp_consents} show={show} />}
                             </div>
                         </div>
 
@@ -57,7 +73,7 @@ const CountryConsents = () => {
                                     </tr>
                                 </tbody>
                             </table>
-                            
+
                         </div>
 
                         <div className="table-responsive shadow-sm bg-white mb-3">

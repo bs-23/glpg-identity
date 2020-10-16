@@ -14,13 +14,12 @@ export default function HcpRoutes() {
 
     return (
         <Switch>
-            <PrivateRoute exact path={path} component={DataPrivacyAndConsentManagement} module={'privacy'}/>
-            <PrivateRoute path={`${path}/list`} component={Consents} module={'privacy'}/>
-            <PrivateRoute path={`${path}/create`} component={ConsentForm} module={'privacy'}/>
-            <PrivateRoute path={`${path}/country/create`} component={CreateCountryConsent} module={'privacy'}/>
-            <PrivateRoute path={`${path}/country`} component={CountryConsents} module={'privacy'}/>
-            <PrivateRoute path={`${path}/consent-performance-report/cdp`} component={CdpConsentPerformanceReport} module={'privacy'}/>
-            <PrivateRoute path={`${path}/consent-performance-report/veeva-crm`} component={VeevaConsentPerformanceReport} module={'privacy'}/>
+            <PrivateRoute exact path={path} component={DataPrivacyAndConsentManagement} module={'privacy'} />
+            <PrivateRoute path={`${path}/list`} component={Consents} module={'privacy'} />
+            <PrivateRoute path={`${path}/create`} component={ConsentForm} module={'privacy'} />
+            <PrivateRoute path={`${path}/country`} component={CountryConsents} module={'privacy'} />
+            <PrivateRoute path={`${path}/consent-performance-report/cdp`} component={CdpConsentPerformanceReport} module={'privacy'} />
+            <PrivateRoute path={`${path}/consent-performance-report/veeva-crm`} component={VeevaConsentPerformanceReport} module={'privacy'} />
         </Switch>
     );
 }
