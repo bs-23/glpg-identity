@@ -20,6 +20,14 @@ const CdpConsents = () => {
         ));
     }
 
+    function getLocales(translations){
+        if(translations){
+            const locales = translations.map(item => item.locale);
+            return locales.join(', ');
+        }
+        return '';
+    }
+
     useEffect(() => {
         loadCdpConsents();
     }, []);
@@ -68,8 +76,8 @@ const CdpConsents = () => {
                                         {cdp_consents.map((row, index) => (
                                             <tr>
                                                 <td>{row.title}</td>
-                                                <td>NL_NL, BE_NL</td>
-                                                <td>Medical</td>
+                                                <td>{getLocales(row.translations)}</td>
+                                                <td>{row.consent_category ? row.consent_category.title : ''}</td>
                                                 <td>{row.preference}</td>
                                                 <td>{row.is_active ? 'Active' : 'Inactive'}</td>
                                                 <td>System Admin</td>
