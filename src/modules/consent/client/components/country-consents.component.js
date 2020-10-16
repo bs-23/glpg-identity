@@ -15,7 +15,7 @@ const CountryConsents = () => {
                             <ol className="breadcrumb rounded-0">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/consent">Data Privacy & Consent Management</NavLink></li>
-                                <li className="breadcrumb-item active"><span>Country Consents</span></li>
+                                <li className="breadcrumb-item active"><span>Country Consents List</span></li>
                             </ol>
                         </nav>
                     </div>
