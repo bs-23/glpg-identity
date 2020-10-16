@@ -584,7 +584,8 @@ async function createConsent(req, res) {
                 slug: title,
                 legal_basis,
                 is_active,
-                preference
+                preference,
+                created_by: req.user.id
             },
             attributes: { exclude: ['created_at', 'updated_at'] }
         });
