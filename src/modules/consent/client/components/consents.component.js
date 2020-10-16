@@ -163,7 +163,7 @@ const Consents = () => {
                                                 </Accordion.Toggle>
                                             </Card.Header>
                                             <Accordion.Collapse eventKey="0">
-                                                <Card.Body><div>{parse(parse(translation.rich_text))}</div></Card.Body>
+                                                <Card.Body><div>{parse(translation.rich_text)}</div></Card.Body>
                                             </Accordion.Collapse>
                                         </Card>
                                     </Accordion>
