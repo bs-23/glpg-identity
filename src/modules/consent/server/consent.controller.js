@@ -10,6 +10,7 @@ const ConsentCategory = require('./consent-category.model');
 const ConsentLanguage = require('./consent-locale.model');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const HCPS = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_profile.model'));
+const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model.js'));
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 
@@ -485,17 +486,23 @@ async function getCdpConsents(req, res) {
     try {
         let { translations, category } = req.query;
 
-        const inclusions = category === 'true'
-            ? [{
+        const inclusions = [{
+            model: User,
+            as: 'createdByUser',
+            attributes: ['id', 'first_name', 'last_name'],
+        }];
+
+        if (category === 'true') {
+            inclusions.push({
                 model: ConsentCategory,
                 as: 'consent_category',
                 attributes: ['id', 'title', 'type']
-            }]
-            : [];
+            });
+        }
 
         const consents = await Consent.findAll({
             include: inclusions,
-            attributes: { exclude: ['category_id'] }
+            attributes: { exclude: ['category_id', 'created_by'] }
         });
 
         translations === 'true' && await Promise.all(consents.map(async consent => {
