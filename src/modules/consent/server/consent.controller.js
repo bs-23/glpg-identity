@@ -731,7 +731,7 @@ async function deleteCdpConsent(req, res) {
 
 async function getCountryConsents(req, res) {
     try {
-        const countryConsentDbos = await ConsentCountry.findAll({
+        const countryConsents = await ConsentCountry.findAll({
             include: [{
                 model: Consent,
                 as: 'consent',
@@ -739,11 +739,9 @@ async function getCountryConsents(req, res) {
             }]
         });
 
-        if (!countryConsentDbos || countryConsentDbos.length < 1) {
+        if (!countryConsents || countryConsents.length < 1) {
             return res.status(400).send('Country Consents not found.');
         }
-
-        const countryConsents = countryConsentDbos.map(c => ({ ...c.dataValues }))
 
         await Promise.all(countryConsents.map(async (countryConsent) => {
             const consentTransations = await ConsentLanguage.findAll({
@@ -751,7 +749,7 @@ async function getCountryConsents(req, res) {
             });
 
             const locales = consentTransations.map(ct => ct.locale.toUpperCase());
-            countryConsent.locales = locales.join(', ');
+            countryConsent.dataValues.consent.dataValues.locales = locales.join(', ');
         }));
 
         res.json(countryConsents);
