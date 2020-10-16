@@ -11,6 +11,7 @@ const CdpConsents = () => {
     const dispatch = useDispatch();
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
     const [lgShow, setLgShow] = useState(false);
+    const [consent, setConsent] = useState({});
 
     async function loadCdpConsents() {
         const params = new URLSearchParams(window.location.search);
@@ -18,6 +19,13 @@ const CdpConsents = () => {
             params.get('translations') ? params.get('translations') : '',
             params.get('category') ? params.get('category') : ''
         ));
+    }
+
+    const getConsentsForCurrentUser = (row) => {
+        // const { data } = await axios.get(`/api/hcp-profiles/${currentUser.id}/consents`);
+        // setCurrentUser({ ...currentUser, consents: data.data });
+        setConsent(row);
+        setLgShow(true);
     }
 
     function getLocales(translations){
@@ -74,7 +82,7 @@ const CdpConsents = () => {
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
                                         {cdp_consents.map((row, index) => (
-                                            <tr>
+                                            <tr key={index}>
                                                 <td>{row.title}</td>
                                                 <td>{getLocales(row.translations)}</td>
                                                 <td>{row.consent_category ? row.consent_category.title : ''}</td>
@@ -87,7 +95,7 @@ const CdpConsents = () => {
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu>
                                                         <Dropdown.Item>Edit Consent</Dropdown.Item>
-                                                        <Dropdown.Item onClick={() => setLgShow(true)}>Consent Detail</Dropdown.Item>
+                                                        <Dropdown.Item onClick={() => getConsentsForCurrentUser(row)}>Consent Detail</Dropdown.Item>
                                                     </Dropdown.Menu>
                                                 </Dropdown></td>
                                             </tr>
@@ -115,34 +123,34 @@ const CdpConsents = () => {
                     <div className="px-4 py-3">
                         <div className="row">
                             <div className="col">
-                                <h4 className="mt-1 font-weight-bold">Consent Title	</h4>
-                                <div className="">I give my consent to send me promotional email</div>
+                                <h4 className="mt-1 font-weight-bold">Consent Title</h4>
+                                <div className="">{consent.title}</div>
                             </div>
                         </div>
                         <div className="row mt-3">
                             <div className="col-6">
                                 <div className="mt-1 font-weight-bold">Consent Type</div>
-                                <div className="">Medical</div>
+                                <div className="">{consent.consent_category ? consent.consent_category.title : ''}</div>
                             </div>
                             <div className="col-6">
                                 <div className="mt-1 font-weight-bold">Preference</div>
-                                <div className="">Galapagos Terms of Use</div>
+                                <div className="">{consent.preference}</div>
                             </div>
                         </div>
                         <div className="row mt-3">
                             <div className="col-6">
                                 <div className="mt-1 font-weight-bold">Status</div>
-                                <div className="">Active</div>
+                                <div className="">{consent.is_active ? 'Active' : 'Inactive'}</div>
                             </div>
                             <div className="col-6">
                                 <div className="mt-1 font-weight-bold">Created By</div>
-                                <div className="">System Admin</div>
+                                <div className="">{consent.createdByUser ? `${consent.createdByUser.first_name} ${consent.createdByUser.last_name}` : ''}</div>
                             </div>
                         </div>
                         <div className="row mt-3">
                             <div className="col-6">
                                 <div className="mt-1 font-weight-bold">Ctreated Date</div>
-                                <div className="">20.102020</div>
+                                <div className="">{(new Date(consent.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
                             </div>
                         </div>
                         <div className="row mt-4">
@@ -153,7 +161,7 @@ const CdpConsents = () => {
                                         <Card.Header>
                                             <Accordion.Toggle as={Card.Header} variant="link" eventKey="0">
                                                 NL_NL
-      </Accordion.Toggle>
+                                            </Accordion.Toggle>
                                         </Card.Header>
                                         <Accordion.Collapse eventKey="0">
                                             <Card.Body>NL_NL text</Card.Body>
@@ -163,7 +171,7 @@ const CdpConsents = () => {
                                         <Card.Header>
                                             <Accordion.Toggle as={Card.Header}variant="link" eventKey="1">
                                                 BE_NL
-      </Accordion.Toggle>
+                                            </Accordion.Toggle>
                                         </Card.Header>
                                         <Accordion.Collapse eventKey="1">
                                             <Card.Body>BE_NL text</Card.Body>
