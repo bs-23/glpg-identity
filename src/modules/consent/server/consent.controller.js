@@ -555,7 +555,11 @@ async function getCdpConsent(req, res) {
             attributes: { exclude: ['consent_id', 'created_at', 'updated_at'] }
         })
 
-        data.translations = translations;
+        data.translations = translations.map(t => ({
+            id: t.id,
+            locale: t.locale,
+            rich_text: validator.unescape(t.rich_text)
+        }));
 
         res.json(data);
     } catch (err) {
