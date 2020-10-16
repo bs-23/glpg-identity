@@ -6,9 +6,8 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import Modal from 'react-bootstrap/Modal';
 import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
-import parse from 'html-react-parser';
 
-const Consents = () => {
+const CdpConsents = () => {
     const dispatch = useDispatch();
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
     const [lgShow, setLgShow] = useState(false);
@@ -66,7 +65,7 @@ const Consents = () => {
                             </div>
                         </div>
 
-                        {cdp_consents && cdp_consents.length > 0 &&
+                        {cdp_consents && cdp_consents.length > 0 && 
                             <div className="table-responsive shadow-sm bg-white">
                                 <table className="table table-hover table-sm mb-0 cdp-table">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
@@ -108,7 +107,6 @@ const Consents = () => {
                     </div>
                 </div>
             </div>
-
             <Modal
                 size="lg"
                 centered
@@ -158,20 +156,28 @@ const Consents = () => {
                         <div className="row mt-4">
                             <div className="col accordion-consent rounded shadow-sm p-0">
                                 <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Available Translation	</h4>
-                                {consent.translations && consent.translations.length > 0 ? consent.translations.map((translation, index) => (
-                                    <Accordion defaultActiveKey="0" key={index}>
-                                        <Card>
-                                            <Card.Header>
-                                                <Accordion.Toggle as={Card.Header} variant="link" eventKey="0">
-                                                    {translation.locale}
-                                                </Accordion.Toggle>
-                                            </Card.Header>
-                                            <Accordion.Collapse eventKey="0">
-                                                <Card.Body>{parse(translation.rich_text || '')}</Card.Body>
-                                            </Accordion.Collapse>
-                                        </Card>
-                                    </Accordion>
-                                )) : 'There are no translations'}
+                                <Accordion defaultActiveKey="0">
+                                    <Card>
+                                        <Card.Header>
+                                            <Accordion.Toggle as={Card.Header} variant="link" eventKey="0">
+                                                NL_NL
+                                            </Accordion.Toggle>
+                                        </Card.Header>
+                                        <Accordion.Collapse eventKey="0">
+                                            <Card.Body>NL_NL text</Card.Body>
+                                        </Accordion.Collapse>
+                                    </Card>
+                                    <Card>
+                                        <Card.Header>
+                                            <Accordion.Toggle as={Card.Header}variant="link" eventKey="1">
+                                                BE_NL
+                                            </Accordion.Toggle>
+                                        </Card.Header>
+                                        <Accordion.Collapse eventKey="1">
+                                            <Card.Body>BE_NL text</Card.Body>
+                                        </Accordion.Collapse>
+                                    </Card>
+                                </Accordion>
                             </div>
                         </div>
                     </div>
@@ -181,4 +187,4 @@ const Consents = () => {
     );
 }
 
-export default Consents;
+export default CdpConsents;
