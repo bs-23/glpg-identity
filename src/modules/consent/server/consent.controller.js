@@ -514,11 +514,8 @@ async function getCdpConsents(req, res) {
                 attributes: { exclude: ['consent_id', 'created_at', 'updated_at'] }
             });
 
-            consent.dataValues.translations = consentTranslations.map(ct => ({
-                id: ct.id,
-                locale: ct.locale,
-                rich_text: validator.unescape(ct.rich_text)
-            }));
+            const locales = consentTranslations.map(ct => ct.locale.toUpperCase());
+            consent.dataValues.locales = locales.join(', ');
         }));
 
         res.json(consents);
@@ -538,23 +535,36 @@ async function getCdpConsent(req, res) {
             where: {
                 id: req.params.id
             },
-            include: [{
-                model: User,
-                as: 'createdByUser',
-                attributes: ['id', 'first_name', 'last_name'],
-            }]
+            include: [
+                {
+                    model: User,
+                    as: 'createdByUser',
+                    attributes: ['id', 'first_name', 'last_name'],
+                },
+                {
+                    model: ConsentCategory,
+                    as: 'consent_category',
+                    attributes: ['id', 'title', 'type']
+                },
+                {
+                    model: ConsentCountry,
+                    as: 'consent_country'
+                }
+            ],
+            attributes: { exclude: ['category_id'] }
         });
 
         if (!consent) {
             res.status(404).send('Consent not found');
         }
 
-        const data = { ...consent.dataValues };
+        const { consent_country, ...otherProps } = consent.dataValues;
+        const data = { ...otherProps, countries: consent_country };
 
         const translations = await ConsentLanguage.findAll({
             where: { consent_id: consent.id },
             attributes: { exclude: ['consent_id', 'created_at', 'updated_at'] }
-        })
+        });
 
         data.translations = translations.map(t => ({
             id: t.id,
@@ -755,11 +765,11 @@ async function getCountryConsents(req, res) {
         }
 
         await Promise.all(countryConsents.map(async (countryConsent) => {
-            const consentTransations = await ConsentLanguage.findAll({
+            const consentTranslations = await ConsentLanguage.findAll({
                 where: { consent_id: countryConsent.consent_id }
             });
 
-            const locales = consentTransations.map(ct => ct.locale.toUpperCase());
+            const locales = consentTranslations.map(ct => ct.locale.toUpperCase());
             countryConsent.dataValues.consent.dataValues.locales = locales.join(', ');
         }));
 
