@@ -6,7 +6,6 @@ import Modal from 'react-bootstrap/Modal';
 import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
 import CreateCountryConsent from './create-country-consent.component';
-import { useSelector, useDispatch } from 'react-redux';
 import { getCdpConsents } from '../consent.action';
 import axios from "axios";
 
@@ -18,9 +17,6 @@ const CountryConsents = () => {
     const dispatch = useDispatch();
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
     const [countries, setCountries] = useState([]);
-
-
-    const dispatch = useDispatch();
     const [countryConsent, setCountryConsent] = useState([]);
     const country_consents = useSelector(state => state.consentReducer.country_consents).reduce(
         (grouped, current) => {
