@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { NavLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import Dropdown from 'react-bootstrap/Dropdown';
-import Modal from 'react-bootstrap/Modal';
-import Accordion from 'react-bootstrap/Accordion';
-import Card from 'react-bootstrap/Card';
 import CountryConsentForm from './country-consent-form';
 import { getCdpConsents } from '../consent.action';
 import optTypes from '../opt-types.json';
@@ -18,7 +14,7 @@ const CountryConsents = () => {
     const dispatch = useDispatch();
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
     const [countries, setCountries] = useState([]);
-    const [countryConsent, setCountryConsent] = useState([]);
+    const [] = useState([]);
     const country_consents = useSelector(state => state.consentReducer.country_consents);
 
     const getGroupedCountryConsents = () => {

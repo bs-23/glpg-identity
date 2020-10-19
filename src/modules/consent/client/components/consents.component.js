@@ -14,10 +14,6 @@ const Consents = () => {
     const [lgShow, setLgShow] = useState(false);
     const [consent, setConsent] = useState({});
 
-    async function loadCdpConsents() {
-        dispatch(getCdpConsents(true, true));
-    }
-
     const getConsents = (row) => {
         setConsent(row);
         setLgShow(true);
@@ -32,7 +28,7 @@ const Consents = () => {
     }
 
     useEffect(() => {
-        loadCdpConsents();
+        dispatch(getCdpConsents(true, true));
     }, []);
 
     return (
