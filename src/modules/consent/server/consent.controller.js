@@ -514,7 +514,11 @@ async function getCdpConsents(req, res) {
                 attributes: { exclude: ['consent_id', 'created_at', 'updated_at'] }
             });
 
-            consent.dataValues.translations = [...consentTranslations];
+            consent.dataValues.translations = consentTranslations.map(ct => ({
+                id: ct.id,
+                locale: ct.locale,
+                rich_text: validator.unescape(ct.rich_text)
+            }));
         }));
 
         res.json(consents);
@@ -552,7 +556,11 @@ async function getCdpConsent(req, res) {
             attributes: { exclude: ['consent_id', 'created_at', 'updated_at'] }
         })
 
-        data.translations = translations;
+        data.translations = translations.map(t => ({
+            id: t.id,
+            locale: t.locale,
+            rich_text: validator.unescape(t.rich_text)
+        }));
 
         res.json(data);
     } catch (err) {
@@ -732,7 +740,7 @@ async function deleteCdpConsent(req, res) {
 
 async function getCountryConsents(req, res) {
     try {
-        const countryConsentDbos = await ConsentCountry.findAll({
+        const countryConsents = await ConsentCountry.findAll({
             include: [{
                 model: Consent,
                 as: 'consent',
@@ -740,11 +748,9 @@ async function getCountryConsents(req, res) {
             }]
         });
 
-        if (!countryConsentDbos || countryConsentDbos.length < 1) {
+        if (!countryConsents || countryConsents.length < 1) {
             return res.status(400).send('Country Consents not found.');
         }
-
-        const countryConsents = countryConsentDbos.map(c => ({ ...c.dataValues }))
 
         await Promise.all(countryConsents.map(async (countryConsent) => {
             const consentTransations = await ConsentLanguage.findAll({
@@ -752,7 +758,7 @@ async function getCountryConsents(req, res) {
             });
 
             const locales = consentTransations.map(ct => ct.locale.toUpperCase());
-            countryConsent.locales = locales.join(', ');
+            countryConsent.dataValues.consent.dataValues.locales = locales.join(', ');
         }));
 
         res.json(countryConsents);

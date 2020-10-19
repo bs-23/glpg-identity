@@ -22,7 +22,6 @@ export function getConsentReport(page, codbase, process_activity, opt_type, orde
     };
 }
 
-
 export function getVeevaConsentReport(page, codbase, process_activity, opt_type, orderBy, orderType) {
     const search_params = new URLSearchParams('');
 
@@ -61,4 +60,13 @@ export function getCdpConsents(translations, category){
     };
 }
 
-
+export function getCountryConsents() {
+    const url = '/api/consent/country/';
+    return {
+        type: Types.GET_COUNTRY_CONSENTS,
+        payload: axios({
+            method: 'get',
+            url
+        })
+    };
+}

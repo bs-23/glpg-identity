@@ -15,23 +15,17 @@ const Consents = () => {
     const [consent, setConsent] = useState({});
 
     async function loadCdpConsents() {
-        const params = new URLSearchParams(window.location.search);
-        dispatch(getCdpConsents(
-            params.get('translations') ? params.get('translations') : '',
-            params.get('category') ? params.get('category') : ''
-        ));
+        dispatch(getCdpConsents(true, true));
     }
 
-    const getConsentsForCurrentUser = (row) => {
-        // const { data } = await axios.get(`/api/hcp-profiles/${currentUser.id}/consents`);
-        // setCurrentUser({ ...currentUser, consents: data.data });
+    const getConsents = (row) => {
         setConsent(row);
         setLgShow(true);
     }
 
     function getLocales(translations){
         if(translations){
-            const locales = translations.map(item => item.locale);
+            const locales = translations.map(item => item.locale.toUpperCase());
             return locales.join(', ');
         }
         return '';
@@ -96,7 +90,7 @@ const Consents = () => {
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu>
                                                         <Dropdown.Item>Edit Consent</Dropdown.Item>
-                                                        <Dropdown.Item onClick={() => getConsentsForCurrentUser(row)}>Consent Detail</Dropdown.Item>
+                                                        <Dropdown.Item onClick={() => getConsents(row)}>Consent Detail</Dropdown.Item>
                                                     </Dropdown.Menu>
                                                 </Dropdown></td>
                                             </tr>
@@ -163,11 +157,11 @@ const Consents = () => {
                                         <Card>
                                             <Card.Header>
                                                 <Accordion.Toggle as={Card.Header} variant="link" eventKey="0">
-                                                    {translation.locale}
+                                                    {translation.locale.toUpperCase()}
                                                 </Accordion.Toggle>
                                             </Card.Header>
                                             <Accordion.Collapse eventKey="0">
-                                                <Card.Body>{parse(translation.rich_text || '')}</Card.Body>
+                                                <Card.Body><div>{parse(translation.rich_text)}</div></Card.Body>
                                             </Accordion.Collapse>
                                         </Card>
                                     </Accordion>
