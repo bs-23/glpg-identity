@@ -354,14 +354,17 @@ async function registrationLookup(req, res) {
             response.errors.push(new CustomError('UUID is already registered.', 4101, 'uuid'));
             return res.status(400).send(response);
         } else {
+            const uuidWithoutSpecialCharacter = uuid.replace(/[-]/gi, '');
+
             const master_data = await sequelize.datasyncConnector.query(`
                 SELECT h.*, s.specialty_code
                 FROM ciam.vwhcpmaster AS h
                 INNER JOIN ciam.vwmaphcpspecialty AS s
                 ON s.individual_id_onekey = h.individual_id_onekey
-                WHERE h.uuid_1 = $uuid OR h.uuid_2 = $uuid
+                WHERE regexp_replace(h.uuid_1, '[-]', '', 'gi') = $uuid
+                OR regexp_replace(h.uuid_2, '[-]', '', 'gi') = $uuid
             `, {
-                bind: { uuid },
+                bind: { uuid: uuidWithoutSpecialCharacter },
                 type: QueryTypes.SELECT
             });
 
