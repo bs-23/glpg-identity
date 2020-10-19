@@ -1,7 +1,22 @@
-import React from "react";
+import axios from "axios";
+import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
+import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
+import { createConsent } from "../consent.action";
+import { useToasts } from "react-toast-notifications";
 
 const ConsentForm = () => {
+    const { addToast } = useToasts();
+    const [categories, setCategories] = useState([]);
+    const [isActive, setIsActive] = useState(true);
+
+    useEffect(() => {
+        async function getConsentCatogories() {
+            const response = await axios.get('/api/consent/category');
+            setCategories(response.data);
+        }
+        getConsentCatogories();
+    }, []);
 
     return (
         <main className="app__content cdp-light-bg h-100">
@@ -18,16 +33,137 @@ const ConsentForm = () => {
                         </nav>
                     </div>
                 </div>
-                <div className="row">
-                    <div className="col-12">
-                        <div className="shadow-sm bg-white mb-3">
-                            <h2 className="d-flex align-items-center p-3 px-sm-4 py-sm-2 page-title light">
-                                <span className="page-title__text font-weight-bold py-3">Create New Consent</span>
-                            </h2>
-                            <div className="add-user p-3"></div>
+                {categories.length > 0 &&
+                    <div className="row">
+                        <div className="col-12">
+                            <div className="shadow-sm bg-white mb-3">
+                                <h2 className="d-flex align-items-center p-3 px-sm-4 py-sm-2 page-title light">
+                                    <span className="page-title__text font-weight-bold py-3">Create New Consent</span>
+                                </h2>
+                                <div className="add-user p-3">
+                                    <Formik
+                                        initialValues={{
+                                            category_id: categories[0].id,
+                                            legal_basis: "consent",
+                                            title: "",
+                                            preference: "",
+                                            translations: [],
+                                            is_active: isActive
+                                        }}
+                                        displayName="ConsentForm"
+                                        // validationSchema={consentSchema}
+                                        onSubmit={(values, actions) => {
+                                            console.log(values)
+                                            values.is_active = isActive;
+
+                                            dispatch(createConsent(values))
+                                            .then(res => {
+                                                actions.resetForm();
+                                                addToast('Consent created successfully', {
+                                                    appearance: 'success',
+                                                    autoDismiss: true
+                                                });
+                                                // history.push(`/users/${res.value.data.id}`)
+                                            }).catch(err => {
+                                                const errorMessage = typeof err.response.data === 'string' ? err.response.data : err.response.statusText
+                                                addToast(errorMessage, {
+                                                    appearance: 'error',
+                                                    autoDismiss: true
+                                                });
+                                            });
+
+                                            actions.setSubmitting(false);
+                                        }}
+                                    >
+                                        {formikProps => (
+                                            <Form onSubmit={formikProps.handleSubmit}>
+                                                <div className="row">
+                                                    <div className="col-12 col-lg-8 col-xl-6">
+                                                        <div className="row">
+                                                            <div className="col-12 col-sm-6">
+                                                                <div className="form-group">
+                                                                    <label className="font-weight-bold" htmlFor="category_id">Select Category <span className="text-danger">*</span></label>
+                                                                    <Field data-testid="category" as="select" name="category_id" className="form-control">
+                                                                        {categories.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
+                                                                    </Field>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="col-12 col-sm-6">
+                                                                <div className="form-group">
+                                                                    <label className="font-weight-bold" htmlFor="category_id">Select Legal Basis <span className="text-danger">*</span></label>
+                                                                    <Field data-testid="legal_basis" as="select" name="legal_basis" className="form-control">
+                                                                        {['consent', 'contract'].map(item => <option key={item} value={item}>{item}</option>)}
+                                                                    </Field>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="col-12 col-sm-6">
+                                                                <div className="form-group">
+                                                                    <label className="font-weight-bold" htmlFor="title"> Title <span className="text-danger">*</span></label>
+                                                                    <Field className="form-control" type="name" name="title" />
+                                                                    <div className="invalid-feedback"><ErrorMessage name="title" /></div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="col-12 col-sm-6">
+                                                                <div className="form-group">
+                                                                    <label className="font-weight-bold" htmlFor="preference"> Preference <span className="text-danger">*</span></label>
+                                                                    <Field className="form-control" type="preference" name="preference"/>
+                                                                    <div className="invalid-feedback"><ErrorMessage name="preference" /></div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="col-12 col-sm-6">
+                                                                <div className="form-group">
+                                                                    <label className="d-flex justify-content-between align-items-center">
+                                                                        <span className="switch-label"> Active </span>
+                                                                        <span className="switch">
+                                                                            <input
+                                                                                name="is_active"
+                                                                                type="checkbox"
+                                                                                value={isActive}
+                                                                                checked={isActive}
+                                                                                onChange={() => setIsActive(!isActive)}
+                                                                            />
+                                                                            <span className="slider round"></span>
+                                                                        </span>
+                                                                    </label>
+                                                                    {/* <label className="font-weight-bold" htmlFor="is_active"> is active </label>
+                                                                    
+                                                                    <span className="switch">
+                                                                        <Field type="checkbox" name="is_active" />
+                                                                        <input
+                                                                            name="is_active"
+                                                                            type="checkbox"
+                                                                            checked={isActive}
+                                                                            value={isActive}
+                                                                            onChange={e => {
+                                                                                alert('harrr')
+                                                                                if (e.target.checked) setIsActive(false);
+                                                                                else setIsActive(true);
+                                                                            }}
+                                                                            onClick={() => {
+                                                                                alert('habib')
+                                                                            }}
+                                                                        />
+                                                                        <span className="slider round"></span>
+                                                                    </span> */}
+                                                                </div>
+                                                            </div>
+                                                            
+                                                        </div>
+                                                        <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" >Submit</button>
+                                                    </div>
+                                                </div>
+                                            </Form>
+                                        )}
+                                    </Formik>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                }
             </div>
 
         </main>
