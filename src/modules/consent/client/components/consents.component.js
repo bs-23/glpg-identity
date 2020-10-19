@@ -62,8 +62,8 @@ const Consents = () => {
                                 <table className="table table-hover table-sm mb-0 cdp-table">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
-                                            <th>Consent Title</th>
-                                            <th>Available Translation</th>
+                                            <th>Title</th>
+                                            <th>Available Translations</th>
                                             <th>Consent Type</th>
                                             <th>Preference</th>
                                             <th>Status</th>
