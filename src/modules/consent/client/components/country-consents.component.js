@@ -7,6 +7,7 @@ import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
 import CountryConsentForm from './country-consent-form';
 import { getCdpConsents } from '../consent.action';
+import optTypes from '../opt-types.json';
 import axios from "axios";
 
 
@@ -26,20 +27,21 @@ const CountryConsents = () => {
         const groupedByCountry = country_consents.reduce(
             (grouped, current) => {
                 const existing = grouped.find(g => g.country_iso2 === current.country_iso2);
+                const optType = optTypes.find(ot => ot.value === current.opt_type);
                 if (existing) {
                     existing.consents.push({
                         ...current.consent,
-                        opt_type: current.opt_type
+                        opt_type: optType.text
                     });
                 } else {
                     const country = countries.find(c => c.country_iso2.toLowerCase() === current.country_iso2.toLowerCase());
                     grouped.push({
                         name: country.codbase_desc,
                         country_iso2: current.country_iso2,
-                        flagUrl: `/assets/flag/flag-${country.codbase_desc.toLowerCase()}.svg`,
+                        flagUrl: `/assets/flag/flag-${country.codbase_desc.replace(' ', '-').toLowerCase()}.svg`,
                         consents: [{
                             ...current.consent,
-                            opt_type: current.opt_type
+                            opt_type: optType.text
                         }]
                     });
                 }

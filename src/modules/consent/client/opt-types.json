@@ -1,10 +1,10 @@
 [
     {
-        "name": "Single Opt-in",
+        "text": "Single Opt-in",
         "value": "single-opt-in"
     },
     {
-        "name": "Double Opt-in",
+        "text": "Double Opt-in",
         "value": "double-opt-in"
     }
 ]

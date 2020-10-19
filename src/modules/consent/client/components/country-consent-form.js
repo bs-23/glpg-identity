@@ -25,7 +25,7 @@ const CountryConsentForm = (props) => {
                     <div className="consent-manage p-3">
                         <Formik
                             initialValues={{
-                                consent_id: props.consents[1].id,
+                                consent_id: props.consents[0].id,
                                 country_iso2: props.countries[0].country_iso2,
                                 opt_type: optTypes[0].value
                             }}
@@ -75,7 +75,7 @@ const CountryConsentForm = (props) => {
                                                 <Field data-testid="opt_type" as="select" name="opt_type" className="form-control">
                                                 {
                                                     optTypes.map(optType => (
-                                                        <option key={optType.value} value={optType.value}>{optType.name}</option>
+                                                        <option key={optType.value} value={optType.value}>{optType.text}</option>
                                                     ))
                                                 }
                                                 </Field>
