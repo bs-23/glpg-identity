@@ -4,7 +4,6 @@ import DataPrivacyAndConsentManagement from './components/data-privacy-and-conse
 import Consents from './components/consents.component';
 import ConsentForm from './components/consent-form.component';
 import CountryConsents from './components/country-consents.component';
-import CreateCountryConsent from './components/create-country-consent.component';
 import CdpConsentPerformanceReport from './components/cdp-consent-performance-report.component';
 import VeevaConsentPerformanceReport from './components/veeva-consent-performance-report.component';
 import PrivateRoute from "../../core/client/PrivateRoute";
