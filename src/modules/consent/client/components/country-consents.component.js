@@ -18,38 +18,37 @@ const CountryConsents = () => {
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
     const [countries, setCountries] = useState([]);
     const [countryConsent, setCountryConsent] = useState([]);
-    const country_consents = useSelector(state => state.consentReducer.country_consents).reduce(
-        (grouped, current) => {
-            const existing = grouped.find(g => g.country_iso2 === current.country_iso2);
-            if (existing) {
-                existing.consents.push({
-                    ...current.consent,
-                    opt_type: current.opt_type
-                });
-            } else {
-                grouped.push({
-                    country_iso2: current.country_iso2,
-                    consents: [{
+    const country_consents = useSelector(state => state.consentReducer.country_consents);
+
+    const getGroupedCountryConsents = () => {
+        if (!countries || !countries.length) return [];
+
+        const groupedByCountry = country_consents.reduce(
+            (grouped, current) => {
+                const existing = grouped.find(g => g.country_iso2 === current.country_iso2);
+                if (existing) {
+                    existing.consents.push({
                         ...current.consent,
                         opt_type: current.opt_type
-                    }]
-                });
+                    });
+                } else {
+                    const country = countries.find(c => c.country_iso2.toLowerCase() === current.country_iso2.toLowerCase());
+                    grouped.push({
+                        name: country.codbase_desc,
+                        country_iso2: current.country_iso2,
+                        flagUrl: `/assets/flag/flag-${country.codbase_desc.toLowerCase()}.svg`,
+                        consents: [{
+                            ...current.consent,
+                            opt_type: current.opt_type
+                        }]
+                    });
+                }
+                return grouped;
             }
-            return grouped;
-        }
-        , []
-    );
-
-    const getCountryName = (country_iso2) => {
-        const country = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
-        return (country || {}).codbase_desc;
-    };
-
-    const getCountryFlagUrl = (country_iso2) => {
-        const country = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
-        if (!country) return '';
-        return `/assets/flag/flag-${country.codbase_desc.toLowerCase()}.svg`
-    };
+            , []
+        );
+        return groupedByCountry;
+    }
 
     useEffect(() => {
         async function getCountries() {
@@ -88,13 +87,13 @@ const CountryConsents = () => {
                         </div>
 
                         {
-                            country_consents.map((countryConsent, countryConsentIndex) =>
+                            getGroupedCountryConsents().map((countryConsent, countryConsentIndex) =>
                                 (
                                     <div className="table-responsive shadow-sm bg-white mb-3" key={countryConsentIndex}>
                                         <table className="table table-hover table-sm mb-0 cdp-table mb-2">
                                             <thead className="bg-light cdp-table__header">
                                                 <tr>
-                                                    <th colSpan="4"><div className="d-flex align-items-center"><img alt="CDP LOGO" src={getCountryFlagUrl(countryConsent.country_iso2)} height="18" className="mr-2" /> {getCountryName(countryConsent.country_iso2)}</div></th>
+                                                    <th colSpan="4"><div className="d-flex align-items-center"><img alt={countryConsent.name} src={countryConsent.flagUrl} height="18" className="mr-2" /> {countryConsent.name}</div></th>
                                                 </tr>
                                             </thead>
                                             <thead className="cdp-table__header">
