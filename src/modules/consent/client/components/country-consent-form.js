@@ -2,29 +2,22 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import Modal from 'react-bootstrap/Modal'
-import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
-import { useSelector, useDispatch } from 'react-redux';
-import { getCdpConsents } from '../consent.action';
+import { Form, Formik, Field } from "formik";
 import axios from 'axios';
 import { useToasts } from 'react-toast-notifications';
 
-const CreateCountryConsent = (props) => {
-
-
+const CountryConsentForm = (props) => {
     const [show, setShow] = useState(false);
     const { addToast } = useToasts();
-
     const handleClose = () => {
-
         setShow(false);
         props.changeShow(false);
     }
 
-
     return (
         <Modal show={props.show} onHide={handleClose}>
             <Modal.Header closeButton>
-                <Modal.Title>Modal heading</Modal.Title>
+                <Modal.Title>Assign Consent</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 {props.consents.length > 0 && props.countries.length > 0 &&
@@ -36,11 +29,7 @@ const CreateCountryConsent = (props) => {
                                 opt_type: "single-opt-in"
                             }}
                             displayName="ConsentForm"
-                            //validationSchema={registerSchema}
                             onSubmit={(values, actions) => {
-                                console.log(values);
-
-
                                 axios.post('/api/consent/country', values).then(() => {
                                     actions.resetForm();
                                     addToast('Consent assigned successfully', {
@@ -53,11 +42,11 @@ const CreateCountryConsent = (props) => {
                                         appearance: 'error',
                                         autoDismiss: true
                                     });
+                                }).finally(function () {
+                                    actions.setSubmitting(false);
+                                    handleClose();
+
                                 });
-
-
-                                actions.setSubmitting(false);
-                                handleClose();
                             }}
                         >
                             {formikProps => (
@@ -88,13 +77,12 @@ const CreateCountryConsent = (props) => {
                                                 </Field>
                                             </div>
                                         </div>
-                                        <button className="btn btn-primary mr-2" onClick={handleClose}>
+                                        <button type="submit" className="btn btn-primary mr-2" onClick={handleClose}>
                                             Save
                                         </button>
-                                        <button className="btn btn-secondary" onClick={handleClose}>
+                                        <button type="button" className="btn btn-secondary" onClick={handleClose}>
                                             Close
                                         </button>
-
                                     </div>
                                 </Form>
                             )}
@@ -106,4 +94,4 @@ const CreateCountryConsent = (props) => {
     );
 }
 
-export default CreateCountryConsent;
+export default CountryConsentForm;

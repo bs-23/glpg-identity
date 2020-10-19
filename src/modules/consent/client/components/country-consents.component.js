@@ -5,7 +5,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import Modal from 'react-bootstrap/Modal';
 import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
-import CreateCountryConsent from './create-country-consent.component';
+import CountryConsentForm from './country-consent-form';
 import { getCdpConsents } from '../consent.action';
 import axios from "axios";
 
@@ -78,7 +78,7 @@ const CountryConsents = () => {
                                 <button onClick={() => setShow(true)} className="btn cdp-btn-secondary text-white ml-2">
                                     <i className="icon icon-plus pr-1"></i> Create country consent
                                 </button>
-                                {cdp_consents && <CreateCountryConsent changeShow={(val) => setShow(val)} countries={countries} consents={cdp_consents} show={show} />}
+                                {cdp_consents && <CountryConsentForm changeShow={(val) => setShow(val)} countries={countries} consents={cdp_consents} show={show} />}
                             </div>
                         </div>
 
