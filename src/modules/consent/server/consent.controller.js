@@ -571,11 +571,13 @@ async function getCdpConsent(req, res) {
 
 async function createConsent(req, res) {
     try {
-        const { category_id, title, legal_basis, is_active, preference, translations } = req.body;
+        let { category_id, title, legal_basis, is_active, preference, translations } = req.body;
 
         if (!category_id || !title || !legal_basis) {
             return res.status(400).send('Invalid request.');
         }
+
+        is_active = !!is_active;
 
         const consentCategory = await ConsentCategory.findOne({ where: { id: category_id } });
 
