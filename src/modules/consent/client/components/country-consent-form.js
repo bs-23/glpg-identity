@@ -5,6 +5,7 @@ import Modal from 'react-bootstrap/Modal'
 import { Form, Formik, Field } from "formik";
 import axios from 'axios';
 import { useToasts } from 'react-toast-notifications';
+import optTypes from '../opt-types.json';
 
 const CountryConsentForm = (props) => {
     const [show, setShow] = useState(false);
@@ -24,9 +25,9 @@ const CountryConsentForm = (props) => {
                     <div className="consent-manage p-3">
                         <Formik
                             initialValues={{
-                                consent_id: props.consents[0].id,
+                                consent_id: props.consents[1].id,
                                 country_iso2: props.countries[0].country_iso2,
-                                opt_type: "single-opt-in"
+                                opt_type: optTypes[0].value
                             }}
                             displayName="ConsentForm"
                             onSubmit={(values, actions) => {
@@ -72,8 +73,11 @@ const CountryConsentForm = (props) => {
                                             <div className="form-group">
                                                 <label className="font-weight-bold" htmlFor="opt_type">Select Opt Type: <span className="text-danger">*</span></label>
                                                 <Field data-testid="opt_type" as="select" name="opt_type" className="form-control">
-                                                    <option key="single-opt-in" value="single-opt-in">Single Opt-in</option>
-                                                    <option key="double-opt-in" value="double-opt-in">Double Opt-in</option>
+                                                {
+                                                    optTypes.map(optType => (
+                                                        <option key={optType.value} value={optType.value}>{optType.name}</option>
+                                                    ))
+                                                }
                                                 </Field>
                                             </div>
                                         </div>

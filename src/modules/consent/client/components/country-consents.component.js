@@ -99,7 +99,7 @@ const CountryConsents = () => {
                                             <thead className="cdp-table__header">
                                                 <tr>
                                                     <th>Consent Title</th>
-                                                    <th>Available Translation</th>
+                                                    <th>Available Translations</th>
                                                     <th>Opt Type</th>
                                                     <th>Action</th>
                                                 </tr>

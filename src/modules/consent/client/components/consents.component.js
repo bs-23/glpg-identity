@@ -65,8 +65,8 @@ const Consents = () => {
                                 <table className="table table-hover table-sm mb-0 cdp-table">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
-                                            <th>Consent Title</th>
-                                            <th>Available Translation</th>
+                                            <th>Title</th>
+                                            <th>Available Translations</th>
                                             <th>Consent Type</th>
                                             <th>Preference</th>
                                             <th>Status</th>
@@ -119,7 +119,7 @@ const Consents = () => {
                     <div className="px-4 py-3">
                         <div className="row">
                             <div className="col">
-                                <h4 className="mt-1 font-weight-bold">Consent Title</h4>
+                                <h4 className="mt-1 font-weight-bold">Title</h4>
                                 <div className="">{consent.title}</div>
                             </div>
                         </div>
@@ -151,7 +151,7 @@ const Consents = () => {
                         </div>
                         <div className="row mt-4">
                             <div className="col accordion-consent rounded shadow-sm p-0">
-                                <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Available Translation	</h4>
+                                <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Available Translations</h4>
                                 {consent.translations && consent.translations.length > 0 ? consent.translations.map((translation, index) => (
                                     <Accordion defaultActiveKey="0" key={index}>
                                         <Card>
