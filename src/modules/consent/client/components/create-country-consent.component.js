@@ -5,11 +5,14 @@ import Modal from 'react-bootstrap/Modal'
 import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
 import { useSelector, useDispatch } from 'react-redux';
 import { getCdpConsents } from '../consent.action';
+import axios from 'axios';
+import { useToasts } from 'react-toast-notifications';
 
 const CreateCountryConsent = (props) => {
 
 
     const [show, setShow] = useState(false);
+    const { addToast } = useToasts();
 
     const handleClose = () => {
 
@@ -24,18 +27,81 @@ const CreateCountryConsent = (props) => {
                 <Modal.Title>Modal heading</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                {props.consents && props.consents.map(x => (
-                    <span>{x.title}</span>
-                ))}
+                {props.consents.length > 0 && props.countries.length > 0 &&
+                    <div className="consent-manage p-3">
+                        <Formik
+                            initialValues={{
+                                consent_id: props.consents[0].id,
+                                country_iso2: props.countries[0].country_iso2,
+                                opt_type: "single-opt-in"
+                            }}
+                            displayName="ConsentForm"
+                            //validationSchema={registerSchema}
+                            onSubmit={(values, actions) => {
+                                console.log(values);
+
+
+                                axios.post('/api/consent/country', values).then(() => {
+                                    actions.resetForm();
+                                    addToast('Consent assigned successfully', {
+                                        appearance: 'success',
+                                        autoDismiss: true
+                                    });
+
+                                }).catch(error => {
+                                    addToast(error.response.data, {
+                                        appearance: 'error',
+                                        autoDismiss: true
+                                    });
+                                });
+
+
+                                actions.setSubmitting(false);
+                                handleClose();
+                            }}
+                        >
+                            {formikProps => (
+                                <Form onSubmit={formikProps.handleSubmit}>
+                                    <div className="row">
+                                        <div className="col-12">
+                                            <div className="form-group">
+                                                <label className="font-weight-bold" htmlFor="consent_id">Select Consent <span className="text-danger">*</span></label>
+                                                <Field data-testid="consent" as="select" name="consent_id" className="form-control">
+                                                    {props.consents.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
+                                                </Field>
+                                            </div>
+                                        </div>
+                                        <div className="col-12">
+                                            <div className="form-group">
+                                                <label className="font-weight-bold" htmlFor="country_iso2">Select Country <span className="text-danger">*</span></label>
+                                                <Field data-testid="country_iso2" as="select" name="country_iso2" className="form-control">
+                                                    {props.countries.map(item => <option key={item.countryid} value={item.country_iso2}>{item.codbase_desc}</option>)}
+                                                </Field>
+                                            </div>
+                                        </div>
+                                        <div className="col-12">
+                                            <div className="form-group">
+                                                <label className="font-weight-bold" htmlFor="opt_type">Select Opt Type: <span className="text-danger">*</span></label>
+                                                <Field data-testid="opt_type" as="select" name="opt_type" className="form-control">
+                                                    <option key="single-opt-in" value="single-opt-in">Single Opt-in</option>
+                                                    <option key="double-opt-in" value="double-opt-in">Double Opt-in</option>
+                                                </Field>
+                                            </div>
+                                        </div>
+                                        <button className="btn btn-primary mr-2" onClick={handleClose}>
+                                            Save
+                                        </button>
+                                        <button className="btn btn-secondary" onClick={handleClose}>
+                                            Close
+                                        </button>
+
+                                    </div>
+                                </Form>
+                            )}
+                        </Formik>
+                    </div>
+                }
             </Modal.Body>
-            <Modal.Footer>
-                <button className="btn btn-secondary" onClick={handleClose}>
-                    Close
-          </button>
-                <button className="btn btn-primary" onClick={handleClose}>
-                    Save Changes
-          </button>
-            </Modal.Footer>
         </Modal>
     );
 }

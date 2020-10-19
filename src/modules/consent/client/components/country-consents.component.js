@@ -7,14 +7,21 @@ import Card from 'react-bootstrap/Card';
 import CreateCountryConsent from './create-country-consent.component';
 import { useSelector, useDispatch } from 'react-redux';
 import { getCdpConsents } from '../consent.action';
+import axios from "axios";
 
 
 const CountryConsents = () => {
     const [show, setShow] = useState(false);
     const dispatch = useDispatch();
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
+    const [countries, setCountries] = useState([]);
 
     useEffect(() => {
+        async function getCountries() {
+            const response = await axios.get('/api/countries');
+            setCountries(response.data);
+        }
+        getCountries();
         dispatch(getCdpConsents(null, null));
     }, []);
 
@@ -34,16 +41,13 @@ const CountryConsents = () => {
                 </div>
                 <div className="row">
                     <div className="col-12">
-                        {cdp_consents && cdp_consents.length > 0 && cdp_consents.map(x => {
-                            <span>{x.title}</span>
-                        })}
                         <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
                             <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Country Consents</h4>
                             <div class="d-flex justify-content-between align-items-center">
                                 <button onClick={() => setShow(true)} className="btn cdp-btn-secondary text-white ml-2">
                                     <i className="icon icon-plus pr-1"></i> Create country consent
                                 </button>
-                                {cdp_consents && <CreateCountryConsent changeShow={(val) => setShow(val)} consents={cdp_consents} show={show} />}
+                                {cdp_consents && <CreateCountryConsent changeShow={(val) => setShow(val)} countries={countries} consents={cdp_consents} show={show} />}
                             </div>
                         </div>
 
