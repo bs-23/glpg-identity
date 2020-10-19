@@ -9,6 +9,27 @@ const ConsentForm = () => {
     const { addToast } = useToasts();
     const [categories, setCategories] = useState([]);
     const [isActive, setIsActive] = useState(true);
+    const [translations, setTranslations] = useState([]);
+
+    const getTranslations = () => (
+        <React.Fragment>
+            <div className="col-12 col-sm-6">
+                <div className="form-group">
+                    <label className="font-weight-bold"> Locale <span className="text-danger">*</span></label>
+                    <Field className="form-control" type="preference" name="preference"/>
+                    <div className="invalid-feedback"><ErrorMessage name="preference" /></div>
+                </div>
+            </div>
+
+            <div className="col-12 col-sm-6">
+                <div className="form-group">
+                    <label className="font-weight-bold" htmlFor="preference"> Rich Text <span className="text-danger">*</span></label>
+                    <Field className="form-control" type="preference" name="preference"/>
+                    <div className="invalid-feedback"><ErrorMessage name="preference" /></div>
+                </div>
+            </div>
+        </React.Fragment>
+    );
 
     useEffect(() => {
         async function getConsentCatogories() {
@@ -54,7 +75,6 @@ const ConsentForm = () => {
                                         // validationSchema={consentSchema}
                                         onSubmit={(values, actions) => {
                                             console.log(values)
-                                            values.is_active = isActive;
 
                                             dispatch(createConsent(values))
                                             .then(res => {
@@ -114,10 +134,23 @@ const ConsentForm = () => {
                                                                 </div>
                                                             </div>
 
+                                                            {getTranslations()}
+
+                                                            <div className="col-12 col-sm-7">
+                                                                <div className="form-group">
+                                                                    <label className="d-flex justify-content-between align-items-center"> 
+                                                                        <span> Add more translations</span>
+                                                                        <span>
+                                                                            <button > + </button>
+                                                                        </span>
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+
                                                             <div className="col-12 col-sm-6">
                                                                 <div className="form-group">
                                                                     <label className="d-flex justify-content-between align-items-center">
-                                                                        <span className="switch-label"> Active </span>
+                                                                        <span className="switch-label"> Status </span>
                                                                         <span className="switch">
                                                                             <input
                                                                                 name="is_active"
@@ -129,26 +162,6 @@ const ConsentForm = () => {
                                                                             <span className="slider round"></span>
                                                                         </span>
                                                                     </label>
-                                                                    {/* <label className="font-weight-bold" htmlFor="is_active"> is active </label>
-                                                                    
-                                                                    <span className="switch">
-                                                                        <Field type="checkbox" name="is_active" />
-                                                                        <input
-                                                                            name="is_active"
-                                                                            type="checkbox"
-                                                                            checked={isActive}
-                                                                            value={isActive}
-                                                                            onChange={e => {
-                                                                                alert('harrr')
-                                                                                if (e.target.checked) setIsActive(false);
-                                                                                else setIsActive(true);
-                                                                            }}
-                                                                            onClick={() => {
-                                                                                alert('habib')
-                                                                            }}
-                                                                        />
-                                                                        <span className="slider round"></span>
-                                                                    </span> */}
                                                                 </div>
                                                             </div>
                                                             
