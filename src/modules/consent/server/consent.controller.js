@@ -14,6 +14,7 @@ const User = require(path.join(process.cwd(), 'src/modules/user/server/user.mode
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 
+
 async function getConsents(req, res) {
     const response = new Response({}, []);
 
@@ -570,11 +571,13 @@ async function getCdpConsent(req, res) {
 
 async function createConsent(req, res) {
     try {
-        const { category_id, title, legal_basis, is_active, preference, translations } = req.body;
+        let { category_id, title, legal_basis, is_active, preference, translations } = req.body;
 
         if (!category_id || !title || !legal_basis) {
             return res.status(400).send('Invalid request.');
         }
+
+        is_active = !!is_active;
 
         const consentCategory = await ConsentCategory.findOne({ where: { id: category_id } });
 
@@ -638,7 +641,7 @@ async function createConsent(req, res) {
 
 async function updateCdpConsent(req, res) {
     try {
-        const {category_id, title, legal_basis, is_active, preference, translations } = req.body;
+        const { category_id, title, legal_basis, is_active, preference, translations } = req.body;
 
         const id = req.params.id;
         if (!id) {
@@ -779,6 +782,21 @@ async function assignConsentToCountry(req, res) {
 
         if (!consent) {
             return res.status(400).send('Consent not found.');
+        }
+
+        const existedCountryConsent = await ConsentCountry.findOne({
+            where: {
+                consent_id: consent_id,
+                country_iso2: {
+                    [Op.iLike]: country_iso2
+                },
+                opt_type: opt_type
+
+            }
+        });
+
+        if (existedCountryConsent) {
+            return res.status(400).send('Already exists');
         }
 
         const [countryConsent, created] = await ConsentCountry.findOrCreate({

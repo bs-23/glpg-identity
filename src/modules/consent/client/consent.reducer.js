@@ -3,12 +3,14 @@ import Types from "./consent.types";
 const initialState = {
     consents: {},
     veeva_consents: {},
-    cdp_consents: {},
+    cdp_consents: [],
+    country_consents: []
 };
 
 export default function reducer(state = initialState, action) {
     switch (action.type) {
         case Types.GET_CONSENTS_REPORT_FULFILLED: {
+
             return {
                 ...state,
                 consents: action.payload.data.data
@@ -26,6 +28,13 @@ export default function reducer(state = initialState, action) {
             return {
                 ...state,
                 cdp_consents: action.payload.data
+            }
+        }
+
+        case Types.GET_COUNTRY_CONSENTS_FULFILLED: {
+            return {
+                ...state,
+                country_consents: action.payload.data
             }
         }
     }
