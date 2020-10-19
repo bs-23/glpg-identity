@@ -40,9 +40,11 @@ const CountryConsents = () => {
         , []
     );
 
-    async function loadCountryConsents() {
-        dispatch(getCountryConsents());
-    }
+    const getCountryName = (country_iso2) => {
+        const country = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+
+        return (country || {}).codbase_desc;
+    };
 
     useEffect(() => {
         async function getCountries() {
@@ -51,7 +53,7 @@ const CountryConsents = () => {
         }
         getCountries();
         dispatch(getCdpConsents(null, null));
-        loadCountryConsents();
+        dispatch(getCountryConsents());
     }, []);
 
     return (
@@ -69,29 +71,6 @@ const CountryConsents = () => {
                     </div>
                 </div>
                 <div className="row">
-
-                    {/* {
-                        country_consents.map((countryConsent, index) =>
-                            (
-                                <div key={index}>
-                                    <ul >{countryConsent.country_iso2}---------------</ul>
-                                    {
-                                        countryConsent.consents.map((consent, i) =>
-                                            (
-                                                <span key={i}>{consent.opt_type}===========</span>
-                                            )
-                                        )
-                                    }
-                                </div>
-                            )
-                        )
-                    } */}
-
-
-
-
-
-
                     <div className="col-12">
                         <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
                             <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Country Consents</h4>
@@ -103,63 +82,46 @@ const CountryConsents = () => {
                             </div>
                         </div>
 
-                        <div className="table-responsive shadow-sm bg-white mb-3">
-                            <table className="table table-hover table-sm mb-0 cdp-table mb-2">
-                                <thead className="bg-light cdp-table__header">
-                                    <tr>
-                                        <th colSpan="4"><div className="d-flex align-items-center"><img alt="CDP LOGO" src="/assets/flag/flag-netherlands.svg" height="18" className="mr-2" /> Netherlands</div></th>
-                                    </tr>
-                                </thead>
-                                <thead className="cdp-table__header">
-                                    <tr>
-                                        <th>Consent Title</th>
-                                        <th>Available Translation</th>
-                                        <th>Opt Type</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="cdp-table__body bg-white">
-                                    <tr>
-                                        <td>I give my consent to send me promotional email</td>
-                                        <td>NL_NL, BE_NL</td>
-                                        <td>Single Opt-In</td>
-                                        <td>
-                                            <a href="#" className="btn btn-link">Edit</a> | <a href="#" className="btn btn-link text-danger">Delete</a>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        {
+                            country_consents.map((countryConsent, countryConsentIndex) =>
+                                (
+                                    <div className="table-responsive shadow-sm bg-white mb-3" key={countryConsentIndex}>
+                                        <table className="table table-hover table-sm mb-0 cdp-table mb-2">
+                                            <thead className="bg-light cdp-table__header">
+                                                <tr>
+                                                    <th colSpan="4"><div className="d-flex align-items-center"><img alt="CDP LOGO" src="/assets/flag/flag-netherlands.svg" height="18" className="mr-2" /> {getCountryName(countryConsent.country_iso2)}</div></th>
+                                                </tr>
+                                            </thead>
+                                            <thead className="cdp-table__header">
+                                                <tr>
+                                                    <th>Consent Title</th>
+                                                    <th>Available Translation</th>
+                                                    <th>Opt Type</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="cdp-table__body bg-white">
+                                                {
+                                                    countryConsent.consents.map((consent, coonsentIndex) =>
+                                                        (
+                                                            <tr key={coonsentIndex}>
+                                                                <td>{consent.title}</td>
+                                                                <td>{consent.locales}</td>
+                                                                <td>{consent.opt_type}</td>
+                                                                <td>
+                                                                    <a href="#" className="btn btn-link">Edit</a> | <a href="#" className="btn btn-link text-danger">Delete</a>
+                                                                </td>
+                                                            </tr>
+                                                        )
+                                                    )
+                                                }
+                                            </tbody>
+                                        </table>
 
-                        </div>
-
-                        <div className="table-responsive shadow-sm bg-white mb-3">
-                            <table className="table table-hover table-sm mb-0 cdp-table mb-2">
-                                <thead className="bg-light cdp-table__header">
-                                    <tr>
-                                        <th colSpan="4"><div className="d-flex align-items-center"><img alt="CDP LOGO" src="/assets/flag/flag-belgium.svg" className="mr-2" height="18" /> Belgium</div></th>
-                                    </tr>
-                                </thead>
-                                <thead className="cdp-table__header">
-                                    <tr>
-                                        <th>Consent Title</th>
-                                        <th>Available Translation</th>
-                                        <th>Opt Type</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="cdp-table__body bg-white">
-                                    <tr>
-                                        <td>I give my consent to send me promotional email</td>
-                                        <td>NL_NL, BE_NL</td>
-                                        <td>Single Opt-In</td>
-                                        <td>
-                                            <a href="#" className="btn btn-link">Edit</a> | <a href="#" className="btn btn-link text-danger">Delete</a>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-
-                        </div>
+                                    </div>
+                                )
+                            )
+                        }
                     </div>
                 </div>
             </div>
