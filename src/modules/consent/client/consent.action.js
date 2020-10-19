@@ -60,6 +60,16 @@ export function getCdpConsents(translations, category){
     };
 }
 
+export function createConsent(data) {
+    return {
+        type: Types.CREATE_CONSENT,
+        payload: axios({
+            method: 'post',
+            url: '/api/cdp-consents',
+            data
+        })
+    };
+}
 export function getCountryConsents() {
     const url = '/api/consent/country/';
     return {
