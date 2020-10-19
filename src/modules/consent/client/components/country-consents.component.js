@@ -42,8 +42,13 @@ const CountryConsents = () => {
 
     const getCountryName = (country_iso2) => {
         const country = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
-
         return (country || {}).codbase_desc;
+    };
+
+    const getCountryFlagUrl = (country_iso2) => {
+        const country = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+        if (!country) return '';
+        return `/assets/flag/flag-${country.codbase_desc.toLowerCase()}.svg`
     };
 
     useEffect(() => {
@@ -89,7 +94,7 @@ const CountryConsents = () => {
                                         <table className="table table-hover table-sm mb-0 cdp-table mb-2">
                                             <thead className="bg-light cdp-table__header">
                                                 <tr>
-                                                    <th colSpan="4"><div className="d-flex align-items-center"><img alt="CDP LOGO" src="/assets/flag/flag-netherlands.svg" height="18" className="mr-2" /> {getCountryName(countryConsent.country_iso2)}</div></th>
+                                                    <th colSpan="4"><div className="d-flex align-items-center"><img alt="CDP LOGO" src={getCountryFlagUrl(countryConsent.country_iso2)} height="18" className="mr-2" /> {getCountryName(countryConsent.country_iso2)}</div></th>
                                                 </tr>
                                             </thead>
                                             <thead className="cdp-table__header">
