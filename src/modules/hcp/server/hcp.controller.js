@@ -454,9 +454,13 @@ async function createHcpProfile(req, res) {
 
         let master_data = {};
 
-        if (req.body.uuid) {
-            master_data = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwhcpmaster WHERE uuid_1 = $uuid OR uuid_2 = $uuid', {
-                bind: { uuid: req.body.uuid },
+        if (uuid) {
+            const uuidWithoutSpecialCharacter = uuid.replace(/[-]/gi, '');
+
+            master_data = await sequelize.datasyncConnector.query(`select * from ciam.vwhcpmaster
+                    where regexp_replace(uuid_1, '[-]', '', 'gi') = $uuid
+                    OR regexp_replace(uuid_2, '[-]', '', 'gi') = $uuid`, {
+                bind: { uuid: uuidWithoutSpecialCharacter },
                 type: QueryTypes.SELECT
             });
             master_data = master_data && master_data.length ? master_data[0] : {};
