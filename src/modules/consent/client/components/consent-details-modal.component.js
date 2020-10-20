@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from "react";
+import { useSelector } from 'react-redux';
 import Modal from 'react-bootstrap/Modal';
 import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
@@ -7,10 +8,14 @@ import optTypes from '../opt-types.json';
 
 const ConsentDetailsModal = ({ lgShow, setLgShow, consent }) => {
     const getConsentCountries = (consentCountries) => {
-        return consentCountries.map(countryConsent => ({
-            name: countryConsent.country_iso2,
-            opt_type: (optTypes.find(optType => optType.value === countryConsent.opt_type) || {}).text
-        }));
+        const countries = useSelector(state => state.userReducer.countries);
+        return consentCountries.map(countryConsent => {
+            const country = countries.find(c => c.country_iso2.toLowerCase() === countryConsent.country_iso2.toLowerCase());
+            return {
+                name: country.codbase_desc,
+                opt_type: (optTypes.find(optType => optType.value === countryConsent.opt_type) || {}).text
+            };
+        });
     };
 
     return <Modal
