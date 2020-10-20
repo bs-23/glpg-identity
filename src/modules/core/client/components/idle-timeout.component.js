@@ -18,8 +18,6 @@ export default function IdleTimeOutModalComponent(props) {
 
         setCookie('logged_in', '', { path: '/' });
         removeCookie('logged_in');
-
-        localStorage.removeItem('logged_in');
     };
 
     useIdleTimer({
