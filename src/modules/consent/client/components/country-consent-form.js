@@ -23,7 +23,7 @@ const CountryConsentForm = (props) => {
     });
 
     return (
-        <Modal show={props.show} onHide={handleClose}>
+        <Modal size="lg" centered show={props.show} onHide={handleClose}>
             <Modal.Header closeButton>
                 <Modal.Title>{props.editable ? 'Manage opt type' : 'Assign consent to country'}</Modal.Title>
             </Modal.Header>
@@ -90,12 +90,6 @@ const CountryConsentForm = (props) => {
                                                 </Field>
                                             </div>
                                         </div>
-                                        <button type="submit" className="btn btn-primary mr-2">
-                                            Save Changes
-                                        </button>
-                                        <button type="button" className="btn btn-secondary" onClick={handleClose}>
-                                            Close
-                                        </button>
                                     </div>
                                 </Form>
                             )}
@@ -103,6 +97,10 @@ const CountryConsentForm = (props) => {
                     </div>
                 }
             </Modal.Body>
+            <Modal.Footer>
+                <button type="submit" className="btn cdp-btn-primary mr-2 text-white shadow-sm">Save Changes</button>
+                <button type="button" className="btn cdp-btn-secondary text-white shadow-sm" onClick={handleClose}>Close</button>
+            </Modal.Footer>
         </Modal>
     );
 }
