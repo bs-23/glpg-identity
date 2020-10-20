@@ -159,7 +159,7 @@ const ConsentForm = () => {
                                                             <div className="col-12 col-sm-6">
                                                                 <div className="form-group">
                                                                     <label className="font-weight-bold" htmlFor="category_id">Select Legal Basis <span className="text-danger">*</span></label>
-                                                                    <Field data-testid="legal_basis" as="select" name="legal_basis" className="form-control">
+                                                                    <Field data-testid="legal_basis" as="select" name="legal_basis" className="form-control text-capitalize">
                                                                         {['consent', 'contract'].map(item => <option key={item} value={item}>{item}</option>)}
                                                                     </Field>
                                                                 </div>
