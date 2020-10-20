@@ -13,6 +13,8 @@ import { getCountryConsents, deleteCountryConsent } from '../consent.action';
 
 const CountryConsents = () => {
     const [show, setShow] = useState(false);
+    const [editable, setEditable] = useState(false);
+    const [editOption, setEditOption] = useState(null);
     const [showDelete, setShowDelete] = useState(false);
     const [consentToDelete, setConsentToDelete] = useState(null);
     const { addToast } = useToasts();
@@ -36,7 +38,8 @@ const CountryConsents = () => {
                     existing.consents.push({
                         ...current.consent,
                         opt_type: optType.text,
-                        country_consent_id: current.id
+                        country_consent_id: current.id,
+                        country_iso2: current.country_iso2
                     });
                 } else {
                     const country = countries.find(c => c.country_iso2.toLowerCase() === current.country_iso2.toLowerCase());
@@ -47,7 +50,8 @@ const CountryConsents = () => {
                         consents: [{
                             ...current.consent,
                             opt_type: optType.text,
-                            country_consent_id: current.id
+                            country_consent_id: current.id,
+                            country_iso2: current.country_iso2
                         }]
                     });
                 }
@@ -56,6 +60,12 @@ const CountryConsents = () => {
             , []
         );
         return groupedByCountry;
+    }
+
+    const setEdit = (consent) => {
+        setEditOption(consent);
+        setEditable(true);
+        setShow(true);
     }
 
     async function showConsentDetailsModal(id) {
@@ -115,10 +125,10 @@ const CountryConsents = () => {
                         <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
                             <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Country Consents</h4>
                             <div class="d-flex justify-content-between align-items-center">
-                                <button onClick={() => setShow(true)} className="btn cdp-btn-secondary text-white ml-2">
+                                <button onClick={() => { setShow(true); setEditable(false); setEditOption(null); }} className="btn cdp-btn-secondary text-white ml-2">
                                     <i className="icon icon-plus pr-1"></i> Assign consent to country
                                 </button>
-                                {cdp_consents && <CountryConsentForm changeShow={(val) => setShow(val)} countries={countries} consents={cdp_consents} show={show} />}
+                                {cdp_consents && <CountryConsentForm editable={editable} options={editOption} changeShow={(val) => setShow(val)} countries={countries} consents={cdp_consents} show={show} />}
                             </div>
                         </div>
 
@@ -151,7 +161,7 @@ const CountryConsents = () => {
                                                                 <td>{consent.locales}</td>
                                                                 <td>{consent.opt_type}</td>
                                                                 <td>
-                                                                    <a href="#" className="btn btn-link">Manage opt type</a> | <button onClick={() => setDeleteModal(consent.country_consent_id, consent.title, countryConsent.name)} className="btn btn-link text-danger">Remove</button>
+                                                                    <button className="btn btn-link" onClick={() => setEdit(consent)}>Manage opt type</button> | <button onClick={() => setDeleteModal(consent.country_consent_id, consent.title, countryConsent.name)} className="btn btn-link text-danger">Remove</button>
                                                                 </td>
                                                             </tr>
                                                         )
