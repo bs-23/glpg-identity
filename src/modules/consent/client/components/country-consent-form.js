@@ -45,7 +45,6 @@ const CountryConsentForm = (props) => {
                                 }).finally(function () {
                                     actions.setSubmitting(false);
                                     handleClose();
-
                                 });
                             }}
                         >
@@ -80,7 +79,7 @@ const CountryConsentForm = (props) => {
                                                 </Field>
                                             </div>
                                         </div>
-                                        <button type="submit" className="btn btn-primary mr-2" onClick={handleClose}>
+                                        <button type="submit" className="btn btn-primary mr-2">
                                             Save Changes
                                         </button>
                                         <button type="button" className="btn btn-secondary" onClick={handleClose}>
