@@ -456,6 +456,7 @@ async function createHcpProfile(req, res) {
         }
 
         let master_data = {};
+        let uuid_from_master_data;
 
         if (uuid) {
             const uuidWithoutSpecialCharacter = uuid.replace(/[-]/gi, '');
@@ -467,11 +468,17 @@ async function createHcpProfile(req, res) {
                 type: QueryTypes.SELECT
             });
             master_data = master_data && master_data.length ? master_data[0] : {};
+
+            const uuid_1_from_master_data = (master_data.uuid_1 || '');
+            const uuid_2_from_master_data = (master_data.uuid_2 || '');
+
+            uuid_from_master_data = [uuid_1_from_master_data, uuid_2_from_master_data]
+                .find(id => id.replace(/[-]/gi, '') === uuidWithoutSpecialCharacter);
         }
 
         const model = {
             email: email.toLowerCase(),
-            uuid,
+            uuid: uuid_from_master_data || uuid,
             salutation,
             first_name,
             last_name,
