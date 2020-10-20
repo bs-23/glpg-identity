@@ -16,7 +16,6 @@ const CountryConsentForm = (props) => {
     }
 
     useEffect(() => {
-        console.log(props.options);
         if (props.countries && props.editable) {
             setCountry(props.countries.find(x => x.country_iso2.toLowerCase() === props.options.country_iso2.toLowerCase()));
         }
