@@ -4,10 +4,13 @@ import { NavLink } from 'react-router-dom';
 import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
 import { createConsent } from "../consent.action";
 import { useToasts } from "react-toast-notifications";
+import CountryCodes from 'country-codes-list';
 
 const ConsentForm = () => {
+    const CountryCodesObject = Object.values(CountryCodes.customList('countryCode', '{countryCode} {officialLanguageCode} {officialLanguageNameEn}'));
     const { addToast } = useToasts();
     const [categories, setCategories] = useState([]);
+    const [userCountries, setUserCountries] = useState([]);
     const [isActive, setIsActive] = useState(true);
     const [translations, setTranslations] = useState([{ country: '', language: '' , rich_text: '', locale: '' }]);
 
@@ -40,21 +43,52 @@ const ConsentForm = () => {
 
             return (<React.Fragment key={idx}>
                 <label className="col-12 col-sm-10 font-weight-bold">{translationId}</label>
+
                 <div className="col-12 col-sm-6">
                     <div className="form-group">
-                        <label className="font-weight-bold" htmlFor={countryId}> Country </label>
-                        <Field className="form-control country" value={item.country} onChange={(e) => handleChange(e)} type='text' data-id={idx} name={countryId} id={countryId}/>
-                        <div className="invalid-feedback"><ErrorMessage name={countryId} /></div>
+                        <label className="font-weight-bold" htmlFor={countryId}>Select Country </label>
+                        <Field className="form-control country" value={item.country} onChange={(e) => handleChange(e)} data-id={idx} as="select" name={countryId} id={countryId}>
+                            {userCountries.map(element => <option key={element.countryid} value={element.country_iso2.toLowerCase()}>{element.codbase_desc}</option>)}
+                        </Field>
                     </div>
                 </div>
 
                 <div className="col-12 col-sm-6">
                     <div className="form-group">
+                        <label className="font-weight-bold" htmlFor={languageId}>Select Language </label>
+                        <Field className="form-control language" value={item.language} onChange={(e) => handleChange(e)} data-id={idx} as="select" name={languageId} id={languageId}>
+                            {CountryCodesObject.map(element => {
+                                const [country_iso2, language_code, language_name] = element.split(' ');
+                                return <option key={country_iso2} value={language_code}>{language_name}</option>
+                            })}
+                        </Field>
+                    </div>
+                </div>
+
+                {/* <div className="col-12 col-sm-6">
+                    <div className="form-group">
+                        <label className="font-weight-bold" htmlFor={languageId}> Select Language </label>
+                        <Field className="form-control country" value={item.country} onChange={(e) => handleChange(e)} data-id={idx} as="select" name={countryId} id={countryId}>
+                            {userCountries.map(item => <option key={item.countryid} value={item.country_iso2}>{item.codbase_desc}</option>)}
+                        </Field>
+                    </div>
+                </div> */}
+
+                {/* <div className="col-12 col-sm-6">
+                    <div className="form-group">
+                        <label className="font-weight-bold" htmlFor={countryId}> Country </label>
+                        <Field className="form-control country" value={item.country} onChange={(e) => handleChange(e)} type='text' data-id={idx} name={countryId} id={countryId}/>
+                        <div className="invalid-feedback"><ErrorMessage name={countryId} /></div>
+                    </div>
+                </div> */}
+
+                {/* <div className="col-12 col-sm-6">
+                    <div className="form-group">
                         <label className="font-weight-bold" htmlFor={languageId}> Language </label>
                         <Field className="form-control language" value={item.language} onChange={(e) => handleChange(e)} type='text' data-id={idx} name={languageId} id={languageId}/>
                         <div className="invalid-feedback"><ErrorMessage name={languageId} /></div>
                     </div>
-                </div>
+                </div> */}
 
                 <div className="col-12 col-sm-6">
                     <div className="form-group">
@@ -78,12 +112,22 @@ const ConsentForm = () => {
         )});
     };
 
+    const fetchUserCountries = (userCountries, allCountries) => userCountries.map(element => allCountries.find(x => x.country_iso2 == element));
+
     useEffect(() => {
         async function getConsentCatogories() {
             const response = await axios.get('/api/consent/category');
             setCategories(response.data);
         }
+        async function getCountries() {
+            const response = (await axios.get('/api/countries')).data;
+            const userProfile = (await axios.get('/api/users/profile')).data;
+            setUserCountries(fetchUserCountries(userProfile.countries, response));
+        }
+
         getConsentCatogories();
+        getCountries();
+        // console.log(CountryCodesObject);
     }, []);
 
     return (
