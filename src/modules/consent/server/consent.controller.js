@@ -788,48 +788,32 @@ async function assignConsentToCountry(req, res) {
             return res.status(400).send('Invalid request.');
         }
 
+        const existingCountryConsent = await ConsentCountry.findOne({
+            where: {
+                consent_id: consent_id,
+                country_iso2: {
+                    [Op.iLike]: country_iso2
+                }
+            }
+        });
+
+        if (existingCountryConsent) {
+            return res.status(400).send('Country-Consent association already exists');
+        }
+
         const consent = await Consent.findOne({ where: { id: consent_id } });
 
         if (!consent) {
             return res.status(400).send('Consent not found.');
         }
 
-        const existedCountryConsent = await ConsentCountry.findOne({
-            where: {
-                consent_id: consent_id,
-                country_iso2: {
-                    [Op.iLike]: country_iso2
-                },
-                opt_type: opt_type
-
-            }
+        const createdCountryConsent = await ConsentCountry.create({
+            consent_id,
+            country_iso2: country_iso2.toUpperCase(),
+            opt_type
         });
 
-        if (existedCountryConsent) {
-            return res.status(400).send('Already exists');
-        }
-
-        const [countryConsent, created] = await ConsentCountry.findOrCreate({
-            where: {
-                consent_id,
-                country_iso2
-            },
-            defaults: {
-                consent_id,
-                country_iso2,
-                opt_type
-            }
-        });
-
-        if (!created && countryConsent) {
-            await countryConsent.update({
-                consent_id,
-                country_iso2,
-                opt_type
-            });
-        }
-
-        res.json(countryConsent);
+        res.json(createdCountryConsent);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
