@@ -99,7 +99,7 @@ const CountryConsents = () => {
                             <ol className="breadcrumb rounded-0">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/consent">Data Privacy & Consent Management</NavLink></li>
-                                <li className="breadcrumb-item active"><span>Country Consents List</span></li>
+                                <li className="breadcrumb-item active"><span>Manage Consent Per Country</span></li>
                             </ol>
                         </nav>
                     </div>
@@ -110,7 +110,7 @@ const CountryConsents = () => {
                             <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Country Consents</h4>
                             <div class="d-flex justify-content-between align-items-center">
                                 <button onClick={() => setShow(true)} className="btn cdp-btn-secondary text-white ml-2">
-                                    <i className="icon icon-plus pr-1"></i> Create country consent
+                                    <i className="icon icon-plus pr-1"></i> Assign consent to country
                                 </button>
                                 {cdp_consents && <CountryConsentForm changeShow={(val) => setShow(val)} countries={countries} consents={cdp_consents} show={show} />}
                             </div>
@@ -143,7 +143,7 @@ const CountryConsents = () => {
                                                                 <td>{consent.locales}</td>
                                                                 <td>{consent.opt_type}</td>
                                                                 <td>
-                                                                    <a href="#" className="btn btn-link">Edit</a> | <button onClick={() => setDeleteModal(consent.country_consent_id)} className="btn btn-link text-danger">Delete</button>
+                                                                    <a href="#" className="btn btn-link">Manage opt type</a> | <button onClick={() => setDeleteModal(consent.country_consent_id)} className="btn btn-link text-danger">Remove</button>
 
                                                                 </td>
                                                             </tr>
@@ -160,7 +160,7 @@ const CountryConsents = () => {
 
                         <Modal show={showDelete} onHide={() => setShowDelete(false)}>
                             <Modal.Header closeButton>
-                                <Modal.Title>Modal heading</Modal.Title>
+                                <Modal.Title>Remove country consent</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>
                                 <p>Are you sure to delete this country consent?</p>
