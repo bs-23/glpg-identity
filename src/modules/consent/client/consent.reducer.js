@@ -4,7 +4,8 @@ const initialState = {
     consents: {},
     veeva_consents: {},
     cdp_consents: [],
-    country_consents: []
+    country_consents: [],
+    consent: null
 };
 
 export default function reducer(state = initialState, action) {
@@ -52,6 +53,13 @@ export default function reducer(state = initialState, action) {
             return {
                 ...state,
                 country_consents: state.country_consents
+            }
+        }
+
+        case Types.GET_CONSENT_FULFILLED: {
+            return {
+                ...state,
+                consent: action.payload.data
             }
         }
     }

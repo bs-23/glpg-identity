@@ -5,7 +5,7 @@ import { Form, Formik, Field } from "formik";
 import axios from 'axios';
 import { useToasts } from 'react-toast-notifications';
 import optTypes from '../opt-types.json';
-import { updateCountryConsent } from '../consent.action';
+import { updateCountryConsent } from '../consent.actions';
 import { useDispatch } from 'react-redux';
 
 const CountryConsentForm = (props) => {

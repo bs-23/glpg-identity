@@ -104,3 +104,12 @@ export function updateCountryConsent(id, data) {
     };
 }
 
+export function getConsent(id) {
+    return {
+        type: Types.GET_CONSENT,
+        payload: axios({
+            method: 'get',
+            url: `/api/cdp-consents/${id}`
+        })
+    };
+}
