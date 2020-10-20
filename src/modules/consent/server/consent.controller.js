@@ -836,6 +836,28 @@ async function assignConsentToCountry(req, res) {
     }
 }
 
+async function updateCountryConsent(req, res) {
+    try {
+        const id = req.params.id;
+        const optType = req.body.opt_type;
+
+        if (!id || !optType) return res.status(400).send('Invalid request.');
+
+        const consentCountry = await ConsentCountry.findOne({ where: { id } });
+
+        if (!consentCountry) return res.status(404).send('Country-Consent association does noit exist.');
+
+        await consentCountry.update({
+            opt_type: optType
+        });
+
+        res.sendStatus(200);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 async function deleteCountryConsent(req, res) {
     try {
         const id = req.params.id;
@@ -867,4 +889,5 @@ exports.deleteCdpConsent = deleteCdpConsent;
 exports.updateCdpConsent = updateCdpConsent;
 exports.getCountryConsents = getCountryConsents;
 exports.assignConsentToCountry = assignConsentToCountry;
+exports.updateCountryConsent = updateCountryConsent;
 exports.deleteCountryConsent = deleteCountryConsent;
