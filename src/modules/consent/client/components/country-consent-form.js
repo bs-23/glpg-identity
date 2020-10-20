@@ -1,6 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import React, { useState } from 'react';
 import Modal from 'react-bootstrap/Modal'
 import { Form, Formik, Field } from "formik";
 import axios from 'axios';
@@ -8,7 +7,7 @@ import { useToasts } from 'react-toast-notifications';
 import optTypes from '../opt-types.json';
 
 const CountryConsentForm = (props) => {
-    const [show, setShow] = useState(false);
+    const [, setShow] = useState(false);
     const { addToast } = useToasts();
     const handleClose = () => {
         setShow(false);

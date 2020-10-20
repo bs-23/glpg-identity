@@ -120,26 +120,24 @@ const ConsentForm = () => {
                                             is_active: isActive
                                         }}
                                         displayName="ConsentForm"
-                                        // validationSchema={consentSchema}
                                         onSubmit={(values, actions) => {
                                             values.translations = translations;
                                             console.log(values)
 
                                             dispatch(createConsent(values))
-                                            .then(res => {
-                                                actions.resetForm();
-                                                addToast('Consent created successfully', {
-                                                    appearance: 'success',
-                                                    autoDismiss: true
+                                                .then(res => {
+                                                    actions.resetForm();
+                                                    addToast('Consent created successfully', {
+                                                        appearance: 'success',
+                                                        autoDismiss: true
+                                                    });
+                                                }).catch(err => {
+                                                    const errorMessage = typeof err.response.data === 'string' ? err.response.data : err.response.statusText
+                                                    addToast(errorMessage, {
+                                                        appearance: 'error',
+                                                        autoDismiss: true
+                                                    });
                                                 });
-                                                // history.push(`/users/${res.value.data.id}`)
-                                            }).catch(err => {
-                                                const errorMessage = typeof err.response.data === 'string' ? err.response.data : err.response.statusText
-                                                addToast(errorMessage, {
-                                                    appearance: 'error',
-                                                    autoDismiss: true
-                                                });
-                                            });
 
                                             actions.setSubmitting(false);
                                         }}
@@ -178,7 +176,7 @@ const ConsentForm = () => {
                                                             <div className="col-12 col-sm-6">
                                                                 <div className="form-group">
                                                                     <label className="font-weight-bold" htmlFor="preference"> Preference <span className="text-danger">*</span></label>
-                                                                    <Field className="form-control" type="preference" name="preference"/>
+                                                                    <Field className="form-control" type="preference" name="preference" />
                                                                     <div className="invalid-feedback"><ErrorMessage name="preference" /></div>
                                                                 </div>
                                                             </div>
@@ -187,7 +185,7 @@ const ConsentForm = () => {
 
                                                             <div className="col-12 col-sm-7">
                                                                 <div className="form-group">
-                                                                    <label className="d-flex justify-content-between align-items-center"> 
+                                                                    <label className="d-flex justify-content-between align-items-center">
                                                                         <span> Add more translations</span>
                                                                         <span  onClick={addNewTranslation}>
                                                                             + 
@@ -213,7 +211,7 @@ const ConsentForm = () => {
                                                                     </label>
                                                                 </div>
                                                             </div>
-                                                            
+
                                                         </div>
                                                         <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" >Submit</button>
                                                     </div>

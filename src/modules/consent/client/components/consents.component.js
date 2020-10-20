@@ -3,7 +3,8 @@ import { NavLink } from 'react-router-dom';
 import { getCdpConsents } from '../consent.action';
 import { useSelector, useDispatch } from 'react-redux';
 import Dropdown from 'react-bootstrap/Dropdown';
-import ConsentDetailsModal from './consent-details-modal.component'
+import ConsentDetailsModal from './consent-details-modal.component';
+import axios from 'axios';
 
 const Consents = () => {
     const dispatch = useDispatch();
@@ -11,25 +12,14 @@ const Consents = () => {
     const [lgShow, setLgShow] = useState(false);
     const [consent, setConsent] = useState({});
 
-    async function loadCdpConsents() {
-        dispatch(getCdpConsents(true, true));
-    }
-
-    const getConsents = (row) => {
-        setConsent(row);
+    async function showConsentDetails(row) {
+        const response = await axios.get(`/api/cdp-consents/${row.id}`);
+        setConsent(response.data);
         setLgShow(true);
     }
 
-    function getLocales(translations){
-        if(translations){
-            const locales = translations.map(item => item.locale.toUpperCase());
-            return locales.join(', ');
-        }
-        return '';
-    }
-
     useEffect(() => {
-        loadCdpConsents();
+        dispatch(getCdpConsents(true, true));
     }, []);
 
     return (
@@ -76,7 +66,7 @@ const Consents = () => {
                                         {cdp_consents.map((row, index) => (
                                             <tr key={index}>
                                                 <td>{row.title}</td>
-                                                <td>{getLocales(row.translations)}</td>
+                                                <td>{row.locales}</td>
                                                 <td>{row.consent_category ? row.consent_category.title : ''}</td>
                                                 <td>{row.preference}</td>
                                                 <td>{row.is_active ? 'Active' : 'Inactive'}</td>
@@ -87,7 +77,7 @@ const Consents = () => {
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu>
                                                         <Dropdown.Item>Edit Consent</Dropdown.Item>
-                                                        <Dropdown.Item onClick={() => getConsents(row)}>Consent Detail</Dropdown.Item>
+                                                        <Dropdown.Item onClick={() => showConsentDetails(row)}>Consent Detail</Dropdown.Item>
                                                     </Dropdown.Menu>
                                                 </Dropdown></td>
                                             </tr>
@@ -102,7 +92,7 @@ const Consents = () => {
 
             <ConsentDetailsModal
                 lgShow={lgShow}
-                setLgShow={setLgShow} 
+                setLgShow={setLgShow}
                 consent={consent}
             />
         </main>
