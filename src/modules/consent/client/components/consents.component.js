@@ -87,7 +87,7 @@ const ConsentsComponent = () => {
                 </div>
             </div>
 
-            {consentId && <ConsentComponent consentId={consentId} />}
+            {consentId && <ConsentComponent consentId={consentId} setConsentId={setConsentId} />}
         </main>
     );
 }

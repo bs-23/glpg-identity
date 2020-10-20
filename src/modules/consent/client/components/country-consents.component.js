@@ -189,7 +189,7 @@ const CountryConsents = () => {
                             </Modal.Body>
                         </Modal>
 
-                        {consentId && <ConsentComponent consentId={consentId} />}
+                        {consentId && <ConsentComponent consentId={consentId} setConsentId={setConsentId} />}
                     </div>
                 </div>
             </div>

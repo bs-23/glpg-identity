@@ -7,10 +7,9 @@ import parse from 'html-react-parser';
 import optTypes from '../opt-types.json';
 import { getConsent, setConsent } from '../consent.actions';
 
-const ConsentComponent = ({ consentId }) => {
+const ConsentComponent = ({ consentId, setConsentId }) => {
     const dispatch = useDispatch();
     const consent = useSelector(state => state.consentReducer.consent);
-    const [showConsentModal, setShowConsentModal] = useState(false);
     const countries = useSelector(state => state.userReducer.countries);
 
     const getConsentCountries = (consentCountries) => {
@@ -24,19 +23,18 @@ const ConsentComponent = ({ consentId }) => {
     };
 
     const hideConsentDetails = () => {
-        setShowConsentModal(false);
         dispatch(setConsent(null));
+        setConsentId(null);
     };
 
     useEffect(() => {
         dispatch(getConsent(consentId));
-        setShowConsentModal(true);
     }, [consentId]);
 
     return <Modal
         size="lg"
         centered
-        show={showConsentModal}
+        show={!!consentId}
         onHide={() => hideConsentDetails()}>
         <Modal.Header closeButton>
             <Modal.Title>
