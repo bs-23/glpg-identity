@@ -41,40 +41,49 @@ const ConsentForm = () => {
             const richTextId = `rich-text-${idx}`;
 
             return (<React.Fragment key={idx}>
-                <label className="col-12 col-sm-10 font-weight-bold">{translationId}</label>
-                <div className="col-12 col-sm-6">
-                    <div className="form-group">
-                        <label className="font-weight-bold" htmlFor={countryId}> Country </label>
-                        <Field className="form-control country" value={item.country} onChange={(e) => handleChange(e)} type='text' data-id={idx} name={countryId} id={countryId}/>
-                        <div className="invalid-feedback"><ErrorMessage name={countryId} /></div>
-                    </div>
-                </div>
+                <div className="bg-light col-12 border-bottom">
+                    <div className="row">
+                        <div className="d-flex justify-content-between font-weight-bold py-2 col-12">
+                            {translationId}
+                            <div className="d-flex justify-content-end">
+                                {idx < lastTranslation - 1 && <div className="">
+                                    <div className="form-group">
+                                        <label className="d-flex justify-content-between align-items-center">
+                                            <i className="fas fa-minus-circle text-danger fa-2x" onClick={() => removeTranslation(idx)}></i>
+                                        </label>
+                                    </div>
+                                </div>}
+                                <i class="fas fa-plus-circle cdp-text-primary fa-2x" onClick={addNewTranslation}></i>
+                            </div>
+                            
+                        </div>
+                        <div className="col-12 col-sm-6">
+                            <div className="form-group">
+                                <label className="font-weight-bold" htmlFor={countryId}> Country </label>
+                                <Field className="form-control country" value={item.country} onChange={(e) => handleChange(e)} type='text' data-id={idx} name={countryId} id={countryId} />
+                                <div className="invalid-feedback"><ErrorMessage name={countryId} /></div>
+                            </div>
+                        </div>
 
-                <div className="col-12 col-sm-6">
-                    <div className="form-group">
-                        <label className="font-weight-bold" htmlFor={languageId}> Language </label>
-                        <Field className="form-control language" value={item.language} onChange={(e) => handleChange(e)} type='text' data-id={idx} name={languageId} id={languageId}/>
-                        <div className="invalid-feedback"><ErrorMessage name={languageId} /></div>
-                    </div>
-                </div>
+                        <div className="col-12 col-sm-6">
+                            <div className="form-group">
+                                <label className="font-weight-bold" htmlFor={languageId}> Language </label>
+                                <Field className="form-control language" value={item.language} onChange={(e) => handleChange(e)} type='text' data-id={idx} name={languageId} id={languageId} />
+                                <div className="invalid-feedback"><ErrorMessage name={languageId} /></div>
+                            </div>
+                        </div>
 
-                <div className="col-12 col-sm-6">
-                    <div className="form-group">
-                        <label className="font-weight-bold" htmlFor={richTextId}> Rich Text </label>
-                        <Field className="form-control rich_text" value={item.rich_text} onChange={(e) => handleChange(e)} type='text' data-id={idx} name={richTextId} id={richTextId}/>
-                        <div className="invalid-feedback"><ErrorMessage name={richTextId} /></div>
+                        <div className="col-12">
+                            <div className="form-group">
+                                <label className="font-weight-bold" htmlFor={richTextId}> Rich Text </label>
+                                <Field className="form-control rich_text" value={item.rich_text} onChange={(e) => handleChange(e)} type='text' data-id={idx} name={richTextId} id={richTextId} />
+                                <div className="invalid-feedback"><ErrorMessage name={richTextId} /></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                {idx < lastTranslation-1 && <div className="col-12 col-sm-6">
-                    <div className="form-group">
-                        <label className="d-flex justify-content-between align-items-center">
-                            <span>Remove translations</span>
-                            <span className="pl-3 pt-2 pr-3 pb-2 border border-danger rounded" onClick={() => removeTranslation(idx)}>
-                                -
-                            </span>
-                        </label>
-                    </div>
-                </div>}
+                
+                
             </React.Fragment>
         )});
     };
@@ -179,38 +188,27 @@ const ConsentForm = () => {
                                                                     <Field className="form-control" type="preference" name="preference" />
                                                                     <div className="invalid-feedback"><ErrorMessage name="preference" /></div>
                                                                 </div>
+                                                        </div>
+
+                                                        <div className="col-12 col-sm-6">
+                                                            <div className="form-group">
+                                                                <label className="d-flex justify-content-between align-items-center">
+                                                                    <span className="switch-label"> Status </span>
+                                                                    <span className="switch">
+                                                                        <input
+                                                                            name="is_active"
+                                                                            type="checkbox"
+                                                                            value={isActive}
+                                                                            checked={isActive}
+                                                                            onChange={() => setIsActive(!isActive)}
+                                                                        />
+                                                                        <span className="slider round"></span>
+                                                                    </span>
+                                                                </label>
                                                             </div>
+                                                        </div>
 
                                                             {getTranslations()}
-
-                                                            <div className="col-12 col-sm-7">
-                                                                <div className="form-group">
-                                                                    <label className="d-flex justify-content-between align-items-center">
-                                                                        <span> Add more translations</span>
-                                                                        <span className="pl-3 pt-2 pr-3 pb-2 border border-primary rounded" onClick={addNewTranslation}>
-                                                                            +
-                                                                        </span>
-                                                                    </label>
-                                                                </div>
-                                                            </div>
-
-                                                            <div className="col-12 col-sm-6">
-                                                                <div className="form-group">
-                                                                    <label className="d-flex justify-content-between align-items-center">
-                                                                        <span className="switch-label"> Status </span>
-                                                                        <span className="switch">
-                                                                            <input
-                                                                                name="is_active"
-                                                                                type="checkbox"
-                                                                                value={isActive}
-                                                                                checked={isActive}
-                                                                                onChange={() => setIsActive(!isActive)}
-                                                                            />
-                                                                            <span className="slider round"></span>
-                                                                        </span>
-                                                                    </label>
-                                                                </div>
-                                                            </div>
 
                                                         </div>
                                                         <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" >Submit</button>
