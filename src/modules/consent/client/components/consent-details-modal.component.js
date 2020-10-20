@@ -32,48 +32,39 @@ const ConsentDetailsModal = ({ lgShow, setLgShow, consent }) => {
         <Modal.Body>
             <div className="px-4 py-3">
                 <div className="row">
-                    <div className="col">
-                        <h4 className="mt-1 font-weight-bold">Consent Title</h4>
+                    <div className="col-12 pb-3 px-0">
+                        <label className="mt-1 font-weight-bold">Consent Title</label>
                         <div className="">{consent.title}</div>
                     </div>
-                </div>
-                <div className="row mt-3">
-                    <div className="col-6">
-                        <div className="mt-1 font-weight-bold">Consent Type</div>
+                    <div className="col-12 col-sm-6 pb-3 px-0">
+                        <label className="mt-1 font-weight-bold">Consent Type</label>
                         <div className="">{consent.consent_category ? consent.consent_category.title : ''}</div>
                     </div>
-                    <div className="col-6">
-                        <div className="mt-1 font-weight-bold">Preference</div>
+                    <div className="col-12 col-sm-6 pb-3 px-0">
+                        <label className="mt-1 font-weight-bold">Preference</label>
                         <div className="">{consent.preference}</div>
                     </div>
-                </div>
-                <div className="row mt-3">
-                    <div className="col-6">
-                        <div className="mt-1 font-weight-bold">Status</div>
+                    <div className="col-12 col-sm-6 pb-3 px-0">
+                        <label className="mt-1 font-weight-bold">Status</label>
                         <div className="">{consent.is_active ? 'Active' : 'Inactive'}</div>
                     </div>
-                    <div className="col-6">
-                        <div className="mt-1 font-weight-bold">Created By</div>
+                    <div className="col-12 col-sm-6 pb-3 px-0">
+                        <label className="mt-1 font-weight-bold">Created By</label>
                         <div className="">{consent.createdByUser ? `${consent.createdByUser.first_name} ${consent.createdByUser.last_name}` : ''}</div>
                     </div>
-                </div>
-                <div className="row mt-3">
-                    <div className="col-6">
-                        <div className="mt-1 font-weight-bold">Ctreated Date</div>
-                        <div className="">{(new Date(consent.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
+                    <div className="col-12 col-sm-6 pb-3 px-0">
+                        <label className="mt-1 font-weight-bold">Ctreated Date</label>
+                    <div className="">{(new Date(consent.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
                     </div>
-                </div>
-
-                <div className="row mt-3">
-                    <div className="col-12">
-                        <div className="mt-1 font-weight-bold">Assigned Countries</div>
+                    <div className="col-12 pb-3 px-0">
+                        <label className="pb-1 font-weight-bold">Assigned Countries</label>
                         {consent.countries && consent.countries.length > 0 ?
                             (
-                                <table className="table table-hover table-sm mb-0 cdp-table">
-                                    <thead className="cdp-bg-primary text-white cdp-table__header">
+                                <table className="table table-hover table-sm mb-0 cdp-table mb-2 shadow-sm">
+                                    <thead className="cdp-bg-primary-lighter text-white cdp-table__header">
                                         <tr>
-                                            <th>Country</th>
-                                            <th>Opt Type</th>
+                                            <th className="py-1">Country</th>
+                                            <th className="py-1">Opt Type</th>
                                         </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
@@ -90,20 +81,20 @@ const ConsentDetailsModal = ({ lgShow, setLgShow, consent }) => {
                         }
                     </div>
                 </div>
-
                 <div className="row mt-4">
                     <div className="col accordion-consent rounded shadow-sm p-0">
                         <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Available Translations</h4>
                         {consent.translations && consent.translations.length > 0 ? consent.translations.map((translation, index) => (
                             <Accordion defaultActiveKey="0" key={index}>
                                 <Card>
-                                    <Card.Header>
-                                        <Accordion.Toggle as={Card.Header} variant="link" eventKey="0">
+                                    <Card.Header className="p-0">
+                                        <Accordion.Toggle as={Card.Header} variant="link" eventKey="0" type="button" className="card-header d-flex justify-content-between">
                                             {translation.locale.toUpperCase()}
+                                            <i class="icon icon-arrow-down ml-2 faq__icon-down"></i>
                                         </Accordion.Toggle>
                                     </Card.Header>
                                     <Accordion.Collapse eventKey="0">
-                                        <Card.Body><div>{parse(translation.rich_text)}</div></Card.Body>
+                                        <Card.Body className="ml-0"><div>{parse(translation.rich_text)}</div></Card.Body>
                                     </Accordion.Collapse>
                                 </Card>
                             </Accordion>
