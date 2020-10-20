@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { NavLink } from 'react-router-dom';
+import { useToasts } from 'react-toast-notifications';
 import { useSelector, useDispatch } from 'react-redux';
+import Modal from 'react-bootstrap/Modal'
+import axios from "axios";
 import CountryConsentForm from './country-consent-form';
 import { getCdpConsents } from '../consent.action';
 import optTypes from '../opt-types.json';
-import axios from "axios";
-import Modal from 'react-bootstrap/Modal'
-import { useToasts } from 'react-toast-notifications';
+import ConsentDetailsModal from './consent-details-modal.component';
 
 import { getCountryConsents, deleteCountryConsent } from '../consent.action';
 
@@ -15,6 +16,8 @@ const CountryConsents = () => {
     const [showDelete, setShowDelete] = useState(false);
     const [consentToDelete, setConsentToDelete] = useState(null);
     const { addToast } = useToasts();
+    const [consentDetails, setConsentDetails] = useState({});
+    const [showConsentDetails, setShowConsentDetails] = useState(false);
 
     const dispatch = useDispatch();
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
@@ -53,6 +56,12 @@ const CountryConsents = () => {
             , []
         );
         return groupedByCountry;
+    }
+
+    async function showConsentDetailsModal(id) {
+        const response = await axios.get(`/api/cdp-consents/${id}`);
+        setConsentDetails(response.data);
+        setShowConsentDetails(true);
     }
 
     const setDeleteModal = (id, title, countryName) => {
@@ -136,7 +145,9 @@ const CountryConsents = () => {
                                                     countryConsent.consents.map((consent, coonsentIndex) =>
                                                         (
                                                             <tr key={coonsentIndex}>
-                                                                <td>{consent.title}</td>
+                                                                <td>
+                                                                    <span className="btn text-primary" onClick={() => showConsentDetailsModal(consent.id)}>{consent.title}</span>
+                                                                </td>
                                                                 <td>{consent.locales}</td>
                                                                 <td>{consent.opt_type}</td>
                                                                 <td>
@@ -172,6 +183,12 @@ const CountryConsents = () => {
                                 <button className="ml-2" onClick={() => deleteItem()}>Confirm</button>
                             </Modal.Body>
                         </Modal>
+
+                        <ConsentDetailsModal
+                            lgShow={showConsentDetails}
+                            setLgShow={setShowConsentDetails}
+                            consent={consentDetails}
+                        />
                     </div>
                 </div>
             </div>

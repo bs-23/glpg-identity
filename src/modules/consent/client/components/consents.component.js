@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { NavLink } from 'react-router-dom';
-import { getCdpConsents } from '../consent.action';
 import { useSelector, useDispatch } from 'react-redux';
 import Dropdown from 'react-bootstrap/Dropdown';
-import ConsentDetailsModal from './consent-details-modal.component';
 import axios from 'axios';
+import { getCdpConsents } from '../consent.action';
+import ConsentDetailsModal from './consent-details-modal.component';
 
 const Consents = () => {
     const dispatch = useDispatch();
