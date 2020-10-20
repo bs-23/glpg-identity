@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
-import { createConsent } from "../consent.action";
+import { createConsent } from '../consent.actions';
 import { useToasts } from "react-toast-notifications";
 import CountryCodes from 'country-codes-list';
 
@@ -190,7 +190,7 @@ const ConsentForm = () => {
                                                 <div className="row">
                                                     <div className="col-12 col-lg-8 col-xl-6">
                                                         <div className="row">
-                                                            
+
                                                             <div className="col-12 col-sm-6">
                                                                 <div className="form-group">
                                                                     <label className="font-weight-bold" htmlFor="title"> Title <span className="text-danger">*</span></label>

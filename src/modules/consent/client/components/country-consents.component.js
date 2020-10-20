@@ -5,10 +5,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import Modal from 'react-bootstrap/Modal'
 import axios from "axios";
 import CountryConsentForm from './country-consent-form';
-import { getCdpConsents } from '../consent.action';
 import optTypes from '../opt-types.json';
-import ConsentDetailsModal from './consent-details-modal.component';
-import { getCountryConsents, deleteCountryConsent } from '../consent.action';
+import ConsentComponent from './consent.component';
+import { getCountryConsents, deleteCountryConsent, getCdpConsents } from '../consent.actions';
 
 const CountryConsents = () => {
     const [show, setShow] = useState(false);
@@ -17,8 +16,7 @@ const CountryConsents = () => {
     const [showDelete, setShowDelete] = useState(false);
     const [consentToDelete, setConsentToDelete] = useState(null);
     const { addToast } = useToasts();
-    const [consentDetails, setConsentDetails] = useState({});
-    const [showConsentDetails, setShowConsentDetails] = useState(false);
+    const [consentId, setConsentId] = useState(null);
 
     const dispatch = useDispatch();
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
@@ -67,11 +65,9 @@ const CountryConsents = () => {
         setShow(true);
     }
 
-    async function showConsentDetailsModal(id) {
-        const response = await axios.get(`/api/cdp-consents/${id}`);
-        setConsentDetails(response.data);
-        setShowConsentDetails(true);
-    }
+    const showConsentDetailsModal = (id) => {
+        setConsentId(id);
+    };
 
     const setDeleteModal = (id, title, countryName) => {
         setConsentToDelete({ id, title, countryName });
@@ -193,11 +189,7 @@ const CountryConsents = () => {
                             </Modal.Body>
                         </Modal>
 
-                        <ConsentDetailsModal
-                            lgShow={showConsentDetails}
-                            setLgShow={setShowConsentDetails}
-                            consent={consentDetails}
-                        />
+                        {consentId && <ConsentComponent consentId={consentId} />}
                     </div>
                 </div>
             </div>
