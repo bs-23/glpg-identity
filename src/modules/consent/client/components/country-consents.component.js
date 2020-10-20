@@ -155,12 +155,12 @@ const CountryConsents = () => {
                                                         (
                                                             <tr key={coonsentIndex}>
                                                                 <td>
-                                                                    <span className="cdp-text-primary text-underline" onClick={() => showConsentDetailsModal(consent.id)}>{consent.title}</span>
+                                                                    <span type="button" className="btn btn-link cdp-text-primary p-0" onClick={() => showConsentDetailsModal(consent.id)}><i className="fas fa-caret-right mr-1"></i>{consent.title}</span>
                                                                 </td>
                                                                 <td>{consent.locales}</td>
                                                                 <td>{consent.opt_type}</td>
                                                                 <td>
-                                                                    <button className="btn btn-link" onClick={() => setEdit(consent)}>Manage opt type</button> <button onClick={() => setDeleteModal(consent.country_consent_id, consent.title, countryConsent.name)} className="btn btn-link text-danger">Remove</button>
+                                                                    <button className="btn btn-link cdp-text-primary p-0 mr-3" onClick={() => setEdit(consent)}><i className="fas fa-tasks mr-1"></i>Manage opt type</button> <button onClick={() => setDeleteModal(consent.country_consent_id, consent.title, countryConsent.name)} className="btn btn-link text-danger p-0"><i className="far fa-trash-alt mr-1"></i>Remove</button>
                                                                 </td>
                                                             </tr>
                                                         )
