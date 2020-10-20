@@ -161,17 +161,17 @@ const CountryConsents = () => {
                             </Modal.Header>
                             <Modal.Body>
                                 {consentToDelete ? (
-                                    <div className="mb-2">
-                                        Are you sure to remove this consent from {consentToDelete.countryName}?
-                                        <div className="card p-2">
+                                    <div>
+                                        Are you sure to remove this consent from <b>{consentToDelete.countryName}</b>?
+                                        <div className="card mt-2 mb-3">
                                             <div className="card-body">
                                                 {consentToDelete.title}
                                             </div>
                                         </div>
                                     </div>
                                 ) : null}
-                                <button onClick={() => setShowDelete(false)}>Close</button>
-                                <button className="ml-2" onClick={() => deleteItem()}>Save Changes</button>
+                                <button onClick={() => setShowDelete(false)}>Cancel</button>
+                                <button className="ml-2" onClick={() => deleteItem()}>Confirm</button>
                             </Modal.Body>
                         </Modal>
                     </div>

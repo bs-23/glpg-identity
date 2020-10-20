@@ -67,10 +67,10 @@ const ConsentForm = () => {
                 </div>
                 {idx < lastTranslation-1 && <div className="col-12 col-sm-6">
                     <div className="form-group">
-                        <label className="d-flex justify-content-between align-items-center"> 
-                            <span> Remove translations</span>
-                            <span onClick={() => removeTranslation(idx)}>
-                                - 
+                        <label className="d-flex justify-content-between align-items-center">
+                            <span>Remove translations</span>
+                            <span className="pl-3 pt-2 pr-3 pb-2 border border-danger rounded" onClick={() => removeTranslation(idx)}>
+                                -
                             </span>
                         </label>
                     </div>
@@ -187,8 +187,8 @@ const ConsentForm = () => {
                                                                 <div className="form-group">
                                                                     <label className="d-flex justify-content-between align-items-center">
                                                                         <span> Add more translations</span>
-                                                                        <span  onClick={addNewTranslation}>
-                                                                            + 
+                                                                        <span className="pl-3 pt-2 pr-3 pb-2 border border-primary rounded" onClick={addNewTranslation}>
+                                                                            +
                                                                         </span>
                                                                     </label>
                                                                 </div>
