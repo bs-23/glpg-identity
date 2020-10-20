@@ -13,7 +13,7 @@ import { getCountryConsents, deleteCountryConsent } from '../consent.action';
 const CountryConsents = () => {
     const [show, setShow] = useState(false);
     const [showDelete, setShowDelete] = useState(false);
-    const [deleteId, setDeleteId] = useState(null);
+    const [consentToDelete, setConsentToDelete] = useState(null);
     const { addToast } = useToasts();
 
     const dispatch = useDispatch();
@@ -55,18 +55,17 @@ const CountryConsents = () => {
         return groupedByCountry;
     }
 
-    const setDeleteModal = (id) => {
-        setDeleteId(id);
+    const setDeleteModal = (id, title, countryName) => {
+        setConsentToDelete({ id, title, countryName });
         setShowDelete(true);
     }
 
     const deleteItem = () => {
-        dispatch(deleteCountryConsent(deleteId)).then(() => {
+        dispatch(deleteCountryConsent(consentToDelete.id)).then(() => {
             addToast('Country Consent deleted successfully', {
                 appearance: 'success',
                 autoDismiss: true
             });
-
         }).catch(error => {
             addToast(error.response.data, {
                 appearance: 'error',
@@ -74,10 +73,8 @@ const CountryConsents = () => {
             });
         }).finally(function () {
             setShowDelete(false);
-            setDeleteId(null);
-
+            setConsentToDelete(null);
         });
-
     }
 
     useEffect(() => {
@@ -143,7 +140,7 @@ const CountryConsents = () => {
                                                                 <td>{consent.locales}</td>
                                                                 <td>{consent.opt_type}</td>
                                                                 <td>
-                                                                    <a href="#" className="btn btn-link">Edit</a> | <button onClick={() => setDeleteModal(consent.country_consent_id)} className="btn btn-link text-danger">Delete</button>
+                                                                    <a href="#" className="btn btn-link">Edit</a> | <button onClick={() => setDeleteModal(consent.country_consent_id, consent.title, countryConsent.name)} className="btn btn-link text-danger">Delete</button>
 
                                                                 </td>
                                                             </tr>
@@ -160,21 +157,26 @@ const CountryConsents = () => {
 
                         <Modal show={showDelete} onHide={() => setShowDelete(false)}>
                             <Modal.Header closeButton>
-                                <Modal.Title>Modal heading</Modal.Title>
+                                <Modal.Title>Remove Consent from Country</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>
-                                <p>Are you sure to delete this country consent?</p>
+                                {consentToDelete ? (
+                                    <div className="mb-2">
+                                        Are you sure to remove this consent from {consentToDelete.countryName}?
+                                        <div className="card p-2">
+                                            <div className="card-body">
+                                                {consentToDelete.title}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : null}
                                 <button onClick={() => setShowDelete(false)}>Close</button>
-                                <button onClick={() => deleteItem()}>Save Changes</button>
+                                <button className="ml-2" onClick={() => deleteItem()}>Save Changes</button>
                             </Modal.Body>
-
                         </Modal>
-
-
                     </div>
                 </div>
             </div>
-
         </main>
     );
 }
