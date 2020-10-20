@@ -32,8 +32,6 @@ const ConsentForm = () => {
     }
 
     const getTranslations = () => {
-        const lastTranslation = translations.length;
-
         return translations.map((item, idx) => {
             const translationId = `Translation-${idx+1}`;
             const countryId = `country-${idx}`;
@@ -65,7 +63,8 @@ const ConsentForm = () => {
                         <div className="invalid-feedback"><ErrorMessage name={richTextId} /></div>
                     </div>
                 </div>
-                {idx < lastTranslation-1 && <div className="col-12 col-sm-6">
+
+                <div className="col-12 col-sm-6">
                     <div className="form-group">
                         <label className="d-flex justify-content-between align-items-center">
                             <span>Remove translations</span>
@@ -74,7 +73,7 @@ const ConsentForm = () => {
                             </span>
                         </label>
                     </div>
-                </div>}
+                </div>
             </React.Fragment>
         )});
     };
@@ -147,24 +146,7 @@ const ConsentForm = () => {
                                                 <div className="row">
                                                     <div className="col-12 col-lg-8 col-xl-6">
                                                         <div className="row">
-                                                            <div className="col-12 col-sm-6">
-                                                                <div className="form-group">
-                                                                    <label className="font-weight-bold" htmlFor="category_id">Select Category <span className="text-danger">*</span></label>
-                                                                    <Field data-testid="category" as="select" name="category_id" className="form-control">
-                                                                        {categories.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
-                                                                    </Field>
-                                                                </div>
-                                                            </div>
-
-                                                            <div className="col-12 col-sm-6">
-                                                                <div className="form-group">
-                                                                    <label className="font-weight-bold" htmlFor="category_id">Select Legal Basis <span className="text-danger">*</span></label>
-                                                                    <Field data-testid="legal_basis" as="select" name="legal_basis" className="form-control text-capitalize">
-                                                                        {['consent', 'contract'].map(item => <option key={item} value={item}>{item}</option>)}
-                                                                    </Field>
-                                                                </div>
-                                                            </div>
-
+                                                            
                                                             <div className="col-12 col-sm-6">
                                                                 <div className="form-group">
                                                                     <label className="font-weight-bold" htmlFor="title"> Title <span className="text-danger">*</span></label>
@@ -181,16 +163,21 @@ const ConsentForm = () => {
                                                                 </div>
                                                             </div>
 
-                                                            {getTranslations()}
-
-                                                            <div className="col-12 col-sm-7">
+                                                            <div className="col-12 col-sm-6">
                                                                 <div className="form-group">
-                                                                    <label className="d-flex justify-content-between align-items-center">
-                                                                        <span> Add more translations</span>
-                                                                        <span className="pl-3 pt-2 pr-3 pb-2 border border-primary rounded" onClick={addNewTranslation}>
-                                                                            +
-                                                                        </span>
-                                                                    </label>
+                                                                    <label className="font-weight-bold" htmlFor="category_id">Select Category <span className="text-danger">*</span></label>
+                                                                    <Field data-testid="category" as="select" name="category_id" className="form-control">
+                                                                        {categories.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
+                                                                    </Field>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="col-12 col-sm-6">
+                                                                <div className="form-group">
+                                                                    <label className="font-weight-bold" htmlFor="category_id">Select Legal Basis <span className="text-danger">*</span></label>
+                                                                    <Field data-testid="legal_basis" as="select" name="legal_basis" className="form-control text-capitalize">
+                                                                        {['consent', 'contract'].map(item => <option key={item} value={item}>{item}</option>)}
+                                                                    </Field>
                                                                 </div>
                                                             </div>
 
@@ -212,6 +199,18 @@ const ConsentForm = () => {
                                                                 </div>
                                                             </div>
 
+                                                            {getTranslations()}
+
+                                                            <div className="col-12 col-sm-7">
+                                                                <div className="form-group">
+                                                                    <label className="d-flex justify-content-between align-items-center">
+                                                                        <span> Add more translations</span>
+                                                                        <span className="pl-3 pt-2 pr-3 pb-2 border border-primary rounded" onClick={addNewTranslation}>
+                                                                            +
+                                                                        </span>
+                                                                    </label>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                         <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" >Submit</button>
                                                     </div>
