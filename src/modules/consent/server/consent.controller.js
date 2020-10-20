@@ -788,6 +788,10 @@ async function assignConsentToCountry(req, res) {
             return res.status(400).send('Invalid request.');
         }
 
+        const availableOptTypes = ConsentCountry.rawAttributes.opt_type.values;
+        if (!availableOptTypes.includes(opt_type))
+            return res.status(400).send('Invalid Opt Type');
+
         const existingCountryConsent = await ConsentCountry.findOne({
             where: {
                 consent_id: consent_id,
