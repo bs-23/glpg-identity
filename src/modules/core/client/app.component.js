@@ -56,12 +56,9 @@ axios.interceptors.response.use(response => {
 axios.interceptors.response.use(
     response => response,
     error => {
-        const loggedInUser = store.getState().userReducer.loggedInUser;
+        const {loggedInUser} = store.getState().userReducer;
 
-        if (error.response.status === 401 && loggedInUser) {
-            localStorage.removeItem('logged_in');
-            window.location = "/login";
-        }
+        if (error.response.status === 401 && loggedInUser) window.location = "/login";
 
         return Promise.reject(error);
     }
