@@ -2,21 +2,18 @@ import React, { useEffect, useState } from "react";
 import { NavLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import Dropdown from 'react-bootstrap/Dropdown';
-import axios from 'axios';
-import { getCdpConsents } from '../consent.action';
-import ConsentDetailsModal from './consent-details-modal.component';
+import { getCdpConsents } from '../consent.actions';
+import ConsentComponent from './consent.component';
 
-const Consents = () => {
+const ConsentsComponent = () => {
     const dispatch = useDispatch();
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
-    const [lgShow, setLgShow] = useState(false);
-    const [consent, setConsent] = useState({});
 
-    async function showConsentDetails(row) {
-        const response = await axios.get(`/api/cdp-consents/${row.id}`);
-        setConsent(response.data);
-        setLgShow(true);
-    }
+    const [consentId, setConsentId] = useState(null);
+
+    const showConsentDetails = (row) => {
+        setConsentId(row.id);
+    };
 
     useEffect(() => {
         dispatch(getCdpConsents(true, true));
@@ -90,13 +87,9 @@ const Consents = () => {
                 </div>
             </div>
 
-            <ConsentDetailsModal
-                lgShow={lgShow}
-                setLgShow={setLgShow}
-                consent={consent}
-            />
+            {consentId && <ConsentComponent consentId={consentId} setConsentId={setConsentId} />}
         </main>
     );
 }
 
-export default Consents;
+export default ConsentsComponent;

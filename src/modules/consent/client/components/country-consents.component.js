@@ -5,11 +5,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import Modal from 'react-bootstrap/Modal'
 import axios from "axios";
 import CountryConsentForm from './country-consent-form';
-import { getCdpConsents } from '../consent.action';
 import optTypes from '../opt-types.json';
-import ConsentDetailsModal from './consent-details-modal.component';
-
-import { getCountryConsents, deleteCountryConsent } from '../consent.action';
+import ConsentComponent from './consent.component';
+import { getCountryConsents, deleteCountryConsent, getCdpConsents } from '../consent.actions';
 
 const CountryConsents = () => {
     const [show, setShow] = useState(false);
@@ -18,8 +16,7 @@ const CountryConsents = () => {
     const [showDelete, setShowDelete] = useState(false);
     const [consentToDelete, setConsentToDelete] = useState(null);
     const { addToast } = useToasts();
-    const [consentDetails, setConsentDetails] = useState({});
-    const [showConsentDetails, setShowConsentDetails] = useState(false);
+    const [consentId, setConsentId] = useState(null);
 
     const dispatch = useDispatch();
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
@@ -68,11 +65,9 @@ const CountryConsents = () => {
         setShow(true);
     }
 
-    async function showConsentDetailsModal(id) {
-        const response = await axios.get(`/api/cdp-consents/${id}`);
-        setConsentDetails(response.data);
-        setShowConsentDetails(true);
-    }
+    const showConsentDetailsModal = (id) => {
+        setConsentId(id);
+    };
 
     const setDeleteModal = (id, title, countryName) => {
         setConsentToDelete({ id, title, countryName });
@@ -137,9 +132,9 @@ const CountryConsents = () => {
                                 (
                                     <div className="table-responsive shadow-sm bg-white mb-3" key={countryConsentIndex}>
                                         <table className="table table-hover table-sm mb-0 cdp-table mb-2">
-                                            <thead className="bg-light cdp-table__header">
+                                            <thead className="cdp-bg-primary-lighter cdp-table__header">
                                                 <tr>
-                                                    <th colSpan="4"><div className="d-flex align-items-center"><img alt={countryConsent.name} src={countryConsent.flagUrl} height="18" className="mr-2" /> {countryConsent.name}</div></th>
+                                                    <th colSpan="4"><div className="d-flex align-items-center text-white"><img alt={countryConsent.name} src={countryConsent.flagUrl} height="18" className="mr-2" /> {countryConsent.name}</div></th>
                                                 </tr>
                                             </thead>
                                             <thead className="cdp-table__header">
@@ -156,12 +151,12 @@ const CountryConsents = () => {
                                                         (
                                                             <tr key={coonsentIndex}>
                                                                 <td>
-                                                                    <span className="btn text-primary" onClick={() => showConsentDetailsModal(consent.id)}>{consent.title}</span>
+                                                                    <span type="button" className="btn btn-link cdp-text-primary p-0" onClick={() => showConsentDetailsModal(consent.id)}><i className="fas fa-caret-right mr-1"></i>{consent.title}</span>
                                                                 </td>
                                                                 <td>{consent.locales}</td>
                                                                 <td>{consent.opt_type}</td>
                                                                 <td>
-                                                                    <button className="btn btn-link" onClick={() => setEdit(consent)}>Manage opt type</button> | <button onClick={() => setDeleteModal(consent.country_consent_id, consent.title, countryConsent.name)} className="btn btn-link text-danger">Remove</button>
+                                                                    <button className="btn btn-link cdp-text-primary p-0 mr-3" onClick={() => setEdit(consent)}><i className="fas fa-tasks mr-1"></i>Manage opt type</button> <button onClick={() => setDeleteModal(consent.country_consent_id, consent.title, countryConsent.name)} className="btn btn-link text-danger p-0"><i className="far fa-trash-alt mr-1"></i>Remove</button>
                                                                 </td>
                                                             </tr>
                                                         )
@@ -194,11 +189,7 @@ const CountryConsents = () => {
                             </Modal.Body>
                         </Modal>
 
-                        <ConsentDetailsModal
-                            lgShow={showConsentDetails}
-                            setLgShow={setShowConsentDetails}
-                            consent={consentDetails}
-                        />
+                        {consentId && <ConsentComponent consentId={consentId} setConsentId={setConsentId} />}
                     </div>
                 </div>
             </div>

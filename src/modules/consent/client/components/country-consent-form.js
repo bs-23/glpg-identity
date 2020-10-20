@@ -5,11 +5,14 @@ import { Form, Formik, Field } from "formik";
 import axios from 'axios';
 import { useToasts } from 'react-toast-notifications';
 import optTypes from '../opt-types.json';
+import { updateCountryConsent } from '../consent.actions';
+import { useDispatch } from 'react-redux';
 
 const CountryConsentForm = (props) => {
     const [, setShow] = useState(false);
     const [country, setCountry] = useState(false);
     const { addToast } = useToasts();
+    const dispatch = useDispatch();
     const handleClose = () => {
         setShow(false);
         props.changeShow(false);
@@ -23,7 +26,7 @@ const CountryConsentForm = (props) => {
     });
 
     return (
-        <Modal show={props.show} onHide={handleClose}>
+        <Modal size="lg" centered show={props.show} onHide={handleClose}>
             <Modal.Header closeButton>
                 <Modal.Title>{props.editable ? 'Manage opt type' : 'Assign consent to country'}</Modal.Title>
             </Modal.Header>
@@ -42,6 +45,24 @@ const CountryConsentForm = (props) => {
                                     axios.post('/api/consent/country', values).then(() => {
                                         actions.resetForm();
                                         addToast('Consent assigned successfully', {
+                                            appearance: 'success',
+                                            autoDismiss: true
+                                        });
+                                        handleClose();
+
+                                    }).catch(error => {
+                                        addToast(error.response.data, {
+                                            appearance: 'error',
+                                            autoDismiss: true
+                                        });
+                                    }).finally(function () {
+                                        actions.setSubmitting(false);
+
+                                    });
+                                } else {
+                                    dispatch(updateCountryConsent(props.options.country_consent_id, { opt_type: values.opt_type })).then(() => {
+                                        actions.resetForm();
+                                        addToast('Opt in changed successfully', {
                                             appearance: 'success',
                                             autoDismiss: true
                                         });
@@ -90,12 +111,6 @@ const CountryConsentForm = (props) => {
                                                 </Field>
                                             </div>
                                         </div>
-                                        <button type="submit" className="btn btn-primary mr-2">
-                                            Save Changes
-                                        </button>
-                                        <button type="button" className="btn btn-secondary" onClick={handleClose}>
-                                            Close
-                                        </button>
                                     </div>
                                 </Form>
                             )}
@@ -103,6 +118,10 @@ const CountryConsentForm = (props) => {
                     </div>
                 }
             </Modal.Body>
+            <Modal.Footer>
+                <button type="submit" className="btn cdp-btn-primary mr-2 text-white shadow-sm">Save Changes</button>
+                <button type="button" className="btn cdp-btn-secondary text-white shadow-sm" onClick={handleClose}>Close</button>
+            </Modal.Footer>
         </Modal>
     );
 }

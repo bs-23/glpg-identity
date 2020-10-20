@@ -4,7 +4,8 @@ const initialState = {
     consents: {},
     veeva_consents: {},
     cdp_consents: [],
-    country_consents: []
+    country_consents: [],
+    consent: null
 };
 
 export default function reducer(state = initialState, action) {
@@ -43,6 +44,29 @@ export default function reducer(state = initialState, action) {
             return {
                 ...state,
                 country_consents: state.country_consents.filter(x => x.id !== id)
+            }
+        }
+
+        case Types.UPDATE_COUNTRY_CONSENT_FULFILLED: {
+            const id = action.payload.config.url.split("/api/consent/country/")[1];
+            state.country_consents.find(x => x.id === id).opt_type = action.payload.data.opt_type;
+            return {
+                ...state,
+                country_consents: state.country_consents
+            }
+        }
+
+        case Types.GET_CONSENT_FULFILLED: {
+            return {
+                ...state,
+                consent: action.payload.data
+            }
+        }
+
+        case Types.SET_CONSENT: {
+            return {
+                ...state,
+                consent: action.payload
             }
         }
     }

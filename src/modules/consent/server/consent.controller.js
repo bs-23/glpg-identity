@@ -788,48 +788,59 @@ async function assignConsentToCountry(req, res) {
             return res.status(400).send('Invalid request.');
         }
 
+        const availableOptTypes = ConsentCountry.rawAttributes.opt_type.values;
+        if (!availableOptTypes.includes(opt_type))
+            return res.status(400).send('Invalid Opt Type');
+
+        const existingCountryConsent = await ConsentCountry.findOne({
+            where: {
+                consent_id: consent_id,
+                country_iso2: {
+                    [Op.iLike]: country_iso2
+                }
+            }
+        });
+
+        if (existingCountryConsent) {
+            return res.status(400).send('Country-Consent association already exists');
+        }
+
         const consent = await Consent.findOne({ where: { id: consent_id } });
 
         if (!consent) {
             return res.status(400).send('Consent not found.');
         }
 
-        const existedCountryConsent = await ConsentCountry.findOne({
-            where: {
-                consent_id: consent_id,
-                country_iso2: {
-                    [Op.iLike]: country_iso2
-                },
-                opt_type: opt_type
-
-            }
+        const createdCountryConsent = await ConsentCountry.create({
+            consent_id,
+            country_iso2: country_iso2.toUpperCase(),
+            opt_type
         });
 
-        if (existedCountryConsent) {
-            return res.status(400).send('Already exists');
-        }
+        res.json(createdCountryConsent);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
 
-        const [countryConsent, created] = await ConsentCountry.findOrCreate({
-            where: {
-                consent_id,
-                country_iso2
-            },
-            defaults: {
-                consent_id,
-                country_iso2,
-                opt_type
-            }
+async function updateCountryConsent(req, res) {
+    try {
+        const id = req.params.id;
+        const optType = req.body.opt_type;
+
+        if (!id || !optType) return res.status(400).send('Invalid request.');
+
+        const consentCountry = await ConsentCountry.findOne({ where: { id } });
+
+        if (!consentCountry) return res.status(404).send('Country-Consent association does noit exist.');
+
+        await consentCountry.update({
+            opt_type: optType
         });
 
-        if (!created && countryConsent) {
-            await countryConsent.update({
-                consent_id,
-                country_iso2,
-                opt_type
-            });
-        }
+        res.json(consentCountry);
 
-        res.json(countryConsent);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -867,4 +878,5 @@ exports.deleteCdpConsent = deleteCdpConsent;
 exports.updateCdpConsent = updateCdpConsent;
 exports.getCountryConsents = getCountryConsents;
 exports.assignConsentToCountry = assignConsentToCountry;
+exports.updateCountryConsent = updateCountryConsent;
 exports.deleteCountryConsent = deleteCountryConsent;
