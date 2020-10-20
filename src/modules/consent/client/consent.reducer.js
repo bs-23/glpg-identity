@@ -37,6 +37,14 @@ export default function reducer(state = initialState, action) {
                 country_consents: action.payload.data
             }
         }
+
+        case Types.DELETE_COUNTRY_CONSENT_FULFILLED: {
+            const id = action.payload.config.url.split("/api/consent/country/")[1];
+            return {
+                ...state,
+                country_consents: state.country_consents.filter(x => x.id !== id)
+            }
+        }
     }
     return state;
 }

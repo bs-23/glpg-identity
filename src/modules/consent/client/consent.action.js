@@ -11,7 +11,7 @@ export function getConsentReport(page, codbase, process_activity, opt_type, orde
     orderBy && search_params.append('orderBy', orderBy);
     orderType && search_params.append('orderType', orderType);
 
-    const url = `/api/consent-performance-report${search_params.toString() !== '' ? '?' + search_params.toString() : '' }`;
+    const url = `/api/consent-performance-report${search_params.toString() !== '' ? '?' + search_params.toString() : ''}`;
 
     return {
         type: Types.GET_CONSENTS_REPORT,
@@ -32,7 +32,7 @@ export function getVeevaConsentReport(page, codbase, process_activity, opt_type,
     orderBy && search_params.append('orderBy', orderBy);
     orderType && search_params.append('orderType', orderType);
 
-    const url = `/api/datasync-consent-performance-report${search_params.toString() !== '' ? '?' + search_params.toString() : '' }`;
+    const url = `/api/datasync-consent-performance-report${search_params.toString() !== '' ? '?' + search_params.toString() : ''}`;
 
     return {
         type: Types.GET_VEEVA_CONSENTS_REPORT,
@@ -43,13 +43,13 @@ export function getVeevaConsentReport(page, codbase, process_activity, opt_type,
     };
 }
 
-export function getCdpConsents(translations, category){
+export function getCdpConsents(translations, category) {
     const search_params = new URLSearchParams('');
 
     translations && search_params.append('translations', translations);
     category && search_params.append('category', category);
 
-    const url = `/api/cdp-consents${search_params.toString() !== '' ? '?' + search_params.toString() : '' }`;
+    const url = `/api/cdp-consents${search_params.toString() !== '' ? '?' + search_params.toString() : ''}`;
 
     return {
         type: Types.GET_CDP_CONSENTS,
@@ -76,6 +76,17 @@ export function getCountryConsents() {
         type: Types.GET_COUNTRY_CONSENTS,
         payload: axios({
             method: 'get',
+            url
+        })
+    };
+}
+
+export function deleteCountryConsent(id) {
+    const url = `/api/consent/country/${id}`;
+    return {
+        type: Types.DELETE_COUNTRY_CONSENT,
+        payload: axios({
+            method: 'delete',
             url
         })
     };

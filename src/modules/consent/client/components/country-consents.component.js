@@ -5,12 +5,17 @@ import CountryConsentForm from './country-consent-form';
 import { getCdpConsents } from '../consent.action';
 import optTypes from '../opt-types.json';
 import axios from "axios";
+import Modal from 'react-bootstrap/Modal'
+import { useToasts } from 'react-toast-notifications';
 
-
-import { getCountryConsents } from '../consent.action';
+import { getCountryConsents, deleteCountryConsent } from '../consent.action';
 
 const CountryConsents = () => {
     const [show, setShow] = useState(false);
+    const [showDelete, setShowDelete] = useState(false);
+    const [deleteId, setDeleteId] = useState(null);
+    const { addToast } = useToasts();
+
     const dispatch = useDispatch();
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
     const [countries, setCountries] = useState([]);
@@ -27,7 +32,8 @@ const CountryConsents = () => {
                 if (existing) {
                     existing.consents.push({
                         ...current.consent,
-                        opt_type: optType.text
+                        opt_type: optType.text,
+                        country_consent_id: current.id
                     });
                 } else {
                     const country = countries.find(c => c.country_iso2.toLowerCase() === current.country_iso2.toLowerCase());
@@ -37,7 +43,8 @@ const CountryConsents = () => {
                         flagUrl: `/assets/flag/flag-${country.codbase_desc.replace(' ', '-').toLowerCase()}.svg`,
                         consents: [{
                             ...current.consent,
-                            opt_type: optType.text
+                            opt_type: optType.text,
+                            country_consent_id: current.id
                         }]
                     });
                 }
@@ -46,6 +53,31 @@ const CountryConsents = () => {
             , []
         );
         return groupedByCountry;
+    }
+
+    const setDeleteModal = (id) => {
+        setDeleteId(id);
+        setShowDelete(true);
+    }
+
+    const deleteItem = () => {
+        dispatch(deleteCountryConsent(deleteId)).then(() => {
+            addToast('Country Consent deleted successfully', {
+                appearance: 'success',
+                autoDismiss: true
+            });
+
+        }).catch(error => {
+            addToast(error.response.data, {
+                appearance: 'error',
+                autoDismiss: true
+            });
+        }).finally(function () {
+            setShowDelete(false);
+            setDeleteId(null);
+
+        });
+
     }
 
     useEffect(() => {
@@ -111,7 +143,8 @@ const CountryConsents = () => {
                                                                 <td>{consent.locales}</td>
                                                                 <td>{consent.opt_type}</td>
                                                                 <td>
-                                                                    <a href="#" className="btn btn-link">Edit</a> | <a href="#" className="btn btn-link text-danger">Delete</a>
+                                                                    <a href="#" className="btn btn-link">Edit</a> | <button onClick={() => setDeleteModal(consent.country_consent_id)} className="btn btn-link text-danger">Delete</button>
+
                                                                 </td>
                                                             </tr>
                                                         )
@@ -124,6 +157,20 @@ const CountryConsents = () => {
                                 )
                             )
                         }
+
+                        <Modal show={showDelete} onHide={() => setShowDelete(false)}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Modal heading</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <p>Are you sure to delete this country consent?</p>
+                                <button onClick={() => setShowDelete(false)}>Close</button>
+                                <button onClick={() => deleteItem()}>Save Changes</button>
+                            </Modal.Body>
+
+                        </Modal>
+
+
                     </div>
                 </div>
             </div>
