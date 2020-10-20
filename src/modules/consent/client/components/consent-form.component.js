@@ -11,8 +11,9 @@ const ConsentForm = () => {
     const { addToast } = useToasts();
     const [categories, setCategories] = useState([]);
     const [userCountries, setUserCountries] = useState([]);
+    const [countryLanguages, setCountryLanguages] = useState([]);
     const [isActive, setIsActive] = useState(true);
-    const [translations, setTranslations] = useState([{ country: '', language: '' , rich_text: '', locale: '' }]);
+    const [translations, setTranslations] = useState([]);
 
     const handleChange = (e) => {
         const newTranslations = [...translations];
@@ -24,7 +25,12 @@ const ConsentForm = () => {
     }
 
     const addNewTranslation = () => {
-        const newTranslations = [...translations, { country: '', language: '' , rich_text: '', locale: '' }];
+        const [, , lang] = countryLanguages[0].split(' ');
+        const init_lang = lang.replace(/,/g, '').toLowerCase();
+
+        const init_country_iso2 = userCountries[0].country_iso2.toLowerCase();
+
+        const newTranslations = [...translations, { country: init_country_iso2, language: init_lang , rich_text: '', locale: `${init_country_iso2}_${init_lang}` }];
         setTranslations(newTranslations);
     }
 
@@ -33,6 +39,38 @@ const ConsentForm = () => {
         newTranslations.splice(idx, 1);
         setTranslations(newTranslations);
     }
+
+    const fetchUserCountries = (userCountries, allCountries) => userCountries.map(element => allCountries.find(x => x.country_iso2 == element));
+
+    useEffect(() => {
+        async function getConsentCatogories() {
+            const response = await axios.get('/api/consent/category');
+            setCategories(response.data);
+        }
+        async function getCountries() {
+            const response = (await axios.get('/api/countries')).data;
+            const userProfile = (await axios.get('/api/users/profile')).data;
+            setUserCountries(fetchUserCountries(userProfile.countries, response));
+        }
+
+        function getLanguages() {
+            const mapped_languages = {};
+
+            const country_languages = CountryCodesObject.filter(item => {
+                const [, , language_name] = item.split(' ');
+                if(!mapped_languages[language_name]) {
+                    mapped_languages[language_name] = true;
+                    return true;
+                }
+                return false;
+            });
+            setCountryLanguages(country_languages);
+        }
+
+        getConsentCatogories();
+        getCountries();
+        getLanguages();
+    }, []);
 
     const getTranslations = () => {
         return translations.map((item, idx) => {
@@ -57,38 +95,13 @@ const ConsentForm = () => {
                     <div className="form-group">
                         <label className="font-weight-bold" htmlFor={languageId}>Select Language </label>
                         <Field className="form-control language" value={item.language} onChange={(e) => handleChange(e)} data-id={idx} as="select" name={languageId} id={languageId}>
-                            {CountryCodesObject.map(element => {
+                            {countryLanguages.map(element => {
                                 const [country_iso2, language_code, language_name] = element.split(' ');
-                                return <option key={country_iso2} value={language_code}>{language_name}</option>
+                                return language_name && <option key={country_iso2} value={language_code}>{language_name.replace(/,/g, '')}</option>
                             })}
                         </Field>
                     </div>
                 </div>
-
-                {/* <div className="col-12 col-sm-6">
-                    <div className="form-group">
-                        <label className="font-weight-bold" htmlFor={languageId}> Select Language </label>
-                        <Field className="form-control country" value={item.country} onChange={(e) => handleChange(e)} data-id={idx} as="select" name={countryId} id={countryId}>
-                            {userCountries.map(item => <option key={item.countryid} value={item.country_iso2}>{item.codbase_desc}</option>)}
-                        </Field>
-                    </div>
-                </div> */}
-
-                {/* <div className="col-12 col-sm-6">
-                    <div className="form-group">
-                        <label className="font-weight-bold" htmlFor={countryId}> Country </label>
-                        <Field className="form-control country" value={item.country} onChange={(e) => handleChange(e)} type='text' data-id={idx} name={countryId} id={countryId}/>
-                        <div className="invalid-feedback"><ErrorMessage name={countryId} /></div>
-                    </div>
-                </div> */}
-
-                {/* <div className="col-12 col-sm-6">
-                    <div className="form-group">
-                        <label className="font-weight-bold" htmlFor={languageId}> Language </label>
-                        <Field className="form-control language" value={item.language} onChange={(e) => handleChange(e)} type='text' data-id={idx} name={languageId} id={languageId}/>
-                        <div className="invalid-feedback"><ErrorMessage name={languageId} /></div>
-                    </div>
-                </div> */}
 
                 <div className="col-12 col-sm-6">
                     <div className="form-group">
@@ -112,24 +125,6 @@ const ConsentForm = () => {
         )});
     };
 
-    const fetchUserCountries = (userCountries, allCountries) => userCountries.map(element => allCountries.find(x => x.country_iso2 == element));
-
-    useEffect(() => {
-        async function getConsentCatogories() {
-            const response = await axios.get('/api/consent/category');
-            setCategories(response.data);
-        }
-        async function getCountries() {
-            const response = (await axios.get('/api/countries')).data;
-            const userProfile = (await axios.get('/api/users/profile')).data;
-            setUserCountries(fetchUserCountries(userProfile.countries, response));
-        }
-
-        getConsentCatogories();
-        getCountries();
-        // console.log(CountryCodesObject);
-    }, []);
-
     return (
         <main className="app__content cdp-light-bg h-100">
             <div className="container-fluid">
@@ -145,7 +140,7 @@ const ConsentForm = () => {
                         </nav>
                     </div>
                 </div>
-                {categories.length > 0 &&
+                {categories && userCountries && countryLanguages && categories.length && userCountries.length && countryLanguages.length &&
                     <div className="row">
                         <div className="col-12">
                             <div className="shadow-sm bg-white mb-3">
