@@ -27,7 +27,7 @@ const CountryConsents = () => {
 
         const groupedByCountry = country_consents.reduce(
             (grouped, current) => {
-                const existing = grouped.find(g => g.country_iso2 === current.country_iso2);
+                const existing = grouped.find(g => g.country_iso2.toLowerCase() === current.country_iso2.toLowerCase());
                 const optType = optTypes.find(ot => ot.value === current.opt_type);
                 if (existing) {
                     existing.consents.push({
@@ -141,7 +141,6 @@ const CountryConsents = () => {
                                                                 <td>{consent.opt_type}</td>
                                                                 <td>
                                                                     <a href="#" className="btn btn-link">Manage opt type</a> | <button onClick={() => setDeleteModal(consent.country_consent_id, consent.title, countryConsent.name)} className="btn btn-link text-danger">Remove</button>
-
                                                                 </td>
                                                             </tr>
                                                         )
@@ -149,7 +148,6 @@ const CountryConsents = () => {
                                                 }
                                             </tbody>
                                         </table>
-
                                     </div>
                                 )
                             )
