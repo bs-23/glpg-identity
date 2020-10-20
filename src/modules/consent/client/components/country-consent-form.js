@@ -17,7 +17,7 @@ const CountryConsentForm = (props) => {
     return (
         <Modal show={props.show} onHide={handleClose}>
             <Modal.Header closeButton>
-                <Modal.Title>Assign Consent</Modal.Title>
+                <Modal.Title>Assign consent to country</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 {props.consents.length > 0 && props.countries.length > 0 &&
@@ -54,14 +54,6 @@ const CountryConsentForm = (props) => {
                                     <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
-                                                <label className="font-weight-bold" htmlFor="consent_id">Select Consent <span className="text-danger">*</span></label>
-                                                <Field data-testid="consent" as="select" name="consent_id" className="form-control">
-                                                    {props.consents.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
-                                                </Field>
-                                            </div>
-                                        </div>
-                                        <div className="col-12">
-                                            <div className="form-group">
                                                 <label className="font-weight-bold" htmlFor="country_iso2">Select Country <span className="text-danger">*</span></label>
                                                 <Field data-testid="country_iso2" as="select" name="country_iso2" className="form-control">
                                                     {props.countries.map(item => <option key={item.countryid} value={item.country_iso2}>{item.codbase_desc}</option>)}
@@ -70,18 +62,26 @@ const CountryConsentForm = (props) => {
                                         </div>
                                         <div className="col-12">
                                             <div className="form-group">
-                                                <label className="font-weight-bold" htmlFor="opt_type">Select Opt Type: <span className="text-danger">*</span></label>
+                                                <label className="font-weight-bold" htmlFor="consent_id">Select Consent <span className="text-danger">*</span></label>
+                                                <Field data-testid="consent" as="select" name="consent_id" className="form-control">
+                                                    {props.consents.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
+                                                </Field>
+                                            </div>
+                                        </div>
+                                        <div className="col-12">
+                                            <div className="form-group">
+                                                <label className="font-weight-bold" htmlFor="opt_type">Select Opt Type <span className="text-danger">*</span></label>
                                                 <Field data-testid="opt_type" as="select" name="opt_type" className="form-control">
-                                                {
-                                                    optTypes.map(optType => (
-                                                        <option key={optType.value} value={optType.value}>{optType.text}</option>
-                                                    ))
-                                                }
+                                                    {
+                                                        optTypes.map(optType => (
+                                                            <option key={optType.value} value={optType.value}>{optType.text}</option>
+                                                        ))
+                                                    }
                                                 </Field>
                                             </div>
                                         </div>
                                         <button type="submit" className="btn btn-primary mr-2" onClick={handleClose}>
-                                            Save
+                                            Save Changes
                                         </button>
                                         <button type="button" className="btn btn-secondary" onClick={handleClose}>
                                             Close

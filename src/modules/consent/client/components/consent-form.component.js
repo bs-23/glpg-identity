@@ -9,27 +9,75 @@ const ConsentForm = () => {
     const { addToast } = useToasts();
     const [categories, setCategories] = useState([]);
     const [isActive, setIsActive] = useState(true);
-    const [translations, setTranslations] = useState([]);
+    const [translations, setTranslations] = useState([{ country: '', language: '' , rich_text: '', locale: '' }]);
 
-    const getTranslations = () => (
-        <React.Fragment>
-            <div className="col-12 col-sm-6">
-                <div className="form-group">
-                    <label className="font-weight-bold"> Locale <span className="text-danger">*</span></label>
-                    <Field className="form-control" type="preference" name="preference" />
-                    <div className="invalid-feedback"><ErrorMessage name="preference" /></div>
-                </div>
-            </div>
+    const handleChange = (e) => {
+        const newTranslations = [...translations];
+        const field = e.target.className.split(' ');
+        const translation = newTranslations[e.target.dataset.id];
+        translation[field[1]] = e.target.value;
+        if(field[1] === 'country' || field[1] === 'language') translation['locale'] = `${translation['country']}_${translation['language']}`;
+        setTranslations(newTranslations);
+    }
 
-            <div className="col-12 col-sm-6">
-                <div className="form-group">
-                    <label className="font-weight-bold" htmlFor="preference"> Rich Text <span className="text-danger">*</span></label>
-                    <Field className="form-control" type="preference" name="preference" />
-                    <div className="invalid-feedback"><ErrorMessage name="preference" /></div>
+    const addNewTranslation = () => {
+        const newTranslations = [...translations, { country: '', language: '' , rich_text: '', locale: '' }];
+        setTranslations(newTranslations);
+    }
+
+    const removeTranslation = (idx) => {
+        const newTranslations = [...translations];
+        newTranslations.splice(idx, 1);
+        setTranslations(newTranslations);
+    }
+
+    const getTranslations = () => {
+        const lastTranslation = translations.length;
+
+        return translations.map((item, idx) => {
+            const translationId = `Translation-${idx+1}`;
+            const countryId = `country-${idx}`;
+            const languageId = `language-${idx}`;
+            const richTextId = `rich-text-${idx}`;
+
+            return (<React.Fragment key={idx}>
+                <label className="col-12 col-sm-10 font-weight-bold">{translationId}</label>
+                <div className="col-12 col-sm-6">
+                    <div className="form-group">
+                        <label className="font-weight-bold" htmlFor={countryId}> Country </label>
+                        <Field className="form-control country" value={item.country} onChange={(e) => handleChange(e)} type='text' data-id={idx} name={countryId} id={countryId}/>
+                        <div className="invalid-feedback"><ErrorMessage name={countryId} /></div>
+                    </div>
                 </div>
-            </div>
-        </React.Fragment>
-    );
+
+                <div className="col-12 col-sm-6">
+                    <div className="form-group">
+                        <label className="font-weight-bold" htmlFor={languageId}> Language </label>
+                        <Field className="form-control language" value={item.language} onChange={(e) => handleChange(e)} type='text' data-id={idx} name={languageId} id={languageId}/>
+                        <div className="invalid-feedback"><ErrorMessage name={languageId} /></div>
+                    </div>
+                </div>
+
+                <div className="col-12 col-sm-6">
+                    <div className="form-group">
+                        <label className="font-weight-bold" htmlFor={richTextId}> Rich Text </label>
+                        <Field className="form-control rich_text" value={item.rich_text} onChange={(e) => handleChange(e)} type='text' data-id={idx} name={richTextId} id={richTextId}/>
+                        <div className="invalid-feedback"><ErrorMessage name={richTextId} /></div>
+                    </div>
+                </div>
+                {idx < lastTranslation-1 && <div className="col-12 col-sm-6">
+                    <div className="form-group">
+                        <label className="d-flex justify-content-between align-items-center"> 
+                            <span> Remove translations</span>
+                            <span onClick={() => removeTranslation(idx)}>
+                                - 
+                            </span>
+                        </label>
+                    </div>
+                </div>}
+            </React.Fragment>
+        )});
+    };
 
     useEffect(() => {
         async function getConsentCatogories() {
@@ -73,6 +121,9 @@ const ConsentForm = () => {
                                         }}
                                         displayName="ConsentForm"
                                         onSubmit={(values, actions) => {
+                                            values.translations = translations;
+                                            console.log(values)
+
                                             dispatch(createConsent(values))
                                                 .then(res => {
                                                     actions.resetForm();
@@ -136,8 +187,8 @@ const ConsentForm = () => {
                                                                 <div className="form-group">
                                                                     <label className="d-flex justify-content-between align-items-center">
                                                                         <span> Add more translations</span>
-                                                                        <span>
-                                                                            <button > + </button>
+                                                                        <span  onClick={addNewTranslation}>
+                                                                            + 
                                                                         </span>
                                                                     </label>
                                                                 </div>
