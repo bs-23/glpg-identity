@@ -8,7 +8,6 @@ import CountryConsentForm from './country-consent-form';
 import { getCdpConsents } from '../consent.action';
 import optTypes from '../opt-types.json';
 import ConsentDetailsModal from './consent-details-modal.component';
-
 import { getCountryConsents, deleteCountryConsent } from '../consent.action';
 
 const CountryConsents = () => {

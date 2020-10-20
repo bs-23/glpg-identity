@@ -835,7 +835,8 @@ async function updateCountryConsent(req, res) {
             opt_type: optType
         });
 
-        res.sendStatus(200);
+        res.json(consentCountry);
+
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');

@@ -45,6 +45,15 @@ export default function reducer(state = initialState, action) {
                 country_consents: state.country_consents.filter(x => x.id !== id)
             }
         }
+
+        case Types.UPDATE_COUNTRY_CONSENT_FULFILLED: {
+            const id = action.payload.config.url.split("/api/consent/country/")[1];
+            state.country_consents.find(x => x.id === id).opt_type = action.payload.data.opt_type;
+            return {
+                ...state,
+                country_consents: state.country_consents
+            }
+        }
     }
     return state;
 }

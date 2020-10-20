@@ -5,11 +5,14 @@ import { Form, Formik, Field } from "formik";
 import axios from 'axios';
 import { useToasts } from 'react-toast-notifications';
 import optTypes from '../opt-types.json';
+import { updateCountryConsent } from '../consent.action';
+import { useDispatch } from 'react-redux';
 
 const CountryConsentForm = (props) => {
     const [, setShow] = useState(false);
     const [country, setCountry] = useState(false);
     const { addToast } = useToasts();
+    const dispatch = useDispatch();
     const handleClose = () => {
         setShow(false);
         props.changeShow(false);
@@ -42,6 +45,24 @@ const CountryConsentForm = (props) => {
                                     axios.post('/api/consent/country', values).then(() => {
                                         actions.resetForm();
                                         addToast('Consent assigned successfully', {
+                                            appearance: 'success',
+                                            autoDismiss: true
+                                        });
+                                        handleClose();
+
+                                    }).catch(error => {
+                                        addToast(error.response.data, {
+                                            appearance: 'error',
+                                            autoDismiss: true
+                                        });
+                                    }).finally(function () {
+                                        actions.setSubmitting(false);
+
+                                    });
+                                } else {
+                                    dispatch(updateCountryConsent(props.options.country_consent_id, { opt_type: values.opt_type })).then(() => {
+                                        actions.resetForm();
+                                        addToast('Opt in changed successfully', {
                                             appearance: 'success',
                                             autoDismiss: true
                                         });

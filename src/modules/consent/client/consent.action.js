@@ -91,3 +91,16 @@ export function deleteCountryConsent(id) {
         })
     };
 }
+
+export function updateCountryConsent(id, data) {
+    const url = `/api/consent/country/${id}`;
+    return {
+        type: Types.UPDATE_COUNTRY_CONSENT,
+        payload: axios({
+            method: 'put',
+            url,
+            data
+        })
+    };
+}
+
