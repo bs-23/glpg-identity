@@ -5,15 +5,15 @@ import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
 import parse from 'html-react-parser';
 import optTypes from '../opt-types.json';
-import { getConsent } from '../consent.actions';
+import { getConsent, setConsent } from '../consent.actions';
 
 const ConsentComponent = ({ consentId }) => {
     const dispatch = useDispatch();
     const consent = useSelector(state => state.consentReducer.consent);
     const [showConsentModal, setShowConsentModal] = useState(false);
+    const countries = useSelector(state => state.userReducer.countries);
 
     const getConsentCountries = (consentCountries) => {
-        const countries = useSelector(state => state.userReducer.countries);
         return consentCountries.map(countryConsent => {
             const country = countries.find(c => c.country_iso2.toLowerCase() === countryConsent.country_iso2.toLowerCase());
             return {
@@ -21,6 +21,11 @@ const ConsentComponent = ({ consentId }) => {
                 opt_type: (optTypes.find(optType => optType.value === countryConsent.opt_type) || {}).text
             };
         });
+    };
+
+    const hideConsentDetails = () => {
+        setShowConsentModal(false);
+        dispatch(setConsent(null));
     };
 
     useEffect(() => {
@@ -31,7 +36,8 @@ const ConsentComponent = ({ consentId }) => {
     return <Modal
         size="lg"
         centered
-        show={!!consentId}>
+        show={showConsentModal}
+        onHide={() => hideConsentDetails()}>
         <Modal.Header closeButton>
             <Modal.Title>
                 Consent details

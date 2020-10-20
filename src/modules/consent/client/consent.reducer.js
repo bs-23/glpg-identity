@@ -62,6 +62,13 @@ export default function reducer(state = initialState, action) {
                 consent: action.payload.data
             }
         }
+
+        case Types.SET_CONSENT: {
+            return {
+                ...state,
+                consent: action.payload
+            }
+        }
     }
     return state;
 }

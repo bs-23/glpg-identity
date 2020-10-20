@@ -113,3 +113,10 @@ export function getConsent(id) {
         })
     };
 }
+
+export function setConsent(consent) {
+    return {
+        type: Types.SET_CONSENT,
+        payload: consent
+    };
+}
