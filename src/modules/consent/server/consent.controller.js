@@ -587,6 +587,10 @@ async function createConsent(req, res) {
             return res.status(400).send('Invalid request.');
         }
 
+        if (!translations || !translations.length) {
+            return res.status(400).send('Must provide at least one translation.');
+        }
+
         is_active = !!is_active;
 
         if (preference && preference.length) {
@@ -622,7 +626,7 @@ async function createConsent(req, res) {
 
         const data = { ...consent.dataValues };
 
-        if (translations && created) {
+        if (created) {
             data.translations = [];
             await Promise.all(translations
                 .filter(translation => translation.locale && translation.rich_text)

@@ -266,3 +266,18 @@ a {
 .react-toast-notifications__container {
     z-index: 2000!important;
 }
+
+.border-primary {
+    border-color: $primary-color !important;
+}
+
+.hover-opacity {
+    cursor: pointer;
+    opacity: 1;
+    transition: all .25s ease;
+
+    &:hover {
+        opacity: .8;
+        
+    }
+}

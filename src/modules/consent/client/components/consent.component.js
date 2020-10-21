@@ -96,23 +96,27 @@ const ConsentComponent = ({ consentId, setConsentId }) => {
                     </div>
 
                     <div className="row mt-1">
-                        <div className="col accordion-consent rounded shadow-sm p-0">
-                            <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Available Localizations</h4>
-                            {consent.translations && consent.translations.length > 0 ? consent.translations.map((translation, index) => (
-                                <Accordion defaultActiveKey="0" key={index}>
-                                    <Card>
-                                        <Card.Header className="p-0">
-                                            <Accordion.Toggle as={Card.Header} variant="link" eventKey="0" type="button" className="card-header d-flex justify-content-between">
-                                                {translation.locale.toUpperCase()}
-                                                <i class="icon icon-arrow-down ml-2 faq__icon-down"></i>
-                                            </Accordion.Toggle>
-                                        </Card.Header>
-                                        <Accordion.Collapse eventKey="0">
-                                            <Card.Body className="ml-0"><div>{parse(translation.rich_text)}</div></Card.Body>
-                                        </Accordion.Collapse>
-                                    </Card>
-                                </Accordion>
-                            )) : 'There are no translations for this Consent.'}
+                        <div className="col accordion-consent rounded shadow-sm p-0 border">
+                            <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg rounded-top">Available Localizations</h4>
+                            {consent.translations && consent.translations.length > 0 ?
+                                (<Accordion>
+                                    {
+                                        consent.translations.map((translation, index) => (
+                                            <Card key={index}>
+                                                <Accordion.Collapse eventKey={'locale-' + index}>
+                                                    <Card.Body className="ml-0"><div>{parse(translation.rich_text)}</div></Card.Body>
+                                                </Accordion.Collapse>
+                                                <Card.Header className="p-0">
+                                                    <Accordion.Toggle as={Card.Header} variant="link" eventKey={'locale-' + index} type="button" className="card-header d-flex justify-content-between">
+                                                        {translation.locale.toUpperCase()}
+                                                        <i class="icon icon-arrow-down ml-2 faq__icon-down"></i>
+                                                    </Accordion.Toggle>
+                                                </Card.Header>
+                                            </Card>
+                                        ))
+                                    }
+                                </Accordion>)
+                                : 'There are no translations for this Consent.'}
                         </div>
                     </div>
                 </div>
