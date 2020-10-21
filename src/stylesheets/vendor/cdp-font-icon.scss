@@ -258,6 +258,23 @@
     content: "\33";
 }
 
+.icon-defile-roles:before {
+    content: "\34";
+}
+
+.icon-partner:before {
+    content: "\35";
+}
+
+.icon-supplier:before {
+    content: "\36";
+}
+
+.icon-list-edit:before {
+    content: "\37";
+}
+
+
 //custome css
 $class-slug: icon- !default;
 
