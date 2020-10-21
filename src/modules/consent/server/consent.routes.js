@@ -41,4 +41,12 @@ module.exports = app => {
 
     app.route('/api/consent/category')
         .get(CDPAuthStrategy, controller.getConsentCatogories);
+
+    app.route('/api/privacy/consent-preferences')
+        .get(CDPAuthStrategy, controller.getConsentPreferences)
+        .post(CDPAuthStrategy, controller.createConsentPreference);
+
+    app.route('/api/privacy/consent-preferences/:id')
+        .get(CDPAuthStrategy, controller.getConsentPreference)
+        .put(CDPAuthStrategy, controller.updateConsentPreference);
 };

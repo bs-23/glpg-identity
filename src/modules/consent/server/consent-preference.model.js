@@ -21,7 +21,7 @@ const ConsentPreference = sequelize.cdpConnector.define('consent_preferences', {
     title: {
         unique: true,
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING(30)
     },
     slug: {
         unique: true,
@@ -30,6 +30,10 @@ const ConsentPreference = sequelize.cdpConnector.define('consent_preferences', {
         set() {
             this.setDataValue('slug', makeCustomSlug(this.title));
         }
+    },
+    is_active: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
