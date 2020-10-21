@@ -904,6 +904,74 @@ async function deleteCountryConsent(req, res) {
     }
 }
 
+async function getConsentPreference(req, res) {
+    try {
+        const data = await ConsentPreference.findOne({ where: { id: req.params.id } });
+        res.json(data);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function getConsentPreferences(req, res) {
+    try {
+        const data = await ConsentPreference.findAll({});
+        res.json(data);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function createConsentPreference(req, res) {
+    try {
+        const [data, created] = await ConsentPreference.findOrCreate({
+            where: {
+                title: req.body.title
+            },
+            defaults: {
+                title: req.body.title,
+                slug: req.body.title,
+                is_active: true
+            }
+        });
+
+        if (!created && data) {
+            return res.status(400).send('The consent preference title is already exists.');
+        }
+
+        res.json(data);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function updateConsentPreference(req, res) {
+    try {
+        const { title, is_active } = req.body;
+        const isTitleExists = await ConsentPreference.findOne({ where: { id: {[Op.not]: req.params.id}, title } });
+
+        if(isTitleExists) {
+            return res.status(400).send('The preference title is already exists.');
+        }
+
+        const consentPreference = await ConsentPreference.findOne({ where: { id: req.params.id } });
+
+        const data = await consentPreference.update({ title, is_active });
+
+        // TODO: update slug value automatically
+
+        res.json(data);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 exports.getConsents = getConsents;
 exports.getConsentsReport = getConsentsReport;
 exports.getDatasyncConsentsReport = getDatasyncConsentsReport;
@@ -920,3 +988,7 @@ exports.getCountryConsents = getCountryConsents;
 exports.assignConsentToCountry = assignConsentToCountry;
 exports.updateCountryConsent = updateCountryConsent;
 exports.deleteCountryConsent = deleteCountryConsent;
+exports.getConsentPreference = getConsentPreference;
+exports.getConsentPreferences = getConsentPreferences;
+exports.createConsentPreference = createConsentPreference;
+exports.updateConsentPreference = updateConsentPreference;

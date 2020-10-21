@@ -200,9 +200,9 @@ async function init() {
             ];
 
             const consent_preferences = [
-                { id: '1c5cbd55-6c32-45e0-80a1-cd4ccd39c68e', title: 'Galapagos Terms of Use', slug: '' },
-                { id: '2b5c322e-ee07-4255-b1fe-1d525ab4c6f4', title: 'Galapagos E-Mail Newsletter', slug: '' },
-                { id: 'c0f5fe58-6b3f-4990-ad8f-2fdf92ac13e8', title: 'Sharing Personal Data With 3rd Parties', slug: '' }
+                { id: '1c5cbd55-6c32-45e0-80a1-cd4ccd39c68e', title: 'Galapagos Terms of Use', slug: '', is_active: true },
+                { id: '2b5c322e-ee07-4255-b1fe-1d525ab4c6f4', title: 'Galapagos E-Mail Newsletter', slug: '', is_active: true },
+                { id: 'c0f5fe58-6b3f-4990-ad8f-2fdf92ac13e8', title: 'Sharing Personal Data With 3rd Parties', slug: '', is_active: true }
             ];
 
             const consents = [

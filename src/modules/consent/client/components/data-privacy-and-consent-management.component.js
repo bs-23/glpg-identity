@@ -34,11 +34,11 @@ const ConsentManagement = () => {
                                                 <span className="d-block cdp-list-group__link-activity">within 5 - 10 minutes</span>
                                             </span>
                                         </NavLink>
-                                        <NavLink to="#" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link disabled">
+                                        <NavLink to="/consent/consent-preferences" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
                                             <i className="icon icon-accept icon-3x cdp-list-group__icon"></i>
                                             <span>
-                                                <strong className="mb-2 h4 d-block cdp-list-group__link-title">Configure Consent Type</strong>
-                                                <span className="d-block cdp-list-group__link-description">Manage consent types such as  Soft opt-in or opt-out related to medical (scientific) and marketing (sales) consents.</span>
+                                                <strong className="mb-2 h4 d-block cdp-list-group__link-title">Configure Consent Preference or purpose</strong>
+                                                <span className="d-block cdp-list-group__link-description">Manage consent preferences or purposes.</span>
                                                 <span className="d-block cdp-list-group__link-activity">within 5 - 10 minutes</span>
                                             </span>
                                         </NavLink>
