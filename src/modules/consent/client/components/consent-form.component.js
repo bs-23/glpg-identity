@@ -1,14 +1,17 @@
 import axios from "axios";
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
+import { useDispatch } from "react-redux";
 import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
 import { createConsent } from '../consent.actions';
 import { useToasts } from "react-toast-notifications";
 import CountryCodes from 'country-codes-list';
+import { consentSchema } from '../consent.schema';
 
 const ConsentForm = () => {
     const CountryCodesObject = Object.values(CountryCodes.customList('countryCode', '{countryCode} {officialLanguageCode} {officialLanguageNameEn}'));
     const { addToast } = useToasts();
+    const dispatch = useDispatch();
     const [categories, setCategories] = useState([]);
     const [userCountries, setUserCountries] = useState([]);
     const [countryLanguages, setCountryLanguages] = useState([]);
@@ -158,9 +161,20 @@ const ConsentForm = () => {
                                             is_active: isActive
                                         }}
                                         displayName="ConsentForm"
+                                        validationSchema={consentSchema}
                                         onSubmit={(values, actions) => {
                                             values.translations = translations;
                                             console.log(values)
+
+                                            const validTranslations = translations.filter(item => item.locale && item.rich_text);
+                                            if(!validTranslations.length) {
+                                                addToast('Must set at least one translation', {
+                                                    appearance: 'error',
+                                                    autoDismiss: true
+                                                });
+                                                actions.setSubmitting(false);
+                                                return;
+                                            }
 
                                             dispatch(createConsent(values))
                                                 .then(res => {
