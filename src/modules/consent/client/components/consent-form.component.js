@@ -28,12 +28,12 @@ const ConsentForm = () => {
     }
 
     const addNewTranslation = () => {
-        const [, , lang] = countryLanguages[0].split(' ');
-        const init_lang = lang.replace(/,/g, '').toLowerCase();
+        const [, lang_code, ] = countryLanguages[0].split(' ');
+        const init_lang_code = lang_code.toLowerCase();
 
         const init_country_iso2 = userCountries[0].country_iso2.toLowerCase();
 
-        const newTranslations = [...translations, { country: init_country_iso2, language: init_lang , rich_text: '', locale: `${init_country_iso2}_${init_lang}` }];
+        const newTranslations = [...translations, { country: init_country_iso2, language: init_lang_code , rich_text: '', locale: `${init_country_iso2}_${init_lang_code}` }];
         setTranslations(newTranslations);
     }
 
@@ -66,19 +66,20 @@ const ConsentForm = () => {
 
             const country_languages = CountryCodesObject.filter(item => {
                 const [, , language_name] = item.split(' ');
-                if(!mapped_languages[language_name]) {
+                if(language_name && !mapped_languages[language_name]) {
                     mapped_languages[language_name] = true;
                     return true;
                 }
                 return false;
             });
-            const sorted_languages = country_languages.sort((a, b) => {
+            country_languages.sort((a, b) => {
                 const [, , language_name1] = a.split(' ');
                 const [, , language_name2] = b.split(' ');
                 if(language_name1.replace(/,/g, '') < language_name2.replace(/,/g, '')) return -1;
                 return 1;
             });
-            setCountryLanguages(sorted_languages);
+            console.log(country_languages)
+            setCountryLanguages(country_languages);
         }
 
         getConsentCatogories();
