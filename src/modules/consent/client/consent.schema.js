@@ -4,8 +4,7 @@ import { string, object, ref, array, boolean } from 'yup';
 export const consentSchema = object().shape({
     title: string()
         .required('This field must not be empty.'),
-    preference: string()
-        .required('This field must not be empty.'),
+    preference: string(),
     category_id: string()
         .required('This field must not be empty.'),
     legal_basis: string()

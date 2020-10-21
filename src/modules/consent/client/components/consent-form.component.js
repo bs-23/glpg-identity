@@ -45,6 +45,11 @@ const ConsentForm = () => {
 
     const fetchUserCountries = (userCountries, allCountries) => userCountries.map(element => allCountries.find(x => x.country_iso2 == element));
 
+    const resetForm = () => {
+        setTranslations([]);
+        setIsActive(true);
+    }
+
     useEffect(() => {
         async function getConsentCatogories() {
             const response = await axios.get('/api/consent/category');
@@ -184,6 +189,7 @@ const ConsentForm = () => {
 
                                             dispatch(createConsent(values))
                                                 .then(res => {
+                                                    resetForm();
                                                     actions.resetForm();
                                                     addToast('Consent created successfully', {
                                                         appearance: 'success',
@@ -214,10 +220,20 @@ const ConsentForm = () => {
                                                                 </div>
                                                             </div>
 
-                                                            <div className="col-12 col-sm-6">
+                                                            {/* <div className="col-12 col-sm-6">
                                                                 <div className="form-group">
                                                                     <label className="font-weight-bold" htmlFor="preference"> Preference <span className="text-danger">*</span></label>
                                                                     <Field className="form-control" type="preference" name="preference" />
+                                                                    <div className="invalid-feedback"><ErrorMessage name="preference" /></div>
+                                                                </div>
+                                                            </div> */}
+
+                                                            <div className="col-12 col-sm-6">
+                                                                <div className="form-group">
+                                                                    <label className="font-weight-bold" htmlFor="preference"> Select Preference </label>
+                                                                    <Field data-testid="preference" as="select" name="preference" className="form-control">
+                                                                        {['', 'Galapagos Terms of Use', 'Promotional email marketing'].map(item => <option key={item} value={item}>{item === '' ? 'Select Preference' : item}</option>)}
+                                                                    </Field>
                                                                     <div className="invalid-feedback"><ErrorMessage name="preference" /></div>
                                                                 </div>
                                                             </div>
@@ -228,6 +244,7 @@ const ConsentForm = () => {
                                                                     <Field data-testid="category" as="select" name="category_id" className="form-control">
                                                                         {categories.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
                                                                     </Field>
+                                                                    <div className="invalid-feedback"><ErrorMessage name="category_id" /></div>
                                                                 </div>
                                                             </div>
 
@@ -237,6 +254,7 @@ const ConsentForm = () => {
                                                                     <Field data-testid="legal_basis" as="select" name="legal_basis" className="form-control text-capitalize">
                                                                         {['consent', 'contract'].map(item => <option key={item} value={item}>{item}</option>)}
                                                                     </Field>
+                                                                    <div className="invalid-feedback"><ErrorMessage name="legal_basis" /></div>
                                                                 </div>
                                                             </div>
 
