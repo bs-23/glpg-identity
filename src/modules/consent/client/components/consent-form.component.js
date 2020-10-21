@@ -43,7 +43,7 @@ const ConsentForm = () => {
         setTranslations(newTranslations);
     }
 
-    const fetchUserCountries = (userCountries, allCountries) => userCountries.map(element => allCountries.find(x => x.country_iso2 == element));
+    const fetchUserCountries = (userCountries, allCountries) => userCountries.map(element => allCountries.find(x => x.country_iso2 == element)).filter(element => element);
 
     const resetForm = () => {
         setTranslations([]);
