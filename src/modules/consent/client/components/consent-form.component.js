@@ -67,7 +67,13 @@ const ConsentForm = () => {
                 }
                 return false;
             });
-            setCountryLanguages(country_languages);
+            const sorted_languages = country_languages.sort((a, b) => {
+                const [, , language_name1] = a.split(' ');
+                const [, , language_name2] = b.split(' ');
+                if(language_name1.replace(/,/g, '') < language_name2.replace(/,/g, '')) return -1;
+                return 1;
+            });
+            setCountryLanguages(sorted_languages);
         }
 
         getConsentCatogories();
