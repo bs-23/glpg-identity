@@ -128,7 +128,7 @@ const ConsentForm = () => {
                         </div>
                     </div>
                 </div>
-                
+
             </React.Fragment>
         )});
     };
@@ -297,7 +297,7 @@ const ConsentForm = () => {
                     }
                 </div>
             </div>
-           
+
         </main>
     );
 }

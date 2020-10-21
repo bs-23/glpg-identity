@@ -8,6 +8,9 @@ import CountryConsentForm from './country-consent-form';
 import optTypes from '../opt-types.json';
 import ConsentComponent from './consent.component';
 import { getCountryConsents, deleteCountryConsent, getCdpConsents } from '../consent.actions';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Popover from 'react-bootstrap/Popover';
+import parse from 'html-react-parser';
 
 const CountryConsents = () => {
     const [show, setShow] = useState(false);
@@ -118,8 +121,7 @@ const CountryConsents = () => {
                 <div className="row">
                     <div className="col-12">
                         <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
-                            <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Country Consents</h4>
-                            <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex justify-content-end align-items-center">
                                 <button onClick={() => { setShow(true); setEditable(false); setEditOption(null); }} className="btn cdp-btn-secondary text-white ml-2">
                                     <i className="icon icon-plus pr-1"></i> Assign consent to country
                                 </button>
@@ -151,9 +153,28 @@ const CountryConsents = () => {
                                                         (
                                                             <tr key={coonsentIndex}>
                                                                 <td>
+
                                                                     <span type="button" className="btn btn-link cdp-text-primary p-0" onClick={() => showConsentDetailsModal(consent.id)}><i className="fas fa-caret-right mr-1"></i>{consent.title}</span>
+
                                                                 </td>
-                                                                <td>{consent.locales}</td>
+                                                                <td>
+
+                                                                    {consent.translations.length > 0 && consent.translations.map(translation => (
+                                                                        <OverlayTrigger key={translation.id}
+                                                                            placement="top"
+                                                                            delay={{ show: 250, hide: 400 }}
+                                                                            overlay={
+                                                                                <Popover id={`popover-positioned-top`}>
+                                                                                    <Popover.Content>
+                                                                                        <div>{parse(translation.rich_text)}</div>
+                                                                                    </Popover.Content>
+                                                                                </Popover>
+                                                                            }
+
+                                                                        >
+                                                                            <span className="badge badge-secondary-light shadow-sm font-weight-bold-light mr-1 text-uppercase text-dark">{translation.locale}</span>
+                                                                        </OverlayTrigger>
+                                                                    ))}</td>
                                                                 <td>{consent.opt_type}</td>
                                                                 <td>
                                                                     <button className="btn btn-link cdp-text-primary p-0 mr-3" onClick={() => setEdit(consent)}><i className="fas fa-tasks mr-1"></i>Manage opt type</button> <button onClick={() => setDeleteModal(consent.country_consent_id, consent.title, countryConsent.name)} className="btn btn-link text-danger p-0"><i className="far fa-trash-alt mr-1"></i>Remove</button>
@@ -178,13 +199,13 @@ const CountryConsents = () => {
                                     <div>
                                         Are you sure to remove this consent from <b>{consentToDelete.countryName}</b>?
                                         <div className="alert alert-warning my-3">
-                                            
-                                                {consentToDelete.title}
-                                           
+
+                                            {consentToDelete.title}
+
                                         </div>
                                     </div>
                                 ) : null}
-                               
+
                             </Modal.Body>
                             <Modal.Footer>
                                 <button className="btn cdp-btn-outline-primary" onClick={() => setShowDelete(false)}>Cancel</button>
@@ -196,7 +217,7 @@ const CountryConsents = () => {
                     </div>
                 </div>
             </div>
-        </main>
+        </main >
     );
 }
 

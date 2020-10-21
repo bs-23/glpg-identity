@@ -16,6 +16,7 @@ export default function HcpRoutes() {
             <PrivateRoute exact path={path} component={DataPrivacyAndConsentManagement} module={'privacy'} />
             <PrivateRoute path={`${path}/list`} component={ConsentsComponent} module={'privacy'} />
             <PrivateRoute path={`${path}/create`} component={ConsentForm} module={'privacy'} />
+            <PrivateRoute path={`${path}/edit/:id`} component={ConsentForm} module={'privacy'} />
             <PrivateRoute path={`${path}/manage-consents-per-country`} component={CountryConsents} module={'privacy'} />
             <PrivateRoute path={`${path}/consent-performance-report/cdp`} component={CdpConsentPerformanceReport} module={'privacy'} />
             <PrivateRoute path={`${path}/consent-performance-report/veeva-crm`} component={VeevaConsentPerformanceReport} module={'privacy'} />

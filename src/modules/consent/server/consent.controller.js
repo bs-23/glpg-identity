@@ -14,6 +14,13 @@ const User = require(path.join(process.cwd(), 'src/modules/user/server/user.mode
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 
+function getTranslationViewmodels(translations) {
+    return translations.map(t => ({
+        id: t.id,
+        locale: t.locale,
+        rich_text: validator.unescape(t.rich_text)
+    }));
+}
 
 async function getConsents(req, res) {
     const response = new Response({}, []);
@@ -510,12 +517,9 @@ async function getCdpConsents(req, res) {
             const consentTranslations = await ConsentLanguage.findAll({
                 where: {
                     consent_id: consent.id
-                },
-                attributes: { exclude: ['consent_id', 'created_at', 'updated_at'] }
+                }
             });
-
-            const locales = consentTranslations.map(ct => ct.locale.toUpperCase());
-            consent.dataValues.locales = locales.join(', ');
+            consent.dataValues.translations = getTranslationViewmodels(consentTranslations);
         }));
 
         res.json(consents);
@@ -562,15 +566,10 @@ async function getCdpConsent(req, res) {
         const data = { ...otherProps, countries: consent_country };
 
         const translations = await ConsentLanguage.findAll({
-            where: { consent_id: consent.id },
-            attributes: { exclude: ['consent_id', 'created_at', 'updated_at'] }
+            where: { consent_id: consent.id }
         });
 
-        data.translations = translations.map(t => ({
-            id: t.id,
-            locale: t.locale,
-            rich_text: validator.unescape(t.rich_text)
-        }));
+        data.translations = getTranslationViewmodels(translations);
 
         res.json(data);
     } catch (err) {
@@ -629,15 +628,18 @@ async function createConsent(req, res) {
         if (created) {
             data.translations = [];
             await Promise.all(translations
-                .filter(translation => translation.locale && translation.rich_text)
+                .filter(translation => translation.country_iso2 && translation.lang_code && translation.rich_text)
                 .map(async (translation) => {
+                    const locale = `${translation.lang_code.toLowerCase()}_${translation.country_iso2.toUpperCase()}`;
                     const [consentTransation, translationCreated] = await ConsentLanguage.findOrCreate({
                         where: {
                             consent_id: consent.id,
-                            locale: translation.locale
+                            locale: {
+                                [Op.iLike]: locale
+                            }
                         },
                         defaults: {
-                            locale: translation.locale,
+                            locale: locale,
                             rich_text: translation.rich_text,
                             consent_id: consent.id
                         }
@@ -706,15 +708,17 @@ async function updateCdpConsent(req, res) {
 
         if (translations) {
             await Promise.all(translations
-                .filter(translation => translation.locale && translation.rich_text)
+                .filter(translation => translation.country_iso2 && translation.lang_code && translation.rich_text)
                 .map(async (translation) => {
+                    const locale = `${translation.lang_code.toLowerCase()}_${translation.country_iso2.toUpperCase()}`;
                     const [consentTransation, translationCreated] = await ConsentLanguage.findOrCreate({
                         where: {
                             consent_id: consent.id,
-                            locale: translation.locale
+                            locale: locale
                         },
                         defaults: {
-                            ...translation,
+                            locale: locale,
+                            rich_text: translation.rich_text,
                             consent_id: consent.id
                         }
                     });
@@ -776,9 +780,10 @@ async function getCountryConsents(req, res) {
 
         await Promise.all(countryConsents.map(async (countryConsent) => {
             const consentTranslations = await ConsentLanguage.findAll({
-                where: { consent_id: countryConsent.consent_id }
+                where: { consent_id: countryConsent.consent_id },
+                attributes: { exclude: ['consent_id', 'created_at', 'updated_at'] }
             });
-            countryConsent.dataValues.consent.dataValues.translations = consentTranslations;
+            countryConsent.dataValues.consent.dataValues.translations = getTranslationViewmodels(consentTranslations);
         }));
 
         res.json(countryConsents);
