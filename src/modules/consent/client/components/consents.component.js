@@ -74,10 +74,9 @@ const ConsentsComponent = () => {
                                 <table className="table table-hover table-sm mb-0 cdp-table">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
-                                            <th>Title</th>
+                                            <th>Preference</th>
                                             <th>Available Localizations</th>
                                             <th>Consent Type</th>
-                                            <th>Preference</th>
                                             <th>Status</th>
                                             <th>Created By</th>
                                             <th>Created Date</th>
@@ -87,10 +86,9 @@ const ConsentsComponent = () => {
                                     <tbody className="cdp-table__body bg-white">
                                         {cdp_consents.map((row, index) => (
                                             <tr key={index}>
-                                                <td>{row.title}</td>
+                                                <td>{row.consent_preference.title}</td>
                                                 <td>{row.locales}</td>
                                                 <td>{row.consent_category ? row.consent_category.title : ''}</td>
-                                                <td>{row.preference}</td>
                                                 <td>{row.is_active ? 'Active' : 'Inactive'}</td>
                                                 <td>{row.createdByUser ? `${row.createdByUser.first_name} ${row.createdByUser.last_name}` : ''}</td>
                                                 <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>

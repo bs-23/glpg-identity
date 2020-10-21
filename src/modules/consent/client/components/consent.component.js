@@ -46,16 +46,12 @@ const ConsentComponent = ({ consentId, setConsentId }) => {
                 <div className="px-4 py-3">
                     <div className="row">
                         <div className="col-12 pb-3 px-0">
-                            <label className="mt-1 font-weight-bold">Consent Title</label>
-                            <div className="">{consent.title}</div>
+                            <label className="mt-1 font-weight-bold">Preference / Purpose</label>
+                            <div className="">{consent.consent_preference.title}</div>
                         </div>
                         <div className="col-12 col-sm-6 pb-3 px-0">
                             <label className="mt-1 font-weight-bold">Consent Type</label>
                             <div>{consent.consent_category ? consent.consent_category.title : ''}</div>
-                        </div>
-                        <div className="col-12 col-sm-6 pb-3 px-0">
-                            <label className="mt-1 font-weight-bold">Preference</label>
-                            <div>{consent.preference}</div>
                         </div>
                         <div className="col-12 col-sm-6 pb-3 px-0">
                             <label className="mt-1 font-weight-bold">Status</label>
