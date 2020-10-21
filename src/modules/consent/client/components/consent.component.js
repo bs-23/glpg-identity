@@ -108,7 +108,7 @@ const ConsentComponent = ({ consentId, setConsentId }) => {
                                                 </Accordion.Collapse>
                                                 <Card.Header className="p-0">
                                                     <Accordion.Toggle as={Card.Header} variant="link" eventKey={'locale-' + index} type="button" className="card-header d-flex justify-content-between">
-                                                        {translation.locale.toUpperCase()}
+                                                        {translation.locale}
                                                         <i class="icon icon-arrow-down ml-2 faq__icon-down"></i>
                                                     </Accordion.Toggle>
                                                 </Card.Header>
