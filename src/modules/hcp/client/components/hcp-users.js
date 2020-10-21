@@ -172,7 +172,7 @@ export default function hcpUsers() {
                                             {hcps.codbase ?
                                                 getUuidAuthorities(hcps.codbase).map(authority =>
                                                     (
-                                                        <a key={authority.name} className="mr-3" role="button" onClick={() => openAuthorityLink(authority.link)}>
+                                                        <a key={authority.link} className="mr-3" role="button" onClick={() => openAuthorityLink(authority.link)}>
                                                             <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height={authority.heightSingle} />
                                                         </a>
                                                     )
@@ -187,7 +187,7 @@ export default function hcpUsers() {
                                                             getUuidAuthorities().map(authority =>
                                                                 (
                                                                     <Dropdown.Item
-                                                                        key={authority.name} className="border-bottom py-2 px-3"
+                                                                        key={authority.link} className="border-bottom py-2 px-3"
                                                                         onClick={() => openAuthorityLink(authority.link)}
                                                                         role="button"
                                                                         >
