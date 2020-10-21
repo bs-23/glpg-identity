@@ -496,11 +496,18 @@ async function getCdpConsents(req, res) {
     try {
         let { translations, category } = req.query;
 
-        const inclusions = [{
-            model: User,
-            as: 'createdByUser',
-            attributes: ['id', 'first_name', 'last_name'],
-        }];
+        const inclusions = [
+            {
+                model: User,
+                as: 'createdByUser',
+                attributes: ['id', 'first_name', 'last_name']
+            },
+            {
+                model: ConsentPreference,
+                as: 'consent_preference',
+                attributes: ['id', 'title']
+            }
+        ];
 
         if (category === 'true') {
             inclusions.push({
@@ -551,6 +558,11 @@ async function getCdpConsent(req, res) {
                     model: ConsentCategory,
                     as: 'consent_category',
                     attributes: ['id', 'title', 'type']
+                },
+                {
+                    model: ConsentPreference,
+                    as: 'consent_preference',
+                    attributes: ['id', 'title']
                 },
                 {
                     model: ConsentCountry,
@@ -772,7 +784,12 @@ async function getCountryConsents(req, res) {
             include: [{
                 model: Consent,
                 as: 'consent',
-                attributes: { exclude: ['created_at', 'updated_at'] }
+                attributes: { exclude: ['created_at', 'updated_at'] },
+                include: {
+                    model: ConsentPreference,
+                    as: 'consent_preference',
+                    attributes: { exclude: ['created_by, updated_by, created_at', 'updated_at'] },
+                }
             }]
         });
 

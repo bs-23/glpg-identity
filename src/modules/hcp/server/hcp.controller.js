@@ -786,7 +786,7 @@ async function getHCPUserConsents(req, res) {
         const consentResponse = userConsentDetails.map(({
             consent_id: id,
             rich_text,
-            consent: { title }
+            consent: { consent_preference: { title } }
         }) => ({ id, title, rich_text: validator.unescape(rich_text) }));
 
         response.data = consentResponse.map(conRes => {

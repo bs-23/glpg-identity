@@ -141,7 +141,7 @@ const CountryConsents = () => {
                                             </thead>
                                             <thead className="cdp-table__header">
                                                 <tr>
-                                                    <th>Consent Title</th>
+                                                    <th>Preference / Purpose</th>
                                                     <th>Available Localizations</th>
                                                     <th>Opt Type</th>
                                                     <th>Action</th>
@@ -153,12 +153,11 @@ const CountryConsents = () => {
                                                         (
                                                             <tr key={coonsentIndex}>
                                                                 <td>
-
-                                                                    <span type="button" className="btn btn-link cdp-text-primary p-0" onClick={() => showConsentDetailsModal(consent.id)}><i className="fas fa-caret-right mr-1"></i>{consent.title}</span>
-
+                                                                    <span type="button" className="btn btn-link cdp-text-primary p-0" onClick={() => showConsentDetailsModal(consent.id)}>
+                                                                        <i className="fas fa-caret-right mr-1"></i>{consent.consent_preference.title}
+                                                                    </span>
                                                                 </td>
                                                                 <td>
-
                                                                     {consent.translations && consent.translations.length > 0 && consent.translations.map(translation => (
                                                                         <OverlayTrigger key={translation.id}
                                                                             placement="top"
@@ -199,13 +198,10 @@ const CountryConsents = () => {
                                     <div>
                                         Are you sure to remove this consent from <b>{consentToDelete.countryName}</b>?
                                         <div className="alert alert-warning my-3">
-
                                             {consentToDelete.title}
-
                                         </div>
                                     </div>
                                 ) : null}
-
                             </Modal.Body>
                             <Modal.Footer>
                                 <button className="btn cdp-btn-outline-primary" onClick={() => setShowDelete(false)}>Cancel</button>

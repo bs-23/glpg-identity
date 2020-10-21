@@ -1,8 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-bootstrap/Modal'
 import { Form, Formik, Field } from "formik";
-import axios from 'axios';
 import { useToasts } from 'react-toast-notifications';
 import optTypes from '../opt-types.json';
 import { updateCountryConsent, createCountryConsent } from '../consent.actions';
@@ -16,13 +14,12 @@ const CountryConsentForm = (props) => {
     const handleClose = () => {
         setShow(false);
         props.changeShow(false);
-    }
+    };
 
     useEffect(() => {
         if (props.countries && props.editable) {
             setCountry(props.countries.find(x => x.country_iso2.toLowerCase() === props.options.country_iso2.toLowerCase()));
         }
-
     });
 
     return (
@@ -67,7 +64,6 @@ const CountryConsentForm = (props) => {
                                         autoDismiss: true
                                     });
                                     handleClose();
-
                                 }).catch(error => {
                                     addToast(error.response.data, {
                                         appearance: 'error',
@@ -75,13 +71,11 @@ const CountryConsentForm = (props) => {
                                     });
                                 }).finally(function () {
                                     actions.setSubmitting(false);
-
                                 });
                             }
                         }}
                     >
                         {formikProps => (
-
                             <Form onSubmit={formikProps.handleSubmit}>
                                 <Modal.Body>
                                     <div className="row">
@@ -97,7 +91,7 @@ const CountryConsentForm = (props) => {
                                             <div className="form-group">
                                                 <label className="font-weight-bold" htmlFor="consent_id">Select Consent <span className="text-danger">*</span></label>
                                                 <Field disabled={props.editable ? true : false} data-testid="consent" as="select" name="consent_id" className="form-control">
-                                                    {props.consents.map(item => <option key={item.id} value={item.id}>{props.editable ? props.options.title : item.title}</option>)}
+                                                    {props.consents.map(item => <option key={item.id} value={item.id}>{props.editable ? props.options.consent_preference.title : item.consent_preference.title}</option>)}
                                                 </Field>
                                             </div>
                                         </div>
@@ -124,7 +118,6 @@ const CountryConsentForm = (props) => {
                     </Formik>
                 </div>
             }
-
         </Modal>
     );
 }
