@@ -1,17 +1,18 @@
 const path = require('path');
 const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
-const uniqueSlug = require('unique-slug');
+// const uniqueSlug = require('unique-slug');
 const ConsentCategory = require('./consent-category.model');
+const ConsentPreference = require('./consent-preference.model');
 const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model.js'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
-const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
-const makeCustomSlug = (title) => {
-    const code = uniqueSlug(`${title}`);
-    if(title.length > 50) return convertToSlug(`${title.substring(0, 50)} ${code}`);
-    return convertToSlug(`${title} ${code}`);
-};
+// const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+// const makeCustomSlug = (preference) => {
+//     const code = uniqueSlug(`${preference}`);
+//     if(preference.length > 50) return convertToSlug(`${preference.substring(0, 50)} ${code}`);
+//     return convertToSlug(`${preference} ${code}`);
+// };
 
 const Consent = sequelize.cdpConnector.define('consents', {
     id: {
@@ -24,19 +25,19 @@ const Consent = sequelize.cdpConnector.define('consents', {
         allowNull: false,
         type: DataTypes.UUID
     },
-    title: {
-        unique: true,
-        allowNull: false,
-        type: DataTypes.STRING
-    },
-    slug: {
-        unique: true,
-        allowNull: false,
-        type: DataTypes.STRING,
-        set() {
-            this.setDataValue('slug', makeCustomSlug(this.title));
-        }
-    },
+    // title: {
+    //     unique: true,
+    //     allowNull: false,
+    //     type: DataTypes.STRING
+    // },
+    // slug: {
+    //     unique: true,
+    //     allowNull: false,
+    //     type: DataTypes.STRING,
+    //     set() {
+    //         this.setDataValue('slug', makeCustomSlug(this.preference));
+    //     }
+    // },
     legal_basis: {
         allowNull: false,
         type: DataTypes.ENUM,
@@ -46,8 +47,9 @@ const Consent = sequelize.cdpConnector.define('consents', {
         type: DataTypes.BOOLEAN,
         defaultValue: false
     },
-    preference: {
-        type: DataTypes.STRING
+    preference_id: {
+        allowNull: false,
+        type: DataTypes.UUID
     },
     created_by: {
         type: DataTypes.UUID
@@ -66,6 +68,10 @@ ConsentCategory.hasMany(Consent, {
 
 Consent.belongsTo(ConsentCategory, {
     foreignKey: 'category_id'
+});
+
+Consent.belongsTo(ConsentPreference, {
+    foreignKey: 'preference_id'
 });
 
 Consent.belongsTo(User, {as: 'createdByUser', foreignKey: 'created_by'});
