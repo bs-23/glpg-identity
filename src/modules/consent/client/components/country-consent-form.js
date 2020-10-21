@@ -5,7 +5,7 @@ import { Form, Formik, Field } from "formik";
 import axios from 'axios';
 import { useToasts } from 'react-toast-notifications';
 import optTypes from '../opt-types.json';
-import { updateCountryConsent } from '../consent.actions';
+import { updateCountryConsent, createCountryConsent } from '../consent.actions';
 import { useDispatch } from 'react-redux';
 
 const CountryConsentForm = (props) => {
@@ -30,58 +30,60 @@ const CountryConsentForm = (props) => {
             <Modal.Header closeButton>
                 <Modal.Title>{props.editable ? 'Manage opt type' : 'Assign consent to country'}</Modal.Title>
             </Modal.Header>
-            <Modal.Body>
-                {props.consents.length > 0 && props.countries.length > 0 &&
-                    <div className="consent-manage p-3">
-                        <Formik
-                            initialValues={{
-                                consent_id: props.consents[0].id,
-                                country_iso2: props.editable ? country.country_iso2 : props.countries[0].country_iso2,
-                                opt_type: optTypes[0].value
-                            }}
-                            displayName="ConsentForm"
-                            onSubmit={(values, actions) => {
-                                if (!props.editable) {
-                                    axios.post('/api/consent/country', values).then(() => {
-                                        actions.resetForm();
-                                        addToast('Consent assigned successfully', {
-                                            appearance: 'success',
-                                            autoDismiss: true
-                                        });
-                                        handleClose();
 
-                                    }).catch(error => {
-                                        addToast(error.response.data, {
-                                            appearance: 'error',
-                                            autoDismiss: true
-                                        });
-                                    }).finally(function () {
-                                        actions.setSubmitting(false);
-
+            {props.consents.length > 0 && props.countries.length > 0 &&
+                <div className="consent-manage p-3">
+                    <Formik
+                        initialValues={{
+                            consent_id: props.consents[0].id,
+                            country_iso2: props.editable ? country.country_iso2 : props.countries[0].country_iso2,
+                            opt_type: optTypes[0].value
+                        }}
+                        displayName="ConsentForm"
+                        onSubmit={(values, actions) => {
+                            if (!props.editable) {
+                                dispatch(createCountryConsent(values)).then(() => {
+                                    actions.resetForm();
+                                    addToast('Consent assigned successfully', {
+                                        appearance: 'success',
+                                        autoDismiss: true
                                     });
-                                } else {
-                                    dispatch(updateCountryConsent(props.options.country_consent_id, { opt_type: values.opt_type })).then(() => {
-                                        actions.resetForm();
-                                        addToast('Opt in changed successfully', {
-                                            appearance: 'success',
-                                            autoDismiss: true
-                                        });
-                                        handleClose();
+                                    handleClose();
 
-                                    }).catch(error => {
-                                        addToast(error.response.data, {
-                                            appearance: 'error',
-                                            autoDismiss: true
-                                        });
-                                    }).finally(function () {
-                                        actions.setSubmitting(false);
-
+                                }).catch(error => {
+                                    addToast(error.response.data, {
+                                        appearance: 'error',
+                                        autoDismiss: true
                                     });
-                                }
-                            }}
-                        >
-                            {formikProps => (
-                                <Form onSubmit={formikProps.handleSubmit}>
+                                }).finally(function () {
+                                    actions.setSubmitting(false);
+
+                                });
+                            } else {
+                                dispatch(updateCountryConsent(props.options.country_consent_id, { opt_type: values.opt_type })).then(() => {
+                                    actions.resetForm();
+                                    addToast('Opt in changed successfully', {
+                                        appearance: 'success',
+                                        autoDismiss: true
+                                    });
+                                    handleClose();
+
+                                }).catch(error => {
+                                    addToast(error.response.data, {
+                                        appearance: 'error',
+                                        autoDismiss: true
+                                    });
+                                }).finally(function () {
+                                    actions.setSubmitting(false);
+
+                                });
+                            }
+                        }}
+                    >
+                        {formikProps => (
+
+                            <Form onSubmit={formikProps.handleSubmit}>
+                                <Modal.Body>
                                     <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
@@ -112,16 +114,17 @@ const CountryConsentForm = (props) => {
                                             </div>
                                         </div>
                                     </div>
-                                </Form>
-                            )}
-                        </Formik>
-                    </div>
-                }
-            </Modal.Body>
-            <Modal.Footer>
-                <button type="submit" className="btn cdp-btn-primary mr-2 text-white shadow-sm">Save Changes</button>
-                <button type="button" className="btn cdp-btn-secondary text-white shadow-sm" onClick={handleClose}>Close</button>
-            </Modal.Footer>
+                                </Modal.Body>
+                                <Modal.Footer>
+                                    <button type="submit" className="btn cdp-btn-primary mr-2 text-white shadow-sm">Save Changes</button>
+                                    <button type="button" className="btn cdp-btn-secondary text-white shadow-sm" onClick={handleClose}>Close</button>
+                                </Modal.Footer>
+                            </Form>
+                        )}
+                    </Formik>
+                </div>
+            }
+
         </Modal>
     );
 }
