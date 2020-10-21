@@ -23,6 +23,7 @@ import ForgotPassword from '../../user/client/components/forgot-password.compone
 import ResetPasswordForm from '../../user/client/components/reset-password.component';
 import SwaggerLogin from '../../../config/server/lib/swagger/swagger-login.component';
 import store from './store';
+import BusinessPartnerRoutes from '../../business-partner/client/business-partner.routes';
 
 let refCount = 0;
 
@@ -89,6 +90,8 @@ export default function App() {
                 <Route path="/hcps" component={HcpRoutes} />
 
                 <Route path='/consent' component={ConsentRoutes} />
+
+                <Route path='/business-partner' component={BusinessPartnerRoutes} />
 
                 <Route path="/reset-password" component={ResetPasswordForm} />
 

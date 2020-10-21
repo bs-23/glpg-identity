@@ -54,7 +54,8 @@ async function init() {
             const permissions = [
                 { module: Modules.PLATFORM.value, status: "active", title: Modules.PLATFORM.title, created_by: admin.id, updated_by: admin.id },
                 { module: Modules.INFORMATION.value, status: "active", title: Modules.INFORMATION.title, created_by: admin.id, updated_by: admin.id },
-                { module: Modules.PRIVACY.value, status: "active", title: Modules.PRIVACY.title, created_by: admin.id, updated_by: admin.id }
+                { module: Modules.PRIVACY.value, status: "active", title: Modules.PRIVACY.title, created_by: admin.id, updated_by: admin.id },
+                { module: Modules.BUSINESS_PARTNER.value, status: "active", title: Modules.BUSINESS_PARTNER.title, created_by: admin.id, updated_by: admin.id }
             ];
 
             Permission.destroy({ truncate: { cascade: true } }).then(() => {
