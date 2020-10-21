@@ -153,7 +153,7 @@ const ConsentForm = () => {
                     </div>
                 </div>
                 <div className="container">
-                    {categories && userCountries && countryLanguages && categories.length && userCountries.length && countryLanguages.length &&
+                    {categories && userCountries && countryLanguages && categories.length > 0 && userCountries.length > 0 && countryLanguages.length > 0 &&
                         <div className="row">
                             <div className="col-12">
                                 <div className="shadow-sm bg-white mb-3">
