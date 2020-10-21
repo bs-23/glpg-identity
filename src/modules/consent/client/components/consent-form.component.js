@@ -98,7 +98,7 @@ const ConsentForm = () => {
                     <div className="row border border-primary rounded pb-3 mb-3 mx-0 shadow-sm">
                         <label className="col-12 font-weight-bold d-flex justify-content-between align-items-center bg-light py-2 border-bottom rounded-top">
                             {translationId}
-                            <i className="fas fa-minus-circle text-danger fa-2x" type="button" onClick={() => removeTranslation(idx)}></i>
+                            <i className="fas fa-minus-circle text-danger fa-2x hover-opacity" type="button" title="Remove" onClick={() => removeTranslation(idx)}></i>
                         </label>
                         <div className="col-12 col-sm-6">
                             <div className="form-group">
@@ -257,10 +257,10 @@ const ConsentForm = () => {
                                                                     </div>
                                                                 </div>
 
-                                                                <div className="col-12 col-sm-6">
+                                                                <div className="col-12 col-sm-6 py-3">
                                                                     <div className="form-group">
                                                                         <label className="d-flex justify-content-between align-items-center">
-                                                                            <span className="switch-label"> Status </span>
+                                                                            <span className="switch-label font-weight-bold"> Status </span>
                                                                             <span className="switch">
                                                                                 <input
                                                                                     name="is_active"
@@ -279,9 +279,9 @@ const ConsentForm = () => {
 
                                                                 <div className="col-12">
                                                                     <div className="form-group">
-                                                                        <label className="d-flex align-items-center cdp-text-primary" type="button" onClick={addNewTranslation}>
-                                                                                <i className="fas fa-plus  fa-2x mr-2" ></i>
-                                                                                Add Localizations
+                                                                    <label className="d-flex align-items-center cdp-text-primary hover-opacity" type="button" onClick={addNewTranslation}>
+                                                                        <i className="fas fa-plus  fa-2x mr-3" ></i>
+                                                                        <span className="h4 mb-0">Add Localizations</span>
                                                                         </label>
                                                                         </div>
                                                                     </div>
