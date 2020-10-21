@@ -629,15 +629,18 @@ async function createConsent(req, res) {
         if (created) {
             data.translations = [];
             await Promise.all(translations
-                .filter(translation => translation.locale && translation.rich_text)
+                .filter(translation => translation.country_iso2 && translation.lang_code && translation.rich_text)
                 .map(async (translation) => {
+                    const locale = `${translation.lang_code.toLowerCase()}_${translation.country_iso2.toUpperCase()}`;
                     const [consentTransation, translationCreated] = await ConsentLanguage.findOrCreate({
                         where: {
                             consent_id: consent.id,
-                            locale: translation.locale
+                            locale: {
+                                [Op.iLike]: locale
+                            }
                         },
                         defaults: {
-                            locale: translation.locale,
+                            locale: locale,
                             rich_text: translation.rich_text,
                             consent_id: consent.id
                         }
@@ -706,15 +709,17 @@ async function updateCdpConsent(req, res) {
 
         if (translations) {
             await Promise.all(translations
-                .filter(translation => translation.locale && translation.rich_text)
+                .filter(translation => translation.country_iso2 && translation.lang_code && translation.rich_text)
                 .map(async (translation) => {
+                    const locale = `${translation.lang_code.toLowerCase()}_${translation.country_iso2.toUpperCase()}`;
                     const [consentTransation, translationCreated] = await ConsentLanguage.findOrCreate({
                         where: {
                             consent_id: consent.id,
-                            locale: translation.locale
+                            locale: locale
                         },
                         defaults: {
-                            ...translation,
+                            locale: locale,
+                            rich_text: translation.rich_text,
                             consent_id: consent.id
                         }
                     });

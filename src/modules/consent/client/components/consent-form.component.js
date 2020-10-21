@@ -130,7 +130,7 @@ const ConsentForm = () => {
                         </div>
                     </div>
                 </div>
-                
+
             </React.Fragment>
         )});
     };
@@ -174,9 +174,8 @@ const ConsentForm = () => {
                                             validationSchema={consentSchema}
                                             onSubmit={(values, actions) => {
                                                 values.translations = translations;
-                                                console.log(values)
-
                                                 const validTranslations = translations.filter(item => item.locale && item.rich_text);
+
                                                 if (!validTranslations.length) {
                                                     addToast('Must provide at least one translation', {
                                                         appearance: 'error',
@@ -299,7 +298,7 @@ const ConsentForm = () => {
                     }
                 </div>
             </div>
-           
+
         </main>
     );
 }
