@@ -774,9 +774,7 @@ async function getCountryConsents(req, res) {
             const consentTranslations = await ConsentLanguage.findAll({
                 where: { consent_id: countryConsent.consent_id }
             });
-
-            const locales = consentTranslations.map(ct => ct.locale.toUpperCase());
-            countryConsent.dataValues.consent.dataValues.locales = locales.join(', ');
+            countryConsent.dataValues.consent.dataValues.translations = consentTranslations;
         }));
 
         res.json(countryConsents);
