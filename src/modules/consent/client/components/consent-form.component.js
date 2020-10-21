@@ -23,17 +23,15 @@ const ConsentForm = () => {
         const field = e.target.className.split(' ');
         const translation = newTranslations[e.target.dataset.id];
         translation[field[1]] = e.target.value;
-        if(field[1] === 'country_iso2' || field[1] === 'lang_code') translation['locale'] = `${translation['country_iso2']}_${translation['lang_code']}`;
+        // if(field[1] === 'country_iso2' || field[1] === 'lang_code') translation['locale'] = `${translation['country_iso2']}_${translation['lang_code']}`;
         setTranslations(newTranslations);
     }
 
     const addNewTranslation = () => {
         const [, lang_code, ] = countryLanguages[0].split(' ');
         const init_lang_code = lang_code.toLowerCase();
-
         const init_country_iso2 = userCountries[0].country_iso2.toLowerCase();
-
-        const newTranslations = [...translations, { country_iso2: init_country_iso2, lang_code: init_lang_code , rich_text: '', locale: `${init_country_iso2}_${init_lang_code}` }];
+        const newTranslations = [...translations, { country_iso2: init_country_iso2, lang_code: init_lang_code , rich_text: '' }];
         setTranslations(newTranslations);
     }
 
@@ -176,7 +174,7 @@ const ConsentForm = () => {
                                                 values.translations = translations;
                                                 console.log(values)
 
-                                                const validTranslations = translations.filter(item => item.locale && item.rich_text);
+                                                const validTranslations = translations.filter(item => item.country_iso2 && item.lang_code && item.rich_text);
                                                 if (!validTranslations.length) {
                                                     addToast('Must provide at least one translation', {
                                                         appearance: 'error',
