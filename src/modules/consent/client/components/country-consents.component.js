@@ -121,7 +121,7 @@ const CountryConsents = () => {
                 <div className="row">
                     <div className="col-12">
                         <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
-                            <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex justify-content-end align-items-center">
                                 <button onClick={() => { setShow(true); setEditable(false); setEditOption(null); }} className="btn cdp-btn-secondary text-white ml-2">
                                     <i className="icon icon-plus pr-1"></i> Assign consent to country
                                 </button>
@@ -166,13 +166,13 @@ const CountryConsents = () => {
                                                                             overlay={
                                                                                 <Popover id={`popover-positioned-top`}>
                                                                                     <Popover.Content>
-                                                                                        <div>{parse(parse(translation.rich_text))}</div>
+                                                                                        <div>{parse(translation.rich_text)}</div>
                                                                                     </Popover.Content>
                                                                                 </Popover>
                                                                             }
 
                                                                         >
-                                                                            <span className="badge badge-light mr-1 text-capitalize">{translation.locale}</span>
+                                                                            <span className="badge badge-secondary-light shadow-sm font-weight-bold-light mr-1 text-uppercase text-dark">{translation.locale}</span>
                                                                         </OverlayTrigger>
                                                                     ))}</td>
                                                                 <td>{consent.opt_type}</td>
