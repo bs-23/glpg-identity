@@ -164,15 +164,15 @@ const CountryConsents = () => {
                                                                             placement="top"
                                                                             delay={{ show: 250, hide: 400 }}
                                                                             overlay={
-                                                                                <Popover id={`popover-positioned-top`}>
-                                                                                    <Popover.Content>
+                                                                                <Popover className="popup-customize" id={`popover-positioned-top`}>
+                                                                                    <Popover.Content className="popup-customize__content">
                                                                                         <div>{parse(translation.rich_text)}</div>
                                                                                     </Popover.Content>
                                                                                 </Popover>
                                                                             }
 
                                                                         >
-                                                                            <span className="badge badge-secondary-light shadow-sm font-weight-bold-light mr-1 text-uppercase text-dark">{translation.locale}</span>
+                                                                            <span className="badge badge-secondary-light shadow-sm font-weight-bold-light mr-1 text-dark">{translation.locale}</span>
                                                                         </OverlayTrigger>
                                                                     ))}</td>
                                                                 <td>{consent.opt_type}</td>
