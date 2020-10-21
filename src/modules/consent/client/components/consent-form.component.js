@@ -28,12 +28,12 @@ const ConsentForm = () => {
     }
 
     const addNewTranslation = () => {
-        const [, , lang] = countryLanguages[0].split(' ');
-        const init_lang = lang.replace(/,/g, '').toLowerCase();
+        const [, lang_code, ] = countryLanguages[0].split(' ');
+        const init_lang_code = lang_code.toLowerCase();
 
         const init_country_iso2 = userCountries[0].country_iso2.toLowerCase();
 
-        const newTranslations = [...translations, { country: init_country_iso2, language: init_lang , rich_text: '', locale: `${init_country_iso2}_${init_lang}` }];
+        const newTranslations = [...translations, { country: init_country_iso2, language: init_lang_code , rich_text: '', locale: `${init_country_iso2}_${init_lang_code}` }];
         setTranslations(newTranslations);
     }
 
@@ -66,19 +66,20 @@ const ConsentForm = () => {
 
             const country_languages = CountryCodesObject.filter(item => {
                 const [, , language_name] = item.split(' ');
-                if(!mapped_languages[language_name]) {
+                if(language_name && !mapped_languages[language_name]) {
                     mapped_languages[language_name] = true;
                     return true;
                 }
                 return false;
             });
-            const sorted_languages = country_languages.sort((a, b) => {
+            country_languages.sort((a, b) => {
                 const [, , language_name1] = a.split(' ');
                 const [, , language_name2] = b.split(' ');
                 if(language_name1.replace(/,/g, '') < language_name2.replace(/,/g, '')) return -1;
                 return 1;
             });
-            setCountryLanguages(sorted_languages);
+            console.log(country_languages)
+            setCountryLanguages(country_languages);
         }
 
         getConsentCatogories();
@@ -95,8 +96,8 @@ const ConsentForm = () => {
 
             return (<React.Fragment key={idx}>
                 <div className="col-12">
-                    <div className="row border rounded pb-3 mb-3 mx-0">
-                        <label className="col-12 font-weight-bold d-flex justify-content-between align-items-center bg-light py-2 border-bottom">
+                    <div className="row border border-primary rounded pb-3 mb-3 mx-0 shadow-sm">
+                        <label className="col-12 font-weight-bold d-flex justify-content-between align-items-center bg-light py-2 border-bottom rounded-top">
                             {translationId}
                             <i className="fas fa-minus-circle text-danger fa-2x" type="button" onClick={() => removeTranslation(idx)}></i>
                         </label>
@@ -178,7 +179,7 @@ const ConsentForm = () => {
 
                                                 const validTranslations = translations.filter(item => item.locale && item.rich_text);
                                                 if (!validTranslations.length) {
-                                                    addToast('Must set at least one translation', {
+                                                    addToast('Must provide at least one translation', {
                                                         appearance: 'error',
                                                         autoDismiss: true
                                                     });
@@ -277,15 +278,15 @@ const ConsentForm = () => {
 
                                                                 {getTranslations()}
 
-                                                                <div className="col-12 col-sm-7">
+                                                                <div className="col-12">
                                                                     <div className="form-group">
-                                                                        <label className="d-flex align-items-center" onClick={addNewTranslation}>
-                                                                            <i className="fas fa-plus cdp-text-primary fa-2x mr-2" ></i>
-                                                                            Add Localizations
-                                                                </label>
+                                                                        <label className="d-flex align-items-center cdp-text-primary" type="button" onClick={addNewTranslation}>
+                                                                                <i className="fas fa-plus  fa-2x mr-2" ></i>
+                                                                                Add Localizations
+                                                                        </label>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
                                                             <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" >Submit</button>
                                                         </div>
                                                     </div>
