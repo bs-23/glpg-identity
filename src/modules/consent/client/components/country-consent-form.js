@@ -26,7 +26,7 @@ const CountryConsentForm = (props) => {
     });
 
     return (
-        <Modal size="lg" centered show={props.show} onHide={handleClose}>
+        <Modal centered show={props.show} onHide={handleClose}>
             <Modal.Header closeButton>
                 <Modal.Title>{props.editable ? 'Manage opt type' : 'Assign consent to country'}</Modal.Title>
             </Modal.Header>

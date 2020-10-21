@@ -16,6 +16,7 @@ async function init() {
     const ApplicationDomain = require(path.join(process.cwd(), 'src/modules/application/server/application-domain.model'));
     const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
     const ConsentCategory = require(path.join(process.cwd(), 'src/modules/consent/server/consent-category.model'));
+    const ConsentPreference = require(path.join(process.cwd(), 'src/modules/consent/server/consent-preference.model'));
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
     const ConsentLocale = require(path.join(process.cwd(), 'src/modules/consent/server/consent-locale.model'));
     const ConsentCountry = require(path.join(process.cwd(), 'src/modules/consent/server/consent-country.model'));
@@ -198,34 +199,43 @@ async function init() {
                 { id: '59953d51-2449-4b65-950f-9f88654019bb', title: 'General Consent', type: 'general' }
             ];
 
+            const consent_preferences = [
+                { id: '1c5cbd55-6c32-45e0-80a1-cd4ccd39c68e', title: 'Galapagos Terms of Use', slug: '' },
+                { id: '2b5c322e-ee07-4255-b1fe-1d525ab4c6f4', title: 'Galapagos E-Mail Newsletter', slug: '' },
+                { id: 'c0f5fe58-6b3f-4990-ad8f-2fdf92ac13e8', title: 'Sharing Personal Data With 3rd Parties', slug: '' }
+            ];
+
             const consents = [
                 {
                     id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
-                    title: 'I agree to the Galapagos Terms of Service',
-                    slug: '',
+                    //title: 'I agree to the Galapagos Terms of Service',
+                    //slug: '',
                     category_id: '59953d51-2449-4b65-950f-9f88654019bb',
                     legal_basis: 'consent',
-                    preference: 'Galapagos Terms of Use',
+                    //preference: 'Galapagos Terms of Use',
+                    preference_id: '1c5cbd55-6c32-45e0-80a1-cd4ccd39c68e',
                     is_active: true,
                     created_by: admin.id
                 },
                 {
                     id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
-                    title: 'I give my consent to send me promotional email',
-                    slug: '',
+                    //title: 'I give my consent to send me promotional email',
+                    //slug: '',
                     category_id: 'fe037405-c676-4d98-bd05-85008900c838',
                     legal_basis: 'consent',
-                    preference: 'Promotional email marketing',
+                    //preference: 'Promotional Email Marketing',
+                    preference_id: '2b5c322e-ee07-4255-b1fe-1d525ab4c6f4',
                     is_active: true,
                     created_by: admin.id
                 },
                 {
                     id: '2b9fa7f9-2c1e-4621-a091-5e4bf539b875',
-                    title: 'I declare that the information is complete and accurate',
-                    slug: '',
+                    //title: 'I declare that the information is complete and accurate',
+                    //slug: '',
                     category_id: '59953d51-2449-4b65-950f-9f88654019bb',
                     legal_basis: 'consent',
-                    preference: '',
+                    //preference: '',
+                    preference_id: 'c0f5fe58-6b3f-4990-ad8f-2fdf92ac13e8',
                     is_active: true,
                     created_by: admin.id
                 }
@@ -235,47 +245,47 @@ async function init() {
                 {
                     rich_text: "<p>Ce site est strictement destiné aux médecins et non aux infirmie(è)r(es) et / ou au grand public. Vous déclarez explicitement être médecin au sens de l'article 3 de la loi sur l’art de guérir.</p>",
                     consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
-                    locale: 'fr_be'
+                    locale: 'fr_BE'
                 },
                 {
                     rich_text: "<p>Vous déclarez que les données saisies sont vos données personnelles et que les informations sont complètes et exactes. En aucun cas, vos données ne peuvent être partagées avec des tiers pour permettre à ces tiers d'accéder au présent site. Vous devez immédiatement informer Galapagos de toute utilisation non autorisée connue ou soupçonnée de vos informations personnelles dans le cadre de l'accès à ce site.</p>",
                     consent_id: '2b9fa7f9-2c1e-4621-a091-5e4bf539b875',
-                    locale: 'fr_be'
+                    locale: 'fr_BE'
                 },
                 {
                     rich_text: "<p>Je consens à ce que Galapagos m'envoie des informations promotionnelles et environnementales concernant tous les produits et services de Galapagos à l'adresse mail que j'ai fournie. <br> <br> Pour obtenir de plus amples informations sur la manière dont nous traitons vos données à caractère personnel, veuillez vous référer à notre <a href='https://www.glpg.com/belgique/fr-politique-de-confidentialite' target='_blank'>Déclaration de confidentialité</a>.</p>",
                     consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
-                    locale: 'fr_be'
+                    locale: 'fr_BE'
                 },
                 {
                     rich_text: "<p>Deze website is strikt bedoeld voor geneesheren en niet voor verpleegkundigen en/of het grote publiek. U verklaart uitdrukkelijk dat u een geneesheer bent in de zin van artikel 3 van de wet betreffende de uitoefening van de gezondheidszorgberoepen.</p>",
                     consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
-                    locale: 'nl_be'
+                    locale: 'nl_BE'
                 },
                 {
                     rich_text: "<p>U verklaart dat de ingevulde gegevens uw persoonlijke gegevens zijn en dat de informatie volledig en accuraat is. Uw gegevens mogen in geen geval gedeeld worden met derden om die derden toegang te verlenen aan huidige website. U moet Galapagos onmiddellijk op de hoogte brengen van elk bekend of vermoeden van niet-geautoriseerd gebruik van uw persoonlijke gegevens inzake de toegang tot deze website.</p>",
                     consent_id: '2b9fa7f9-2c1e-4621-a091-5e4bf539b875',
-                    locale: 'nl_be'
+                    locale: 'nl_BE'
                 },
                 {
                     rich_text: "<p>Ik ontvang graag informatieve en promotionele communicatie via e-mail over de producten, diensten en andere ontwikkelingen van Galapagos. <br> <br> Raadpleeg onze <a href='https://www.glpg.com/belgie/privacyverklaring' target='_blank'>privacyverklaring</a> voor meer informatie over hoe we met uw persoonsgegevens omgaan.</p>",
                     consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
-                    locale: 'nl_be'
+                    locale: 'nl_BE'
                 },
                 {
                     rich_text: "<p>Ik bevestig dat ik een professionele zorgverlener ben die in Nederland werkzaam is en ik accepteer de <a href='https://www.glpg.com/nederland/disclaimer' target='_blank'>Gebruiksvoorwaarden</a> van Galapagos.nl.</p>",
                     consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
-                    locale: 'nl_nl'
+                    locale: 'nl_NL'
                 },
                 {
                     rich_text: "<p>Ik verklaar dat de ingevulde gegevens mijn persoonlijke gegevens zijn en dat de informatie volledig en accuraat is. Ik verklaar dat ik mijn gegevens niet zal delen met derden om die derden toegang te verlenen tot de huidige website. Ik zal Galapagos onmiddellijk op de hoogte brengen van elk bekend of vermoed niet-geautoriseerd gebruik van mijn persoonlijke gegevens inzake de toegang tot deze website.</p>",
                     consent_id: '2b9fa7f9-2c1e-4621-a091-5e4bf539b875',
-                    locale: 'nl_nl'
+                    locale: 'nl_NL'
                 },
                 {
                     rich_text: "<p>Ik ontvang graag informatieve en promotionele communicatie via e-mail over de producten, diensten en andere ontwikkelingen van Galapagos. <br> <br> Raadpleeg onze <a href='https://www.glpg.com/nederland/privacyverklaring' target='_blank'>privacyverklaring</a> voor meer informatie over hoe we met uw persoonsgegevens omgaan.</p>",
                     consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
-                    locale: 'nl_nl'
+                    locale: 'nl_NL'
                 }
             ];
 
@@ -320,19 +330,24 @@ async function init() {
                     returning: true,
                     ignoreDuplicates: false
                 }).then(function () {
-                    Consent.bulkCreate(consents, {
+                    ConsentPreference.bulkCreate(consent_preferences, {
                         returning: true,
                         ignoreDuplicates: false
                     }).then(function () {
-                        ConsentLocale.bulkCreate(consentLocales, {
+                        Consent.bulkCreate(consents, {
                             returning: true,
                             ignoreDuplicates: false
                         }).then(function () {
-                            ConsentCountry.bulkCreate(consentCountries, {
+                            ConsentLocale.bulkCreate(consentLocales, {
                                 returning: true,
                                 ignoreDuplicates: false
                             }).then(function () {
-                                callback();
+                                ConsentCountry.bulkCreate(consentCountries, {
+                                    returning: true,
+                                    ignoreDuplicates: false
+                                }).then(function () {
+                                    callback();
+                                });
                             });
                         });
                     });

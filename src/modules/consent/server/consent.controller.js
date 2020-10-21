@@ -7,6 +7,7 @@ const validator = require('validator');
 const ConsentLocale = require('./consent-locale.model');
 const ConsentCountry = require('./consent-country.model');
 const ConsentCategory = require('./consent-category.model');
+const ConsentPreference = require('./consent-preference.model');
 const ConsentLanguage = require('./consent-locale.model');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const HCPS = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_profile.model'));
@@ -57,16 +58,16 @@ async function getConsents(req, res) {
                 where: {
                     consent_id: consentCountry.consent_id,
                     locale: {
-                        [Op.or]: [
-                            locale.toUpperCase(),
-                            locale.toLowerCase()
-                        ]
+                        [Op.iLike]: `%${locale}`
                     }
                 }, include: [{
                     model: Consent,
                     as: 'consent',
                     include: [{
                         model: ConsentCategory
+                    },
+                    {
+                        model: ConsentPreference
                     }]
                 }]
             });
@@ -89,13 +90,14 @@ async function getConsents(req, res) {
                 id: consentLang.consent.id,
                 title: consentLang.consent.title,
                 rich_text: validator.unescape(consentLang.rich_text),
-                slug: consentLang.consent.slug,
+                //slug: consentLang.consent.slug,
                 opt_type: consentCountry.opt_type,
                 category: consentLang.consent.consent_category.type,
                 category_title: consentLang.consent.consent_category.title,
                 country_iso2: country_iso2,
                 locale: consentLang.locale,
-                preference: consentLang.consent.preference
+                preference: consentLang.consent.consent_preference.title,
+                slug: consentLang.consent.consent_preference.slug
             }
         }));
 
