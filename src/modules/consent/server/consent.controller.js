@@ -589,6 +589,11 @@ async function createConsent(req, res) {
 
         is_active = !!is_active;
 
+        if (preference && preference.length) {
+            const preferences = ['Galapagos Terms of Use', 'Promotional email marketing'];
+            if (!preferences.includes(preference)) return res.status(400).send('Invalid Preference.');
+        }
+
         const consentCategory = await ConsentCategory.findOne({ where: { id: category_id } });
 
         if (!consentCategory) {
@@ -628,7 +633,8 @@ async function createConsent(req, res) {
                             locale: translation.locale
                         },
                         defaults: {
-                            ...translation,
+                            locale: translation.locale,
+                            rich_text: translation.rich_text,
                             consent_id: consent.id
                         }
                     });
