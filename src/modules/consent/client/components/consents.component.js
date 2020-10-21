@@ -98,7 +98,7 @@ const ConsentsComponent = () => {
                                                     <Dropdown.Menu>
                                                         <Dropdown.Item>Edit Consent</Dropdown.Item>
                                                         <Dropdown.Item onClick={() => showConsentDetails(row)}>Consent Detail</Dropdown.Item>
-                                                        <Dropdown.Item onClick={() => toggleDeleteConsentModal(row)}>Delete</Dropdown.Item>
+                                                        <Dropdown.Item className="text-danger" onClick={() => toggleDeleteConsentModal(row)}>Delete</Dropdown.Item>
                                                     </Dropdown.Menu>
                                                 </Dropdown></td>
                                             </tr>
