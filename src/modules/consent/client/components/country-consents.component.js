@@ -166,7 +166,7 @@ const CountryConsents = () => {
                                                                             overlay={
                                                                                 <Popover id={`popover-positioned-top`}>
                                                                                     <Popover.Content>
-                                                                                        <div>{parse(parse(translation.rich_text))}</div>
+                                                                                        <div>{parse(translation.rich_text)}</div>
                                                                                     </Popover.Content>
                                                                                 </Popover>
                                                                             }
