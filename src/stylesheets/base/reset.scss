@@ -270,6 +270,9 @@ a {
 .border-primary {
     border-color: $primary-color !important;
 }
+.badge-secondary-light {
+    background-color: $secondary-color-lighter !important;
+}
 
 .hover-opacity {
     cursor: pointer;
@@ -278,6 +281,5 @@ a {
 
     &:hover {
         opacity: .8;
-        
     }
 }
