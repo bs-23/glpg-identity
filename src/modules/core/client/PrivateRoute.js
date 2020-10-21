@@ -31,26 +31,30 @@ export default function PrivateRoute({ component: Component, module, ...rest }) 
         });
     }
 
+    // roles.forEach(role => {
+    //     const union = (a, b) => [...new Set([...a, ...b])];
+    //     if(role.permissions) permissions = union(permissions, role.permissions);
+    // });
 
     return (
         <Route {...rest} render={props => {
             return (
-                loggedInUser ? (!module || serviceCategories.some(module_permission => module_permission === module)) ? (
+                loggedInUser && cookies.logged_in ? (!module || serviceCategories.some( module_permission => module_permission === module)) ? (
                     <>
                         <Navbar />
                         <Component {...props} />
                     </>
                 ) : (
-                        props.history.replace({
-                            pathname: "/forbidden",
-                            state: { from: props.location }
-                        })
-                    ) : cookies.logged_in ? null : (
-                        <Redirect push to={{
-                            pathname: "/login",
-                            state: { from: props.location }
-                        }} />
-                    )
+                    props.history.replace({
+                        pathname: "/forbidden",
+                        state: { from: props.location }
+                    })
+                ) : cookies.logged_in ? null : (
+                    <Redirect push to={{
+                        pathname: "/login",
+                        state: { from: props.location }
+                    }}/>
+                )
             )
         }} />
     );

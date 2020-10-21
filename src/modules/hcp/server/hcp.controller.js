@@ -100,11 +100,15 @@ async function generateEmailOptions(emailType, application, user) {
     };
 }
 
-async function sendConsentConfirmationMail(user, consents, application) {
+async function sendConsentConfirmationMail(user, application) {
+    const mailOptions = await generateEmailOptions('consent-confirmation', application, user);
+    await emailService.send(mailOptions);
+}
+
+async function sendDoubleOptInConsentConfirmationMail(user, application) {
     const consentConfirmationToken = generateConsentConfirmationAccessToken(user);
 
     const mailOptions = await generateEmailOptions('double-opt-in-consent-confirm', application, user);
-    mailOptions.data.consents = consents || [];
     mailOptions.data.link = `${mailOptions.domain}${application.consent_confirmation_path}?token=${consentConfirmationToken}&journey=consent_confirmation&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
 
     await emailService.send(mailOptions);
@@ -357,14 +361,17 @@ async function registrationLookup(req, res) {
             response.errors.push(new CustomError('UUID is already registered.', 4101, 'uuid'));
             return res.status(400).send(response);
         } else {
+            const uuidWithoutSpecialCharacter = uuid.replace(/[-]/gi, '');
+
             const master_data = await sequelize.datasyncConnector.query(`
                 SELECT h.*, s.specialty_code
                 FROM ciam.vwhcpmaster AS h
                 INNER JOIN ciam.vwmaphcpspecialty AS s
                 ON s.individual_id_onekey = h.individual_id_onekey
-                WHERE h.uuid_1 = $uuid OR h.uuid_2 = $uuid
+                WHERE regexp_replace(h.uuid_1, '[-]', '', 'gi') = $uuid
+                OR regexp_replace(h.uuid_2, '[-]', '', 'gi') = $uuid
             `, {
-                bind: { uuid },
+                bind: { uuid: uuidWithoutSpecialCharacter },
                 type: QueryTypes.SELECT
             });
 
@@ -386,7 +393,7 @@ async function registrationLookup(req, res) {
 
 async function createHcpProfile(req, res) {
     const response = new Response({}, []);
-    const { email, uuid, salutation, first_name, last_name, country_iso2, language_code, specialty_onekey, telephone, locale } = req.body;
+    const { email, uuid, salutation, first_name, last_name, country_iso2, language_code, specialty_onekey, telephone, locale, birthdate } = req.body;
 
     if (!email || !validator.isEmail(email)) {
         response.errors.push(new CustomError('Email address is missing or invalid.', 400, 'email'));
@@ -456,18 +463,29 @@ async function createHcpProfile(req, res) {
         }
 
         let master_data = {};
+        let uuid_from_master_data;
 
-        if (req.body.uuid) {
-            master_data = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwhcpmaster WHERE uuid_1 = $uuid OR uuid_2 = $uuid', {
-                bind: { uuid: req.body.uuid },
+        if (uuid) {
+            const uuidWithoutSpecialCharacter = uuid.replace(/[-]/gi, '');
+
+            master_data = await sequelize.datasyncConnector.query(`select * from ciam.vwhcpmaster
+                    where regexp_replace(uuid_1, '[-]', '', 'gi') = $uuid
+                    OR regexp_replace(uuid_2, '[-]', '', 'gi') = $uuid`, {
+                bind: { uuid: uuidWithoutSpecialCharacter },
                 type: QueryTypes.SELECT
             });
             master_data = master_data && master_data.length ? master_data[0] : {};
+
+            const uuid_1_from_master_data = (master_data.uuid_1 || '');
+            const uuid_2_from_master_data = (master_data.uuid_2 || '');
+
+            uuid_from_master_data = [uuid_1_from_master_data, uuid_2_from_master_data]
+                .find(id => id.replace(/[-]/gi, '') === uuidWithoutSpecialCharacter);
         }
 
         const model = {
             email: email.toLowerCase(),
-            uuid,
+            uuid: uuid_from_master_data || uuid,
             salutation,
             first_name,
             last_name,
@@ -476,6 +494,7 @@ async function createHcpProfile(req, res) {
             locale: locale.toLowerCase(),
             specialty_onekey,
             telephone,
+            birthdate,
             application_id: req.user.id,
             individual_id_onekey: master_data.individual_id_onekey,
             created_by: req.user.id,
@@ -544,14 +563,12 @@ async function createHcpProfile(req, res) {
         }
 
         if (hcpUser.dataValues.status === 'consent_pending') {
-            const unconfirmedConsents = consentArr.filter(consent => !consent.consent_confirmed);
-            const consentTitles = unconfirmedConsents.map(consent => validator.unescape(consent.title));
-
-            await sendConsentConfirmationMail(hcpUser.dataValues, consentTitles, req.user);
+            await sendDoubleOptInConsentConfirmationMail(hcpUser.dataValues, req.user);
         }
 
         if (hcpUser.dataValues.status === 'self_verified') {
             await addPasswordResetTokenToUser(hcpUser);
+            await sendConsentConfirmationMail(hcpUser.dataValues, req.user);
 
             response.data.password_reset_token = hcpUser.dataValues.reset_password_token;
             response.data.retention_period = '1 hour';
@@ -631,7 +648,6 @@ async function approveHCPUser(req, res) {
         let userConsents = await HcpConsents.findAll({ where: { [Op.and]: [{ user_id: id }, { consent_confirmed: false }] } });
 
         let hasDoubleOptIn = false;
-        const consentTitles = [];
 
         if (userConsents && userConsents.length) {
             const consentIds = userConsents.map(consent => consent.consent_id)
@@ -644,7 +660,6 @@ async function approveHCPUser(req, res) {
 
             if (allConsentDetails && allConsentDetails.length) {
                 hasDoubleOptIn = true;
-                allConsentDetails.forEach(consent => consentTitles.push(validator.unescape(consent.rich_text)));
             }
         }
 
@@ -652,7 +667,7 @@ async function approveHCPUser(req, res) {
         await hcpUser.save();
 
         if (hcpUser.dataValues.status === 'consent_pending') {
-            await sendConsentConfirmationMail(hcpUser, consentTitles, userApplication);
+            await sendDoubleOptInConsentConfirmationMail(hcpUser, userApplication);
         }
 
         if (hcpUser.dataValues.status === 'manually_verified') {

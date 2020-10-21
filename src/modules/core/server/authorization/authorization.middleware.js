@@ -1,4 +1,5 @@
 const path = require("path");
+const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const User = require(path.join(process.cwd(), "src/modules/user/server/user.model"));
 const UserProfile = require(path.join(process.cwd(), "src/modules/user/server/user-profile.model"));

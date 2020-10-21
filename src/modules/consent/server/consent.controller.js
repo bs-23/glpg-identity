@@ -7,6 +7,7 @@ const validator = require('validator');
 const ConsentLocale = require('./consent-locale.model');
 const ConsentCountry = require('./consent-country.model');
 const ConsentCategory = require('./consent-category.model');
+const ConsentLanguage = require('./consent-locale.model');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const HCPS = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_profile.model'));
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
@@ -468,9 +469,45 @@ async function getUserConsents(req, res) {
     }
 }
 
+async function getCdpConsents(req, res) {
+    try {
+        let { translations, category } = req.query;
+
+        const inclusions = category === 'true'
+            ? [{
+                model: ConsentCategory,
+                as: 'consent_category',
+                attributes: ['id', 'title', 'type']
+            }]
+            : [];
+
+        const consents = await Consent.findAll({
+            include: inclusions,
+            attributes: { exclude: ['category_id', 'created_at', 'updated_at'] }
+        });
+
+        translations === 'true' && await Promise.all(consents.map(async consent => {
+            const consentTranslations = await ConsentLanguage.findAll({
+                where: {
+                    consent_id: consent.id
+                },
+                attributes: { exclude: ['consent_id', 'created_at', 'updated_at'] }
+            });
+
+            consent.dataValues.translations = [...consentTranslations];
+        }));
+
+        res.json(consents);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 exports.getConsents = getConsents;
 exports.getConsentsReport = getConsentsReport;
 exports.getDatasyncConsentsReport = getDatasyncConsentsReport;
 exports.getAllProcessActivities = getAllProcessActivities;
 exports.getAllOptTypes = getAllOptTypes;
 exports.getUserConsents = getUserConsents;
+exports.getCdpConsents = getCdpConsents;

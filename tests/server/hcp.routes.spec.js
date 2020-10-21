@@ -9,6 +9,7 @@ const emailService = require(path.join(process.cwd(), 'src/config/server/lib/ema
 const { defaultUser, userWithInvalidUUID, userWithValidUUID } = specHelper.hcp;
 const { defaultApplication, users: { defaultAdmin } } = specHelper;
 const { demoConsent } = specHelper.consent;
+const { signCookie } = specHelper;
 
 let appInstance;
 let request;
@@ -124,7 +125,7 @@ describe('HCP Routes', () => {
 
     it('Should edit an HCP user - Edit HCP user', async () => {
         const response = await request.put(`/api/hcps/${defaultUser.id}`)
-            .set('Cookie', [`access_token=${defaultAdmin.access_token}`])
+            .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`])
             .send({
                 first_name: faker.name.firstName(),
                 last_name: faker.name.lastName()
@@ -137,7 +138,7 @@ describe('HCP Routes', () => {
 
     it('Should get 404 when trying to edit an non existing HCP user - Edit HCP user', async () => {
         const response = await request.put(`/api/hcps/${faker.random.uuid()}`)
-            .set('Cookie', [`access_token=${defaultAdmin.access_token}`])
+            .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`])
             .send({
                 first_name: faker.name.firstName(),
                 last_name: faker.name.lastName(),
@@ -165,7 +166,7 @@ describe('HCP Routes', () => {
     it('Should get hcp users data', async () => {
         const response = await request
             .get('/api/hcps/?page=1&status=self_verified')
-            .set('Cookie', [`access_token=${defaultAdmin.access_token}`]);
+            .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`])
 
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveProperty('data');
@@ -175,7 +176,8 @@ describe('HCP Routes', () => {
     it('Should get specialties for given locale', async () => {
         const response = await request
             .get('/api/hcp-profiles/specialties?locale=nl_NL')
-            .set('Authorization', `bearer ${defaultApplication.access_token}`);
+            .set('Authorization', `bearer ${defaultApplication.access_token}`)
+
 
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveProperty('data');
@@ -378,7 +380,7 @@ describe('HCP Routes', () => {
                 const hcp = await HCPModel.findOne({ where: { email: userWithInvalidUUID.email.toLowerCase() }});
 
                 const response = await request.put(`/api/hcp-profiles/${hcp.id}/approve`)
-                    .set('Cookie', [`access_token=${defaultAdmin.access_token}`])
+                    .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`])
 
                 expect(response.statusCode).toBe(200);
                 expect(response.body).toHaveProperty('data');
@@ -397,7 +399,7 @@ describe('HCP Routes', () => {
                     });
 
                 const response = await request.put(`/api/hcp-profiles/${hcp.id}/reject`)
-                    .set('Cookie', [`access_token=${defaultAdmin.access_token}`])
+                    .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`])
 
                 const doesHCPExistInDB = await HCPModel.findOne({ where: { id: hcp.id } });
 
@@ -440,7 +442,7 @@ describe('HCP Routes', () => {
                 const hcp = await HCPModel.findOne({ where: { email: userWithInvalidUUID.email.toLowerCase() }});
 
                 const response = await request.put(`/api/hcp-profiles/${hcp.id}/approve`)
-                    .set('Cookie', [`access_token=${defaultAdmin.access_token}`])
+                    .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`])
 
                 expect(response.statusCode).toBe(200);
                 expect(response.body).toHaveProperty('data');

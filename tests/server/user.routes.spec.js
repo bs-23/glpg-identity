@@ -10,6 +10,7 @@ const emailService = require(path.join(process.cwd(), 'src/config/server/lib/ema
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
 const { defaultAdmin, defaultUser } = specHelper.users;
+const { signCookie } = specHelper;
 
 let request;
 let fakeAxios;
@@ -35,9 +36,10 @@ describe('User Routes', () => {
 
     it('Should get 401 Unauthorized http status code with invalid credential', async () => {
         const response = await request.post('/api/login').send({
-            email: faker.internet.email(),
+            username: faker.internet.email(),
             password: faker.internet.password(),
-            recaptchaToken: recaptchaResponse
+            recaptchaToken: recaptchaResponse,
+            grant_type: "password"
         });
 
         expect(response.statusCode).toBe(401);
@@ -45,9 +47,10 @@ describe('User Routes', () => {
 
     it('Should login with valid email and password', async () => {
         const response = await request.post('/api/login').send({
-            email: defaultUser.email,
+            username: defaultUser.email,
             password: defaultUser.password,
-            recaptchaToken: recaptchaResponse
+            recaptchaToken: recaptchaResponse,
+            grant_type: 'password'
         });
 
         expect(response.statusCode).toBe(200);
@@ -56,7 +59,7 @@ describe('User Routes', () => {
 
     it('Should logout when requesting logout with valid credential', async () => {
         const response = await request.get('/api/logout')
-            .set('Cookie', [`access_token=${defaultUser.access_token}`]);
+            .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`]);
 
         expect(response.res.headers['set-cookie'][0].split(';')[0].split('=')[1]).toBe('');
     });
@@ -64,7 +67,7 @@ describe('User Routes', () => {
     it("Should get the signed in user's profile", async () => {
         const response = await request
             .get('/api/users/profile')
-            .set('Cookie', [`access_token=${defaultUser.access_token}`]);
+            .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`]);
 
         expect(response.statusCode).toBe(200);
         expect(response.res.headers['content-type']).toMatch('application/json');
@@ -73,7 +76,7 @@ describe('User Routes', () => {
     it('Should create new user', async () => {
         const response = await request
             .post('/api/users')
-            .set('Cookie', [`access_token=${defaultUser.access_token}`])
+            .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
             .send({
                 first_name: faker.name.firstName(),
                 last_name: faker.name.lastName(),
@@ -89,7 +92,7 @@ describe('User Routes', () => {
     it('Should get an error when creating new user with duplicate email', async () => {
         const response = await request
             .post('/api/users')
-            .set('Cookie', [`access_token=${defaultUser.access_token}`])
+            .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
             .send({
                 first_name: defaultUser.first_name,
                 last_name: defaultUser.last_name,
@@ -103,7 +106,7 @@ describe('User Routes', () => {
     it('Should not change password because current password is invalid', async () => {
         const response = await request
             .post('/api/users/change-password')
-            .set('Cookie', [`access_token=${defaultUser.access_token}`])
+            .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
             .send({
                 currentPassword: faker.internet.password(8),
                 newPassword: faker.internet.password(8),
@@ -116,7 +119,7 @@ describe('User Routes', () => {
     it('Should not change password if passwords dont match', async () => {
         const response = await request
             .post('/api/users/change-password')
-            .set('Cookie', [`access_token=${defaultUser.access_token}`])
+            .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
             .send({
                 currentPassword: defaultUser.password,
                 newPassword: faker.internet.password(8),
@@ -129,7 +132,7 @@ describe('User Routes', () => {
     it('Should change password', async () => {
         const response = await request
             .post('/api/users/change-password')
-            .set('Cookie', [`access_token=${defaultUser.access_token}`])
+            .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
             .send({
                 currentPassword: defaultUser.password,
                 newPassword: '1c9QZu5YU%J$',
@@ -147,7 +150,7 @@ describe('User Routes', () => {
     it('should return all CDP users', async () => {
         const response = await request
             .get('/api/users')
-            .set('Cookie', [`access_token=${defaultAdmin.access_token}`]);
+            .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`]);
 
         expect(response.statusCode).toBe(200);
     });

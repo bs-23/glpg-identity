@@ -1,11 +1,13 @@
 const faker = require('faker');
 const jwt = require('jsonwebtoken');
-
+var crypto = require('crypto');
 const path = require('path')
+
 const { Modules } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
 
 process.env.CDP_TOKEN_SECRET = 'super-secret-private-key';
 process.env.APPLICATION_TOKEN_SECRET = 'application-token-secret-key';
+process.env.CDP_COOKIE_SECRET = 'cookie-secret-key';
 const defaultUserId = 'ce2f07f9-c40b-43b8-8200-124de9fc2e46';
 const defaultAdminId = 'f29b63e5-36c7-4210-a5a8-c1e9d0c5b9e4';
 const defaultApplicationId = '9017a1ee-3391-40a0-ad50-70bc7f1657f0';
@@ -19,6 +21,14 @@ const hcpValidUserId = '1ffe73e9-7922-4640-ba0c-3628b3358ab8';
 const hcpInvalidUserId = '1ffe73e9-7922-4640-ba0c-3628b3358ba8';
 
 module.exports = {
+    signCookie: (value) => {
+        const cookieSecret = process.env.CDP_COOKIE_SECRET;
+        return value + '.' + crypto
+          .createHmac('sha256', cookieSecret)
+          .update(value)
+          .digest('base64')
+          .replace(/\=+$/, '');
+    },
     defaultApplication: {
         id: defaultApplicationId,
         name: faker.company.companyName(),

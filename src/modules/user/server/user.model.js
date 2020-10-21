@@ -74,6 +74,9 @@ const User = sequelize.cdpConnector.define('users', {
     password_updated_at: {
         type: Sequelize.DATE
     },
+    refresh_token: {
+        type: DataTypes.STRING
+    },
     created_by: {
         type: DataTypes.UUID,
         validate: {
