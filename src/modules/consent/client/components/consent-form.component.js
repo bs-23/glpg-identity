@@ -23,7 +23,7 @@ const ConsentForm = () => {
         const field = e.target.className.split(' ');
         const translation = newTranslations[e.target.dataset.id];
         translation[field[1]] = e.target.value;
-        if(field[1] === 'country' || field[1] === 'language') translation['locale'] = `${translation['country']}_${translation['language']}`;
+        if(field[1] === 'country_iso2' || field[1] === 'lang_code') translation['locale'] = `${translation['country_iso2']}_${translation['lang_code']}`;
         setTranslations(newTranslations);
     }
 
@@ -33,7 +33,7 @@ const ConsentForm = () => {
 
         const init_country_iso2 = userCountries[0].country_iso2.toLowerCase();
 
-        const newTranslations = [...translations, { country: init_country_iso2, language: init_lang_code , rich_text: '', locale: `${init_country_iso2}_${init_lang_code}` }];
+        const newTranslations = [...translations, { country_iso2: init_country_iso2, lang_code: init_lang_code , rich_text: '', locale: `${init_country_iso2}_${init_lang_code}` }];
         setTranslations(newTranslations);
     }
 
@@ -103,7 +103,7 @@ const ConsentForm = () => {
                         <div className="col-12 col-sm-6">
                             <div className="form-group">
                                 <label className="font-weight-bold" htmlFor={countryId}>Select Country </label>
-                                <Field className="form-control country" value={item.country} onChange={(e) => handleChange(e)} data-id={idx} as="select" name={countryId} id={countryId}>
+                                <Field className="form-control country_iso2" value={item.country_iso2} onChange={(e) => handleChange(e)} data-id={idx} as="select" name={countryId} id={countryId}>
                                     {userCountries.map(element => <option key={element.countryid} value={element.country_iso2.toLowerCase()}>{element.codbase_desc}</option>)}
                                 </Field>
                             </div>
@@ -112,7 +112,7 @@ const ConsentForm = () => {
                         <div className="col-12 col-sm-6">
                             <div className="form-group">
                                 <label className="font-weight-bold" htmlFor={languageId}>Select Language </label>
-                                <Field className="form-control language" value={item.language} onChange={(e) => handleChange(e)} data-id={idx} as="select" name={languageId} id={languageId}>
+                                <Field className="form-control lang_code" value={item.lang_code} onChange={(e) => handleChange(e)} data-id={idx} as="select" name={languageId} id={languageId}>
                                     {countryLanguages.map(element => {
                                         const [country_iso2, language_code, language_name] = element.split(' ');
                                         return language_name && <option key={country_iso2} value={language_code}>{language_name.replace(/,/g, '')}</option>
