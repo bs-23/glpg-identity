@@ -70,6 +70,18 @@ export function createConsent(data) {
         })
     };
 }
+
+export function updateConsent(data, id){
+    return {
+        type: Types.UPDATE_CONSENT,
+        payload: axios({
+            method: 'put',
+            url: `/api/cdp-consents/${id}`,
+            data
+        })
+    };
+}
+
 export function getCountryConsents() {
     const url = '/api/consent/country/';
     return {
