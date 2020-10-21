@@ -70,6 +70,14 @@ export default function reducer(state = initialState, action) {
             }
         }
 
+        case Types.CREATE_COUNTRY_CONSENT_FULFILLED: {
+            console.log([...state.country_consents, action.payload.data]);
+            return {
+                ...state,
+                country_consents: [...state.country_consents, action.payload.data]
+            }
+        }
+
         case Types.DELETE_CONSENT_FULFILLED: {
             const id = action.payload.config.url.split("/api/cdp-consents/")[1];
             return {

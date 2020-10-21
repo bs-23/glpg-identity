@@ -131,3 +131,13 @@ export function deleteConsent(id) {
         })
     };
 }
+export function createCountryConsent(data) {
+    return {
+        type: Types.CREATE_COUNTRY_CONSENT,
+        payload: axios({
+            method: 'post',
+            url: '/api/consent/country',
+            data
+        })
+    };
+}

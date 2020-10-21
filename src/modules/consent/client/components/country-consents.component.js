@@ -159,7 +159,7 @@ const CountryConsents = () => {
                                                                 </td>
                                                                 <td>
 
-                                                                    {consent.translations.length > 0 && consent.translations.map(translation => (
+                                                                    {consent.translations && consent.translations.length > 0 && consent.translations.map(translation => (
                                                                         <OverlayTrigger key={translation.id}
                                                                             placement="top"
                                                                             delay={{ show: 250, hide: 400 }}

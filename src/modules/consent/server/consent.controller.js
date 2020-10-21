@@ -824,11 +824,19 @@ async function assignConsentToCountry(req, res) {
             return res.status(400).send('Consent not found.');
         }
 
+        const translations = await ConsentLanguage.findAll({
+            where: { consent_id: consent.id }
+        });
+
+        consent.dataValues.translations = getTranslationViewmodels(translations);
+
         const createdCountryConsent = await ConsentCountry.create({
             consent_id,
             country_iso2: country_iso2.toUpperCase(),
             opt_type
         });
+
+        createdCountryConsent.dataValues.consent = consent;
 
         res.json(createdCountryConsent);
     } catch (err) {
