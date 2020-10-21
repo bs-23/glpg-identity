@@ -169,7 +169,7 @@ const CountryConsents = () => {
                             )
                         }
 
-                        <Modal show={showDelete} onHide={() => setShowDelete(false)}>
+                        <Modal centered size="lg" show={showDelete} onHide={() => setShowDelete(false)}>
                             <Modal.Header closeButton>
                                 <Modal.Title>Remove Consent from Country</Modal.Title>
                             </Modal.Header>
@@ -177,16 +177,19 @@ const CountryConsents = () => {
                                 {consentToDelete ? (
                                     <div>
                                         Are you sure to remove this consent from <b>{consentToDelete.countryName}</b>?
-                                        <div className="card mt-2 mb-3">
-                                            <div className="card-body">
+                                        <div className="alert alert-warning my-3">
+                                            
                                                 {consentToDelete.title}
-                                            </div>
+                                           
                                         </div>
                                     </div>
                                 ) : null}
-                                <button onClick={() => setShowDelete(false)}>Cancel</button>
-                                <button className="ml-2" onClick={() => deleteItem()}>Confirm</button>
+                               
                             </Modal.Body>
+                            <Modal.Footer>
+                                <button className="btn cdp-btn-outline-primary" onClick={() => setShowDelete(false)}>Cancel</button>
+                                <button className="ml-2 btn cdp-btn-secondary text-white" onClick={() => deleteItem()}>Confirm</button>
+                            </Modal.Footer>
                         </Modal>
 
                         {consentId && <ConsentComponent consentId={consentId} setConsentId={setConsentId} />}
