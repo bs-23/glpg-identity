@@ -172,7 +172,7 @@ const CountryConsents = () => {
                                                                             }
 
                                                                         >
-                                                                            <span className="badge badge-primary-light font-weight-bold-light mr-1 text-uppercase text-white">{translation.locale}</span>
+                                                                            <span className="badge badge-secondary-light shadow-sm font-weight-bold-light mr-1 text-uppercase text-dark">{translation.locale}</span>
                                                                         </OverlayTrigger>
                                                                     ))}</td>
                                                                 <td>{consent.opt_type}</td>
