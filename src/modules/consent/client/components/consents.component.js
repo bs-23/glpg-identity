@@ -2,18 +2,41 @@ import React, { useEffect, useState } from "react";
 import { NavLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import Dropdown from 'react-bootstrap/Dropdown';
-import { getCdpConsents } from '../consent.actions';
+import Modal from 'react-bootstrap/Modal'
+import { getCdpConsents, deleteConsent } from '../consent.actions';
 import ConsentComponent from './consent.component';
 
 const ConsentsComponent = () => {
     const dispatch = useDispatch();
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
-
     const [consentId, setConsentId] = useState(null);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [consentToDelete, setConsentToDelete] = useState(null);
 
     const showConsentDetails = (row) => {
         setConsentId(row.id);
     };
+
+    const toggleDeleteConsentModal = (consent) => {
+        setConsentToDelete(consent);
+        setShowDeleteModal(!!consent);
+    };
+
+    const deleteItem = () => {
+        dispatch(deleteConsent(consentToDelete.id)).then(() => {
+            addToast('Consent deleted successfully', {
+                appearance: 'success',
+                autoDismiss: true
+            });
+        }).catch(error => {
+            addToast(error.response.data, {
+                appearance: 'error',
+                autoDismiss: true
+            });
+        }).finally(function () {
+            toggleDeleteConsentModal(null);
+        });
+    }
 
     useEffect(() => {
         dispatch(getCdpConsents(true, true));
@@ -50,7 +73,7 @@ const ConsentsComponent = () => {
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
                                             <th>Title</th>
-                                            <th>Available Translations</th>
+                                            <th>Available Localizations</th>
                                             <th>Consent Type</th>
                                             <th>Preference</th>
                                             <th>Status</th>
@@ -75,6 +98,7 @@ const ConsentsComponent = () => {
                                                     <Dropdown.Menu>
                                                         <Dropdown.Item>Edit Consent</Dropdown.Item>
                                                         <Dropdown.Item onClick={() => showConsentDetails(row)}>Consent Detail</Dropdown.Item>
+                                                        <Dropdown.Item onClick={() => toggleDeleteConsentModal(row)}>Delete</Dropdown.Item>
                                                     </Dropdown.Menu>
                                                 </Dropdown></td>
                                             </tr>
@@ -88,6 +112,26 @@ const ConsentsComponent = () => {
             </div>
 
             {consentId && <ConsentComponent consentId={consentId} setConsentId={setConsentId} />}
+
+            <Modal show={showDeleteModal} onHide={() => toggleDeleteConsentModal(null)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Delete Consent</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {consentToDelete ? (
+                        <div>
+                            Are you sure to delete the following consent?
+                            <div className="card mt-2 mb-3">
+                                <div className="card-body">
+                                    {consentToDelete.title}
+                                </div>
+                            </div>
+                        </div>
+                    ) : null}
+                    <button onClick={() => toggleDeleteConsentModal(null)}>Cancel</button>
+                    <button className="ml-2" onClick={() => deleteItem()}>Confirm</button>
+                </Modal.Body>
+            </Modal>
         </main>
     );
 }

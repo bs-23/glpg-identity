@@ -120,3 +120,14 @@ export function setConsent(consent) {
         payload: consent
     };
 }
+
+export function deleteConsent(id) {
+    const url = `/api/cdp-consents/${id}`;
+    return {
+        type: Types.DELETE_CONSENT,
+        payload: axios({
+            method: 'delete',
+            url
+        })
+    };
+}

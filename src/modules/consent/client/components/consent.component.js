@@ -97,7 +97,7 @@ const ConsentComponent = ({ consentId, setConsentId }) => {
 
                     <div className="row mt-1">
                         <div className="col accordion-consent rounded shadow-sm p-0">
-                            <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Available Translations</h4>
+                            <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Available Localizations</h4>
                             {consent.translations && consent.translations.length > 0 ? consent.translations.map((translation, index) => (
                                 <Accordion defaultActiveKey="0" key={index}>
                                     <Card>

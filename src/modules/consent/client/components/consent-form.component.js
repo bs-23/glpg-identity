@@ -134,7 +134,7 @@ const ConsentForm = () => {
                             <ol className="breadcrumb rounded-0">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/consent/">Data Privacy & Consent Management</NavLink></li>
-                                <li className="breadcrumb-item"><NavLink to="/consent/list">CDP Consents List</NavLink></li>
+                                <li className="breadcrumb-item"><NavLink to="/consent/list">CDP Consents</NavLink></li>
                                 <li className="breadcrumb-item active"><span>Add new Consent</span></li>
                             </ol>
                         </nav>
