@@ -78,7 +78,6 @@ const ConsentForm = () => {
                 if(language_name1.replace(/,/g, '') < language_name2.replace(/,/g, '')) return -1;
                 return 1;
             });
-            console.log(country_languages)
             setCountryLanguages(country_languages);
         }
 
@@ -125,7 +124,7 @@ const ConsentForm = () => {
                         <div className="col-12">
                             <div className="form-group">
                                 <label className="font-weight-bold" htmlFor={richTextId}> Rich Text </label>
-                                <Field className="form-control rich_text" value={item.rich_text} onChange={(e) => handleChange(e)} type='textarea' data-id={idx} name={richTextId} id={richTextId} />
+                                <Field className="form-control rich_text" row="6" value={item.rich_text} onChange={(e) => handleChange(e)} type='textarea' as='textarea' data-id={idx} name={richTextId} id={richTextId} />
                                 <div className="invalid-feedback"><ErrorMessage name={richTextId} /></div>
                             </div>
                         </div>
