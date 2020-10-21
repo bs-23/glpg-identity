@@ -179,7 +179,7 @@ const ConsentForm = () => {
 
                                             const validTranslations = translations.filter(item => item.locale && item.rich_text);
                                             if(!validTranslations.length) {
-                                                addToast('Must set at least one translation', {
+                                                addToast('Must provide at least one translation', {
                                                     appearance: 'error',
                                                     autoDismiss: true
                                                 });
