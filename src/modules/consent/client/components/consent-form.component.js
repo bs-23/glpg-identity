@@ -15,6 +15,7 @@ const ConsentForm = (props) => {
     const [consent, setConsent] = useState({});
     const [consentId, setConsentId] = useState();
     const [categories, setCategories] = useState([]);
+    const [preferences, setPreferences] = useState([]);
     const [userCountries, setUserCountries] = useState([]);
     const [countryLanguages, setCountryLanguages] = useState([]);
     const [isActive, setIsActive] = useState(true);
@@ -69,7 +70,10 @@ const ConsentForm = (props) => {
             const userProfile = (await axios.get('/api/users/profile')).data;
             setUserCountries(fetchUserCountries(userProfile.countries, response));
         }
-
+        async function getPreferences() {
+            const response = await axios.get('/api/privacy/consent-preferences');
+            setPreferences(response.data);
+        }
         function getLanguages() {
             const mapped_languages = {};
 
@@ -92,6 +96,7 @@ const ConsentForm = (props) => {
         if(id) getConsent();
         getConsentCatogories();
         getCountries();
+        getPreferences();
         getLanguages();
     }, [props]);
 
@@ -174,8 +179,7 @@ const ConsentForm = (props) => {
                                             initialValues={{
                                                 category_id: consentId && consent.consent_category ? consent.consent_category.id : categories[0].id,
                                                 legal_basis: consentId && consent ? consent.legal_basis : "consent",
-                                                // title: consentId && consent ? consent.title : "",
-                                                preference: consentId && consent ? consent.preference : "",
+                                                preference_id: consentId && consent ? consent.preference : "",
                                                 translations: consentId && consent ? consent.translations : [],
                                                 is_active: consentId && consent ? consent.is_active : isActive
                                             }}
@@ -237,28 +241,20 @@ const ConsentForm = (props) => {
                                                         <div className="col-12">
                                                             <div className="row">
 
-                                                                {/* <div className="col-12 col-sm-6">
-                                                                    <div className="form-group">
-                                                                        <label className="font-weight-bold" htmlFor="title"> Title <span className="text-danger">*</span></label>
-                                                                        {consentId && consent ? <Field className="form-control" type="name" name="title" value={consent.title}/> : <Field className="form-control" type="name" name="title"/>}
-                                                                        <div className="invalid-feedback"><ErrorMessage name="title" /></div>
-                                                                    </div>
-                                                                </div> */}
-
                                                                 <div className="col-12 col-sm-6">
                                                                     <div className="form-group">
-                                                                        <label className="font-weight-bold" htmlFor="preference"> Select Preference </label>
+                                                                        <label className="font-weight-bold" htmlFor="preference_id"> Select Preference </label>
                                                                         {
                                                                             consentId && consent ? (
-                                                                                <Field data-testid="preference" as="select" name="preference" className="form-control" value={consent.preference }>
-                                                                                    {['', 'Galapagos Terms of Use', 'Promotional email marketing'].map(item => <option key={item} value={item}>{item === '' ? 'Select Preference' : item}</option>)}
+                                                                                <Field data-testid="preference_id" as="select" name="preference_id" className="form-control" value={consent.preference }>
+                                                                                    {preferences.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
                                                                                 </Field>
                                                                             ):
-                                                                            (<Field data-testid="preference" as="select" name="preference" className="form-control">
-                                                                                    {['', 'Galapagos Terms of Use', 'Promotional email marketing'].map(item => <option key={item} value={item}>{item === '' ? 'Select Preference' : item}</option>)}
+                                                                            (<Field data-testid="preference_id" as="select" name="preference_id" className="form-control">
+                                                                                    {preferences.map(item => <option key={item.id}>{item.title}</option>)}
                                                                             </Field>)
                                                                         }
-                                                                        <div className="invalid-feedback"><ErrorMessage name="preference" /></div>
+                                                                        <div className="invalid-feedback"><ErrorMessage name="preference_id" /></div>
                                                                     </div>
                                                                 </div>
 
