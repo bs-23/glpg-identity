@@ -24,8 +24,7 @@ module.exports = app => {
 
     app.route('/api/cdp-consents/:id')
         .get(CDPAuthStrategy, controller.getCdpConsent)
-        .put(CDPAuthStrategy, controller.updateCdpConsent)
-        .delete(CDPAuthStrategy, controller.deleteCdpConsent);
+        .put(CDPAuthStrategy, controller.updateCdpConsent);
 
     app.route('/api/cdp-consents')
         .get(CDPAuthStrategy, controller.getCdpConsents)
@@ -39,14 +38,11 @@ module.exports = app => {
         .put(CDPAuthStrategy, controller.updateCountryConsent)
         .delete(CDPAuthStrategy, controller.deleteCountryConsent);
 
-    app.route('/api/consent/category')
-        .get(CDPAuthStrategy, controller.getConsentCatogories);
+    app.route('/api/privacy/consent-categories')
+        .get(CDPAuthStrategy, controller.getConsentCategories)
+        .post(CDPAuthStrategy, controller.createConsentCategory);
 
-    app.route('/api/privacy/consent-preferences')
-        .get(CDPAuthStrategy, controller.getConsentPreferences)
-        .post(CDPAuthStrategy, controller.createConsentPreference);
-
-    app.route('/api/privacy/consent-preferences/:id')
-        .get(CDPAuthStrategy, controller.getConsentPreference)
-        .put(CDPAuthStrategy, controller.updateConsentPreference);
+    app.route('/api/privacy/consent-categories/:id')
+        .get(CDPAuthStrategy, controller.getConsentCategory)
+        .put(CDPAuthStrategy, controller.updateConsentCategory);
 };

@@ -62,7 +62,7 @@ const ConsentForm = (props) => {
             setConsentId(id);
         }
         async function getConsentCatogories() {
-            const response = await axios.get('/api/consent/category');
+            const response = await axios.get('/api/privacy/consent-countries');
             setCategories(response.data);
         }
         async function getCountries() {

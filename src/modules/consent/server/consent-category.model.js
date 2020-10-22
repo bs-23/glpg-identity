@@ -3,6 +3,8 @@ const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
+const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+
 const ConsentCategory = sequelize.cdpConnector.define('consent_categories', {
     id: {
         allowNull: false,
@@ -11,13 +13,17 @@ const ConsentCategory = sequelize.cdpConnector.define('consent_categories', {
         defaultValue: DataTypes.UUIDV4
     },
     title: {
+        unique: true,
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING(50)
     },
-    type: {
+    slug: {
+        unique: true,
         allowNull: false,
-        type: DataTypes.ENUM,
-        values: ['dm', 'mc', 'general']
+        type: DataTypes.STRING,
+        set() {
+            this.setDataValue('slug', convertToSlug(this.title));
+        }
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
