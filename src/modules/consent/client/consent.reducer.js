@@ -77,14 +77,6 @@ export default function reducer(state = initialState, action) {
                 country_consents: [...state.country_consents, action.payload.data]
             }
         }
-
-        case Types.DELETE_CONSENT_FULFILLED: {
-            const id = action.payload.config.url.split("/api/cdp-consents/")[1];
-            return {
-                ...state,
-                cdp_consents: state.cdp_consents.filter(consent => consent.id !== id)
-            }
-        }
     }
     return state;
 }

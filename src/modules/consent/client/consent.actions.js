@@ -121,16 +121,6 @@ export function setConsent(consent) {
     };
 }
 
-export function deleteConsent(id) {
-    const url = `/api/cdp-consents/${id}`;
-    return {
-        type: Types.DELETE_CONSENT,
-        payload: axios({
-            method: 'delete',
-            url
-        })
-    };
-}
 export function createCountryConsent(data) {
     return {
         type: Types.CREATE_COUNTRY_CONSENT,

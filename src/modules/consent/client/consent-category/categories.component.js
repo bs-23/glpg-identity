@@ -75,8 +75,8 @@ const ConsentCategories = () => {
                                                 <td>{row.createdByUser ? `${row.createdByUser.first_name} ${row.createdByUser.last_name}` : ''}</td>
                                                 <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                 <td>
-                                                    <button className="btn btn-link cdp-text-primary p-0 mr-3" onClick={() => setConsentCategoryId(row.id)}>
-                                                        <i className="fas fa-tasks mr-1"></i>Edit
+                                                    <button className="btn cdp-btn-link-primary p-0 mr-3" onClick={() => setConsentCategoryId(row.id)}>
+                                                        <i className="fas fa-pen mr-2"></i>Edit
                                                     </button>
                                                 </td>
                                             </tr>
