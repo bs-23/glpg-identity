@@ -15,7 +15,6 @@ const ConsentForm = (props) => {
     const [consent, setConsent] = useState({});
     const [consentId, setConsentId] = useState();
     const [categories, setCategories] = useState([]);
-    const [preferences, setPreferences] = useState([]);
     const [userCountries, setUserCountries] = useState([]);
     const [countryLanguages, setCountryLanguages] = useState([]);
     const [isActive, setIsActive] = useState(true);
@@ -62,17 +61,13 @@ const ConsentForm = (props) => {
             setConsentId(id);
         }
         async function getConsentCatogories() {
-            const response = await axios.get('/api/privacy/consent-countries');
+            const response = await axios.get('/api/privacy/consent-categories');
             setCategories(response.data);
         }
         async function getCountries() {
             const response = (await axios.get('/api/countries')).data;
             const userProfile = (await axios.get('/api/users/profile')).data;
             setUserCountries(fetchUserCountries(userProfile.countries, response));
-        }
-        async function getPreferences() {
-            const response = await axios.get('/api/privacy/consent-preferences');
-            setPreferences(response.data);
         }
         function getLanguages() {
             const mapped_languages = {};
@@ -93,10 +88,10 @@ const ConsentForm = (props) => {
             });
             setCountryLanguages(country_languages);
         }
+
         if(id) getConsent();
         getConsentCatogories();
         getCountries();
-        getPreferences();
         getLanguages();
     }, [props]);
 
@@ -179,7 +174,7 @@ const ConsentForm = (props) => {
                                             initialValues={{
                                                 category_id: consentId && consent.consent_category ? consent.consent_category.id : categories[0].id,
                                                 legal_basis: consentId && consent ? consent.legal_basis : "consent",
-                                                preference_id: consentId && consent ? consent.preference : "",
+                                                preference: consentId && consent ? consent.preference : "",
                                                 translations: consentId && consent ? consent.translations : [],
                                                 is_active: consentId && consent ? consent.is_active : isActive
                                             }}
@@ -241,20 +236,11 @@ const ConsentForm = (props) => {
                                                         <div className="col-12">
                                                             <div className="row">
 
-                                                                <div className="col-12 col-sm-6">
+                                                                <div className="col-12">
                                                                     <div className="form-group">
-                                                                        <label className="font-weight-bold" htmlFor="preference_id"> Select Preference </label>
-                                                                        {
-                                                                            consentId && consent ? (
-                                                                                <Field data-testid="preference_id" as="select" name="preference_id" className="form-control" value={consent.preference }>
-                                                                                    {preferences.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
-                                                                                </Field>
-                                                                            ):
-                                                                            (<Field data-testid="preference_id" as="select" name="preference_id" className="form-control">
-                                                                                    {preferences.map(item => <option key={item.id}>{item.title}</option>)}
-                                                                            </Field>)
-                                                                        }
-                                                                        <div className="invalid-feedback"><ErrorMessage name="preference_id" /></div>
+                                                                        <label className="font-weight-bold" htmlFor='preference'> Preference <span className="text-danger">*</span></label>
+                                                                        <Field className="form-control rich_text" type='text' name='preference' id='preference' />
+                                                                        <div className="invalid-feedback"><ErrorMessage name='preference' /></div>
                                                                     </div>
                                                                 </div>
 
