@@ -594,47 +594,40 @@ async function getCdpConsent(req, res) {
 
 async function createConsent(req, res) {
     try {
-        let { category_id, title, legal_basis, is_active, preference, translations } = req.body;
+        let { preference_id, category_id, legal_basis, is_active, translations } = req.body;
 
-        if (!category_id || !title || !legal_basis) {
+        if (!preference_id || !category_id || !legal_basis) {
             return res.status(400).send('Invalid request.');
         }
 
         if (!translations || !translations.length) {
-            return res.status(400).send('Must provide at least one translation.');
+            return res.status(400).send('Please provide at least one translation.');
         }
 
         is_active = !!is_active;
 
-        if (preference && preference.length) {
-            const preferences = ['Galapagos Terms of Use', 'Promotional email marketing'];
-            if (!preferences.includes(preference)) return res.status(400).send('Invalid Preference.');
-        }
+        const preference = await ConsentPreference.findOne({ where: { id: preference_id } });
+        if (!preference) return res.status(400).send('Invalid Preference');
 
         const consentCategory = await ConsentCategory.findOne({ where: { id: category_id } });
-
-        if (!consentCategory) {
-            return res.status(400).send('Invalid Consent Category Id.');
-        }
+        if (!consentCategory) return res.status(400).send('Invalid Consent Category');
 
         const [consent, created] = await Consent.findOrCreate({
             where: {
-                title
+                preference_id
             },
             defaults: {
+                preference_id,
                 category_id,
-                title,
-                slug: title,
                 legal_basis,
                 is_active,
-                preference,
                 created_by: req.user.id
             },
             attributes: { exclude: ['created_at', 'updated_at'] }
         });
 
         if (!created && consent) {
-            return res.status(400).send('Consent with same Title already exists.');
+            return res.status(400).send('Consent with same Preference already exists.');
         }
 
         const data = { ...consent.dataValues };
