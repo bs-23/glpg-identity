@@ -540,9 +540,7 @@ async function getCdpConsent(req, res) {
             attributes: { exclude: ['category_id'] }
         });
 
-        if (!consent) {
-            res.status(404).send('Consent not found');
-        }
+        if (!consent) return res.status(404).send('Consent not found');
 
         const { consent_country, ...otherProps } = consent.dataValues;
         const data = { ...otherProps, countries: consent_country };
