@@ -37,7 +37,7 @@ const CountryConsents = () => {
                 if (existing) {
                     existing.consents.push({
                         ...current.consent,
-                        opt_type: optType.text,
+                        optType,
                         country_consent_id: current.id,
                         country_iso2: current.country_iso2
                     });
@@ -49,7 +49,7 @@ const CountryConsents = () => {
                         flagUrl: `/assets/flag/flag-${country.codbase_desc.replace(' ', '-').toLowerCase()}.svg`,
                         consents: [{
                             ...current.consent,
-                            opt_type: optType.text,
+                            optType,
                             country_consent_id: current.id,
                             country_iso2: current.country_iso2
                         }]
@@ -174,7 +174,7 @@ const CountryConsents = () => {
                                                                             <span className="badge badge-secondary-light shadow-sm font-weight-bold-light mr-1 text-dark">{translation.locale}</span>
                                                                         </OverlayTrigger>
                                                                     ))}</td>
-                                                                <td>{consent.opt_type}</td>
+                                                                <td>{consent.optType.text}</td>
                                                                 <td>
                                                                     <button className="btn btn-link cdp-text-primary p-0 mr-3" onClick={() => setEdit(consent)}><i className="fas fa-tasks mr-1"></i>Manage opt type</button> <button onClick={() => setDeleteModal(consent.country_consent_id, consent.title, countryConsent.name)} className="btn btn-link text-danger p-0"><i className="far fa-trash-alt mr-1"></i>Remove</button>
                                                                 </td>
