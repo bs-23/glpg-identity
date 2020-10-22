@@ -93,7 +93,9 @@ const ConsentsComponent = () => {
                                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu>
-                                                        <Dropdown.Item>Edit Consent</Dropdown.Item>
+                                                        <Dropdown.Item>
+                                                            <NavLink to={`/consent/edit/${row.id}`}>Edit Consent</NavLink>
+                                                        </Dropdown.Item>
                                                         <Dropdown.Item onClick={() => showConsentDetails(row)}>Consent Detail</Dropdown.Item>
                                                     </Dropdown.Menu>
                                                 </Dropdown></td>

@@ -3,15 +3,17 @@ import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useDispatch } from "react-redux";
 import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
-import { createConsent } from '../consent.actions';
+import { createConsent, updateConsent } from '../consent.actions';
 import { useToasts } from "react-toast-notifications";
 import CountryCodes from 'country-codes-list';
 import { consentSchema } from '../consent.schema';
 
-const ConsentForm = () => {
+const ConsentForm = (props) => {
     const CountryCodesObject = Object.values(CountryCodes.customList('countryCode', '{countryCode} {officialLanguageCode} {officialLanguageNameEn}'));
     const { addToast } = useToasts();
     const dispatch = useDispatch();
+    const [consent, setConsent] = useState({});
+    const [consentId, setConsentId] = useState();
     const [categories, setCategories] = useState([]);
     const [userCountries, setUserCountries] = useState([]);
     const [countryLanguages, setCountryLanguages] = useState([]);
@@ -23,17 +25,15 @@ const ConsentForm = () => {
         const field = e.target.className.split(' ');
         const translation = newTranslations[e.target.dataset.id];
         translation[field[1]] = e.target.value;
-        if(field[1] === 'country_iso2' || field[1] === 'lang_code') translation['locale'] = `${translation['country_iso2']}_${translation['lang_code']}`;
+        // if(field[1] === 'country_iso2' || field[1] === 'lang_code') translation['locale'] = `${translation['country_iso2']}_${translation['lang_code']}`;
         setTranslations(newTranslations);
     }
 
     const addNewTranslation = () => {
         const [, lang_code, ] = countryLanguages[0].split(' ');
         const init_lang_code = lang_code.toLowerCase();
-
         const init_country_iso2 = userCountries[0].country_iso2.toLowerCase();
-
-        const newTranslations = [...translations, { country_iso2: init_country_iso2, lang_code: init_lang_code , rich_text: '', locale: `${init_country_iso2}_${init_lang_code}` }];
+        const newTranslations = [...translations, { country_iso2: init_country_iso2, lang_code: init_lang_code , rich_text: '' }];
         setTranslations(newTranslations);
     }
 
@@ -51,8 +51,17 @@ const ConsentForm = () => {
     }
 
     useEffect(() => {
+        const { id } = props ? props.match ? props.match.params : '' : '';
+
+        async function getConsent() {
+            const response = await axios.get(`/api/cdp-consents/${id}`);
+            setConsent(response.data);
+            setTranslations(response.data.translations.map(i => ({...i, country_iso2: i.locale.split('_')[0], lang_code: i.locale.split('_')[1] })));
+            setIsActive(response.data.is_active);
+            setConsentId(id);
+        }
         async function getConsentCatogories() {
-            const response = await axios.get('/api/privacy/consent-countries');
+            const response = await axios.get('/api/privacy/consent-categories');
             setCategories(response.data);
         }
         async function getCountries() {
@@ -60,7 +69,6 @@ const ConsentForm = () => {
             const userProfile = (await axios.get('/api/users/profile')).data;
             setUserCountries(fetchUserCountries(userProfile.countries, response));
         }
-
         function getLanguages() {
             const mapped_languages = {};
 
@@ -81,10 +89,11 @@ const ConsentForm = () => {
             setCountryLanguages(country_languages);
         }
 
+        if(id) getConsent();
         getConsentCatogories();
         getCountries();
         getLanguages();
-    }, []);
+    }, [props]);
 
     const getTranslations = () => {
         return translations.map((item, idx) => {
@@ -163,19 +172,19 @@ const ConsentForm = () => {
                                     <div className="add-user p-3">
                                         <Formik
                                             initialValues={{
-                                                category_id: categories[0].id,
-                                                legal_basis: "consent",
-                                                title: "",
-                                                preference: "",
-                                                translations: [],
-                                                is_active: isActive
+                                                category_id: consentId && consent.consent_category ? consent.consent_category.id : categories[0].id,
+                                                legal_basis: consentId && consent ? consent.legal_basis : "consent",
+                                                preference: consentId && consent ? consent.preference : "",
+                                                translations: consentId && consent ? consent.translations : [],
+                                                is_active: consentId && consent ? consent.is_active : isActive
                                             }}
                                             displayName="ConsentForm"
                                             validationSchema={consentSchema}
                                             onSubmit={(values, actions) => {
                                                 values.translations = translations;
-                                                const validTranslations = translations.filter(item => item.locale && item.rich_text);
+                                                console.log(values)
 
+                                                const validTranslations = translations.filter(item => item.country_iso2 && item.lang_code && item.rich_text);
                                                 if (!validTranslations.length) {
                                                     addToast('Please provide at least one translation', {
                                                         appearance: 'error',
@@ -185,23 +194,40 @@ const ConsentForm = () => {
                                                     return;
                                                 }
 
-                                                dispatch(createConsent(values))
-                                                    .then(res => {
-                                                        resetForm();
-                                                        actions.resetForm();
-                                                        addToast('Consent created successfully', {
-                                                            appearance: 'success',
-                                                            autoDismiss: true
+                                                if(consentId){
+                                                    dispatch(updateConsent(values, consentId))
+                                                        .then(res => {
+                                                            addToast('Consent updated successfully', {
+                                                                appearance: 'success',
+                                                                autoDismiss: true
+                                                            });
+                                                        }).catch(err => {
+                                                            const errorMessage = typeof err.response.data === 'string' ? err.response.data : err.response.statusText
+                                                            addToast(errorMessage, {
+                                                                appearance: 'error',
+                                                                autoDismiss: true
+                                                            });
                                                         });
-                                                    }).catch(err => {
-                                                        const errorMessage = typeof err.response.data === 'string' ? err.response.data : err.response.statusText
-                                                        addToast(errorMessage, {
-                                                            appearance: 'error',
-                                                            autoDismiss: true
+                                                    actions.setSubmitting(false);
+                                                }
+                                                else{
+                                                    dispatch(createConsent(values))
+                                                        .then(res => {
+                                                            resetForm();
+                                                            actions.resetForm();
+                                                            addToast('Consent created successfully', {
+                                                                appearance: 'success',
+                                                                autoDismiss: true
+                                                            });
+                                                        }).catch(err => {
+                                                            const errorMessage = typeof err.response.data === 'string' ? err.response.data : err.response.statusText
+                                                            addToast(errorMessage, {
+                                                                appearance: 'error',
+                                                                autoDismiss: true
+                                                            });
                                                         });
-                                                    });
-
-                                                actions.setSubmitting(false);
+                                                    actions.setSubmitting(false);
+                                                }
                                             }}
                                         >
                                             {formikProps => (
@@ -210,38 +236,26 @@ const ConsentForm = () => {
                                                         <div className="col-12">
                                                             <div className="row">
 
-                                                                <div className="col-12 col-sm-6">
+                                                                <div className="col-12">
                                                                     <div className="form-group">
-                                                                        <label className="font-weight-bold" htmlFor="title"> Title <span className="text-danger">*</span></label>
-                                                                        <Field className="form-control" type="name" name="title" />
-                                                                        <div className="invalid-feedback"><ErrorMessage name="title" /></div>
-                                                                    </div>
-                                                                </div>
-
-                                                                {/* <div className="col-12 col-sm-6">
-                                                                <div className="form-group">
-                                                                    <label className="font-weight-bold" htmlFor="preference"> Preference <span className="text-danger">*</span></label>
-                                                                    <Field className="form-control" type="preference" name="preference" />
-                                                                    <div className="invalid-feedback"><ErrorMessage name="preference" /></div>
-                                                                </div>
-                                                            </div> */}
-
-                                                                <div className="col-12 col-sm-6">
-                                                                    <div className="form-group">
-                                                                        <label className="font-weight-bold" htmlFor="preference"> Select Preference </label>
-                                                                        <Field data-testid="preference" as="select" name="preference" className="form-control">
-                                                                            {['', 'Galapagos Terms of Use', 'Promotional email marketing'].map(item => <option key={item} value={item}>{item === '' ? 'Select Preference' : item}</option>)}
-                                                                        </Field>
-                                                                        <div className="invalid-feedback"><ErrorMessage name="preference" /></div>
+                                                                        <label className="font-weight-bold" htmlFor='preference'> Preference <span className="text-danger">*</span></label>
+                                                                        <Field className="form-control rich_text" type='text' name='preference' id='preference' />
+                                                                        <div className="invalid-feedback"><ErrorMessage name='preference' /></div>
                                                                     </div>
                                                                 </div>
 
                                                                 <div className="col-12 col-sm-6">
                                                                     <div className="form-group">
                                                                         <label className="font-weight-bold" htmlFor="category_id">Select Category <span className="text-danger">*</span></label>
-                                                                        <Field data-testid="category" as="select" name="category_id" className="form-control">
-                                                                            {categories.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
-                                                                        </Field>
+                                                                        {
+                                                                            consentId && consent ? 
+                                                                            (<Field data-testid="category" as="select" name="category_id" className="form-control" value={consent.consent_category.id}>
+                                                                                {categories.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
+                                                                            </Field>) : 
+                                                                            (<Field data-testid="category" as="select" name="category_id" className="form-control">
+                                                                                {categories.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
+                                                                            </Field>)
+                                                                        }
                                                                         <div className="invalid-feedback"><ErrorMessage name="category_id" /></div>
                                                                     </div>
                                                                 </div>
@@ -249,9 +263,15 @@ const ConsentForm = () => {
                                                                 <div className="col-12 col-sm-6">
                                                                     <div className="form-group">
                                                                         <label className="font-weight-bold" htmlFor="category_id">Select Legal Basis <span className="text-danger">*</span></label>
-                                                                        <Field data-testid="legal_basis" as="select" name="legal_basis" className="form-control text-capitalize">
-                                                                            {['consent', 'contract'].map(item => <option key={item} value={item}>{item}</option>)}
-                                                                        </Field>
+                                                                        {
+                                                                            consentId && consent ? 
+                                                                            (<Field data-testid="legal_basis" as="select" name="legal_basis" className="form-control text-capitalize" value={consent.legal_basis}>
+                                                                                {['consent', 'contract'].map(item => <option key={item} value={item}>{item}</option>)}
+                                                                            </Field>) : 
+                                                                            (<Field data-testid="legal_basis" as="select" name="legal_basis" className="form-control text-capitalize">
+                                                                                {['consent', 'contract'].map(item => <option key={item} value={item}>{item}</option>)}
+                                                                            </Field>)
+                                                                        }
                                                                         <div className="invalid-feedback"><ErrorMessage name="legal_basis" /></div>
                                                                     </div>
                                                                 </div>
@@ -259,7 +279,7 @@ const ConsentForm = () => {
                                                                 <div className="col-12 col-sm-6 py-3">
                                                                     <div className="form-group">
                                                                         <label className="d-flex justify-content-between align-items-center">
-                                                                            <span className="switch-label font-weight-bold"> Status </span>
+                                                                            <span className="switch-label font-weight-bold"> Active Status </span>
                                                                             <span className="switch">
                                                                                 <input
                                                                                     name="is_active"
