@@ -206,7 +206,8 @@ async function init() {
                     preference: 'Galapagos Terms of Use',
                     slug: '',
                     is_active: true,
-                    created_by: admin.id
+                    created_by: admin.id,
+                    updated_by: admin.id
                 },
                 {
                     id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
@@ -215,7 +216,8 @@ async function init() {
                     preference: 'Galapagos E-Mail Newsletter',
                     slug: '',
                     is_active: true,
-                    created_by: admin.id
+                    created_by: admin.id,
+                    updated_by: admin.id
                 },
                 {
                     id: '2b9fa7f9-2c1e-4621-a091-5e4bf539b875',
@@ -224,7 +226,8 @@ async function init() {
                     preference: 'Sharing Personal Data With 3rd Parties',
                     slug: '',
                     is_active: true,
-                    created_by: admin.id
+                    created_by: admin.id,
+                    updated_by: admin.id
                 }
             ];
 
