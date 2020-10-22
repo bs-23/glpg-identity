@@ -6,6 +6,9 @@ import Modal from 'react-bootstrap/Modal';
 import { useToasts } from 'react-toast-notifications';
 import { getCdpConsents } from '../consent.actions';
 import ConsentComponent from './consent.component';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Popover from 'react-bootstrap/Popover';
+import parse from 'html-react-parser';
 
 const ConsentsComponent = () => {
     const { addToast } = useToasts();
@@ -64,7 +67,24 @@ const ConsentsComponent = () => {
                                         {cdp_consents.map((row, index) => (
                                             <tr key={index}>
                                                 <td>{row.preference}</td>
-                                                <td>{row.locales}</td>
+                                                <td>
+                                                    {row.translations && row.translations.length > 0 && row.translations.map(translation => (
+                                                        <OverlayTrigger key={translation.id}
+                                                            placement="top"
+                                                            delay={{ show: 250, hide: 400 }}
+                                                            overlay={
+                                                                <Popover className="popup-customize" id={`popover-positioned-top`}>
+                                                                    <Popover.Content className="popup-customize__content">
+                                                                        <div>{parse(translation.rich_text)}</div>
+                                                                    </Popover.Content>
+                                                                </Popover>
+                                                            }
+
+                                                        >
+                                                            <span className="badge badge-secondary-light shadow-sm font-weight-bold-light mr-1 text-dark">{translation.locale}</span>
+                                                        </OverlayTrigger>
+                                                    ))}
+                                                </td>
                                                 <td>{row.consent_category ? row.consent_category.title : ''}</td>
                                                 <td>{row.is_active ? 'Active' : 'Inactive'}</td>
                                                 <td>{row.createdByUser ? `${row.createdByUser.first_name} ${row.createdByUser.last_name}` : ''}</td>
