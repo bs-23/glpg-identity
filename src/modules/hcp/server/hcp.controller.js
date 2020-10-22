@@ -13,7 +13,6 @@ const logService = require(path.join(process.cwd(), 'src/modules/core/server/aud
 const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
 const ConsentLocale = require(path.join(process.cwd(), 'src/modules/consent/server/consent-locale.model'));
 const ConsentCountry = require(path.join(process.cwd(), 'src/modules/consent/server/consent-country.model'));
-const ConsentPreference = require(path.join(process.cwd(), 'src/modules/consent/server/consent-preference.model'));
 const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
@@ -500,8 +499,7 @@ async function createHcpProfile(req, res) {
 
                 if (!consentResponse) return;
 
-                const consentPreference = await ConsentPreference.findOne({ where: { slug: preferenceSlug } });
-                const consentDetails = await Consent.findOne({ where: { preference_id: consentPreference.id } });
+                const consentDetails = await Consent.findOne({ where: { slug: preferenceSlug } });
 
                 if (!consentDetails) return;
 
@@ -766,13 +764,7 @@ async function getHCPUserConsents(req, res) {
         const userConsentDetails = await ConsentLocale.findAll({
             include: {
                 model: Consent,
-                as: 'consent',
-                //attributes: ['title'],
-                include: {
-                    model: ConsentPreference,
-                    as: 'consent_preference',
-                    attributes: ['title']
-                }
+                as: 'consent'
             }, where: {
                 consent_id: userConsents.map(consent => consent.consent_id),
                 locale: {
@@ -786,8 +778,8 @@ async function getHCPUserConsents(req, res) {
         const consentResponse = userConsentDetails.map(({
             consent_id: id,
             rich_text,
-            consent: { consent_preference: { title } }
-        }) => ({ id, title, rich_text: validator.unescape(rich_text) }));
+            consent: { preference }
+        }) => ({ id, preference, rich_text: validator.unescape(rich_text) }));
 
         response.data = consentResponse.map(conRes => {
             const matchedConsent = userConsents.find(consent => consent.consent_id === conRes.id);

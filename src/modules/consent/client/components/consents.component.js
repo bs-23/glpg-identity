@@ -86,7 +86,7 @@ const ConsentsComponent = () => {
                                     <tbody className="cdp-table__body bg-white">
                                         {cdp_consents.map((row, index) => (
                                             <tr key={index}>
-                                                <td>{row.consent_preference.title}</td>
+                                                <td>{row.preference}</td>
                                                 <td>{row.locales}</td>
                                                 <td>{row.consent_category ? row.consent_category.title : ''}</td>
                                                 <td>{row.is_active ? 'Active' : 'Inactive'}</td>
