@@ -670,7 +670,7 @@ async function createConsent(req, res) {
 
 async function updateCdpConsent(req, res) {
     try {
-        const { category_id, title, legal_basis, is_active, preference, translations } = req.body;
+        const { preference_id, category_id, legal_basis, is_active, translations } = req.body;
 
         const id = req.params.id;
         if (!id) {
@@ -679,36 +679,27 @@ async function updateCdpConsent(req, res) {
 
         if (category_id) {
             const consentCategory = await ConsentCategory.findOne({ where: { id: category_id } });
-            if (!consentCategory) {
-                return res.status(400).send('Invalid Consent Category Id.');
-            }
+            if (!consentCategory) return res.status(400).send('Invalid Consent Category');
         }
 
-        if (title) {
-            const consentWithSameTitle = await Consent.findOne({
+        if (preference_id) {
+            const consentWithSamePreference = await Consent.findOne({
                 where: {
-                    title: title,
+                    preference_id,
                     id: { [Op.ne]: id }
                 }
             });
-            if (consentWithSameTitle) {
-                return res.status(400).send('Another Consent with same Title exists.');
-            }
+            if (consentWithSamePreference) return res.status(400).send('Another Consent with same Preference exists.');
         }
 
         const consent = await Consent.findOne({ where: { id: id } });
-
-        if (!consent) {
-            return res.status(404).send('Consent not found.');
-        }
+        if (!consent) return res.status(404).send('Consent not found.');
 
         await consent.update({
+            preference_id,
             category_id,
-            title,
-            slug: title,
             legal_basis,
-            is_active,
-            preference
+            is_active
         });
 
         await ConsentLanguage.destroy({ where: { consent_id: consent.id } });
@@ -827,7 +818,7 @@ async function assignConsentToCountry(req, res) {
         });
 
         if (existingCountryConsent) {
-            return res.status(400).send('Country-Consent association already exists');
+            return res.status(400).send('This Consent is already added for the selected Country');
         }
 
         const consent = await Consent.findOne({ where: { id: consent_id } });
