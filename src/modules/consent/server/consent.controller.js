@@ -866,12 +866,10 @@ async function createConsentCategory(req, res) {
             }
         });
 
-        const { first_name, last_name, id } = await data.getCreatedByUser();
-
         data.dataValues.createdByUser = {
-            first_name,
-            last_name,
-            id
+            first_name: req.user.first_name,
+            last_name: req.user.last_name,
+            id: req.user.id
         }
 
         if (!created && data) {

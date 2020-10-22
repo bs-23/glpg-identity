@@ -16,6 +16,12 @@ const CountryConsentForm = (props) => {
         setShow(false);
         props.changeShow(false);
     };
+    const showToast = (msg, type) => {
+        addToast(msg, {
+            appearance: type,
+            autoDismiss: true
+        });
+    };
 
     useEffect(() => {
         if (props.countries && props.editable) {
@@ -43,17 +49,10 @@ const CountryConsentForm = (props) => {
                             if (!props.editable) {
                                 dispatch(createCountryConsent(values)).then(() => {
                                     actions.resetForm();
-                                    addToast('Consent assigned successfully', {
-                                        appearance: 'success',
-                                        autoDismiss: true
-                                    });
+                                    showToast('Consent assigned successfully', 'success');
                                     handleClose();
-
                                 }).catch(error => {
-                                    addToast(error.response.data, {
-                                        appearance: 'error',
-                                        autoDismiss: true
-                                    });
+                                    showToast(error.response.data, 'error');
                                 }).finally(function () {
                                     actions.setSubmitting(false);
 
@@ -61,16 +60,10 @@ const CountryConsentForm = (props) => {
                             } else {
                                 dispatch(updateCountryConsent(props.options.country_consent_id, { opt_type: values.opt_type })).then(() => {
                                     actions.resetForm();
-                                    addToast('Opt in changed successfully', {
-                                        appearance: 'success',
-                                        autoDismiss: true
-                                    });
+                                    showToast('Opt in changed successfully', 'success');
                                     handleClose();
                                 }).catch(error => {
-                                    addToast(error.response.data, {
-                                        appearance: 'error',
-                                        autoDismiss: true
-                                    });
+                                    showToast(error.response.data, 'error');
                                 }).finally(function () {
                                     actions.setSubmitting(false);
                                 });
