@@ -34,7 +34,7 @@ const CountryConsentForm = (props) => {
                         initialValues={{
                             consent_id: props.consents[0].id,
                             country_iso2: props.editable ? country.country_iso2 : props.countries[0].country_iso2,
-                            opt_type: optTypes[0].value
+                            opt_type: props.editable && props.options.optType ?  props.options.optType.value : optTypes[0].value
                         }}
                         displayName="ConsentForm"
                         onSubmit={(values, actions) => {
