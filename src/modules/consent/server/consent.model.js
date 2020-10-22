@@ -48,6 +48,9 @@ const Consent = sequelize.cdpConnector.define('consents', {
     },
     created_by: {
         type: DataTypes.UUID
+    },
+    updated_by: {
+        type: DataTypes.UUID
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
@@ -66,5 +69,6 @@ Consent.belongsTo(ConsentCategory, {
 });
 
 Consent.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by'});
+Consent.belongsTo(User, { as: 'updatedByUser', foreignKey: 'updated_by'});
 
 module.exports = Consent;

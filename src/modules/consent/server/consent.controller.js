@@ -479,6 +479,11 @@ async function getCdpConsents(req, res) {
                 model: User,
                 as: 'createdByUser',
                 attributes: ['id', 'first_name', 'last_name']
+            },
+            {
+                model: User,
+                as: 'updatedByUser',
+                attributes: ['id', 'first_name', 'last_name']
             }
         ];
 
@@ -492,7 +497,7 @@ async function getCdpConsents(req, res) {
 
         const consents = await Consent.findAll({
             include: inclusions,
-            attributes: { exclude: ['category_id', 'created_by'] }
+            attributes: { exclude: ['category_id', 'created_by', 'updated_by'] }
         });
 
         translations === 'true' && await Promise.all(consents.map(async consent => {
@@ -528,6 +533,11 @@ async function getCdpConsent(req, res) {
                     attributes: ['id', 'first_name', 'last_name']
                 },
                 {
+                    model: User,
+                    as: 'updatedByUser',
+                    attributes: ['id', 'first_name', 'last_name']
+                },
+                {
                     model: ConsentCategory,
                     as: 'consent_category',
                     attributes: ['id', 'title', 'slug']
@@ -537,12 +547,10 @@ async function getCdpConsent(req, res) {
                     as: 'consent_country'
                 }
             ],
-            attributes: { exclude: ['category_id'] }
+            attributes: { exclude: ['category_id', 'created_by', 'updated_by'] }
         });
 
-        if (!consent) {
-            res.status(404).send('Consent not found');
-        }
+        if (!consent) return res.status(404).send('Consent not found');
 
         const { consent_country, ...otherProps } = consent.dataValues;
         const data = { ...otherProps, countries: consent_country };
@@ -587,7 +595,8 @@ async function createConsent(req, res) {
                 category_id,
                 legal_basis,
                 is_active,
-                created_by: req.user.id
+                created_by: req.user.id,
+                updated_by: req.user.id
             },
             attributes: { exclude: ['created_at', 'updated_at'] }
         });
@@ -649,7 +658,7 @@ async function updateCdpConsent(req, res) {
 
         const consentCategory = await ConsentCategory.findOne({ where: { id: category_id } });
         if (!consentCategory) return res.status(400).send('Invalid Consent Category');
-        
+
         const consentWithSamePreference = await Consent.findOne({
             where: {
                 preference,
@@ -666,7 +675,8 @@ async function updateCdpConsent(req, res) {
             slug: preference,
             category_id,
             legal_basis,
-            is_active
+            is_active,
+            updated_by: req.user.id
         });
 
         await ConsentLanguage.destroy({ where: { consent_id: consent.id } });
@@ -856,12 +866,10 @@ async function createConsentCategory(req, res) {
             }
         });
 
-        const { first_name, last_name, id } = await data.getCreatedByUser();
-
         data.dataValues.createdByUser = {
-            first_name,
-            last_name,
-            id
+            first_name: req.user.first_name,
+            last_name: req.user.last_name,
+            id: req.user.id
         }
 
         if (!created && data) {

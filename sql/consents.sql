@@ -8,6 +8,7 @@ CREATE TABLE ciam.consents
     title character varying(255) COLLATE pg_catalog."default" NOT NULL,
     slug character varying(255) COLLATE pg_catalog."default" NOT NULL,
     created_by uuid NOT NULL,
+    updated_by uuid NOT NULL,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
     CONSTRAINT consents_pkey PRIMARY KEY (id),

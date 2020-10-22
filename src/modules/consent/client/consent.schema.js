@@ -10,3 +10,14 @@ export const consentSchema = object().shape({
         .required('This field must not be empty.'),
     is_active: boolean(),
 });
+
+
+export const countryConsentSchema = object().shape({
+    consent_id: string()
+        .required('This field must not be empty.'),
+    country_iso2: string()
+        .required('This field must not be empty.'),
+    opt_type: string()
+        .required('This field must not be empty.')
+});
+
