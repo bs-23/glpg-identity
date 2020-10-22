@@ -663,7 +663,7 @@ async function updateCdpConsent(req, res) {
 
         await consent.update({
             preference,
-            // slug: preference,
+            slug: preference,
             category_id,
             legal_basis,
             is_active
