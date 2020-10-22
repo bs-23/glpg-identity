@@ -279,7 +279,7 @@ const ConsentForm = (props) => {
                                                                 <div className="col-12 col-sm-6 py-3">
                                                                     <div className="form-group">
                                                                         <label className="d-flex justify-content-between align-items-center">
-                                                                            <span className="switch-label font-weight-bold"> Status </span>
+                                                                            <span className="switch-label font-weight-bold"> Active Status </span>
                                                                             <span className="switch">
                                                                                 <input
                                                                                     name="is_active"
