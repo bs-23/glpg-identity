@@ -174,7 +174,7 @@ const ConsentForm = (props) => {
                                             initialValues={{
                                                 category_id: consentId && consent.consent_category ? consent.consent_category.id : categories[0].id,
                                                 legal_basis: consentId && consent ? consent.legal_basis : "consent",
-                                                title: consentId && consent ? consent.title : "",
+                                                // title: consentId && consent ? consent.title : "",
                                                 preference: consentId && consent ? consent.preference : "",
                                                 translations: consentId && consent ? consent.translations : [],
                                                 is_active: consentId && consent ? consent.is_active : isActive
@@ -237,13 +237,13 @@ const ConsentForm = (props) => {
                                                         <div className="col-12">
                                                             <div className="row">
 
-                                                                <div className="col-12 col-sm-6">
+                                                                {/* <div className="col-12 col-sm-6">
                                                                     <div className="form-group">
                                                                         <label className="font-weight-bold" htmlFor="title"> Title <span className="text-danger">*</span></label>
                                                                         {consentId && consent ? <Field className="form-control" type="name" name="title" value={consent.title}/> : <Field className="form-control" type="name" name="title"/>}
                                                                         <div className="invalid-feedback"><ErrorMessage name="title" /></div>
                                                                     </div>
-                                                                </div>
+                                                                </div> */}
 
                                                                 <div className="col-12 col-sm-6">
                                                                     <div className="form-group">
