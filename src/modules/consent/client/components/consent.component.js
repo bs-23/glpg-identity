@@ -62,8 +62,16 @@ const ConsentComponent = ({ consentId, setConsentId }) => {
                             <div>{consent.createdByUser ? `${consent.createdByUser.first_name} ${consent.createdByUser.last_name}` : ''}</div>
                         </div>
                         <div className="col-12 col-sm-6 pb-3 px-0">
-                            <label className="mt-1 font-weight-bold">Ctreated Date</label>
+                            <label className="mt-1 font-weight-bold">Created On</label>
                             <div>{(new Date(consent.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
+                        </div>
+                        <div className="col-12 col-sm-6 pb-3 px-0">
+                            <label className="mt-1 font-weight-bold">Updated By</label>
+                            <div>{consent.createdByUser ? `${consent.updatedByUser.first_name} ${consent.updatedByUser.last_name}` : ''}</div>
+                        </div>
+                        <div className="col-12 col-sm-6 pb-3 px-0">
+                            <label className="mt-1 font-weight-bold">Updatd On</label>
+                            <div>{(new Date(consent.updated_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
                         </div>
                         <div className="col-12 pb-3 px-0">
                             <label className="mt-1 font-weight-bold">Assigned Countries</label>
