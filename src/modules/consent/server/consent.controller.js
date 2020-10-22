@@ -649,7 +649,7 @@ async function updateCdpConsent(req, res) {
 
         const consentCategory = await ConsentCategory.findOne({ where: { id: category_id } });
         if (!consentCategory) return res.status(400).send('Invalid Consent Category');
-        
+
         const consentWithSamePreference = await Consent.findOne({
             where: {
                 preference,
@@ -856,12 +856,10 @@ async function createConsentCategory(req, res) {
             }
         });
 
-        const { first_name, last_name, id } = await data.getCreatedByUser();
-
         data.dataValues.createdByUser = {
-            first_name,
-            last_name,
-            id
+            first_name: req.user.first_name,
+            last_name: req.user.last_name,
+            id: req.user.id
         }
 
         if (!created && data) {
