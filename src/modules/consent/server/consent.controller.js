@@ -159,15 +159,12 @@ async function getConsentsReport(req, res) {
         const country_iso2_list = req.user.type === 'admin' ? (await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry", { type: QueryTypes.SELECT })).map(i => i.country_iso2) : (await HCPS.findAll()).map(i => i.get("country_iso2"));
         const countries_ignorecase = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
 
-
         const codbase_list_mapped_with_user_country_iso2_list = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => req.user.countries.includes(i.country_iso2)).map(i => i.codbase) : [];
         const country_iso2_list_for_user_countries_codbase = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => codbase_list_mapped_with_user_country_iso2_list.includes(i.codbase)).map(i => i.country_iso2) : [];
         const countries_ignorecase_for_user_countries_codbase = [].concat.apply([], country_iso2_list_for_user_countries_codbase.map(i => ignoreCaseArray(i)));
 
-
         const process_activities = (await ConsentCategory.findAll()).map(i => i.type);
         const opt_types = [...new Set((await ConsentCountry.findAll()).map(i => i.opt_type))];
-
 
         const consent_filter = {
             response: true,
@@ -184,20 +181,25 @@ async function getConsentsReport(req, res) {
             include: [
                 {
                     model: HCPS,
-                    attributes: { exclude: ['password', 'created_by', 'updated_by'] },
+                    attributes: { exclude: ['password', 'created_by', 'updated_by'] }
                 },
                 {
                     model: Consent,
-                    attributes: ['preference', 'legal_basis', 'updated_at'],
+                    attributes: ['legal_basis', 'updated_at'],
                     include: [
                         {
                             model: ConsentCategory,
-                            attributes: ['title', 'type'],
+                            attributes: ['title', 'type']
                         },
                         {
                             model: ConsentCountry,
                             as: 'consent_country',
-                            attributes: ['country_iso2', 'opt_type'],
+                            attributes: ['country_iso2', 'opt_type']
+                        },
+                        {
+                            model: ConsentPreference,
+                            as: 'consent_preference',
+                            attributes: ['title']
                         }
                     ]
                 }
@@ -206,7 +208,7 @@ async function getConsentsReport(req, res) {
             offset,
             limit,
             order: order,
-            subQuery: false,
+            subQuery: false
         });
 
         hcp_consents.forEach(hcp_consent => {
@@ -215,7 +217,7 @@ async function getConsentsReport(req, res) {
             hcp_consent.dataValues.consent_confirmed = hcp_consent.consent_confirmed;
             hcp_consent.dataValues.legal_basis = hcp_consent.consent.legal_basis;
             hcp_consent.dataValues.given_date = hcp_consent.updated_at;
-            hcp_consent.dataValues.preference = hcp_consent.consent.preference;
+            hcp_consent.dataValues.preference = hcp_consent.consent.consent_preference.title;
             hcp_consent.dataValues.title = hcp_consent.consent.consent_category.title;
             hcp_consent.dataValues.type = hcp_consent.consent.consent_category.type;
             hcp_consent.dataValues.country_iso2 = hcp_consent.consent.consent_country[0].country_iso2;
@@ -234,15 +236,15 @@ async function getConsentsReport(req, res) {
                     model: Consent,
                     include: [
                         {
-                            model: ConsentCategory,
+                            model: ConsentCategory
                         },
                         {
                             model: ConsentCountry,
-                            as: 'consent_country',
+                            as: 'consent_country'
                         }
                     ]
                 }
-            ],
+            ]
         });
 
         const data = {
@@ -257,13 +259,12 @@ async function getConsentsReport(req, res) {
             opt_type: opt_type ? opt_type : '',
             countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : req.user.countries,
             orderBy: orderBy,
-            orderType: orderType,
+            orderType: orderType
         };
 
         response.data = data;
         res.json(response);
-    }
-    catch (err) {
+    } catch (err) {
         console.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
@@ -594,47 +595,40 @@ async function getCdpConsent(req, res) {
 
 async function createConsent(req, res) {
     try {
-        let { category_id, title, legal_basis, is_active, preference, translations } = req.body;
+        let { preference_id, category_id, legal_basis, is_active, translations } = req.body;
 
-        if (!category_id || !title || !legal_basis) {
+        if (!preference_id || !category_id || !legal_basis) {
             return res.status(400).send('Invalid request.');
         }
 
         if (!translations || !translations.length) {
-            return res.status(400).send('Must provide at least one translation.');
+            return res.status(400).send('Please provide at least one translation.');
         }
 
         is_active = !!is_active;
 
-        if (preference && preference.length) {
-            const preferences = ['Galapagos Terms of Use', 'Promotional email marketing'];
-            if (!preferences.includes(preference)) return res.status(400).send('Invalid Preference.');
-        }
+        const preference = await ConsentPreference.findOne({ where: { id: preference_id } });
+        if (!preference) return res.status(400).send('Invalid Preference');
 
         const consentCategory = await ConsentCategory.findOne({ where: { id: category_id } });
-
-        if (!consentCategory) {
-            return res.status(400).send('Invalid Consent Category Id.');
-        }
+        if (!consentCategory) return res.status(400).send('Invalid Consent Category');
 
         const [consent, created] = await Consent.findOrCreate({
             where: {
-                title
+                preference_id
             },
             defaults: {
+                preference_id,
                 category_id,
-                title,
-                slug: title,
                 legal_basis,
                 is_active,
-                preference,
                 created_by: req.user.id
             },
             attributes: { exclude: ['created_at', 'updated_at'] }
         });
 
         if (!created && consent) {
-            return res.status(400).send('Consent with same Title already exists.');
+            return res.status(400).send('Consent with same Preference already exists.');
         }
 
         const data = { ...consent.dataValues };
