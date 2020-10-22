@@ -1,5 +1,5 @@
 import Modal from 'react-bootstrap/Modal';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { useToasts } from 'react-toast-notifications';
 import { useSelector, useDispatch } from 'react-redux';
@@ -72,7 +72,7 @@ const ConsentCategories = () => {
                                             <tr key={index}>
                                                 <td>{row.title}</td>
                                                 <td>{row.slug}</td>
-                                                <td>{row.createdByUser ? `${row.createdByUser.first_name} ${row.createdByUser.last_name}` : ''}</td>
+                                                <td>{row.createdByUser ? <Link to={`/users/${row.createdByUser.id}`} >{`${row.createdByUser.first_name} ${row.createdByUser.last_name}`}</Link> : ''}</td>
                                                 <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                 <td>
                                                     <button className="btn cdp-btn-link-primary p-0 mr-3" onClick={() => setConsentCategoryId(row.id)}>

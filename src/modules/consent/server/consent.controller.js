@@ -834,7 +834,13 @@ async function getConsentCategory(req, res) {
 
 async function getConsentCategories(req, res) {
     try {
-        const data = await ConsentCategory.findAll({});
+        const data = await ConsentCategory.findAll({
+            include: [{
+                model: User,
+                as: 'createdByUser',
+                attributes: ['first_name', 'last_name', 'id']
+            }]
+        });
         res.json(data);
     } catch (err) {
         console.error(err);
@@ -850,9 +856,18 @@ async function createConsentCategory(req, res) {
             },
             defaults: {
                 title: req.body.title,
-                slug: req.body.title
+                slug: req.body.title,
+                created_by: req.user.id
             }
         });
+
+        const { first_name, last_name, id } = await data.getCreatedByUser();
+
+        data.dataValues.createdByUser = {
+            first_name,
+            last_name,
+            id
+        }
 
         if (!created && data) {
             return res.status(400).send('The consent category is already exists.');
@@ -877,12 +892,9 @@ async function updateConsentCategory(req, res) {
 
         const consentCategory = await ConsentCategory.findOne({ where: { id: req.params.id } });
 
-        const data = await consentCategory.update({ title });
-
-        // TODO: update slug value automatically
+        const data = await consentCategory.update({ title, slug: title });
 
         res.json(data);
-
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
