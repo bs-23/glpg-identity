@@ -86,7 +86,7 @@ const ConsentComponent = ({ consentId, setConsentId }) => {
                                         </tbody>
                                     </table>
                                 )
-                                : 'This consent is not assigned to any country.'
+                                : <p className="alert alert-warning">This consent is not assigned to any country.</p>
                             }
                         </div>
                     </div>
@@ -112,7 +112,7 @@ const ConsentComponent = ({ consentId, setConsentId }) => {
                                         ))
                                     }
                                 </Accordion>)
-                                : 'There are no translations for this Consent.'}
+                                : <p className="alert alert-warning mx-3 mt-3">There are no translations for this Consent.</p>}
                         </div>
                     </div>
                 </div>
