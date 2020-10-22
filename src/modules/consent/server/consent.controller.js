@@ -736,33 +736,6 @@ async function updateCdpConsent(req, res) {
     }
 }
 
-async function deleteCdpConsent(req, res) {
-    try {
-        if (!req.params.id) {
-            return res.status(400).send('Invalid request.');
-        }
-
-        const consent = await Consent.findOne({
-            where: {
-                id: req.params.id
-            }
-        });
-
-        if (!consent) {
-            res.status(404).send('Consent not found');
-        }
-
-        await ConsentCountry.destroy({ where: { consent_id: consent.id } });
-        await ConsentLanguage.destroy({ where: { consent_id: consent.id } });
-        await consent.destroy();
-
-        res.sendStatus(200);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Internal server error');
-    }
-}
-
 async function getCountryConsents(req, res) {
     try {
         const countryConsents = await ConsentCountry.findAll({
@@ -967,7 +940,6 @@ exports.getConsentCatogories = getConsentCatogories;
 exports.getCdpConsents = getCdpConsents;
 exports.getCdpConsent = getCdpConsent;
 exports.createConsent = createConsent;
-exports.deleteCdpConsent = deleteCdpConsent;
 exports.updateCdpConsent = updateCdpConsent;
 exports.getCountryConsents = getCountryConsents;
 exports.assignConsentToCountry = assignConsentToCountry;
