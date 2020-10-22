@@ -112,6 +112,14 @@
         }
 
         &-link {
+            &-primary {
+                color: $primary-color !important;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+
             &-secondary {
                 color: $secondary-color !important;
 

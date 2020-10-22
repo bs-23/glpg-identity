@@ -120,8 +120,8 @@ const CountryConsents = () => {
                 </div>
                 <div className="row">
                     <div className="col-12">
-                        <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
-                            <div class="d-flex justify-content-end align-items-center">
+                        <div className="d-sm-flex justify-content-end align-items-center mb-3 mt-4">
+                            <div class="d-flex justify-content-between align-items-center">
                                 <button onClick={() => { setShow(true); setEditable(false); setEditOption(null); }} className="btn cdp-btn-secondary text-white ml-2">
                                     <i className="icon icon-plus pr-1"></i> Assign consent to country
                                 </button>
