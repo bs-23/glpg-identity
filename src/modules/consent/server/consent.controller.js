@@ -84,16 +84,14 @@ async function getConsents(req, res) {
 
             return {
                 id: consentLang.consent.id,
-                title: consentLang.consent.title,
                 rich_text: validator.unescape(consentLang.rich_text),
-                //slug: consentLang.consent.slug,
                 opt_type: consentCountry.opt_type,
-                category: consentLang.consent.consent_category.type,
+                category_slug: consentLang.consent.consent_category.slug,
                 category_title: consentLang.consent.consent_category.title,
                 country_iso2: country_iso2,
                 locale: consentLang.locale,
-                preference: consentLang.consent.consent_preference.title,
-                slug: consentLang.consent.consent_preference.slug
+                preference: consentLang.consent.preference,
+                slug: consentLang.consent.slug
             }
         }));
 
