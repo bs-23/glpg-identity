@@ -1,0 +1,10 @@
+[
+    {
+        "text": "Single Opt-in",
+        "value": "single-opt-in"
+    },
+    {
+        "text": "Double Opt-in",
+        "value": "double-opt-in"
+    }
+]

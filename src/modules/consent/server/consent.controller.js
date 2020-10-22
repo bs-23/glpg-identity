@@ -7,11 +7,21 @@ const validator = require('validator');
 const ConsentLocale = require('./consent-locale.model');
 const ConsentCountry = require('./consent-country.model');
 const ConsentCategory = require('./consent-category.model');
+const ConsentPreference = require('./consent-preference.model');
 const ConsentLanguage = require('./consent-locale.model');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const HCPS = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_profile.model'));
+const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model.js'));
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
+
+function getTranslationViewmodels(translations) {
+    return translations.map(t => ({
+        id: t.id,
+        locale: t.locale,
+        rich_text: validator.unescape(t.rich_text)
+    }));
+}
 
 async function getConsents(req, res) {
     const response = new Response({}, []);
@@ -26,13 +36,15 @@ async function getConsents(req, res) {
 
         locale = locale || 'en';
 
-        const consentCountries = await ConsentCountry.findAll({where: {
-            country_iso2: {
-                [Op.or]: [
-                    country_iso2.toUpperCase(),
-                    country_iso2.toLowerCase()
-                ]
-            }}, include: [{
+        const consentCountries = await ConsentCountry.findAll({
+            where: {
+                country_iso2: {
+                    [Op.or]: [
+                        country_iso2.toUpperCase(),
+                        country_iso2.toLowerCase()
+                    ]
+                }
+            }, include: [{
                 model: Consent,
                 as: 'consent',
                 include: [{
@@ -42,49 +54,54 @@ async function getConsents(req, res) {
         });
 
         const consentLocales = await Promise.all(consentCountries.map(async consentCountry => {
-            return await ConsentLocale.findAll({where: {
-                consent_id: consentCountry.consent_id,
-                locale: {
-                    [Op.or]: [
-                        locale.toUpperCase(),
-                        locale.toLowerCase()
-                    ]
-                }}, include: [{
+            return await ConsentLocale.findAll({
+                where: {
+                    consent_id: consentCountry.consent_id,
+                    locale: {
+                        [Op.iLike]: `%${locale}`
+                    }
+                }, include: [{
                     model: Consent,
                     as: 'consent',
                     include: [{
                         model: ConsentCategory
+                    },
+                    {
+                        model: ConsentPreference
                     }]
                 }]
             });
         }));
 
-        const result = await Promise.all(_.flatten(consentLocales).map( async consentLang => {
-            const consentCountry = await ConsentCountry.findOne({where: {
-                country_iso2: {
-                    [Op.or]: [
-                        country_iso2.toUpperCase(),
-                        country_iso2.toLowerCase()
-                    ]
-                },
-                consent_id : consentLang.consent_id
-            }});
+        const result = await Promise.all(_.flatten(consentLocales).map(async consentLang => {
+            const consentCountry = await ConsentCountry.findOne({
+                where: {
+                    country_iso2: {
+                        [Op.or]: [
+                            country_iso2.toUpperCase(),
+                            country_iso2.toLowerCase()
+                        ]
+                    },
+                    consent_id: consentLang.consent_id
+                }
+            });
 
             return {
                 id: consentLang.consent.id,
                 title: consentLang.consent.title,
                 rich_text: validator.unescape(consentLang.rich_text),
-                slug: consentLang.consent.slug,
-                opt_type: consentCountry.opt_type ,
+                //slug: consentLang.consent.slug,
+                opt_type: consentCountry.opt_type,
                 category: consentLang.consent.consent_category.type,
                 category_title: consentLang.consent.consent_category.title,
                 country_iso2: country_iso2,
                 locale: consentLang.locale,
-                preference: consentLang.consent.preference
+                preference: consentLang.consent.consent_preference.title,
+                slug: consentLang.consent.consent_preference.slug
             }
         }));
 
-        if(!result || !result.length) {
+        if (!result || !result.length) {
             response.data = [];
             return res.status(204).send(response);
         }
@@ -103,10 +120,10 @@ function ignoreCaseArray(str) {
     return [str.toLowerCase(), str.toUpperCase(), str.charAt(0).toLowerCase() + str.charAt(1).toUpperCase(), str.charAt(0).toUpperCase() + str.charAt(1).toLowerCase()];
 }
 
-async function getConsentsReport(req, res){
+async function getConsentsReport(req, res) {
     const response = new Response({}, []);
 
-    try{
+    try {
         const page = req.query.page ? req.query.page - 1 : 0;
         const limit = 30;
         const codbase = req.query.codbase === undefined ? '' : req.query.codbase;
@@ -118,18 +135,18 @@ async function getConsentsReport(req, res){
         const orderType = req.query.orderType ? req.query.orderType : '';
         const order = [];
 
-        if(orderBy && orderType){
-            if(orderBy === 'first_name') order.push([HCPS, 'first_name', orderType]);
-            if(orderBy === 'last_name') order.push([HCPS, 'last_name', orderType]);
-            if(orderBy === 'email') order.push([HCPS, 'email', orderType]);
+        if (orderBy && orderType) {
+            if (orderBy === 'first_name') order.push([HCPS, 'first_name', orderType]);
+            if (orderBy === 'last_name') order.push([HCPS, 'last_name', orderType]);
+            if (orderBy === 'email') order.push([HCPS, 'email', orderType]);
 
-            if(orderBy === 'consent_type') order.push([Consent, ConsentCategory, 'title', orderType]);
+            if (orderBy === 'consent_type') order.push([Consent, ConsentCategory, 'title', orderType]);
 
-            if(orderBy === 'opt_type') order.push([Consent, { model: ConsentCountry, as: 'consent_country' }, 'opt_type', orderType === 'ASC' ? 'DESC' : 'ASC']);
+            if (orderBy === 'opt_type') order.push([Consent, { model: ConsentCountry, as: 'consent_country' }, 'opt_type', orderType === 'ASC' ? 'DESC' : 'ASC']);
 
-            if(orderBy === 'legal_basis') order.push([Consent, 'legal_basis', orderType]);
-            if(orderBy === 'preferences') order.push([Consent, 'preference', orderType]);
-            if(orderBy === 'date') order.push(['updated_at', orderType]);
+            if (orderBy === 'legal_basis') order.push([Consent, 'legal_basis', orderType]);
+            if (orderBy === 'preferences') order.push([Consent, 'preference', orderType]);
+            if (orderBy === 'date') order.push(['updated_at', orderType]);
         }
         order.push([HCPS, 'created_at', 'DESC']);
         order.push([HCPS, 'id', 'DESC']);
@@ -192,7 +209,7 @@ async function getConsentsReport(req, res){
             subQuery: false,
         });
 
-        hcp_consents.forEach( hcp_consent => {
+        hcp_consents.forEach(hcp_consent => {
             hcp_consent.dataValues.consent_id = hcp_consent.consent_id;
             hcp_consent.dataValues.response = hcp_consent.response;
             hcp_consent.dataValues.consent_confirmed = hcp_consent.consent_confirmed;
@@ -246,17 +263,17 @@ async function getConsentsReport(req, res){
         response.data = data;
         res.json(response);
     }
-    catch(err){
+    catch (err) {
         console.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
 }
 
-async function getDatasyncConsentsReport(req, res){
+async function getDatasyncConsentsReport(req, res) {
     const response = new Response({}, []);
 
-    try{
+    try {
         const page = req.query.page ? req.query.page - 1 : 0;
         const limit = 30;
         const codbase = req.query.codbase === undefined ? '' : req.query.codbase;
@@ -264,7 +281,7 @@ async function getDatasyncConsentsReport(req, res){
         // const opt_type = req.query.opt_type === undefined ? '' : req.query.opt_type;
         const offset = page * limit;
 
-        async function getCountryIso2(){
+        async function getCountryIso2() {
             const user_codbase_list_for_iso2 = (await sequelize.datasyncConnector.query(
                 `SELECT * FROM ciam.vwcountry where ciam.vwcountry.country_iso2 = ANY($countries);`,
                 {
@@ -279,7 +296,7 @@ async function getDatasyncConsentsReport(req, res){
                 `SELECT * FROM ciam.vwcountry where ciam.vwcountry.codbase = ANY($codbases);`,
                 {
                     bind: {
-                        codbases : user_codbase_list_for_iso2
+                        codbases: user_codbase_list_for_iso2
                     },
                     type: QueryTypes.SELECT
                 }
@@ -303,16 +320,16 @@ async function getDatasyncConsentsReport(req, res){
         const orderType = req.query.orderType && req.query.orderType.toLowerCase() === "desc" ? "DESC" : "ASC";
         let sortBy = 'content_type';
 
-        if(orderBy && orderType){
-            if(orderBy === 'name') sortBy = 'ciam.vw_veeva_consent_master.account_name';
-            if(orderBy === 'email') sortBy = 'ciam.vw_veeva_consent_master.channel_value';
+        if (orderBy && orderType) {
+            if (orderBy === 'name') sortBy = 'ciam.vw_veeva_consent_master.account_name';
+            if (orderBy === 'email') sortBy = 'ciam.vw_veeva_consent_master.channel_value';
             // if(orderBy === 'consent_type') order.push([Consent, ConsentCategory, 'title', orderType]);
 
-            if(orderBy === 'opt_type') sortBy = 'ciam.vw_veeva_consent_master.opt_type';
+            if (orderBy === 'opt_type') sortBy = 'ciam.vw_veeva_consent_master.opt_type';
 
             // if(orderBy === 'legal_basis') order.push([Consent, 'legal_basis', orderType]);
-            if(orderBy === 'preferences') sortBy = 'ciam.vw_veeva_consent_master.content_type';
-            if(orderBy === 'date') sortBy = 'ciam.vw_veeva_consent_master.capture_datetime';
+            if (orderBy === 'preferences') sortBy = 'ciam.vw_veeva_consent_master.content_type';
+            if (orderBy === 'date') sortBy = 'ciam.vw_veeva_consent_master.capture_datetime';
         }
 
         const hcp_consents = await sequelize.datasyncConnector.query(
@@ -359,7 +376,7 @@ async function getDatasyncConsentsReport(req, res){
             }))[0];
 
 
-        hcp_consents.forEach( hcp_consent => {
+        hcp_consents.forEach(hcp_consent => {
             hcp_consent.name = hcp_consent.account_name;
             hcp_consent.first_name = hcp_consent.firstname;
             hcp_consent.last_name = hcp_consent.lastname;
@@ -397,7 +414,7 @@ async function getDatasyncConsentsReport(req, res){
         response.data = data;
         res.json(response);
     }
-    catch(err){
+    catch (err) {
         console.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
@@ -405,22 +422,22 @@ async function getDatasyncConsentsReport(req, res){
 }
 
 async function getAllProcessActivities(req, res) {
-    try{
+    try {
         const process_activities = await ConsentCategory.findAll();
         res.json(process_activities);
     }
-    catch(err){
+    catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
     }
 }
 
-async function getAllOptTypes(req, res){
-    try{
+async function getAllOptTypes(req, res) {
+    try {
         const opt_types = new Set((await ConsentCountry.findAll()).map(i => i.opt_type));
         res.json([...opt_types]);
     }
-    catch(err){
+    catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
     }
@@ -463,35 +480,492 @@ async function getUserConsents(req, res) {
     }
 }
 
+async function getConsentCatogories(req, res) {
+    try {
+        const consentCategories = await ConsentCategory.findAll({
+            attributes: { exclude: ['created_at', 'updated_at'] }
+        });
+        res.json(consentCategories);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 async function getCdpConsents(req, res) {
     try {
         let { translations, category } = req.query;
 
-        const inclusions = category === 'true'
-            ? [{
+        const inclusions = [
+            {
+                model: User,
+                as: 'createdByUser',
+                attributes: ['id', 'first_name', 'last_name']
+            },
+            {
+                model: ConsentPreference,
+                as: 'consent_preference',
+                attributes: ['id', 'title']
+            }
+        ];
+
+        if (category === 'true') {
+            inclusions.push({
                 model: ConsentCategory,
                 as: 'consent_category',
                 attributes: ['id', 'title', 'type']
-            }]
-            : [];
+            });
+        }
 
         const consents = await Consent.findAll({
             include: inclusions,
-            attributes: { exclude: ['category_id', 'created_at', 'updated_at'] }
+            attributes: { exclude: ['category_id', 'created_by'] }
         });
 
         translations === 'true' && await Promise.all(consents.map(async consent => {
             const consentTranslations = await ConsentLanguage.findAll({
                 where: {
                     consent_id: consent.id
-                },
-                attributes: { exclude: ['consent_id', 'created_at', 'updated_at'] }
+                }
             });
-
-            consent.dataValues.translations = [...consentTranslations];
+            consent.dataValues.translations = getTranslationViewmodels(consentTranslations);
         }));
 
         res.json(consents);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function getCdpConsent(req, res) {
+    try {
+        if (!req.params.id) {
+            return res.status(400).send('Invalid request.');
+        }
+
+        const consent = await Consent.findOne({
+            where: {
+                id: req.params.id
+            },
+            include: [
+                {
+                    model: User,
+                    as: 'createdByUser',
+                    attributes: ['id', 'first_name', 'last_name'],
+                },
+                {
+                    model: ConsentCategory,
+                    as: 'consent_category',
+                    attributes: ['id', 'title', 'type']
+                },
+                {
+                    model: ConsentPreference,
+                    as: 'consent_preference',
+                    attributes: ['id', 'title']
+                },
+                {
+                    model: ConsentCountry,
+                    as: 'consent_country'
+                }
+            ],
+            attributes: { exclude: ['category_id'] }
+        });
+
+        if (!consent) {
+            res.status(404).send('Consent not found');
+        }
+
+        const { consent_country, ...otherProps } = consent.dataValues;
+        const data = { ...otherProps, countries: consent_country };
+
+        const translations = await ConsentLanguage.findAll({
+            where: { consent_id: consent.id }
+        });
+
+        data.translations = getTranslationViewmodels(translations);
+
+        res.json(data);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function createConsent(req, res) {
+    try {
+        let { category_id, title, legal_basis, is_active, preference, translations } = req.body;
+
+        if (!category_id || !title || !legal_basis) {
+            return res.status(400).send('Invalid request.');
+        }
+
+        if (!translations || !translations.length) {
+            return res.status(400).send('Must provide at least one translation.');
+        }
+
+        is_active = !!is_active;
+
+        if (preference && preference.length) {
+            const preferences = ['Galapagos Terms of Use', 'Promotional email marketing'];
+            if (!preferences.includes(preference)) return res.status(400).send('Invalid Preference.');
+        }
+
+        const consentCategory = await ConsentCategory.findOne({ where: { id: category_id } });
+
+        if (!consentCategory) {
+            return res.status(400).send('Invalid Consent Category Id.');
+        }
+
+        const [consent, created] = await Consent.findOrCreate({
+            where: {
+                title
+            },
+            defaults: {
+                category_id,
+                title,
+                slug: title,
+                legal_basis,
+                is_active,
+                preference,
+                created_by: req.user.id
+            },
+            attributes: { exclude: ['created_at', 'updated_at'] }
+        });
+
+        if (!created && consent) {
+            return res.status(400).send('Consent with same Title already exists.');
+        }
+
+        const data = { ...consent.dataValues };
+
+        if (created) {
+            data.translations = [];
+            await Promise.all(translations
+                .filter(translation => translation.country_iso2 && translation.lang_code && translation.rich_text)
+                .map(async (translation) => {
+                    const locale = `${translation.lang_code.toLowerCase()}_${translation.country_iso2.toUpperCase()}`;
+                    const [consentTransation, translationCreated] = await ConsentLanguage.findOrCreate({
+                        where: {
+                            consent_id: consent.id,
+                            locale: {
+                                [Op.iLike]: locale
+                            }
+                        },
+                        defaults: {
+                            locale: locale,
+                            rich_text: translation.rich_text,
+                            consent_id: consent.id
+                        }
+                    });
+
+                    if (translationCreated) {
+                        data.translations.push(consentTransation);
+                    } else {
+                        console.error('Create Translation failed: ', translation);
+                    }
+                })
+            );
+        }
+
+        res.json(data);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function updateCdpConsent(req, res) {
+    try {
+        const { category_id, title, legal_basis, is_active, preference, translations } = req.body;
+
+        const id = req.params.id;
+        if (!id) {
+            return res.status(400).send('Invalid request.');
+        }
+
+        if (category_id) {
+            const consentCategory = await ConsentCategory.findOne({ where: { id: category_id } });
+            if (!consentCategory) {
+                return res.status(400).send('Invalid Consent Category Id.');
+            }
+        }
+
+        if (title) {
+            const consentWithSameTitle = await Consent.findOne({
+                where: {
+                    title: title,
+                    id: { [Op.ne]: id }
+                }
+            });
+            if (consentWithSameTitle) {
+                return res.status(400).send('Another Consent with same Title exists.');
+            }
+        }
+
+        const consent = await Consent.findOne({ where: { id: id } });
+
+        if (!consent) {
+            return res.status(404).send('Consent not found.');
+        }
+
+        await consent.update({
+            category_id,
+            title,
+            slug: title,
+            legal_basis,
+            is_active,
+            preference
+        });
+
+        await ConsentLanguage.destroy({ where: { consent_id: consent.id } });
+
+        if (translations) {
+            await Promise.all(translations
+                .filter(translation => translation.country_iso2 && translation.lang_code && translation.rich_text)
+                .map(async (translation) => {
+                    const locale = `${translation.lang_code.toLowerCase()}_${translation.country_iso2.toUpperCase()}`;
+                    const [consentTransation, translationCreated] = await ConsentLanguage.findOrCreate({
+                        where: {
+                            consent_id: consent.id,
+                            locale: locale
+                        },
+                        defaults: {
+                            locale: locale,
+                            rich_text: translation.rich_text,
+                            consent_id: consent.id
+                        }
+                    });
+
+                    if (!translationCreated) {
+                        console.error('Create Translation failed: ', translation);
+                    }
+                })
+            );
+        }
+
+        res.sendStatus(200);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function deleteCdpConsent(req, res) {
+    try {
+        if (!req.params.id) {
+            return res.status(400).send('Invalid request.');
+        }
+
+        const consent = await Consent.findOne({
+            where: {
+                id: req.params.id
+            }
+        });
+
+        if (!consent) {
+            res.status(404).send('Consent not found');
+        }
+
+        await ConsentCountry.destroy({ where: { consent_id: consent.id } });
+        await ConsentLanguage.destroy({ where: { consent_id: consent.id } });
+        await consent.destroy();
+
+        res.sendStatus(200);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function getCountryConsents(req, res) {
+    try {
+        const countryConsents = await ConsentCountry.findAll({
+            include: [{
+                model: Consent,
+                as: 'consent',
+                attributes: { exclude: ['created_at', 'updated_at'] },
+                include: {
+                    model: ConsentPreference,
+                    as: 'consent_preference',
+                    attributes: { exclude: ['created_by, updated_by, created_at', 'updated_at'] },
+                }
+            }]
+        });
+
+        if (!countryConsents || countryConsents.length < 1) {
+            return res.status(400).send('Country Consents not found.');
+        }
+
+        await Promise.all(countryConsents.map(async (countryConsent) => {
+            const consentTranslations = await ConsentLanguage.findAll({
+                where: { consent_id: countryConsent.consent_id },
+                attributes: { exclude: ['consent_id', 'created_at', 'updated_at'] }
+            });
+            countryConsent.dataValues.consent.dataValues.translations = getTranslationViewmodels(consentTranslations);
+        }));
+
+        res.json(countryConsents);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function assignConsentToCountry(req, res) {
+    try {
+        const { consent_id, country_iso2, opt_type } = req.body;
+
+        if (!consent_id || !country_iso2 || !opt_type) {
+            return res.status(400).send('Invalid request.');
+        }
+
+        const availableOptTypes = ConsentCountry.rawAttributes.opt_type.values;
+        if (!availableOptTypes.includes(opt_type))
+            return res.status(400).send('Invalid Opt Type');
+
+        const existingCountryConsent = await ConsentCountry.findOne({
+            where: {
+                consent_id: consent_id,
+                country_iso2: {
+                    [Op.iLike]: country_iso2
+                }
+            }
+        });
+
+        if (existingCountryConsent) {
+            return res.status(400).send('Country-Consent association already exists');
+        }
+
+        const consent = await Consent.findOne({ where: { id: consent_id } });
+
+        if (!consent) {
+            return res.status(400).send('Consent not found.');
+        }
+
+        const translations = await ConsentLanguage.findAll({
+            where: { consent_id: consent.id }
+        });
+
+        consent.dataValues.translations = getTranslationViewmodels(translations);
+
+        const createdCountryConsent = await ConsentCountry.create({
+            consent_id,
+            country_iso2: country_iso2.toUpperCase(),
+            opt_type
+        });
+
+        createdCountryConsent.dataValues.consent = consent;
+
+        res.json(createdCountryConsent);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function updateCountryConsent(req, res) {
+    try {
+        const id = req.params.id;
+        const optType = req.body.opt_type;
+
+        if (!id || !optType) return res.status(400).send('Invalid request.');
+
+        const consentCountry = await ConsentCountry.findOne({ where: { id } });
+
+        if (!consentCountry) return res.status(404).send('Country-Consent association does noit exist.');
+
+        await consentCountry.update({
+            opt_type: optType
+        });
+
+        res.json(consentCountry);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function deleteCountryConsent(req, res) {
+    try {
+        const id = req.params.id;
+
+        if (!id) {
+            return res.status(400).send('Invalid request.');
+        }
+
+        await ConsentCountry.destroy({ where: { id } });
+
+        res.sendStatus(200);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function getConsentPreference(req, res) {
+    try {
+        const data = await ConsentPreference.findOne({ where: { id: req.params.id } });
+        res.json(data);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function getConsentPreferences(req, res) {
+    try {
+        const data = await ConsentPreference.findAll({});
+        res.json(data);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function createConsentPreference(req, res) {
+    try {
+        const [data, created] = await ConsentPreference.findOrCreate({
+            where: {
+                title: req.body.title
+            },
+            defaults: {
+                title: req.body.title,
+                slug: req.body.title,
+                is_active: true
+            }
+        });
+
+        if (!created && data) {
+            return res.status(400).send('The consent preference title is already exists.');
+        }
+
+        res.json(data);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function updateConsentPreference(req, res) {
+    try {
+        const { title, is_active } = req.body;
+        const isTitleExists = await ConsentPreference.findOne({ where: { id: {[Op.not]: req.params.id}, title } });
+
+        if(isTitleExists) {
+            return res.status(400).send('The preference title is already exists.');
+        }
+
+        const consentPreference = await ConsentPreference.findOne({ where: { id: req.params.id } });
+
+        const data = await consentPreference.update({ title, is_active });
+
+        // TODO: update slug value automatically
+
+        res.json(data);
+
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -504,4 +978,17 @@ exports.getDatasyncConsentsReport = getDatasyncConsentsReport;
 exports.getAllProcessActivities = getAllProcessActivities;
 exports.getAllOptTypes = getAllOptTypes;
 exports.getUserConsents = getUserConsents;
+exports.getConsentCatogories = getConsentCatogories;
 exports.getCdpConsents = getCdpConsents;
+exports.getCdpConsent = getCdpConsent;
+exports.createConsent = createConsent;
+exports.deleteCdpConsent = deleteCdpConsent;
+exports.updateCdpConsent = updateCdpConsent;
+exports.getCountryConsents = getCountryConsents;
+exports.assignConsentToCountry = assignConsentToCountry;
+exports.updateCountryConsent = updateCountryConsent;
+exports.deleteCountryConsent = deleteCountryConsent;
+exports.getConsentPreference = getConsentPreference;
+exports.getConsentPreferences = getConsentPreferences;
+exports.createConsentPreference = createConsentPreference;
+exports.updateConsentPreference = updateConsentPreference;
