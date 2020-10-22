@@ -7,6 +7,7 @@ import { createConsent, updateConsent } from '../consent.actions';
 import { useToasts } from "react-toast-notifications";
 import CountryCodes from 'country-codes-list';
 import { consentSchema } from '../consent.schema';
+import DraftEdior from '../../../core/client/components/draft-editor';
 
 const ConsentForm = (props) => {
     const CountryCodesObject = Object.values(CountryCodes.customList('countryCode', '{countryCode} {officialLanguageCode} {officialLanguageNameEn}'));
@@ -123,7 +124,7 @@ const ConsentForm = (props) => {
 
                         <div className="col-12 col-sm-6">
                             <div className="form-group">
-                                <label className="font-weight-bold" htmlFor={languageId}>Select Language </label>
+                                <label className="font-weight-bold" htmlFor={languageId}>Select Language</label>
                                 <Field className="form-control lang_code" value={item.lang_code} onChange={(e) => handleChange(e)} data-id={idx} as="select" name={languageId} id={languageId}>
                                     {countryLanguages.map(element => {
                                         const [country_iso2, language_code, language_name] = element.split(' ');
@@ -135,11 +136,18 @@ const ConsentForm = (props) => {
 
                         <div className="col-12">
                             <div className="form-group">
-                                <label className="font-weight-bold" htmlFor={richTextId}> Rich Text </label>
+                                <label className="font-weight-bold" htmlFor={richTextId}>Rich Text</label>
                                 <Field className="form-control rich_text" row="6" value={item.rich_text} onChange={(e) => handleChange(e)} type='textarea' as='textarea' data-id={idx} name={richTextId} id={richTextId} />
                                 <div className="invalid-feedback"><ErrorMessage name={richTextId} /></div>
                             </div>
                         </div>
+
+                        {/* <div className="col-12">
+                            <div className="form-group">
+                                <label className="font-weight-bold" htmlFor={richTextId}>Draft Editor</label>
+                                <DraftEdior/>
+                            </div>
+                        </div> */}
                     </div>
                 </div>
 
@@ -256,10 +264,10 @@ const ConsentForm = (props) => {
                                                                     <div className="form-group">
                                                                         <label className="font-weight-bold" htmlFor="category_id">Select Category <span className="text-danger">*</span></label>
                                                                         {
-                                                                            consentId && consent ? 
+                                                                            consentId && consent ?
                                                                             (<Field data-testid="category_id" as="select" name="category_id" className="form-control" value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
                                                                                 {categories.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
-                                                                            </Field>) : 
+                                                                            </Field>) :
                                                                             (<Field data-testid="category_id" as="select" name="category_id" className="form-control">
                                                                                 {categories.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
                                                                             </Field>)
@@ -272,10 +280,10 @@ const ConsentForm = (props) => {
                                                                     <div className="form-group">
                                                                         <label className="font-weight-bold" htmlFor="category_id">Select Legal Basis <span className="text-danger">*</span></label>
                                                                         {
-                                                                            consentId && consent ? 
+                                                                            consentId && consent ?
                                                                             (<Field data-testid="legal_basis" as="select" name="legal_basis" className="form-control text-capitalize" value={legalBasis} onChange={(e) => setLegalBasis(e.target.value)}>
                                                                                 {['consent', 'contract'].map(item => <option key={item} value={item}>{item}</option>)}
-                                                                            </Field>) : 
+                                                                            </Field>) :
                                                                             (<Field data-testid="legal_basis" as="select" name="legal_basis" className="form-control text-capitalize">
                                                                                 {['consent', 'contract'].map(item => <option key={item} value={item}>{item}</option>)}
                                                                             </Field>)
