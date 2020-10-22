@@ -636,33 +636,33 @@ async function createConsent(req, res) {
 
 async function updateCdpConsent(req, res) {
     try {
-        const { preference_id, category_id, legal_basis, is_active, translations } = req.body;
+        const { preference, category_id, legal_basis, is_active, translations } = req.body;
 
         const id = req.params.id;
-        if (!id) {
+        if (!id || !preference || !category_id || !legal_basis) {
             return res.status(400).send('Invalid request.');
         }
 
-        if (category_id) {
-            const consentCategory = await ConsentCategory.findOne({ where: { id: category_id } });
-            if (!consentCategory) return res.status(400).send('Invalid Consent Category');
+        if (!translations || !translations.length) {
+            return res.status(400).send('Please provide at least one translation.');
         }
 
-        if (preference_id) {
-            const consentWithSamePreference = await Consent.findOne({
-                where: {
-                    preference_id,
-                    id: { [Op.ne]: id }
-                }
-            });
-            if (consentWithSamePreference) return res.status(400).send('Another Consent with same Preference exists.');
-        }
+        const consentCategory = await ConsentCategory.findOne({ where: { id: category_id } });
+        if (!consentCategory) return res.status(400).send('Invalid Consent Category');
+        
+        const consentWithSamePreference = await Consent.findOne({
+            where: {
+                preference,
+                id: { [Op.ne]: id }
+            }
+        });
+        if (consentWithSamePreference) return res.status(400).send('Another Consent with same Preference exists.');
 
         const consent = await Consent.findOne({ where: { id: id } });
         if (!consent) return res.status(404).send('Consent not found.');
 
         await consent.update({
-            preference_id,
+            preference,
             category_id,
             legal_basis,
             is_active

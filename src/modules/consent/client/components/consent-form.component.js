@@ -19,13 +19,14 @@ const ConsentForm = (props) => {
     const [countryLanguages, setCountryLanguages] = useState([]);
     const [isActive, setIsActive] = useState(true);
     const [translations, setTranslations] = useState([]);
+    const [categoryId, setCategoryId] = useState([]);
+    const [legalBasis, setLegalBasis] = useState([]);
 
     const handleChange = (e) => {
         const newTranslations = [...translations];
         const field = e.target.className.split(' ');
         const translation = newTranslations[e.target.dataset.id];
         translation[field[1]] = e.target.value;
-        // if(field[1] === 'country_iso2' || field[1] === 'lang_code') translation['locale'] = `${translation['country_iso2']}_${translation['lang_code']}`;
         setTranslations(newTranslations);
     }
 
@@ -56,9 +57,11 @@ const ConsentForm = (props) => {
         async function getConsent() {
             const response = await axios.get(`/api/cdp-consents/${id}`);
             setConsent(response.data);
-            setTranslations(response.data.translations.map(i => ({...i, country_iso2: i.locale.split('_')[0], lang_code: i.locale.split('_')[1] })));
+            setTranslations(response.data.translations.map(i => ({...i, country_iso2: i.locale.split('_')[1], lang_code: i.locale.split('_')[0] })));
             setIsActive(response.data.is_active);
             setConsentId(id);
+            setCategoryId(response.data.consent_category.id);
+            setLegalBasis(response.data.legal_basis);
         }
         async function getConsentCatogories() {
             const response = await axios.get('/api/privacy/consent-categories');
@@ -112,7 +115,7 @@ const ConsentForm = (props) => {
                         <div className="col-12 col-sm-6">
                             <div className="form-group">
                                 <label className="font-weight-bold" htmlFor={countryId}>Select Country </label>
-                                <Field className="form-control country_iso2" value={item.country_iso2} onChange={(e) => handleChange(e)} data-id={idx} as="select" name={countryId} id={countryId}>
+                                <Field className="form-control country_iso2" value={item.country_iso2.toLowerCase()} onChange={(e) => handleChange(e)} data-id={idx} as="select" name={countryId} id={countryId}>
                                     {userCountries.map(element => <option key={element.countryid} value={element.country_iso2.toLowerCase()}>{element.codbase_desc}</option>)}
                                 </Field>
                             </div>
@@ -182,6 +185,11 @@ const ConsentForm = (props) => {
                                             validationSchema={consentSchema}
                                             onSubmit={(values, actions) => {
                                                 values.translations = translations;
+                                                values.is_active = isActive;
+                                                if(consentId && consent) {
+                                                    values.category_id = categoryId;
+                                                    values.legal_basis = legalBasis;
+                                                }
                                                 console.log(values)
 
                                                 const validTranslations = translations.filter(item => item.country_iso2 && item.lang_code && item.rich_text);
@@ -249,10 +257,10 @@ const ConsentForm = (props) => {
                                                                         <label className="font-weight-bold" htmlFor="category_id">Select Category <span className="text-danger">*</span></label>
                                                                         {
                                                                             consentId && consent ? 
-                                                                            (<Field data-testid="category" as="select" name="category_id" className="form-control" value={consent.consent_category.id}>
+                                                                            (<Field data-testid="category_id" as="select" name="category_id" className="form-control" value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
                                                                                 {categories.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
                                                                             </Field>) : 
-                                                                            (<Field data-testid="category" as="select" name="category_id" className="form-control">
+                                                                            (<Field data-testid="category_id" as="select" name="category_id" className="form-control">
                                                                                 {categories.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
                                                                             </Field>)
                                                                         }
@@ -265,7 +273,7 @@ const ConsentForm = (props) => {
                                                                         <label className="font-weight-bold" htmlFor="category_id">Select Legal Basis <span className="text-danger">*</span></label>
                                                                         {
                                                                             consentId && consent ? 
-                                                                            (<Field data-testid="legal_basis" as="select" name="legal_basis" className="form-control text-capitalize" value={consent.legal_basis}>
+                                                                            (<Field data-testid="legal_basis" as="select" name="legal_basis" className="form-control text-capitalize" value={legalBasis} onChange={(e) => setLegalBasis(e.target.value)}>
                                                                                 {['consent', 'contract'].map(item => <option key={item} value={item}>{item}</option>)}
                                                                             </Field>) : 
                                                                             (<Field data-testid="legal_basis" as="select" name="legal_basis" className="form-control text-capitalize">
