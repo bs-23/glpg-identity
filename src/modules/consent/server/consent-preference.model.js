@@ -21,7 +21,7 @@ const ConsentPreference = sequelize.cdpConnector.define('consent_preferences', {
     title: {
         unique: true,
         allowNull: false,
-        type: DataTypes.STRING(30)
+        type: DataTypes.STRING
     },
     slug: {
         unique: true,
