@@ -53,7 +53,7 @@
         "link": "https://www.studiolegalemetta.com/en/italian-tax-code-codice-fiscale/",
         "logo": "/assets/logo/logo-studio-legale-metta.png",
         "height": 28,
-        "heightSingle": 30
+        "heightSingle": 25
     },
     {
         "codbase": "WIT",
@@ -61,7 +61,31 @@
         "link": "https://www.mef.gov.it/en/index.html",
         "logo": "/assets/logo/logo-mef.svg",
         "height": 35,
-        "heightSingle": 35
+        "heightSingle": 25
+    },
+    {
+        "codbase": "WIT",
+        "name": "",
+        "link": "https://portale.fnomceo.it/cerca-prof/elenco.php",
+        "logo": "/assets/logo/logo-mef.svg",
+        "height": 35,
+        "heightSingle": 25
+    },
+    {
+        "codbase": "WIT",
+        "name": "",
+        "link": "http://www.codicefiscaleonline.com/codice_inverso.php",
+        "logo": "/assets/logo/logo-mef.svg",
+        "height": 35,
+        "heightSingle": 25
+    },
+    {
+        "codbase": "WIT",
+        "name": "MEF",
+        "link": "https://telematici.agenziaentrate.gov.it/VerificaCF/Scegli.do?parameter=verificaCf",
+        "logo": "/assets/logo/logo-mef.svg",
+        "height": 35,
+        "heightSingle": 25
     },
     {
         "codbase": "WES",
