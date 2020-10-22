@@ -304,16 +304,16 @@ const CdpConsentPerformanceReport = () => {
                                             <div className="col accordion-consent rounded shadow-sm p-0">
                                                 <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Consents</h4>
                                                 {currentUser.consents && currentUser.consents.length ? <Accordion>{currentUser.consents.map(consent =>
-                                                    <Card key={consent.id} className="">
+                                                    <Card key={consent.id}>
                                                         <Accordion.Collapse eventKey={consent.id}>
-                                                            <Card.Body className="">
+                                                            <Card.Body>
                                                                 <div>{parse(consent.rich_text)}</div>
-                                                                <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Consent type:</span> <span className="text-capitalize">{consent.opt_type}</span></div>
+                                                                <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Consent Opt-Type:</span> <span className="text-capitalize">{consent.opt_type}</span></div>
                                                                 {consent.consent_given && <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Consent given date:</span>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>}
                                                             </Card.Body>
                                                         </Accordion.Collapse>
                                                         <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
-                                                            <span className="d-flex align-items-center"><i class={`icon ${consent.consent_given ? 'icon-check-filled' : 'icon-close-circle text-danger'} cdp-text-primary mr-4 consent-check`}></i> <span className="consent-summary">{consent.title}</span></span>
+                                                            <span className="d-flex align-items-center"><i class={`icon ${consent.consent_given ? 'icon-check-filled' : 'icon-close-circle text-danger'} cdp-text-primary mr-4 consent-check`}></i> <span className="consent-summary">{consent.preference}</span></span>
                                                             <i className="icon icon-arrow-down ml-2 accordion-consent__icon-down"></i>
                                                         </Accordion.Toggle>
                                                     </Card>
@@ -324,8 +324,6 @@ const CdpConsentPerformanceReport = () => {
                                     }
                                 </Modal.Body>
                             </Modal>
-
-
 
                             {consents_report['hcp_consents'] && consents_report['hcp_consents'].length > 0 &&
                                 <React.Fragment>
@@ -430,7 +428,7 @@ const CdpConsentPerformanceReport = () => {
                                                         <td>{row.hcp_profile.first_name}</td>
                                                         <td>{row.hcp_profile.last_name}</td>
                                                         <td><i className="icon icon-check-filled icon-position-bit-down text-primary-color mr-2 cdp-text-primary"></i>{row.hcp_profile.email}</td>
-                                                        <td>{row.title}</td>
+                                                        <td>{row.category}</td>
                                                         <td>{titleCase(row.opt_type)}</td>
                                                         <td>{titleCase(row.legal_basis)}</td>
                                                         <td>{row.preference}</td>

@@ -5,30 +5,30 @@ import { useToasts } from 'react-toast-notifications';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 
-import PreferenceSchema from './preference.schema';
-import { getConsentPreferences, getConsentPreference, createConsentPreference, updateConsentPreference } from './preference.actions';
+import CategorySchema from './category.schema';
+import { getConsentCategories, getConsentCategory, createConsentCategory, updateConsentCategory } from './category.actions';
 
-const ConsentPreferences = () => {
+const ConsentCategories = () => {
     const dispatch = useDispatch();
     const { addToast } = useToasts();
-    const [consentPreferenceId, setConsentPreferenceId] = useState(undefined);
+    const [consentCategoryId, setConsentCategoryId] = useState(undefined);
 
     const handleClose = () => {
-        setConsentPreferenceId(undefined);
+        setConsentCategoryId(undefined);
     };
 
-    const consent_preference = useSelector(state => state.preferenceReducer.consent_preference);
-    const consent_preferences = useSelector(state => state.preferenceReducer.consent_preferences);
+    const consent_category = useSelector(state => state.consentCategoryReducer.consent_category);
+    const consent_categories = useSelector(state => state.consentCategoryReducer.consent_categories);
 
     useEffect(() => {
-        dispatch(getConsentPreferences());
+        dispatch(getConsentCategories());
     }, []);
 
     useEffect(() => {
-        if(consentPreferenceId) {
-            dispatch(getConsentPreference(consentPreferenceId));
+        if(consentCategoryId) {
+            dispatch(getConsentCategory(consentCategoryId));
         }
-    }, [consentPreferenceId]);
+    }, [consentCategoryId]);
 
     return (
         <main className="app__content cdp-light-bg h-100">
@@ -39,7 +39,7 @@ const ConsentPreferences = () => {
                             <ol className="breadcrumb rounded-0">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/consent">Data Privacy & Consent Management</NavLink></li>
-                                <li className="breadcrumb-item active"><span>Consent Preferences</span></li>
+                                <li className="breadcrumb-item active"><span>Consent Categories</span></li>
                             </ol>
                         </nav>
                     </div>
@@ -47,38 +47,36 @@ const ConsentPreferences = () => {
                 <div className="row">
                     <div className="col-12">
                         <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
-                            <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Consent preferences</h4>
+                            <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Consent categories</h4>
                             <div class="d-flex justify-content-between align-items-center">
-                                <button onClick={() => setConsentPreferenceId(null)} className="btn cdp-btn-secondary text-white ml-2">
-                                    <i className="icon icon-plus pr-1"></i> Create new preference
+                                <button onClick={() => setConsentCategoryId(null)} className="btn cdp-btn-secondary text-white ml-2">
+                                    <i className="icon icon-plus pr-1"></i> Create new category
                                 </button>
                             </div>
                         </div>
 
-                        { consent_preferences.length > 0 &&
+                        { consent_categories.length > 0 &&
                             <div className="table-responsive shadow-sm bg-white">
                                 <table className="table table-hover table-sm mb-0 cdp-table">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
                                             <th>Title</th>
                                             <th>Slug</th>
-                                            <th>Is Active</th>
                                             <th>Created By</th>
                                             <th>Created Date</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
-                                        {consent_preferences.map((row, index) => (
+                                        { consent_categories.map((row, index) => (
                                             <tr key={index}>
                                                 <td>{row.title}</td>
                                                 <td>{row.slug}</td>
-                                                <td>{row.is_active ? 'Active' : 'Inactive'}</td>
                                                 <td>{row.createdByUser ? `${row.createdByUser.first_name} ${row.createdByUser.last_name}` : ''}</td>
                                                 <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                 <td>
-                                                    <button className="btn btn-link cdp-text-primary p-0 mr-3" onClick={() => setConsentPreferenceId(row.id)}>
-                                                        <i className="fas fa-tasks mr-1"></i>Edit
+                                                    <button className="btn cdp-btn-link-primary p-0 mr-3" onClick={() => setConsentCategoryId(row.id)}>
+                                                        <i className="fas fa-pen mr-2"></i>Edit
                                                     </button>
                                                 </td>
                                             </tr>
@@ -88,7 +86,7 @@ const ConsentPreferences = () => {
                             </div>
                         }
 
-                        { consent_preferences.length === 0 &&
+                        { consent_categories.length === 0 &&
                             <div className="row justify-content-center mt-sm-5 pt-5 mb-3">
                                 <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">
                                     <i class="icon icon-team icon-6x cdp-text-secondary"></i>
@@ -100,25 +98,24 @@ const ConsentPreferences = () => {
                 </div>
             </div>
 
-            <Modal dialogClassName="modal-90w modal-customize"centered show={consentPreferenceId !== undefined} onHide={handleClose}>
+            <Modal dialogClassName="modal-90w modal-customize"centered show={consentCategoryId !== undefined} onHide={handleClose}>
                 <Modal.Header closeButton>
                     <Modal.Title>
-                        Consent preference
+                        Consent category
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Formik
                         initialValues={{
-                            title: consentPreferenceId && consent_preference ? consent_preference.title : "",
-                            is_active: consentPreferenceId && consent_preference ? consent_preference.is_active : false
+                            title: consentCategoryId && consent_category ? consent_category.title : ""
                         }}
-                        displayName="ConsentPreferenceForm"
+                        displayName="ConsentCategoryForm"
                         enableReinitialize={true}
-                        validationSchema={PreferenceSchema}
+                        validationSchema={CategorySchema}
                         onSubmit={(values, actions) => {
-                            if(consentPreferenceId) {
-                                dispatch(updateConsentPreference(consentPreferenceId, values)).then(function() {
-                                    addToast('Consent preference updated successfully', {
+                            if(consentCategoryId) {
+                                dispatch(updateConsentCategory(consentCategoryId, values)).then(function() {
+                                    addToast('Consent category updated successfully', {
                                         appearance: 'success',
                                         autoDismiss: true
                                     });
@@ -129,10 +126,10 @@ const ConsentPreferences = () => {
                                     });
                                 });
                             } else {
-                                dispatch(createConsentPreference(values)).then(function() {
-                                    setConsentPreferenceId(undefined);
+                                dispatch(createConsentCategory(values)).then(function() {
+                                    setConsentCategoryId(undefined);
                                     actions.resetForm();
-                                    addToast('Consent preference created successfully', {
+                                    addToast('Consent category created successfully', {
                                         appearance: 'success',
                                         autoDismiss: true
                                     });
@@ -158,13 +155,6 @@ const ConsentPreferences = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="row">
-                                    <div className="col-12 col-sm-12">
-                                        <div className="form-group">
-                                            TODO: Add a is_active checkbox here
-                                        </div>
-                                    </div>
-                                </div>
                                 <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting}>Save changes</button>
                             </Form>
                         )}
@@ -175,4 +165,4 @@ const ConsentPreferences = () => {
     );
 }
 
-export default ConsentPreferences;
+export default ConsentCategories;

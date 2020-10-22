@@ -16,7 +16,6 @@ async function init() {
     const ApplicationDomain = require(path.join(process.cwd(), 'src/modules/application/server/application-domain.model'));
     const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
     const ConsentCategory = require(path.join(process.cwd(), 'src/modules/consent/server/consent-category.model'));
-    const ConsentPreference = require(path.join(process.cwd(), 'src/modules/consent/server/consent-preference.model'));
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
     const ConsentLocale = require(path.join(process.cwd(), 'src/modules/consent/server/consent-locale.model'));
     const ConsentCountry = require(path.join(process.cwd(), 'src/modules/consent/server/consent-country.model'));
@@ -171,8 +170,8 @@ async function init() {
 
             const applicationDomains = [
                 { application_id: '3252888b-530a-441b-8358-3e423dbce08a', country_iso2: 'nl', domain: 'http://172.16.229.25:4503' },
-                { application_id: 'a7959308-7ec5-4090-94ff-2367113a454d', country_iso2: 'nl', domain: 'www-dev.jyseleca.nl' },
-                { application_id: 'a7959308-7ec5-4090-94ff-2367113a454d', country_iso2: 'be', domain: 'products-dev.glpg.com' }
+                { application_id: 'a7959308-7ec5-4090-94ff-2367113a454d', country_iso2: 'nl', domain: 'https://www-dev.jyseleca.nl' },
+                { application_id: 'a7959308-7ec5-4090-94ff-2367113a454d', country_iso2: 'be', domain: 'https://products-dev.glpg.com' }
             ];
 
             Application.destroy({ truncate: { cascade: true } }).then(() => {
@@ -194,48 +193,36 @@ async function init() {
     function consentSeeder(callback) {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
             const consent_categories = [
-                { id: 'fe037405-c676-4d98-bd05-85008900c838', title: 'Direct Marketing', type: 'dm' },
-                { id: '29374bce-7c3f-4408-a138-c062143d2247', title: 'Medical Consent', type: 'mc' },
-                { id: '59953d51-2449-4b65-950f-9f88654019bb', title: 'General Consent', type: 'general' }
-            ];
-
-            const consent_preferences = [
-                { id: '1c5cbd55-6c32-45e0-80a1-cd4ccd39c68e', title: 'Galapagos Terms of Use', slug: '', is_active: true },
-                { id: '2b5c322e-ee07-4255-b1fe-1d525ab4c6f4', title: 'Galapagos E-Mail Newsletter', slug: '', is_active: true },
-                { id: 'c0f5fe58-6b3f-4990-ad8f-2fdf92ac13e8', title: 'Sharing Personal Data With 3rd Parties', slug: '', is_active: true }
+                { id: 'fe037405-c676-4d98-bd05-85008900c838', title: 'Direct Marketing', type: 'dm', slug: '' },
+                { id: '29374bce-7c3f-4408-a138-c062143d2247', title: 'Medical Consent', type: 'mc', slug: '' },
+                { id: '59953d51-2449-4b65-950f-9f88654019bb', title: 'General Consent', type: 'general', slug: '' }
             ];
 
             const consents = [
                 {
                     id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
-                    //title: 'I agree to the Galapagos Terms of Service',
-                    //slug: '',
                     category_id: '59953d51-2449-4b65-950f-9f88654019bb',
                     legal_basis: 'consent',
-                    //preference: 'Galapagos Terms of Use',
-                    preference_id: '1c5cbd55-6c32-45e0-80a1-cd4ccd39c68e',
+                    preference: 'Galapagos Terms of Use',
+                    slug: '',
                     is_active: true,
                     created_by: admin.id
                 },
                 {
                     id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
-                    //title: 'I give my consent to send me promotional email',
-                    //slug: '',
                     category_id: 'fe037405-c676-4d98-bd05-85008900c838',
                     legal_basis: 'consent',
-                    //preference: 'Promotional Email Marketing',
-                    preference_id: '2b5c322e-ee07-4255-b1fe-1d525ab4c6f4',
+                    preference: 'Galapagos E-Mail Newsletter',
+                    slug: '',
                     is_active: true,
                     created_by: admin.id
                 },
                 {
                     id: '2b9fa7f9-2c1e-4621-a091-5e4bf539b875',
-                    //title: 'I declare that the information is complete and accurate',
-                    //slug: '',
                     category_id: '59953d51-2449-4b65-950f-9f88654019bb',
                     legal_basis: 'consent',
-                    //preference: '',
-                    preference_id: 'c0f5fe58-6b3f-4990-ad8f-2fdf92ac13e8',
+                    preference: 'Sharing Personal Data With 3rd Parties',
+                    slug: '',
                     is_active: true,
                     created_by: admin.id
                 }
@@ -330,24 +317,19 @@ async function init() {
                     returning: true,
                     ignoreDuplicates: false
                 }).then(function () {
-                    ConsentPreference.bulkCreate(consent_preferences, {
+                    Consent.bulkCreate(consents, {
                         returning: true,
                         ignoreDuplicates: false
                     }).then(function () {
-                        Consent.bulkCreate(consents, {
+                        ConsentLocale.bulkCreate(consentLocales, {
                             returning: true,
                             ignoreDuplicates: false
                         }).then(function () {
-                            ConsentLocale.bulkCreate(consentLocales, {
+                            ConsentCountry.bulkCreate(consentCountries, {
                                 returning: true,
                                 ignoreDuplicates: false
                             }).then(function () {
-                                ConsentCountry.bulkCreate(consentCountries, {
-                                    returning: true,
-                                    ignoreDuplicates: false
-                                }).then(function () {
-                                    callback();
-                                });
+                                callback();
                             });
                         });
                     });

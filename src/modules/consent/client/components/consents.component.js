@@ -4,41 +4,21 @@ import { useSelector, useDispatch } from 'react-redux';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Modal from 'react-bootstrap/Modal';
 import { useToasts } from 'react-toast-notifications';
-import { getCdpConsents, deleteConsent } from '../consent.actions';
+import { getCdpConsents } from '../consent.actions';
 import ConsentComponent from './consent.component';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Popover from 'react-bootstrap/Popover';
+import parse from 'html-react-parser';
 
 const ConsentsComponent = () => {
     const { addToast } = useToasts();
     const dispatch = useDispatch();
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
     const [consentId, setConsentId] = useState(null);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [consentToDelete, setConsentToDelete] = useState(null);
 
     const showConsentDetails = (row) => {
         setConsentId(row.id);
     };
-
-    const toggleDeleteConsentModal = (consent) => {
-        setConsentToDelete(consent);
-        setShowDeleteModal(!!consent);
-    };
-
-    const deleteItem = () => {
-        dispatch(deleteConsent(consentToDelete.id)).then(() => {
-            addToast('Consent deleted successfully', {
-                appearance: 'success',
-                autoDismiss: true
-            });
-        }).catch(error => {
-            addToast(error.response.data, {
-                appearance: 'error',
-                autoDismiss: true
-            });
-        }).finally(function () {
-            toggleDeleteConsentModal(null);
-        });
-    }
 
     useEffect(() => {
         dispatch(getCdpConsents(true, true));
@@ -86,8 +66,25 @@ const ConsentsComponent = () => {
                                     <tbody className="cdp-table__body bg-white">
                                         {cdp_consents.map((row, index) => (
                                             <tr key={index}>
-                                                <td>{row.consent_preference.title}</td>
-                                                <td>{row.locales}</td>
+                                                <td>{row.preference}</td>
+                                                <td>
+                                                    {row.translations && row.translations.length > 0 && row.translations.map(translation => (
+                                                        <OverlayTrigger key={translation.id}
+                                                            placement="top"
+                                                            delay={{ show: 250, hide: 400 }}
+                                                            overlay={
+                                                                <Popover className="popup-customize" id={`popover-positioned-top`}>
+                                                                    <Popover.Content className="popup-customize__content">
+                                                                        <div>{parse(translation.rich_text)}</div>
+                                                                    </Popover.Content>
+                                                                </Popover>
+                                                            }
+
+                                                        >
+                                                            <span className="badge badge-secondary-light shadow-sm font-weight-bold-light mr-1 text-dark">{translation.locale}</span>
+                                                        </OverlayTrigger>
+                                                    ))}
+                                                </td>
                                                 <td>{row.consent_category ? row.consent_category.title : ''}</td>
                                                 <td>{row.is_active ? 'Active' : 'Inactive'}</td>
                                                 <td>{row.createdByUser ? `${row.createdByUser.first_name} ${row.createdByUser.last_name}` : ''}</td>
@@ -98,7 +95,6 @@ const ConsentsComponent = () => {
                                                     <Dropdown.Menu>
                                                         <Dropdown.Item>Edit Consent</Dropdown.Item>
                                                         <Dropdown.Item onClick={() => showConsentDetails(row)}>Consent Detail</Dropdown.Item>
-                                                        <Dropdown.Item className="text-danger" onClick={() => toggleDeleteConsentModal(row)}>Delete</Dropdown.Item>
                                                     </Dropdown.Menu>
                                                 </Dropdown></td>
                                             </tr>
@@ -112,26 +108,6 @@ const ConsentsComponent = () => {
             </div>
 
             {consentId && <ConsentComponent consentId={consentId} setConsentId={setConsentId} />}
-
-            <Modal show={showDeleteModal} onHide={() => toggleDeleteConsentModal(null)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Delete Consent</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    {consentToDelete ? (
-                        <div>
-                            Are you sure to delete the following consent?
-                            <div className="card mt-2 mb-3">
-                                <div className="card-body">
-                                    {consentToDelete.title}
-                                </div>
-                            </div>
-                        </div>
-                    ) : null}
-                    <button onClick={() => toggleDeleteConsentModal(null)}>Cancel</button>
-                    <button className="ml-2" onClick={() => deleteItem()}>Confirm</button>
-                </Modal.Body>
-            </Modal>
         </main>
     );
 }

@@ -91,7 +91,7 @@ const CountryConsentForm = (props) => {
                                             <div className="form-group">
                                                 <label className="font-weight-bold" htmlFor="consent_id">Select Consent <span className="text-danger">*</span></label>
                                                 <Field disabled={props.editable ? true : false} data-testid="consent" as="select" name="consent_id" className="form-control">
-                                                    {props.consents.map(item => <option key={item.id} value={item.id}>{props.editable ? props.options.consent_preference.title : item.consent_preference.title}</option>)}
+                                                    {props.consents.map(item => <option key={item.id} value={item.id}>{props.editable ? props.options.preference : item.preference}</option>)}
                                                 </Field>
                                             </div>
                                         </div>
