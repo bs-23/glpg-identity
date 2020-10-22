@@ -72,8 +72,8 @@ const CountryConsents = () => {
         setConsentId(id);
     };
 
-    const setDeleteModal = (id, title, countryName) => {
-        setConsentToDelete({ id, title, countryName });
+    const setDeleteModal = (id, preference, countryName) => {
+        setConsentToDelete({ id, preference, countryName });
         setShowDelete(true);
     }
 
@@ -176,7 +176,7 @@ const CountryConsents = () => {
                                                                     ))}</td>
                                                                 <td>{consent.optType.text}</td>
                                                                 <td>
-                                                                    <button className="btn btn-link cdp-text-primary p-0 mr-3" onClick={() => setEdit(consent)}><i className="fas fa-tasks mr-1"></i>Manage opt type</button> <button onClick={() => setDeleteModal(consent.country_consent_id, consent.title, countryConsent.name)} className="btn btn-link text-danger p-0"><i className="far fa-trash-alt mr-1"></i>Remove</button>
+                                                                    <button className="btn btn-link cdp-text-primary p-0 mr-3" onClick={() => setEdit(consent)}><i className="fas fa-tasks mr-1"></i>Manage opt type</button> <button onClick={() => setDeleteModal(consent.country_consent_id, consent.preference, countryConsent.name)} className="btn btn-link text-danger p-0"><i className="far fa-trash-alt mr-1"></i>Remove</button>
                                                                 </td>
                                                             </tr>
                                                         )
@@ -196,9 +196,9 @@ const CountryConsents = () => {
                             <Modal.Body>
                                 {consentToDelete ? (
                                     <div>
-                                        Are you sure to remove this consent from <b>{consentToDelete.countryName}</b>?
+                                        Are you sure you want to remove following consent from <b>{consentToDelete.countryName}</b>?
                                         <div className="alert alert-warning my-3">
-                                            {consentToDelete.title}
+                                            {consentToDelete.preference}
                                         </div>
                                     </div>
                                 ) : null}

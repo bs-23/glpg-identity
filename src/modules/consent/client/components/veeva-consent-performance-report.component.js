@@ -299,12 +299,12 @@ const ConsentPerformanceReport = () => {
                                                         <Accordion.Collapse eventKey={consent.id}>
                                                             <Card.Body className="">
                                                                 <div>{parse(consent.rich_text)}</div>
-                                                                <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Consent type:</span> <span className="text-capitalize">{consent.opt_type}</span></div>
+                                                                <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Opt Type:</span> <span className="text-capitalize">{consent.opt_type}</span></div>
                                                                 <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Consent given date:</span>{(new Date(consent.given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
                                                             </Card.Body>
                                                         </Accordion.Collapse>
                                                         <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
-                                                            <span className="d-flex align-items-center"><i class={`icon icon-check-filled cdp-text-primary mr-4 consent-check`}></i> <span className="consent-summary">{consent.title}</span></span>
+                                                            <span className="d-flex align-items-center"><i class={`icon icon-check-filled cdp-text-primary mr-4 consent-check`}></i> <span className="consent-summary">{consent.content_type}</span></span>
                                                             <i className="icon icon-arrow-down ml-2 accordion-consent__icon-down"></i>
                                                         </Accordion.Toggle>
                                                     </Card>
@@ -342,17 +342,6 @@ const ConsentPerformanceReport = () => {
                                                                 onClick={() => dispatch(getVeevaConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'email', getorderType('email') ))}
                                                             >
                                                                 Email
-                                                            <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
-                                                        </LinkContainer>
-                                                    </th>
-
-                                                    <th>
-                                                        <LinkContainer to={getUrl('consent_type')}>
-                                                            <span
-                                                                className={consents_report.orderBy === 'consent_type' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getVeevaConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'consent_type', getorderType('consent_type') ))}
-                                                            >
-                                                                Consent Type
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
                                                         </LinkContainer>
                                                     </th>
@@ -409,7 +398,6 @@ const ConsentPerformanceReport = () => {
                                                     <tr key={index}>
                                                         <td>{row.name}</td>
                                                         <td><i className="icon icon-check-filled icon-position-bit-down text-primary-color mr-2 cdp-text-primary"></i>{row.email}</td>
-                                                        <td>{row.title}</td>
                                                         <td>{titleCase(row.opt_type)}</td>
                                                         <td>{titleCase(row.legal_basis)}</td>
                                                         <td>{row.preference}</td>

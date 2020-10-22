@@ -59,7 +59,7 @@ const ConsentsComponent = () => {
                                             <th>Consent Type</th>
                                             <th>Status</th>
                                             <th>Created By</th>
-                                            <th>Created Date</th>
+                                            <th>Created On</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
