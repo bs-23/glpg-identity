@@ -308,7 +308,7 @@ const CdpConsentPerformanceReport = () => {
                                                         <Accordion.Collapse eventKey={consent.id}>
                                                             <Card.Body>
                                                                 <div>{parse(consent.rich_text)}</div>
-                                                                <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Consent Opt-Type:</span> <span className="text-capitalize">{consent.opt_type}</span></div>
+                                                                <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Opt Type:</span> <span className="text-capitalize">{consent.opt_type}</span></div>
                                                                 {consent.consent_given && <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Consent given date:</span>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>}
                                                             </Card.Body>
                                                         </Accordion.Collapse>
