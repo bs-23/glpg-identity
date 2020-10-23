@@ -28,6 +28,9 @@ const ConsentCategory = sequelize.cdpConnector.define('consent_categories', {
     },
     created_by: {
         type: DataTypes.UUID
+    },
+    updated_by: {
+        type: DataTypes.UUID
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,

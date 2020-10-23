@@ -862,7 +862,8 @@ async function createConsentCategory(req, res) {
             defaults: {
                 title: req.body.title,
                 slug: req.body.title,
-                created_by: req.user.id
+                created_by: req.user.id,
+                updated_by: req.user.id
             }
         });
 
@@ -895,7 +896,7 @@ async function updateConsentCategory(req, res) {
 
         const consentCategory = await ConsentCategory.findOne({ where: { id: req.params.id } });
 
-        const data = await consentCategory.update({ title, slug: title });
+        const data = await consentCategory.update({ title, slug: title, updated_by: req.user.id });
 
         res.json(data);
     } catch (err) {
