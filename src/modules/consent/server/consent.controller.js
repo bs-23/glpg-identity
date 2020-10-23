@@ -689,7 +689,9 @@ async function updateCdpConsent(req, res) {
                     const [consentTransation, translationCreated] = await ConsentLanguage.findOrCreate({
                         where: {
                             consent_id: consent.id,
-                            locale: locale
+                            locale: {
+                                [Op.iLike]: locale
+                            }
                         },
                         defaults: {
                             locale: locale,
