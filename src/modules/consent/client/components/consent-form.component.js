@@ -178,7 +178,7 @@ const ConsentForm = (props) => {
                                     <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                     <li className="breadcrumb-item"><NavLink to="/consent/">Data Privacy & Consent Management</NavLink></li>
                                     <li className="breadcrumb-item"><NavLink to="/consent/list">CDP Consents</NavLink></li>
-                                    <li className="breadcrumb-item active"><span>Add new Consent</span></li>
+                                    <li className="breadcrumb-item active"><span>{consentId ? 'Edit Consent' : 'Add new Consent'}</span></li>
                                 </ol>
                             </nav>
                         </div>
