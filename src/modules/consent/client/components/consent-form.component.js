@@ -212,13 +212,23 @@ const ConsentForm = (props) => {
 
                                                 const validTranslations = translations.filter(item => item.country_iso2 && item.lang_code && item.rich_text && item.rich_text !== '<p><br></p>');
 
-                                                if (!validTranslations.length) {
+                                                if (!validTranslations || !validTranslations.length) {
                                                     addToast('Please provide at least one translation', {
                                                         appearance: 'error',
                                                         autoDismiss: true
                                                     });
                                                     actions.setSubmitting(false);
                                                     return;
+                                                } else {
+                                                    const uniqueTranslations = new Set(validTranslations.map(t => t.country_iso2.toLowerCase() + t.lang_code.toLowerCase));
+                                                    if (uniqueTranslations.size < validTranslations.length) {
+                                                        addToast('Please remove duplicate translations.', {
+                                                            appearance: 'error',
+                                                            autoDismiss: true
+                                                        });
+                                                        actions.setSubmitting(false);
+                                                        return;
+                                                    }
                                                 }
 
                                                 values.translations = validTranslations;
