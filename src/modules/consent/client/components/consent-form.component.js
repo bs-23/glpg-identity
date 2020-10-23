@@ -202,15 +202,14 @@ const ConsentForm = (props) => {
                                             displayName="ConsentForm"
                                             validationSchema={consentSchema}
                                             onSubmit={(values, actions) => {
-                                                values.translations = translations;
                                                 values.is_active = isActive;
                                                 if(consentId && consent) {
                                                     values.category_id = categoryId;
                                                     values.legal_basis = legalBasis;
                                                 }
-                                                console.log(values)
 
-                                                const validTranslations = translations.filter(item => item.country_iso2 && item.lang_code && item.rich_text);
+                                                const validTranslations = translations.filter(item => item.country_iso2 && item.lang_code && item.rich_text && item.rich_text !== '<p><br></p>');
+
                                                 if (!validTranslations.length) {
                                                     addToast('Please provide at least one translation', {
                                                         appearance: 'error',
@@ -219,6 +218,8 @@ const ConsentForm = (props) => {
                                                     actions.setSubmitting(false);
                                                     return;
                                                 }
+
+                                                values.translations = validTranslations;
 
                                                 if(consentId){
                                                     dispatch(updateConsent(values, consentId))

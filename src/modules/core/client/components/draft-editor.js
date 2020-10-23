@@ -5,6 +5,10 @@ import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import 'draft-js/dist/Draft.css';
 
+const toolbarOptions = {
+    options: ['inline', 'blockType', 'fontSize', 'fontFamily', 'list', 'textAlign', 'link']
+}
+
 export default function DraftEditor({ onChangeHTML, htmlContent }) {
     const [editorState, setEditorState] = React.useState(() => EditorState.createEmpty());
 
@@ -34,5 +38,6 @@ export default function DraftEditor({ onChangeHTML, htmlContent }) {
     return <Editor
                 editorState={editorState}
                 onEditorStateChange={setEditorState}
+                toolbar={toolbarOptions}
             />
 }
