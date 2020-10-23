@@ -145,7 +145,7 @@ const ConsentForm = (props) => {
                         <div className="col-12">
                             <div className="form-group">
                                 <label className="font-weight-bold" htmlFor={richTextId}>Rich Text</label>
-                                <div className="border rounded">
+                                <div className="border rounded draft-editor">
                                     <DraftEdior htmlContent={item.rich_text} onChangeHTML={(html) =>
                                         handleChange({
                                             target: {

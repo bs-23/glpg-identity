@@ -108,7 +108,7 @@ const ConsentComponent = ({ consentId, setConsentId }) => {
                                         consent.translations.map((translation, index) => (
                                             <Card key={index}>
                                                 <Accordion.Collapse eventKey={'locale-' + index}>
-                                                    <Card.Body className="ml-0"><div>{parse(translation.rich_text)}</div></Card.Body>
+                                                    <Card.Body className="ml-0 accordion-consent__body"><div>{parse(translation.rich_text)}</div></Card.Body>
                                                 </Accordion.Collapse>
                                                 <Card.Header className="p-0">
                                                     <Accordion.Toggle as={Card.Header} variant="link" eventKey={'locale-' + index} type="button" className="card-header d-flex justify-content-between">
