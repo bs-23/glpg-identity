@@ -94,6 +94,10 @@ export default function DraftEditor({ onChangeHTML, htmlContent }) {
         setShowAddUrlBar(true);
     }
 
+    const onHeaderStyleClick = (style) => {
+        setEditorState(RichUtils.toggleBlockType(editorState, style));
+    }
+
     useEffect(() => {
         if(onChangeHTML) {
             const editorContentInHTML = convertContentToHtml();
@@ -114,6 +118,10 @@ export default function DraftEditor({ onChangeHTML, htmlContent }) {
 
     return <div className="border border-secondary">
         <div className="p-2" style={{ background: '#d6d6d6' }}>
+            <span className="btn btn-info btn-sm mr-1" onClick={() => onHeaderStyleClick('header-one')}>H1</span>
+            <span className="btn btn-info btn-sm mr-1" onClick={() => onHeaderStyleClick('header-two')}>H2</span>
+            <span className="btn btn-info btn-sm mr-1" onClick={() => onHeaderStyleClick('header-three')}>H3</span>
+            <span className="btn btn-info btn-sm mr-1" onClick={() => onHeaderStyleClick('header-four')}>H4</span>
             <span className="btn btn-info btn-sm mr-1" onClick={onBoldClick}>Bold</span>
             <span className="btn btn-info btn-sm mr-1" onClick={onUnderlineClick}>Underline</span>
             <span className="btn btn-info btn-sm mr-1" onClick={onItalicClick}>Italic</span>
