@@ -220,7 +220,7 @@ const ConsentForm = (props) => {
                                                     actions.setSubmitting(false);
                                                     return;
                                                 } else {
-                                                    const uniqueTranslations = new Set(validTranslations.map(t => t.country_iso2.toLowerCase() + t.lang_code.toLowerCase));
+                                                    const uniqueTranslations = new Set(validTranslations.map(t => t.country_iso2.toLowerCase() + t.lang_code.toLowerCase()));
                                                     if (uniqueTranslations.size < validTranslations.length) {
                                                         addToast('Please remove duplicate translations.', {
                                                             appearance: 'error',

@@ -579,7 +579,7 @@ async function createConsent(req, res) {
         if (!translations || !translations.length) {
             return res.status(400).send('Please provide at least one translation.');
         } else {
-            const uniqueTranslations = new Set(translations.map(t => t.country_iso2.toLowerCase() + t.lang_code.toLowerCase));
+            const uniqueTranslations = new Set(translations.map(t => t.country_iso2.toLowerCase() + t.lang_code.toLowerCase()));
             if (uniqueTranslations.size < translations.length) return res.status(400).send('Please remove duplicate translations.');
         }
 
@@ -658,7 +658,7 @@ async function updateCdpConsent(req, res) {
         if (!translations || !translations.length) {
             return res.status(400).send('Please provide at least one translation.');
         } else {
-            const uniqueTranslations = new Set(translations.map(t => t.country_iso2.toLowerCase() + t.lang_code.toLowerCase));
+            const uniqueTranslations = new Set(translations.map(t => t.country_iso2.toLowerCase() + t.lang_code.toLowerCase()));
             if (uniqueTranslations.size < translations.length) return res.status(400).send('Please remove duplicate translations.');
         }
 
