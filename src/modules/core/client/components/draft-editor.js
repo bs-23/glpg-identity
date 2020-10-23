@@ -6,7 +6,13 @@ import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import 'draft-js/dist/Draft.css';
 
 const toolbarOptions = {
-    options: ['inline', 'blockType', 'fontSize', 'fontFamily', 'list', 'textAlign', 'link']
+    options: ['inline', 'blockType', 'list', 'link'],
+    inline: {
+        options: ['bold', 'italic', 'underline', 'strikethrough', 'monospace']
+    },
+    list: {
+        options: ['unordered', 'ordered']
+    }
 }
 
 export default function DraftEditor({ onChangeHTML, htmlContent }) {
