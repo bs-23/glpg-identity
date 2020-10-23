@@ -189,15 +189,15 @@ const CountryConsents = () => {
                             )
                         }
 
-                        <Modal centered size="lg" show={showDelete} onHide={() => setShowDelete(false)}>
+                        <Modal centered show={showDelete} onHide={() => setShowDelete(false)}>
                             <Modal.Header closeButton>
-                                <Modal.Title>Remove Consent from Country</Modal.Title>
+                                <Modal.Title className="modal-title_small">Remove Consent from Country</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>
                                 {consentToDelete ? (
                                     <div>
                                         Are you sure you want to remove following consent from <b>{consentToDelete.countryName}</b>?
-                                        <div className="alert alert-warning my-3">
+                                        <div className="alert alert-info my-3">
                                             {consentToDelete.preference}
                                         </div>
                                     </div>

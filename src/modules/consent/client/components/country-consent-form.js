@@ -32,11 +32,11 @@ const CountryConsentForm = (props) => {
     return (
         <Modal centered show={props.show} onHide={handleClose}>
             <Modal.Header closeButton>
-                <Modal.Title>{props.editable ? 'Manage opt type' : 'Assign consent to country'}</Modal.Title>
+                <Modal.Title className="modal-title_small">{props.editable ? 'Manage opt type' : 'Assign consent to country'}</Modal.Title>
             </Modal.Header>
 
             {props.consents.length > 0 && props.countries.length > 0 &&
-                <div className="consent-manage p-3">
+                <div className="consent-manage">
                     <Formik
                         initialValues={{
                             consent_id: props.editable ? props.options.country_consent_id : "",
@@ -71,8 +71,8 @@ const CountryConsentForm = (props) => {
                         }}
                     >
                         {formikProps => (
-                            <Form onSubmit={formikProps.handleSubmit}>
-                                <Modal.Body>
+                        <Form onSubmit={formikProps.handleSubmit}>
+                            <Modal.Body className="p-4">
                                     <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
