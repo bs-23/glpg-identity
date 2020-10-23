@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
 import { createConsent, updateConsent } from '../consent.actions';
 import { useToasts } from "react-toast-notifications";
@@ -22,6 +22,7 @@ const ConsentForm = (props) => {
     const [translations, setTranslations] = useState([]);
     const [categoryId, setCategoryId] = useState([]);
     const [legalBasis, setLegalBasis] = useState([]);
+    const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
 
     const handleChange = (e) => {
         const newTranslations = [...translations];
@@ -58,7 +59,7 @@ const ConsentForm = (props) => {
         async function getConsent() {
             const response = await axios.get(`/api/cdp-consents/${id}`);
             setConsent(response.data);
-            setTranslations(response.data.translations.map(i => ({...i, country_iso2: i.locale.split('_')[1], lang_code: i.locale.split('_')[0] })));
+            setTranslations(response.data.translations.map(i => ({ ...i, country_iso2: i.locale.split('_')[1], lang_code: i.locale.split('_')[0] })));
             setIsActive(response.data.is_active);
             setConsentId(id);
             setCategoryId(response.data.consent_category.id);
@@ -69,16 +70,15 @@ const ConsentForm = (props) => {
             setCategories(response.data);
         }
         async function getCountries() {
-            const response = (await axios.get('/api/countries')).data;
-            const userProfile = (await axios.get('/api/users/profile')).data;
-            setUserCountries(fetchUserCountries(userProfile.countries, response));
+            const response = await axios.get('/api/countries');
+            setUserCountries(fetchUserCountries(loggedInUser.countries, response.data));
         }
         function getLanguages() {
             const mapped_languages = {};
 
             const country_languages = CountryCodesObject.filter(item => {
                 const [, , language_name] = item.split(' ');
-                if(language_name && !mapped_languages[language_name]) {
+                if (language_name && !mapped_languages[language_name]) {
                     mapped_languages[language_name] = true;
                     return true;
                 }
@@ -87,13 +87,13 @@ const ConsentForm = (props) => {
             country_languages.sort((a, b) => {
                 const [, , language_name1] = a.split(' ');
                 const [, , language_name2] = b.split(' ');
-                if(language_name1.replace(/,/g, '') < language_name2.replace(/,/g, '')) return -1;
+                if (language_name1.replace(/,/g, '') < language_name2.replace(/,/g, '')) return -1;
                 return 1;
             });
             setCountryLanguages(country_languages);
         }
 
-        if(id) getConsent();
+        if (id) getConsent();
         getConsentCatogories();
         getCountries();
         getLanguages();
@@ -188,7 +188,7 @@ const ConsentForm = (props) => {
                             <div className="col-12">
                                 <div className="shadow-sm bg-white mb-3">
                                     <h2 className="d-flex align-items-center p-3 px-sm-4 py-sm-2 page-title light">
-                                        <span className="page-title__text font-weight-bold py-3">Create New Consent</span>
+                                    <span className="page-title__text font-weight-bold py-3">{consentId ? 'Edit Consent' : 'Create New Consent'}</span>
                                     </h2>
                                     <div className="add-user p-3">
                                         <Formik
