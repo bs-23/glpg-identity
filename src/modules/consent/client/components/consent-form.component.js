@@ -134,17 +134,17 @@ const ConsentForm = (props) => {
                             </div>
                         </div>
 
-                        <div className="col-12">
+                        {/* <div className="col-12">
                             <div className="form-group">
                                 <label className="font-weight-bold" htmlFor={richTextId}>Rich Text</label>
                                 <Field className="form-control rich_text" row="6" value={item.rich_text} onChange={(e) => handleChange(e)} type='textarea' as='textarea' data-id={idx} name={richTextId} id={richTextId} />
                                 <div className="invalid-feedback"><ErrorMessage name={richTextId} /></div>
                             </div>
-                        </div>
+                        </div> */}
 
                         <div className="col-12">
                             <div className="form-group">
-                                <label className="font-weight-bold" htmlFor={richTextId}>Draft Editor</label>
+                                <label className="font-weight-bold" htmlFor={richTextId}>Rich Text</label>
                                 <DraftEdior htmlContent={item.rich_text} onChangeHTML={(html) =>
                                     handleChange({
                                         target: {
