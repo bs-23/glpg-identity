@@ -42,7 +42,8 @@ async function getConsents(req, res) {
                         country_iso2.toUpperCase(),
                         country_iso2.toLowerCase()
                     ]
-                }
+                },
+                "$consent.is_active$": true
             }, include: [{
                 model: Consent,
                 as: 'consent',
