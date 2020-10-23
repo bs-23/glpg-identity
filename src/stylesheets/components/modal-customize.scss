@@ -10,6 +10,10 @@
         font-size: 34px !important;
         font-weight: bold !important;
         color: $primary-color;
+
+        &_small {
+            font-size: 24px !important;
+        }
     }
 
     label {
