@@ -301,6 +301,10 @@ export default function hcpUsers() {
                                                 <div className="mt-1 font-weight-bold">Status</div>
                                                 <div className="text-capitalize">{currentUser.status ? _.startCase(_.toLower(currentUser.status.replace(/_/g, ' '))) : '--'}</div>
                                             </div>
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Date of Birth</div>
+                                                <div className="">{currentUser.birthdate ? (new Date(currentUser.birthdate)).toLocaleDateString('en-GB').replace(/\//g, '.') : '--'}</div>
+                                            </div>
                                         </div>
                                         <div className="row mt-4">
                                             <div className="col accordion-consent rounded shadow-sm p-0">
