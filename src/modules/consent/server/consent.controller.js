@@ -578,6 +578,9 @@ async function createConsent(req, res) {
 
         if (!translations || !translations.length) {
             return res.status(400).send('Please provide at least one translation.');
+        } else {
+            const uniqueTranslations = new Set(translations.map(t => t.country_iso2.toLowerCase() + t.lang_code.toLowerCase));
+            if (uniqueTranslations.size < translations.length) return res.status(400).send('Please remove duplicate translations.');
         }
 
         is_active = !!is_active;
@@ -654,6 +657,9 @@ async function updateCdpConsent(req, res) {
 
         if (!translations || !translations.length) {
             return res.status(400).send('Please provide at least one translation.');
+        } else {
+            const uniqueTranslations = new Set(translations.map(t => t.country_iso2.toLowerCase() + t.lang_code.toLowerCase));
+            if (uniqueTranslations.size < translations.length) return res.status(400).send('Please remove duplicate translations.');
         }
 
         const consentCategory = await ConsentCategory.findOne({ where: { id: category_id } });
