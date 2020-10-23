@@ -145,17 +145,19 @@ const ConsentForm = (props) => {
                         <div className="col-12">
                             <div className="form-group">
                                 <label className="font-weight-bold" htmlFor={richTextId}>Rich Text</label>
-                                <DraftEdior htmlContent={item.rich_text} onChangeHTML={(html) =>
-                                    handleChange({
-                                        target: {
-                                            value: html,
-                                            className: "form-control rich_text",
-                                            dataset: {
-                                                id: idx
+                                <div className="border rounded">
+                                    <DraftEdior htmlContent={item.rich_text} onChangeHTML={(html) =>
+                                        handleChange({
+                                            target: {
+                                                value: html,
+                                                className: "form-control rich_text",
+                                                dataset: {
+                                                    id: idx
+                                                }
                                             }
-                                        }
-                                    })}
-                                />
+                                        })}
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
