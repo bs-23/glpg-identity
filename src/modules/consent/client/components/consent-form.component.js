@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
 import { createConsent, updateConsent } from '../consent.actions';
 import { useToasts } from "react-toast-notifications";
@@ -22,6 +22,7 @@ const ConsentForm = (props) => {
     const [translations, setTranslations] = useState([]);
     const [categoryId, setCategoryId] = useState([]);
     const [legalBasis, setLegalBasis] = useState([]);
+    const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
 
     const handleChange = (e) => {
         const newTranslations = [...translations];
@@ -69,9 +70,8 @@ const ConsentForm = (props) => {
             setCategories(response.data);
         }
         async function getCountries() {
-            const response = (await axios.get('/api/countries')).data;
-            const userProfile = (await axios.get('/api/users/profile')).data;
-            setUserCountries(fetchUserCountries(userProfile.countries, response));
+            const response = await axios.get('/api/countries');
+            setUserCountries(fetchUserCountries(loggedInUser.countries, response.data));
         }
         function getLanguages() {
             const mapped_languages = {};
