@@ -38,6 +38,10 @@ const ConsentForm = (props) => {
         const init_country_iso2 = userCountries[0].country_iso2.toLowerCase();
         const newTranslations = [...translations, { country_iso2: init_country_iso2, lang_code: init_lang_code , rich_text: '' }];
         setTranslations(newTranslations);
+        setTimeout(() => {
+            const lastTranslation = document.getElementById(`translation-${translations.length + 1}`);
+            lastTranslation.scrollIntoView({ behavior: 'smooth' });
+        }, 50);
     }
 
     const removeTranslation = (idx) => {
@@ -101,13 +105,13 @@ const ConsentForm = (props) => {
 
     const getTranslations = (formikProps) => {
         return translations.map((item, idx) => {
-            const translationId = `Translation-${idx+1}`;
+            const translationId = `translation-${idx+1}`;
             const countryId = `country-${idx}`;
             const languageId = `language-${idx}`;
             const richTextId = `rich-text-${idx}`;
 
             return (<React.Fragment key={idx}>
-                <div className="col-12">
+                <div className="col-12" id={translationId}>
                     <div className="row border border-primary rounded pb-3 mb-3 mx-0 shadow-sm">
                         <label className="col-12 font-weight-bold d-flex justify-content-between align-items-center bg-light py-2 border-bottom rounded-top">
                             {formikProps?.values?.preference}
