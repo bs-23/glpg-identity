@@ -32,3 +32,9 @@
   /* border: 1px solid red; */
   /* margin: 5px 0; */
 }
+
+.draft-editor {
+    .rdw-editor-main {
+        a { color: $secondary-color;}
+    }
+}

@@ -99,7 +99,7 @@ const ConsentForm = (props) => {
         getLanguages();
     }, [props]);
 
-    const getTranslations = () => {
+    const getTranslations = (formikProps) => {
         return translations.map((item, idx) => {
             const translationId = `Translation-${idx+1}`;
             const countryId = `country-${idx}`;
@@ -110,7 +110,7 @@ const ConsentForm = (props) => {
                 <div className="col-12">
                     <div className="row border border-primary rounded pb-3 mb-3 mx-0 shadow-sm">
                         <label className="col-12 font-weight-bold d-flex justify-content-between align-items-center bg-light py-2 border-bottom rounded-top">
-                            {translationId}
+                            {formikProps?.values?.preference}
                             <i className="fas fa-minus-circle text-danger fa-2x hover-opacity" type="button" title="Remove" onClick={() => removeTranslation(idx)}></i>
                         </label>
                         <div className="col-12 col-sm-6">
@@ -145,7 +145,7 @@ const ConsentForm = (props) => {
                         <div className="col-12">
                             <div className="form-group">
                                 <label className="font-weight-bold" htmlFor={richTextId}>Rich Text</label>
-                                <div className="border rounded">
+                                <div className="border rounded draft-editor">
                                     <DraftEdior htmlContent={item.rich_text} onChangeHTML={(html) =>
                                         handleChange({
                                             target: {
@@ -178,7 +178,7 @@ const ConsentForm = (props) => {
                                     <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                     <li className="breadcrumb-item"><NavLink to="/consent/">Data Privacy & Consent Management</NavLink></li>
                                     <li className="breadcrumb-item"><NavLink to="/consent/list">CDP Consents</NavLink></li>
-                                    <li className="breadcrumb-item active"><span>Add new Consent</span></li>
+                                    <li className="breadcrumb-item active"><span>{consentId ? 'Edit Consent' : 'Add new Consent'}</span></li>
                                 </ol>
                             </nav>
                         </div>
@@ -212,13 +212,23 @@ const ConsentForm = (props) => {
 
                                                 const validTranslations = translations.filter(item => item.country_iso2 && item.lang_code && item.rich_text && item.rich_text !== '<p><br></p>');
 
-                                                if (!validTranslations.length) {
+                                                if (!validTranslations || !validTranslations.length) {
                                                     addToast('Please provide at least one translation', {
                                                         appearance: 'error',
                                                         autoDismiss: true
                                                     });
                                                     actions.setSubmitting(false);
                                                     return;
+                                                } else {
+                                                    const uniqueTranslations = new Set(validTranslations.map(t => t.country_iso2.toLowerCase() + t.lang_code.toLowerCase()));
+                                                    if (uniqueTranslations.size < validTranslations.length) {
+                                                        addToast('Please remove duplicate translations.', {
+                                                            appearance: 'error',
+                                                            autoDismiss: true
+                                                        });
+                                                        actions.setSubmitting(false);
+                                                        return;
+                                                    }
                                                 }
 
                                                 values.translations = validTranslations;
@@ -323,7 +333,7 @@ const ConsentForm = (props) => {
                                                                     </div>
                                                                 </div>
 
-                                                                {getTranslations()}
+                                                                {getTranslations(formikProps)}
 
                                                                 <div className="col-12">
                                                                     <div className="form-group">
