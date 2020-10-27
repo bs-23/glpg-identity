@@ -99,7 +99,7 @@ const ConsentForm = (props) => {
         getLanguages();
     }, [props]);
 
-    const getTranslations = () => {
+    const getTranslations = (formikProps) => {
         return translations.map((item, idx) => {
             const translationId = `Translation-${idx+1}`;
             const countryId = `country-${idx}`;
@@ -110,7 +110,7 @@ const ConsentForm = (props) => {
                 <div className="col-12">
                     <div className="row border border-primary rounded pb-3 mb-3 mx-0 shadow-sm">
                         <label className="col-12 font-weight-bold d-flex justify-content-between align-items-center bg-light py-2 border-bottom rounded-top">
-                            {translationId}
+                            {formikProps?.values?.preference}
                             <i className="fas fa-minus-circle text-danger fa-2x hover-opacity" type="button" title="Remove" onClick={() => removeTranslation(idx)}></i>
                         </label>
                         <div className="col-12 col-sm-6">
@@ -333,7 +333,7 @@ const ConsentForm = (props) => {
                                                                     </div>
                                                                 </div>
 
-                                                                {getTranslations()}
+                                                                {getTranslations(formikProps)}
 
                                                                 <div className="col-12">
                                                                     <div className="form-group">
