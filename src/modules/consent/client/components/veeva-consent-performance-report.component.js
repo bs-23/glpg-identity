@@ -12,7 +12,7 @@ import axios from 'axios';
 
 import _ from 'lodash';
 import parse from 'html-react-parser';
-import { getVeevaConsentReport } from '../consent.action';
+import { getVeevaConsentReport } from '../consent.actions';
 
 const ConsentPerformanceReport = () => {
     const dispatch = useDispatch();
@@ -87,7 +87,7 @@ const ConsentPerformanceReport = () => {
         let url = '';
         if(!Array.isArray(url_parameters)) return url;
 
-        
+
         url_parameters.forEach( item => {
             if(item.value){
                 if(url.length) url+='&';
@@ -97,18 +97,18 @@ const ConsentPerformanceReport = () => {
         });
         return url;
     }
-    
+
     function getorderType(orderBy){
         return consents_report.orderBy !== orderBy  ? 'ASC' : (consents_report.orderBy === orderBy && consents_report.orderType === 'DESC') ? 'ASC' : 'DESC';
     }
 
     function getUrl(orderBy){
-        return `/consent/consent-performance-report/veeva-crm${makeUrl( [ 
-            { name: 'page', value: consents_report.page - 1 }, 
-            { name: 'codbase', value: consents_report.codbase }, 
-            { name: 'process_activity', value: consents_report.process_activity }, 
-            { name: 'opt_type', value: consents_report.opt_type }, 
-            { name: 'orderBy', value: orderBy }, 
+        return `/consent/consent-performance-report/veeva-crm${makeUrl( [
+            { name: 'page', value: consents_report.page - 1 },
+            { name: 'codbase', value: consents_report.codbase },
+            { name: 'process_activity', value: consents_report.process_activity },
+            { name: 'opt_type', value: consents_report.opt_type },
+            { name: 'orderBy', value: orderBy },
             { name: 'orderType', value: getorderType(orderBy) }
         ] )}`
     }
@@ -116,10 +116,10 @@ const ConsentPerformanceReport = () => {
     function titleCase(str) {
         let splitStr = str.toLowerCase().split('-');
         for (let i = 0; i < splitStr.length; i++) {
-            splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);     
+            splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
         }
-        
-        return splitStr.join(' '); 
+
+        return splitStr.join(' ');
     }
 
 
@@ -157,7 +157,7 @@ const ConsentPerformanceReport = () => {
                                         <NavLink className="custom-tab px-4 py-3 cdp-border-primary" to="/consent/consent-performance-report/veeva-crm"><img alt="Veeva CRM LOGO" src="/assets/logo/logo-veevacrm.svg" height="13" /></NavLink>
                                     </div>
                                 </div>
-                               
+
                                 <div className="d-flex pt-3 pt-sm-0">
                                     <React.Fragment>
                                         {countries && consents_report['countries'] &&
@@ -167,9 +167,9 @@ const ConsentPerformanceReport = () => {
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
                                                     <LinkContainer to={`/consent/consent-performance-report/veeva-crm${makeUrl( [
-                                                        { name: 'process_activity', value: consents_report.process_activity }, 
-                                                        { name: 'opt_type', value: consents_report.opt_type }, 
-                                                        { name: 'orderBy', value: consents_report.orderBy }, 
+                                                        { name: 'process_activity', value: consents_report.process_activity },
+                                                        { name: 'opt_type', value: consents_report.opt_type },
+                                                        { name: 'orderBy', value: consents_report.orderBy },
                                                         { name: 'orderType', value: consents_report.orderType }
                                                     ] )}`}>
                                                         <Dropdown.Item className={consents_report.codbase === '' ? 'd-none' : ''} onClick={() => dispatch(getVeevaConsentReport('', '', consents_report.process_activity, consents_report.opt_type, consents_report.orderBy, consents_report.orderType))}>All</Dropdown.Item>
@@ -177,15 +177,15 @@ const ConsentPerformanceReport = () => {
                                                     {
                                                         countries.map((item, index) => (
                                                             consents_report.countries.includes(item.country_iso2) && <LinkContainer  key={index} to={`/consent/consent-performance-report/veeva-crm${makeUrl( [
-                                                                { name: 'codbase', value: item.codbase }, 
-                                                                { name: 'process_activity', value: consents_report.process_activity }, 
-                                                                { name: 'opt_type', value: consents_report.opt_type }, 
-                                                                { name: 'orderBy', value: consents_report.orderBy}, 
+                                                                { name: 'codbase', value: item.codbase },
+                                                                { name: 'process_activity', value: consents_report.process_activity },
+                                                                { name: 'opt_type', value: consents_report.opt_type },
+                                                                { name: 'orderBy', value: consents_report.orderBy},
                                                                 { name: 'orderType', value: consents_report.orderType }
                                                             ] )}`}>
                                                                 <Dropdown.Item className={consents_report.countries.includes(item.country_iso2) && consents_report.codbase === item.codbase ? 'd-none' : ''} onClick={() => dispatch(getVeevaConsentReport('',  item.codbase, consents_report.process_activity, consents_report.opt_type, consents_report.orderBy, consents_report.orderType))}>
                                                                     {
-                                                                        
+
                                                                         consents_report.countries.includes(item.country_iso2) ? item.codbase_desc : null
                                                                     }
                                                                 </Dropdown.Item>
@@ -193,7 +193,7 @@ const ConsentPerformanceReport = () => {
                                                         ))
                                                     }
                                                 </Dropdown.Menu>
-                                            </Dropdown> 
+                                            </Dropdown>
                                         }
 
                                         {/* <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-btn-primary text-white dropdown shadow-sm">
@@ -261,7 +261,7 @@ const ConsentPerformanceReport = () => {
                                     </Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
-                                    { currentUser && 
+                                    { currentUser &&
                                     <div className="px-4 py-3">
                                         <div className="row">
                                             <div className="col">
@@ -290,7 +290,7 @@ const ConsentPerformanceReport = () => {
                                                 <div className="">{getCountryName(currentUser.country_code) || '--'}</div>
                                             </div>
                                         </div>
-                                        
+
                                         <div className="row mt-4">
                                             <div className="col accordion-consent rounded shadow-sm p-0">
                                                 <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Consents</h4>
@@ -299,12 +299,12 @@ const ConsentPerformanceReport = () => {
                                                         <Accordion.Collapse eventKey={consent.id}>
                                                             <Card.Body className="">
                                                                 <div>{parse(consent.rich_text)}</div>
-                                                                <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Consent type:</span> <span className="text-capitalize">{consent.opt_type}</span></div>
+                                                                <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Opt Type:</span> <span className="text-capitalize">{consent.opt_type}</span></div>
                                                                 <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Consent given date:</span>{(new Date(consent.given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
                                                             </Card.Body>
                                                         </Accordion.Collapse>
                                                         <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
-                                                            <span className="d-flex align-items-center"><i class={`icon icon-check-filled cdp-text-primary mr-4 consent-check`}></i> <span className="consent-summary">{consent.title}</span></span>
+                                                            <span className="d-flex align-items-center"><i class={`icon icon-check-filled cdp-text-primary mr-4 consent-check`}></i> <span className="consent-summary">{consent.content_type}</span></span>
                                                             <i className="icon icon-arrow-down ml-2 accordion-consent__icon-down"></i>
                                                         </Accordion.Toggle>
                                                     </Card>
@@ -317,7 +317,7 @@ const ConsentPerformanceReport = () => {
                             </Modal>
 
 
-                            
+
                             {consents_report['hcp_consents'] && consents_report['hcp_consents'].length > 0 &&
                                 <React.Fragment>
                                     <div className="shadow-sm bg-white table-responsive">
@@ -326,7 +326,7 @@ const ConsentPerformanceReport = () => {
                                                 <tr>
                                                     <th>
                                                         <LinkContainer to={getUrl('name')}>
-                                                            <span 
+                                                            <span
                                                                 className={consents_report.orderBy === 'name' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
                                                                 onClick={() => dispatch(getVeevaConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'name', getorderType('name') ))}
                                                             >
@@ -337,7 +337,7 @@ const ConsentPerformanceReport = () => {
 
                                                     <th>
                                                         <LinkContainer to={getUrl('email')}>
-                                                            <span 
+                                                            <span
                                                                 className={consents_report.orderBy === 'email' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
                                                                 onClick={() => dispatch(getVeevaConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'email', getorderType('email') ))}
                                                             >
@@ -347,19 +347,8 @@ const ConsentPerformanceReport = () => {
                                                     </th>
 
                                                     <th>
-                                                        <LinkContainer to={getUrl('consent_type')}>
-                                                            <span 
-                                                                className={consents_report.orderBy === 'consent_type' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getVeevaConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'consent_type', getorderType('consent_type') ))}
-                                                            >
-                                                                Consent Type
-                                                            <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
-                                                        </LinkContainer>
-                                                    </th>
-
-                                                    <th>
                                                         <LinkContainer to={getUrl('opt_type')}>
-                                                            <span 
+                                                            <span
                                                                 className={consents_report.orderBy === 'opt_type' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
                                                                 onClick={() => dispatch(getVeevaConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'opt_type', getorderType('opt_type') ))}
                                                             >
@@ -370,7 +359,7 @@ const ConsentPerformanceReport = () => {
 
                                                     <th>
                                                         <LinkContainer to={getUrl('legal_basis')}>
-                                                            <span 
+                                                            <span
                                                                 className={consents_report.orderBy === 'legal_basis' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
                                                                 onClick={() => dispatch(getVeevaConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'legal_basis', getorderType('legal_basis') ))}
                                                             >
@@ -381,7 +370,7 @@ const ConsentPerformanceReport = () => {
 
                                                     <th>
                                                         <LinkContainer to={getUrl('preferences')}>
-                                                            <span 
+                                                            <span
                                                                 className={consents_report.orderBy === 'preferences' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
                                                                 onClick={() => dispatch(getVeevaConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'preferences', getorderType('preferences') ))}
                                                             >
@@ -392,7 +381,7 @@ const ConsentPerformanceReport = () => {
 
                                                     <th>
                                                         <LinkContainer to={getUrl('date')}>
-                                                            <span 
+                                                            <span
                                                                 className={consents_report.orderBy === 'date' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
                                                                 onClick={() => dispatch(getVeevaConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'date', getorderType('date') ))}
                                                             >
@@ -400,7 +389,7 @@ const ConsentPerformanceReport = () => {
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
                                                         </LinkContainer>
                                                     </th>
-                                                    
+
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -409,7 +398,6 @@ const ConsentPerformanceReport = () => {
                                                     <tr key={index}>
                                                         <td>{row.name}</td>
                                                         <td><i className="icon icon-check-filled icon-position-bit-down text-primary-color mr-2 cdp-text-primary"></i>{row.email}</td>
-                                                        <td>{row.title}</td>
                                                         <td>{titleCase(row.opt_type)}</td>
                                                         <td>{titleCase(row.legal_basis)}</td>
                                                         <td>{row.preference}</td>
@@ -421,7 +409,7 @@ const ConsentPerformanceReport = () => {
                                                                             <i className="icon icon-setting"></i> Action
                                                                     </Dropdown.Toggle>
                                                                     <Dropdown.Menu>
-                                                                        <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(row)}>Profile</Dropdown.Item></LinkContainer> 
+                                                                        <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(row)}>Profile</Dropdown.Item></LinkContainer>
                                                                          {row.status === 'not_verified' && <LinkContainer to="#"><Dropdown.Item onClick={() => onUpdateStatus(row)}>Manage Status</Dropdown.Item></LinkContainer>}
                                                                     </Dropdown.Menu>
                                                                 </Dropdown>
@@ -438,13 +426,13 @@ const ConsentPerformanceReport = () => {
                                             <div className="pagination justify-content-end align-items-center border-top p-3">
                                                 <span className="cdp-text-primary font-weight-bold">{consents_report.start + ' - ' + consents_report.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + consents_report.total}</span>
                                                 {
-                                                    consents_report.page <= 1 ? (<span className="pagination-btn" data-testid='Prev' disabled={consents_report.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>) : (<LinkContainer 
-                                                        to={`/consent/consent-performance-report/veeva-crm${makeUrl( [ 
-                                                            { name: 'page', value: consents_report.page - 1 }, 
-                                                            { name: 'codbase', value: consents_report.codbase }, 
-                                                            { name: 'process_activity', value: consents_report.process_activity }, 
-                                                            { name: 'opt_type', value: consents_report.opt_type }, 
-                                                            { name: 'orderBy', value: consents_report.orderBy }, 
+                                                    consents_report.page <= 1 ? (<span className="pagination-btn" data-testid='Prev' disabled={consents_report.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>) : (<LinkContainer
+                                                        to={`/consent/consent-performance-report/veeva-crm${makeUrl( [
+                                                            { name: 'page', value: consents_report.page - 1 },
+                                                            { name: 'codbase', value: consents_report.codbase },
+                                                            { name: 'process_activity', value: consents_report.process_activity },
+                                                            { name: 'opt_type', value: consents_report.opt_type },
+                                                            { name: 'orderBy', value: consents_report.orderBy },
                                                             { name: 'orderType', value: consents_report.orderType }
                                                         ] )}`}
                                                     >
@@ -453,13 +441,13 @@ const ConsentPerformanceReport = () => {
                                                 }
 
                                                 {
-                                                    consents_report.end === consents_report.total ? (<span className="pagination-btn" data-testid='Next' disabled={consents_report.end === consents_report.total}><i className="icon icon-arrow-down ml-2 next"></i></span>) : (<LinkContainer 
-                                                        to={`/consent/consent-performance-report/veeva-crm${makeUrl( [ 
-                                                            { name: 'page', value: consents_report.page + 1 }, 
-                                                            { name: 'codbase', value: consents_report.codbase }, 
-                                                            { name: 'process_activity', value: consents_report.process_activity }, 
-                                                            { name: 'opt_type', value: consents_report.opt_type }, 
-                                                            { name: 'orderBy', value: consents_report.orderBy}, 
+                                                    consents_report.end === consents_report.total ? (<span className="pagination-btn" data-testid='Next' disabled={consents_report.end === consents_report.total}><i className="icon icon-arrow-down ml-2 next"></i></span>) : (<LinkContainer
+                                                        to={`/consent/consent-performance-report/veeva-crm${makeUrl( [
+                                                            { name: 'page', value: consents_report.page + 1 },
+                                                            { name: 'codbase', value: consents_report.codbase },
+                                                            { name: 'process_activity', value: consents_report.process_activity },
+                                                            { name: 'opt_type', value: consents_report.opt_type },
+                                                            { name: 'orderBy', value: consents_report.orderBy},
                                                             { name: 'orderType', value: consents_report.orderType }
                                                         ] )}`}
                                                     >

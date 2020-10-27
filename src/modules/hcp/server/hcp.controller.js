@@ -352,35 +352,48 @@ async function registrationLookup(req, res) {
 
     try {
         const profileByEmail = await Hcp.findOne({ where: where(fn('lower', col('email')), fn('lower', email)) });
-        const profileByUUID = await Hcp.findOne({ where: { uuid } });
 
         if (profileByEmail) {
             response.errors.push(new CustomError('Email address is already registered.', 4001, 'email'));
             return res.status(400).send(response);
-        } else if (profileByUUID) {
+        }
+
+        const uuidWithoutSpecialCharacter = uuid.replace(/[-]/gi, '');
+
+        const master_data = await sequelize.datasyncConnector.query(`
+            SELECT h.*, s.specialty_code
+            FROM ciam.vwhcpmaster AS h
+            INNER JOIN ciam.vwmaphcpspecialty AS s
+            ON s.individual_id_onekey = h.individual_id_onekey
+            WHERE regexp_replace(h.uuid_1, '[-]', '', 'gi') = $uuid
+            OR regexp_replace(h.uuid_2, '[-]', '', 'gi') = $uuid
+        `, {
+            bind: { uuid: uuidWithoutSpecialCharacter },
+            type: QueryTypes.SELECT
+        });
+
+        let uuid_from_master_data;
+
+        if(master_data && master_data.length) {
+            const uuid_1_from_master_data = (master_data[0].uuid_1 || '');
+            const uuid_2_from_master_data = (master_data[0].uuid_2 || '');
+
+            uuid_from_master_data = [uuid_1_from_master_data, uuid_2_from_master_data]
+                .find(id => id.replace(/[-]/gi, '') === uuidWithoutSpecialCharacter);
+        }
+
+        const profileByUUID = await Hcp.findOne({ where: { uuid: uuid_from_master_data || uuid }});
+
+        if (profileByUUID) {
             response.errors.push(new CustomError('UUID is already registered.', 4101, 'uuid'));
             return res.status(400).send(response);
+        }
+
+        if (master_data && master_data.length) {
+            response.data = mapMasterDataToHcpProfile(master_data[0]);
         } else {
-            const uuidWithoutSpecialCharacter = uuid.replace(/[-]/gi, '');
-
-            const master_data = await sequelize.datasyncConnector.query(`
-                SELECT h.*, s.specialty_code
-                FROM ciam.vwhcpmaster AS h
-                INNER JOIN ciam.vwmaphcpspecialty AS s
-                ON s.individual_id_onekey = h.individual_id_onekey
-                WHERE regexp_replace(h.uuid_1, '[-]', '', 'gi') = $uuid
-                OR regexp_replace(h.uuid_2, '[-]', '', 'gi') = $uuid
-            `, {
-                bind: { uuid: uuidWithoutSpecialCharacter },
-                type: QueryTypes.SELECT
-            });
-
-            if (master_data && master_data.length) {
-                response.data = mapMasterDataToHcpProfile(master_data[0]);
-            } else {
-                response.errors.push(new CustomError('Invalid UUID.', 4100, 'uuid'));
-                return res.status(400).send(response);
-            }
+            response.errors.push(new CustomError('Invalid UUID.', 4100, 'uuid'));
+            return res.status(400).send(response);
         }
 
         res.json(response);
@@ -448,18 +461,9 @@ async function createHcpProfile(req, res) {
 
     try {
         const isEmailExists = await Hcp.findOne({ where: where(fn('lower', col('email')), fn('lower', email)) });
-        const isUUIDExists = await Hcp.findOne({ where: { uuid: req.body.uuid } });
 
         if (isEmailExists) {
             response.errors.push(new CustomError('Email already exists.', 4001, 'email'));
-        }
-
-        if (isUUIDExists) {
-            response.errors.push(new CustomError('UUID already exists.', 4101, 'uuid'));
-        }
-
-        if (response.errors.length) {
-            return res.status(400).send(response);
         }
 
         let master_data = {};
@@ -481,6 +485,16 @@ async function createHcpProfile(req, res) {
 
             uuid_from_master_data = [uuid_1_from_master_data, uuid_2_from_master_data]
                 .find(id => id.replace(/[-]/gi, '') === uuidWithoutSpecialCharacter);
+        }
+
+        const isUUIDExists = await Hcp.findOne({ where: { uuid: uuid_from_master_data || uuid }});
+
+        if (isUUIDExists) {
+            response.errors.push(new CustomError('UUID already exists.', 4101, 'uuid'));
+        }
+
+        if (response.errors.length) {
+            return res.status(400).send(response);
         }
 
         const model = {
@@ -508,17 +522,20 @@ async function createHcpProfile(req, res) {
 
         if (req.body.consents && req.body.consents.length) {
             await Promise.all(req.body.consents.map(async consent => {
-                const consentSlug = Object.keys(consent)[0];
+                const preferenceSlug = Object.keys(consent)[0];
                 const consentResponse = Object.values(consent)[0];
 
                 if (!consentResponse) return;
 
-                const consentDetails = await Consent.findOne({ where: { slug: consentSlug } });
+                const consentDetails = await Consent.findOne({ where: { slug: preferenceSlug } });
+
                 if (!consentDetails) return;
 
                 const consentLocale = await ConsentLocale.findOne({
                     where: {
-                        locale: model.locale.toLowerCase(),
+                        locale: {
+                            [Op.iLike]: `%${model.locale}`
+                        },
                         consent_id: consentDetails.id
                     }
                 });
@@ -772,11 +789,25 @@ async function getHCPUserConsents(req, res) {
 
         if (!userConsents) return res.json([]);
 
-        const userConsentDetails = await ConsentLocale.findAll({ include: { model: Consent, as: 'consent', attributes: ['title'] }, where: { consent_id: userConsents.map(consent => consent.consent_id), locale: locale ? locale.toLowerCase() : doc.locale }, attributes: ['consent_id', 'rich_text'] });
+        const userConsentDetails = await ConsentLocale.findAll({
+            include: {
+                model: Consent,
+                as: 'consent'
+            }, where: {
+                consent_id: userConsents.map(consent => consent.consent_id),
+                locale: {
+                    [Op.iLike]: `%${locale ? locale : doc.locale}`
+                }
+            }, attributes: ['consent_id', 'rich_text']
+        });
 
         const consentCountries = await ConsentCountry.findAll({ where: { consent_id: userConsents.map(consent => consent.consent_id), country_iso2: { [Op.or]: [doc.country_iso2.toUpperCase(), doc.country_iso2.toLowerCase()] } } });
 
-        const consentResponse = userConsentDetails.map(({ consent_id: id, rich_text, consent: { title } }) => ({ id, title, rich_text: validator.unescape(rich_text) }));
+        const consentResponse = userConsentDetails.map(({
+            consent_id: id,
+            rich_text,
+            consent: { preference }
+        }) => ({ id, preference, rich_text: validator.unescape(rich_text) }));
 
         response.data = consentResponse.map(conRes => {
             const matchedConsent = userConsents.find(consent => consent.consent_id === conRes.id);
