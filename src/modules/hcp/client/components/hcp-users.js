@@ -303,7 +303,7 @@ export default function hcpUsers() {
                                             </div>
                                             <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">Date of Birth</div>
-                                                <div className="">{currentUser.birthdate ? (new Date(currentUser.birthdate)).toLocaleDateString('en-GB').replace(/\//g, '.') : '--'}</div>
+                                                <div className="">{currentUser.birthdate ? currentUser.birthdate : '--'}</div>
                                             </div>
                                         </div>
                                         <div className="row mt-4">
