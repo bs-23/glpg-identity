@@ -174,7 +174,7 @@ async function getAppCountryServiceCategoriesFromPermissionSet(permissionSet) {
     }
 
     if(countries.includes('all')) {
-        const allCountries = await sequelize.datasyncConnector.query("SELECT DISTINCT ON(codbase_desc) * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;", { type: QueryTypes.SELECT });
+        const allCountries = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry WHERE codbase_desc=countryname ORDER BY codbase_desc, countryname;", { type: QueryTypes.SELECT });
         countries = allCountries.map(c => c.country_iso2);
     }
 

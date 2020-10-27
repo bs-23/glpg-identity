@@ -147,7 +147,7 @@ async function getUserApplicationCountry(permissionSet) {
     }
 
     if(countries.includes('all')) {
-        const countriesDb = await sequelize.datasyncConnector.query("SELECT DISTINCT ON(codbase_desc) * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;", { type: QueryTypes.SELECT });
+        const countriesDb = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry WHERE codbase_desc=countryname ORDER BY codbase_desc, countryname", { type: QueryTypes.SELECT });
         countries = countriesDb.map(c => c.country_iso2);
     }
 
@@ -906,8 +906,7 @@ async function updateSignedInUserProfile(req, res) {
             await emailService.send(options);
         }
 
-        const signedInUserWithApplicationDetails = await attachApplicationInfoToUser(signedInUser);
-        res.json(formatProfile(signedInUserWithApplicationDetails));
+        res.json(await formatProfile(signedInUser));
     }catch(err){
         console.error(err);
         res.status(500).send('Internal server error');
