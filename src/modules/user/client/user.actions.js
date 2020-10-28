@@ -70,15 +70,6 @@ export function getUsers(page = 1, codbase, orderBy, orderType) {
     };
 }
 
-export function deleteUser(id) {
-    return {
-        type: Types.DELETE_USER,
-        payload: axios({
-            method: 'delete',
-            url: `/api/users/${id}`
-        })
-    };
-}
 
 export function getRoles() {
     return {
