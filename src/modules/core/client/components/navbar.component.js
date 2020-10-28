@@ -8,7 +8,7 @@ import { useHistory } from "react-router-dom";
 export default function Navbar() {
     const [, setCookie, removeCookie] = useCookies();
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
-    const countries = useSelector(state => state.countryReduces.countries);
+    const countries = useSelector(state => state.countryReducer.countries);
     const { first_name, last_name } = loggedInUser;
     const dispatch = useDispatch()
     const history = useHistory();
