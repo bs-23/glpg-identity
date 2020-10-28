@@ -3,13 +3,12 @@ import Types from './user.types';
 const initialState = {
     loggedInUser: null,
     users: {},
-    deletedUserInfo: {},
     roles: [],
     countries: []
 };
 
 function sortItems(items, propertyName, type) {
-    if(!propertyName || propertyName === 'null') {
+    if (!propertyName || propertyName === 'null') {
         return items;
     }
     return items.sort(function (a, b) {
@@ -76,12 +75,6 @@ export default function reducer(state = initialState, action) {
                 ...state,
                 users: (action.payload.type === 'ASC') ? { ...state.users, users: sortItems(state.users['users'], action.payload.val, 1) } :
                     { ...state.users, users: sortItems(state.users['users'], action.payload.val, -1) }
-            }
-        }
-        case Types.DELETE_USER_FULFILLED: {
-            return {
-                ...state,
-                deletedUserInfo: action.payload.data
             }
         }
         case Types.CREATE_ROLE_FULFILLED: {
