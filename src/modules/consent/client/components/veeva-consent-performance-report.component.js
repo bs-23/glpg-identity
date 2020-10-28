@@ -408,7 +408,7 @@ const ConsentPerformanceReport = () => {
                                                 {consents_report['hcp_consents'].map((row, index) => (
                                                     <tr key={index}>
                                                         <td>{row.name}</td>
-                                                        <td><i className="icon icon-check-filled icon-position-bit-down text-primary-color mr-2 cdp-text-primary"></i>{row.email}</td>
+                                                        <td>{row.email}</td>
                                                         <td>{row.title}</td>
                                                         <td>{titleCase(row.opt_type)}</td>
                                                         <td>{titleCase(row.legal_basis)}</td>
