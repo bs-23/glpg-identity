@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import {ContentState, EditorState} from 'draft-js';
 import {stateToHTML} from 'draft-js-export-html';
+import { ContentState, EditorState, convertFromHTML } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import 'draft-js/dist/Draft.css';
@@ -54,7 +54,7 @@ export default function DraftEditor({ onChangeHTML, htmlContent }) {
     }
 
     useEffect(() => {
-        if(onChangeHTML) {
+        if (onChangeHTML) {
             const editorContentInHTML = convertContentToHtml();
             onChangeHTML(editorContentInHTML);
         }
@@ -69,8 +69,8 @@ export default function DraftEditor({ onChangeHTML, htmlContent }) {
     }, []);
 
     return <Editor
-                editorState={editorState}
-                onEditorStateChange={setEditorState}
-                toolbar={toolbarOptions}
-            />
+        editorState={editorState}
+        onEditorStateChange={setEditorState}
+        toolbar={toolbarOptions}
+    />
 }
