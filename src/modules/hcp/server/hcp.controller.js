@@ -345,32 +345,48 @@ async function registrationLookup(req, res) {
 
     try {
         const profileByEmail = await Hcp.findOne({ where: where(fn('lower', col('email')), fn('lower', email)) });
-        const profileByUUID = await Hcp.findOne({ where: { uuid } });
 
         if (profileByEmail) {
             response.errors.push(new CustomError('Email address is already registered.', 4001, 'email'));
             return res.status(400).send(response);
-        } else if (profileByUUID) {
+        }
+
+        const uuidWithoutSpecialCharacter = uuid.replace(/[-]/gi, '');
+
+        const master_data = await sequelize.datasyncConnector.query(`
+            SELECT h.*, s.specialty_code
+            FROM ciam.vwhcpmaster AS h
+            INNER JOIN ciam.vwmaphcpspecialty AS s
+            ON s.individual_id_onekey = h.individual_id_onekey
+            WHERE regexp_replace(h.uuid_1, '[-]', '', 'gi') = $uuid
+            OR regexp_replace(h.uuid_2, '[-]', '', 'gi') = $uuid
+        `, {
+            bind: { uuid: uuidWithoutSpecialCharacter },
+            type: QueryTypes.SELECT
+        });
+
+        let uuid_from_master_data;
+
+        if(master_data && master_data.length) {
+            const uuid_1_from_master_data = (master_data[0].uuid_1 || '');
+            const uuid_2_from_master_data = (master_data[0].uuid_2 || '');
+
+            uuid_from_master_data = [uuid_1_from_master_data, uuid_2_from_master_data]
+                .find(id => id.replace(/[-]/gi, '') === uuidWithoutSpecialCharacter);
+        }
+
+        const profileByUUID = await Hcp.findOne({ where: { uuid: uuid_from_master_data || uuid }});
+
+        if (profileByUUID) {
             response.errors.push(new CustomError('UUID is already registered.', 4101, 'uuid'));
             return res.status(400).send(response);
-        } else {
-            const master_data = await sequelize.datasyncConnector.query(`
-                SELECT h.*, s.specialty_code
-                FROM ciam.vwhcpmaster AS h
-                INNER JOIN ciam.vwmaphcpspecialty AS s
-                ON s.individual_id_onekey = h.individual_id_onekey
-                WHERE h.uuid_1 = $uuid OR h.uuid_2 = $uuid
-            `, {
-                bind: { uuid },
-                type: QueryTypes.SELECT
-            });
+        }
 
-            if (master_data && master_data.length) {
-                response.data = mapMasterDataToHcpProfile(master_data[0]);
-            } else {
-                response.errors.push(new CustomError('Invalid UUID.', 4100, 'uuid'));
-                return res.status(400).send(response);
-            }
+        if (master_data && master_data.length) {
+            response.data = mapMasterDataToHcpProfile(master_data[0]);
+        } else {
+            response.errors.push(new CustomError('Invalid UUID.', 4100, 'uuid'));
+            return res.status(400).send(response);
         }
 
         res.json(response);
@@ -438,11 +454,33 @@ async function createHcpProfile(req, res) {
 
     try {
         const isEmailExists = await Hcp.findOne({ where: where(fn('lower', col('email')), fn('lower', email)) });
-        const isUUIDExists = await Hcp.findOne({ where: { uuid: req.body.uuid } });
 
         if (isEmailExists) {
             response.errors.push(new CustomError('Email already exists.', 4001, 'email'));
         }
+
+        let master_data = {};
+        let uuid_from_master_data;
+
+        if (uuid) {
+            const uuidWithoutSpecialCharacter = uuid.replace(/[-]/gi, '');
+
+            master_data = await sequelize.datasyncConnector.query(`select * from ciam.vwhcpmaster
+                    where regexp_replace(uuid_1, '[-]', '', 'gi') = $uuid
+                    OR regexp_replace(uuid_2, '[-]', '', 'gi') = $uuid`, {
+                bind: { uuid: uuidWithoutSpecialCharacter },
+                type: QueryTypes.SELECT
+            });
+            master_data = master_data && master_data.length ? master_data[0] : {};
+
+            const uuid_1_from_master_data = (master_data.uuid_1 || '');
+            const uuid_2_from_master_data = (master_data.uuid_2 || '');
+
+            uuid_from_master_data = [uuid_1_from_master_data, uuid_2_from_master_data]
+                .find(id => id.replace(/[-]/gi, '') === uuidWithoutSpecialCharacter);
+        }
+
+        const isUUIDExists = await Hcp.findOne({ where: { uuid: uuid_from_master_data || uuid }});
 
         if (isUUIDExists) {
             response.errors.push(new CustomError('UUID already exists.', 4101, 'uuid'));
@@ -452,19 +490,9 @@ async function createHcpProfile(req, res) {
             return res.status(400).send(response);
         }
 
-        let master_data = {};
-
-        if (req.body.uuid) {
-            master_data = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwhcpmaster WHERE uuid_1 = $uuid OR uuid_2 = $uuid', {
-                bind: { uuid: req.body.uuid },
-                type: QueryTypes.SELECT
-            });
-            master_data = master_data && master_data.length ? master_data[0] : {};
-        }
-
         const model = {
             email: email.toLowerCase(),
-            uuid,
+            uuid: uuid_from_master_data || uuid,
             salutation,
             first_name,
             last_name,

@@ -395,7 +395,7 @@ const CdpConsentPerformanceReport = () => {
                                                     <tr key={index}>
                                                         <td>{row.hcp_profile.first_name}</td>
                                                         <td>{row.hcp_profile.last_name}</td>
-                                                        <td><i className="icon icon-check-filled icon-position-bit-down text-primary-color mr-2 cdp-text-primary"></i>{row.hcp_profile.email}</td>
+                                                        <td><i className="icon icon-check-filled icon-position-bit-down mr-2 cdp-text-secondary"></i>{row.hcp_profile.email}</td>
                                                         <td>{row.title}</td>
                                                         <td>{titleCase(row.opt_type)}</td>
                                                         <td>{titleCase(row.legal_basis)}</td>

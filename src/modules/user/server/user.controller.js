@@ -129,11 +129,11 @@ async function getSignedInUserProfile(req, res) {
 async function login(req, res) {
     try {
         let user;
-        const { username, password, recaptchaToken, grant_type, refresh_token } = req.body;
+        const { username, password, recaptchaToken, grant_type } = req.body;
 
         if(!grant_type) return res.status(400).send('Invalid grant_type.');
 
-        if(grant_type && grant_type !== 'password' && grant_type !== 'refresh_token') {
+        if(grant_type && grant_type !== 'password') {
             return res.status(400).send('The requested grant_type is not supported.')
         }
 
@@ -195,22 +195,6 @@ async function login(req, res) {
             }
 
             await user.update({ refresh_token: generateRefreshToken(user) });
-        }
-
-        if(grant_type === 'refresh_token') {
-            if(!refresh_token) return res.status(401).send('The refresh token is invalid or expired.');
-
-            try {
-                const decoded = jwt.verify(refresh_token, nodecache.getValue('CDP_REFRESH_SECRET'));
-                user = await User.findOne({ where: { id: decoded.id }});
-
-                if(user.refresh_token !== refresh_token) {
-                    return res.status(401).send('The refresh token is invalid or expired.');
-                }
-            } catch(err) {
-                console.log(err);
-                return res.status(401).send('The refresh token is invalid or expired.');
-            }
         }
 
         res.cookie('access_token', generateAccessToken(user), { httpOnly: true, sameSite: true, signed: true });
