@@ -7,7 +7,7 @@ import 'draft-js/dist/Draft.css';
 import htmlToDraft from 'html-to-draftjs';
 
 const toolbarOptions = {
-    options: ['inline', 'blockType', 'list', 'link', 'colorPicker', 'fontSize', 'remove'],
+    options: ['inline', 'blockType', 'list', 'link', 'remove'],
     inline: {
         options: ['bold', 'italic', 'underline', 'strikethrough', 'monospace']
     },
