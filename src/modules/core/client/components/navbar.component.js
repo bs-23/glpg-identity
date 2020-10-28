@@ -1,21 +1,21 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useCookies } from 'react-cookie';
-import { getCountries } from '../../../user/client/user.actions'
+import { getCountries } from '../../../core/client/country/country.actions';
 import { useHistory } from "react-router-dom";
 // import Dropdown from 'react-bootstrap/Dropdown';
 
 export default function Navbar() {
     const [, setCookie, removeCookie] = useCookies();
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
-    const countries = useSelector(state => state.userReducer.countries);
+    const countries = useSelector(state => state.countryReduces.countries);
     const { first_name, last_name } = loggedInUser;
     const dispatch = useDispatch()
     const history = useHistory();
 
     useEffect(() => {
-        dispatch(getCountries())
-    }, [])
+        dispatch(getCountries());
+    }, []);
 
     const handleLogOut = () => {
         // alert('clicked auto');

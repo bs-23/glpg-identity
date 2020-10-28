@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { NavLink, useHistory } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
@@ -9,10 +9,10 @@ import { useToasts } from "react-toast-notifications";
 import Dropdown from 'react-bootstrap/Dropdown';
 // const countryCodes = require('country-codes-list');
 import CountryCodes from 'country-codes-list';
+import { getCountries } from '../../../core/client/country/country.actions';
 
 export default function UserForm() {
     const dispatch = useDispatch();
-    const [countries, setCountries] = useState([]);
     const [roles, setRoles] = useState([]);
     const [applications, setApplications] = useState([]);
     const [selectedRoles, setSelectedRoles] = useState([]);
@@ -22,6 +22,8 @@ export default function UserForm() {
     const CountryCodesObject = CountryCodes.customList('countryCode', '+{countryCallingCode}')
     const [selectedCountryCode, setSelectedCountryCode] = useState(0);
 
+    const countries = useSelector(state => state.countryReducer.countries);
+
 
     const generateCountryIconPath = (country) => {
         if(country) return `/assets/flag/flag-${country.toLowerCase().replace(/ /g, "-")}.svg`;
@@ -29,10 +31,6 @@ export default function UserForm() {
     }
 
     useEffect(() => {
-        async function getCountries() {
-            const response = await axios.get('/api/countries');
-            setCountries(response.data);
-        }
         async function getAppplications() {
             const response = await axios.get('/api/applications');
             setApplications(response.data);
@@ -41,7 +39,7 @@ export default function UserForm() {
             const response = await axios.get('/api/roles');
             setRoles(response.data);
         }
-        getCountries();
+        dispatch(getCountries());
         getAppplications();
         getRoles();
     }, []);
