@@ -10,17 +10,19 @@ const Application = require('../../../application/server/application.model');
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 
 const allCountries = async () => {
-    const countries = await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT });
+    const countries = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry WHERE codbase_desc=countryname ORDER BY codbase_desc, countryname;", { type: QueryTypes.SELECT });
+    const allCountryObject = { country_iso2: 'all' };
+    countries.push(allCountryObject);
     return countries;
 }
 
 const allServiceCategories = async () => {
-    const serviceCategories = await ServiceCategory.findAll({ where: { slug: { [Op.ne]: 'all' }} });
+    const serviceCategories = await ServiceCategory.findAll();
     return serviceCategories.map(i => i.dataValues);
 }
 
 const allApplications = async () => {
-    const applications = await Application.findAll({ where: { slug: { [Op.ne]: 'all' }} });
+    const applications = await Application.findAll();
     return applications.map(i => i.dataValues);
 }
 
@@ -69,7 +71,7 @@ async function getPermissionSets(req, res) {
                 }
                 if(ps.ps_app && ps.ps_app.find(papp => papp.application.slug === 'all')) {
                     const applications = await allApplications();
-                    ps.dataValues.ps_app = applications && applications.map(app=> ({ application: { id: app.id, name: app.name } }));
+                    ps.dataValues.ps_app = applications && applications.map(app=> ({ application: { id: app.id, name: app.name, slug: app.slug } }));
                 }
                 return ps.dataValues;
             })
@@ -108,7 +110,7 @@ async function getPermissionSet(req, res) {
                     include: [{
                         model: Application,
                         as: 'application',
-                        attributes: [ 'id', 'name' ]
+                        attributes: [ 'id', 'name', 'slug' ]
 
                     }]
                 }
@@ -118,13 +120,19 @@ async function getPermissionSet(req, res) {
 
         if(!permissionSet) return res.status(404).send('Permission set not found.');
 
-        if(permissionSet.dataValues.slug === 'system_admin'){
+        if(permissionSet.countries && permissionSet.countries.includes('all')){
             const countries = await allCountries();
-            const applications = await allApplications();
-            const serviceCategories = await allServiceCategories();
             permissionSet.dataValues.countries = countries.map(c => c.country_iso2);
-            permissionSet.dataValues.ps_app = applications && applications.map(app=> ({ application: { id: app.id, name: app.name } }));
+        }
+
+        if(permissionSet.ps_sc && permissionSet.ps_sc.find(psc => psc.serviceCategory.slug === 'all')) {
+            const serviceCategories = await allServiceCategories();
             permissionSet.dataValues.ps_sc = serviceCategories && serviceCategories.map(sc => ({ serviceCategory: { id: sc.id, title: sc.title, slug: sc.slug } }));
+        }
+
+        if(permissionSet.ps_app && permissionSet.ps_app.find(papp => papp.application.slug === 'all')) {
+            const applications = await allApplications();
+            permissionSet.dataValues.ps_app = applications && applications.map(app=> ({ application: { id: app.id, name: app.name } }));
         }
 
         res.json(permissionSet.dataValues);

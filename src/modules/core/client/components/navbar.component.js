@@ -5,24 +5,11 @@ import { useHistory } from "react-router-dom";
 import _ from 'lodash';
 import { getCountries } from '../../../user/client/user.actions'
 
-
-const safeGet = (object, property) => {
-    const propData = (object || {})[property];
-    return (prop) => prop ? safeGet(propData, prop) : propData;
-};
-
-const flatten = (array) => {
-    return Array.isArray(array) ? [].concat(...array.map(flatten)) : array;
-}
-
-const union = (a, b) => [...new Set([...a, ...b])];
-
-
 export default function Navbar() {
     const [, setCookie, removeCookie] = useCookies();
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
     const countries = useSelector(state => state.userReducer.countries);
-    const { first_name, last_name } = loggedInUser;
+    const { first_name, last_name, applications: userApplications, countries: userCountries } = loggedInUser;
     const dispatch = useDispatch()
     const history = useHistory();
 
@@ -44,51 +31,18 @@ export default function Navbar() {
         return `/assets/flag/flag-placeholder.svg`;
     }
 
-    const extractUserCountries = (data) => {
-        const profile_permission_sets = safeGet(data, 'profile')('permissionSets')();
-        const profile_countries = profile_permission_sets ? profile_permission_sets.map(pps => safeGet(pps, 'countries')() || []) : [];
-
-        const userRoles = safeGet(data, 'role')();
-        const roles_countries = userRoles ? userRoles.map(role => {
-            const role_permission_sets = safeGet(role, 'permissionSets')();
-            return role_permission_sets.map(rps => safeGet(rps, 'countries')() || []);
-        }) : [];
-
-        const userCountries = union(flatten(profile_countries), flatten(roles_countries));
-
-        return userCountries;
-    }
-
-    const extractUserApplications = (data) => {
-        const profile_permission_sets = safeGet(data, 'profile')('permissionSets')();
-        const profile_applications = profile_permission_sets ? profile_permission_sets.map(pps => pps.application || []) : [];
-
-        const userRoles = safeGet(data, 'role')();
-        const roles_applications = userRoles ? userRoles.map(role => {
-            const role_permission_sets = safeGet(role, 'permissionSets')();
-            return role_permission_sets.map(rps => safeGet(rps, 'application')() || []);
-        }) : [];
-
-        const userFlattenedApplications = [...flatten(profile_applications), ...flatten(roles_applications)];
-        const userDistinctApplications = _.uniqWith(userFlattenedApplications, function(arrVal, othVal) {
-            return arrVal.slug === othVal.slug;
-        });
-
-        return userDistinctApplications;
-    }
-
-    const renderCountryIcons = (userCountriesCode) => {
-        if(userCountriesCode){
-            const selectedCountries = countries && countries.filter(c => userCountriesCode.includes(c.country_iso2) ? true : false).map(c => c.codbase_desc)
+    const renderCountryIcons = () => {
+        if(userCountries){
+            const selectedCountries = countries && countries.filter(c => userCountries.includes(c.country_iso2) ? true : false).map(c => c.codbase_desc)
             return selectedCountries.map( country => {
                 return <img key={country} height="26" width="26" src={generateCountryIconPath(country)} onError={addFallbackIcon} title={country} alt="Flag" className="ml-1" />;
             })
         }
     }
 
-    const renderApplicationIcon = (applications) => {
-        if(applications){
-            return applications.map(app => {
+    const renderApplicationIcon = () => {
+        if(userApplications){
+            return userApplications.map(app => {
                 const { name, logo_link, slug } = app;
                 return <img className="ml-2" key={slug} src={logo_link} title={name} alt={`${name} Logo`} width="122" />
             })
@@ -126,10 +80,10 @@ export default function Navbar() {
                         <div className="d-block d-sm-flex justify-content-end align-items-center">
                             {loggedInUser.type !== 'admin' && <div className="mb-2 mb-sm-0 d-flex justify-content-end align-items-center">
                                 <div className="mr-3">
-                                    {renderApplicationIcon(extractUserApplications(loggedInUser))}
+                                    {renderApplicationIcon()}
                                 </div>
                                 <div className="mr-2">
-                                    {renderCountryIcons(extractUserCountries(loggedInUser))}
+                                    {renderCountryIcons()}
                                 </div>
                             </div>}
                             <div className="mb-2 mb-sm-0 d-flex justify-content-end align-items-center">

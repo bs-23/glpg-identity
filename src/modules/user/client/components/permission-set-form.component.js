@@ -41,8 +41,12 @@ const CheckList = ({ name, options, labelExtractor, idExtractor, allOptionID }) 
             }
         }
         else {
-            let filteredOptionIds = arrayHelpers.form.values[name].filter(id => id !== allOptionID).filter(id => id !== optionId);
-            arrayHelpers.form.setFieldValue(name, filteredOptionIds);
+            if(allOptionID && (optionId === allOptionID)){
+                arrayHelpers.form.setFieldValue(name, []);
+            }else{
+                let filteredOptionIds = arrayHelpers.form.values[name].filter(id => id !== allOptionID).filter(id => id !== optionId);
+                arrayHelpers.form.setFieldValue(name, filteredOptionIds);
+            }
         }
     }
 
@@ -88,8 +92,12 @@ const ToggleList = ({ name, options, labelExtractor, idExtractor, allOptionID })
             };
         }
         else {
-            let filteredOptionIds = arrayHelpers.form.values[name].filter(id => id !== allOptionID).filter(id => id !== optionId);
-            arrayHelpers.form.setFieldValue(name, filteredOptionIds);
+            if(allOptionID && (optionId === allOptionID)){
+                arrayHelpers.form.setFieldValue(name, []);
+            }else{
+                let filteredOptionIds = arrayHelpers.form.values[name].filter(id => id !== allOptionID).filter(id => id !== optionId);
+                arrayHelpers.form.setFieldValue(name, filteredOptionIds);
+            }
         }
     }
 
@@ -97,7 +105,6 @@ const ToggleList = ({ name, options, labelExtractor, idExtractor, allOptionID })
                 name={name}
                 render={arrayHelpers => (
                     options.map(item => <label key={idExtractor(item)} className="d-flex  align-items-center">
-
                         <span className="switch">
                             <input name={name}
                                 className="custom-control-input"

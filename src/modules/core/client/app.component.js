@@ -58,7 +58,7 @@ axios.interceptors.response.use(
     error => {
         const {loggedInUser} = store.getState().userReducer;
 
-        if (error.response.status === 401 && loggedInUser) window.location = "/login";
+        if (error.response && error.response.status === 401 && loggedInUser) window.location = "/login";
 
         return Promise.reject(error);
     }

@@ -47,20 +47,28 @@ const SelectOneToggleList = ({ name, options, labelExtractor, idExtractor }) => 
             </Field>
 }
 
+const WarningMessage = ({ message }) => <div className="alert alert-warning">
+    {message}
+</div>
+
 const UserDetails = (props) => {
     const [userInfo, setUserInfo] = useState({});
     const [countries, setCountries] = useState([]);
     const [modalShow, setModalShow] = useState({ permissionSetDetails: false });
     const [permissionSetDetailID, setPermissionSetDetailID] = useState(null);
     const [roles, setRoles] = useState([]);
+    const [notAllowed, setNotAllowed] = useState(false);
     const { addToast } = useToasts();
 
     const nullValueToken = '--';
 
-    async function getUserInfo() {
+    function getUserInfo() {
         const { id } = props.match.params;
-        const response = await axios.get(`/api/users/${id}`);
-        setUserInfo(response.data);
+        axios.get(`/api/users/${id}`)
+            .then(res => setUserInfo(res.data))
+            .catch(err => {
+                if(err.response && err.response.status === 403) setNotAllowed(true);
+            });
     }
 
     const handlePermissionSetClick = (id) => {
@@ -148,7 +156,7 @@ const UserDetails = (props) => {
                                                 <span className="page-title__text font-weight-bold py-3">Profile Details</span>
                                             </h2>
                                             <div className="profile-detail p-3 py-sm-4 px-sm-5 mb-3 mb-sm-0">
-                                                <h2 className="profile-detail__name pb-3">{ userInfo.first_name && userInfo.last_name ? userInfo.first_name + " " + userInfo.last_name : '' }</h2>
+                                                {notAllowed ? <WarningMessage message="You are not allowed to view this profile." /> : <> <h2 className="profile-detail__name pb-3">{ userInfo.first_name && userInfo.last_name ? userInfo.first_name + " " + userInfo.last_name : '' }</h2>
                                                 <div className="profile-detail__row pb-0 pb-sm-2 d-block d-sm-flex">
                                                     <div className="profile-detail__col pb-3 pr-0 pr-sm-3">
                                                         <span className="mr-2 d-block profile-detail__label">Email</span>
@@ -207,25 +215,23 @@ const UserDetails = (props) => {
                                                     </div>
                                                     <div className="profile-detail__col-fluid pb-3 pr-0 pr-sm-3">
                                                         <span className="mr-2 d-block profile-detail__label">Status</span>
-                                                            {/* <div> */}
-                                                                <Field
-                                                                    as="select"
-                                                                    name="status"
-                                                                    className="form-control cdp-border-primary"
-                                                                    disabled={userInfo.type === 'admin'}
-                                                                >
-                                                                    <option value="active">Active</option>
-                                                                    <option value="inactive">Inactive</option>
-                                                                </Field>
-                                                                <button type="submit" className="btn btn-block text-white cdp-btn-secondary btn-sm mt-4 p-2" disabled={formikProps.isSubmitting || userInfo.type === 'admin'}>Save Changes</button>
-                                                            {/* </div> */}
+                                                            <Field
+                                                                as="select"
+                                                                name="status"
+                                                                className="form-control cdp-border-primary"
+                                                                disabled={userInfo.type === 'admin'}
+                                                            >
+                                                                <option value="active">Active</option>
+                                                                <option value="inactive">Inactive</option>
+                                                            </Field>
+                                                            <button type="submit" className="btn btn-block text-white cdp-btn-secondary btn-sm mt-4 p-2" disabled={formikProps.isSubmitting || userInfo.type === 'admin'}>Save Changes</button>
                                                     </div>
                                                 </div>
                                                 <PermissionSetDetailsModal
                                                     permissionSetId={permissionSetDetailID}
                                                     show={modalShow.permissionSetDetails}
                                                     onHide={handlePermissionSetDetailHide}
-                                                />
+                                                /></>}
                                             </div>
                                         </div>
                                     </div>

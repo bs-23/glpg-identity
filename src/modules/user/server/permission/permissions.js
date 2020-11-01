@@ -1,5 +1,6 @@
 const path = require('path');
 const { QueryTypes, Op } = require('sequelize');
+const _ = require('lodash');
 const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const UserProfile = require(path.join(process.cwd(), "src/modules/user/server/user-profile.model"));
@@ -14,15 +15,13 @@ const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/
 const ServiceCategory = require(path.join(process.cwd(), "src/modules/user/server/permission/service-category.model"));
 
 async function getUserPermissions(userId) {
-    let all_applications = [];
-    let all_countries = [];
-    let all_service_categories = [];
-    let role_applications = [];
     let profile_applications = [];
-    let role_countries = [];
     let profile_countries = [];
-    let role_service_categories = [];
     let profile_service_categories = [];
+
+    let role_applications = [];
+    let role_countries = [];
+    let role_service_categories = [];
 
     const user = await User.findOne({
         where: {
@@ -112,7 +111,7 @@ async function getUserPermissions(userId) {
     if (user.userProfile) {
         const profilePermissionSets = user.userProfile.up_ps;
         for (const userProPermSet of profilePermissionSets) {
-            const [applications, countries, serviceCategories] = await getAppCountryServiceCategoriesFromPermissionSet(userProPermSet.ps);
+            const [applications, countries, serviceCategories] = await getPermissionsFromPermissionSet(userProPermSet.ps);
             profile_applications = profile_applications.concat(applications);
             profile_countries = profile_countries.concat(countries);
             profile_service_categories = profile_service_categories.concat(serviceCategories);
@@ -121,7 +120,7 @@ async function getUserPermissions(userId) {
 
     for (const userRole of user.userRoles) {
         for (const rolePermSet of userRole.role.role_ps) {
-            const [applications, countries, serviceCategories] = await getAppCountryServiceCategoriesFromPermissionSet(rolePermSet.ps);
+            const [applications, countries, serviceCategories] = await getPermissionsFromPermissionSet(rolePermSet.ps);
             role_applications = role_applications.concat(applications);
             role_countries = role_countries.concat(countries);
             role_service_categories = role_service_categories.concat(serviceCategories);
@@ -129,24 +128,26 @@ async function getUserPermissions(userId) {
 
     }
 
-    all_countries = [...new Set(role_countries.concat(profile_countries))];
-    all_applications = [...new Set(role_applications.concat(profile_applications))];
-    all_service_categories = [...new Set(role_service_categories.concat(profile_service_categories))];
+    const user_countries = [...new Set(role_countries.concat(profile_countries))];
+    const user_applications = _.uniqBy(role_applications.concat(profile_applications), app => app.slug);
+    const user_service_categories = _.uniqBy(role_service_categories.concat(profile_service_categories), sc => sc.slug);
 
-    return [all_applications, all_countries, all_service_categories];
+    return [user_applications, user_countries, user_service_categories];
 }
 
-async function getAppCountryServiceCategoriesFromPermissionSet(permissionSet) {
+async function getPermissionsFromPermissionSet(permissionSet) {
     let applications = [];
     let countries = [];
     let serviceCategories = [];
 
     if (permissionSet.ps_app) {
         for (const ps_app of permissionSet.ps_app) {
-            const userApplication = ps_app.application;
+            const { id, name, slug, logo_link} = ps_app.application;
+
+            const userApplication = { id, name, slug, logo_link };
 
             if(userApplication.slug === 'all'){
-                const allApplications = await Application.findAll({ where: { slug: { [Op.ne]: 'all' } }, attributes: ['id', 'name', 'slug'] });
+                const allApplications = await Application.findAll({ where: { slug: { [Op.ne]: 'all' } }, attributes: ['id', 'name', 'slug', 'logo_link'] });
                 applications = allApplications;
                 break;
             }
@@ -181,4 +182,68 @@ async function getAppCountryServiceCategoriesFromPermissionSet(permissionSet) {
     return [applications, countries, serviceCategories];
 }
 
+async function getRequestingUserPermissions(user) {
+    if(!user) return [[], [], []];
+
+    let role_applications = [];
+    let role_countries = [];
+    let role_service_categories = [];
+
+    let profile_applications = [];
+    let profile_countries = [];
+    let profile_service_categories = [];
+
+    if (user.userProfile) {
+        const profilePermissionSets = user.userProfile.up_ps;
+        for (const userProPermSet of profilePermissionSets) {
+            const [applications, countries, serviceCategories] = await getPermissionsFromPermissionSet(userProPermSet.ps);
+            profile_applications = profile_applications.concat(applications);
+            profile_countries = profile_countries.concat(countries);
+            profile_service_categories = profile_service_categories.concat(serviceCategories);
+        }
+    }
+
+    for (const userRole of user.userRoles) {
+        for (const rolePermSet of userRole.role.role_ps) {
+            const [applications, countries, serviceCategories] = await getPermissionsFromPermissionSet(rolePermSet.ps);
+            role_applications = role_applications.concat(applications);
+            role_countries = role_countries.concat(countries);
+            role_service_categories = role_service_categories.concat(serviceCategories);
+        }
+    }
+
+    const user_countries = [...new Set(role_countries.concat(profile_countries))];
+    const user_applications = _.uniqBy(role_applications.concat(profile_applications), app => app.slug);
+    const user_service_categories = _.uniqBy(role_service_categories.concat(profile_service_categories), sc => sc.slug);
+
+    return [user_applications, user_countries, user_service_categories];
+}
+
+const isRequestingUserPermitted = async (user, requiredPermissions) => {
+    const [user_applications, user_countries, user_service_categories] = await getRequestingUserPermissions(user);
+    const { countries, applications, service_categories } = requiredPermissions;
+
+    if(countries) {
+        const hasCountryPermission = countries.some(c_iso2 => user_countries.includes(c_iso2));
+        if(!hasCountryPermission) return false;
+    }
+
+    if(applications) {
+        const hasApplicationPermission = applications.some(req_app =>
+            user_applications.some(user_app => (user_app.id === req_app.id) || (user_app.slug === req_app.slug)));
+        if(!hasApplicationPermission) return false;
+    }
+
+    if(service_categories) {
+        const hasServiceCategoryPermission = service_categories.some(req_sc =>
+            user_service_categories.some(user_sc => (user_sc.id === req_sc.id) || (user_sc.slug === req_sc.slug)));
+        if(!hasServiceCategoryPermission) false;
+    }
+
+    return true;
+}
+
 exports.getUserPermissions = getUserPermissions;
+exports.getRequestingUserPermissions = getRequestingUserPermissions;
+exports.getPermissionsFromPermissionSet = getPermissionsFromPermissionSet;
+exports.isRequestingUserPermitted = isRequestingUserPermitted;

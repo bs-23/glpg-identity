@@ -175,7 +175,7 @@ async function getHcps(req, res) {
         const codbase = req.query.codbase === 'undefined' ? null : req.query.codbase;
         const offset = page * limit;
 
-        const application_list = (await Hcp.findAll()).map(i => i.get("application_id"));
+        // const application_list = (await Hcp.findAll()).map(i => i.get("application_id"));
 
         const [userPermittedApplications, userPermittedCountries] = await getUserPermissions(req.user.id);
 
@@ -224,9 +224,19 @@ async function getHcps(req, res) {
         const specialty_list = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwspecialtymaster", { type: QueryTypes.SELECT });
 
         const hcp_filter = {
-            status: status === null ? { [Op.or]: ['self_verified', 'manually_verified', 'consent_pending', 'not_verified', null] } : status,
-            application_id: req.user.type === 'admin' ? { [Op.or]: application_list } : userPermittedApplications.map(app => app.id),
-            country_iso2: codbase ? { [Op.any]: [ignorecase_of_selected_iso2_list_for_codbase] } : { [Op.any]: [ignorecase_of_country_iso2_list] },
+            status: status === null
+                ? { [Op.or]: ['self_verified', 'manually_verified', 'consent_pending', 'not_verified', null] }
+                : status,
+            application_id: userPermittedApplications.length
+                ? userPermittedApplications.map(app => app.id)
+                : null,
+            country_iso2: codbase
+                ? ignorecase_of_selected_iso2_list_for_codbase.length
+                    ? ignorecase_of_selected_iso2_list_for_codbase
+                    : null
+                : ignorecase_of_country_iso2_list.length
+                    ? ignorecase_of_country_iso2_list
+                    : null,
         };
 
         const orderBy = req.query.orderBy === 'null'

@@ -403,7 +403,7 @@ async function getDatasyncConsentsReport(req, res) {
             codbase: codbase ? codbase : '',
             // process_activity: process_activity ? process_activity : '',
             // opt_type: opt_type ? opt_type : '',
-            countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : req.user.countries,
+            countries: userPermittedCountries,
             orderBy: orderBy,
             orderType: orderType,
         };

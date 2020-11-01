@@ -67,9 +67,12 @@ export default function Users() {
         let countryArr = [];
         let countryString = "";
         if (countries.length > 0 && (user_countries.length)) {
-            (user_countries).map((country, key) => (
-                countryArr.push(countries.find(i => i.country_iso2 === country)).codbase_desc)
-            );
+            if(user_countries.includes('all')) {
+                countryArr = [...countries];
+            }else {
+                user_countries.map((country_iso2) =>
+                    countryArr.push(countries.find(i => i.country_iso2 === country_iso2)).codbase_desc);
+            }
         }
 
         countryArr.sort((a, b) => (a.codbase_desc > b.codbase_desc) ? 1 : -1);
@@ -88,7 +91,6 @@ export default function Users() {
             const userProfile = (await axios.get('/api/users/profile')).data;
             const userCountries = extractLoggedInUserCountries(userProfile);
             setCountries(response);
-            // (userProfile.type === "admin") ? setUserCountries(response) : setUserCountries(fetchUserCountries(userProfile.countries, response));
             (userProfile.type === "admin") ? setUserCountries(response) : setUserCountries(fetchUserCountries(userCountries, response));
         }
         getCountries();

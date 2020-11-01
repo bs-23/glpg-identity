@@ -21,6 +21,7 @@ const Application = require(path.join(process.cwd(), "src/modules/application/se
 const PasswordPolicies = require(path.join(process.cwd(), "src/modules/core/server/password/password-policies.js"));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const { QueryTypes, Op, where, col, fn } = require('sequelize');
+const { getUserPermissions, getRequestingUserPermissions, getPermissionsFromPermissionSet, isRequestingUserPermitted } = require(path.join(process.cwd(), "src/modules/user/server/permission/permissions.js"));
 
 function generateAccessToken(doc) {
     return jwt.sign({
@@ -41,7 +42,6 @@ function generateRefreshToken(doc) {
 }
 
 async function getProfilePermissions(user) {
-
     let serviceCategories = [];
     const permissionSets = [];
     const userProfile = user.userProfile;
@@ -50,23 +50,19 @@ async function getProfilePermissions(user) {
 
     if (userProfile) {
         for (const userProPermSet of userProfile.up_ps) {
-            // let permissionSet = userProPermSet.ps;
-            // for (const psc of permissionSet.ps_sc) {
-            //     serviceCategories.push(psc.serviceCategory);
-            // }
-            const applicationsCountries = await getUserApplicationCountry(userProPermSet.ps);
+            const permissions = await getPermissionsFromPermissionSet(userProPermSet.ps);
 
-            applications = applicationsCountries[0];
-            countries = applicationsCountries[1];
-            serviceCategories = applicationsCountries[2];
+            applications = permissions[0];
+            countries = permissions[1];
+            serviceCategories = permissions[2];
 
             permissionSets.push({
-                serviceCategories: serviceCategories.map(sc => sc.slug),
+                serviceCategories: serviceCategories.map(sc => ({ title: sc.title, slug: sc.slug })),
                 application: applications.length > 0 ? applications : null,
                 countries: countries
             });
-
         }
+
         const profile = {
             title: userProfile.title,
             permissionSets: permissionSets
@@ -74,11 +70,9 @@ async function getProfilePermissions(user) {
 
         return profile;
     }
-
 }
 
 async function getRolePermissions(user) {
-
     let serviceCategories = [];
     const permissionSets = [];
     let applications = [];
@@ -89,79 +83,27 @@ async function getRolePermissions(user) {
     if (userRoles && userRoles.length) {
         for (const userRole of userRoles) {
             for (const rolePermSet of userRole.role.role_ps) {
-                const applicationsCountries = await getUserApplicationCountry(rolePermSet.ps);
+                const permissions = await getPermissionsFromPermissionSet(rolePermSet.ps);
 
-                applications = applicationsCountries[0];
-                countries = applicationsCountries[1];
-                serviceCategories = applicationsCountries[2];
+                applications = permissions[0];
+                countries = permissions[1];
+                serviceCategories = permissions[2];
 
                 permissionSets.push({
-                    serviceCategories: serviceCategories.map(sc => sc.slug),
+                    serviceCategories: serviceCategories.map(sc => ({ title: sc.title, slug: sc.slug })),
                     application: applications.length > 0 ? applications : null,
                     countries: countries
                 });
-
             }
 
             roles.push({
                 title: userRole.role.title,
                 permissionSets: permissionSets
-
             })
         }
 
     }
     return roles;
-
-}
-
-async function getUserApplicationCountry(permissionSet) {
-    let applications = [];
-    let countries = [];
-    let serviceCategories = [];
-
-    if(permissionSet.ps_sc){
-        for (const ps_sc of permissionSet.ps_sc) {
-            const userServiceCategory = ps_sc.serviceCategory;
-            serviceCategories.push({
-                id: userServiceCategory.id,
-                title: userServiceCategory.title,
-                slug: userServiceCategory.slug
-            });
-        }
-    }
-
-    if (permissionSet.ps_app) {
-        for (const ps_app of permissionSet.ps_app) {
-            const userApplication = ps_app.application;
-            applications.push({
-                name: userApplication.name,
-                slug: userApplication.slug,
-                logo_link: userApplication.logo_link
-            });
-        }
-    }
-
-    if (permissionSet.countries) {
-        countries = permissionSet.countries;
-    }
-
-    if(countries.includes('all')) {
-        const countriesDb = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry WHERE codbase_desc=countryname ORDER BY codbase_desc, countryname", { type: QueryTypes.SELECT });
-        countries = countriesDb.map(c => c.country_iso2);
-    }
-
-    if(applications.find(app => app.slug === 'all')) {
-        const allApplications = await Application.findAll({ where: { slug: { [Op.ne]: 'all' } }, attributes: ['name', 'slug', 'logo_link'] });
-        applications = allApplications;
-    }
-
-    if(serviceCategories.find(sc => sc.slug === 'all')) {
-        const allServiceCategories = await ServiceCategory.findAll({ where: { slug: { [Op.ne]: 'all' } }, attributes: ['id', 'title', 'slug'] });
-        serviceCategories = allServiceCategories;
-    }
-
-    return [applications, countries, serviceCategories];
 }
 
 async function getCommaSeparatedAppCountryPermissions(user) {
@@ -177,7 +119,7 @@ async function getCommaSeparatedAppCountryPermissions(user) {
 
     for (const userRole of user.userRoles) {
         for (const rolePermSet of userRole.role.role_ps) {
-            const applicationsCountries = await getUserApplicationCountry(rolePermSet.ps);
+            const applicationsCountries = await getPermissionsFromPermissionSet(rolePermSet.ps);
             role_applications = role_applications.concat(applicationsCountries[0]);
             role_countries = role_countries.concat(applicationsCountries[1])
             role_ps.push({
@@ -194,7 +136,7 @@ async function getCommaSeparatedAppCountryPermissions(user) {
         const profilePermissionSets = user.userProfile.up_ps;
         for (const userProPermSet of profilePermissionSets) {
 
-            const applicationsCountries = await getUserApplicationCountry(userProPermSet.ps);
+            const applicationsCountries = await getPermissionsFromPermissionSet(userProPermSet.ps);
             profile_applications = profile_applications.concat(applicationsCountries[0]);
             profile_countries = profile_countries.concat(applicationsCountries[1]);
             profile_ps.push({
@@ -233,12 +175,6 @@ async function formatProfile(user) {
         profile: await getProfilePermissions(user),
         role: await getRolePermissions(user),
         status: user.status,
-        // roles: getRolesPermissions(user.userrole),
-        // application: user.application,
-        // countries: user.countries
-        // roles: getRolesPermissions(user.userrole),
-        // application: user.application,
-        // countries: user.countries,
         last_login: user.last_login,
         expiry_date: user.expiry_date,
     };
@@ -273,16 +209,6 @@ var trimRequestBody = function(reqBody){
             reqBody[key] = reqBody[key].trim();
     });
     return reqBody;
-}
-
-async function attachApplicationInfoToUser(user) {
-    const userApplication = await Application.findOne({ where: { id: user.application_id } });
-    user.application = userApplication ? {
-        name: userApplication.name,
-        slug: userApplication.slug,
-        logo_link: userApplication.logo_link
-    } : null;
-    return user;
 }
 
 async function getSignedInUserProfile(req, res) {
@@ -343,7 +269,7 @@ async function login(req, res) {
                                         {
                                             model: Application,
                                             as: 'application',
-
+                                            attributes: ['id', 'name', 'slug', 'logo_link']
                                         }
                                     ]
 
@@ -385,7 +311,7 @@ async function login(req, res) {
                                             {
                                                 model: Application,
                                                 as: 'application',
-
+                                                attributes: ['id', 'name', 'slug', 'logo_link']
                                             }
                                         ]
 
@@ -560,6 +486,8 @@ async function getUsers(req, res) {
         // const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => i.codbase === codbase).map(i => i.country_iso2);
         // const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
 
+        const [, userCountries,] = await getRequestingUserPermissions(req.user);
+
         const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`
             SELECT * FROM ciam.vwcountry
             WHERE codbase = $codbase
@@ -570,10 +498,18 @@ async function getUsers(req, res) {
             type: QueryTypes.SELECT
         })).map(c => c.country_iso2);
 
+        if(country_iso2_list_for_codbase.length) country_iso2_list_for_codbase.push('all');
+        if(userCountries.length) userCountries.push('all');
+
         const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase
             .map(i => ignoreCaseArray(i)));
 
+        const user_countries_ignorecase = [].concat.apply([], userCountries
+            .map(i => ignoreCaseArray(i)));
+
         let countries_ignorecase_for_codbase_formatted = '{' + countries_ignorecase_for_codbase.join(", ") + '}';
+
+        const user_countries_ignorecase_formatted = '{' + user_countries_ignorecase.join(", ") + '}';
 
         const orderBy = req.query.orderBy === 'null'
             ? null
@@ -598,34 +534,37 @@ async function getUsers(req, res) {
             order.splice(1, 0, [{ model: User, as: 'createdByUser' }, 'last_name', orderType]);
         }
 
-        const users = await User.findAll({
-            where: {
-                id: { [Op.ne]: signedInId },
-                type: 'basic',
-                [Op.or]: [
-                    {
-                        '$userRoles.role.role_ps.ps.countries$': codbase ? { [Op.overlap]: countries_ignorecase_for_codbase_formatted } : {
-                            [Op.or]: [{
-                                [Op.ne]: '{0}'
-                            }, {
-                                [Op.eq]: null
-                            }]
-                        }
-
-                    },
-                    {
-                        '$userProfile.up_ps.ps.countries$': codbase ? { [Op.overlap]: countries_ignorecase_for_codbase_formatted } : {
-                            [Op.or]: [{
-                                [Op.ne]: '{0}'
-                            }, {
-                                [Op.eq]: null
-                            }]
-                        }
-
-                    }
-
-                ]
+        const userCountryFilter = [
+            {
+                '$userRoles.role.role_ps.ps.countries$': codbase
+                    ? { [Op.overlap]: countries_ignorecase_for_codbase_formatted }
+                    : { [Op.overlap]: user_countries_ignorecase_formatted }
             },
+            {
+                '$userProfile.up_ps.ps.countries$': codbase
+                    ? { [Op.overlap]: countries_ignorecase_for_codbase_formatted }
+                    : { [Op.overlap]: user_countries_ignorecase_formatted }
+            }
+        ]
+
+        if(!codbase) {
+            userCountryFilter.push({
+                [Op.and]: [{
+                    '$userProfile.up_ps.ps.countries$': null
+                }, {
+                    '$userRoles.role.role_ps.ps.countries$': null
+                }]
+            });
+        }
+
+        const userFilter = {
+            id: { [Op.ne]: signedInId },
+            type: 'basic',
+            [Op.or]: userCountryFilter
+        }
+
+        const users = await User.findAll({
+            where: userFilter,
             offset,
             limit,
             order: order,
@@ -848,6 +787,12 @@ async function getUser(req, res) {
 
 
         if (!user) return res.status(404).send("User is not found or may be removed");
+
+        const [, userCountryPermissions, ] = await getUserPermissions(user.id);
+
+        const hasPermission = userCountryPermissions.length ? await isRequestingUserPermitted(req.user, { countries: userCountryPermissions }) : true;
+
+        if(!hasPermission) return res.status(403).send('You do not have permission to view this profile.');
 
         const formattedUser = await formatProfileDetail(user);
 

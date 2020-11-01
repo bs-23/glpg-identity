@@ -284,6 +284,38 @@ const UpdateMyProfile = () => {
                                             </div>
                                         </div>
                                     </div>
+                                    <div className="row">
+                                        <div className="col-12">
+                                            <div className="form-group">
+                                                <label className="font-weight-bold-light" htmlFor="profile">Profile<span className="text-danger"></span></label>
+                                                <Field
+                                                    as="select"
+                                                    name="profile"
+                                                    className="form-control"
+                                                    value={myProfileInfo ? myProfileInfo.profile.title : ''}
+                                                    disabled
+                                                >
+                                                    <option value={myProfileInfo ? myProfileInfo.profile.title : ''}>{myProfileInfo ? myProfileInfo.profile.title : ''}</option>
+                                                </Field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="row">
+                                        <div className="col-12">
+                                            <div className="form-group">
+                                                <label className="font-weight-bold-light" htmlFor="role">Role<span className="text-danger"></span></label>
+                                                <Field
+                                                    as="select"
+                                                    name="role"
+                                                    className="form-control"
+                                                    value={myProfileInfo ? myProfileInfo.role[0].title : ''}
+                                                    disabled
+                                                >
+                                                    <option value={myProfileInfo ? myProfileInfo.role[0].title : ''}>{myProfileInfo ? myProfileInfo.role[0].title : ''}</option>
+                                                </Field>
+                                            </div>
+                                        </div>
+                                    </div>
                                     {getMyCountryISO2().length > 0 && <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
@@ -312,6 +344,24 @@ const UpdateMyProfile = () => {
                                                             <span className="switch-label">{appName}</span>
                                                             <span className="switch">
                                                                 <input name="roles" type="checkbox" value={appName} checked disabled />
+                                                                <span className="slider round"></span>
+                                                            </span>
+                                                        </label>
+                                                    </li>)}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>}
+                                    {myProfileInfo && myProfileInfo.serviceCategories && myProfileInfo.serviceCategories.length > 0 && <div className="row">
+                                        <div className="col-12">
+                                            <div className="form-group">
+                                                <label className="font-weight-bold-light" htmlFor="serviceCategories">Service Categories<span className="text-danger"></span></label>
+                                                <ul className="list-unstyled pl-0 py-2 mb-0">
+                                                    {myProfileInfo.serviceCategories.map(sc => <li key={sc.slug} className="">
+                                                        <label className="d-flex justify-content-between align-items-center">
+                                                            <span className="switch-label">{sc.title}</span>
+                                                            <span className="switch">
+                                                                <input name="serviceCategories" type="checkbox" value={sc.title} checked disabled />
                                                                 <span className="slider round"></span>
                                                             </span>
                                                         </label>
