@@ -113,6 +113,13 @@ export default function reducer(state = initialState, action) {
             };
         }
         case Types.UPDATE_PROFILE_FULFILLED: {
+            const loggedInUser = action.payload.data;
+            const [userCountires, userApps, userServiceCategories] = getUserPermissions(loggedInUser);
+
+            loggedInUser.countries = userCountires;
+            loggedInUser.applications = userApps;
+            loggedInUser.serviceCategories = userServiceCategories;
+
             return {
                 ...state,
                 loggedInUser: action.payload.data

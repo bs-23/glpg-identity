@@ -292,10 +292,10 @@ const UpdateMyProfile = () => {
                                                     as="select"
                                                     name="profile"
                                                     className="form-control"
-                                                    value={myProfileInfo ? myProfileInfo.profile.title : ''}
+                                                    value={myProfileInfo && myProfileInfo.profile ? myProfileInfo.profile.title : ''}
                                                     disabled
                                                 >
-                                                    <option value={myProfileInfo ? myProfileInfo.profile.title : ''}>{myProfileInfo ? myProfileInfo.profile.title : ''}</option>
+                                                    <option value={myProfileInfo && myProfileInfo.profile ? myProfileInfo.profile.title : ''}>{myProfileInfo && myProfileInfo.profile ? myProfileInfo.profile.title : ''}</option>
                                                 </Field>
                                             </div>
                                         </div>
@@ -308,10 +308,10 @@ const UpdateMyProfile = () => {
                                                     as="select"
                                                     name="role"
                                                     className="form-control"
-                                                    value={myProfileInfo ? myProfileInfo.role[0].title : ''}
+                                                    value={myProfileInfo && myProfileInfo.role.length ? myProfileInfo.role[0].title : ''}
                                                     disabled
                                                 >
-                                                    <option value={myProfileInfo ? myProfileInfo.role[0].title : ''}>{myProfileInfo ? myProfileInfo.role[0].title : ''}</option>
+                                                    <option value={myProfileInfo && myProfileInfo.role.length ? myProfileInfo.role[0].title : ''}>{myProfileInfo && myProfileInfo.role.length ? myProfileInfo.role[0].title : ''}</option>
                                                 </Field>
                                             </div>
                                         </div>
