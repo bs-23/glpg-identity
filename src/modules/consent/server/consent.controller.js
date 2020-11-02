@@ -9,9 +9,9 @@ const ConsentCountry = require('./consent-country.model');
 const ConsentCategory = require('./consent-category.model');
 const ConsentLanguage = require('./consent-locale.model');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
-const HCPS = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_profile.model'));
 const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model.js'));
-const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
+const HCPS = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-profile.model'));
+const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-consents.model'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 
 function getTranslationViewmodels(translations) {

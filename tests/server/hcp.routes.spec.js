@@ -217,8 +217,8 @@ describe('HCP Routes', () => {
                 return Promise.resolve();
             });
 
-            HCPModel = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_profile.model.js'));
-            HCPConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model.js'));
+            HCPModel = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-profile.model.js'));
+            HCPConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-consents.model.js'));
 
             singleOptInConsent =  {
                 locale: 'nl_nl',
