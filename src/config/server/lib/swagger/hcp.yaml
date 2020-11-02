@@ -473,7 +473,7 @@ components:
                     type: string
                 specialty_onekey:
                     type: string
-                origin:
+                origin_url:
                     type: string
                 consents:
                     type: array

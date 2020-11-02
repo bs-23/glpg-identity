@@ -399,7 +399,7 @@ async function registrationLookup(req, res) {
 
 async function createHcpProfile(req, res) {
     const response = new Response({}, []);
-    const { email, uuid, salutation, first_name, last_name, country_iso2, language_code, specialty_onekey, telephone, locale, birthdate, origin } = req.body;
+    const { email, uuid, salutation, first_name, last_name, country_iso2, language_code, specialty_onekey, telephone, locale, birthdate, origin_url } = req.body;
 
     if (!email || !validator.isEmail(email)) {
         response.errors.push(new CustomError('Email address is missing or invalid.', 400, 'email'));
@@ -437,9 +437,9 @@ async function createHcpProfile(req, res) {
         response.errors.push(new CustomError('specialty_onekey is missing.', 400, 'specialty_onekey'));
     }
 
-    if (!origin) {
-        response.errors.push(new CustomError('origin is missing.', 400, 'origin'));
-    }
+    // if (!origin_url) {
+    //     response.errors.push(new CustomError('Origin URL is missing.', 400, 'origin_url'));
+    // }
 
     if (specialty_onekey) {
         const specialty_master_data = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwspecialtymaster WHERE cod_id_onekey = $specialty_onekey", {
@@ -508,7 +508,7 @@ async function createHcpProfile(req, res) {
             birthdate,
             application_id: req.user.id,
             individual_id_onekey: master_data.individual_id_onekey,
-            origin: origin,
+            origin_url,
             created_by: req.user.id,
             updated_by: req.user.id
         };

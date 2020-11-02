@@ -96,7 +96,7 @@ const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
     reset_password_expires: {
         type: DataTypes.STRING
     },
-    origin: {
+    origin_url: {
         allowNull: false,
         type: DataTypes.STRING
     }
