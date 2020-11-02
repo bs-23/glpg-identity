@@ -471,6 +471,8 @@ components:
                     type: string
                 specialty_onekey:
                     type: string
+                origin:
+                    type: string
                 consents:
                     type: array
                     items:
