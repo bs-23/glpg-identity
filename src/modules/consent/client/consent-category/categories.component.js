@@ -12,9 +12,11 @@ const ConsentCategories = () => {
     const dispatch = useDispatch();
     const { addToast } = useToasts();
     const [consentCategoryId, setConsentCategoryId] = useState(undefined);
+    const [showForm, setShowForm] = useState(false);
 
-    const handleClose = () => {
-        setConsentCategoryId(undefined);
+    const toggleForm = (id) => {
+        setConsentCategoryId(id);
+        setShowForm(!!id);
     };
 
     const consent_category = useSelector(state => state.consentCategoryReducer.consent_category);
@@ -47,9 +49,9 @@ const ConsentCategories = () => {
                 <div className="row">
                     <div className="col-12">
                         <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
-                            <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Consent categories</h4>
+                            <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Consent Categories</h4>
                             <div class="d-flex justify-content-between align-items-center">
-                                <button onClick={() => setConsentCategoryId(null)} className="btn cdp-btn-secondary text-white ml-2">
+                                <button onClick={() => setShowForm(true)} className="btn cdp-btn-secondary text-white ml-2">
                                     <i className="icon icon-plus pr-1"></i> Create new category
                                 </button>
                             </div>
@@ -75,7 +77,7 @@ const ConsentCategories = () => {
                                                 <td>{row.createdBy || '--'}</td>
                                                 <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                 <td>
-                                                    <button className="btn cdp-btn-link-primary p-0 mr-3" onClick={() => setConsentCategoryId(row.id)}>
+                                                    <button className="btn cdp-btn-link-primary p-0 mr-3" onClick={() => {toggleForm(row.id)}}>
                                                         <i className="fas fa-pen mr-2"></i>Edit
                                                     </button>
                                                 </td>
@@ -98,7 +100,7 @@ const ConsentCategories = () => {
                 </div>
             </div>
 
-            <Modal dialogClassName="modal-90w modal-customize"centered show={consentCategoryId !== undefined} onHide={handleClose}>
+            <Modal dialogClassName="modal-90w modal-customize"centered show={showForm} onHide={toggleForm}>
                 <Modal.Header closeButton>
                     <Modal.Title>
                         Consent category
@@ -115,6 +117,7 @@ const ConsentCategories = () => {
                         onSubmit={(values, actions) => {
                             if(consentCategoryId) {
                                 dispatch(updateConsentCategory(consentCategoryId, values)).then(function() {
+                                    toggleForm(null);
                                     addToast('Consent category updated successfully', {
                                         appearance: 'success',
                                         autoDismiss: true
@@ -127,7 +130,7 @@ const ConsentCategories = () => {
                                 });
                             } else {
                                 dispatch(createConsentCategory(values)).then(function() {
-                                    setConsentCategoryId(undefined);
+                                    toggleForm(null);
                                     actions.resetForm();
                                     addToast('Consent category created successfully', {
                                         appearance: 'success',
