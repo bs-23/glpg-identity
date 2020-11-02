@@ -59,7 +59,7 @@ const ConsentComponent = ({ consentId, setConsentId }) => {
                         </div>
                         <div className="col-12 col-sm-6 pb-3 px-0">
                             <label className="mt-1 font-weight-bold">Created By</label>
-                            <div>{consent.createdByUser ? `${consent.createdByUser.first_name} ${consent.createdByUser.last_name}` : ''}</div>
+                            <div>{consent.createdBy || '--'}</div>
                         </div>
                         <div className="col-12 col-sm-6 pb-3 px-0">
                             <label className="mt-1 font-weight-bold">Created On</label>
@@ -67,7 +67,7 @@ const ConsentComponent = ({ consentId, setConsentId }) => {
                         </div>
                         <div className="col-12 col-sm-6 pb-3 px-0">
                             <label className="mt-1 font-weight-bold">Last Updated By</label>
-                            <div>{consent.createdByUser ? `${consent.updatedByUser.first_name} ${consent.updatedByUser.last_name}` : ''}</div>
+                            <div>{consent.updatedBy || '--'}</div>
                         </div>
                         <div className="col-12 col-sm-6 pb-3 px-0">
                             <label className="mt-1 font-weight-bold">Last Updatd On</label>
