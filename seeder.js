@@ -25,9 +25,9 @@ async function init() {
     const UserRole = require(path.join(process.cwd(), "src/modules/user/server/user-role.model"));
     const { Modules } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
     require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model'));
-    require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_profile.model'));
-    require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
-    require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_archives.model'));
+    require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-profile.model'));
+    require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-consents.model'));
+    require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-archives.model'));
     require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
     require(path.join(process.cwd(), 'src/modules/core/server/password/password-history.model.js'));
 

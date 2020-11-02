@@ -347,6 +347,17 @@ const ConsentPerformanceReport = () => {
                                                     </th>
 
                                                     <th>
+                                                        <LinkContainer to={getUrl('consent_type')}>
+                                                            <span
+                                                                className={consents_report.orderBy === 'consent_type' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
+                                                                onClick={() => dispatch(getVeevaConsentReport(consents_report.page, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, 'consent_type', getorderType('consent_type') ))}
+                                                            >
+                                                                Consent Type
+                                                            <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                                        </LinkContainer>
+                                                    </th>
+
+                                                    <th>
                                                         <LinkContainer to={getUrl('opt_type')}>
                                                             <span
                                                                 className={consents_report.orderBy === 'opt_type' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
@@ -397,7 +408,8 @@ const ConsentPerformanceReport = () => {
                                                 {consents_report['hcp_consents'].map((row, index) => (
                                                     <tr key={index}>
                                                         <td>{row.name}</td>
-                                                        <td><i className="icon icon-check-filled icon-position-bit-down text-primary-color mr-2 cdp-text-primary"></i>{row.email}</td>
+                                                        <td>{row.email}</td>
+                                                        <td>{row.title}</td>
                                                         <td>{titleCase(row.opt_type)}</td>
                                                         <td>{titleCase(row.legal_basis)}</td>
                                                         <td>{row.preference}</td>

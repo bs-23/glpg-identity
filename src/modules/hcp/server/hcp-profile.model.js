@@ -4,7 +4,7 @@ const Sequelize = require('sequelize');
 const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
-const HcpConsents = require('./hcp_consents.model');
+const HcpConsents = require('./hcp-consents.model');
 
 const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
     id: {
@@ -18,8 +18,9 @@ const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
         type: DataTypes.UUID
     },
     uuid: {
+        allowNull: false,
         unique: true,
-        type: DataTypes.STRING
+        type: DataTypes.STRING(20)
     },
     individual_id_onekey: {
         unique: true,
@@ -27,20 +28,20 @@ const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
     },
     salutation: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING(5)
     },
     first_name: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING(50)
     },
     last_name: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING(50)
     },
     email: {
         unique: true,
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING(100)
     },
     password: {
         type: DataTypes.STRING,
@@ -49,26 +50,27 @@ const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
         }
     },
     telephone: {
-        type: DataTypes.STRING
+        allowNull: true,
+        type: DataTypes.STRING(20)
     },
     birthdate: {
         type: DataTypes.STRING
     },
     country_iso2: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING(2)
     },
     language_code: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING(2)
     },
     locale: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING(5)
     },
     specialty_onekey: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING(20)
     },
     status: {
         type: DataTypes.ENUM,
