@@ -4,7 +4,6 @@ import { ContentState, EditorState, convertFromHTML } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import 'draft-js/dist/Draft.css';
-import htmlToDraft from 'html-to-draftjs';
 
 const toolbarOptions = {
     options: ['inline', 'blockType', 'list', 'link', 'remove'],
@@ -53,6 +52,17 @@ export default function DraftEditor({ onChangeHTML, htmlContent }) {
         return editorContentInHTML;
     }
 
+    const convertHTMLtoState = (html) => {
+        const blocksFromHTML = convertFromHTML(html);
+
+        const state = ContentState.createFromBlockArray(
+            blocksFromHTML.contentBlocks,
+            blocksFromHTML.entityMap,
+        );
+
+        return EditorState.createWithContent(state);
+    }
+
     useEffect(() => {
         if (onChangeHTML) {
             const editorContentInHTML = convertContentToHtml();
@@ -62,9 +72,8 @@ export default function DraftEditor({ onChangeHTML, htmlContent }) {
 
     useEffect(() => {
         if(htmlContent) {
-            const contentBlock = htmlToDraft(htmlContent);
-            const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
-            setEditorState(EditorState.createWithContent(contentState));
+            const editorState = convertHTMLtoState(htmlContent);
+            setEditorState(editorState);
         }
     }, []);
 
