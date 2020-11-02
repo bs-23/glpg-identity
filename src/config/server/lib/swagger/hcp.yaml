@@ -418,6 +418,8 @@ components:
                     type: string
                 birthdate:
                     type: string
+                password_reset_token:
+                    type: string
         resetHcpPassword:
             type: object
             properties:
