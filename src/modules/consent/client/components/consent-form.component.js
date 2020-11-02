@@ -25,6 +25,7 @@ const ConsentForm = (props) => {
     const [categoryId, setCategoryId] = useState([]);
     const [legalBasis, setLegalBasis] = useState([]);
     const [translationToDelete, setTranslationToDelete] = useState(null);
+    const [showError, setShowError] = useState(false);
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
 
     const handleChange = (e) => {
@@ -41,6 +42,7 @@ const ConsentForm = (props) => {
         const init_country_iso2 = userCountries[0].country_iso2.toLowerCase();
         const newTranslations = [...translations, { id: Math.random(), country_iso2: init_country_iso2, lang_code: init_lang_code , rich_text: '' }];
         setTranslations(newTranslations);
+        setShowError(false);
         setTimeout(() => {
             const lastTranslation = document.getElementById(`translation-${translations.length + 1}`);
             lastTranslation.scrollIntoView({ behavior: 'smooth' });
@@ -146,14 +148,6 @@ const ConsentForm = (props) => {
                             </div>
                         </div>
 
-                        {/* <div className="col-12">
-                            <div className="form-group">
-                                <label className="font-weight-bold" htmlFor={richTextId}>Rich Text</label>
-                                <Field className="form-control rich_text" row="6" value={item.rich_text} onChange={(e) => handleChange(e)} type='textarea' as='textarea' data-id={idx} name={richTextId} id={richTextId} />
-                                <div className="invalid-feedback"><ErrorMessage name={richTextId} /></div>
-                            </div>
-                        </div> */}
-
                         <div className="col-12">
                             <div className="form-group">
                                 <label className="font-weight-bold" htmlFor={richTextId}>Rich Text</label>
@@ -170,6 +164,7 @@ const ConsentForm = (props) => {
                                         })}
                                     />
                                 </div>
+                                {showError && item.rich_text === '<p><br></p>' && <div class="invalid-feedback">This field must not be empty.</div>}
                             </div>
                         </div>
                     </div>
@@ -223,6 +218,10 @@ const ConsentForm = (props) => {
                                                 }
 
                                                 const validTranslations = translations.filter(item => item.country_iso2 && item.lang_code && item.rich_text && item.rich_text !== '<p><br></p>');
+                                                if(translations.length !== validTranslations.length){
+                                                    setShowError(true);
+                                                    return;
+                                                }
 
                                                 if (!validTranslations || !validTranslations.length) {
                                                     addToast('Please provide at least one translation', {

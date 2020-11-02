@@ -72,7 +72,7 @@ const ConsentCategories = () => {
                                             <tr key={index}>
                                                 <td>{row.title}</td>
                                                 <td>{row.slug}</td>
-                                                <td>{row.createdByUser ? <Link to={`/users/${row.createdByUser.id}`} >{`${row.createdByUser.first_name} ${row.createdByUser.last_name}`}</Link> : ''}</td>
+                                                <td>{row.createdBy || '--'}</td>
                                                 <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                 <td>
                                                     <button className="btn cdp-btn-link-primary p-0 mr-3" onClick={() => setConsentCategoryId(row.id)}>

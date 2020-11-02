@@ -476,12 +476,12 @@ async function getCdpConsents(req, res) {
             {
                 model: User,
                 as: 'createdByUser',
-                attributes: ['id', 'first_name', 'last_name']
+                attributes: ['first_name', 'last_name']
             },
             {
                 model: User,
                 as: 'updatedByUser',
-                attributes: ['id', 'first_name', 'last_name']
+                attributes: ['first_name', 'last_name']
             }
         ];
 
@@ -498,16 +498,28 @@ async function getCdpConsents(req, res) {
             attributes: { exclude: ['category_id', 'created_by', 'updated_by'] }
         });
 
-        translations === 'true' && await Promise.all(consents.map(async consent => {
+        const data = consents.map(c => {
+            const createdBy = `${c.createdByUser.first_name} ${c.createdByUser.last_name}`;
+            const updatedBy = `${c.updatedByUser.first_name} ${c.updatedByUser.last_name}`;
+            delete c.dataValues.createdByUser;
+            delete c.dataValues.updatedByUser;
+            return {
+                ...c.dataValues,
+                createdBy,
+                updatedBy
+            }
+        });
+
+        translations === 'true' && await Promise.all(data.map(async consent => {
             const consentTranslations = await ConsentLanguage.findAll({
                 where: {
                     consent_id: consent.id
                 }
             });
-            consent.dataValues.translations = getTranslationViewmodels(consentTranslations);
+            consent.translations = getTranslationViewmodels(consentTranslations);
         }));
 
-        res.json(consents);
+        res.json(data);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -550,8 +562,13 @@ async function getCdpConsent(req, res) {
 
         if (!consent) return res.status(404).send('Consent not found');
 
+        const createdBy = `${consent.createdByUser.first_name} ${consent.createdByUser.last_name}`;
+        const updatedBy = `${consent.updatedByUser.first_name} ${consent.updatedByUser.last_name}`;
+        delete consent.dataValues.createdByUser;
+        delete consent.dataValues.updatedByUser;
+
         const { consent_country, ...otherProps } = consent.dataValues;
-        const data = { ...otherProps, countries: consent_country };
+        const data = { ...otherProps, countries: consent_country, createdBy, updatedBy };
 
         const translations = await ConsentLanguage.findAll({
             where: { consent_id: consent.id }
@@ -576,9 +593,16 @@ async function createConsent(req, res) {
 
         if (!translations || !translations.length) {
             return res.status(400).send('Please provide at least one translation.');
-        } else {
-            const uniqueTranslations = new Set(translations.map(t => t.country_iso2.toLowerCase() + t.lang_code.toLowerCase()));
-            if (uniqueTranslations.size < translations.length) return res.status(400).send('Please remove duplicate translations.');
+        }
+
+        const invalidTranslations = translations.filter(t => !t.country_iso2 || !t.lang_code || !t.rich_text);
+        if (invalidTranslations && invalidTranslations.length) {
+            return res.status(400).send('Translations not valid.');
+        }
+
+        const uniqueTranslations = new Set(translations.map(t => t.country_iso2.toLowerCase() + t.lang_code.toLowerCase()));
+        if (uniqueTranslations.size < translations.length) {
+            return res.status(400).send('Please remove duplicate translations.');
         }
 
         is_active = !!is_active;
@@ -845,13 +869,25 @@ async function getConsentCategory(req, res) {
 
 async function getConsentCategories(req, res) {
     try {
-        const data = await ConsentCategory.findAll({
+        const categories = await ConsentCategory.findAll({
             include: [{
                 model: User,
                 as: 'createdByUser',
-                attributes: ['first_name', 'last_name', 'id']
+                attributes: ['first_name', 'last_name']
             }]
         });
+
+        const data = categories.map(c => {
+            const createdBy = `${c.createdByUser.first_name} ${c.createdByUser.last_name}`
+            delete c.dataValues.createdByUser;
+            delete c.dataValues.created_by;
+            delete c.dataValues.updated_by;
+            return {
+                ...c.dataValues,
+                createdBy
+            };
+        });
+
         res.json(data);
     } catch (err) {
         console.error(err);
