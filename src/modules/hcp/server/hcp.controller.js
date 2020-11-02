@@ -922,12 +922,6 @@ async function resetPassword(req, res) {
 
         if (doc.password) await PasswordPolicies.saveOldPassword(doc);
 
-        if (doc.password) {
-            await sendResetPasswordSuccessMail(doc, req.user);
-        } else {
-            await sendRegistrationSuccessMail(doc, req.user);
-        }
-
         await doc.update({ password: req.body.new_password, password_updated_at: new Date(Date.now()), reset_password_token: null, reset_password_expires: null });
 
         await doc.update(
@@ -935,8 +929,8 @@ async function resetPassword(req, res) {
             { where: { email: doc.dataValues.email } }
         );
 
-        response.data = 'Password reset successfully.';
-        res.send(response);
+        response.data = doc.reset_password_token;
+        res.json(response);
     } catch (err) {
         console.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
@@ -968,14 +962,11 @@ async function forgetPassword(req, res) {
             return res.json(response);
         }
 
-        const userApplication = await Application.findOne({ where: { id: doc.application_id } });
 
         if (doc.dataValues.status === 'self_verified' || doc.dataValues.status === 'manually_verified') {
-            await addPasswordResetTokenToUser(doc)
+            await addPasswordResetTokenToUser(doc);
 
-            await sendPasswordResetInstructionMail(doc, userApplication)
-
-            response.data = 'Successfully sent password reset email.'
+            response.data = doc.dataValues.reset_password_token;
 
             return res.json(response);
         }
