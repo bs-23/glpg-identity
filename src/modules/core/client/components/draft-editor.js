@@ -6,7 +6,7 @@ import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import 'draft-js/dist/Draft.css';
 
 const toolbarOptions = {
-    options: ['inline', 'blockType', 'list', 'link', 'remove'],
+    options: ['inline', 'blockType', 'list', 'link'],
     inline: {
         options: ['bold', 'italic', 'underline', 'strikethrough', 'monospace']
     },
