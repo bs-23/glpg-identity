@@ -934,7 +934,7 @@ async function resetPassword(req, res) {
             { where: { email: doc.dataValues.email } }
         );
 
-        response.data = doc.reset_password_token;
+        response.data = 'Password reset successfully.';
         res.json(response);
     } catch (err) {
         console.error(err);
@@ -963,7 +963,9 @@ async function forgetPassword(req, res) {
         });
 
         if (!doc) {
-            response.data = 'Successfully sent password reset email.';
+            response.data = {
+                message: 'Successfully sent password reset email.'
+            };
             return res.json(response);
         }
 
@@ -971,7 +973,10 @@ async function forgetPassword(req, res) {
         if (doc.dataValues.status === 'self_verified' || doc.dataValues.status === 'manually_verified') {
             await addPasswordResetTokenToUser(doc);
 
-            response.data = doc.dataValues.reset_password_token;
+            response.data = {
+                message: 'Successfully sent password reset email.',
+                password_reset_token: doc.dataValues.reset_password_token
+            };
 
             return res.json(response);
         }

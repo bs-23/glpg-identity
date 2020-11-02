@@ -175,7 +175,7 @@ paths:
                                         properties:
                                             password_reset_token:
                                                 type: string
-                                            retention_period:
+                                            message:
                                                 type: string
                                     errors:
                                         $ref: "#/components/schemas/errorBodyInSuccess"
