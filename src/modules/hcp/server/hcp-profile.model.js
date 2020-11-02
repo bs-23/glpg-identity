@@ -97,7 +97,7 @@ const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
         type: DataTypes.STRING
     },
     origin_url: {
-        allowNull: false,
+        allowNull: true,
         type: DataTypes.STRING
     }
 }, {
