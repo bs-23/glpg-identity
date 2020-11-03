@@ -7,13 +7,13 @@ async function login(req, res) {
     try {
         const { password } = req.body;
 
-        //if (!password) {
-        //    return res.status(400).send('Password is required.');
-        //}
+        if (!password) {
+            return res.status(400).send('Password is required.');
+        }
 
-        //if(!bcrypt.compareSync(password, nodecache.getValue('SWAGGER_PASSWORD'))) {
-        //    return res.status(401).send('Invalid password.');
-        //}
+        if(!bcrypt.compareSync(password, nodecache.getValue('SWAGGER_PASSWORD'))) {
+            return res.status(401).send('Invalid password.');
+        }
 
         const accessToken = jwt.sign({
             id: nodecache.getValue('SWAGGER_ID')
