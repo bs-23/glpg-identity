@@ -87,7 +87,7 @@ const ConsentsComponent = () => {
                                                 </td>
                                                 <td>{row.consent_category ? row.consent_category.title : ''}</td>
                                                 <td>{row.is_active ? 'Active' : 'Inactive'}</td>
-                                                <td>{row.createdByUser ? `${row.createdByUser.first_name} ${row.createdByUser.last_name}` : ''}</td>
+                                                <td>{row.createdBy}</td>
                                                 <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                 <td><Dropdown className="ml-auto dropdown-customize">
                                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">

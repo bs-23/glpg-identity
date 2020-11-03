@@ -49,22 +49,6 @@
     },
     {
         "codbase": "WIT",
-        "name": "Studio Legale Metta",
-        "link": "https://www.studiolegalemetta.com/en/italian-tax-code-codice-fiscale/",
-        "logo": "/assets/logo/logo-studio-legale-metta.png",
-        "height": 28,
-        "heightSingle": 25
-    },
-    {
-        "codbase": "WIT",
-        "name": "MEF",
-        "link": "https://www.mef.gov.it/en/index.html",
-        "logo": "/assets/logo/logo-mef.svg",
-        "height": 35,
-        "heightSingle": 25
-    },
-    {
-        "codbase": "WIT",
         "name": "Fnomceo",
         "link": "https://portale.fnomceo.it/cerca-prof/index.php",
         "logo": "/assets/logo/logo-fnomceo.png",

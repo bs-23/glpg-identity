@@ -9,9 +9,9 @@ const ConsentCountry = require('./consent-country.model');
 const ConsentCategory = require('./consent-category.model');
 const ConsentLanguage = require('./consent-locale.model');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
-const HCPS = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_profile.model'));
 const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model.js'));
-const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
+const HCPS = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-profile.model'));
+const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-consents.model'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/user/server/permission/permissions.js'));
 
@@ -86,14 +86,15 @@ async function getConsents(req, res) {
 
             return {
                 id: consentLang.consent.id,
+                preference: consentLang.consent.preference,
+                slug: consentLang.consent.slug,
+                legal_basis: consentLang.consent.legal_basis,
                 rich_text: validator.unescape(consentLang.rich_text),
-                opt_type: consentCountry.opt_type,
-                category_slug: consentLang.consent.consent_category.slug,
                 category_title: consentLang.consent.consent_category.title,
+                category_slug: consentLang.consent.consent_category.slug,
                 country_iso2: country_iso2,
                 locale: consentLang.locale,
-                preference: consentLang.consent.preference,
-                slug: consentLang.consent.slug
+                opt_type: consentCountry.opt_type
             }
         }));
 
@@ -123,7 +124,6 @@ async function getConsentsReport(req, res) {
         const page = req.query.page ? req.query.page - 1 : 0;
         const limit = 30;
         const codbase = req.query.codbase === undefined ? '' : req.query.codbase;
-        const process_activity = req.query.process_activity === undefined ? '' : req.query.process_activity;
         const opt_type = req.query.opt_type === undefined ? '' : req.query.opt_type;
         const offset = page * limit;
 
@@ -163,7 +163,6 @@ async function getConsentsReport(req, res) {
         const country_iso2_list_for_user_countries_codbase = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => codbase_list_mapped_with_user_country_iso2_list.includes(i.codbase)).map(i => i.country_iso2) : [];
         const countries_ignorecase_for_user_countries_codbase = [].concat.apply([], country_iso2_list_for_user_countries_codbase.map(i => ignoreCaseArray(i)));
 
-        const process_activities = (await ConsentCategory.findAll()).map(i => i.slug);
         const opt_types = [...new Set((await ConsentCountry.findAll()).map(i => i.opt_type))];
 
         const consent_filter = {
@@ -171,7 +170,6 @@ async function getConsentsReport(req, res) {
             consent_confirmed: true,
             '$hcp_profile.application_id$': req.user.type === 'admin' ? { [Op.or]: application_list } : userPermittedApplications,
             '$hcp_profile.country_iso2$': codbase ? { [Op.any]: [countries_ignorecase_for_codbase] } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : countries_ignorecase_for_user_countries_codbase,
-            '$consent.consent_category.slug$': process_activity ? { [Op.eq]: process_activity } : { [Op.or]: process_activities },
             '$consent.consent_country.country_iso2$': { [Op.eq]: Sequelize.col('hcp_profile.country_iso2') },
             '$consent.consent_country.opt_type$': opt_type ? { [Op.eq]: opt_type } : { [Op.or]: opt_types }
         };
@@ -250,7 +248,6 @@ async function getConsentsReport(req, res) {
             start: limit * page + 1,
             end: offset + limit > total_consents ? total_consents : offset + limit,
             codbase: codbase ? codbase : '',
-            process_activity: process_activity ? process_activity : '',
             opt_type: opt_type ? opt_type : '',
             countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : userPermittedCountries,
             orderBy: orderBy,
@@ -486,12 +483,12 @@ async function getCdpConsents(req, res) {
             {
                 model: User,
                 as: 'createdByUser',
-                attributes: ['id', 'first_name', 'last_name']
+                attributes: ['first_name', 'last_name']
             },
             {
                 model: User,
                 as: 'updatedByUser',
-                attributes: ['id', 'first_name', 'last_name']
+                attributes: ['first_name', 'last_name']
             }
         ];
 
@@ -508,16 +505,28 @@ async function getCdpConsents(req, res) {
             attributes: { exclude: ['category_id', 'created_by', 'updated_by'] }
         });
 
-        translations === 'true' && await Promise.all(consents.map(async consent => {
+        const data = consents.map(c => {
+            const createdBy = `${c.createdByUser.first_name} ${c.createdByUser.last_name}`;
+            const updatedBy = `${c.updatedByUser.first_name} ${c.updatedByUser.last_name}`;
+            delete c.dataValues.createdByUser;
+            delete c.dataValues.updatedByUser;
+            return {
+                ...c.dataValues,
+                createdBy,
+                updatedBy
+            }
+        });
+
+        translations === 'true' && await Promise.all(data.map(async consent => {
             const consentTranslations = await ConsentLanguage.findAll({
                 where: {
                     consent_id: consent.id
                 }
             });
-            consent.dataValues.translations = getTranslationViewmodels(consentTranslations);
+            consent.translations = getTranslationViewmodels(consentTranslations);
         }));
 
-        res.json(consents);
+        res.json(data);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -560,8 +569,13 @@ async function getCdpConsent(req, res) {
 
         if (!consent) return res.status(404).send('Consent not found');
 
+        const createdBy = `${consent.createdByUser.first_name} ${consent.createdByUser.last_name}`;
+        const updatedBy = `${consent.updatedByUser.first_name} ${consent.updatedByUser.last_name}`;
+        delete consent.dataValues.createdByUser;
+        delete consent.dataValues.updatedByUser;
+
         const { consent_country, ...otherProps } = consent.dataValues;
-        const data = { ...otherProps, countries: consent_country };
+        const data = { ...otherProps, countries: consent_country, createdBy, updatedBy };
 
         const translations = await ConsentLanguage.findAll({
             where: { consent_id: consent.id }
@@ -586,9 +600,16 @@ async function createConsent(req, res) {
 
         if (!translations || !translations.length) {
             return res.status(400).send('Please provide at least one translation.');
-        } else {
-            const uniqueTranslations = new Set(translations.map(t => t.country_iso2.toLowerCase() + t.lang_code.toLowerCase()));
-            if (uniqueTranslations.size < translations.length) return res.status(400).send('Please remove duplicate translations.');
+        }
+
+        const invalidTranslations = translations.filter(t => !t.country_iso2 || !t.lang_code || !t.rich_text);
+        if (invalidTranslations && invalidTranslations.length) {
+            return res.status(400).send('Translations not valid.');
+        }
+
+        const uniqueTranslations = new Set(translations.map(t => t.country_iso2.toLowerCase() + t.lang_code.toLowerCase()));
+        if (uniqueTranslations.size < translations.length) {
+            return res.status(400).send('Please remove duplicate translations.');
         }
 
         is_active = !!is_active;
@@ -855,13 +876,25 @@ async function getConsentCategory(req, res) {
 
 async function getConsentCategories(req, res) {
     try {
-        const data = await ConsentCategory.findAll({
+        const categories = await ConsentCategory.findAll({
             include: [{
                 model: User,
                 as: 'createdByUser',
-                attributes: ['first_name', 'last_name', 'id']
+                attributes: ['first_name', 'last_name']
             }]
         });
+
+        const data = categories.map(c => {
+            const createdBy = `${c.createdByUser.first_name} ${c.createdByUser.last_name}`
+            delete c.dataValues.createdByUser;
+            delete c.dataValues.created_by;
+            delete c.dataValues.updated_by;
+            return {
+                ...c.dataValues,
+                createdBy
+            };
+        });
+
         res.json(data);
     } catch (err) {
         console.error(err);

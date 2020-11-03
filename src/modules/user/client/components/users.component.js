@@ -219,11 +219,7 @@ export default function Users() {
                                                     <td>{sortCountries(extractUserCountries(row))}</td>
                                                     <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                     <td>{(new Date(row.expiry_date)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
-                                                    <td>
-                                                        <NavLink to={`/users/${row.createdByUser.id}`}>
-                                                            {`${row.createdByUser.first_name} ${row.createdByUser.last_name}`}
-                                                        </NavLink>
-                                                    </td>
+                                                    <td>{row.createdBy}</td>
                                                     <td>
                                                         <NavLink to={`/users/${row.id}`} className="btn cdp-btn-outline-primary btn-sm"><i class="icon icon-user mr-2"></i>Profile</NavLink>
                                                     </td>

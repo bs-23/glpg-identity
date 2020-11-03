@@ -1,13 +1,15 @@
-import axios from "axios";
+import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import { useSelector, useDispatch } from "react-redux";
-import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
+import { useSelector, useDispatch } from 'react-redux';
+import { Form, Formik, Field, FieldArray, ErrorMessage } from 'formik';
+import Modal from 'react-bootstrap/Modal'
+import { useToasts } from 'react-toast-notifications';
+import parse from 'html-react-parser';
 import { createConsent, updateConsent } from '../consent.actions';
-import { useToasts } from "react-toast-notifications";
 import CountryCodes from 'country-codes-list';
 import { consentSchema } from '../consent.schema';
-import DraftEdior from '../../../core/client/components/draft-editor';
+import DraftEditor from '../../../core/client/components/draft-editor';
 
 const ConsentForm = (props) => {
     const CountryCodesObject = Object.values(CountryCodes.customList('countryCode', '{countryCode} {officialLanguageCode} {officialLanguageNameEn}'));
@@ -22,6 +24,8 @@ const ConsentForm = (props) => {
     const [translations, setTranslations] = useState([]);
     const [categoryId, setCategoryId] = useState([]);
     const [legalBasis, setLegalBasis] = useState([]);
+    const [translationToDelete, setTranslationToDelete] = useState(null);
+    const [showError, setShowError] = useState(false);
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
 
     const handleChange = (e) => {
@@ -38,6 +42,7 @@ const ConsentForm = (props) => {
         const init_country_iso2 = userCountries[0].country_iso2.toLowerCase();
         const newTranslations = [...translations, { id: Math.random(), country_iso2: init_country_iso2, lang_code: init_lang_code , rich_text: '' }];
         setTranslations(newTranslations);
+        setShowError(false);
         setTimeout(() => {
             const lastTranslation = document.getElementById(`translation-${translations.length + 1}`);
             lastTranslation.scrollIntoView({ behavior: 'smooth' });
@@ -48,7 +53,12 @@ const ConsentForm = (props) => {
         const newTranslations = [...translations];
         newTranslations.splice(idx, 1);
         setTranslations(newTranslations);
+        setTranslationToDelete(null);
     }
+
+    const showRemoveTranslationModal = (index) => {
+        setTranslationToDelete(index);
+    };
 
     const fetchUserCountries = (userCountries, allCountries) => userCountries.map(element => allCountries.find(x => x.country_iso2 == element)).filter(element => element);
 
@@ -115,7 +125,7 @@ const ConsentForm = (props) => {
                     <div className="row border border-primary rounded pb-3 mb-3 mx-0 shadow-sm">
                         <label className="col-12 font-weight-bold d-flex justify-content-between align-items-center bg-light py-2 border-bottom rounded-top">
                             {formikProps?.values?.preference}
-                            <i className="fas fa-minus-circle text-danger fa-2x hover-opacity ml-auto" type="button" title="Remove" onClick={() => removeTranslation(idx)}></i>
+                            <i className="fas fa-minus-circle text-danger fa-2x hover-opacity ml-auto" type="button" title="Remove" onClick={() => showRemoveTranslationModal(idx)}></i>
                         </label>
                         <div className="col-12 col-sm-6">
                             <div className="form-group">
@@ -138,19 +148,11 @@ const ConsentForm = (props) => {
                             </div>
                         </div>
 
-                        {/* <div className="col-12">
-                            <div className="form-group">
-                                <label className="font-weight-bold" htmlFor={richTextId}>Rich Text</label>
-                                <Field className="form-control rich_text" row="6" value={item.rich_text} onChange={(e) => handleChange(e)} type='textarea' as='textarea' data-id={idx} name={richTextId} id={richTextId} />
-                                <div className="invalid-feedback"><ErrorMessage name={richTextId} /></div>
-                            </div>
-                        </div> */}
-
                         <div className="col-12">
                             <div className="form-group">
                                 <label className="font-weight-bold" htmlFor={richTextId}>Rich Text</label>
                                 <div className="border rounded draft-editor">
-                                    <DraftEdior htmlContent={item.rich_text} onChangeHTML={(html) =>
+                                    <DraftEditor htmlContent={item.rich_text} onChangeHTML={(html) =>
                                         handleChange({
                                             target: {
                                                 value: html,
@@ -162,6 +164,7 @@ const ConsentForm = (props) => {
                                         })}
                                     />
                                 </div>
+                                {showError && item.rich_text === '<p><br></p>' && <div class="invalid-feedback">This field must not be empty.</div>}
                             </div>
                         </div>
                     </div>
@@ -215,6 +218,10 @@ const ConsentForm = (props) => {
                                                 }
 
                                                 const validTranslations = translations.filter(item => item.country_iso2 && item.lang_code && item.rich_text && item.rich_text !== '<p><br></p>');
+                                                if(translations.length !== validTranslations.length){
+                                                    setShowError(true);
+                                                    return;
+                                                }
 
                                                 if (!validTranslations || !validTranslations.length) {
                                                     addToast('Please provide at least one translation', {
@@ -361,6 +368,28 @@ const ConsentForm = (props) => {
                     }
                 </div>
             </div>
+
+
+            <Modal centered show={translationToDelete !== null} onHide={() => setTranslationToDelete(null)}>
+                <Modal.Header closeButton>
+                    <Modal.Title className="modal-title_small">Remove Localization</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {translationToDelete !== null && translations[translationToDelete] ? (
+                        <div>
+                            Are you sure you want to remove the following localization?
+                            <div className="alert alert-info my-3">
+                                {parse(translations[translationToDelete].rich_text)}
+                            </div>
+                        </div>
+                    ) : null}
+                </Modal.Body>
+                <Modal.Footer>
+                    <button className="btn cdp-btn-outline-primary" onClick={() => setTranslationToDelete(null)}>Cancel</button>
+                    <button className="ml-2 btn cdp-btn-secondary text-white" onClick={() => removeTranslation(translationToDelete)}>Confirm</button>
+                </Modal.Footer>
+            </Modal>
+
 
         </main>
     );

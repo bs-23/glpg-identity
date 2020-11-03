@@ -3,18 +3,18 @@ paths:
         get:
             tags:
                 - consents
-            summary: Get all consents by country and locale.
+            summary: Get all consents by country_iso2 and locale.
             parameters:
                 - name: country_iso2
                   in: query
                   required: true
-                  description: Country code for which consents are to be returned.
+                  description: Case insensitive country iso2 code for which consents are to be returned
                   schema:
                     type: string
                 - name: locale
                   in: query
                   required: false
-                  description: Case insensitive value in language_country format (e.g. nl_nl or nl_be)
+                  description: Case insensitive value in language_country format (e.g. nl_NL or nl_BE)
                   schema:
                     type: string
             responses:
@@ -41,26 +41,25 @@ components:
             properties:
                 id:
                     type: string
-                title:
-                    type: string
-                rich_text:
+                preference:
                     type: string
                 slug:
                     type: string
-                opt_type:
+                legal_basis:
                     type: string
-                category:
+                rich_text:
                     type: string
                 category_title:
                     type: string
-                country_iso2:
+                category_slug:
                     type: string
-                preference:
+                country_iso2:
                     type: string
                 locale:
                     type: string
-                legal_basis:
+                opt_type:
                     type: string
+
         consentsForCountry:
             type: object
             properties:

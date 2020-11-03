@@ -1,18 +1,14 @@
 import React, { useEffect, useRef } from 'react';
-import {ContentState, EditorState} from 'draft-js';
 import {stateToHTML} from 'draft-js-export-html';
+import { ContentState, EditorState, convertFromHTML } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import 'draft-js/dist/Draft.css';
-import htmlToDraft from 'html-to-draftjs';
 
 const toolbarOptions = {
-    options: ['inline', 'blockType', 'list', 'link', 'colorPicker', 'fontSize', 'remove'],
+    options: ['inline', 'link'],
     inline: {
-        options: ['bold', 'italic', 'underline', 'strikethrough', 'monospace']
-    },
-    list: {
-        options: ['unordered', 'ordered']
+        options: ['bold', 'italic', 'underline']
     }
 }
 
@@ -53,8 +49,19 @@ export default function DraftEditor({ onChangeHTML, htmlContent }) {
         return editorContentInHTML;
     }
 
+    const convertHTMLtoState = (html) => {
+        const blocksFromHTML = convertFromHTML(html);
+
+        const state = ContentState.createFromBlockArray(
+            blocksFromHTML.contentBlocks,
+            blocksFromHTML.entityMap,
+        );
+
+        return EditorState.createWithContent(state);
+    }
+
     useEffect(() => {
-        if(onChangeHTML) {
+        if (onChangeHTML) {
             const editorContentInHTML = convertContentToHtml();
             onChangeHTML(editorContentInHTML);
         }
@@ -62,15 +69,14 @@ export default function DraftEditor({ onChangeHTML, htmlContent }) {
 
     useEffect(() => {
         if(htmlContent) {
-            const contentBlock = htmlToDraft(htmlContent);
-            const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
-            setEditorState(EditorState.createWithContent(contentState));
+            const editorState = convertHTMLtoState(htmlContent);
+            setEditorState(editorState);
         }
     }, []);
 
     return <Editor
-                editorState={editorState}
-                onEditorStateChange={setEditorState}
-                toolbar={toolbarOptions}
-            />
+        editorState={editorState}
+        onEditorStateChange={setEditorState}
+        toolbar={toolbarOptions}
+    />
 }
