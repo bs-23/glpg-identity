@@ -975,7 +975,8 @@ async function forgetPassword(req, res) {
 
             response.data = {
                 message: 'Successfully sent password reset email.',
-                password_reset_token: doc.dataValues.reset_password_token
+                password_reset_token: doc.dataValues.reset_password_token,
+                user_id: doc.dataValues.id
             };
 
             return res.json(response);
