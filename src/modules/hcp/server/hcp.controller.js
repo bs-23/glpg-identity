@@ -863,8 +863,6 @@ async function changePassword(req, res) {
 
         doc.update({ password: new_password, password_updated_at: new Date(Date.now()) });
 
-        await sendChangePasswordSuccessMail(doc, req.user);
-
         response.data = 'Password changed successfully.';
         res.send(response);
     } catch (err) {
