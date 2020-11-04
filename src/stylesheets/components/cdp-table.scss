@@ -1,7 +1,22 @@
 .cdp-table {
 
     &-inline-editing {
+        .inline-editing {
 
+            &__td {
+
+                &:hover {
+                    .inline-editing__edit-icon {
+                        visibility: visible;
+                        transition: all .25s ease;
+                    }
+                }
+            }
+
+            &__edit-icon {
+                visibility: hidden;
+            }
+        }
     }
 
     &-sm {

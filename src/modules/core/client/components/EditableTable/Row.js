@@ -81,6 +81,7 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
                 style={getCellStyle(inputName)}
                 // onMouseEnter={handleMouseEnter}
                 // onMouseLeave={handleMouseLeave}
+                className="inline-editing__td"
             >
                 {editingCell && editingCell.rowIndex === rowIndex && editingCell.columnIndex === colIndex
                     ? <InputField

@@ -6,7 +6,7 @@ const Cell = ({ value, onSwitchToEditMode, showEditIcon, editable }) => {
     return <div>
         <span>{value}</span>
         <i
-            className="icon icon-edit-pencil icon-1x cdp-list-group__icon"
+            className="icon icon-edit-pencil icon-1x inline-editing__edit-icon"
             style={{ marginLeft: '5px', fontSize: '10' }}
             onClick={(e) => onSwitchToEditMode(e)}
         />
