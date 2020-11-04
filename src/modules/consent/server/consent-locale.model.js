@@ -18,7 +18,7 @@ const ConsentLanguage = sequelize.cdpConnector.define('consent_locales', {
     },
     rich_text: {
         allowNull: false,
-        type: DataTypes.STRING(1000),
+        type: DataTypes.STRING(60),
         set(value) {
             this.setDataValue('rich_text', validator.escape(value));
         }
@@ -34,6 +34,6 @@ const ConsentLanguage = sequelize.cdpConnector.define('consent_locales', {
     updatedAt: 'updated_at'
 });
 
-ConsentLanguage.belongsTo(Consent, {as: 'consent', foreignKey: 'consent_id'});
+ConsentLanguage.belongsTo(Consent, { as: 'consent', foreignKey: 'consent_id' });
 
 module.exports = ConsentLanguage;
