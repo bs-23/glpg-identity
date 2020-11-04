@@ -21,6 +21,16 @@ const ErrorMessage = ({ name }) => (
     </Field>
 );
 
+const BackendErrorMessage = ({ name }) => (
+    <Field name={name} >
+        {({ form }) => {
+            const backendErrors = (form.status|| {})['backendErrors'];
+            const error = getIn(backendErrors, name);
+            return error ? error : null;
+        }}
+    </Field>
+)
+
 const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCell, formikProps, onInputChange }) => {
 
     const { handleBlur, handleChange, initialValues, values } = formikProps;
@@ -45,7 +55,7 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
     }
 
     const renderRow = () => columns.map((column, colIndex) => {
-        const [isMouseOver, setIsMouseOver] = useState(false);
+        // const [isMouseOver, setIsMouseOver] = useState(false);
         const { customizeCellContent, beforeChangeAction, customCell: CustomCell, key } = column;
 
         const currentCellValue = row[column.id];
@@ -60,17 +70,17 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
             beforeChangeAction ? beforeChangeAction(row, done) : onCellBlur(e, handleBlur);
         };
 
-        const handleMouseEnter = () => setIsMouseOver(true);
+        // const handleMouseEnter = () => setIsMouseOver(true);
 
-        const handleMouseLeave = () => setIsMouseOver(false);
+        // const handleMouseLeave = () => setIsMouseOver(false);
 
         const Cell = CustomCell ? CustomCell : DefaultCell;
 
         return <React.Fragment key={key || inputName}>
             <td
                 style={getCellStyle(inputName)}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
+                // onMouseEnter={handleMouseEnter}
+                // onMouseLeave={handleMouseLeave}
             >
                 {editingCell && editingCell.rowIndex === rowIndex && editingCell.columnIndex === colIndex
                     ? <InputField
@@ -84,13 +94,16 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
                     : <Cell
                         value={customCellValue || currentCellValue}
                         editable={column.editable}
-                        showEditIcon={isMouseOver}
+                        // showEditIcon={isMouseOver}
                         onSwitchToEditMode={e => onCellSwitchToEdit(rowIndex, colIndex, e)}
                         row={row}
                     />
                 }
                 <div className="invalid-feedback">
                     <ErrorMessage name={`rows[${rowIndex}].${column.id}`}/>
+                </div>
+                <div className="invalid-feedback">
+                    <BackendErrorMessage name={`rows[${rowIndex}].${column.id}`}/>
                 </div>
             </td>
         </React.Fragment>
