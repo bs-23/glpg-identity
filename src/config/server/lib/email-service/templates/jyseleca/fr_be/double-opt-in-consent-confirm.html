@@ -27,17 +27,21 @@
 
         .email-content-wrapper {
             display: block;
-            margin: 30px auto !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
             max-width: 602px;
             width: 602px;
             text-align: left;
         }
 
-        .email-content {
-            box-sizing: border-box;
-            padding: 48px;
+        .email-content-container {
             background-color: #fff;
             border: 1px solid #E3E3E3;
+            padding: 48px;
+        }
+
+        .email-content {
+            text-align: left;
         }
 
         img {
@@ -75,8 +79,7 @@
         }
 
         .btn {
-            box-sizing: border-box;
-            padding: 15px 20px;
+            padding: 0px;
             width: auto;
             text-align: center;
             font-weight: bold;
@@ -110,7 +113,7 @@
                 width: 100% !important
             }
 
-            .email-content {
+            .email-content-container {
                 padding: 30px;
             }
 
@@ -125,39 +128,52 @@
 <body class="email-body">
     <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="email-container">
         <tr>
-            <td class="email-content-wrapper" align="center">
-                <div class="email-content">
-                    <h2 style="margin-bottom:40px;margin-top: 0px;">
-                        <img src="[[s3bucketUrl]]/jyseleca/logo-be-fr.png" alt="Jyseleca Logo"
-                             width="174" />
-                    </h2>
-                    <h3>Bonjour [[firstName]] [[lastName]],</h3>
-                    <p>Merci pour votre inscription sur le <b>site web de Jyseleca</b>.</p>
-                    <p>Nous confirmons que vous avez consenti à recevoir des informations concernant tous les produits et services de Galapagos sur l'adresse mail que vous avez fournie. Si vous souhaitez retirer ce consentement, vous pouvez le faire à tout moment en cliquant sur le lien de désinscription que vous trouverez dans tout futur matériel promotionnel. </p>
-                    <p>
-                        Pour obtenir de plus amples informations sur la manière dont nous traitons vos données à caractère personnel, veuillez vous référer à notre <a href="https://www.glpg.com/belgique/fr-politique-de-confidentialite" target="_blank" style="color:#005DAC;font-weight: 600;">Déclaration de confidentialité</a>.
-                    </p>
-                    <p>Veuillez cliquer sur le bouton ci-dessous pour commencer. </p>
-                    <p style="margin-top: 48px; margin-bottom: 48px;">
-                        <a class="btn" href="[[link]]" target="_blank" style="color: #fff;width: 221px; height: 61px;display: block; line-height: 35px;">C’est parti</a>
-                    </p>
+            <td align="center">
+                <table class="email-content-wrapper">
+                    <tr><td height="30" style="height: 30px">&nbsp;</td></tr>
+                    <tr>
+                        <td align="center" class="email-content-container">
+                            <div class="email-content">
+                                <h2 style="margin-bottom:40px;margin-top: 0px;">
+                                    <img src="[[s3bucketUrl]]/jyseleca/logo-be-fr.png" alt="Jyseleca Logo"
+                                         width="174" />
+                                </h2>
+                                <h3>Bonjour [[firstName]] [[lastName]],</h3>
+                                <p>Merci pour votre inscription sur le <b>site web de Jyseleca</b>.</p>
+                                <p>Nous confirmons que vous avez consenti à recevoir des informations concernant tous les produits et services de Galapagos sur l'adresse mail que vous avez fournie. Si vous souhaitez retirer ce consentement, vous pouvez le faire à tout moment en cliquant sur le lien de désinscription que vous trouverez dans tout futur matériel promotionnel. </p>
+                                <p>
+                                    Pour obtenir de plus amples informations sur la manière dont nous traitons vos données à caractère personnel, veuillez vous référer à notre <a href="https://www.glpg.com/belgique/fr-politique-de-confidentialite" target="_blank" style="color:#005DAC;font-weight: 600;">Déclaration de confidentialité</a>.
+                                </p>
+                                <p>Veuillez cliquer sur le bouton ci-dessous pour commencer. </p>
+                                <p style="margin-top: 48px; margin-bottom: 48px;">
+                                    <a class="btn" href="[[link]]" target="_blank" style="width: 221px; display: block; border-top: 15px solid #005DAC; border-bottom: 15px solid #005DAC; height:31px; line-height:31px; color: #FFFFFF;">C’est parti</a>
+                                </p>
 
-                    <p style="margin-bottom: 0px;">
-                        <span>Sincères salutations,</span>
-                        <b style="display: block;">L’Équipe Jyseleca</b>
-                    </p>
-                </div>
-                <p class="vivaocde">BE-RA-FIL-202010-00011</p>
-                <hr class="email-content-separator" />
-                <div class="email-footer">
-                    <p class="text-small">
-                        Cet e-mail vous a été envoyé en tant que membre enregistré de la plateforme de Galapagos pour les professionnels de la santé. L'utilisation du service et du site web est soumise à nos <a href="https://www.glpg.com/belgique/fr-conditions-utilisation" target="_blank" style="color:#005DAC;font-weight: 600;">conditions d'utilisation</a> et à notre <a href="https://www.glpg.com/belgique/fr-politique-de-confidentialite" target="_blank" style="color:#005DAC;font-weight: 600;">politique de confidentialité</a>.
-                    </p>
-                    <p class="text-small">  &copy; 2020 Galapagos. Tous droits réservés.</p>
-                </div>
+                                <div style="margin-bottom: 0px;">
+                                    <p style="margin-bottom: 0px;padding-bottom:0px;">Sincères salutations,</p>
+                                    <b style="display: block;">L’Équipe Jyseleca</b>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left">
+                            <p class="vivaocde">BE-RA-FIL-202010-00011</p>
+                            <hr class="email-content-separator" />
+                            <div class="email-footer">
+                                <p class="text-small">
+                                    Cet e-mail vous a été envoyé en tant que membre enregistré de la plateforme de Galapagos pour les professionnels de la santé. L'utilisation du service et du site web est soumise à nos <a href="https://www.glpg.com/belgique/fr-conditions-utilisation" target="_blank" style="color:#005DAC;font-weight: 600;">conditions d'utilisation</a> et à notre <a href="https://www.glpg.com/belgique/fr-politique-de-confidentialite" target="_blank" style="color:#005DAC;font-weight: 600;">politique de confidentialité</a>.
+                                </p>
+                                <p class="text-small">  &copy; 2020 Galapagos. Tous droits réservés.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr><td height="30" style="height: 30px">&nbsp;</td></tr>
+                </table>
             </td>
         </tr>
     </table>
+    
 </body>
 
 </html>
