@@ -595,8 +595,6 @@ async function createConsent(req, res) {
             return res.status(400).send('Please provide at least one translation.');
         }
 
-        if (preference.length > 60) return res.status(400).send('This field must be at most 60 characters long');
-
         const invalidTranslations = translations.filter(t => !t.country_iso2 || !t.lang_code || !t.rich_text);
         if (invalidTranslations && invalidTranslations.length) {
             return res.status(400).send('Translations not valid.');
@@ -680,8 +678,6 @@ async function updateCdpConsent(req, res) {
         if (!id || !preference || !category_id || !legal_basis) {
             return res.status(400).send('Invalid request.');
         }
-
-        if (preference.length > 60) return res.status(400).send('This field must be at most 60 characters long');
 
         if (!translations || !translations.length) {
             return res.status(400).send('Please provide at least one translation.');

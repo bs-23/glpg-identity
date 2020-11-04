@@ -9,7 +9,7 @@ const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodeca
 const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
 const makeCustomSlug = (title) => {
     const code = uniqueSlug(`${title}`);
-    if(title.length > 50) return convertToSlug(`${title.substring(0, 50)} ${code}`);
+    if (title.length > 50) return convertToSlug(`${title.substring(0, 50)} ${code}`);
     return convertToSlug(`${title} ${code}`);
 };
 
@@ -27,7 +27,7 @@ const Consent = sequelize.cdpConnector.define('consents', {
     preference: {
         unique: true,
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING(60)
     },
     slug: {
         unique: true,
@@ -68,7 +68,7 @@ Consent.belongsTo(ConsentCategory, {
     foreignKey: 'category_id'
 });
 
-Consent.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by'});
-Consent.belongsTo(User, { as: 'updatedByUser', foreignKey: 'updated_by'});
+Consent.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by' });
+Consent.belongsTo(User, { as: 'updatedByUser', foreignKey: 'updated_by' });
 
 module.exports = Consent;
