@@ -1,12 +1,11 @@
 const path = require('path');
-const fs = require('fs');
 const _ = require('lodash');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
+const axios = require('axios');
 const validator = require('validator');
 const { QueryTypes, Op, where, col, fn } = require('sequelize');
 const Hcp = require('./hcp-profile.model');
-const ApplicationDomain = require('../../application/server/application-domain.model');
 const HcpArchives = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-archives.model'));
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-consents.model'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
@@ -15,7 +14,6 @@ const ConsentLocale = require(path.join(process.cwd(), 'src/modules/consent/serv
 const ConsentCountry = require(path.join(process.cwd(), 'src/modules/consent/server/consent-country.model'));
 const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
-const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const PasswordPolicies = require(path.join(process.cwd(), 'src/modules/core/server/password/password-policies.js'));
@@ -67,85 +65,33 @@ function mapMasterDataToHcpProfile(masterData) {
     return model;
 }
 
-async function generateEmailOptions(emailType, application, user) {
-    const emailDataUrl = path.join(process.cwd(), `src/config/server/lib/email-service/email-options.json`);
-    const emailOptionsText = fs.readFileSync(emailDataUrl, 'utf8');
-    const emailOptions = JSON.parse(emailOptionsText);
-    const emailData = emailOptions[emailType];
+async function notifyHcpUserApproval(hcpUser, userApplication) {
+    try {
+        const secret = userApplication.auth_secret;
+        const token = jwt.sign({
+            id: hcpUser.id
+        }, secret, {
+            expiresIn: '1h'
+        });
 
-    let templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/en/${emailData.template_url}`)
-    const templateUrlInLocale = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/${user.locale.toLowerCase()}/${emailData.template_url}`);
+        const payload = hcpUser.status === 'consent_pending'
+            ? { consent_confirmation_token: generateConsentConfirmationAccessToken(hcpUser) }
+            : { password_setup_token: hcpUser.reset_password_token };
 
-    if (fs.existsSync(templateUrlInLocale)) {
-        templateUrl = templateUrlInLocale;
+        const response = await axios.post(
+            `${hcpUser.origin_url}${userApplication.approve_user_path}`,
+            payload,
+            {
+                headers: {
+                    jwt_token: token
+                }
+            }
+        );
+        return response.status === 200;
+    } catch (error) {
+        console.error(error);
+        return false;
     }
-
-    const subject = emailData.subject[user.locale] || emailData.subject['en'];
-    const plaintext = emailData.plain_text[user.locale] || emailData.plain_text['en'];
-
-    const { domain } = await ApplicationDomain.findOne({ where: { application_id: application.id, country_iso2: user.country_iso2 } });
-
-    return {
-        toAddresses: [user.email],
-        subject: subject,
-        templateUrl: templateUrl,
-        plaintext: plaintext,
-        domain,
-        data: {
-            firstName: user.first_name || '',
-            lastName: user.last_name || '',
-            s3bucketUrl: nodecache.getValue('S3_BUCKET_URL')
-        }
-    };
-}
-
-async function sendConsentConfirmationMail(user, application) {
-    const mailOptions = await generateEmailOptions('consent-confirmation', application, user);
-    await emailService.send(mailOptions);
-}
-
-async function sendDoubleOptInConsentConfirmationMail(user, application) {
-    const consentConfirmationToken = generateConsentConfirmationAccessToken(user);
-
-    const mailOptions = await generateEmailOptions('double-opt-in-consent-confirm', application, user);
-    mailOptions.data.link = `${mailOptions.domain}${application.consent_confirmation_path}?token=${consentConfirmationToken}&journey=consent_confirmation&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
-
-    await emailService.send(mailOptions);
-}
-
-async function sendRegistrationSuccessMail(user, application) {
-    const mailOptions = await generateEmailOptions('registration-success', application, user);
-    mailOptions.data.loginLink = `${mailOptions.domain}${application.journey_redirect_path}?journey=login&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
-
-    await emailService.send(mailOptions);
-}
-
-async function sendChangePasswordSuccessMail(user, application) {
-    const mailOptions = await generateEmailOptions('password-change-success', application, user);
-    await emailService.send(mailOptions);
-}
-
-
-async function sendResetPasswordSuccessMail(user, application) {
-    const mailOptions = await generateEmailOptions('password-reset-success', application, user);
-    mailOptions.data.loginLink = `${mailOptions.domain}${application.journey_redirect_path}?journey=login&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
-
-    await emailService.send(mailOptions);
-}
-
-async function sendPasswordSetupInstructionMail(user, application) {
-    const mailOptions = await generateEmailOptions('password-setup-instructions', application, user);
-    mailOptions.data.link = `${mailOptions.domain}${application.journey_redirect_path}?token=${user.reset_password_token}&journey=single_optin_verified&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
-    mailOptions.data.forgot_password_link = `${mailOptions.domain}${application.journey_redirect_path}?journey=forgot_password&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
-
-    await emailService.send(mailOptions);
-}
-
-async function sendPasswordResetInstructionMail(user, application) {
-    const mailOptions = await generateEmailOptions('password-reset-instructions', application, user);
-    mailOptions.data.link = `${mailOptions.domain}${application.journey_redirect_path}?token=${user.reset_password_token}&journey=set_password&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
-
-    await emailService.send(mailOptions);
 }
 
 async function addPasswordResetTokenToUser(user) {
@@ -433,9 +379,9 @@ async function createHcpProfile(req, res) {
         response.errors.push(new CustomError('specialty_onekey is missing.', 400, 'specialty_onekey'));
     }
 
-    // if (!origin_url) {
-    //     response.errors.push(new CustomError('Origin URL is missing.', 400, 'origin_url'));
-    // }
+    if (!origin_url) {
+        response.errors.push(new CustomError('Origin URL is missing.', 400, 'origin_url'));
+    }
 
     if (specialty_onekey) {
         const specialty_master_data = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwspecialtymaster WHERE cod_id_onekey = $specialty_onekey", {
@@ -668,13 +614,20 @@ async function approveHCPUser(req, res) {
         hcpUser.status = hasDoubleOptIn ? 'consent_pending' : 'manually_verified';
         await hcpUser.save();
 
-        if (hcpUser.dataValues.status === 'consent_pending') {
-            await sendDoubleOptInConsentConfirmationMail(hcpUser, userApplication);
-        }
-
         if (hcpUser.dataValues.status === 'manually_verified') {
             await addPasswordResetTokenToUser(hcpUser);
-            await sendPasswordSetupInstructionMail(hcpUser.dataValues, userApplication);
+        }
+
+        const approveSuceeded = await notifyHcpUserApproval(hcpUser, userApplication);
+
+        if (!approveSuceeded) {
+            await hcpUser.update({
+                status: 'not_verified',
+                reset_password_token: null,
+                reset_password_expires: null
+            });
+            response.errors.push(new CustomError('Failed to approve user.', 400));
+            return res.status(400).send(response);
         }
 
         response.data = getHcpViewModel(hcpUser.dataValues);
@@ -739,7 +692,7 @@ async function getHcpProfile(req, res) {
     try {
         const doc = await Hcp.findOne({
             where: { id: req.params.id },
-            attributes: { exclude: ['password', 'created_at', 'updated_at', 'created_by', 'updated_by', 'reset_password_token', 'reset_password_expires', 'application_id'] }
+            attributes: { exclude: ['password', 'created_at', 'updated_at', 'created_by', 'updated_by', 'reset_password_token', 'reset_password_expires', 'failed_auth_attempt', 'password_updated_at', 'application_id'] }
         });
 
         if (!doc) {
@@ -925,6 +878,8 @@ async function resetPassword(req, res) {
 
         if (doc.password) await PasswordPolicies.saveOldPassword(doc);
 
+        const is_firsttime_setup = !doc.password;
+
         await doc.update({ password: req.body.new_password, password_updated_at: new Date(Date.now()), reset_password_token: null, reset_password_expires: null });
 
         await doc.update(
@@ -932,7 +887,11 @@ async function resetPassword(req, res) {
             { where: { email: doc.dataValues.email } }
         );
 
-        response.data = 'Password reset successfully.';
+        response.data = {
+            message: 'Password reset successfully.',
+            is_firsttime_setup
+        };
+
         res.json(response);
     } catch (err) {
         console.error(err);
