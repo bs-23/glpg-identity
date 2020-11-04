@@ -18,7 +18,7 @@ const ConsentLanguage = sequelize.cdpConnector.define('consent_locales', {
     },
     rich_text: {
         allowNull: false,
-        type: DataTypes.STRING(60),
+        type: DataTypes.STRING(1000),
         set(value) {
             this.setDataValue('rich_text', validator.escape(value));
         }
