@@ -672,10 +672,14 @@ async function updateCdpConsent(req, res) {
     try {
         const { preference, category_id, legal_basis, is_active, translations } = req.body;
 
+
+
         const id = req.params.id;
         if (!id || !preference || !category_id || !legal_basis) {
             return res.status(400).send('Invalid request.');
         }
+
+        if (preference.length > 255) return res.status(400).send('Preference is too long');
 
         if (!translations || !translations.length) {
             return res.status(400).send('Please provide at least one translation.');
