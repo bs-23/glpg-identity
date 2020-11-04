@@ -128,7 +128,12 @@ paths:
                                 type: object
                                 properties:
                                     data:
-                                        type: string
+                                        type: object
+                                        properties:
+                                            is_firsttime_setup:
+                                                type: string
+                                            message:
+                                                type: string
                                     errors:
                                         $ref: "#/components/schemas/errorBodyInSuccess"
                 401:
@@ -174,6 +179,8 @@ paths:
                                         type: object
                                         properties:
                                             password_reset_token:
+                                                type: string
+                                            user_id:
                                                 type: string
                                             message:
                                                 type: string
