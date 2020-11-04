@@ -112,6 +112,14 @@
         }
 
         &-link {
+            &-primary {
+                color: $primary-color !important;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+
             &-secondary {
                 color: $secondary-color !important;
 
@@ -260,5 +268,26 @@ a {
     &.active {
         background: $primary-color !important;
         color: $white-color;
+    }
+}
+
+.react-toast-notifications__container {
+    z-index: 2000!important;
+}
+
+.border-primary {
+    border-color: $primary-color !important;
+}
+.badge-secondary-light {
+    background-color: $secondary-color-lighter !important;
+}
+
+.hover-opacity {
+    cursor: pointer;
+    opacity: 1;
+    transition: all .25s ease;
+
+    &:hover {
+        opacity: .8;
     }
 }

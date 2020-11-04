@@ -64,9 +64,9 @@ const CDPAuthStrategy = (req, res, next) => (
             return;
         }
 
-        req.logIn(user, { session: false }, function(err) {
-          if (err) { return next(err); }
-          next();
+        req.logIn(user, { session: false }, function (err) {
+            if (err) { return next(err); }
+            next();
         });
     })
 )(req, res, next)

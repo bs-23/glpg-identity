@@ -83,7 +83,7 @@ async function generateEmailOptions(emailType, application, user) {
     const subject = emailData.subject[user.locale] || emailData.subject['en'];
     const plaintext = emailData.plain_text[user.locale] || emailData.plain_text['en'];
 
-    const { domain } = await ApplicationDomain.findOne({ where: { application_id: application.id, country_iso2: user.country_iso2 }});
+    const { domain } = await ApplicationDomain.findOne({ where: { application_id: application.id, country_iso2: user.country_iso2 } });
 
     return {
         toAddresses: [user.email],
@@ -125,10 +125,6 @@ async function sendChangePasswordSuccessMail(user, application) {
     await emailService.send(mailOptions);
 }
 
-async function sendRegistrationNotVerifiedMail(user, application) {
-    const mailOptions = await generateEmailOptions('registration-not-verified', application, user);
-    await emailService.send(mailOptions);
-}
 
 async function sendResetPasswordSuccessMail(user, application) {
     const mailOptions = await generateEmailOptions('password-reset-success', application, user);
@@ -176,21 +172,21 @@ async function getHcps(req, res) {
 
         const application_list = (await Hcp.findAll()).map(i => i.get("application_id"));
 
-        async function getCountryIso2(){
+        async function getCountryIso2() {
             const user_codbase_list_for_iso2 = (await sequelize.datasyncConnector.query(
                 `SELECT * FROM ciam.vwcountry where ciam.vwcountry.country_iso2 = ANY($countries);`, {
-                    bind: {
-                        countries: req.user.countries
-                    },
-                    type: QueryTypes.SELECT
-                }
+                bind: {
+                    countries: req.user.countries
+                },
+                type: QueryTypes.SELECT
+            }
             )).map(i => i.codbase);
 
             const user_country_iso2_list = (await sequelize.datasyncConnector.query(
                 `SELECT * FROM ciam.vwcountry where ciam.vwcountry.codbase = ANY($codbases);`,
                 {
                     bind: {
-                        codbases : user_codbase_list_for_iso2
+                        codbases: user_codbase_list_for_iso2
                     },
                     type: QueryTypes.SELECT
                 }
@@ -204,11 +200,11 @@ async function getHcps(req, res) {
 
         const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(
             `SELECT * FROM ciam.vwcountry WHERE ciam.vwcountry.codbase = $codbase;`, {
-                bind: {
-                    codbase: codbase || ''
-                },
-                type: QueryTypes.SELECT
-            }
+            bind: {
+                codbase: codbase || ''
+            },
+            type: QueryTypes.SELECT
+        }
         )).map(i => i.country_iso2);
 
         const selected_iso2_list_for_codbase = country_iso2_list_for_codbase.filter(i => country_iso2_list.includes(i));
@@ -367,7 +363,7 @@ async function registrationLookup(req, res) {
 
         let uuid_from_master_data;
 
-        if(master_data && master_data.length) {
+        if (master_data && master_data.length) {
             const uuid_1_from_master_data = (master_data[0].uuid_1 || '');
             const uuid_2_from_master_data = (master_data[0].uuid_2 || '');
 
@@ -375,7 +371,7 @@ async function registrationLookup(req, res) {
                 .find(id => id.replace(/[-]/gi, '') === uuidWithoutSpecialCharacter);
         }
 
-        const profileByUUID = await Hcp.findOne({ where: { uuid: uuid_from_master_data || uuid }});
+        const profileByUUID = await Hcp.findOne({ where: { uuid: uuid_from_master_data || uuid } });
 
         if (profileByUUID) {
             response.errors.push(new CustomError('UUID is already registered.', 4101, 'uuid'));
@@ -399,7 +395,7 @@ async function registrationLookup(req, res) {
 
 async function createHcpProfile(req, res) {
     const response = new Response({}, []);
-    const { email, uuid, salutation, first_name, last_name, country_iso2, language_code, specialty_onekey, telephone, locale, birthdate } = req.body;
+    const { email, uuid, salutation, first_name, last_name, country_iso2, language_code, specialty_onekey, telephone, locale, birthdate, origin_url } = req.body;
 
     if (!email || !validator.isEmail(email)) {
         response.errors.push(new CustomError('Email address is missing or invalid.', 400, 'email'));
@@ -436,6 +432,10 @@ async function createHcpProfile(req, res) {
     if (!specialty_onekey) {
         response.errors.push(new CustomError('specialty_onekey is missing.', 400, 'specialty_onekey'));
     }
+
+    // if (!origin_url) {
+    //     response.errors.push(new CustomError('Origin URL is missing.', 400, 'origin_url'));
+    // }
 
     if (specialty_onekey) {
         const specialty_master_data = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwspecialtymaster WHERE cod_id_onekey = $specialty_onekey", {
@@ -480,7 +480,7 @@ async function createHcpProfile(req, res) {
                 .find(id => id.replace(/[-]/gi, '') === uuidWithoutSpecialCharacter);
         }
 
-        const isUUIDExists = await Hcp.findOne({ where: { uuid: uuid_from_master_data || uuid }});
+        const isUUIDExists = await Hcp.findOne({ where: { uuid: uuid_from_master_data || uuid } });
 
         if (isUUIDExists) {
             response.errors.push(new CustomError('UUID already exists.', 4101, 'uuid'));
@@ -504,6 +504,7 @@ async function createHcpProfile(req, res) {
             birthdate,
             application_id: req.user.id,
             individual_id_onekey: master_data.individual_id_onekey,
+            origin_url,
             created_by: req.user.id,
             updated_by: req.user.id
         };
@@ -515,17 +516,20 @@ async function createHcpProfile(req, res) {
 
         if (req.body.consents && req.body.consents.length) {
             await Promise.all(req.body.consents.map(async consent => {
-                const consentSlug = Object.keys(consent)[0];
+                const preferenceSlug = Object.keys(consent)[0];
                 const consentResponse = Object.values(consent)[0];
 
                 if (!consentResponse) return;
 
-                const consentDetails = await Consent.findOne({ where: { slug: consentSlug } });
+                const consentDetails = await Consent.findOne({ where: { slug: preferenceSlug } });
+
                 if (!consentDetails) return;
 
                 const consentLocale = await ConsentLocale.findOne({
                     where: {
-                        locale: model.locale.toLowerCase(),
+                        locale: {
+                            [Op.iLike]: `%${model.locale}`
+                        },
                         consent_id: consentDetails.id
                     }
                 });
@@ -565,17 +569,8 @@ async function createHcpProfile(req, res) {
 
         response.data = getHcpViewModel(hcpUser.dataValues);
 
-        if (hcpUser.dataValues.status === 'not_verified') {
-            await sendRegistrationNotVerifiedMail(hcpUser.dataValues, req.user);
-        }
-
-        if (hcpUser.dataValues.status === 'consent_pending') {
-            await sendDoubleOptInConsentConfirmationMail(hcpUser.dataValues, req.user);
-        }
-
         if (hcpUser.dataValues.status === 'self_verified') {
             await addPasswordResetTokenToUser(hcpUser);
-            await sendConsentConfirmationMail(hcpUser.dataValues, req.user);
 
             response.data.password_reset_token = hcpUser.dataValues.reset_password_token;
             response.data.retention_period = '1 hour';
@@ -779,11 +774,25 @@ async function getHCPUserConsents(req, res) {
 
         if (!userConsents) return res.json([]);
 
-        const userConsentDetails = await ConsentLocale.findAll({ include: { model: Consent, as: 'consent', attributes: ['title'] }, where: { consent_id: userConsents.map(consent => consent.consent_id), locale: locale ? locale.toLowerCase() : doc.locale }, attributes: ['consent_id', 'rich_text'] });
+        const userConsentDetails = await ConsentLocale.findAll({
+            include: {
+                model: Consent,
+                as: 'consent'
+            }, where: {
+                consent_id: userConsents.map(consent => consent.consent_id),
+                locale: {
+                    [Op.iLike]: `%${locale ? locale : doc.locale}`
+                }
+            }, attributes: ['consent_id', 'rich_text']
+        });
 
         const consentCountries = await ConsentCountry.findAll({ where: { consent_id: userConsents.map(consent => consent.consent_id), country_iso2: { [Op.or]: [doc.country_iso2.toUpperCase(), doc.country_iso2.toLowerCase()] } } });
 
-        const consentResponse = userConsentDetails.map(({ consent_id: id, rich_text, consent: { title } }) => ({ id, title, rich_text: validator.unescape(rich_text) }));
+        const consentResponse = userConsentDetails.map(({
+            consent_id: id,
+            rich_text,
+            consent: { preference }
+        }) => ({ id, preference, rich_text: validator.unescape(rich_text) }));
 
         response.data = consentResponse.map(conRes => {
             const matchedConsent = userConsents.find(consent => consent.consent_id === conRes.id);
@@ -854,8 +863,6 @@ async function changePassword(req, res) {
 
         doc.update({ password: new_password, password_updated_at: new Date(Date.now()) });
 
-        await sendChangePasswordSuccessMail(doc, req.user);
-
         response.data = 'Password changed successfully.';
         res.send(response);
     } catch (err) {
@@ -918,12 +925,6 @@ async function resetPassword(req, res) {
 
         if (doc.password) await PasswordPolicies.saveOldPassword(doc);
 
-        if (doc.password) {
-            await sendResetPasswordSuccessMail(doc, req.user);
-        } else {
-            await sendRegistrationSuccessMail(doc, req.user);
-        }
-
         await doc.update({ password: req.body.new_password, password_updated_at: new Date(Date.now()), reset_password_token: null, reset_password_expires: null });
 
         await doc.update(
@@ -932,7 +933,7 @@ async function resetPassword(req, res) {
         );
 
         response.data = 'Password reset successfully.';
-        res.send(response);
+        res.json(response);
     } catch (err) {
         console.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
@@ -960,18 +961,21 @@ async function forgetPassword(req, res) {
         });
 
         if (!doc) {
-            response.data = 'Successfully sent password reset email.';
+            response.data = {
+                message: 'Successfully sent password reset email.'
+            };
             return res.json(response);
         }
 
-        const userApplication = await Application.findOne({ where: { id: doc.application_id } });
 
         if (doc.dataValues.status === 'self_verified' || doc.dataValues.status === 'manually_verified') {
-            await addPasswordResetTokenToUser(doc)
+            await addPasswordResetTokenToUser(doc);
 
-            await sendPasswordResetInstructionMail(doc, userApplication)
-
-            response.data = 'Successfully sent password reset email.'
+            response.data = {
+                message: 'Successfully sent password reset email.',
+                password_reset_token: doc.dataValues.reset_password_token,
+                user_id: doc.dataValues.id
+            };
 
             return res.json(response);
         }

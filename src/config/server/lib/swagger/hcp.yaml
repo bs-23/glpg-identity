@@ -175,7 +175,7 @@ paths:
                                         properties:
                                             password_reset_token:
                                                 type: string
-                                            retention_period:
+                                            message:
                                                 type: string
                                     errors:
                                         $ref: "#/components/schemas/errorBodyInSuccess"
@@ -418,6 +418,8 @@ components:
                     type: string
                 birthdate:
                     type: string
+                password_reset_token:
+                    type: string
         resetHcpPassword:
             type: object
             properties:
@@ -470,6 +472,8 @@ components:
                 locale:
                     type: string
                 specialty_onekey:
+                    type: string
+                origin_url:
                     type: string
                 consents:
                     type: array
