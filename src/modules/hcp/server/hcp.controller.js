@@ -155,6 +155,14 @@ async function addPasswordResetTokenToUser(user) {
     await user.save();
 }
 
+var trimRequestBody = function(reqBody){
+    Object.keys(reqBody).forEach(key => {
+        if(typeof reqBody[key] === 'string')
+            reqBody[key] = reqBody[key].trim();
+    });
+    return reqBody;
+}
+
 function ignoreCaseArray(str) {
     return [str.toLowerCase(), str.toUpperCase(), str.charAt(0).toLowerCase() + str.charAt(1).toUpperCase(), str.charAt(0).toUpperCase() + str.charAt(1).toLowerCase()];
 }
@@ -314,6 +322,134 @@ async function editHcp(req, res) {
         delete HcpUser.dataValues.updated_by;
 
         response.data = HcpUser;
+        res.json(response);
+    } catch (err) {
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
+    }
+}
+
+async function updateHcps(req, res) {
+    const Hcps = req.body;
+    const response = new Response({}, []);
+    const hcpsToUpdate = [];
+    console.log(Hcps);
+    try {
+        if(!Array.isArray(Hcps)) {
+            response.error.push(new CustomError('Must be an array', 400));
+            return res.status(400).send(response);
+        }
+
+        function Error(rowIndex, property, message) {
+            this.rowIndex = rowIndex;
+            this.property = property;
+            this.message = message;
+        }
+
+        await Promise.all(Hcps.map(async hcp => {
+            const { id, email, first_name, last_name, uuid, specialty_onekey, country_iso2, _rowIndex } = trimRequestBody(hcp);
+
+            if(!id) {
+                response.errors.push(new Error(_rowIndex, 'id', 'ID is missing.'));
+            }
+
+            if(!first_name) {
+                response.errors.push(new Error(_rowIndex, 'first_name', 'First Name is missing.'));
+            }
+
+            if(!last_name) {
+                response.errors.push(new Error(_rowIndex, 'last_name', 'Last Name is missing.'));
+            }
+
+            if(!uuid) {
+                response.errors.push(new Error(_rowIndex, 'uuid', 'UUID is missing.'));
+            }
+
+            if(!email) {
+                response.errors.push(new Error(_rowIndex, 'email', 'Email is missing.'));
+            }
+
+            if(!specialty_onekey) {
+                response.errors.push(new Error(_rowIndex, 'specialty_onekey', 'Specialty Onekey is missing.'));
+            }
+
+            if(!country_iso2) {
+                response.errors.push(new Error(_rowIndex, 'country_iso2', 'Country ISO2 is missing.'));
+            }
+
+            const HcpUser = await Hcp.findOne({ where: { id: id } });
+
+            if (!HcpUser) {
+                response.errors.push(new Error(_rowIndex, 'id', 'User not found.'));
+            }
+
+            if(email) {
+                if(!validator.isEmail(email)) {
+                    response.errors.push(new Error(_rowIndex, 'email', 'Invalid email'));
+                }else{
+                    const doesEmailExist = await Hcp.findOne({
+                        where: {
+                            id: { [Op.ne]: id },
+                            email: { [Op.iLike]: `${email}` } }
+                        }
+                    );
+
+                    if(doesEmailExist) {
+                        response.errors.push(new Error(_rowIndex, 'email', 'Email already exists'));
+                    }
+                }
+            }
+
+            let uuid_from_master_data;
+
+            if(uuid) {
+                let master_data = {};
+
+                const uuidWithoutSpecialCharacter = uuid.replace(/[-]/gi, '');
+
+                master_data = await sequelize.datasyncConnector.query(`select * from ciam.vwhcpmaster
+                        where regexp_replace(uuid_1, '[-]', '', 'gi') = $uuid
+                        OR regexp_replace(uuid_2, '[-]', '', 'gi') = $uuid`, {
+                    bind: { uuid: uuidWithoutSpecialCharacter },
+                    type: QueryTypes.SELECT
+                });
+                master_data = master_data && master_data.length ? master_data[0] : {};
+
+                const uuid_1_from_master_data = (master_data.uuid_1 || '');
+                const uuid_2_from_master_data = (master_data.uuid_2 || '');
+
+                uuid_from_master_data = [uuid_1_from_master_data, uuid_2_from_master_data]
+                    .find(id => id.replace(/[-]/gi, '') === uuidWithoutSpecialCharacter);
+
+                const doesUUIDExist = await Hcp.findOne({ where: { uuid: uuid_from_master_data || uuid } });
+
+                if (doesUUIDExist) {
+                    response.errors.push(new Error(_rowIndex, 'uuid', 'UUID already exists.'));
+                }
+
+                hcpsToUpdate.push({
+                    id,
+                    uuid: uuid_from_master_data || uuid,
+                    email,
+                    first_name,
+                    last_name,
+                    uuid,
+                    specialty_onekey,
+                    country_iso2
+                })
+            }
+        }));
+
+        if(response.error && response.error.length) {
+            return res.status(400).send(response);
+        }
+
+        await Hcp.bulkCreate(hcpsToUpdate, {
+            updateOnDuplicate : ['email', 'uuid', 'first_name', 'last_name', 'country_iso2', 'locale', 'specialty_onekey']
+        });
+
+        response.data = hcpsToUpdate;
         res.json(response);
     } catch (err) {
         console.error(err);
@@ -1119,3 +1255,4 @@ exports.confirmConsents = confirmConsents;
 exports.approveHCPUser = approveHCPUser;
 exports.rejectHCPUser = rejectHCPUser;
 exports.getHCPUserConsents = getHCPUserConsents;
+exports.updateHcps = updateHcps;

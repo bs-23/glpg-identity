@@ -8,13 +8,14 @@ import { useSelector, useDispatch } from 'react-redux';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Form, Formik, Field, ErrorMessage } from "formik";
 import { useToasts } from 'react-toast-notifications';
-import { getHcpProfiles } from '../hcp.actions';
-import { ApprovalRejectSchema } from '../hcp.schema';
-import uuidAuthorities from '../uuid-authorities.json';
 import axios from 'axios';
-
 import _ from 'lodash';
 import parse from 'html-react-parser';
+
+import { getHcpProfiles } from '../hcp.actions';
+import { ApprovalRejectSchema, HcpInlineEditSchema } from '../hcp.schema';
+import uuidAuthorities from '../uuid-authorities.json';
+import EditableTable from '../../../core/client/components/EditableTable/EditableTable';
 
 export default function hcpUsers() {
     const dispatch = useDispatch();
@@ -28,6 +29,8 @@ export default function hcpUsers() {
     const [currentUser, setCurrentUser] = useState({});
     const { addToast } = useToasts();
     const [sort, setSort] = useState({ type: 'ASC', value: null });
+    const [specialtiesByLocale] = useState(new Map());
+    const [specialties] = useState(new Map());
 
     const hcps = useSelector(state => state.hcpReducer.hcps);
 
@@ -138,6 +141,109 @@ export default function hcpUsers() {
         window.open(link, 'name','width=600,height=400');
     }
 
+    const getSpecialtyOptions = async (value, row) => {
+        const language = row.locale.split('_')[0].toLowerCase();
+        const locale = `${language}_${row.country_iso2.toLowerCase()}`;
+        if(specialtiesByLocale.has(locale)) {
+            const options = specialtiesByLocale.get(locale);
+            return options;
+        }
+        const { data } = await axios.get(`/api/hcp-profiles/specialties-cdp?locale=${locale}`);
+        const options = data.data.map(sp => {
+            specialties.set(sp.cod_id_onekey, sp.cod_description);
+            return { value: sp.cod_id_onekey, label: sp.cod_description };
+        })
+        specialtiesByLocale.set(locale, options);
+        return options;
+    }
+
+    const getSpecialtyDescription = (sp_onekey, row) => {
+        if(specialties.has(sp_onekey)) {
+            console.log(specialties)
+            const specialty_desc = specialties.get(sp_onekey);
+            return specialty_desc;
+        }
+        return row.specialty_description;
+    }
+
+    const formatDate = (date) => {
+        return (new Date(date)).toLocaleDateString('en-GB').replace(/\//g, '.')
+    }
+
+    const submitHandler = ({ updatedRows }, done) => {
+        console.log('Updated Rows: ', updatedRows);
+        axios.put('/api/hcp-profiles/update-hcps', updatedRows)
+            .then(data => {
+                console.log('Success');
+                done();
+            });
+    }
+
+    const generateSortHandler = (columnName) => () => urlChange(1, hcps.codBase, hcps.status, columnName);
+
+    const renderStatus = ({ value: status }) => {
+        return status === 'self_verified'
+        ? <span><i className="fa fa-xs fa-circle text-success pr-2 hcp-status-icon"></i>Self Verified</span>
+        : status === 'manually_verified'
+            ? <span><i className="fa fa-xs fa-circle text-success pr-2 hcp-status-icon"></i>Manually Verified</span>
+            : status === 'consent_pending'
+                ? <span><i className="fa fa-xs fa-circle text-warning pr-2 hcp-status-icon"></i>Consent Pending</span>
+                : status === 'not_verified'
+                    ? <span><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Not Verified</span>
+                    : status === 'rejected'
+                        ? <span><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Rejected</span>
+                        : <span></span>
+    }
+
+    const renderSingleOptInSymbol = ({ value }) => {
+        return value && value.includes('single-opt-in')
+            ? <i className="fas fa-check-circle cdp-text-primary font-size-15px"></i>
+            : <i className="icon icon-close-circle text-danger consent-not-given"> </i>
+    }
+
+    const renderDoubleOptInSymbol = ({ value }) => {
+        return value && value.includes('double-opt-in')
+            ? <i className="fas fa-check-circle cdp-text-primary font-size-15px"></i>
+            : <i className="icon icon-close-circle text-danger consent-not-given"> </i>
+    }
+
+    const renderActions = ({ row }) => {
+        return <span>
+            <Dropdown className="ml-auto dropdown-customize">
+                <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                    <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(row)}>Profile</Dropdown.Item></LinkContainer>
+                    {row.status === 'not_verified' && <LinkContainer to="#"><Dropdown.Item onClick={() => onUpdateStatus(row)}>Manage Status</Dropdown.Item></LinkContainer>}
+                </Dropdown.Menu>
+            </Dropdown>
+        </span>
+    }
+
+    const columns = [
+        { id: 'email', name: 'Email', onSort: generateSortHandler('email'), fieldType: { name: 'email' } },
+        { id: 'created_at', name: 'Date of Registration', onSort: generateSortHandler('created_at'), customizeCellContent: formatDate, fieldType: { name: 'date' } },
+        { id: 'first_name', name: 'First Name', onSort: generateSortHandler('first_name') },
+        { id: 'last_name', name: 'Last Name', onSort: generateSortHandler('onSort') },
+        { id: 'status', name: 'Status', editable: false, customCell: renderStatus, onSort: generateSortHandler('status') },
+        { id: 'uuid', name: 'UUID', onSort: generateSortHandler('uuid') },
+        {
+            id: 'country_iso2',
+            name: 'Country',
+            customizeCellContent: getCountryName,
+            fieldType: { name: 'select', options: countries && countries.map(c => ({ value: c.country_iso2.toLowerCase(), label: c.codbase_desc }))  }
+        },
+        {
+            id: 'specialty_onekey',
+            name: 'Specialty',
+            customizeCellContent: getSpecialtyDescription,
+            fieldType: { name: 'select', options: getSpecialtyOptions }
+        },
+        { id: 'opt_types', key:"single", name: 'Single Opt-In', editable: false, customCell: renderSingleOptInSymbol },
+        { id: 'opt_types', key:"double", name: 'Double Opt-In', editable: false, customCell: renderDoubleOptInSymbol },
+        { id: 'action', name: 'Action', editable: false, customCell: renderActions }
+    ];
+
     useEffect(() => {
         getCountries();
         getAllCountries();
@@ -146,6 +252,8 @@ export default function hcpUsers() {
     useEffect(() => {
         loadHcpProfiles();
     }, [location]);
+
+    console.log(hcps)
 
     return (
         <main className="app__content cdp-light-bg">
@@ -481,6 +589,29 @@ export default function hcpUsers() {
                                     </div>
 
                                 </React.Fragment>
+                            }
+
+                            {hcps['users'] &&
+                                <EditableTable
+                                    rows={hcps.users}
+                                    columns={columns}
+                                    onSubmit={submitHandler}
+                                    schema={HcpInlineEditSchema}
+                                    enableReinitialize
+                                >
+                                {
+                                    (editableTableProps) => {
+                                        console.log(editableTableProps);
+                                        const { dirty, values, resetForm, submitForm } = editableTableProps;
+                                        return dirty && <div>
+                                            <div>
+                                                <button className="btn btn-primary" onClick={resetForm}>Reset</button>
+                                                <button className="btn btn-primary ml-2" onClick={submitForm} disabled={!dirty}>Save Changes</button>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                </EditableTable>
                             }
 
                             {hcps['users'] && hcps['users'].length === 0 &&
