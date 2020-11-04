@@ -69,7 +69,7 @@ const EditableTable = ({ columns: rawColumns, rows: rawRows, schema: rowSchema, 
         return updatedRows;
     }
 
-    return <div className="">
+    return <div className="shadow-sm bg-white table-responsive">
         <Formik
             initialValues={{ rows: rawRows }}
             validationSchema={tableSchema}
@@ -85,9 +85,9 @@ const EditableTable = ({ columns: rawColumns, rows: rawRows, schema: rowSchema, 
                 const dirty = formikProps.dirty;
 
                 return <>
-                    <table className="table table-bordered">
+                    <table className="table table-hover table-sm mb-0 cdp-table cdp-table-sm mt-3">
                         <Header columns={rawColumns} dirty={dirty} />
-                        <tbody>
+                        <tbody className="cdp-table__body bg-white">
                             {formikProps.values.rows.map((row, index) =>
                                 <Row
                                     key={index}
