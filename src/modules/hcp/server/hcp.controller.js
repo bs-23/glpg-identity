@@ -423,7 +423,14 @@ async function updateHcps(req, res) {
                 uuid_from_master_data = [uuid_1_from_master_data, uuid_2_from_master_data]
                     .find(id => id.replace(/[-]/gi, '') === uuidWithoutSpecialCharacter);
 
-                const doesUUIDExist = await Hcp.findOne({ where: { uuid: uuid_from_master_data || uuid } });
+                const doesUUIDExist = await Hcp.findOne({
+                    where: {
+                        id: {
+                            [Op.ne]: id
+                        },
+                        uuid: uuid_from_master_data || uuid
+                    }
+                });
 
                 if (doesUUIDExist) {
                     response.errors.push(new Error(_rowIndex, 'uuid', 'UUID already exists.'));
@@ -444,7 +451,7 @@ async function updateHcps(req, res) {
             }
         }));
 
-        if(response.error && response.error.length) {
+        if(response.errors && response.errors.length) {
             return res.status(400).send(response);
         }
 

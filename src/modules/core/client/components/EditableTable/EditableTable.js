@@ -28,11 +28,22 @@ const EditableTable = ({ columns: rawColumns, rows: rawRows, schema: rowSchema, 
     }
 
     const handleSubmit = (values, formikProps) => {
-        const done = success => {
-            if(success) {
+        const done = (success, error) => {
+            if(success){
                 formikProps.resetForm({
-                    values: values
+                    values: values,
+                    status: {}
                 });
+                return;
+            }
+            if(error){
+                const numberOfRows = formikRef.current.values.rows.length;
+                const backendErrors = Array(numberOfRows).fill({});
+                error.map(({ rowIndex, property, message}) => {
+                    const currentErrorObject = backendErrors[rowIndex];
+                    backendErrors[rowIndex] = { ...currentErrorObject, [property]: message }; //[property] = message;
+                });
+                formikProps.setStatus({ backendErrors: { rows: backendErrors } });
             }
         }
 

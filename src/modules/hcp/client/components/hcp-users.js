@@ -175,7 +175,11 @@ export default function hcpUsers() {
         axios.put('/api/hcp-profiles/update-hcps', updatedRows)
             .then(data => {
                 console.log('Success');
-                done();
+                done(true);
+            })
+            .catch(err => {
+                console.log(err.response);
+                done(null, err.response.data.errors);
             });
     }
 
@@ -601,8 +605,8 @@ export default function hcpUsers() {
                                 >
                                 {
                                     (editableTableProps) => {
-                                        console.log(editableTableProps);
-                                        const { dirty, values, resetForm, submitForm } = editableTableProps;
+                                        const { dirty, values, touched, status, resetForm, submitForm } = editableTableProps;
+                                        console.log('status: ', status, touched)
                                         return dirty && <div>
                                             <div>
                                                 <button className="btn btn-primary" onClick={resetForm}>Reset</button>
