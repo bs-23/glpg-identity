@@ -679,7 +679,7 @@ async function updateCdpConsent(req, res) {
             return res.status(400).send('Invalid request.');
         }
 
-        if (preference.length > 255) return res.status(400).send('Preference is too long');
+        if (preference.length > 60) return res.status(400).send('This field must be at most 60 characters long');
 
         if (!translations || !translations.length) {
             return res.status(400).send('Please provide at least one translation.');
