@@ -85,7 +85,7 @@ const EditableTable = ({ columns: rawColumns, rows: rawRows, schema: rowSchema, 
                 const dirty = formikProps.dirty;
 
                 return <>
-                    <table className="table table-hover table-sm mb-0 cdp-table cdp-table-sm mt-3">
+                    <table className="table table-hover table-sm mb-0 cdp-table cdp-table-sm mt-3 cdp-table-inline-editing">
                         <Header columns={rawColumns} dirty={dirty} />
                         <tbody className="cdp-table__body bg-white">
                             {formikProps.values.rows.map((row, index) =>
