@@ -334,7 +334,8 @@ async function updateHcps(req, res) {
     const Hcps = req.body;
     const response = new Response({}, []);
     const hcpsToUpdate = [];
-    console.log(Hcps);
+    const hcpModelInstances = [];
+
     try {
         if(!Array.isArray(Hcps)) {
             response.error.push(new CustomError('Must be an array', 400));
@@ -437,7 +438,9 @@ async function updateHcps(req, res) {
                     uuid,
                     specialty_onekey,
                     country_iso2
-                })
+                });
+
+                hcpModelInstances.push(HcpUser);
             }
         }));
 
@@ -445,9 +448,13 @@ async function updateHcps(req, res) {
             return res.status(400).send(response);
         }
 
-        await Hcp.bulkCreate(hcpsToUpdate, {
-            updateOnDuplicate : ['email', 'uuid', 'first_name', 'last_name', 'country_iso2', 'locale', 'specialty_onekey']
-        });
+        await Promise.all(hcpModelInstances.map(async (hcp, index) => {
+            await hcp.update(hcpsToUpdate[index]);
+        }));
+
+        // await Hcp.bulkCreate(hcpsToUpdate, {
+        //     updateOnDuplicate : ['email', 'uuid', 'first_name', 'last_name', 'country_iso2', 'locale', 'specialty_onekey']
+        // });
 
         response.data = hcpsToUpdate;
         res.json(response);
