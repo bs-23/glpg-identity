@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import DefaultCell from './Cell';
 import InputField from './Inputs/InputField';
 import { Field, getIn } from 'formik';
@@ -36,9 +36,15 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
     const { handleBlur, handleChange, initialValues, values } = formikProps;
 
     const isCellInvalid = (name) => {
-        const error = getIn(formikProps.errors, name);
+        const feError = getIn(formikProps.errors, name);
         const touch = getIn(formikProps.touched, name);
-        return touch && error ? true : false;
+        const hasFrontEndError = touch && feError ? true : false;
+
+        const backendErrors = (formikProps.status|| {})['backendErrors'];
+        const beError = getIn(backendErrors, name);
+        const hasBackEndError = beError ? true : false;
+
+        return hasFrontEndError || hasBackEndError;
     }
 
     const hasCellChanged = name => {

@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import * as yup from 'yup';
 import Row from './Row';
-import { Formik } from 'formik';
+import { Formik, setIn } from 'formik';
 import Header from './Header';
 import { useEffect } from 'react';
 
@@ -9,6 +9,7 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
     const [editingCell, setEditingCell] = useState(null);
     const [rawRows, setRawRows] = useState([]);
     const formikRef = useRef();
+    const formikBag = formikRef.current;
 
     useEffect(() => {
         setRawRows(rows);
@@ -28,8 +29,11 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
     }
 
     const handleInputChange = (e, handleChange) => {
-        // if(e.target.type === 'date') e.target.value = new Date(e.target.value);
-
+        const inputName = e.target.name;
+        if(formikBag.status && formikBag.status.backendErrors) {
+            const newBackEndError = setIn(formikBag.status.backendErrors, inputName, null);
+            formikBag.setStatus({ backendErrors: newBackEndError });
+        }
         handleChange(e);
     }
 
