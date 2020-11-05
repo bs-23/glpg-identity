@@ -605,8 +605,8 @@ export default function hcpUsers() {
                                 >
                                 {
                                     (editableTableProps) => {
-                                        const { dirty, values, touched, status, resetForm, submitForm } = editableTableProps;
-                                        console.log('status: ', status, touched)
+                                        const { dirty, values, touched, status, resetForm, initialValues, submitForm } = editableTableProps;
+                                        console.log('current val: ', values.rows)
                                         return dirty && <div>
                                             <div>
                                                 <button className="btn btn-primary" onClick={resetForm}>Reset</button>

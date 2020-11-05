@@ -3,10 +3,16 @@ import * as yup from 'yup';
 import Row from './Row';
 import { Formik } from 'formik';
 import Header from './Header';
+import { useEffect } from 'react';
 
-const EditableTable = ({ columns: rawColumns, rows: rawRows, schema: rowSchema, children, onSubmit, ...props }) => {
+const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children, onSubmit, ...props }) => {
     const [editingCell, setEditingCell] = useState(null);
+    const [rawRows, setRawRows] = useState([]);
     const formikRef = useRef();
+
+    useEffect(() => {
+        setRawRows(rows);
+    }, [rows]);
 
     const tableSchema = yup.object().shape({
         rows: yup.array().of(rowSchema)
@@ -30,6 +36,7 @@ const EditableTable = ({ columns: rawColumns, rows: rawRows, schema: rowSchema, 
     const handleSubmit = (values, formikProps) => {
         const done = (success, error) => {
             if(success){
+                setRawRows(values.rows);
                 formikProps.resetForm({
                     values: values,
                     status: {}
@@ -37,11 +44,11 @@ const EditableTable = ({ columns: rawColumns, rows: rawRows, schema: rowSchema, 
                 return;
             }
             if(error){
-                const numberOfRows = formikRef.current.values.rows.length;
+                const numberOfRows = values.rows.length;
                 const backendErrors = Array(numberOfRows).fill({});
                 error.map(({ rowIndex, property, message}) => {
                     const currentErrorObject = backendErrors[rowIndex];
-                    backendErrors[rowIndex] = { ...currentErrorObject, [property]: message }; //[property] = message;
+                    backendErrors[rowIndex] = { ...currentErrorObject, [property]: message };
                 });
                 formikProps.setStatus({ backendErrors: { rows: backendErrors } });
             }
