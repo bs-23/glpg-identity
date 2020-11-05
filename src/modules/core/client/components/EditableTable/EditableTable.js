@@ -43,32 +43,42 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
         const done = (success, error) => {
             if(success === true){
                 setRawRows(values.rows);
+
                 formikProps.resetForm({
                     values: values,
                     status: {}
                 });
+
                 return;
             }
+
             if(Array.isArray(success)) {
                 const updatedData = success;
                 let newIntitialValue = formikBag.initialValues;
+
                 updatedData.map(({ rowIndex, property, value }) => {
                     const inputName = `rows[${rowIndex}].${property}`;
                     newIntitialValue = setIn(newIntitialValue, inputName, value);
                 });
+
+                setRawRows(newIntitialValue.rows);
+
                 formikProps.resetForm({
                     values: newIntitialValue,
                     status: {}
                 });
                 return;
             }
+
             if(error){
                 const numberOfRows = values.rows.length;
                 const backendErrors = Array(numberOfRows).fill({});
+
                 error.map(({ rowIndex, property, message}) => {
                     const currentErrorObject = backendErrors[rowIndex];
                     backendErrors[rowIndex] = { ...currentErrorObject, [property]: message };
                 });
+
                 formikProps.setStatus({ backendErrors: { rows: backendErrors } });
             }
         }
