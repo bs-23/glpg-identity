@@ -174,11 +174,17 @@ export default function hcpUsers() {
         console.log('Updated Rows: ', updatedRows);
         axios.put('/api/hcp-profiles/update-hcps', updatedRows)
             .then(data => {
-                console.log('Success');
+                addToast('Successfully saved changes.', {
+                    appearance: 'success',
+                    autoDismiss: true
+                });
                 done(true);
             })
             .catch(err => {
-                console.log(err.response);
+                addToast('Could not save changes. Please correct the following errors.', {
+                    appearance: 'error',
+                    autoDismiss: true
+                });
                 done(null, err.response.data.errors);
             });
     }
