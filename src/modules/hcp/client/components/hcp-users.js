@@ -260,7 +260,7 @@ export default function hcpUsers() {
 
     const columns = [
         { id: 'email', name: 'Email', onSort: generateSortHandler('email'), fieldType: { name: 'email' }, width: "14%"},
-        { id: 'created_at', name: 'Date of Registration', onSort: generateSortHandler('created_at'), customizeCellContent: formatDate, fieldType: { name: 'date' }, width: "10%" },
+        { id: 'created_at', name: 'Date of Registration', editable: false, onSort: generateSortHandler('created_at'), customizeCellContent: formatDate, fieldType: { name: 'date' }, width: "10%" },
         { id: 'first_name', name: 'First Name', onSort: generateSortHandler('first_name'), width: "10%" },
         { id: 'last_name', name: 'Last Name', onSort: generateSortHandler('onSort'), width: "10%" },
         { id: 'status', name: 'Status', editable: false, customCell: renderStatus, onSort: generateSortHandler('status'), width: "8%" },
