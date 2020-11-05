@@ -41,10 +41,23 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
 
     const handleSubmit = (values, formikProps) => {
         const done = (success, error) => {
-            if(success){
+            if(success === true){
                 setRawRows(values.rows);
                 formikProps.resetForm({
                     values: values,
+                    status: {}
+                });
+                return;
+            }
+            if(Array.isArray(success)) {
+                const updatedData = success;
+                let newIntitialValue = formikBag.initialValues;
+                updatedData.map(({ rowIndex, property, value }) => {
+                    const inputName = `rows[${rowIndex}].${property}`;
+                    newIntitialValue = setIn(newIntitialValue, inputName, value);
+                });
+                formikProps.resetForm({
+                    values: newIntitialValue,
                     status: {}
                 });
                 return;

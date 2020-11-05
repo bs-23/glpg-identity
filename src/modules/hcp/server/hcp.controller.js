@@ -332,20 +332,26 @@ async function editHcp(req, res) {
 
 async function updateHcps(req, res) {
     const Hcps = req.body;
-    const response = new Response({}, []);
+    const response = new Response([], []);
     const hcpsToUpdate = [];
     const hcpModelInstances = [];
+
+    function Data(rowIndex, property, value) {
+        this.rowIndex = rowIndex;
+        this.property = property;
+        this.value = value;
+    }
+
+    function Error(rowIndex, property, message) {
+        this.rowIndex = rowIndex;
+        this.property = property;
+        this.message = message;
+    }
 
     try {
         if(!Array.isArray(Hcps)) {
             response.error.push(new CustomError('Must be an array', 400));
             return res.status(400).send(response);
-        }
-
-        function Error(rowIndex, property, message) {
-            this.rowIndex = rowIndex;
-            this.property = property;
-            this.message = message;
         }
 
         await Promise.all(Hcps.map(async hcp => {
@@ -446,6 +452,7 @@ async function updateHcps(req, res) {
                     country_iso2
                 });
 
+                HcpUser.dataValues._rowIndex = _rowIndex;
                 hcpModelInstances.push(HcpUser);
             }
         }));
@@ -458,11 +465,16 @@ async function updateHcps(req, res) {
             await hcp.update(hcpsToUpdate[index]);
         }));
 
-        // await Hcp.bulkCreate(hcpsToUpdate, {
-        //     updateOnDuplicate : ['email', 'uuid', 'first_name', 'last_name', 'country_iso2', 'locale', 'specialty_onekey']
-        // });
+        hcpModelInstances.map((hcp) => {
+            const { email, first_name, last_name, specialty_onekey, country_iso2, uuid, _rowIndex } = hcp.dataValues;
+            response.data.push(new Data(_rowIndex, 'email', email));
+            response.data.push(new Data(_rowIndex, 'first_name', first_name));
+            response.data.push(new Data(_rowIndex, 'last_name', last_name));
+            response.data.push(new Data(_rowIndex, 'specialty_onekey', specialty_onekey));
+            response.data.push(new Data(_rowIndex, 'country_iso2', country_iso2));
+            response.data.push(new Data(_rowIndex, 'uuid', uuid));
+        });
 
-        response.data = hcpsToUpdate;
         res.json(response);
     } catch (err) {
         console.error(err);
