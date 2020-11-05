@@ -86,14 +86,14 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
                 className="inline-editing__td"
             >
                 {editingCell && editingCell.rowIndex === rowIndex && editingCell.columnIndex === colIndex
-                    ? <InputField
+                    ? <div className="inline-editing__field-wrap"><InputField
                         name={`rows[${rowIndex}].${column.id}`}
                         type={column.fieldType}
                         onBlur={handleOnBlur}
                         onChange={e => onInputChange(e, handleChange)}
                         value={currentCellValue}
                         row={row}
-                    />
+                    /></div>
                     : CustomCell
                         ? <CustomCell
                             value={customCellValue || currentCellValue}

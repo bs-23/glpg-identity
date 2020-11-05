@@ -2,11 +2,21 @@
 
     &-inline-editing {
         .inline-editing {
-
+            &__field-wrap {
+                position: relative;
+            }
             &__td {
 
                 .form-control {
                     width: 100% !important;
+                    height: 33px;
+                    line-height: 33px;
+                    border-radius: 0px;
+                    border: 1px solid $primary-color;
+                    position: absolute;
+                    top: -5px;
+                    left: 0px;
+                    margin-bottom: 0px;
 
                     &:focus {
                         box-shadow: none;
