@@ -1,15 +1,13 @@
 import React from 'react';
 
-const Cell = ({ value, onSwitchToEditMode, showEditIcon, editable }) => {
-    const shouldShowEditIcon = editable !== false && showEditIcon;
-
+const Cell = ({ value, onSwitchToEditMode, editable=true }) => {
     return <div>
         <span>{value}</span>
-        <i
+        {editable && <i
             className="icon icon-edit-pencil icon-1x inline-editing__edit-icon"
             style={{ marginLeft: '5px', fontSize: '10' }}
             onClick={(e) => onSwitchToEditMode(e)}
-        />
+        />}
     </div>
 }
 

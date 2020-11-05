@@ -55,7 +55,6 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
     }
 
     const renderRow = () => columns.map((column, colIndex) => {
-        // const [isMouseOver, setIsMouseOver] = useState(false);
         const { customizeCellContent, beforeChangeAction, customCell: CustomCell, key } = column;
 
         const currentCellValue = row[column.id];
@@ -70,17 +69,11 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
             beforeChangeAction ? beforeChangeAction(row, done) : onCellBlur(e, handleBlur);
         };
 
-        // const handleMouseEnter = () => setIsMouseOver(true);
-
-        // const handleMouseLeave = () => setIsMouseOver(false);
-
         const Cell = CustomCell ? CustomCell : DefaultCell;
 
         return <React.Fragment key={key || inputName}>
             <td
                 style={getCellStyle(inputName)}
-                // onMouseEnter={handleMouseEnter}
-                // onMouseLeave={handleMouseLeave}
                 className="inline-editing__td"
             >
                 {editingCell && editingCell.rowIndex === rowIndex && editingCell.columnIndex === colIndex
@@ -95,7 +88,6 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
                     : <Cell
                         value={customCellValue || currentCellValue}
                         editable={column.editable}
-                        // showEditIcon={isMouseOver}
                         onSwitchToEditMode={e => onCellSwitchToEdit(rowIndex, colIndex, e)}
                         row={row}
                     />
