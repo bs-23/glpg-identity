@@ -911,18 +911,13 @@ async function createConsentCategory(req, res) {
             }
         });
 
-        data.dataValues.createdByUser = {
-            first_name: req.user.first_name,
-            last_name: req.user.last_name,
-            id: req.user.id
-        }
-
         if (!created && data) {
             return res.status(400).send('The consent category is already exists.');
         }
 
-        res.json(data);
+        data.dataValues.createdBy = `${req.user.first_name} ${req.user.last_name}`;
 
+        res.json(data);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
