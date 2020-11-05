@@ -901,7 +901,9 @@ async function createConsentCategory(req, res) {
     try {
         const [data, created] = await ConsentCategory.findOrCreate({
             where: {
-                title: req.body.title
+                title: {
+                    [Op.iLike]: req.body.title
+                }
             },
             defaults: {
                 title: req.body.title,
@@ -912,7 +914,7 @@ async function createConsentCategory(req, res) {
         });
 
         if (!created && data) {
-            return res.status(400).send('The consent category is already exists.');
+            return res.status(400).send('The consent category already exists.');
         }
 
         data.dataValues.createdBy = `${req.user.first_name} ${req.user.last_name}`;
@@ -927,10 +929,17 @@ async function createConsentCategory(req, res) {
 async function updateConsentCategory(req, res) {
     try {
         const { title } = req.body;
-        const isTitleExists = await ConsentCategory.findOne({ where: { id: { [Op.not]: req.params.id }, title } });
+        const isTitleExists = await ConsentCategory.findOne({
+            where: {
+                id: { [Op.not]: req.params.id },
+                title: {
+                    [Op.iLike]: title
+                }
+            }
+        });
 
         if (isTitleExists) {
-            return res.status(400).send('The preference title is already exists.');
+            return res.status(400).send('The consent category already exists.');
         }
 
         const consentCategory = await ConsentCategory.findOne({ where: { id: req.params.id } });
