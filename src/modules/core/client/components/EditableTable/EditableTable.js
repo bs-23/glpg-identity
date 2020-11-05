@@ -5,7 +5,7 @@ import { Formik, setIn } from 'formik';
 import Header from './Header';
 import { useEffect } from 'react';
 
-const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children, onSubmit, ...props }) => {
+const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children, onSubmit, onDirtyChange, ...props }) => {
     const [editingCell, setEditingCell] = useState(null);
     const [rawRows, setRawRows] = useState([]);
     const formikRef = useRef();
@@ -29,12 +29,14 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
     }
 
     const handleInputChange = (e, handleChange) => {
+        handleChange(e);
+
         const inputName = e.target.name;
+
         if(formikBag.status && formikBag.status.backendErrors) {
             const newBackEndError = setIn(formikBag.status.backendErrors, inputName, null);
             formikBag.setStatus({ backendErrors: newBackEndError });
         }
-        handleChange(e);
     }
 
     const handleSubmit = (values, formikProps) => {
@@ -68,10 +70,10 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
     }
 
     const getUpdatedRows = () => {
-        if(!formikRef.current) return [];
+        if(!formikBag) return [];
 
-        const initialValues = formikRef.current.initialValues.rows;
-        const currentValues = formikRef.current.values.rows;
+        const initialValues = formikBag.initialValues.rows;
+        const currentValues = formikBag.values.rows;
 
         const updatedRows = initialValues.reduce((acc, initRow, idx) => {
             const currRow = currentValues[idx];
@@ -91,6 +93,12 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
         return updatedRows;
     }
 
+    // useEffect(() => {
+    //     if(formikBag) {
+    //         if(onDirtyChange) onDirtyChange(formikBag.dirty);
+    //     }
+    // })
+
     return <div className="shadow-sm bg-white table-responsive">
         <Formik
             initialValues={{ rows: rawRows }}
@@ -105,6 +113,10 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
                     ...formikProps
                 }
                 const dirty = formikProps.dirty;
+
+                if(onDirtyChange) setTimeout(() => {
+                    onDirtyChange(dirty);
+                }, 0);
 
                 return <>
                     <table className="table table-hover table-sm mb-0 cdp-table cdp-table-sm mt-3 cdp-table-inline-editing">

@@ -31,6 +31,7 @@ export default function hcpUsers() {
     const [sort, setSort] = useState({ type: 'ASC', value: null });
     const [specialtiesByLocale] = useState(new Map());
     const [specialties] = useState(new Map());
+    const [showFilters, setShowFilters] = useState(true);
 
     const hcps = useSelector(state => state.hcpReducer.hcps);
 
@@ -244,14 +245,14 @@ export default function hcpUsers() {
             : <i className="icon icon-close-circle text-danger consent-not-given"> </i>
     }
 
-    const renderActions = ({ row }) => {
+    const renderActions = ({ row, rowIndex }) => {
         return <span>
             <Dropdown className="ml-auto dropdown-customize">
                 <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
-                    <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(row)}>Profile</Dropdown.Item></LinkContainer>
-                    {row.status === 'not_verified' && <LinkContainer to="#"><Dropdown.Item onClick={() => onUpdateStatus(row)}>Manage Status</Dropdown.Item></LinkContainer>}
+                    <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(hcps.users[rowIndex])}>Profile</Dropdown.Item></LinkContainer>
+                    {row.status === 'not_verified' && <LinkContainer to="#"><Dropdown.Item onClick={() => onUpdateStatus(hcps.users[rowIndex])}>Manage Status</Dropdown.Item></LinkContainer>}
                 </Dropdown.Menu>
             </Dropdown>
         </span>
@@ -281,6 +282,10 @@ export default function hcpUsers() {
         { id: 'opt_types', key:"double", name: 'Double Opt-In', editable: false, customCell: renderDoubleOptInSymbol },
         { id: 'action', name: 'Action', editable: false, customCell: renderActions }
     ];
+
+    const handleTableDirtyStatusChange = (dirty) => {
+        setShowFilters(!dirty);
+    }
 
     useEffect(() => {
         getCountries();
@@ -346,7 +351,7 @@ export default function hcpUsers() {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="d-flex pt-3 pt-sm-0">
+                                {showFilters && <div className="d-flex pt-3 pt-sm-0">
                                     {countries && hcps['countries'] &&
                                         <React.Fragment>
                                             <Dropdown className="ml-auto dropdown-customize mr-2">
@@ -385,7 +390,7 @@ export default function hcpUsers() {
                                             </Dropdown>
                                         </React.Fragment>
                                     }
-                                </div>
+                                </div>}
 
                             </div>
                             <Modal
@@ -633,6 +638,7 @@ export default function hcpUsers() {
                                     columns={columns}
                                     onSubmit={submitHandler}
                                     schema={HcpInlineEditSchema}
+                                    onDirtyChange={handleTableDirtyStatusChange}
                                     enableReinitialize
                                 >
                                 {

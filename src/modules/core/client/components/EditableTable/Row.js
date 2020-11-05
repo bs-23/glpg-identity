@@ -1,5 +1,5 @@
 import React from 'react';
-import DefaultCell from './Cell';
+import Cell from './Cell';
 import InputField from './Inputs/InputField';
 import { Field, getIn } from 'formik';
 
@@ -80,8 +80,6 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
             onCellBlur(e, handleBlur);
         };
 
-        const Cell = CustomCell ? CustomCell : DefaultCell;
-
         return <React.Fragment key={key || inputName}>
             <td
                 style={getCellStyle(inputName)}
@@ -96,12 +94,21 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
                         value={currentCellValue}
                         row={row}
                     />
-                    : <Cell
-                        value={customCellValue || currentCellValue}
-                        editable={column.editable}
-                        onSwitchToEditMode={e => onCellSwitchToEdit(rowIndex, colIndex, e)}
-                        row={row}
-                    />
+                    : CustomCell
+                        ? <CustomCell
+                            value={customCellValue || currentCellValue}
+                            editable={column.editable}
+                            onSwitchToEditMode={e => onCellSwitchToEdit(rowIndex, colIndex, e)}
+                            row={row}
+                            rowIndex={rowIndex}
+                            columnID={column.id}
+                        />
+                        : <Cell
+                            value={customCellValue || currentCellValue}
+                            editable={column.editable}
+                            onSwitchToEditMode={e => onCellSwitchToEdit(rowIndex, colIndex, e)}
+                            row={row}
+                        />
                 }
                 <div className="invalid-feedback">
                     <ErrorMessage name={`rows[${rowIndex}].${column.id}`}/>
