@@ -199,14 +199,13 @@ export default function hcpUsers() {
     }
 
     const submitHandler = ({ updatedRows }, done) => {
-        console.log('Updated Rows: ', updatedRows);
         axios.put('/api/hcp-profiles/update-hcps', updatedRows)
-            .then(data => {
+            .then(({data}) => {
                 addToast('Successfully saved changes.', {
                     appearance: 'success',
                     autoDismiss: true
                 });
-                done(true);
+                done(data.data);
             })
             .catch(err => {
                 addToast('Could not save changes. Please correct the following errors.', {
@@ -563,7 +562,7 @@ export default function hcpUsers() {
                                 </Modal.Body>
 
                             </Modal>
-                            {hcps['users'] && hcps['users'].length > 0 &&
+                            {/* {hcps['users'] && hcps['users'].length > 0 &&
                                 <React.Fragment>
                                     <div className="shadow-sm bg-white table-responsive">
                                         <table className="table table-hover table-sm mb-0 cdp-table cdp-table-sm">
@@ -609,7 +608,6 @@ export default function hcpUsers() {
                                                                     </Dropdown.Toggle>
                                                                     <Dropdown.Menu>
                                                                         <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(row)}>Profile</Dropdown.Item></LinkContainer>
-                                                                        {/* <LinkContainer to="#"><Dropdown.Item>Edit Profile</Dropdown.Item></LinkContainer> */}
                                                                         {row.status === 'not_verified' && <LinkContainer to="#"><Dropdown.Item onClick={() => onUpdateStatus(row)}>Manage Status</Dropdown.Item></LinkContainer>}
                                                                     </Dropdown.Menu>
                                                                 </Dropdown>
@@ -632,35 +630,47 @@ export default function hcpUsers() {
                                     </div>
 
                                 </React.Fragment>
-                            }
+                            } */}
 
-                            {hcps['users'] &&
-                                <EditableTable
-                                    rows={hcps.users}
-                                    columns={columns}
-                                    onSubmit={submitHandler}
-                                    schema={HcpInlineEditSchema}
-                                    onDirtyChange={handleTableDirtyStatusChange}
-                                    enableReinitialize
-                                >
-                                {
-                                    (editableTableProps) => {
-                                        const { dirty, values, touched, status, resetForm, initialValues, submitForm } = editableTableProps;
-                                        console.log('current val: ', values.rows)
-                                        return dirty && <div className="cdp-bg-primary text-center p-2 cdp-table-inline-editing">
-                                            <div>
-                                                <button className="btn cdp-btn-outline-secondary btn-sm text-white" onClick={resetForm}><i class="fas fa-times-circle mr-1"></i> Reset</button>
-                                                <button className="btn cdp-btn-secondary ml-2 btn-sm text-white" onClick={submitForm} disabled={!dirty}><i class="fas fa-check-circle mr-1"></i>Save Changes</button>
+                            {hcps['users'] && hcps['users'].length > 0 &&
+                                <React.Fragment>
+                                    <EditableTable
+                                        rows={hcps.users}
+                                        columns={columns}
+                                        onSubmit={submitHandler}
+                                        schema={HcpInlineEditSchema}
+                                        onDirtyChange={handleTableDirtyStatusChange}
+                                        enableReinitialize
+                                    >
+                                    {
+                                        (editableTableProps) => {
+                                            const { dirty, values, touched, status, resetForm, initialValues, submitForm } = editableTableProps;
+                                            console.log('current val: ', values.rows)
+                                            return dirty && <div className="cdp-bg-primary text-center p-2">
+                                                <div>
+                                                    <button className="btn cdp-btn-outline-secondary btn-sm text-white" onClick={resetForm}><i class="fas fa-times-circle mr-1"></i> Reset</button>
+                                                    <button className="btn cdp-btn-secondary ml-2 btn-sm text-white" onClick={submitForm} disabled={!dirty}><i class="fas fa-check-circle mr-1"></i>Save Changes</button>
+                                                </div>
                                             </div>
+                                        }
+                                    }
+                                    </EditableTable>
+                                    {((hcps.page === 1 &&
+                                        hcps.total > hcps.limit) ||
+                                        (hcps.page > 1))
+                                        && hcps['users'] &&
+                                        <div className="pagination justify-content-end align-items-center border-top p-3">
+                                            <span className="cdp-text-primary font-weight-bold">{hcps.start + ' - ' + hcps.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + hcps.total}</span>
+                                            <span className="pagination-btn" data-testid='Prev' onClick={() => pageLeft()} disabled={hcps.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
+                                            <span className="pagination-btn" data-testid='Next' onClick={() => pageRight()} disabled={hcps.end === hcps.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
                                         </div>
                                     }
-                                }
-                                </EditableTable>
+                                </React.Fragment>
                             }
 
                             {hcps['users'] && hcps['users'].length === 0 &&
                                 <>
-                                <div className="row justify-content-center mt-sm-5 pt-5 mb-3 cdp-table-inline-editing__save-btn">
+                                    <div className="row justify-content-center mt-sm-5 pt-5 mb-3">
                                         <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">
                                             <i class="icon icon-team icon-6x cdp-text-secondary"></i>
                                             <h3 className="font-weight-bold cdp-text-primary pt-4">No Profile Found!</h3>
