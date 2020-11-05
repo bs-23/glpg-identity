@@ -131,7 +131,7 @@ paths:
                                         type: object
                                         properties:
                                             is_firsttime_setup:
-                                                type: string
+                                                type: boolean
                                             message:
                                                 type: string
                                     errors:
