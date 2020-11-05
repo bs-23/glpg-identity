@@ -201,14 +201,16 @@ export default function hcpUsers() {
     const submitHandler = ({ updatedRows }, done) => {
         console.log('Updated Rows: ', updatedRows);
         axios.put('/api/hcp-profiles/update-hcps', updatedRows)
-            .then(data => {
+            .then(({data}) => {
                 addToast('Successfully saved changes.', {
                     appearance: 'success',
                     autoDismiss: true
                 });
-                done(true);
+                console.log(data)
+                done(data.data);
             })
             .catch(err => {
+                console.log(err)
                 addToast('Could not save changes. Please correct the following errors.', {
                     appearance: 'error',
                     autoDismiss: true
@@ -260,7 +262,7 @@ export default function hcpUsers() {
 
     const columns = [
         { id: 'email', name: 'Email', onSort: generateSortHandler('email'), fieldType: { name: 'email' } },
-        { id: 'created_at', name: 'Date of Registration', onSort: generateSortHandler('created_at'), customizeCellContent: formatDate, fieldType: { name: 'date' } },
+        { id: 'created_at', name: 'Date of Registration', editable: false, onSort: generateSortHandler('created_at'), customizeCellContent: formatDate, fieldType: { name: 'date' } },
         { id: 'first_name', name: 'First Name', onSort: generateSortHandler('first_name') },
         { id: 'last_name', name: 'Last Name', onSort: generateSortHandler('onSort') },
         { id: 'status', name: 'Status', editable: false, customCell: renderStatus, onSort: generateSortHandler('status') },
@@ -561,7 +563,7 @@ export default function hcpUsers() {
                                 </Modal.Body>
 
                             </Modal>
-                            {hcps['users'] && hcps['users'].length > 0 &&
+                            {/* {hcps['users'] && hcps['users'].length > 0 &&
                                 <React.Fragment>
                                     <div className="shadow-sm bg-white table-responsive">
                                         <table className="table table-hover table-sm mb-0 cdp-table cdp-table-sm">
@@ -607,7 +609,6 @@ export default function hcpUsers() {
                                                                     </Dropdown.Toggle>
                                                                     <Dropdown.Menu>
                                                                         <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(row)}>Profile</Dropdown.Item></LinkContainer>
-                                                                        {/* <LinkContainer to="#"><Dropdown.Item>Edit Profile</Dropdown.Item></LinkContainer> */}
                                                                         {row.status === 'not_verified' && <LinkContainer to="#"><Dropdown.Item onClick={() => onUpdateStatus(row)}>Manage Status</Dropdown.Item></LinkContainer>}
                                                                     </Dropdown.Menu>
                                                                 </Dropdown>
@@ -630,9 +631,9 @@ export default function hcpUsers() {
                                     </div>
 
                                 </React.Fragment>
-                            }
+                            } */}
 
-                            {hcps['users'] &&
+                            {hcps['users'] && hcps['users'].length > 0 &&
                                 <EditableTable
                                     rows={hcps.users}
                                     columns={columns}
