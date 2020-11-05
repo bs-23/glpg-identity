@@ -141,6 +141,19 @@ export default function hcpUsers() {
         window.open(link, 'name','width=600,height=400');
     }
 
+    const fetchAndSetSpecialtyByLocale = async (locale) => {
+        const { data } = await axios.get(`/api/hcp-profiles/specialties-cdp?locale=${locale}`);
+        if(data) {
+            const options = data.data.map(sp => {
+                specialties.set(sp.cod_id_onekey, { locale: locale, specialty_description: sp.cod_description});
+                return { value: sp.cod_id_onekey, label: sp.cod_description };
+            });
+            specialtiesByLocale.set(locale, options);
+            return options;
+        }
+        return [];
+    }
+
     const getSpecialtyOptions = async (value, row) => {
         const language = row.locale.split('_')[0].toLowerCase();
         const locale = `${language}_${row.country_iso2.toLowerCase()}`;
@@ -148,20 +161,34 @@ export default function hcpUsers() {
             const options = specialtiesByLocale.get(locale);
             return options;
         }
-        const { data } = await axios.get(`/api/hcp-profiles/specialties-cdp?locale=${locale}`);
-        const options = data.data.map(sp => {
-            specialties.set(sp.cod_id_onekey, sp.cod_description);
-            return { value: sp.cod_id_onekey, label: sp.cod_description };
-        })
-        specialtiesByLocale.set(locale, options);
+        const options = await fetchAndSetSpecialtyByLocale(locale);
         return options;
     }
 
+    const handleCountryChange = async (country, row, formikProps, callbackProps) => {
+        const language = row.locale.split('_')[0].toLowerCase();
+        const locale = `${language}_${country.toLowerCase()}`;
+        const { specialty_onekey } = row;
+        const { rowIndex } = callbackProps;
+
+        if(!specialtiesByLocale.has(locale)) {
+            await fetchAndSetSpecialtyByLocale(locale);
+        }
+
+        const doesSpecialtyBelongToCurrentLocale = specialties.has(specialty_onekey) && (specialties.has(specialty_onekey).locale === locale);
+
+        if(!doesSpecialtyBelongToCurrentLocale) {
+            formikProps.setFieldValue(`rows[${rowIndex}].specialty_onekey`, "");
+        }
+    }
+
     const getSpecialtyDescription = (sp_onekey, row) => {
-        if(specialties.has(sp_onekey)) {
-            console.log(specialties)
-            const specialty_desc = specialties.get(sp_onekey);
-            return specialty_desc;
+        if(specialties.size) {
+            if(specialties.has(sp_onekey)) {
+                const { specialty_description } = specialties.get(sp_onekey);
+                return specialty_description;
+            }
+            return "";
         }
         return row.specialty_description;
     }
@@ -240,6 +267,7 @@ export default function hcpUsers() {
         {
             id: 'country_iso2',
             name: 'Country',
+            beforeChangeAction: handleCountryChange,
             customizeCellContent: getCountryName,
             fieldType: { name: 'select', options: countries && countries.map(c => ({ value: c.country_iso2.toLowerCase(), label: c.codbase_desc }))  }
         },
@@ -262,8 +290,6 @@ export default function hcpUsers() {
     useEffect(() => {
         loadHcpProfiles();
     }, [location]);
-
-    console.log(hcps)
 
     return (
         <main className="app__content cdp-light-bg">

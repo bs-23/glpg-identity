@@ -67,12 +67,17 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
         const inputName = `rows[${rowIndex}].${column.id}`;
 
         const customCellValue = customizeCellContent
-            ? customizeCellContent(row[column.id], row)
+            ? customizeCellContent(currentCellValue, row, formikProps, callbackProps)
             : null;
 
+        const callbackProps = {
+            rowIndex,
+            columnID: column.id
+        }
+
         const handleOnBlur = e => {
-            const done = () => onCellBlur(e, handleBlur);
-            beforeChangeAction ? beforeChangeAction(row, done) : onCellBlur(e, handleBlur);
+            beforeChangeAction && Promise.resolve(beforeChangeAction(currentCellValue, row, formikProps, callbackProps));
+            onCellBlur(e, handleBlur);
         };
 
         const Cell = CustomCell ? CustomCell : DefaultCell;

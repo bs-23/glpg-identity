@@ -437,12 +437,11 @@ async function updateHcps(req, res) {
                 }
 
                 hcpsToUpdate.push({
-                    id,
+                    // id,
                     uuid: uuid_from_master_data || uuid,
                     email,
                     first_name,
                     last_name,
-                    uuid,
                     specialty_onekey,
                     country_iso2
                 });
