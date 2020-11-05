@@ -5,6 +5,14 @@
 
             &__td {
 
+                .form-control {
+                    width: auto;
+
+                    &:focus {
+                        box-shadow: none;
+                    }
+                }
+
                 &:hover {
                     .inline-editing__edit-icon {
                         visibility: visible;

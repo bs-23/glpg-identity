@@ -639,10 +639,10 @@ export default function hcpUsers() {
                                     (editableTableProps) => {
                                         const { dirty, values, touched, status, resetForm, initialValues, submitForm } = editableTableProps;
                                         console.log('current val: ', values.rows)
-                                        return dirty && <div>
+                                        return dirty && <div className="cdp-bg-primary text-center p-2">
                                             <div>
-                                                <button className="btn btn-primary" onClick={resetForm}>Reset</button>
-                                                <button className="btn btn-primary ml-2" onClick={submitForm} disabled={!dirty}>Save Changes</button>
+                                                <button className="btn cdp-btn-outline-secondary btn-sm text-white" onClick={resetForm}><i class="fas fa-times-circle mr-1"></i> Reset</button>
+                                                <button className="btn cdp-btn-secondary ml-2 btn-sm text-white" onClick={submitForm} disabled={!dirty}><i class="fas fa-check-circle mr-1"></i>Save Changes</button>
                                             </div>
                                         </div>
                                     }
