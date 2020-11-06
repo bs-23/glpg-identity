@@ -74,6 +74,8 @@ const ConsentForm = (props) => {
 
         async function getConsent() {
             const response = await axios.get(`/api/cdp-consents/${id}`);
+            console.log('came here')
+            console.log(response.data)
             setConsent(response.data);
             setTranslations(response.data.translations.map(i => ({ ...i, country_iso2: i.locale.split('_')[1], lang_code: i.locale.split('_')[0] })));
             setIsActive(response.data.is_active);
@@ -113,6 +115,7 @@ const ConsentForm = (props) => {
         getConsentCatogories();
         getCountries();
         getLanguages();
+        console.log('==========> ', id)
     }, [props]);
 
     const getTranslations = (formikProps) => {
