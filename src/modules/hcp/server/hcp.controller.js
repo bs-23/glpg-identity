@@ -78,6 +78,8 @@ async function notifyHcpUserApproval(hcpUser, userApplication) {
             ? { consent_confirmation_token: generateConsentConfirmationAccessToken(hcpUser) }
             : { password_setup_token: hcpUser.reset_password_token };
 
+        payload.jwt_token = token;
+
         const response = await axios.post(
             `${hcpUser.origin_url}${userApplication.approve_user_path}`,
             payload,
