@@ -38,6 +38,8 @@
                     .inline-editing__edit-icon {
                         visibility: visible;
                         transition: all .25s ease;
+                        position: relative;
+                        top: 2px;
                     }
                 }
             }
