@@ -612,7 +612,9 @@ async function createConsent(req, res) {
 
         const [consent, created] = await Consent.findOrCreate({
             where: {
-                preference
+                preference: {
+                    [Op.iLike]: preference
+                }
             },
             defaults: {
                 preference,
@@ -691,7 +693,9 @@ async function updateCdpConsent(req, res) {
 
         const consentWithSamePreference = await Consent.findOne({
             where: {
-                preference,
+                preference: {
+                    [Op.iLike]: preference
+                },
                 id: { [Op.ne]: id }
             }
         });
