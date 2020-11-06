@@ -29,8 +29,8 @@ export default function hcpUsers() {
     const [currentUser, setCurrentUser] = useState({});
     const { addToast } = useToasts();
     const [sort, setSort] = useState({ type: 'ASC', value: null });
-    const [specialtiesByLocale] = useState(new Map());
-    const [specialties] = useState(new Map());
+    const [allSpecialties, setAllSpecialties] = useState([]);
+    const [specialties_desc] = useState(new Map());
     const [showFilters, setShowFilters] = useState(true);
 
     const hcps = useSelector(state => state.hcpReducer.hcps);
@@ -51,6 +51,18 @@ export default function hcpUsers() {
     async function getAllCountries() {
         const response = await axios.get('/api/all_countries');
         setAllCountries(response.data);
+    }
+
+    const getAllSpecialties = async () => {
+        const { data } = await axios.get(`/api/hcp-profiles/specialties-all`);
+        if(data) {
+            const specialties = data.data.map(sp => {
+                const specialty_locale_key = `${sp.cod_id_onekey}_${sp.cod_locale.toLowerCase()}`;
+                specialties_desc.set(specialty_locale_key, sp.cod_description);
+                return { onekey: sp.cod_id_onekey, locale: sp.cod_locale.toLowerCase(), description: sp.cod_description };
+            });
+            setAllSpecialties(specialties);
+        }
     }
 
     const onUpdateStatus = (user) => {
@@ -142,51 +154,19 @@ export default function hcpUsers() {
         window.open(link, 'name','width=600,height=400');
     }
 
-    const fetchAndSetSpecialtyByLocale = async (locale) => {
-        const { data } = await axios.get(`/api/hcp-profiles/specialties-cdp?locale=${locale}`);
-        if(data) {
-            const options = data.data.map(sp => {
-                specialties.set(sp.cod_id_onekey, { locale: locale, specialty_description: sp.cod_description});
-                return { value: sp.cod_id_onekey, label: sp.cod_description };
-            });
-            specialtiesByLocale.set(locale, options);
-            return options;
-        }
-        return [];
-    }
-
-    const getSpecialtyOptions = async (value, row) => {
-        const language = row.locale.split('_')[0].toLowerCase();
-        const locale = `${language}_${row.country_iso2.toLowerCase()}`;
-        if(specialtiesByLocale.has(locale)) {
-            const options = specialtiesByLocale.get(locale);
-            return options;
-        }
-        const options = await fetchAndSetSpecialtyByLocale(locale);
+    const getSpecialtyOptions = (value, row) => {
+        const { locale } = row;
+        const options = allSpecialties
+            .filter(sp => sp.locale === locale.toLowerCase())
+            .map(sp => ({ key: `${sp.onekey}_${sp.description}`, value: sp.onekey, label: sp.description }));
         return options;
     }
 
-    const handleCountryChange = async (country, row, formikProps, callbackProps) => {
-        const language = row.locale.split('_')[0].toLowerCase();
-        const locale = `${language}_${country.toLowerCase()}`;
-        const { specialty_onekey } = row;
-        const { rowIndex } = callbackProps;
-
-        if(!specialtiesByLocale.has(locale)) {
-            await fetchAndSetSpecialtyByLocale(locale);
-        }
-
-        const doesSpecialtyBelongToCurrentLocale = specialties.has(specialty_onekey) && (specialties.has(specialty_onekey).locale === locale);
-
-        if(!doesSpecialtyBelongToCurrentLocale) {
-            formikProps.setFieldValue(`rows[${rowIndex}].specialty_onekey`, "");
-        }
-    }
-
     const getSpecialtyDescription = (sp_onekey, row) => {
-        if(specialties.size) {
-            if(specialties.has(sp_onekey)) {
-                const { specialty_description } = specialties.get(sp_onekey);
+        if(specialties_desc.size) {
+            const sp_locale_key = `${sp_onekey}_${row.locale.toLowerCase()}`;
+            if(specialties_desc.has(sp_locale_key)) {
+                const specialty_description = specialties_desc.get(sp_locale_key);
                 return specialty_description;
             }
             return "";
@@ -245,33 +225,73 @@ export default function hcpUsers() {
             : <i className="icon icon-close-circle text-danger consent-not-given"> </i>
     }
 
-    const renderActions = ({ row, rowIndex }) => {
+    const renderActions = ({ row, rowIndex, formikProps: { dirty } }) => {
         return <span>
             <Dropdown className="ml-auto dropdown-customize">
                 <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                     <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(hcps.users[rowIndex])}>Profile</Dropdown.Item></LinkContainer>
-                    {row.status === 'not_verified' && <LinkContainer to="#"><Dropdown.Item onClick={() => onUpdateStatus(hcps.users[rowIndex])}>Manage Status</Dropdown.Item></LinkContainer>}
+                    {row.status === 'not_verified' && <LinkContainer disabled={dirty} to="#"><Dropdown.Item onClick={() => onUpdateStatus(hcps.users[rowIndex])}>Manage Status</Dropdown.Item></LinkContainer>}
                 </Dropdown.Menu>
             </Dropdown>
         </span>
     }
 
     const columns = [
-        { id: 'email', name: 'Email', unique: true, onSort: generateSortHandler('email'), fieldType: { name: 'email' }, width: "14%"},
-        { id: 'created_at', name: 'Date of Registration', editable: false, onSort: generateSortHandler('created_at'), customizeCellContent: formatDate, fieldType: { name: 'date' }, width: "10%" },
-        { id: 'first_name', name: 'First Name', onSort: generateSortHandler('first_name'), width: "10%" },
-        { id: 'last_name', name: 'Last Name', onSort: generateSortHandler('onSort'), width: "10%" },
-        { id: 'status', name: 'Status', editable: false, customCell: renderStatus, onSort: generateSortHandler('status'), width: "8%" },
-        { id: 'uuid', name: 'UUID', unique: true, onSort: generateSortHandler('uuid'), width: "8%" },
+        {
+            id: 'email',
+            name: 'Email',
+            unique: true,
+            onSort: generateSortHandler('email'),
+            fieldType: { name: 'email' },
+            width: "14%"
+        },
+        {
+            id: 'created_at',
+            name: 'Date of Registration',
+            editable: false,
+            onSort: generateSortHandler('created_at'),
+            customizeCellContent: formatDate,
+            fieldType: { name: 'date' },
+            width: "10%"
+        },
+        {
+            id: 'first_name',
+            name: 'First Name',
+            onSort: generateSortHandler('first_name'),
+            width: "10%"
+        },
+        {
+            id: 'last_name',
+            name: 'Last Name',
+            onSort: generateSortHandler('onSort'),
+            width: "10%"
+        },
+        {
+            id: 'status',
+            name: 'Status',
+            editable: false,
+            customCell: renderStatus,
+            onSort: generateSortHandler('status'),
+            width: "8%"
+        },
+        {
+            id: 'uuid',
+            name: 'UUID',
+            unique: true,
+            onSort: generateSortHandler('uuid'),
+            width: "8%"
+        },
         {
             id: 'country_iso2',
             name: 'Country',
-            beforeChangeAction: handleCountryChange,
             customizeCellContent: getCountryName,
             width: "10%",
-            fieldType: { name: 'select', options: countries && countries.map(c => ({ value: c.country_iso2.toLowerCase(), label: c.codbase_desc }))  }
+            fieldType: {
+                name: 'select',
+                options: countries && countries.map(c => ({ value: c.country_iso2.toLowerCase(), label: c.codbase_desc }))
+            }
         },
         {
             id: 'specialty_onekey',
@@ -280,9 +300,31 @@ export default function hcpUsers() {
             customizeCellContent: getSpecialtyDescription,
             fieldType: { name: 'select', options: getSpecialtyOptions }
         },
-        { id: 'opt_types', key: "single", name: 'Single Opt-In', editable: false, customCell: renderSingleOptInSymbol, class: "consent-col", width: "8%" },
-        { id: 'opt_types', key: "double", name: 'Double Opt-In', editable: false, customCell: renderDoubleOptInSymbol, class: "consent-col", width: "8%" },
-        { id: 'action', name: 'Action', editable: false, customCell: renderActions, width: "6%" }
+        {
+            id: 'opt_types',
+            key: "single",
+            name: 'Single Opt-In',
+            editable: false,
+            customCell: renderSingleOptInSymbol,
+            class: "consent-col",
+            width: "8%"
+        },
+        {
+            id: 'opt_types',
+            key: "double",
+            name: 'Double Opt-In',
+            editable: false,
+            customCell: renderDoubleOptInSymbol,
+            class: "consent-col",
+            width: "8%"
+        },
+        {
+            id: 'action',
+            name: 'Action',
+            editable: false,
+            customCell: renderActions,
+            width: "6%"
+        }
     ];
 
     const handleTableDirtyStatusChange = (dirty) => {
@@ -292,6 +334,7 @@ export default function hcpUsers() {
     useEffect(() => {
         getCountries();
         getAllCountries();
+        getAllSpecialties();
     }, []);
 
     useEffect(() => {
@@ -648,7 +691,7 @@ export default function hcpUsers() {
                                     {
                                         (editableTableProps) => {
                                             const { dirty, values, touched, status, errors, error, resetForm, initialValues, submitForm } = editableTableProps;
-                                            // console.log('current value: ', values.rows[0] && values.rows[0].first_name)
+                                            console.log('current value: ', values.rows[0] && values.rows[0].first_name)
                                             return dirty && <div className="cdp-bg-primary text-center p-2 cdp-table-inline-editing__save-btn">
                                                 <div>
                                                     <button className="btn cdp-btn-outline-secondary btn-sm text-white" onClick={resetForm}><i class="fas fa-times-circle mr-1"></i> Reset</button>

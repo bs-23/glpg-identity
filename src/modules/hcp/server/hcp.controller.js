@@ -1201,6 +1201,30 @@ async function getSpecialties(req, res) {
     }
 }
 
+async function getAllSpecialties(req, res) {
+    const response = new Response([], []);
+    try {
+        let masterDataSpecialties = await sequelize.datasyncConnector.query(`
+            SELECT codbase, cod_id_onekey, cod_locale, cod_description
+            FROM ciam.vwspecialtymaster
+            `, {
+            type: QueryTypes.SELECT
+        });
+
+        if (!masterDataSpecialties || masterDataSpecialties.length === 0) {
+            response.data = [];
+            return res.status(204).send(response);
+        }
+
+        response.data = masterDataSpecialties;
+        res.json(response);
+    } catch (err) {
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
+    }
+}
+
 async function getAccessToken(req, res) {
     const response = new Response({}, []);
 
@@ -1279,3 +1303,4 @@ exports.approveHCPUser = approveHCPUser;
 exports.rejectHCPUser = rejectHCPUser;
 exports.getHCPUserConsents = getHCPUserConsents;
 exports.updateHcps = updateHcps;
+exports.getAllSpecialties = getAllSpecialties;

@@ -61,7 +61,7 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
     }
 
     const renderRow = () => columns.map((column, colIndex) => {
-        const { customizeCellContent, beforeChangeAction, customCell: CustomCell, key } = column;
+        const { customizeCellContent, onChangeAction, customCell: CustomCell, key } = column;
 
         const currentCellValue = row[column.id];
         const inputName = `rows[${rowIndex}].${column.id}`;
@@ -70,13 +70,17 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
             ? customizeCellContent(currentCellValue, row, formikProps, callbackProps)
             : null;
 
+        const customOrCurrentCellValue = customizeCellContent
+            ? customCellValue
+            : currentCellValue;
+
         const callbackProps = {
             rowIndex,
             columnID: column.id
         }
 
         const handleOnBlur = e => {
-            beforeChangeAction && Promise.resolve(beforeChangeAction(currentCellValue, row, formikProps, callbackProps));
+            onChangeAction && onChangeAction(currentCellValue, row, formikProps, callbackProps);
             onCellBlur(e, handleBlur);
         };
 
@@ -101,15 +105,16 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
                     </div>
                     : CustomCell
                         ? <CustomCell
-                            value={customCellValue || currentCellValue}
+                            value={customOrCurrentCellValue}
                             editable={column.editable}
                             onSwitchToEditMode={e => onCellSwitchToEdit(rowIndex, colIndex, e)}
                             row={row}
                             rowIndex={rowIndex}
                             columnID={column.id}
+                            formikProps={formikProps}
                         />
                         : <Cell
-                            value={customCellValue || currentCellValue}
+                            value={customOrCurrentCellValue}
                             editable={column.editable}
                             onSwitchToEditMode={e => onCellSwitchToEdit(rowIndex, colIndex, e)}
                             row={row}
