@@ -165,8 +165,9 @@ export default function hcpUsers() {
     const getSpecialtyDescription = (sp_onekey, row) => {
         if(specialties_desc.size) {
             const sp_locale_key = `${sp_onekey}_${row.locale.toLowerCase()}`;
-            if(specialties_desc.has(sp_locale_key)) {
-                const specialty_description = specialties_desc.get(sp_locale_key);
+            const sp_en_key = `${sp_onekey}_en`;
+            if(specialties_desc.has(sp_locale_key) || specialties_desc.has(sp_en_key)) {
+                const specialty_description = specialties_desc.get(sp_locale_key) || specialties_desc.get(sp_en_key);
                 return specialty_description;
             }
             return "";
