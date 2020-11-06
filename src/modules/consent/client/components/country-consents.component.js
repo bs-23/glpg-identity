@@ -154,7 +154,7 @@ const CountryConsents = () => {
                                                             <tr key={coonsentIndex}>
                                                                 <td>
                                                                     <span type="button" className="btn btn-link cdp-text-primary p-0" onClick={() => showConsentDetailsModal(consent.id)}>
-                                                                        <i className="fas fa-caret-right mr-1"></i>{consent.preference}
+                                                                        <i className="fas fa-caret-right mr-1"></i>{consent.preference} {consent.is_active ? '' : '(Inactive)'}
                                                                     </span>
                                                                 </td>
                                                                 <td>

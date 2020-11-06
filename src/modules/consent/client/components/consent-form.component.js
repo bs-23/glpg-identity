@@ -133,7 +133,7 @@ const ConsentForm = (props) => {
                             <div className="form-group">
                                 <label className="font-weight-bold" htmlFor={countryId}>Country <span className="text-danger">*</span></label>
                                 <Field className="form-control country_iso2" value={item.country_iso2.toLowerCase()} onChange={(e) => handleChange(e)} data-id={idx} as="select" name={countryId} id={countryId}>
-                                    <option key={'country-'+item.id} value="" disabled>--Select Country--</option>
+                                    <option key={'country-' + item.id} value="" disabled>--Select Country--</option>
                                     {userCountries.map(element => <option key={element.countryid} value={element.country_iso2.toLowerCase()}>{element.codbase_desc}</option>)}
                                 </Field>
                                 {showError && !item.country_iso2 && <div class="invalid-feedback">This field must not be empty.</div>}
@@ -144,7 +144,7 @@ const ConsentForm = (props) => {
                             <div className="form-group">
                                 <label className="font-weight-bold" htmlFor={languageId}>Language <span className="text-danger">*</span></label>
                                 <Field className="form-control lang_code" value={item.lang_code} onChange={(e) => handleChange(e)} data-id={idx} as="select" name={languageId} id={languageId}>
-                                    <option key={'language-'+item.id} value="" disabled>--Select Language--</option>
+                                    <option key={'language-' + item.id} value="" disabled>--Select Language--</option>
                                     {countryLanguages.map(element => {
                                         const [country_iso2, language_code, language_name] = element.split(' ');
                                         return language_name && <option key={country_iso2} value={language_code}>{language_name.replace(/,/g, '')}</option>
@@ -158,7 +158,8 @@ const ConsentForm = (props) => {
                             <div className="form-group">
                                 <label className="font-weight-bold" htmlFor={richTextId}>Rich Text <span className="text-danger">*</span></label>
                                 <div className="border rounded draft-editor">
-                                    <DraftEditor htmlContent={item.rich_text} onChangeHTML={(html) =>
+                                    <DraftEditor htmlContent={item.rich_text} onChangeHTML={(html) => {
+                                        if (item.rich_text.length > 976) setShowError(true);
                                         handleChange({
                                             target: {
                                                 value: html,
@@ -167,10 +168,14 @@ const ConsentForm = (props) => {
                                                     id: idx
                                                 }
                                             }
-                                        })}
+                                        });
+                                    }}
+
+
                                     />
                                 </div>
                                 {showError && item.rich_text === '<p><br></p>' && <div class="invalid-feedback">This field must not be empty.</div>}
+                                {showError && item.rich_text.length > 976 && <div class="invalid-feedback">Maximum character limit has been exceeded.</div>}
                             </div>
                         </div>
                     </div>
@@ -368,7 +373,7 @@ const ConsentForm = (props) => {
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" >Submit</button>
+                                                            <button type="submit" disabled={showError} className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" >Submit</button>
                                                         </div>
                                                     </div>
                                                 </Form>
