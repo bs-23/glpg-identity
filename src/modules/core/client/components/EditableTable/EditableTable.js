@@ -1,11 +1,35 @@
 import React, { useState, useRef } from 'react';
 import * as yup from 'yup';
 import Row from './Row';
-import { Formik, setIn } from 'formik';
+import { Formik, setIn, getIn } from 'formik';
 import Header from './Header';
 import { useEffect } from 'react';
 
-const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children, onSubmit, onDirtyChange, ...props }) => {
+yup.addMethod(yup.object, 'uniqueProperty', function (property, message) {
+    return this.test('unique', message, function (value) {
+        if (!value || !value[property]) {
+            return true;
+        }
+
+        if (this.parent.filter(v => v !== value).some(v => v[property] === value[property])) {
+            return this.createError({ path: `${this.path}.${property}` });
+        }
+
+        return true;
+    });
+});
+
+const addValidationToSchema = (schema, columns) => {
+    let modifiedSchema = schema;
+    columns.map(col => {
+        if(col.unique){
+            modifiedSchema = modifiedSchema['uniqueProperty'](col.id, `${col.name} matches with another row.`)
+        }
+    })
+    return modifiedSchema;
+}
+
+const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children, onSubmit, onDirtyChange, sortOn, sortType, ...props }) => {
     const [editingCell, setEditingCell] = useState(null);
     const [rawRows, setRawRows] = useState([]);
     const formikRef = useRef();
@@ -15,8 +39,10 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
         setRawRows(rows);
     }, [rows]);
 
+    const rowSchemaWithOptionalValidation = addValidationToSchema(rowSchema, rawColumns);
+
     const tableSchema = yup.object().shape({
-        rows: yup.array().of(rowSchema)
+        rows: yup.array().of(rowSchemaWithOptionalValidation)
     });
 
     const handleCellSwitchToEdit = (rowIndex, columnIndex) => {
@@ -25,6 +51,14 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
 
     const handleCellBlur = (e, handleBlur) => {
         setEditingCell(null);
+
+        if(formikBag) {
+            const inputName = e.target.name;
+            const value = e.target.value;
+            const newLastCommitedValues = setIn(formikBag.status.lastCommitedValues, inputName, value);
+            formikBag.setStatus({ ...formikBag.status, lastCommitedValues: newLastCommitedValues });
+        }
+
         handleBlur(e);
     }
 
@@ -35,7 +69,7 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
 
         if(formikBag.status && formikBag.status.backendErrors) {
             const newBackEndError = setIn(formikBag.status.backendErrors, inputName, null);
-            formikBag.setStatus({ backendErrors: newBackEndError });
+            formikBag.setStatus({ ...formikBag.status, backendErrors: newBackEndError });
         }
     }
 
@@ -46,7 +80,7 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
 
                 formikProps.resetForm({
                     values: values,
-                    status: {}
+                    status: { lastCommitedValues: { rows: values.rows }}
                 });
 
                 return;
@@ -74,12 +108,12 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
                 const numberOfRows = values.rows.length;
                 const backendErrors = Array(numberOfRows).fill({});
 
-                error.map(({ rowIndex, property, message}) => {
+                error.map(({ rowIndex, property, message }) => {
                     const currentErrorObject = backendErrors[rowIndex];
                     backendErrors[rowIndex] = { ...currentErrorObject, [property]: message };
                 });
 
-                formikProps.setStatus({ backendErrors: { rows: backendErrors } });
+                formikProps.setStatus({ ...formikProps.status, backendErrors: { rows: backendErrors } });
             }
         }
 
@@ -87,9 +121,27 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
             onSubmit({
                 rows: values.rows,
                 updatedRows: getUpdatedRows(),
+                getUpdatedCells,
                 formikProps
             }, done);
         };
+    }
+
+    const handleInputKeyDown = async (e, handleBlur) => {
+        e.persist();
+
+        if(e.key === 'Escape') {
+            const inputName = e.target.name;
+            if(formikBag.status.lastCommitedValues) {
+                const lastCommitedValue = getIn(formikBag.status.lastCommitedValues, inputName);
+                await formikBag.setFieldValue(inputName, lastCommitedValue, true);
+            }
+            handleBlur(e);
+        }
+
+        if(e.key === 'Enter') {
+            handleBlur(e);
+        }
     }
 
     const getUpdatedRows = () => {
@@ -116,15 +168,40 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
         return updatedRows;
     }
 
-    // useEffect(() => {
-    //     if(formikBag) {
-    //         if(onDirtyChange) onDirtyChange(formikBag.dirty);
-    //     }
-    // })
+    const getUpdatedCells = (idProperty = 'id') => {
+        if(!formikBag) return [];
+
+        const initialValues = formikBag.initialValues.rows;
+        const currentValues = formikBag.values.rows;
+
+        const updatedCellsOfRows = initialValues.reduce((acc, initRow, idx) => {
+            const currRow = currentValues[idx];
+            const updatedCells = {};
+            let hasRowChanged = false;
+
+            Object.keys(initRow).forEach(key => {
+                if (initRow[key] !== currRow[key]) {
+                    updatedCells[key] = currRow[key];
+                    hasRowChanged = true;
+                    return;
+                }
+                if(key === idProperty) updatedCells[key] = currRow[key];
+            });
+
+            updatedCells._rowIndex = idx;
+
+            if(hasRowChanged) acc.push(updatedCells);
+
+            return acc;
+        }, []);
+
+        return updatedCellsOfRows;
+    }
 
     return <div className="shadow-sm bg-white table-responsive">
         <Formik
             initialValues={{ rows: rawRows }}
+            initialStatus={{ lastCommitedValues: { rows: rawRows } }}
             validationSchema={tableSchema}
             onSubmit={handleSubmit}
             innerRef={formikRef}
@@ -133,6 +210,7 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
             {(formikProps) => {
                 const editableTableProps = {
                     getUpdatedRows,
+                    getUpdatedCells,
                     ...formikProps
                 }
                 const dirty = formikProps.dirty;
@@ -143,7 +221,7 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
 
                 return <>
                     <table className="table table-hover table-sm mb-0 cdp-table cdp-table-sm mt-3 cdp-table-inline-editing">
-                        <Header columns={rawColumns} dirty={dirty} />
+                        <Header columns={rawColumns} dirty={dirty} sortOn={sortOn} sortType={sortType} />
                         <tbody className="cdp-table__body bg-white">
                             {formikProps.values.rows.map((row, index) =>
                                 <Row
@@ -156,6 +234,7 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
                                     onCellBlur={handleCellBlur}
                                     onInputChange={handleInputChange}
                                     onCellSwitchToEdit={handleCellSwitchToEdit}
+                                    onInputKeyDown={handleInputKeyDown}
                                 />
                             )}
                         </tbody>

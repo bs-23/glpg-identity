@@ -198,8 +198,9 @@ export default function hcpUsers() {
         return (new Date(date)).toLocaleDateString('en-GB').replace(/\//g, '.')
     }
 
-    const submitHandler = ({ updatedRows }, done) => {
-        axios.put('/api/hcp-profiles/update-hcps', updatedRows)
+    const submitHandler = ({ getUpdatedCells }, done) => {
+        const updatedCells = getUpdatedCells();
+        axios.put('/api/hcp-profiles/update-hcps', updatedCells)
             .then(({data}) => {
                 addToast('Successfully saved changes.', {
                     appearance: 'success',
@@ -258,12 +259,12 @@ export default function hcpUsers() {
     }
 
     const columns = [
-        { id: 'email', name: 'Email', onSort: generateSortHandler('email'), fieldType: { name: 'email' }, width: "14%"},
+        { id: 'email', name: 'Email', unique: true, onSort: generateSortHandler('email'), fieldType: { name: 'email' }, width: "14%"},
         { id: 'created_at', name: 'Date of Registration', editable: false, onSort: generateSortHandler('created_at'), customizeCellContent: formatDate, fieldType: { name: 'date' }, width: "10%" },
         { id: 'first_name', name: 'First Name', onSort: generateSortHandler('first_name'), width: "10%" },
         { id: 'last_name', name: 'Last Name', onSort: generateSortHandler('onSort'), width: "10%" },
         { id: 'status', name: 'Status', editable: false, customCell: renderStatus, onSort: generateSortHandler('status'), width: "8%" },
-        { id: 'uuid', name: 'UUID', onSort: generateSortHandler('uuid'), width: "8%" },
+        { id: 'uuid', name: 'UUID', unique: true, onSort: generateSortHandler('uuid'), width: "8%" },
         {
             id: 'country_iso2',
             name: 'Country',
@@ -637,6 +638,8 @@ export default function hcpUsers() {
                                     <EditableTable
                                         rows={hcps.users}
                                         columns={columns}
+                                        sortOn={sort.value}
+                                        sortType={sort.type}
                                         onSubmit={submitHandler}
                                         schema={HcpInlineEditSchema}
                                         onDirtyChange={handleTableDirtyStatusChange}
@@ -644,8 +647,8 @@ export default function hcpUsers() {
                                     >
                                     {
                                         (editableTableProps) => {
-                                            const { dirty, values, touched, status, resetForm, initialValues, submitForm } = editableTableProps;
-                                            console.log('current val: ', values.rows)
+                                            const { dirty, values, touched, status, errors, error, resetForm, initialValues, submitForm } = editableTableProps;
+                                            // console.log('current value: ', values.rows[0] && values.rows[0].first_name)
                                             return dirty && <div className="cdp-bg-primary text-center p-2 cdp-table-inline-editing__save-btn">
                                                 <div>
                                                     <button className="btn cdp-btn-outline-secondary btn-sm text-white" onClick={resetForm}><i class="fas fa-times-circle mr-1"></i> Reset</button>

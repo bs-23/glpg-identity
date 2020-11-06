@@ -31,7 +31,7 @@ const BackendErrorMessage = ({ name }) => (
     </Field>
 )
 
-const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCell, formikProps, onInputChange }) => {
+const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCell, formikProps, onInputChange, onInputKeyDown }) => {
 
     const { handleBlur, handleChange, initialValues, values } = formikProps;
 
@@ -80,20 +80,25 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
             onCellBlur(e, handleBlur);
         };
 
+        const handleInputKeyDown = e => onInputKeyDown(e, handleOnBlur);
+
         return <React.Fragment key={key || inputName}>
             <td
                 style={getCellStyle(inputName)}
                 className="inline-editing__td"
             >
                 {editingCell && editingCell.rowIndex === rowIndex && editingCell.columnIndex === colIndex
-                    ? <div className="inline-editing__field-wrap"><InputField
-                        name={`rows[${rowIndex}].${column.id}`}
-                        type={column.fieldType}
-                        onBlur={handleOnBlur}
-                        onChange={e => onInputChange(e, handleChange)}
-                        value={currentCellValue}
-                        row={row}
-                    /></div>
+                    ? <div className="inline-editing__field-wrap">
+                        <InputField
+                            name={`rows[${rowIndex}].${column.id}`}
+                            type={column.fieldType}
+                            value={currentCellValue}
+                            row={row}
+                            onBlur={handleOnBlur}
+                            onChange={e => onInputChange(e, handleChange)}
+                            onKeyDown={handleInputKeyDown}
+                        />
+                    </div>
                     : CustomCell
                         ? <CustomCell
                             value={customCellValue || currentCellValue}

@@ -335,6 +335,8 @@ async function updateHcps(req, res) {
     const response = new Response([], []);
     const hcpsToUpdate = [];
     const hcpModelInstances = [];
+    const emailsToUpdate = new Map();
+    const uuidsToUpdate = new Map();
 
     function Data(rowIndex, property, value) {
         this.rowIndex = rowIndex;
@@ -361,30 +363,6 @@ async function updateHcps(req, res) {
                 response.errors.push(new Error(_rowIndex, 'id', 'ID is missing.'));
             }
 
-            if(!first_name) {
-                response.errors.push(new Error(_rowIndex, 'first_name', 'First Name is missing.'));
-            }
-
-            if(!last_name) {
-                response.errors.push(new Error(_rowIndex, 'last_name', 'Last Name is missing.'));
-            }
-
-            if(!uuid) {
-                response.errors.push(new Error(_rowIndex, 'uuid', 'UUID is missing.'));
-            }
-
-            if(!email) {
-                response.errors.push(new Error(_rowIndex, 'email', 'Email is missing.'));
-            }
-
-            if(!specialty_onekey) {
-                response.errors.push(new Error(_rowIndex, 'specialty_onekey', 'Specialty Onekey is missing.'));
-            }
-
-            if(!country_iso2) {
-                response.errors.push(new Error(_rowIndex, 'country_iso2', 'Country ISO2 is missing.'));
-            }
-
             const HcpUser = await Hcp.findOne({ where: { id: id } });
 
             if (!HcpUser) {
@@ -404,6 +382,12 @@ async function updateHcps(req, res) {
 
                     if(doesEmailExist) {
                         response.errors.push(new Error(_rowIndex, 'email', 'Email already exists'));
+                    }
+
+                    if(emailsToUpdate.has(email)) {
+                        emailsToUpdate.get(email).push(_rowIndex);
+                    }else{
+                        emailsToUpdate.set(email, [_rowIndex]);
                     }
                 }
             }
@@ -442,20 +426,37 @@ async function updateHcps(req, res) {
                     response.errors.push(new Error(_rowIndex, 'uuid', 'UUID already exists.'));
                 }
 
-                hcpsToUpdate.push({
-                    // id,
-                    uuid: uuid_from_master_data || uuid,
-                    email,
-                    first_name,
-                    last_name,
-                    specialty_onekey,
-                    country_iso2
-                });
-
-                HcpUser.dataValues._rowIndex = _rowIndex;
-                hcpModelInstances.push(HcpUser);
+                if(uuidsToUpdate.has(uuid)) {
+                    uuidsToUpdate.get(uuid).push(_rowIndex);
+                }else{
+                    uuidsToUpdate.set(uuid, [_rowIndex]);
+                }
             }
+
+            hcpsToUpdate.push({
+                uuid: uuid_from_master_data || uuid,
+                email,
+                first_name,
+                last_name,
+                specialty_onekey,
+                country_iso2
+            });
+
+            HcpUser.dataValues._rowIndex = _rowIndex;
+            hcpModelInstances.push(HcpUser);
         }));
+
+        emailsToUpdate.forEach((listOfIndex) => {
+            if(listOfIndex.length > 1) {
+                listOfIndex.map(ind => response.errors.push(new Error(ind, 'email', 'Email matches with another row.')))
+            }
+        })
+
+        uuidsToUpdate.forEach((listOfIndex) => {
+            if(listOfIndex.length > 1) {
+                listOfIndex.map(ind => response.errors.push(new Error(ind, 'uuid', 'UUID matches with another row.')))
+            }
+        })
 
         if(response.errors && response.errors.length) {
             return res.status(400).send(response);
@@ -465,14 +466,11 @@ async function updateHcps(req, res) {
             await hcp.update(hcpsToUpdate[index]);
         }));
 
-        hcpModelInstances.map((hcp) => {
-            const { email, first_name, last_name, specialty_onekey, country_iso2, uuid, _rowIndex } = hcp.dataValues;
-            response.data.push(new Data(_rowIndex, 'email', email));
-            response.data.push(new Data(_rowIndex, 'first_name', first_name));
-            response.data.push(new Data(_rowIndex, 'last_name', last_name));
-            response.data.push(new Data(_rowIndex, 'specialty_onekey', specialty_onekey));
-            response.data.push(new Data(_rowIndex, 'country_iso2', country_iso2));
-            response.data.push(new Data(_rowIndex, 'uuid', uuid));
+        hcpModelInstances.map((hcpModelIns, idx) => {
+            const { _rowIndex } = hcpModelIns.dataValues;
+            Object.keys(hcpsToUpdate[idx]).map(key => {
+                if(hcpsToUpdate[idx][key]) response.data.push(new Data(_rowIndex, key, hcpModelIns.dataValues[key]));
+            })
         });
 
         res.json(response);
