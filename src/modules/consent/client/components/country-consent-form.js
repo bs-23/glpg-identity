@@ -89,7 +89,7 @@ const CountryConsentForm = (props) => {
                                                 <label className="font-weight-bold" htmlFor="consent_id">Select Consent <span className="text-danger">*</span></label>
                                                 <Field disabled={props.editable ? true : false} data-testid="consent" as="select" name="consent_id" className="form-control">
                                                     <option key="select-consent" value="" disabled>--Select Consent--</option>
-                                                    {props.consents.map(item => <option key={item.id} value={item.id}>{props.editable ? props.options.preference : item.preference}</option>)}
+                                                    {props.consents.map(item => <option key={item.id} value={item.id}>{props.editable ? props.options.preference + (props.options.is_active ? ' (Active)' : ' (Inactive)') : item.preference+ (item.is_active ? ' (Active)' : ' (Inactive)')}</option>)}
                                                 </Field>
                                                 <div className="invalid-feedback"><ErrorMessage name="consent_id" /></div>
                                             </div>

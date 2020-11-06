@@ -28,6 +28,11 @@ const ConsentForm = (props) => {
     const [showError, setShowError] = useState(false);
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
 
+    const legalBasisList = [
+        { id: 'consent', value: 'Consent' },
+        { id: 'contract', value: 'Contract' }
+    ];
+
     const handleChange = (e) => {
         const newTranslations = [...translations];
         const field = e.target.className.split(' ');
@@ -37,10 +42,7 @@ const ConsentForm = (props) => {
     }
 
     const addNewTranslation = () => {
-        const [, lang_code, ] = countryLanguages[0].split(' ');
-        const init_lang_code = lang_code.toLowerCase();
-        const init_country_iso2 = userCountries[0].country_iso2.toLowerCase();
-        const newTranslations = [...translations, { id: Math.random(), country_iso2: init_country_iso2, lang_code: init_lang_code , rich_text: '' }];
+        const newTranslations = [...translations, { id: Math.random(), country_iso2: '', lang_code: '', rich_text: '' }];
         setTranslations(newTranslations);
         setShowError(false);
         setTimeout(() => {
@@ -115,7 +117,7 @@ const ConsentForm = (props) => {
 
     const getTranslations = (formikProps) => {
         return translations.map((item, idx) => {
-            const translationId = `translation-${idx+1}`;
+            const translationId = `translation-${idx + 1}`;
             const countryId = `country-${idx}`;
             const languageId = `language-${idx}`;
             const richTextId = `rich-text-${idx}`;
@@ -129,28 +131,32 @@ const ConsentForm = (props) => {
                         </label>
                         <div className="col-12 col-sm-6">
                             <div className="form-group">
-                                <label className="font-weight-bold" htmlFor={countryId}>Select Country </label>
+                                <label className="font-weight-bold" htmlFor={countryId}>Country <span className="text-danger">*</span></label>
                                 <Field className="form-control country_iso2" value={item.country_iso2.toLowerCase()} onChange={(e) => handleChange(e)} data-id={idx} as="select" name={countryId} id={countryId}>
+                                    <option key={'country-'+item.id} value="" disabled>--Select Country--</option>
                                     {userCountries.map(element => <option key={element.countryid} value={element.country_iso2.toLowerCase()}>{element.codbase_desc}</option>)}
                                 </Field>
+                                {showError && !item.country_iso2 && <div class="invalid-feedback">This field must not be empty.</div>}
                             </div>
                         </div>
 
                         <div className="col-12 col-sm-6">
                             <div className="form-group">
-                                <label className="font-weight-bold" htmlFor={languageId}>Select Language</label>
+                                <label className="font-weight-bold" htmlFor={languageId}>Language <span className="text-danger">*</span></label>
                                 <Field className="form-control lang_code" value={item.lang_code} onChange={(e) => handleChange(e)} data-id={idx} as="select" name={languageId} id={languageId}>
+                                    <option key={'language-'+item.id} value="" disabled>--Select Language--</option>
                                     {countryLanguages.map(element => {
                                         const [country_iso2, language_code, language_name] = element.split(' ');
                                         return language_name && <option key={country_iso2} value={language_code}>{language_name.replace(/,/g, '')}</option>
                                     })}
                                 </Field>
+                                {showError && !item.lang_code && <div class="invalid-feedback">This field must not be empty.</div>}
                             </div>
                         </div>
 
                         <div className="col-12">
                             <div className="form-group">
-                                <label className="font-weight-bold" htmlFor={richTextId}>Rich Text</label>
+                                <label className="font-weight-bold" htmlFor={richTextId}>Rich Text <span className="text-danger">*</span></label>
                                 <div className="border rounded draft-editor">
                                     <DraftEditor htmlContent={item.rich_text} onChangeHTML={(html) =>
                                         handleChange({
@@ -171,7 +177,8 @@ const ConsentForm = (props) => {
                 </div>
 
             </React.Fragment>
-        )});
+            )
+        });
     };
 
     return (
@@ -197,14 +204,16 @@ const ConsentForm = (props) => {
                             <div className="col-12">
                                 <div className="shadow-sm bg-white mb-3">
                                     <h2 className="d-flex align-items-center p-3 px-sm-4 py-sm-2 page-title light">
-                                    <span className="page-title__text font-weight-bold py-3">{consentId ? 'Edit Consent' : 'Create New Consent'}</span>
+                                        <span className="page-title__text font-weight-bold py-3">{consentId ? 'Edit Consent' : 'Create New Consent'}</span>
                                     </h2>
                                     <div className="add-user p-3">
                                         <Formik
                                             initialValues={{
-                                                category_id: consentId && consent.consent_category ? consent.consent_category.id : categories[0].id,
-                                                legal_basis: consentId && consent ? consent.legal_basis : "consent",
-                                                preference: consentId && consent ? consent.preference : "",
+                                                category_id: consentId && consent.consent_category
+                                                    ? consent.consent_category.id
+                                                    : '',
+                                                legal_basis: consentId && consent ? consent.legal_basis : '',
+                                                preference: consentId && consent ? consent.preference : '',
                                                 translations: consentId && consent ? consent.translations : [],
                                                 is_active: consentId && consent ? consent.is_active : isActive
                                             }}
@@ -212,13 +221,13 @@ const ConsentForm = (props) => {
                                             validationSchema={consentSchema}
                                             onSubmit={(values, actions) => {
                                                 values.is_active = isActive;
-                                                if(consentId && consent) {
+                                                if (consentId && consent) {
                                                     values.category_id = categoryId;
                                                     values.legal_basis = legalBasis;
                                                 }
 
                                                 const validTranslations = translations.filter(item => item.country_iso2 && item.lang_code && item.rich_text && item.rich_text !== '<p><br></p>');
-                                                if(translations.length !== validTranslations.length){
+                                                if (translations.length !== validTranslations.length) {
                                                     setShowError(true);
                                                     return;
                                                 }
@@ -244,7 +253,7 @@ const ConsentForm = (props) => {
 
                                                 values.translations = validTranslations;
 
-                                                if(consentId){
+                                                if (consentId) {
                                                     dispatch(updateConsent(values, consentId))
                                                         .then(res => {
                                                             addToast('Consent updated successfully', {
@@ -260,7 +269,7 @@ const ConsentForm = (props) => {
                                                         });
                                                     actions.setSubmitting(false);
                                                 }
-                                                else{
+                                                else {
                                                     dispatch(createConsent(values))
                                                         .then(res => {
                                                             resetForm();
@@ -296,15 +305,17 @@ const ConsentForm = (props) => {
 
                                                                 <div className="col-12 col-sm-6">
                                                                     <div className="form-group">
-                                                                        <label className="font-weight-bold" htmlFor="category_id">Select Category <span className="text-danger">*</span></label>
+                                                                        <label className="font-weight-bold" htmlFor="category_id">Category <span className="text-danger">*</span></label>
                                                                         {
                                                                             consentId && consent ?
-                                                                            (<Field data-testid="category_id" as="select" name="category_id" className="form-control" value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
-                                                                                {categories.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
-                                                                            </Field>) :
-                                                                            (<Field data-testid="category_id" as="select" name="category_id" className="form-control">
-                                                                                {categories.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
-                                                                            </Field>)
+                                                                                (<Field data-testid="category_id" as="select" name="category_id" className="form-control" value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
+                                                                                    <option key="select-category" value="" disabled>--Select Category--</option>
+                                                                                    {categories.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
+                                                                                </Field>) :
+                                                                                (<Field data-testid="category_id" as="select" name="category_id" className="form-control">
+                                                                                    <option key="select-category" value="" disabled>--Select Category--</option>
+                                                                                    {categories.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
+                                                                                </Field>)
                                                                         }
                                                                         <div className="invalid-feedback"><ErrorMessage name="category_id" /></div>
                                                                     </div>
@@ -312,15 +323,17 @@ const ConsentForm = (props) => {
 
                                                                 <div className="col-12 col-sm-6">
                                                                     <div className="form-group">
-                                                                        <label className="font-weight-bold" htmlFor="category_id">Select Legal Basis <span className="text-danger">*</span></label>
+                                                                        <label className="font-weight-bold" htmlFor="category_id">Legal Basis <span className="text-danger">*</span></label>
                                                                         {
                                                                             consentId && consent ?
-                                                                            (<Field data-testid="legal_basis" as="select" name="legal_basis" className="form-control text-capitalize" value={legalBasis} onChange={(e) => setLegalBasis(e.target.value)}>
-                                                                                {['consent', 'contract'].map(item => <option key={item} value={item}>{item}</option>)}
-                                                                            </Field>) :
-                                                                            (<Field data-testid="legal_basis" as="select" name="legal_basis" className="form-control text-capitalize">
-                                                                                {['consent', 'contract'].map(item => <option key={item} value={item}>{item}</option>)}
-                                                                            </Field>)
+                                                                                (<Field data-testid="legal_basis" as="select" name="legal_basis" className="form-control text-capitalize" value={legalBasis} onChange={(e) => setLegalBasis(e.target.value)}>
+                                                                                    <option key="select-legal-basis" value="" disabled>--Select Legal Basis--</option>
+                                                                                    {legalBasisList.map(item => <option key={item.id} value={item.id}>{item.value}</option>)}
+                                                                                </Field>) :
+                                                                                (<Field data-testid="legal_basis" as="select" name="legal_basis" className="form-control text-capitalize">
+                                                                                    <option key="select-legal-basis" value="" disabled>--Select Legal Basis--</option>
+                                                                                    {legalBasisList.map(item => <option key={item.id} value={item.id}>{item.value}</option>)}
+                                                                                </Field>)
                                                                         }
                                                                         <div className="invalid-feedback"><ErrorMessage name="legal_basis" /></div>
                                                                     </div>
@@ -348,13 +361,13 @@ const ConsentForm = (props) => {
 
                                                                 <div className="col-12">
                                                                     <div className="form-group">
-                                                                    <label className="d-flex align-items-center cdp-text-primary hover-opacity" type="button" onClick={addNewTranslation}>
-                                                                        <i className="fas fa-plus  fa-2x mr-3" ></i>
-                                                                        <span className="h4 mb-0">Add Localizations</span>
+                                                                        <label className="d-flex align-items-center cdp-text-primary hover-opacity" type="button" onClick={addNewTranslation}>
+                                                                            <i className="fas fa-plus  fa-2x mr-3" ></i>
+                                                                            <span className="h4 mb-0">Add Localizations</span>
                                                                         </label>
-                                                                        </div>
                                                                     </div>
                                                                 </div>
+                                                            </div>
                                                             <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" >Submit</button>
                                                         </div>
                                                     </div>

@@ -612,7 +612,9 @@ async function createConsent(req, res) {
 
         const [consent, created] = await Consent.findOrCreate({
             where: {
-                preference
+                preference: {
+                    [Op.iLike]: preference
+                }
             },
             defaults: {
                 preference,
@@ -672,6 +674,8 @@ async function updateCdpConsent(req, res) {
     try {
         const { preference, category_id, legal_basis, is_active, translations } = req.body;
 
+
+
         const id = req.params.id;
         if (!id || !preference || !category_id || !legal_basis) {
             return res.status(400).send('Invalid request.');
@@ -689,7 +693,9 @@ async function updateCdpConsent(req, res) {
 
         const consentWithSamePreference = await Consent.findOne({
             where: {
-                preference,
+                preference: {
+                    [Op.iLike]: preference
+                },
                 id: { [Op.ne]: id }
             }
         });
@@ -899,7 +905,9 @@ async function createConsentCategory(req, res) {
     try {
         const [data, created] = await ConsentCategory.findOrCreate({
             where: {
-                title: req.body.title
+                title: {
+                    [Op.iLike]: req.body.title
+                }
             },
             defaults: {
                 title: req.body.title,
@@ -909,18 +917,13 @@ async function createConsentCategory(req, res) {
             }
         });
 
-        data.dataValues.createdByUser = {
-            first_name: req.user.first_name,
-            last_name: req.user.last_name,
-            id: req.user.id
+        if (!created && data) {
+            return res.status(400).send('The consent category already exists.');
         }
 
-        if (!created && data) {
-            return res.status(400).send('The consent category is already exists.');
-        }
+        data.dataValues.createdBy = `${req.user.first_name} ${req.user.last_name}`;
 
         res.json(data);
-
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -930,10 +933,17 @@ async function createConsentCategory(req, res) {
 async function updateConsentCategory(req, res) {
     try {
         const { title } = req.body;
-        const isTitleExists = await ConsentCategory.findOne({ where: { id: { [Op.not]: req.params.id }, title } });
+        const isTitleExists = await ConsentCategory.findOne({
+            where: {
+                id: { [Op.not]: req.params.id },
+                title: {
+                    [Op.iLike]: title
+                }
+            }
+        });
 
         if (isTitleExists) {
-            return res.status(400).send('The preference title is already exists.');
+            return res.status(400).send('The consent category already exists.');
         }
 
         const consentCategory = await ConsentCategory.findOne({ where: { id: req.params.id } });

@@ -148,8 +148,8 @@ async function init() {
                     slug: convertToSlug('HCP Portal'),
                     email: 'hcp-portal@glpg.com',
                     password: 'P@ssword123',
-                    consent_confirmation_path: '/bin/public/glpg-hcpportal/consentConfirm.consent.html',
-                    journey_redirect_path: '/bin/public/glpg-hcpportal/journeyRedirect.journey.html',
+                    approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
+                    auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6a',
                     logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
                     created_by: admin.id,
                     updated_by: admin.id
@@ -160,8 +160,8 @@ async function init() {
                     slug: convertToSlug('Jyseleca'),
                     email: 'jyseleca@glpg.com',
                     password: 'P@ssword123',
-                    consent_confirmation_path: '/bin/public/glpg-brandx/consentConfirm.consent.html',
-                    journey_redirect_path: '/bin/public/glpg-brandx/journeyRedirect.journey.html',
+                    approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
+                    auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6a',
                     logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/jyseleca/logo.png`,
                     created_by: admin.id,
                     updated_by: admin.id
