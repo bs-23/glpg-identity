@@ -4,19 +4,24 @@
         .inline-editing {
             &__field-wrap {
                 position: relative;
+                height: 29px;
+                margin-top: -4px;
             }
+
             &__td {
 
                 .form-control {
                     width: 100% !important;
                     height: 33px;
-                    line-height: 33px;
+                    line-height: 33px !important;
                     border-radius: 0px;
                     border: 1px solid $primary-color;
                     position: absolute;
-                    top: -5px;
+                    top: 0px;
                     left: 0px;
                     margin-bottom: 0px;
+                    padding-top: 0px;
+                    padding-bottom: 0px;
 
                     &:focus {
                         box-shadow: none;
