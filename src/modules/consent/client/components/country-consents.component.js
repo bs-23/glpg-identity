@@ -136,14 +136,15 @@ const CountryConsents = () => {
                                         <table className="table table-hover table-sm mb-0 cdp-table mb-2">
                                             <thead className="cdp-bg-primary-lighter cdp-table__header">
                                                 <tr>
-                                                    <th colSpan="4"><div className="d-flex align-items-center text-white"><img alt={countryConsent.name} src={countryConsent.flagUrl} height="18" className="mr-2" /> {countryConsent.name}</div></th>
+                                                    <th colSpan="5"><div className="d-flex align-items-center text-white"><img alt={countryConsent.name} src={countryConsent.flagUrl} height="18" className="mr-2" /> {countryConsent.name}</div></th>
                                                 </tr>
                                             </thead>
                                             <thead className="cdp-table__header">
                                                 <tr>
-                                                    <th width="40%">Preference / Purpose</th>
+                                                    <th width="35%">Preference / Purpose</th>
+                                                    <th width="10%">Status</th>
                                                     <th width="20%">Available Localizations</th>
-                                                    <th width="20%">Opt Type</th>
+                                                    <th width="15%">Opt Type</th>
                                                     <th width="20%">Action</th>
                                                 </tr>
                                             </thead>
@@ -157,6 +158,7 @@ const CountryConsents = () => {
                                                                         <i className="fas fa-caret-right mr-1"></i>{consent.preference}
                                                                     </span>
                                                                 </td>
+                                                                <td>{consent.is_active ? 'Active' : 'Inactive'}</td>
                                                                 <td>
                                                                     {consent.translations && consent.translations.length > 0 && consent.translations.map(translation => (
                                                                         <OverlayTrigger key={translation.id}
