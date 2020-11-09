@@ -1175,13 +1175,44 @@ async function getSpecialties(req, res) {
     }
 }
 
-async function getAllSpecialties(req, res) {
+async function getSpecialtiesWithEnglishTranslation(req, res) {
     const response = new Response([], []);
     try {
+        const { country_iso2, locale } = req.query;
+
+        if (!country_iso2) response.errors.push(new CustomError(`Missing required query parameter`, 4300, 'country_iso2'));
+
+        if (!locale) response.errors.push(new CustomError(`Missing required query parameter`, 4300, 'locale'));
+
+        if (response.errors && response.errors.length) return res.status(400).send(response);
+
+        const countries = await sequelize.datasyncConnector.query(`
+            SELECT * FROM ciam.vwcountry
+            WHERE LOWER(ciam.vwcountry.country_iso2) = $country_iso2;`, {
+            bind: {
+                country_iso2: country_iso2.toLowerCase()
+            },
+            type: QueryTypes.SELECT
+        });
+
+        if (!countries || !countries.length) {
+            response.data = [];
+            return res.status(204).send(response);
+        }
+
         let masterDataSpecialties = await sequelize.datasyncConnector.query(`
-            SELECT codbase, cod_id_onekey, cod_locale, cod_description
-            FROM ciam.vwspecialtymaster
+            SELECT cod_id_onekey, codbase, cod_description, cod_locale
+            FROM ciam.vwspecialtymaster as Specialty
+            WHERE cod_id_onekey in
+                    (SELECT cod_id_onekey
+                    FROM ciam.vwspecialtymaster as Specialty
+                    WHERE LOWER(cod_locale) = $locale AND LOWER(codbase) = $codbase)
+                AND (LOWER(cod_locale) = 'en' OR LOWER(cod_locale) = $locale)
             `, {
+            bind: {
+                locale: locale.toLowerCase(),
+                codbase: countries[0].codbase.toLowerCase()
+            },
             type: QueryTypes.SELECT
         });
 
@@ -1277,4 +1308,4 @@ exports.approveHCPUser = approveHCPUser;
 exports.rejectHCPUser = rejectHCPUser;
 exports.getHCPUserConsents = getHCPUserConsents;
 exports.updateHcps = updateHcps;
-exports.getAllSpecialties = getAllSpecialties;
+exports.getSpecialtiesWithEnglishTranslation = getSpecialtiesWithEnglishTranslation;

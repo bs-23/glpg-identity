@@ -12,7 +12,7 @@ import axios from 'axios';
 import _ from 'lodash';
 import parse from 'html-react-parser';
 
-import { getHcpProfiles } from '../hcp.actions';
+import { getHcpProfiles, getHCPSpecialities } from '../hcp.actions';
 import { ApprovalRejectSchema, HcpInlineEditSchema } from '../hcp.schema';
 import uuidAuthorities from '../uuid-authorities.json';
 import EditableTable from '../../../core/client/components/EditableTable/EditableTable';
@@ -29,11 +29,10 @@ export default function hcpUsers() {
     const [currentUser, setCurrentUser] = useState({});
     const { addToast } = useToasts();
     const [sort, setSort] = useState({ type: 'ASC', value: null });
-    const [allSpecialties, setAllSpecialties] = useState([]);
-    const [specialties_desc] = useState(new Map());
     const [showFilters, setShowFilters] = useState(true);
 
     const hcps = useSelector(state => state.hcpReducer.hcps);
+    const specialties = useSelector(state => state.hcpReducer.specialties);
 
     const pageLeft = () => {
         if (hcps.page > 1) urlChange(hcps.page - 1, hcps.codbase, hcps.status, params.get('orderBy'), true);
@@ -51,18 +50,6 @@ export default function hcpUsers() {
     async function getAllCountries() {
         const response = await axios.get('/api/all_countries');
         setAllCountries(response.data);
-    }
-
-    const getAllSpecialties = async () => {
-        const { data } = await axios.get(`/api/hcp-profiles/specialties-all`);
-        if(data) {
-            const specialties = data.data.map(sp => {
-                const specialty_locale_key = `${sp.cod_id_onekey}_${sp.cod_locale.toLowerCase()}`;
-                specialties_desc.set(specialty_locale_key, sp.cod_description);
-                return { onekey: sp.cod_id_onekey, locale: sp.cod_locale.toLowerCase(), description: sp.cod_description };
-            });
-            setAllSpecialties(specialties);
-        }
     }
 
     const onUpdateStatus = (user) => {
@@ -154,24 +141,37 @@ export default function hcpUsers() {
         window.open(link, 'name','width=600,height=400');
     }
 
-    const getSpecialtyOptions = (value, row) => {
-        const { locale } = row;
-        const options = allSpecialties
-            .filter(sp => sp.locale === locale.toLowerCase())
-            .map(sp => ({ key: `${sp.onekey}_${sp.description}`, value: sp.onekey, label: sp.description }));
+    const getSpecialtyOptions = async (value, row) => {
+        const { country_iso2, locale } = row;
+        const response = await dispatch(getHCPSpecialities(country_iso2, locale));
+        const { value: { data: specialty_by_country_locale } } = response;
+
+        if(!specialty_by_country_locale) return [];
+
+        const options = specialty_by_country_locale.map(sp => ({
+            key: `${sp.cod_id_onekey}_${sp.cod_description}`,
+            value: sp.cod_id_onekey,
+            label: sp.cod_description
+        }));
+
         return options;
     }
 
-    const getSpecialtyDescription = (sp_onekey, row) => {
-        if(specialties_desc.size) {
-            const sp_locale_key = `${sp_onekey}_${row.locale.toLowerCase()}`;
-            const sp_en_key = `${sp_onekey}_en`;
-            if(specialties_desc.has(sp_locale_key) || specialties_desc.has(sp_en_key)) {
-                const specialty_description = specialties_desc.get(sp_locale_key) || specialties_desc.get(sp_en_key);
-                return specialty_description;
-            }
-            return "";
+    const getSpecialtyDescription = (specialty_onekey, row) => {
+        const { locale, country_iso2 } = row;
+        const country_locale_key = `${country_iso2.toLowerCase()}_${locale.toLowerCase()}`;
+        const specialty_by_country_locale = specialties[country_locale_key];
+
+        if(specialty_by_country_locale) {
+            const specialties_by_onekey = specialty_by_country_locale.filter(sp => sp.cod_id_onekey === specialty_onekey);
+
+            const speciality_en = specialties_by_onekey.find(sp => sp.cod_locale.toLowerCase() === 'en');
+            if(speciality_en) return speciality_en.cod_description;
+
+            const speciality_locale = specialties_by_onekey.find(sp => sp.cod_locale.toLowerCase() === locale.toLowerCase());
+            return speciality_locale ? speciality_locale.cod_description : '';
         }
+
         return row.specialty_description;
     }
 
@@ -338,7 +338,6 @@ export default function hcpUsers() {
     useEffect(() => {
         getCountries();
         getAllCountries();
-        getAllSpecialties();
     }, []);
 
     useEffect(() => {
