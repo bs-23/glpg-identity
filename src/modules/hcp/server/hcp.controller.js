@@ -373,10 +373,6 @@ async function createHcpProfile(req, res) {
         response.errors.push(new CustomError('language_code is missing.', 400, 'language_code'));
     }
 
-    if (!locale) {
-        response.errors.push(new CustomError('locale is missing.', 400, 'locale'));
-    }
-
     if (!specialty_onekey) {
         response.errors.push(new CustomError('specialty_onekey is missing.', 400, 'specialty_onekey'));
     }
@@ -446,7 +442,7 @@ async function createHcpProfile(req, res) {
             last_name,
             language_code: language_code.toLowerCase(),
             country_iso2: country_iso2.toLowerCase(),
-            locale: locale.toLowerCase(),
+            locale: `${language_code.toLowerCase()}_${country_iso2.toUpperCase()}`,
             specialty_onekey,
             telephone,
             birthdate,
