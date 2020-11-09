@@ -314,6 +314,12 @@ paths:
                 - hcp-profiles
             summary: Get specialties by locale.
             parameters:
+                - name: country_iso2
+                  in: query
+                  required: true
+                  description: Case insensitive ISO-2 code of the country
+                  schema:
+                    type: string
                 - name: locale
                   in: query
                   required: true

@@ -78,6 +78,8 @@ async function notifyHcpUserApproval(hcpUser, userApplication) {
             ? { consent_confirmation_token: generateConsentConfirmationAccessToken(hcpUser) }
             : { password_setup_token: hcpUser.reset_password_token };
 
+        payload.jwt_token = token;
+
         const response = await axios.post(
             `${hcpUser.origin_url}${userApplication.approve_user_path}`,
             payload,
@@ -530,10 +532,6 @@ async function createHcpProfile(req, res) {
         response.errors.push(new CustomError('language_code is missing.', 400, 'language_code'));
     }
 
-    if (!locale) {
-        response.errors.push(new CustomError('locale is missing.', 400, 'locale'));
-    }
-
     if (!specialty_onekey) {
         response.errors.push(new CustomError('specialty_onekey is missing.', 400, 'specialty_onekey'));
     }
@@ -603,7 +601,7 @@ async function createHcpProfile(req, res) {
             last_name,
             language_code: language_code.toLowerCase(),
             country_iso2: country_iso2.toLowerCase(),
-            locale: locale.toLowerCase(),
+            locale: `${language_code.toLowerCase()}_${country_iso2.toUpperCase()}`,
             specialty_onekey,
             telephone,
             birthdate,
@@ -1111,21 +1109,37 @@ async function forgetPassword(req, res) {
 async function getSpecialties(req, res) {
     const response = new Response([], []);
     try {
-        const locale = req.query.locale;
+        const { country_iso2, locale } = req.query;
 
-        if (!locale) {
-            response.errors.push(new CustomError(`Missing required query parameter`, 4300, 'locale'));
-            return res.status(400).send(response);
+        if (!country_iso2) response.errors.push(new CustomError(`Missing required query parameter`, 4300, 'country_iso2'));
+
+        if (!locale) response.errors.push(new CustomError(`Missing required query parameter`, 4300, 'locale'));
+
+        if (response.errors && response.errors.length) return res.status(400).send(response);
+
+        const countries = await sequelize.datasyncConnector.query(`
+            SELECT * FROM ciam.vwcountry
+            WHERE LOWER(ciam.vwcountry.country_iso2) = $country_iso2;`, {
+            bind: {
+                country_iso2: country_iso2.toLowerCase()
+            },
+            type: QueryTypes.SELECT
+        });
+
+        if (!countries || !countries.length) {
+            response.data = [];
+            return res.status(204).send(response);
         }
 
         let masterDataSpecialties = await sequelize.datasyncConnector.query(`
             SELECT codbase, cod_id_onekey, cod_locale, cod_description
             FROM ciam.vwspecialtymaster as Specialty
-            WHERE LOWER(cod_locale) = $locale
+            WHERE LOWER(cod_locale) = $locale AND LOWER(codbase) = $codbase
             ORDER BY cod_description ASC;
             `, {
             bind: {
-                locale: locale.toLowerCase()
+                locale: locale.toLowerCase(),
+                codbase: countries[0].codbase.toLowerCase()
             },
             type: QueryTypes.SELECT
         });
@@ -1136,11 +1150,12 @@ async function getSpecialties(req, res) {
             masterDataSpecialties = await sequelize.datasyncConnector.query(`
             SELECT codbase, cod_id_onekey, cod_locale, cod_description
             FROM ciam.vwspecialtymaster as Specialty
-            WHERE LOWER(cod_locale) = $locale
+            WHERE LOWER(cod_locale) = $locale AND LOWER(codbase) = $codbase
             ORDER BY cod_description ASC;
             `, {
                 bind: {
-                    locale: languageCode.toLowerCase()
+                    locale: languageCode.toLowerCase(),
+                    codbase: countries[0].codbase.toLowerCase()
                 },
                 type: QueryTypes.SELECT
             });

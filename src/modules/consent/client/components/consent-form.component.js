@@ -22,8 +22,8 @@ const ConsentForm = (props) => {
     const [countryLanguages, setCountryLanguages] = useState([]);
     const [isActive, setIsActive] = useState(true);
     const [translations, setTranslations] = useState([]);
-    const [categoryId, setCategoryId] = useState([]);
-    const [legalBasis, setLegalBasis] = useState([]);
+    // const [categoryId, setCategoryId] = useState([]);
+    // const [legalBasis, setLegalBasis] = useState([]);
     const [translationToDelete, setTranslationToDelete] = useState(null);
     const [showError, setShowError] = useState(false);
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
@@ -74,12 +74,12 @@ const ConsentForm = (props) => {
 
         async function getConsent() {
             const response = await axios.get(`/api/cdp-consents/${id}`);
+            setConsentId(id);
             setConsent(response.data);
             setTranslations(response.data.translations.map(i => ({ ...i, country_iso2: i.locale.split('_')[1], lang_code: i.locale.split('_')[0] })));
             setIsActive(response.data.is_active);
-            setConsentId(id);
-            setCategoryId(response.data.consent_category.id);
-            setLegalBasis(response.data.legal_basis);
+            // setCategoryId(response.data.consent_category.id);
+            // setLegalBasis(response.data.legal_basis);
         }
         async function getConsentCatogories() {
             const response = await axios.get('/api/privacy/consent-categories');
@@ -214,7 +214,7 @@ const ConsentForm = (props) => {
                                     <div className="add-user p-3">
                                         <Formik
                                             initialValues={{
-                                                category_id: consentId && consent.consent_category
+                                                category_id: consentId && consent && consent.consent_category
                                                     ? consent.consent_category.id
                                                     : '',
                                                 legal_basis: consentId && consent ? consent.legal_basis : '',
@@ -226,10 +226,6 @@ const ConsentForm = (props) => {
                                             validationSchema={consentSchema}
                                             onSubmit={(values, actions) => {
                                                 values.is_active = isActive;
-                                                if (consentId && consent) {
-                                                    values.category_id = categoryId;
-                                                    values.legal_basis = legalBasis;
-                                                }
 
                                                 const validTranslations = translations.filter(item => item.country_iso2 && item.lang_code && item.rich_text && item.rich_text !== '<p><br></p>');
                                                 if (translations.length !== validTranslations.length) {
@@ -303,7 +299,7 @@ const ConsentForm = (props) => {
                                                                 <div className="col-12">
                                                                     <div className="form-group">
                                                                         <label className="font-weight-bold" htmlFor='preference'> Preference <span className="text-danger">*</span></label>
-                                                                        <Field className="form-control rich_text" type='text' name='preference' id='preference' />
+                                                                        <Field className="form-control preference" type='text' name='preference' id='preference' />
                                                                         <div className="invalid-feedback"><ErrorMessage name='preference' /></div>
                                                                     </div>
                                                                 </div>
@@ -311,17 +307,10 @@ const ConsentForm = (props) => {
                                                                 <div className="col-12 col-sm-6">
                                                                     <div className="form-group">
                                                                         <label className="font-weight-bold" htmlFor="category_id">Category <span className="text-danger">*</span></label>
-                                                                        {
-                                                                            consentId && consent ?
-                                                                                (<Field data-testid="category_id" as="select" name="category_id" className="form-control" value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
-                                                                                    <option key="select-category" value="" disabled>--Select Category--</option>
-                                                                                    {categories.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
-                                                                                </Field>) :
-                                                                                (<Field data-testid="category_id" as="select" name="category_id" className="form-control">
-                                                                                    <option key="select-category" value="" disabled>--Select Category--</option>
-                                                                                    {categories.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
-                                                                                </Field>)
-                                                                        }
+                                                                        <Field data-testid="category_id" as="select" name="category_id" className="form-control">
+                                                                            <option key="select-category" value="" disabled>--Select Category--</option>
+                                                                            {categories.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
+                                                                        </Field>
                                                                         <div className="invalid-feedback"><ErrorMessage name="category_id" /></div>
                                                                     </div>
                                                                 </div>
@@ -329,17 +318,10 @@ const ConsentForm = (props) => {
                                                                 <div className="col-12 col-sm-6">
                                                                     <div className="form-group">
                                                                         <label className="font-weight-bold" htmlFor="category_id">Legal Basis <span className="text-danger">*</span></label>
-                                                                        {
-                                                                            consentId && consent ?
-                                                                                (<Field data-testid="legal_basis" as="select" name="legal_basis" className="form-control text-capitalize" value={legalBasis} onChange={(e) => setLegalBasis(e.target.value)}>
-                                                                                    <option key="select-legal-basis" value="" disabled>--Select Legal Basis--</option>
-                                                                                    {legalBasisList.map(item => <option key={item.id} value={item.id}>{item.value}</option>)}
-                                                                                </Field>) :
-                                                                                (<Field data-testid="legal_basis" as="select" name="legal_basis" className="form-control text-capitalize">
-                                                                                    <option key="select-legal-basis" value="" disabled>--Select Legal Basis--</option>
-                                                                                    {legalBasisList.map(item => <option key={item.id} value={item.id}>{item.value}</option>)}
-                                                                                </Field>)
-                                                                        }
+                                                                        <Field data-testid="legal_basis" as="select" name="legal_basis" className="form-control text-capitalize">
+                                                                            <option key="select-legal-basis" value="" disabled>--Select Legal Basis--</option>
+                                                                            {legalBasisList.map(item => <option key={item.id} value={item.id}>{item.value}</option>)}
+                                                                        </Field>
                                                                         <div className="invalid-feedback"><ErrorMessage name="legal_basis" /></div>
                                                                     </div>
                                                                 </div>
