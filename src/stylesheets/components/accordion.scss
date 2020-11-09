@@ -74,6 +74,12 @@
         background: $gray-FAFAFA;
     }
 
+    &__body {
+        a {
+            color: $secondary-color;
+        }
+    }
+
     .accordion {
         .card {
             border-bottom: 0px !important;

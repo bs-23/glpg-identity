@@ -96,7 +96,7 @@ export default function UserForm() {
                     <div className="row">
                         <div className="col-12">
                             <div className="shadow-sm bg-white mb-3">
-                            <h2 className="d-flex align-items-center p-3 px-sm-4 py-sm-4 page-title light">
+                                <h2 className="d-flex align-items-center p-3 px-sm-4 py-sm-4 page-title light">
                                     <span className="page-title__text font-weight-bold py-3">Create New User</span>
                                 </h2>
                                 <div className="add-user p-3">
