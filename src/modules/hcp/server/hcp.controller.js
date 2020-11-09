@@ -954,21 +954,37 @@ async function forgetPassword(req, res) {
 async function getSpecialties(req, res) {
     const response = new Response([], []);
     try {
-        const locale = req.query.locale;
+        const { country_iso2, locale } = req.query;
 
-        if (!locale) {
-            response.errors.push(new CustomError(`Missing required query parameter`, 4300, 'locale'));
-            return res.status(400).send(response);
+        if (!country_iso2) response.errors.push(new CustomError(`Missing required query parameter`, 4300, 'country_iso2'));
+
+        if (!locale) response.errors.push(new CustomError(`Missing required query parameter`, 4300, 'locale'));
+
+        if (response.errors && response.errors.length) return res.status(400).send(response);
+
+        const countries = await sequelize.datasyncConnector.query(`
+            SELECT * FROM ciam.vwcountry
+            WHERE LOWER(ciam.vwcountry.country_iso2) = $country_iso2;`, {
+            bind: {
+                country_iso2: country_iso2.toLowerCase()
+            },
+            type: QueryTypes.SELECT
+        });
+
+        if (!countries || !countries.length) {
+            response.data = [];
+            return res.status(204).send(response);
         }
 
         let masterDataSpecialties = await sequelize.datasyncConnector.query(`
             SELECT codbase, cod_id_onekey, cod_locale, cod_description
             FROM ciam.vwspecialtymaster as Specialty
-            WHERE LOWER(cod_locale) = $locale
+            WHERE LOWER(cod_locale) = $locale AND LOWER(codbase) = $codbase
             ORDER BY cod_description ASC;
             `, {
             bind: {
-                locale: locale.toLowerCase()
+                locale: locale.toLowerCase(),
+                codbase: countries[0].codbase.toLowerCase()
             },
             type: QueryTypes.SELECT
         });
@@ -979,11 +995,12 @@ async function getSpecialties(req, res) {
             masterDataSpecialties = await sequelize.datasyncConnector.query(`
             SELECT codbase, cod_id_onekey, cod_locale, cod_description
             FROM ciam.vwspecialtymaster as Specialty
-            WHERE LOWER(cod_locale) = $locale
+            WHERE LOWER(cod_locale) = $locale AND LOWER(codbase) = $codbase
             ORDER BY cod_description ASC;
             `, {
                 bind: {
-                    locale: languageCode.toLowerCase()
+                    locale: languageCode.toLowerCase(),
+                    codbase: countries[0].codbase.toLowerCase()
                 },
                 type: QueryTypes.SELECT
             });
