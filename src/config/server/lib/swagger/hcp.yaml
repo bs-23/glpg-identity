@@ -433,6 +433,8 @@ components:
                     type: string
                 password_reset_token:
                     type: string
+                consent_confirmation_token:
+                    type: string
                 language_code:
                     type: string
                 locale:

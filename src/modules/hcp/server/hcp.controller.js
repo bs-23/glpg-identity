@@ -217,8 +217,13 @@ async function getHcps(req, res) {
 
         const hcp_users = [];
         hcps.forEach(user => {//add specialty name from data sync
-            const specialty = specialty_list.find(i => i.cod_id_onekey === user.specialty_onekey);
-            (specialty) ? user.dataValues.specialty_description = specialty.cod_description : user.dataValues.specialty_description = null;
+            const specialties = specialty_list.filter(i => i.cod_id_onekey === user.specialty_onekey);
+            const specialtyInEnglish = specialties && specialties.find(s => s.cod_locale === 'en');
+            (specialtyInEnglish)
+                ? user.dataValues.specialty_description = specialtyInEnglish.cod_description
+                : specialties.length
+                    ? user.dataValues.specialty_description = specialties[0].cod_description
+                    : user.dataValues.specialty_description = null;
             hcp_users.push(user);
         });
 
@@ -512,6 +517,10 @@ async function createHcpProfile(req, res) {
         await hcpUser.save();
 
         response.data = getHcpViewModel(hcpUser.dataValues);
+
+        if (hcpUser.dataValues.status === 'consent_pending') {
+            response.data.consent_confirmation_token = generateConsentConfirmationAccessToken(hcpUser)
+        }
 
         if (hcpUser.dataValues.status === 'self_verified') {
             await addPasswordResetTokenToUser(hcpUser);
