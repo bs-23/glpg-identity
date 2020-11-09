@@ -245,7 +245,7 @@ export default function hcpUsers() {
             name: 'Email',
             unique: true,
             onSort: generateSortHandler('email'),
-            fieldType: { name: 'email' },
+            fieldType: { name: 'email', maxLength: '100' },
             width: "14%"
         },
         {
@@ -260,12 +260,14 @@ export default function hcpUsers() {
         {
             id: 'first_name',
             name: 'First Name',
+            fieldType: { name: 'text', maxLength: '50' },
             onSort: generateSortHandler('first_name'),
             width: "10%"
         },
         {
             id: 'last_name',
             name: 'Last Name',
+            fieldType: { name: 'text', maxLength: '50' },
             onSort: generateSortHandler('onSort'),
             width: "10%"
         },
@@ -282,6 +284,7 @@ export default function hcpUsers() {
             name: 'UUID',
             unique: true,
             onSort: generateSortHandler('uuid'),
+            fieldType: { name: 'email', maxLength: '20' },
             width: "8%"
         },
         {

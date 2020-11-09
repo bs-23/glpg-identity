@@ -32,7 +32,6 @@ const BackendErrorMessage = ({ name }) => (
 )
 
 const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCell, formikProps, onInputChange, onInputKeyDown }) => {
-
     const { handleBlur, handleChange, initialValues, values } = formikProps;
 
     const isCellInvalid = (name) => {
@@ -61,7 +60,7 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
     }
 
     const renderRow = () => columns.map((column, colIndex) => {
-        const { customizeCellContent, onChangeAction, customCell: CustomCell, key } = column;
+        const { fieldType, customizeCellContent, onChangeAction, customCell: CustomCell, key } = column;
 
         const currentCellValue = row[column.id];
         const inputName = `rows[${rowIndex}].${column.id}`;
@@ -95,7 +94,7 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
                     ? <div className="inline-editing__field-wrap">
                         <InputField
                             name={`rows[${rowIndex}].${column.id}`}
-                            type={column.fieldType}
+                            type={fieldType}
                             value={currentCellValue}
                             row={row}
                             onBlur={handleOnBlur}
