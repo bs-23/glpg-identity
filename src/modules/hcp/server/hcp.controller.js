@@ -513,6 +513,10 @@ async function createHcpProfile(req, res) {
 
         response.data = getHcpViewModel(hcpUser.dataValues);
 
+        if (hcpUser.dataValues.status === 'consent_pending') {
+            response.data.consent_confirmation_token = generateConsentConfirmationAccessToken(hcpUser)
+        }
+
         if (hcpUser.dataValues.status === 'self_verified') {
             await addPasswordResetTokenToUser(hcpUser);
 
