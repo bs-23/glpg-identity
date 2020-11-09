@@ -4,20 +4,21 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { getUsers } from '../user.actions';
+import { getCountries } from '../../../core/client/country/country.actions';
 
 export default function Users() {
     const dispatch = useDispatch();
     const location = useLocation();
     const history = useHistory();
 
-    const userdata = useSelector(state => state.userReducer.users);
-
-    const [countries, setCountries] = useState([]);
     const [codBase, setCodBase] = useState(null);
     const [userCountries, setUserCountries] = useState([]);
-
-    const params = new URLSearchParams(window.location.search);
     const [sort, setSort] = useState({ type: 'asc', value: null });
+
+    const userdata = useSelector(state => state.userReducer.users);
+    const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
+    const countries = useSelector(state => state.countryReducer.countries);
+    const params = new URLSearchParams(window.location.search);
 
 
     const sortCountries = (user_countries) => {
@@ -39,14 +40,14 @@ export default function Users() {
     }
 
     useEffect(() => {
-        async function getCountries() {
-            const response = (await axios.get('/api/countries')).data;
-            const userProfile = (await axios.get('/api/users/profile')).data;
-            setCountries(response);
-            (userProfile.type === "admin") ? setUserCountries(response) : setUserCountries(fetchUserCountries(userProfile.countries, response));
-        }
-        getCountries();
+        dispatch(getCountries());
     }, []);
+
+    useEffect(() => {
+        (loggedInUser.type === "admin")
+            ? setUserCountries(countries)
+            : setUserCountries(fetchUserCountries(loggedInUser.countries, countries));
+    }, [countries]);
 
     useEffect(() => {
         setCodBase(params.get('codbase') ? params.get('codbase') : null);

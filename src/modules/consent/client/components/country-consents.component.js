@@ -11,20 +11,22 @@ import { getCountryConsents, deleteCountryConsent, getCdpConsents } from '../con
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Popover from 'react-bootstrap/Popover';
 import parse from 'html-react-parser';
+import { getCountries } from '../../../core/client/country/country.actions';
 
 const CountryConsents = () => {
+    const dispatch = useDispatch();
+    const { addToast } = useToasts();
+
+    const [] = useState([]);
     const [show, setShow] = useState(false);
     const [editable, setEditable] = useState(false);
     const [editOption, setEditOption] = useState(null);
     const [showDelete, setShowDelete] = useState(false);
     const [consentToDelete, setConsentToDelete] = useState(null);
-    const { addToast } = useToasts();
     const [consentId, setConsentId] = useState(null);
 
-    const dispatch = useDispatch();
+    const countries = useSelector(state => state.countryReducer.countries);
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
-    const [countries, setCountries] = useState([]);
-    const [] = useState([]);
     const country_consents = useSelector(state => state.consentReducer.country_consents);
 
     const getGroupedCountryConsents = () => {
@@ -95,11 +97,7 @@ const CountryConsents = () => {
     }
 
     useEffect(() => {
-        async function getCountries() {
-            const response = await axios.get('/api/countries');
-            setCountries(response.data);
-        }
-        getCountries();
+        dispatch(getCountries());
         dispatch(getCdpConsents(null, null));
         dispatch(getCountryConsents());
     }, []);

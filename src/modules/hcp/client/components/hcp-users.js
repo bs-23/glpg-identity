@@ -1,20 +1,22 @@
+import React, { useEffect, useState } from "react";
+import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { NavLink, useLocation, useHistory } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { useToasts } from 'react-toast-notifications';
+import { LinkContainer } from 'react-router-bootstrap';
+import Accordion from 'react-bootstrap/Accordion';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Modal from 'react-bootstrap/Modal';
-import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
-import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from 'react-redux';
-import { LinkContainer } from 'react-router-bootstrap';
-import { Form, Formik, Field, ErrorMessage } from "formik";
-import { useToasts } from 'react-toast-notifications';
+import parse from 'html-react-parser';
+import axios from 'axios';
+import _ from 'lodash';
+
 import { getHcpProfiles } from '../hcp.actions';
 import { ApprovalRejectSchema } from '../hcp.schema';
 import uuidAuthorities from '../uuid-authorities.json';
-import axios from 'axios';
+import { getCountries } from '../../../core/client/country/country.actions';
 
-import _ from 'lodash';
-import parse from 'html-react-parser';
 
 export default function hcpUsers() {
     const dispatch = useDispatch();
@@ -22,7 +24,6 @@ export default function hcpUsers() {
     const history = useHistory();
     const params = new URLSearchParams(window.location.search);
 
-    const [countries, setCountries] = useState([]);
     const [allCountries, setAllCountries] = useState([]);
     const [show, setShow] = useState({ profileManage: false, updateStatus: false });
     const [currentUser, setCurrentUser] = useState({});
@@ -30,6 +31,7 @@ export default function hcpUsers() {
     const [sort, setSort] = useState({ type: 'ASC', value: null });
 
     const hcps = useSelector(state => state.hcpReducer.hcps);
+    const countries = useSelector(state => state.countryReducer.countries);
 
     const pageLeft = () => {
         if (hcps.page > 1) urlChange(hcps.page - 1, hcps.codbase, hcps.status, params.get('orderBy'), true);
@@ -38,11 +40,6 @@ export default function hcpUsers() {
     const pageRight = () => {
         if (hcps.end !== hcps.total) urlChange(hcps.page + 1, hcps.codbase, hcps.status, params.get('orderBy'), true);
     };
-
-    async function getCountries() {
-        const response = await axios.get('/api/countries');
-        setCountries(response.data);
-    }
 
     async function getAllCountries() {
         const response = await axios.get('/api/all_countries');
@@ -139,7 +136,7 @@ export default function hcpUsers() {
     }
 
     useEffect(() => {
-        getCountries();
+        dispatch(getCountries());
         getAllCountries();
     }, []);
 

@@ -10,7 +10,7 @@ import { getConsent, setConsent } from '../consent.actions';
 const ConsentComponent = ({ consentId, setConsentId }) => {
     const dispatch = useDispatch();
     const consent = useSelector(state => state.consentReducer.consent);
-    const countries = useSelector(state => state.userReducer.countries);
+    const countries = useSelector(state => state.countryReducer.countries);
 
     const getConsentCountries = (consentCountries) => {
         return consentCountries.map(countryConsent => {

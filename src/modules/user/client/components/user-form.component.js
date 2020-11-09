@@ -7,23 +7,22 @@ import { createUser } from "../user.actions";
 import { registerSchema } from "../user.schema";
 import { useToasts } from "react-toast-notifications";
 import Dropdown from 'react-bootstrap/Dropdown';
-// const countryCodes = require('country-codes-list');
 import CountryCodes from 'country-codes-list';
 import { getCountries } from '../../../core/client/country/country.actions';
 
 export default function UserForm() {
     const dispatch = useDispatch();
+    const history = useHistory()
+    const { addToast } = useToasts()
+
     const [roles, setRoles] = useState([]);
     const [applications, setApplications] = useState([]);
     const [selectedRoles, setSelectedRoles] = useState([]);
     const [selectedCountries, setSelectedCountries] = useState([]);
-    const history = useHistory()
-    const { addToast } = useToasts()
-    const CountryCodesObject = CountryCodes.customList('countryCode', '+{countryCallingCode}')
     const [selectedCountryCode, setSelectedCountryCode] = useState(0);
 
+    const CountryCodesObject = CountryCodes.customList('countryCode', '+{countryCallingCode}')
     const countries = useSelector(state => state.countryReducer.countries);
-
 
     const generateCountryIconPath = (country) => {
         if(country) return `/assets/flag/flag-${country.toLowerCase().replace(/ /g, "-")}.svg`;
