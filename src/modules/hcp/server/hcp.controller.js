@@ -492,7 +492,9 @@ async function createHcpProfile(req, res) {
 
                 const consentCountry = await ConsentCountry.findOne({
                     where: {
-                        country_iso2: model.country_iso2.toLowerCase(),
+                        country_iso2: {
+                            [Op.iLike]:model.country_iso2
+                        },
                         consent_id: consentDetails.id
                     }
                 });
