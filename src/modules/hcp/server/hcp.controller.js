@@ -618,7 +618,9 @@ async function approveHCPUser(req, res) {
             const allConsentDetails = await ConsentLocale.findAll({
                 where: {
                     consent_id: consentIds,
-                    locale: hcpUser.locale.toLowerCase()
+                    locale: {
+                        [Op.iLike] : hcpUser.locale
+                    }
                 }
             });
 
