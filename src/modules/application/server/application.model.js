@@ -39,11 +39,11 @@ const Application = sequelize.cdpConnector.define('applications', {
     refresh_token: {
         type: DataTypes.STRING
     },
-    consent_confirmation_path: {
+    auth_secret: {
         allowNull: false,
-        type: DataTypes.STRING,
+        type: DataTypes.UUID
     },
-    journey_redirect_path: {
+    approve_user_path: {
         allowNull: false,
         type: DataTypes.STRING,
     },

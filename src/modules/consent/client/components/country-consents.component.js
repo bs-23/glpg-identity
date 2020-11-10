@@ -141,10 +141,10 @@ const CountryConsents = () => {
                                             </thead>
                                             <thead className="cdp-table__header">
                                                 <tr>
-                                                    <th>Preference / Purpose</th>
-                                                    <th>Available Localizations</th>
-                                                    <th>Opt Type</th>
-                                                    <th>Action</th>
+                                                    <th width="40%">Preference / Purpose</th>
+                                                    <th width="20%">Available Localizations</th>
+                                                    <th width="20%">Opt Type</th>
+                                                    <th width="20%">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="cdp-table__body bg-white">
@@ -154,7 +154,7 @@ const CountryConsents = () => {
                                                             <tr key={coonsentIndex}>
                                                                 <td>
                                                                     <span type="button" className="btn btn-link cdp-text-primary p-0" onClick={() => showConsentDetailsModal(consent.id)}>
-                                                                        <i className="fas fa-caret-right mr-1"></i>{consent.preference}
+                                                                        <i className="fas fa-caret-right mr-1"></i>{consent.preference} {consent.is_active ? '' : '(Inactive)'}
                                                                     </span>
                                                                 </td>
                                                                 <td>

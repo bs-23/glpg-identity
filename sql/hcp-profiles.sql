@@ -20,7 +20,7 @@ CREATE TABLE ciam.hcp_profiles
     updated_by uuid,
     reset_password_token character varying(255) COLLATE pg_catalog."default",
     reset_password_expires character varying(255) COLLATE pg_catalog."default",
-    origin_url character varying(255) COLLATE pg_catalog."default",
+    origin_url character varying(255) COLLATE pg_catalog."default" NOT NULL,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
     password_updated_at timestamp with time zone,
