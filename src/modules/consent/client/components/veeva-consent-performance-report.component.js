@@ -346,7 +346,7 @@ const ConsentPerformanceReport = () => {
                                                         </LinkContainer>
                                                     </th>
 
-                                                    <th>
+                                                    {/* <th>
                                                         <LinkContainer to={getUrl('consent_type')}>
                                                             <span
                                                                 className={consents_report.orderBy === 'consent_type' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
@@ -355,7 +355,7 @@ const ConsentPerformanceReport = () => {
                                                                 Consent Type
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
                                                         </LinkContainer>
-                                                    </th>
+                                                    </th> */}
 
                                                     <th>
                                                         <LinkContainer to={getUrl('opt_type')}>
@@ -409,7 +409,7 @@ const ConsentPerformanceReport = () => {
                                                     <tr key={index}>
                                                         <td>{row.name}</td>
                                                         <td>{row.email}</td>
-                                                        <td>{row.title}</td>
+                                                        {/* <td>{row.title}</td> */}
                                                         <td>{titleCase(row.opt_type)}</td>
                                                         <td>{titleCase(row.legal_basis)}</td>
                                                         <td>{row.preference}</td>
