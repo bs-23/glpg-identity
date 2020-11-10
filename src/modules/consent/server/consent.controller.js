@@ -495,7 +495,11 @@ async function getCdpConsents(req, res) {
 
         const consents = await Consent.findAll({
             include: inclusions,
-            attributes: { exclude: ['category_id', 'created_by', 'updated_by'] }
+            attributes: {
+                exclude: ['category_id', 'created_by', 'updated_by']
+
+            },
+            order: [['preference', 'ASC']]
         });
 
         const data = consents.map(c => {
