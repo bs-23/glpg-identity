@@ -204,7 +204,7 @@ const ConsentForm = (props) => {
                     </div>
                 </div>
                 <div className="container">
-                    {categories && userCountries && countryLanguages && categories.length > 0 && userCountries.length > 0 && countryLanguages.length > 0 &&
+                    {categories && userCountries && countryLanguages && categories.length > 0 && userCountries.length > 0 && countryLanguages.length > 0 && ((consentId && Object.keys(consent).length) || (!consentId)) &&
                         <div className="row">
                             <div className="col-12">
                                 <div className="shadow-sm bg-white mb-3">
@@ -214,13 +214,13 @@ const ConsentForm = (props) => {
                                     <div className="add-user p-3">
                                         <Formik
                                             initialValues={{
-                                                category_id: consentId && consent && consent.consent_category
+                                                category_id: consentId && Object.keys(consent).length && consent.consent_category
                                                     ? consent.consent_category.id
                                                     : '',
-                                                legal_basis: consentId && consent ? consent.legal_basis : '',
-                                                preference: consentId && consent ? consent.preference : '',
-                                                translations: consentId && consent ? consent.translations : [],
-                                                is_active: consentId && consent ? consent.is_active : isActive
+                                                legal_basis: consentId && Object.keys(consent).length ? consent.legal_basis : '',
+                                                preference: consentId && Object.keys(consent).length ? consent.preference : '',
+                                                translations: consentId && Object.keys(consent).length ? consent.translations : [],
+                                                is_active: consentId && Object.keys(consent).length ? consent.is_active : isActive
                                             }}
                                             displayName="ConsentForm"
                                             validationSchema={consentSchema}
