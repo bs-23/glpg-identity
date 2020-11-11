@@ -709,7 +709,47 @@ async function getHcpProfile(req, res) {
             return res.status(404).send(response);
         }
 
-        response.data = getHcpViewModel(doc.dataValues);
+        response.data = getHcpViewModel(doc.dataValues);;
+
+        const userConsents = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id', 'response', 'consent_confirmed', 'updated_at'] });
+
+        if (!userConsents) {
+            response.data = { ...response.data, consents: [] };
+            return res.json(response);
+        }
+
+        const userConsentDetails = await ConsentLocale.findAll({
+            include: {
+                model: Consent,
+                as: 'consent'
+            }, where: {
+                consent_id: userConsents.map(consent => consent.consent_id),
+                locale: {
+                    [Op.iLike]: `%${doc.locale}`
+                }
+            }, attributes: ['consent_id', 'rich_text']
+        });
+
+        const consentCountries = await ConsentCountry.findAll({ where: { consent_id: userConsents.map(consent => consent.consent_id), country_iso2: { [Op.or]: [doc.country_iso2.toUpperCase(), doc.country_iso2.toLowerCase()] } } });
+
+        const consentResponse = userConsentDetails.map(({
+            consent_id: id,
+            rich_text,
+            consent: { preference }
+        }) => ({ id, preference, rich_text: validator.unescape(rich_text) }));
+
+        response.data = {
+            ...response.data,
+            consents: consentResponse.map(conRes => {
+                const matchedConsent = userConsents.find(consent => consent.consent_id === conRes.id);
+                const matchedConsentCountries = consentCountries.find(c => c.consent_id === conRes.id);
+                conRes.consent_given_time = matchedConsent ? matchedConsent.updated_at : null;
+                conRes.opt_type = matchedConsentCountries ? matchedConsentCountries.opt_type : null;
+                conRes.consent_given = matchedConsent ? matchedConsent.consent_confirmed && matchedConsent.response ? true : false : null;
+                return conRes;
+            })
+        };
+
         res.json(response);
     } catch (err) {
         console.error(err);
