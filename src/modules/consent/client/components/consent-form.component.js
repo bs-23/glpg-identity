@@ -160,6 +160,7 @@ const ConsentForm = (props) => {
                                 <div className="border rounded draft-editor">
                                     <DraftEditor htmlContent={item.rich_text} onChangeHTML={(html) => {
                                         if (item.rich_text.length > 976) setShowError(true);
+                                        else setShowError(false);
                                         handleChange({
                                             target: {
                                                 value: html,
