@@ -29,16 +29,16 @@ const User = sequelize.cdpConnector.define('users', {
     },
     first_name: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING(50)
     },
     last_name: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING(50)
     },
     email: {
         unique: true,
         allowNull: false,
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(100),
         validate: {
             isEmail: true
         }
@@ -50,7 +50,7 @@ const User = sequelize.cdpConnector.define('users', {
         }
     },
     phone: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING(20)
     },
     type: {
         type: DataTypes.ENUM,

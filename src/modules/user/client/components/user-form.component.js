@@ -7,7 +7,6 @@ import { createUser } from "../user.actions";
 import { registerSchema } from "../user.schema";
 import { useToasts } from "react-toast-notifications";
 import Dropdown from 'react-bootstrap/Dropdown';
-// const countryCodes = require('country-codes-list');
 import CountryCodes from 'country-codes-list';
 
 export default function UserForm() {
