@@ -220,6 +220,8 @@ async function init() {
                     journey_redirect_path: '',
                     login_link: '',
                     logo_link: '',
+                    auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6c',
+                    approve_user_path: '',
                     created_by: admin.id,
                     updated_by: admin.id
                 },
