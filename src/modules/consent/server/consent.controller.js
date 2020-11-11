@@ -495,7 +495,11 @@ async function getCdpConsents(req, res) {
 
         const consents = await Consent.findAll({
             include: inclusions,
-            attributes: { exclude: ['category_id', 'created_by', 'updated_by'] }
+            attributes: {
+                exclude: ['category_id', 'created_by', 'updated_by']
+
+            },
+            order: [['preference', 'ASC']]
         });
 
         const data = consents.map(c => {
@@ -875,8 +879,9 @@ async function getConsentCategories(req, res) {
             include: [{
                 model: User,
                 as: 'createdByUser',
-                attributes: ['first_name', 'last_name']
-            }]
+                attributes: ['first_name', 'last_name'],
+            }],
+            order: [['title', 'ASC']]
         });
 
         const data = categories.map(c => {
