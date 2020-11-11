@@ -9,6 +9,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { Form, Formik, Field, ErrorMessage } from "formik";
 import { useToasts } from 'react-toast-notifications';
 import axios from 'axios';
+import { getAllCountries } from '../../../core/client/country/country.actions';
 
 import _ from 'lodash';
 import parse from 'html-react-parser';
@@ -16,8 +17,6 @@ import { getVeevaConsentReport } from '../consent.actions';
 
 const ConsentPerformanceReport = () => {
     const dispatch = useDispatch();
-    const [countries, setCountries] = useState([]);
-    const [allCountries, setAllCountries] = useState([]);
     const [allProcessActivities, setAllProcessActivities] = useState([]);
     const [allOptTypes, setAllOptTypes] = useState([]);
     const [show, setShow] = useState({ profileManage: false, updateStatus: false });
@@ -25,6 +24,8 @@ const ConsentPerformanceReport = () => {
     const [currentUser, setCurrentUser] = useState({});
 
     const consents_report = useSelector(state => state.consentReducer.veeva_consents);
+    const countries = useSelector(state => state.countryReducer.countries);
+    const allCountries = useSelector(state => state.countryReducer.allCountries);
 
     const pageLeft = () => {
         if (consents_report.page > 1) dispatch(getVeevaConsentReport(consents_report.page - 1, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, consents_report.orderBy, consents_report.orderType));
@@ -33,16 +34,6 @@ const ConsentPerformanceReport = () => {
     const pageRight = () => {
         if (consents_report.end !== consents_report.total) dispatch(getVeevaConsentReport(consents_report.page + 1, consents_report.codbase, consents_report.process_activity, consents_report.opt_type, consents_report.orderBy, consents_report.orderType));
     };
-
-    async function getCountries() {
-        const response = await axios.get('/api/countries');
-        setCountries(response.data);
-    }
-
-    async function getAllCountries() {
-        const response = await axios.get('/api/all_countries');
-        setAllCountries(response.data);
-    }
 
     async function getAllProcessActivities() {
         const response = await axios.get('/api/get-all-process-activities');
@@ -124,8 +115,7 @@ const ConsentPerformanceReport = () => {
 
 
     useEffect(() => {
-        getCountries();
-        getAllCountries();
+        dispatch(getAllCountries());
         getAllProcessActivities();
         getAllOptTypes();
         loadConsentsReport();

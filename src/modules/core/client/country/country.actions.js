@@ -18,3 +18,20 @@ export function getCountries() {
         })
     };
 }
+
+export function getAllCountries() {
+    let { allCountries: countries } = store.getState().countryReducer;
+    if (countries && countries.length) {
+        return {
+            type: Types.GET_ALL_COUNTRIES_FULFILLED,
+            payload: { data: countries }
+        };
+    }
+    return {
+        type: Types.GET_ALL_COUNTRIES,
+        payload: axios({
+            method: 'get',
+            url: '/api/all_countries',
+        })
+    };
+}

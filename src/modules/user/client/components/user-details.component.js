@@ -1,14 +1,15 @@
 import axios from "axios";
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Form, Formik, Field } from "formik";
 import { useToasts } from "react-toast-notifications";
 import { NavLink } from 'react-router-dom';
 
 const UserDetails = (props) => {
     const [userInfo, setUserInfo] = useState({});
-    const [countries, setCountries] = useState([]);
     const { addToast } = useToasts();
-    const nullValueToken = '--'
+    const nullValueToken = '--';
+    const countries = useSelector(state => state.countryReducer.countries);
 
     useEffect(() => {
         const { id } = props.match.params;
@@ -18,13 +19,7 @@ const UserDetails = (props) => {
             setUserInfo(response.data);
         }
 
-        async function getCountries() {
-            const response = await axios.get('/api/countries');
-            setCountries(response.data);
-        }
-
         getInfo();
-        getCountries();
     }, [props]);
 
     return (

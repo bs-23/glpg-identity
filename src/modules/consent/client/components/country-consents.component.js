@@ -11,7 +11,6 @@ import { getCountryConsents, deleteCountryConsent, getCdpConsents } from '../con
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Popover from 'react-bootstrap/Popover';
 import parse from 'html-react-parser';
-import { getCountries } from '../../../core/client/country/country.actions';
 
 const CountryConsents = () => {
     const dispatch = useDispatch();
@@ -97,7 +96,6 @@ const CountryConsents = () => {
     }
 
     useEffect(() => {
-        dispatch(getCountries());
         dispatch(getCdpConsents(null, null));
         dispatch(getCountryConsents());
     }, []);

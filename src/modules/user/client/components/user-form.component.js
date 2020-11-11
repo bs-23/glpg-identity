@@ -8,7 +8,6 @@ import { registerSchema } from "../user.schema";
 import { useToasts } from "react-toast-notifications";
 import Dropdown from 'react-bootstrap/Dropdown';
 import CountryCodes from 'country-codes-list';
-import { getCountries } from '../../../core/client/country/country.actions';
 
 export default function UserForm() {
     const dispatch = useDispatch();
@@ -34,11 +33,12 @@ export default function UserForm() {
             const response = await axios.get('/api/applications');
             setApplications(response.data);
         }
+
         async function getRoles() {
             const response = await axios.get('/api/roles');
             setRoles(response.data);
         }
-        dispatch(getCountries());
+
         getAppplications();
         getRoles();
     }, []);

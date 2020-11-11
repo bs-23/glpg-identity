@@ -15,7 +15,7 @@ import _ from 'lodash';
 import { getHcpProfiles } from '../hcp.actions';
 import { ApprovalRejectSchema } from '../hcp.schema';
 import uuidAuthorities from '../uuid-authorities.json';
-import { getCountries } from '../../../core/client/country/country.actions';
+import { getAllCountries } from '../../../core/client/country/country.actions';
 
 
 export default function hcpUsers() {
@@ -24,7 +24,6 @@ export default function hcpUsers() {
     const history = useHistory();
     const params = new URLSearchParams(window.location.search);
 
-    const [allCountries, setAllCountries] = useState([]);
     const [show, setShow] = useState({ profileManage: false, updateStatus: false });
     const [currentUser, setCurrentUser] = useState({});
     const { addToast } = useToasts();
@@ -32,6 +31,7 @@ export default function hcpUsers() {
 
     const hcps = useSelector(state => state.hcpReducer.hcps);
     const countries = useSelector(state => state.countryReducer.countries);
+    const allCountries = useSelector(state => state.countryReducer.allCountries);
 
     const pageLeft = () => {
         if (hcps.page > 1) urlChange(hcps.page - 1, hcps.codbase, hcps.status, params.get('orderBy'), true);
@@ -40,11 +40,6 @@ export default function hcpUsers() {
     const pageRight = () => {
         if (hcps.end !== hcps.total) urlChange(hcps.page + 1, hcps.codbase, hcps.status, params.get('orderBy'), true);
     };
-
-    async function getAllCountries() {
-        const response = await axios.get('/api/all_countries');
-        setAllCountries(response.data);
-    }
 
     const onUpdateStatus = (user) => {
         setCurrentUser(user);
@@ -136,8 +131,7 @@ export default function hcpUsers() {
     }
 
     useEffect(() => {
-        dispatch(getCountries());
-        getAllCountries();
+        dispatch(getAllCountries());
     }, []);
 
     useEffect(() => {

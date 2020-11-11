@@ -1,10 +1,8 @@
-import axios from 'axios';
 import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import Dropdown from 'react-bootstrap/Dropdown';
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { getUsers } from '../user.actions';
-import { getCountries } from '../../../core/client/country/country.actions';
 
 export default function Users() {
     const dispatch = useDispatch();
@@ -25,7 +23,7 @@ export default function Users() {
         let countryArr = [];
         let countryString = "";
         if (countries.length > 0 && (user_countries.length)) {
-            (user_countries).map((country, key) => (
+            (user_countries).map((country) => (
                 countryArr.push(countries.find(i => i.country_iso2 === country)).codbase_desc)
             );
         }
@@ -38,10 +36,6 @@ export default function Users() {
 
         return countryString;
     }
-
-    useEffect(() => {
-        dispatch(getCountries());
-    }, []);
 
     useEffect(() => {
         (loggedInUser.type === "admin")
