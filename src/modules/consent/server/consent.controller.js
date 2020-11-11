@@ -879,8 +879,9 @@ async function getConsentCategories(req, res) {
             include: [{
                 model: User,
                 as: 'createdByUser',
-                attributes: ['first_name', 'last_name']
-            }]
+                attributes: ['first_name', 'last_name'],
+            }],
+            order: [['title', 'ASC']]
         });
 
         const data = categories.map(c => {
