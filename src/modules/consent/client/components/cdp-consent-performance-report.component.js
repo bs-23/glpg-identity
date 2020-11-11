@@ -170,18 +170,18 @@ const CdpConsentPerformanceReport = () => {
                                             </Dropdown>
                                         }
 
-                                        {/*<Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-btn-primary text-white dropdown shadow-sm">
+                                        <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-btn-primary text-white dropdown shadow-sm">
                                             Opt-In Type
                                             <Dropdown.Toggle variant="" className="ml-2 bg-white rounded-0">
                                             {consents_report.opt_type && (allOptTypes.includes(consents_report.opt_type)) ? consents_report.opt_type : 'All'}
                                             </Dropdown.Toggle>
                                             <Dropdown.Menu>
-                                                <LinkContainer to={`consent-performance-report${makeUrl( [{name: 'codbase', value: consents_report.codbase }, { name: 'orderBy', value: consents_report.orderBy}, { name: 'orderType', value: consents_report.orderType }] )}`}>
+                                                <LinkContainer to={`/consent/consent-performance-report/cdp${makeUrl( [{name: 'codbase', value: consents_report.codbase }, { name: 'orderBy', value: consents_report.orderBy}, { name: 'orderType', value: consents_report.orderType }] )}`}>
                                                     <Dropdown.Item className={consents_report.opt_type === '' ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('', consents_report.codbase, ''))}>All</Dropdown.Item>
                                                 </LinkContainer>
                                                 {
                                                     allOptTypes.map((item, index) => (
-                                                        <LinkContainer key={index} to={`consent-performance-report${makeUrl( [{ name: 'codbase', value: consents_report.codbase } { name: 'opt_type', value: item }, { name: 'orderBy', value: consents_report.orderBy}, { name: 'orderType', value: consents_report.orderType }] )}`}>
+                                                        <LinkContainer key={index} to={`/consent/consent-performance-report/cdp${makeUrl( [{ name: 'codbase', value: consents_report.codbase }, { name: 'opt_type', value: item }, { name: 'orderBy', value: consents_report.orderBy}, { name: 'orderType', value: consents_report.orderType }] )}`}>
                                                             <Dropdown.Item className={consents_report.opt_type === item ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('',  consents_report.codbase, item, consents_report.orderBy, consents_report.orderType))}>
                                                                 {
                                                                     item === consents_report.opt_type ? null : titleCase(item)
@@ -191,7 +191,7 @@ const CdpConsentPerformanceReport = () => {
                                                     ))
                                                 }
                                             </Dropdown.Menu>
-                                        </Dropdown> */}
+                                        </Dropdown>
                                     </React.Fragment>
                                 </div>
                             </div>
