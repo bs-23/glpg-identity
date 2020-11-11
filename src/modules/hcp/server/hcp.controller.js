@@ -65,35 +65,25 @@ function mapMasterDataToHcpProfile(masterData) {
     return model;
 }
 
-async function notifyHcpUserApproval(hcpUser, userApplication) {
-    try {
-        const secret = userApplication.auth_secret;
-        const token = jwt.sign({
-            id: hcpUser.id
-        }, secret, {
-            expiresIn: '1h'
-        });
+async function notifyHcpUserApproval(hcpUser) {
+    const userApplication = await Application.findOne({ where: { id: hcpUser.application_id } });
+    const token = jwt.sign({
+        id: hcpUser.id
+    }, userApplication.auth_secret, {
+        expiresIn: '1h'
+    });
 
-        const payload = hcpUser.status === 'consent_pending'
-            ? { consent_confirmation_token: generateConsentConfirmationAccessToken(hcpUser) }
-            : { password_setup_token: hcpUser.reset_password_token };
+    const payload = hcpUser.status === 'consent_pending'
+        ? { consent_confirmation_token: generateConsentConfirmationAccessToken(hcpUser) }
+        : { password_setup_token: hcpUser.reset_password_token };
 
-        payload.jwt_token = token;
+    payload.jwt_token = token;
 
-        const response = await axios.post(
-            `${hcpUser.origin_url}${userApplication.approve_user_path}`,
-            payload,
-            {
-                headers: {
-                    jwt_token: token
-                }
-            }
-        );
-        return response.status === 200;
-    } catch (error) {
-        console.error(error);
-        return false;
-    }
+    await axios.post(`${hcpUser.origin_url}${userApplication.approve_user_path}`, payload, {
+        headers: {
+            jwt_token: token
+        }
+    });
 }
 
 async function addPasswordResetTokenToUser(user) {
@@ -111,7 +101,7 @@ async function getHcps(req, res) {
     const response = new Response({}, []);
 
     try {
-        const page = req.query.page ? parseInt(req.query.page) - 1 : 0;
+        const page = req.query.page ? +req.query.page - 1 : 0;
         const limit = 15;
         let status = req.query.status === undefined ? null : req.query.status;
         if (status && status.indexOf(',') !== -1) status = status.split(',');
@@ -355,7 +345,7 @@ async function registrationLookup(req, res) {
 
 async function createHcpProfile(req, res) {
     const response = new Response({}, []);
-    const { email, uuid, salutation, first_name, last_name, country_iso2, language_code, specialty_onekey, telephone, locale, birthdate, origin_url } = req.body;
+    const { email, uuid, salutation, first_name, last_name, country_iso2, language_code, specialty_onekey, telephone, birthdate, origin_url } = req.body;
 
     if (!email || !validator.isEmail(email)) {
         response.errors.push(new CustomError('Email address is missing or invalid.', 400, 'email'));
@@ -528,7 +518,7 @@ async function createHcpProfile(req, res) {
         response.data = getHcpViewModel(hcpUser.dataValues);
 
         if (hcpUser.dataValues.status === 'consent_pending') {
-            response.data.consent_confirmation_token = generateConsentConfirmationAccessToken(hcpUser)
+            response.data.consent_confirmation_token = generateConsentConfirmationAccessToken(hcpUser);
         }
 
         if (hcpUser.dataValues.status === 'self_verified') {
@@ -599,15 +589,15 @@ async function approveHCPUser(req, res) {
 
         if (!hcpUser) {
             response.errors.push(new CustomError('User does not exist.', 404));
-            return res.status(404).send(response);
         }
 
         if (hcpUser.dataValues.status !== 'not_verified') {
             response.errors.push(new CustomError('Invalid user status for this request.', 400));
-            return res.status(400).send(response);
         }
 
-        const userApplication = await Application.findOne({ where: { id: hcpUser.application_id } });
+        if (response.errors.length) {
+            return res.status(400).send(response);
+        }
 
         let userConsents = await HcpConsents.findAll({ where: { [Op.and]: [{ user_id: id }, { consent_confirmed: false }] } });
 
@@ -636,14 +626,15 @@ async function approveHCPUser(req, res) {
             await addPasswordResetTokenToUser(hcpUser);
         }
 
-        const approveSuceeded = await notifyHcpUserApproval(hcpUser, userApplication);
-
-        if (!approveSuceeded) {
+        try {
+            await notifyHcpUserApproval(hcpUser);
+        } catch(e) {
             await hcpUser.update({
                 status: 'not_verified',
                 reset_password_token: null,
                 reset_password_expires: null
             });
+            console.error(e);
             response.errors.push(new CustomError('Failed to approve user.', 400));
             return res.status(400).send(response);
         }
