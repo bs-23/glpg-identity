@@ -50,6 +50,13 @@ const CheckList = ({ name, options, labelExtractor, idExtractor, allOptionID }) 
         }
     }
 
+    const allOptionsObject = options.find(op => idExtractor(op) === allOptionID);
+
+    if(allOptionsObject){
+        options = options.filter(op => idExtractor(op) !== allOptionID);
+        options.unshift(allOptionsObject);
+    }
+
     return <FieldArray
                 name={name}
                 render={arrayHelpers => (
@@ -99,6 +106,13 @@ const ToggleList = ({ name, options, labelExtractor, idExtractor, allOptionID })
                 arrayHelpers.form.setFieldValue(name, filteredOptionIds);
             }
         }
+    }
+
+    const allOptionsObject = options.find(op => idExtractor(op) === allOptionID);
+
+    if(allOptionsObject){
+        options = options.filter(op => idExtractor(op) !== allOptionID);
+        options.unshift(allOptionsObject);
     }
 
     return <FieldArray
