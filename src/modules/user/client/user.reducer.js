@@ -3,8 +3,7 @@ import Types from './user.types';
 const initialState = {
     loggedInUser: null,
     users: {},
-    roles: [],
-    countries: []
+    roles: []
 };
 
 function sortItems(items, propertyName, type) {

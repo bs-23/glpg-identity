@@ -71,7 +71,7 @@ export default function App() {
 
     useEffect(() => {
         dispatch(getSignedInUserProfile()).then(() => {
-            dispatch(getCountries('APP'));
+            dispatch(getCountries());
         }).catch(err => {
             if (err.response && err.response.status === 401) removeCookie('logged_in', { path: '/' });
         });

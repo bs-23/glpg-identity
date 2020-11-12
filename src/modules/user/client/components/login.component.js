@@ -8,6 +8,7 @@ import { Form, Formik, Field, ErrorMessage } from 'formik';
 
 import { login } from '../user.actions';
 import { loginSchema } from '../user.schema';
+import { getCountries } from '../../../core/client/country/country.actions';
 
 export default function Login() {
     const dispatch = useDispatch();
@@ -41,6 +42,7 @@ export default function Login() {
                                             recaptchaToken: '1234'// values.recaptchaToken
                                         }))
                                         .then( response => {
+                                            dispatch(getCountries());
                                             setCookie('logged_in', true, { path: '/' });
                                         })
                                         .catch(error => {
