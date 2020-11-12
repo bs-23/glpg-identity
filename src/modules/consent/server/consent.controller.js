@@ -165,7 +165,7 @@ async function getConsentsReport(req, res) {
             consent_confirmed: true,
             '$hcp_profile.application_id$': req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
             '$hcp_profile.country_iso2$': codbase ? { [Op.any]: [countries_ignorecase_for_codbase] } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : countries_ignorecase_for_user_countries_codbase,
-            '$consent.consent_country.country_iso2$': { [Op.eq]: Sequelize.col('hcp_profile.country_iso2') },
+            '$consent.consent_country.country_iso2$': { [Op.or]: [ Sequelize.fn('LOWER', Sequelize.col('hcp_profile.country_iso2')), Sequelize.fn('UPPER', Sequelize.col('hcp_profile.country_iso2')) ] },
             '$consent.consent_country.opt_type$': opt_type ? { [Op.eq]: opt_type } : { [Op.or]: opt_types }
         };
 
