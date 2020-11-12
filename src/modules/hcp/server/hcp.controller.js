@@ -66,35 +66,25 @@ function mapMasterDataToHcpProfile(masterData) {
     return model;
 }
 
-async function notifyHcpUserApproval(hcpUser, userApplication) {
-    try {
-        const secret = userApplication.auth_secret;
-        const token = jwt.sign({
-            id: hcpUser.id
-        }, secret, {
-            expiresIn: '1h'
-        });
+async function notifyHcpUserApproval(hcpUser) {
+    const userApplication = await Application.findOne({ where: { id: hcpUser.application_id } });
+    const token = jwt.sign({
+        id: hcpUser.id
+    }, userApplication.auth_secret, {
+        expiresIn: '1h'
+    });
 
-        const payload = hcpUser.status === 'consent_pending'
-            ? { consent_confirmation_token: generateConsentConfirmationAccessToken(hcpUser) }
-            : { password_setup_token: hcpUser.reset_password_token };
+    const payload = hcpUser.status === 'consent_pending'
+        ? { consent_confirmation_token: generateConsentConfirmationAccessToken(hcpUser) }
+        : { password_setup_token: hcpUser.reset_password_token };
 
-        payload.jwt_token = token;
+    payload.jwt_token = token;
 
-        const response = await axios.post(
-            `${hcpUser.origin_url}${userApplication.approve_user_path}`,
-            payload,
-            {
-                headers: {
-                    jwt_token: token
-                }
-            }
-        );
-        return response.status === 200;
-    } catch (error) {
-        console.error(error);
-        return false;
-    }
+    await axios.post(`${hcpUser.origin_url}${userApplication.approve_user_path}`, payload, {
+        headers: {
+            jwt_token: token
+        }
+    });
 }
 
 async function addPasswordResetTokenToUser(user) {
@@ -112,7 +102,7 @@ async function getHcps(req, res) {
     const response = new Response({}, []);
 
     try {
-        const page = req.query.page ? parseInt(req.query.page) - 1 : 0;
+        const page = req.query.page ? +req.query.page - 1 : 0;
         const limit = 15;
         let status = req.query.status === undefined ? null : req.query.status;
         if (status && status.indexOf(',') !== -1) status = status.split(',');
@@ -372,7 +362,7 @@ async function registrationLookup(req, res) {
 
 async function createHcpProfile(req, res) {
     const response = new Response({}, []);
-    const { email, uuid, salutation, first_name, last_name, country_iso2, language_code, specialty_onekey, telephone, locale, birthdate, origin_url } = req.body;
+    const { email, uuid, salutation, first_name, last_name, country_iso2, language_code, specialty_onekey, telephone, birthdate, origin_url } = req.body;
 
     if (!email || !validator.isEmail(email)) {
         response.errors.push(new CustomError('Email address is missing or invalid.', 400, 'email'));
@@ -509,7 +499,9 @@ async function createHcpProfile(req, res) {
 
                 const consentCountry = await ConsentCountry.findOne({
                     where: {
-                        country_iso2: model.country_iso2.toLowerCase(),
+                        country_iso2: {
+                            [Op.iLike]:model.country_iso2
+                        },
                         consent_id: consentDetails.id
                     }
                 });
@@ -543,7 +535,7 @@ async function createHcpProfile(req, res) {
         response.data = getHcpViewModel(hcpUser.dataValues);
 
         if (hcpUser.dataValues.status === 'consent_pending') {
-            response.data.consent_confirmation_token = generateConsentConfirmationAccessToken(hcpUser)
+            response.data.consent_confirmation_token = generateConsentConfirmationAccessToken(hcpUser);
         }
 
         if (hcpUser.dataValues.status === 'self_verified') {
@@ -614,15 +606,15 @@ async function approveHCPUser(req, res) {
 
         if (!hcpUser) {
             response.errors.push(new CustomError('User does not exist.', 404));
-            return res.status(404).send(response);
         }
 
         if (hcpUser.dataValues.status !== 'not_verified') {
             response.errors.push(new CustomError('Invalid user status for this request.', 400));
-            return res.status(400).send(response);
         }
 
-        const userApplication = await Application.findOne({ where: { id: hcpUser.application_id } });
+        if (response.errors.length) {
+            return res.status(400).send(response);
+        }
 
         let userConsents = await HcpConsents.findAll({ where: { [Op.and]: [{ user_id: id }, { consent_confirmed: false }] } });
 
@@ -633,7 +625,9 @@ async function approveHCPUser(req, res) {
             const allConsentDetails = await ConsentLocale.findAll({
                 where: {
                     consent_id: consentIds,
-                    locale: hcpUser.locale.toLowerCase()
+                    locale: {
+                        [Op.iLike] : hcpUser.locale
+                    }
                 }
             });
 
@@ -649,14 +643,15 @@ async function approveHCPUser(req, res) {
             await addPasswordResetTokenToUser(hcpUser);
         }
 
-        const approveSuceeded = await notifyHcpUserApproval(hcpUser, userApplication);
-
-        if (!approveSuceeded) {
+        try {
+            await notifyHcpUserApproval(hcpUser);
+        } catch(e) {
             await hcpUser.update({
                 status: 'not_verified',
                 reset_password_token: null,
                 reset_password_expires: null
             });
+            console.error(e);
             response.errors.push(new CustomError('Failed to approve user.', 400));
             return res.status(400).send(response);
         }
@@ -731,7 +726,47 @@ async function getHcpProfile(req, res) {
             return res.status(404).send(response);
         }
 
-        response.data = getHcpViewModel(doc.dataValues);
+        response.data = getHcpViewModel(doc.dataValues);;
+
+        const userConsents = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id', 'response', 'consent_confirmed', 'updated_at'] });
+
+        if (!userConsents) {
+            response.data = { ...response.data, consents: [] };
+            return res.json(response);
+        }
+
+        const userConsentDetails = await ConsentLocale.findAll({
+            include: {
+                model: Consent,
+                as: 'consent'
+            }, where: {
+                consent_id: userConsents.map(consent => consent.consent_id),
+                locale: {
+                    [Op.iLike]: `%${doc.locale}`
+                }
+            }, attributes: ['consent_id', 'rich_text']
+        });
+
+        const consentCountries = await ConsentCountry.findAll({ where: { consent_id: userConsents.map(consent => consent.consent_id), country_iso2: { [Op.or]: [doc.country_iso2.toUpperCase(), doc.country_iso2.toLowerCase()] } } });
+
+        const consentResponse = userConsentDetails.map(({
+            consent_id: id,
+            rich_text,
+            consent: { preference }
+        }) => ({ id, preference, rich_text: validator.unescape(rich_text) }));
+
+        response.data = {
+            ...response.data,
+            consents: consentResponse.map(conRes => {
+                const matchedConsent = userConsents.find(consent => consent.consent_id === conRes.id);
+                const matchedConsentCountries = consentCountries.find(c => c.consent_id === conRes.id);
+                conRes.consent_given_time = matchedConsent ? matchedConsent.updated_at : null;
+                conRes.opt_type = matchedConsentCountries ? matchedConsentCountries.opt_type : null;
+                conRes.consent_given = matchedConsent ? matchedConsent.consent_confirmed && matchedConsent.response ? true : false : null;
+                return conRes;
+            })
+        };
+
         res.json(response);
     } catch (err) {
         console.error(err);

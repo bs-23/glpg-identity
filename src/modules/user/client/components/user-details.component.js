@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useToasts } from "react-toast-notifications";
 import { NavLink } from 'react-router-dom';
 import { Form, Formik, Field, ErrorMessage } from "formik";
@@ -53,12 +54,12 @@ const WarningMessage = ({ message }) => <div className="alert alert-warning">
 
 const UserDetails = (props) => {
     const [userInfo, setUserInfo] = useState({});
-    const [countries, setCountries] = useState([]);
     const [modalShow, setModalShow] = useState({ permissionSetDetails: false });
     const [permissionSetDetailID, setPermissionSetDetailID] = useState(null);
     const [roles, setRoles] = useState([]);
     const [notAllowed, setNotAllowed] = useState(false);
     const { addToast } = useToasts();
+    const countries = useSelector(state => state.countryReducer.countries);
 
     const nullValueToken = '--';
 
@@ -107,11 +108,6 @@ const UserDetails = (props) => {
     };
 
     useEffect(() => {
-        async function getCountries() {
-            const response = await axios.get('/api/countries');
-            setCountries(response.data);
-        }
-
         async function getRoles() {
             const response = await axios.get('/api/roles');
             setRoles(response.data);
@@ -119,7 +115,6 @@ const UserDetails = (props) => {
 
         getRoles();
         getUserInfo();
-        getCountries();
     }, []);
 
     return (

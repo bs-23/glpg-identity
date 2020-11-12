@@ -12,7 +12,7 @@ export default function ManagePermissionSets() {
     const [permissionSets, setPermissionSets] = useState([]);
     const [permissionModalShow, setPermissionModalShow] = useState(false);
     const [permissionSetEditID, setPermissionSetEditID] = useState(null);
-    const countries = useSelector(state => state.userReducer.countries);
+    const countries = useSelector(state => state.countryReducer.countries);
     const match = useRouteMatch();
     const history = useHistory();
     const location = useLocation();

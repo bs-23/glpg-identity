@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { NavLink, useHistory } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { Form, Formik, Field, ErrorMessage } from "formik";
-import { createUser, getCountries } from "../user.actions";
+import { createUser } from "../user.actions";
 import { registerSchema } from "../user.schema";
 import { useToasts } from "react-toast-notifications";
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -14,11 +14,11 @@ export default function UserForm() {
     const [selectedCountryCode, setSelectedCountryCode] = useState(0);
     const [profiles, setProfiles] = useState([]);
     const [roles, setRoles] = useState([]);
-    const CountryCodesObject = CountryCodes.customList('countryCode', '+{countryCallingCode}')
-    const countries = useSelector(state => state.userReducer.countries);
     const history = useHistory();
     const { addToast } = useToasts();
 
+    const CountryCodesObject = CountryCodes.customList('countryCode', '+{countryCallingCode}')
+    const countries = useSelector(state => state.countryReducer.countries);
 
     const generateCountryIconPath = (country) => {
         if(country) return `/assets/flag/flag-${country.toLowerCase().replace(/ /g, "-")}.svg`;
@@ -35,8 +35,6 @@ export default function UserForm() {
             setRoles(response.data);
 
         }
-
-        dispatch(getCountries());
         getProfile();
         getRole();
     }, []);

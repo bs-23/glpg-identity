@@ -4,7 +4,7 @@ import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
 import { useSelector, useDispatch } from "react-redux";
 import { useToasts } from "react-toast-notifications";
 import { permissionSetCreateSchema } from "../user.schema";
-import { getCountries } from "../user.actions";
+// import { getCountries } from "../user.actions";
 
 
 const FormField = ({ label, name, type, children, required=true, ...rest }) => <div className="col-12 col-sm-6">
@@ -128,9 +128,9 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
     const [applications, setApplications] = useState([]);
     const [serviceCategories, setServiceCategories] = useState([]);
     const [permissionSet, setPermissionSet] = useState(null);
-    const countries = useSelector(state => state.userReducer.countries);
+    const countries = useSelector(state => state.countryReducer.countries);
     const { addToast } = useToasts();
-    const dispatch = useDispatch();
+    // const dispatch = useDispatch();
 
     const initializeServiceCategoryValues = () => {
         if(permissionSet && permissionSet.serviceCategories){
@@ -218,7 +218,7 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
     useEffect(() => {
         if(permissionSetId) getPermissionSet();
         getApplications();
-        dispatch(getCountries());
+        // dispatch(getCountries());
         getServiceCategories();
     }, []);
 

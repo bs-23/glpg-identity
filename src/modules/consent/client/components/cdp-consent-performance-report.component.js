@@ -7,6 +7,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { LinkContainer } from 'react-router-bootstrap';
 import axios from 'axios';
+import { getAllCountries } from '../../../core/client/country/country.actions';
 
 import _ from 'lodash';
 import parse from 'html-react-parser';
@@ -14,14 +15,14 @@ import { getConsentReport } from '../consent.actions';
 
 const CdpConsentPerformanceReport = () => {
     const dispatch = useDispatch();
-    const [countries, setCountries] = useState([]);
-    const [allCountries, setAllCountries] = useState([]);
     const [allOptTypes, setAllOptTypes] = useState([]);
     const [show, setShow] = useState({ profileManage: false, updateStatus: false });
     const [currentAction, setCurrentAction] = useState({ userId: null, action: null });
     const [currentUser, setCurrentUser] = useState({});
 
     const consents_report = useSelector(state => state.consentReducer.consents);
+    const countries = useSelector(state => state.countryReducer.countries);
+    const allCountries = useSelector(state => state.countryReducer.allCountries);
 
     const pageLeft = () => {
         if (consents_report.page > 1) dispatch(getConsentReport(consents_report.page - 1, consents_report.codbase, consents_report.opt_type, consents_report.orderBy, consents_report.orderType));
@@ -30,16 +31,6 @@ const CdpConsentPerformanceReport = () => {
     const pageRight = () => {
         if (consents_report.end !== consents_report.total) dispatch(getConsentReport(consents_report.page + 1, consents_report.codbase, consents_report.opt_type, consents_report.orderBy, consents_report.orderType));
     };
-
-    async function getCountries() {
-        const response = await axios.get('/api/countries');
-        setCountries(response.data);
-    }
-
-    async function getAllCountries() {
-        const response = await axios.get('/api/all_countries');
-        setAllCountries(response.data);
-    }
 
     async function getAllOptTypes(){
         const response = await axios.get('/api/get-all-opt-types');
@@ -113,8 +104,7 @@ const CdpConsentPerformanceReport = () => {
     }
 
     useEffect(() => {
-        getCountries();
-        getAllCountries();
+        dispatch(getAllCountries());
         getAllOptTypes();
         loadConsentsReport();
     }, []);
@@ -180,18 +170,18 @@ const CdpConsentPerformanceReport = () => {
                                             </Dropdown>
                                         }
 
-                                        {/*<Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-btn-primary text-white dropdown shadow-sm">
+                                        <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-btn-primary text-white dropdown shadow-sm">
                                             Opt-In Type
                                             <Dropdown.Toggle variant="" className="ml-2 bg-white rounded-0">
                                             {consents_report.opt_type && (allOptTypes.includes(consents_report.opt_type)) ? consents_report.opt_type : 'All'}
                                             </Dropdown.Toggle>
                                             <Dropdown.Menu>
-                                                <LinkContainer to={`consent-performance-report${makeUrl( [{name: 'codbase', value: consents_report.codbase }, { name: 'orderBy', value: consents_report.orderBy}, { name: 'orderType', value: consents_report.orderType }] )}`}>
+                                                <LinkContainer to={`/consent/consent-performance-report/cdp${makeUrl( [{name: 'codbase', value: consents_report.codbase }, { name: 'orderBy', value: consents_report.orderBy}, { name: 'orderType', value: consents_report.orderType }] )}`}>
                                                     <Dropdown.Item className={consents_report.opt_type === '' ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('', consents_report.codbase, ''))}>All</Dropdown.Item>
                                                 </LinkContainer>
                                                 {
                                                     allOptTypes.map((item, index) => (
-                                                        <LinkContainer key={index} to={`consent-performance-report${makeUrl( [{ name: 'codbase', value: consents_report.codbase } { name: 'opt_type', value: item }, { name: 'orderBy', value: consents_report.orderBy}, { name: 'orderType', value: consents_report.orderType }] )}`}>
+                                                        <LinkContainer key={index} to={`/consent/consent-performance-report/cdp${makeUrl( [{ name: 'codbase', value: consents_report.codbase }, { name: 'opt_type', value: item }, { name: 'orderBy', value: consents_report.orderBy}, { name: 'orderType', value: consents_report.orderType }] )}`}>
                                                             <Dropdown.Item className={consents_report.opt_type === item ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('',  consents_report.codbase, item, consents_report.orderBy, consents_report.orderType))}>
                                                                 {
                                                                     item === consents_report.opt_type ? null : titleCase(item)
@@ -201,7 +191,7 @@ const CdpConsentPerformanceReport = () => {
                                                     ))
                                                 }
                                             </Dropdown.Menu>
-                                        </Dropdown> */}
+                                        </Dropdown>
                                     </React.Fragment>
                                 </div>
                             </div>

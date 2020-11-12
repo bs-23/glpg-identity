@@ -10,7 +10,7 @@ import { updateMyProfileSchema } from '../../user.schema';
 
 const UpdateMyProfile = () => {
     const myProfileInfo = useSelector(state => state.userReducer.loggedInUser);
-    const countries = useSelector(state => state.userReducer.countries);
+    const countries = useSelector(state => state.countryReducer.countries);
     const [selectedCountryCode, setSelectedCountryCode] = useState(0);
     const { addToast } = useToasts();
     const dispatch = useDispatch();

@@ -23,6 +23,7 @@ import ForgotPassword from '../../user/client/components/forgot-password.compone
 import ResetPasswordForm from '../../user/client/components/reset-password.component';
 import SwaggerLogin from '../../../config/server/lib/swagger/swagger-login.component';
 import store from './store';
+import { getCountries } from '../../core/client/country/country.actions';
 
 let refCount = 0;
 
@@ -69,8 +70,10 @@ export default function App() {
     const [, , removeCookie] = useCookies();
 
     useEffect(() => {
-        dispatch(getSignedInUserProfile()).catch(err => {
-            if(err.response && err.response.status === 401) removeCookie('logged_in', { path: '/' });
+        dispatch(getSignedInUserProfile()).then(() => {
+            dispatch(getCountries('APP'));
+        }).catch(err => {
+            if (err.response && err.response.status === 401) removeCookie('logged_in', { path: '/' });
         });
     }, []);
 

@@ -21,7 +21,7 @@ const Application = require(path.join(process.cwd(), "src/modules/application/se
 const PasswordPolicies = require(path.join(process.cwd(), "src/modules/core/server/password/password-policies.js"));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const { QueryTypes, Op, where, col, fn } = require('sequelize');
-const { getUserPermissions, getRequestingUserPermissions, getPermissionsFromPermissionSet, isRequestingUserPermitted } = require(path.join(process.cwd(), "src/modules/user/server/permission/permissions.js"));
+const { getUserPermissions, getRequestingUserPermissions, getPermissionsFromPermissionSet } = require(path.join(process.cwd(), "src/modules/user/server/permission/permissions.js"));
 
 function generateAccessToken(doc) {
     return jwt.sign({
@@ -798,12 +798,6 @@ async function getUser(req, res) {
 
 
         if (!user) return res.status(404).send("User is not found or may be removed");
-
-        const [, userCountryPermissions, ] = await getUserPermissions(user.id);
-
-        const hasPermission = userCountryPermissions.length ? await isRequestingUserPermitted(req.user, { countries: userCountryPermissions }) : true;
-
-        if(!hasPermission) return res.status(403).send('You do not have permission to view this profile.');
 
         const formattedUser = await formatProfileDetail(user);
 

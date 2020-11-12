@@ -1,20 +1,22 @@
+import React, { useEffect, useState } from "react";
+import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { NavLink, useLocation, useHistory } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { useToasts } from 'react-toast-notifications';
+import { LinkContainer } from 'react-router-bootstrap';
+import Accordion from 'react-bootstrap/Accordion';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Modal from 'react-bootstrap/Modal';
-import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
-import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from 'react-redux';
-import { LinkContainer } from 'react-router-bootstrap';
-import { Form, Formik, Field, ErrorMessage } from "formik";
-import { useToasts } from 'react-toast-notifications';
+import parse from 'html-react-parser';
+import axios from 'axios';
+import _ from 'lodash';
+
 import { getHcpProfiles } from '../hcp.actions';
 import { ApprovalRejectSchema } from '../hcp.schema';
 import uuidAuthorities from '../uuid-authorities.json';
-import axios from 'axios';
+import { getAllCountries } from '../../../core/client/country/country.actions';
 
-import _ from 'lodash';
-import parse from 'html-react-parser';
 
 export default function hcpUsers() {
     const dispatch = useDispatch();
@@ -22,14 +24,14 @@ export default function hcpUsers() {
     const history = useHistory();
     const params = new URLSearchParams(window.location.search);
 
-    const [countries, setCountries] = useState([]);
-    const [allCountries, setAllCountries] = useState([]);
     const [show, setShow] = useState({ profileManage: false, updateStatus: false });
     const [currentUser, setCurrentUser] = useState({});
     const { addToast } = useToasts();
     const [sort, setSort] = useState({ type: 'ASC', value: null });
 
     const hcps = useSelector(state => state.hcpReducer.hcps);
+    const countries = useSelector(state => state.countryReducer.countries);
+    const allCountries = useSelector(state => state.countryReducer.allCountries);
 
     const pageLeft = () => {
         if (hcps.page > 1) urlChange(hcps.page - 1, hcps.codbase, hcps.status, params.get('orderBy'), true);
@@ -38,16 +40,6 @@ export default function hcpUsers() {
     const pageRight = () => {
         if (hcps.end !== hcps.total) urlChange(hcps.page + 1, hcps.codbase, hcps.status, params.get('orderBy'), true);
     };
-
-    async function getCountries() {
-        const response = await axios.get('/api/countries');
-        setCountries(response.data);
-    }
-
-    async function getAllCountries() {
-        const response = await axios.get('/api/all_countries');
-        setAllCountries(response.data);
-    }
 
     const onUpdateStatus = (user) => {
         setCurrentUser(user);
@@ -139,8 +131,7 @@ export default function hcpUsers() {
     }
 
     useEffect(() => {
-        getCountries();
-        getAllCountries();
+        dispatch(getAllCountries());
     }, []);
 
     useEffect(() => {
@@ -310,7 +301,7 @@ export default function hcpUsers() {
                                             <div className="col accordion-consent rounded shadow-sm p-0">
                                                 <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Consents</h4>
                                                 {currentUser.consents && currentUser.consents.length ? <Accordion>{currentUser.consents.map(consent =>
-                                                    <Card key={consent.id}>
+                                                    {return consent.consent_given === true ? <Card key={consent.id}>
                                                         <Accordion.Collapse eventKey={consent.id}>
                                                             <Card.Body>
                                                                 <div>{parse(consent.rich_text)}</div>
@@ -322,7 +313,7 @@ export default function hcpUsers() {
                                                             <span className="d-flex align-items-center"><i class={`icon ${consent.consent_given ? 'icon-check-filled' : 'icon-close-circle text-danger'} cdp-text-primary mr-4 consent-check`}></i> <span className="consent-summary">{consent.preference}</span></span>
                                                             <i className="icon icon-arrow-down ml-2 accordion-consent__icon-down"></i>
                                                         </Accordion.Toggle>
-                                                    </Card>
+                                                    </Card> : null}
                                                 )}</Accordion> : <div className="m-3 alert alert-warning">The HCP has not given any consent.</div>}
                                             </div>
                                         </div>
@@ -357,8 +348,11 @@ export default function hcpUsers() {
                                             <div className="row pb-3">
                                                 <div className="col">
                                                     {currentUser.consents && currentUser.consents.length ?
-                                                        currentUser.consents.map(consent => <div className="pb-1" key={consent.id} ><i className={`icon ${consent.consent_given ? 'icon-check-filled' : 'icon-close-circle text-danger'} cdp-text-primary mr-2 small`}></i>{consent.preference}</div>)
-                                                        : <div className="alert alert-warning">The HCP has not given any consent.</div>}
+                                                        currentUser.consents.map(consent => {return consent.consent_given && <div className="pb-1" key={consent.id} >
+                                                            <i className={`icon ${consent.consent_given ? 'icon-check-filled' : 'icon-close-circle text-danger'} cdp-text-primary mr-2 small`}></i>{consent.preference}
+                                                        </div>})
+                                                        : <div className="alert alert-warning">The HCP has not given any consent.</div>
+                                                    }
                                                 </div>
                                             </div>
                                         </div>

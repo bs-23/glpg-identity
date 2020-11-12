@@ -22,11 +22,10 @@ const ConsentForm = (props) => {
     const [countryLanguages, setCountryLanguages] = useState([]);
     const [isActive, setIsActive] = useState(true);
     const [translations, setTranslations] = useState([]);
-    // const [categoryId, setCategoryId] = useState([]);
-    // const [legalBasis, setLegalBasis] = useState([]);
     const [translationToDelete, setTranslationToDelete] = useState(null);
     const [showError, setShowError] = useState(false);
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
+    const countries = useSelector(state => state.countryReducer.countries);
 
     const legalBasisList = [
         { id: 'consent', value: 'Consent' },
@@ -78,16 +77,13 @@ const ConsentForm = (props) => {
             setConsent(response.data);
             setTranslations(response.data.translations.map(i => ({ ...i, country_iso2: i.locale.split('_')[1], lang_code: i.locale.split('_')[0] })));
             setIsActive(response.data.is_active);
-            // setCategoryId(response.data.consent_category.id);
-            // setLegalBasis(response.data.legal_basis);
         }
         async function getConsentCatogories() {
             const response = await axios.get('/api/privacy/consent-categories');
             setCategories(response.data);
         }
         async function getCountries() {
-            const response = await axios.get('/api/countries');
-            setUserCountries(fetchUserCountries(loggedInUser.countries, response.data));
+            setUserCountries(fetchUserCountries(loggedInUser.countries, countries));
         }
         function getLanguages() {
             const mapped_languages = {};
@@ -160,6 +156,7 @@ const ConsentForm = (props) => {
                                 <div className="border rounded draft-editor">
                                     <DraftEditor htmlContent={item.rich_text} onChangeHTML={(html) => {
                                         if (item.rich_text.length > 976) setShowError(true);
+                                        else setShowError(false);
                                         handleChange({
                                             target: {
                                                 value: html,

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Axios from 'axios';
 import { Modal } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
-import { getCountries } from '../../../user/client/user.actions'
+// import { getCountries } from '../../../user/client/user.actions'
 
 const WarningMessage = ({ message }) => <div className="alert alert-warning">
     {message}
@@ -12,8 +12,8 @@ const PermissionSetDetails = ({ permissionSetId }) => {
     const [permissionDetails, setPermissionDetails] = useState();
     const [notFound, setNotFound] = useState(false);
     const [error, setError] = useState(false);
-    const countries = useSelector(state => state.userReducer.countries);
-    const dispatch = useDispatch();
+    const countries = useSelector(state => state.countryReducer.countries);
+    // const dispatch = useDispatch();
     const nullValueToken = '--';
 
     const getPermissionDetails = async () => {
@@ -50,7 +50,7 @@ const PermissionSetDetails = ({ permissionSetId }) => {
     }
 
     useEffect(() => {
-        dispatch(getCountries());
+        // dispatch(getCountries());
         getPermissionDetails();
     }, []);
 

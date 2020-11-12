@@ -1,10 +1,9 @@
-import axios from 'axios';
 import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import Dropdown from 'react-bootstrap/Dropdown';
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { getUsers } from '../user.actions';
-
+import axios from 'axios';
 
 const safeGet = (object, property) => {
     const propData = (object || {})[property];
@@ -17,21 +16,18 @@ const flatten = (array) => {
 
 const union = (a, b) => [...new Set([...a, ...b])];
 
-
 export default function Users() {
     const dispatch = useDispatch();
     const location = useLocation();
     const history = useHistory();
 
-    const userdata = useSelector(state => state.userReducer.users);
-
-    const [countries, setCountries] = useState([]);
     const [codBase, setCodBase] = useState(null);
     const [userCountries, setUserCountries] = useState([]);
-
-    const params = new URLSearchParams(window.location.search);
     const [sort, setSort] = useState({ type: 'asc', value: null });
 
+    const userdata = useSelector(state => state.userReducer.users);
+    const countries = useSelector(state => state.countryReducer.countries);
+    const params = new URLSearchParams(window.location.search);
 
     const extractUserCountries = (data) => {
         const profile_permission_sets = safeGet(data, 'userProfile')('up_ps')();
@@ -87,11 +83,9 @@ export default function Users() {
 
     useEffect(() => {
         async function getCountries() {
-            const response = (await axios.get('/api/countries')).data;
             const userProfile = (await axios.get('/api/users/profile')).data;
             const userCountries = extractLoggedInUserCountries(userProfile);
-            setCountries(response);
-            (userProfile.type === "admin") ? setUserCountries(response) : setUserCountries(fetchUserCountries(userCountries, response));
+            setUserCountries(fetchUserCountries(userCountries, countries));
         }
         getCountries();
     }, []);
@@ -113,7 +107,7 @@ export default function Users() {
         args.forEach(element => {
             countryList.push(allCountries.find(x => x.country_iso2 == element));
         });
-        return countryList;
+        return countryList.filter(c => c);
     }
 
     const urlChange = (pageNo, country_codbase, orderColumn, pageChange = false) => {

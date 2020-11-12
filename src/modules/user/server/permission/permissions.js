@@ -219,31 +219,6 @@ async function getRequestingUserPermissions(user) {
     return [user_applications, user_countries, user_service_categories];
 }
 
-const isRequestingUserPermitted = async (user, requiredPermissions) => {
-    const [user_applications, user_countries, user_service_categories] = await getRequestingUserPermissions(user);
-    const { countries, applications, service_categories } = requiredPermissions;
-
-    if(countries) {
-        const hasCountryPermission = countries.some(c_iso2 => user_countries.includes(c_iso2));
-        if(!hasCountryPermission) return false;
-    }
-
-    if(applications) {
-        const hasApplicationPermission = applications.some(req_app =>
-            user_applications.some(user_app => (user_app.id === req_app.id) || (user_app.slug === req_app.slug)));
-        if(!hasApplicationPermission) return false;
-    }
-
-    if(service_categories) {
-        const hasServiceCategoryPermission = service_categories.some(req_sc =>
-            user_service_categories.some(user_sc => (user_sc.id === req_sc.id) || (user_sc.slug === req_sc.slug)));
-        if(!hasServiceCategoryPermission) false;
-    }
-
-    return true;
-}
-
 exports.getUserPermissions = getUserPermissions;
 exports.getRequestingUserPermissions = getRequestingUserPermissions;
 exports.getPermissionsFromPermissionSet = getPermissionsFromPermissionSet;
-exports.isRequestingUserPermitted = isRequestingUserPermitted;
