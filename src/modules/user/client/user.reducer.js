@@ -4,8 +4,7 @@ import _ from 'lodash';
 const initialState = {
     loggedInUser: null,
     users: {},
-    roles: [],
-    countries: []
+    roles: []
 };
 
 const getPermissionsFromPermissionSet = (permissionSets) => {
