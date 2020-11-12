@@ -2,13 +2,15 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { useCookies } from 'react-cookie';
 import { useHistory } from 'react-router-dom';
+import _ from 'lodash';
 
 export default function Navbar() {
     const [, setCookie, removeCookie] = useCookies();
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
     const countries = useSelector(state => state.countryReducer.countries);
-    const { first_name, last_name } = loggedInUser;
     const history = useHistory();
+
+    const { first_name, last_name, applications: userApplications, countries: userCountries } = loggedInUser;
 
     const handleLogOut = () => {
         setCookie('logged_in', '', { path: '/' });
@@ -25,8 +27,8 @@ export default function Navbar() {
     }
 
     const renderCountryIcons = () => {
-        if(loggedInUser.countries){
-            const selectedCountries = countries && countries.filter(c => loggedInUser.countries.includes(c.country_iso2) ? true : false).map(c => c.codbase_desc)
+        if(userCountries){
+            const selectedCountries = countries && countries.filter(c => userCountries.includes(c.country_iso2) ? true : false).map(c => c.codbase_desc)
             return selectedCountries.map( country => {
                 return <img key={country} height="26" width="26" src={generateCountryIconPath(country)} onError={addFallbackIcon} title={country} alt="Flag" className="ml-1" />;
             })
@@ -34,9 +36,11 @@ export default function Navbar() {
     }
 
     const renderApplicationIcon = () => {
-        if(loggedInUser.application){
-            const { name, logo_link } = loggedInUser.application
-            return <img src={logo_link} title={name} alt={`${name} Logo`} width="122" />
+        if(userApplications){
+            return userApplications.map(app => {
+                const { name, logo_link, slug } = app;
+                return <img className="ml-2" key={slug} src={logo_link} title={name} alt={`${name} Logo`} width="122" />
+            })
         }
     }
 

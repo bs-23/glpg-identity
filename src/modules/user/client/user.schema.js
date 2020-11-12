@@ -59,11 +59,10 @@ export const registerSchema = object().shape({
         .matches(/^[0-9]*$/, 'This field only contains digits')
         .min(4, 'This field must be at least 4 characters long')
         .max(20, 'This field must be at most 20 characters long'),
-        // .test('is-valid-phone', 'Must be a valid international phone number', validatePhone),
-    countries: string()
-        .required('Must select at least one country'),
-    roles: string()
-        .required('Must select at least one role')
+        // .test('is-valid-phone', 'Must be a valid international phone number.', validatePhone),
+    profile: string()
+        .required('Must select at least one profile'),
+    role: string()
 });
 
 export const changePasswordSchema = object().shape({
@@ -114,6 +113,32 @@ export const roleSchema = object().shape({
             .required('Must select at least one permission')
 });
 
+export const permissionSetCreateSchema = object().shape({
+    title: string().required('This field must not be empty.'),
+    applications: string(),
+    countries: string(),
+    serviceCategories: string(),
+    app_country_service: string()
+        .test('One of three required',
+            'One of the fields countries, applications or service category is required.',
+            function() {
+                const { countries, serviceCategories, applications } = this.parent;
+                return countries || serviceCategories || applications;
+            }
+        )
+});
+
+export const profileCreateSchema = object().shape({
+    title: string().required('This field must not be empty.'),
+    permissionSets: string().required('Must select at least one permission set.'),
+    description: string().nullable()
+});
+
+export const roleCreateSchema = object().shape({
+    title: string().required('This field must not be empty.'),
+    permissionSets: string().required('Must select at least one permission set.'),
+    description: string().nullable()
+});
 export const updateMyProfileSchema = object().shape({
     first_name: string()
         .matches(XRegExp('^[\\pL]+(?:\\s[\\pL]+)*$'), 'This field should contain letters only')

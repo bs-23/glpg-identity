@@ -59,7 +59,7 @@ axios.interceptors.response.use(
     error => {
         const {loggedInUser} = store.getState().userReducer;
 
-        if (error.response.status === 401 && loggedInUser) window.location = "/login";
+        if (error.response && error.response.status === 401 && loggedInUser) window.location = "/login";
 
         return Promise.reject(error);
     }
@@ -71,7 +71,7 @@ export default function App() {
 
     useEffect(() => {
         dispatch(getSignedInUserProfile()).then(() => {
-            dispatch(getCountries('APP'));
+            dispatch(getCountries());
         }).catch(err => {
             if (err.response && err.response.status === 401) removeCookie('logged_in', { path: '/' });
         });

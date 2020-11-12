@@ -3,6 +3,18 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { getUsers } from '../user.actions';
+import axios from 'axios';
+
+const safeGet = (object, property) => {
+    const propData = (object || {})[property];
+    return (prop) => prop ? safeGet(propData, prop) : propData;
+};
+
+const flatten = (array) => {
+    return Array.isArray(array) ? [].concat(...array.map(flatten)) : array;
+}
+
+const union = (a, b) => [...new Set([...a, ...b])];
 
 export default function Users() {
     const dispatch = useDispatch();
@@ -14,22 +26,54 @@ export default function Users() {
     const [sort, setSort] = useState({ type: 'asc', value: null });
 
     const userdata = useSelector(state => state.userReducer.users);
-    const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
     const countries = useSelector(state => state.countryReducer.countries);
     const params = new URLSearchParams(window.location.search);
 
+    const extractUserCountries = (data) => {
+        const profile_permission_sets = safeGet(data, 'userProfile')('up_ps')();
+        const profile_countries = profile_permission_sets ? profile_permission_sets.map(pps => safeGet(pps, 'ps')('countries')()) : [];
+
+        const userRoles = safeGet(data, 'userRoles')();
+        const roles_countries = userRoles ? userRoles.map(role => {
+            const role_permission_sets = safeGet(role, 'role')('role_ps')();
+            return role_permission_sets.map(rps => safeGet(rps, 'ps')('countries')());
+        }) : [];
+
+        const userCountries = union(flatten(profile_countries), flatten(roles_countries)).filter(e => e);
+
+        return userCountries;
+    }
+
+    const extractLoggedInUserCountries = (data) => {
+        const profile_permission_sets = safeGet(data, 'profile')('permissionSets')();
+        const profile_countries = profile_permission_sets ? profile_permission_sets.map(pps => safeGet(pps, 'countries')() || []) : [];
+
+        const userRoles = safeGet(data, 'role')();
+        const roles_countries = userRoles ? userRoles.map(role => {
+            const role_permission_sets = safeGet(role, 'permissionSets')();
+            return role_permission_sets.map(rps => safeGet(rps, 'countries')() || []);
+        }) : [];
+
+        const userCountries = union(flatten(profile_countries), flatten(roles_countries)).filter(e => e);
+
+        return userCountries;
+    }
 
     const sortCountries = (user_countries) => {
         let countryArr = [];
         let countryString = "";
         if (countries.length > 0 && (user_countries.length)) {
-            (user_countries).map((country) => (
-                countryArr.push(countries.find(i => i.country_iso2 === country)).codbase_desc)
-            );
+            if(user_countries.includes('all')) {
+                countryArr = [...countries];
+            }else {
+                user_countries.map((country_iso2) =>
+                    countryArr.push(countries.find(i => i.country_iso2 === country_iso2)).codbase_desc);
+            }
         }
 
         countryArr.sort((a, b) => (a.codbase_desc > b.codbase_desc) ? 1 : -1);
         countryArr.forEach((element, key) => {
+            if(!element) return;
             countryString = countryString + element.codbase_desc;
             if (key < countryArr.length - 1) countryString = countryString + ', ';
         });
@@ -38,10 +82,13 @@ export default function Users() {
     }
 
     useEffect(() => {
-        (loggedInUser.type === "admin")
-            ? setUserCountries(countries)
-            : setUserCountries(fetchUserCountries(loggedInUser.countries, countries));
-    }, [countries]);
+        async function getCountries() {
+            const userProfile = (await axios.get('/api/users/profile')).data;
+            const userCountries = extractLoggedInUserCountries(userProfile);
+            setUserCountries(fetchUserCountries(userCountries, countries));
+        }
+        getCountries();
+    }, []);
 
     useEffect(() => {
         setCodBase(params.get('codbase') ? params.get('codbase') : null);
@@ -60,7 +107,7 @@ export default function Users() {
         args.forEach(element => {
             countryList.push(allCountries.find(x => x.country_iso2 == element));
         });
-        return countryList;
+        return countryList.filter(c => c);
     }
 
     const urlChange = (pageNo, country_codbase, orderColumn, pageChange = false) => {
@@ -163,7 +210,7 @@ export default function Users() {
                                                     <td>{row.last_name}</td>
                                                     <td>{row.email}</td>
                                                     <td className="text-capitalize">{row.status}</td>
-                                                    <td>{sortCountries(row.countries)}</td>
+                                                    <td>{sortCountries(extractUserCountries(row))}</td>
                                                     <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                     <td>{(new Date(row.expiry_date)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                     <td>{row.createdBy}</td>

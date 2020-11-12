@@ -13,6 +13,7 @@ const User = require(path.join(process.cwd(), 'src/modules/user/server/user.mode
 const HCPS = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-profile.model'));
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-consents.model'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
+const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/user/server/permission/permissions.js'));
 
 function getTranslationViewmodels(translations) {
     return translations.map(t => ({
@@ -146,6 +147,10 @@ async function getConsentsReport(req, res) {
         order.push([HCPS, 'created_at', 'DESC']);
         order.push([HCPS, 'id', 'DESC']);
 
+        const userCountriesApplication = await getUserPermissions(req.user.id);
+        const userPermittedCountries = userCountriesApplication[1];
+        const userPermittedApplications = userCountriesApplication[0].map(app => app.id);
+
         const application_list = (await HCPS.findAll()).map(i => i.get("application_id"));
 
         const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => i.codbase === codbase).map(i => i.country_iso2);
@@ -154,7 +159,7 @@ async function getConsentsReport(req, res) {
         const country_iso2_list = req.user.type === 'admin' ? (await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry", { type: QueryTypes.SELECT })).map(i => i.country_iso2) : (await HCPS.findAll()).map(i => i.get("country_iso2"));
         const countries_ignorecase = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
 
-        const codbase_list_mapped_with_user_country_iso2_list = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => req.user.countries.includes(i.country_iso2)).map(i => i.codbase) : [];
+        const codbase_list_mapped_with_user_country_iso2_list = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => userPermittedCountries.includes(i.country_iso2)).map(i => i.codbase) : [];
         const country_iso2_list_for_user_countries_codbase = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => codbase_list_mapped_with_user_country_iso2_list.includes(i.codbase)).map(i => i.country_iso2) : [];
         const countries_ignorecase_for_user_countries_codbase = [].concat.apply([], country_iso2_list_for_user_countries_codbase.map(i => ignoreCaseArray(i)));
 
@@ -163,7 +168,7 @@ async function getConsentsReport(req, res) {
         const consent_filter = {
             response: true,
             consent_confirmed: true,
-            '$hcp_profile.application_id$': req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
+            '$hcp_profile.application_id$': req.user.type === 'admin' ? { [Op.or]: application_list } : userPermittedApplications,
             '$hcp_profile.country_iso2$': codbase ? { [Op.any]: [countries_ignorecase_for_codbase] } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : countries_ignorecase_for_user_countries_codbase,
             '$consent.consent_country.country_iso2$': { [Op.or]: [ Sequelize.fn('LOWER', Sequelize.col('hcp_profile.country_iso2')), Sequelize.fn('UPPER', Sequelize.col('hcp_profile.country_iso2')) ] },
             '$consent.consent_country.opt_type$': opt_type ? { [Op.eq]: opt_type } : { [Op.or]: opt_types }
@@ -244,7 +249,7 @@ async function getConsentsReport(req, res) {
             end: offset + limit > total_consents ? total_consents : offset + limit,
             codbase: codbase ? codbase : '',
             opt_type: opt_type ? opt_type : '',
-            countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : req.user.countries,
+            countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : userPermittedCountries,
             orderBy: orderBy,
             orderType: orderType
         };
@@ -269,12 +274,14 @@ async function getDatasyncConsentsReport(req, res) {
         // const opt_type = req.query.opt_type === undefined ? '' : req.query.opt_type;
         const offset = page * limit;
 
+        const [, userPermittedCountries] = await getUserPermissions(req.user.id);
+
         async function getCountryIso2() {
             const user_codbase_list_for_iso2 = (await sequelize.datasyncConnector.query(
                 `SELECT * FROM ciam.vwcountry where ciam.vwcountry.country_iso2 = ANY($countries);`,
                 {
                     bind: {
-                        countries: req.user.countries
+                        countries: userPermittedCountries
                     },
                     type: QueryTypes.SELECT
                 }
@@ -393,7 +400,7 @@ async function getDatasyncConsentsReport(req, res) {
             codbase: codbase ? codbase : '',
             // process_activity: process_activity ? process_activity : '',
             // opt_type: opt_type ? opt_type : '',
-            countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : req.user.countries,
+            countries: userPermittedCountries,
             orderBy: orderBy,
             orderType: orderType,
         };

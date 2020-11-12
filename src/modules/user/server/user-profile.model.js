@@ -2,11 +2,11 @@ const path = require('path');
 const { DataTypes } = require('sequelize');
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
-const Role_PermissionSet = require('../permission-set/role-permissionSet.model');
-const PermissionSet = require('../permission-set/permission-set.model');
+const UserProfile_PermissionSet = require('./permission-set/userProfile-permissionSet.model');
+const PermissionSet = require('./permission-set/permission-set.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
-const Role = sequelize.cdpConnector.define('roles', {
+const UserProfile = sequelize.cdpConnector.define('user_profiles', {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -19,6 +19,11 @@ const Role = sequelize.cdpConnector.define('roles', {
     slug: {
         type: DataTypes.STRING
     },
+    type: {
+        type: DataTypes.ENUM,
+        values: ['standard', 'custom'],
+        defaultValue: "custom"
+    },
     description: {
         type: DataTypes.STRING
     },
@@ -30,13 +35,14 @@ const Role = sequelize.cdpConnector.define('roles', {
     },
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
-    tableName: 'roles',
+    tableName: 'user_profiles',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
 
-Role.hasMany(Role_PermissionSet, {as: 'role_ps', foreignKey: 'roleId', sourceKey: 'id'});
-Role.belongsToMany(PermissionSet, { through: Role_PermissionSet });
+// UserProfile.hasMany(UserProfile_PermissionSet, {as: 'userProfile_permissionSet', foreignKey: 'userProfileId', sourceKey: 'id'});
+UserProfile.hasMany(UserProfile_PermissionSet, {as: 'up_ps', foreignKey: 'userProfileId', sourceKey: 'id'});
+UserProfile.belongsToMany(PermissionSet, { through: UserProfile_PermissionSet });
 
-module.exports = Role;
+module.exports = UserProfile;

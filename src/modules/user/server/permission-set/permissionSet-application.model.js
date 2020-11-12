@@ -1,38 +1,33 @@
 const path = require('path');
 const { DataTypes } = require('sequelize');
+const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
-const Permission = sequelize.cdpConnector.define('permissions', {
+const PermissionSet_Application = sequelize.cdpConnector.define('permissionSets_applications', {
     id: {
         allowNull: false,
         primaryKey: true,
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4
     },
-    module: {
+    permissionSetId: {
         allowNull: false,
-        type: DataTypes.STRING
-    },
-    title: {
-        type: DataTypes.STRING
-    },
-    status: {
-        type: DataTypes.STRING
-    },
-    created_by: {
         type: DataTypes.UUID
     },
-    updated_by: {
+    applicationId  : {
+        allowNull: false,
         type: DataTypes.UUID
-    },
+    }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
-    tableName: 'permissions',
+    tableName: 'permissionSets_applications',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
 
-module.exports = Permission;
+PermissionSet_Application.belongsTo(Application, {as: 'application', foreignKey: 'applicationId'});
+
+module.exports = PermissionSet_Application;

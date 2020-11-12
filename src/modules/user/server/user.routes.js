@@ -19,7 +19,7 @@ module.exports = app => {
 
     app.route('/api/users/:id')
         .get(CDPAuthStrategy, controller.getUser)
-        .patch(CDPAuthStrategy, controller.partialUpdateUser);
+        .patch(CDPAuthStrategy, controller.updateUserDetails);
 
     app.post('/api/users/change-password', CDPAuthStrategy, controller.changePassword);
 

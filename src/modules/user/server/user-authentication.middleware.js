@@ -2,12 +2,18 @@ const path = require("path");
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const User = require(path.join(process.cwd(), "src/modules/user/server/user.model"));
-const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
-const UserRole = require(path.join(process.cwd(), "src/modules/user/server/user-role.model"));
-const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
-const RolePermission = require(path.join(process.cwd(), "src/modules/user/server/role/role-permission.model"));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const { generateAccessToken } = require(path.join(process.cwd(), "src/modules/user/server/user.controller.js"));
+const UserProfile = require(path.join(process.cwd(), "src/modules/user/server/user-profile.model"));
+const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/userProfile-permissionSet.model"));
+const PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permission-set.model"));
+const User_Role = require(path.join(process.cwd(), "src/modules/user/server/role/user-role.model"));
+const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
+const Role_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/role-permissionSet.model"));
+const PermissionSet_ServiceCateory = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-serviceCategory.model"));
+const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-application.model"));
+const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
+const ServiceCategory = require(path.join(process.cwd(), "src/modules/user/server/permission/service-category.model"));
 
 const CDPAuthStrategy = (req, res, next) => (
     passport.authenticate('user-jwt', async function(err, user) {
@@ -24,23 +30,94 @@ const CDPAuthStrategy = (req, res, next) => (
 
                 const payload = jwt.verify(refreshTokenFromCookie, nodecache.getValue('CDP_REFRESH_SECRET'));
 
-                const userInstanceFromDB = await User.findOne({ where: { id: payload.id },
-                    include: [{
-                        model: UserRole,
-                        as: 'userrole',
-                        include: [{
-                            model: Role,
-                            as: 'role',
+                const userInstanceFromDB = await User.findOne({
+                    where: { id: payload.id },
+                    include: [
+                        {
+                            model: User_Role,
+                            as: 'userRoles',
                             include: [{
-                                model: RolePermission,
-                                as: 'rolePermission',
+                                model: Role,
+                                as: 'role',
                                 include: [{
-                                    model: Permission,
-                                    as: 'permission'
+                                    model: Role_PermissionSet,
+                                    as: 'role_ps',
+                                    include: [{
+                                        model: PermissionSet,
+                                        as: 'ps',
+                                        include: [
+                                            {
+                                                model: PermissionSet_ServiceCateory,
+                                                as: 'ps_sc',
+                                                include: [
+                                                    {
+                                                        model: ServiceCategory,
+                                                        as: 'serviceCategory',
+
+                                                    }
+                                                ]
+
+                                            },
+                                            {
+                                                model: PermissionSet_Application,
+                                                as: 'ps_app',
+                                                include: [
+                                                    {
+                                                        model: Application,
+                                                        as: 'application',
+
+                                                    }
+                                                ]
+
+                                            }
+                                        ]
+
+                                    }]
                                 }]
                             }]
-                        }]
-                    }]
+                        },
+                        {
+
+                            model: UserProfile,
+                            as: 'userProfile',
+                            include: [{
+                                model: UserProfile_PermissionSet,
+                                as: 'up_ps',
+                                include: [{
+                                    model: PermissionSet,
+                                    as: 'ps',
+                                    include: [
+                                        {
+                                            model: PermissionSet_ServiceCateory,
+                                            as: 'ps_sc',
+                                            include: [
+                                                {
+                                                    model: ServiceCategory,
+                                                    as: 'serviceCategory',
+
+                                                }
+                                            ]
+
+                                        },
+                                        {
+                                            model: PermissionSet_Application,
+                                            as: 'ps_app',
+                                            include: [
+                                                {
+                                                    model: Application,
+                                                    as: 'application',
+
+                                                }
+                                            ]
+
+                                        }
+                                    ]
+
+                                }]
+                            }]
+                        }
+
+                    ]
                 })
 
                 if(!userInstanceFromDB) throw new Error();
