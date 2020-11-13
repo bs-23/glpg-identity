@@ -170,10 +170,9 @@ const CdpConsentPerformanceReport = () => {
                                             </Dropdown>
                                         }
 
-                                        <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-btn-primary text-white dropdown shadow-sm">
-                                            Opt-In Type
-                                            <Dropdown.Toggle variant="" className="ml-2 bg-white rounded-0">
-                                            {consents_report.opt_type && (allOptTypes.includes(consents_report.opt_type)) ? consents_report.opt_type : 'All'}
+                                        <Dropdown className="ml-auto dropdown-customize mr-2">
+                                            <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center">
+                                            <i className="icon icon-filter mr-2 mb-n1"></i> {consents_report.opt_type && (allOptTypes.includes(consents_report.opt_type)) ? consents_report.opt_type : 'Filter by Opt Type'}
                                             </Dropdown.Toggle>
                                             <Dropdown.Menu>
                                                 <LinkContainer to={`/consent/consent-performance-report/cdp${makeUrl( [{name: 'codbase', value: consents_report.codbase }, { name: 'orderBy', value: consents_report.orderBy}, { name: 'orderType', value: consents_report.orderType }] )}`}>
