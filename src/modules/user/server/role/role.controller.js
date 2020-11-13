@@ -3,6 +3,7 @@ const { Op } = require('sequelize');
 const Role = require('./role.model');
 const RolePermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/role-permissionSet.model"));
 const PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permission-set.model"));
+const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 
 async function getRoles(req, res) {
     try {
@@ -52,6 +53,14 @@ async function createRole(req, res) {
 
         await RolePermissionSet.bulkCreate(permission_sets);
 
+        await logService.log({
+            event_type: 'CREATE',
+            object_id: role.id,
+            table_name: 'roles',
+            actor: req.user.id,
+            description: `"${role.title}" role created`
+        });
+
         res.json(role);
     } catch (error) {
         console.error(error);
@@ -84,6 +93,14 @@ async function editRole(req, res) {
         });
 
         await foundRole.setPermission_sets(permissionSets);
+
+        await logService.log({
+            event_type: 'UPDATE',
+            object_id: foundRole.id,
+            table_name: 'roles',
+            actor: req.user.id,
+            description: `"${foundRole.title}" role updated`
+        });
 
         res.json(foundRole);
     } catch (error) {

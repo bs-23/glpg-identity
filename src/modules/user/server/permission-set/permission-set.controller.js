@@ -194,9 +194,9 @@ async function createPermissionSet(req, res) {
         await logService.log({
             event_type: 'CREATE',
             object_id: doc.id,
-            table_name: 'permissionSet',
-            created_by: req.user.id,
-            description: `${doc.name} permission set created`
+            table_name: 'permission_sets',
+            actor: req.user.id,
+            description: `"${doc.title}" permission set created`
         });
 
         res.json(doc);
@@ -250,6 +250,14 @@ async function editPermissionSet(req, res) {
         }else{
             await doc.setApplications(applications);
         }
+
+        await logService.log({
+            event_type: 'UPDATE',
+            object_id: doc.id,
+            table_name: 'permission_sets',
+            actor: req.user.id,
+            description: `"${doc.title}" permission set updated`
+        });
 
         res.json(doc);
     } catch (error) {
