@@ -271,9 +271,15 @@ async function getDatasyncConsentsReport(req, res) {
         const page = req.query.page ? req.query.page - 1 : 0;
         const limit = 30;
         const codbase = req.query.codbase === undefined ? '' : req.query.codbase;
-        // const process_activity = req.query.process_activity === undefined ? '' : req.query.process_activity;
-        // const opt_type = req.query.opt_type === undefined ? '' : req.query.opt_type;
+        const opt_type = req.query.opt_type === undefined ? '' : req.query.opt_type;
         const offset = page * limit;
+
+        const setOpt = () => {
+            if(opt_type === 'opt-out') return { type: 'Opt_Out_vod', double_opt_in: false }
+            if(opt_type === 'single-opt-in') return { type: 'Opt_In_vod', double_opt_in: false };
+            return { type: 'Opt_In_vod', double_opt_in: true };
+        }
+        const opt = setOpt();
 
         const [, userPermittedCountries] = await getUserPermissions(req.user.id);
 
@@ -328,6 +334,11 @@ async function getDatasyncConsentsReport(req, res) {
             if (orderBy === 'date') sortBy = 'ciam.vw_veeva_consent_master.capture_datetime';
         }
 
+        const consent_filter = opt_type ? `ciam.vw_veeva_consent_master.country_code = ANY($countries) and
+        ciam.vw_veeva_consent_master.opt_type = '${opt.type}' and
+        ciam.vw_veeva_consent_master.double_opt_in = ${opt.double_opt_in}` : `ciam.vw_veeva_consent_master.country_code = ANY($countries)`;
+
+
         const hcp_consents = await sequelize.datasyncConnector.query(
             `SELECT
                 account_name,
@@ -342,8 +353,7 @@ async function getDatasyncConsentsReport(req, res) {
                 channel_value
             FROM
                 ciam.vw_veeva_consent_master
-            WHERE
-                ciam.vw_veeva_consent_master.country_code = ANY($countries)
+            WHERE ${consent_filter}
             ORDER BY
                 ${sortBy} ${orderType}
             offset $offset
@@ -352,7 +362,7 @@ async function getDatasyncConsentsReport(req, res) {
                 bind: {
                     countries: codbase ? country_iso2_list_for_codbase : country_iso2_list,
                     offset: offset,
-                    limit: limit
+                    limit: limit,
                 },
                 type: QueryTypes.SELECT
             });
@@ -362,8 +372,7 @@ async function getDatasyncConsentsReport(req, res) {
                 COUNT(*)
             FROM
                 ciam.vw_veeva_consent_master
-            WHERE
-            ciam.vw_veeva_consent_master.country_code = ANY($countries);`
+            WHERE ${consent_filter}`
             , {
                 bind: {
                     countries: codbase ? country_iso2_list_for_codbase : country_iso2_list
@@ -399,8 +408,7 @@ async function getDatasyncConsentsReport(req, res) {
             start: limit * page + 1,
             end: offset + limit > total_consents.count ? total_consents.count : offset + limit,
             codbase: codbase ? codbase : '',
-            // process_activity: process_activity ? process_activity : '',
-            // opt_type: opt_type ? opt_type : '',
+            opt_type: opt_type ? opt_type : '',
             countries: userPermittedCountries,
             orderBy: orderBy,
             orderType: orderType,
