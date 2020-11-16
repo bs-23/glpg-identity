@@ -23,11 +23,6 @@ function hasValidCharacters(password) {
     return containsValidCharacters;
 }
 
-// const validatePhone = phone => {
-//     if (!phone) return true
-//     return phoneNumber(phone).isValid()
-// }
-
 export const loginSchema = object().shape({
     email: string()
         .email('This field should be a valid email address')
@@ -52,14 +47,16 @@ export const registerSchema = object().shape({
         .email('This field should be a valid email address')
         .max(100, 'This field must be at most 100 characters long')
         .required('This field must not be empty'),
-    country_code: string()
-        .matches(/^[+]+/, 'This field must start with a plus')
-        .matches(/^[+]?[ 0-9]+$/, 'Must conform to international phone number format and can only contain digits, spaces or plus'),
     phone: string()
         .matches(/^[0-9]*$/, 'This field only contains digits')
         .min(4, 'This field must be at least 4 characters long')
-        .max(20, 'This field must be at most 20 characters long'),
-        // .test('is-valid-phone', 'Must be a valid international phone number.', validatePhone),
+        .test('is-length-valid', 'This field must be at most 20 characters long',
+        function() {
+            const { country_code, phone } = this.parent;
+            if (!phone || !country_code) return false;
+            const phonenumberWithCountryCode = country_code + phone;
+            return phonenumberWithCountryCode.length <= 20;
+        }),
     profile: string()
         .required('Must select at least one profile'),
     role: string()
