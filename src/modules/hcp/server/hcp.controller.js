@@ -195,7 +195,7 @@ async function getHcps(req, res) {
             include: [{
                 model: HcpConsents,
                 as: 'hcpConsents',
-                attributes: ['consent_id', 'response', 'consent_confirmed'],
+                attributes: ['consent_id', 'consent_confirmed', 'opt_type'],
             }],
             attributes: { exclude: ['password', 'created_by', 'updated_by'] },
             offset,
@@ -203,27 +203,40 @@ async function getHcps(req, res) {
             order: order
         });
 
-        await Promise.all(hcps.map(async hcp => {
+        // await Promise.all(hcps.map(async hcp => {
+        //     const opt_types = new Set();
+
+        //     await Promise.all(hcp['hcpConsents'].map(async hcpConsent => {
+
+        //         if (hcpConsent.consent_confirmed) {
+        //             const country_consent = await ConsentCountry.findOne({
+        //                 where: {
+        //                     consent_id: hcpConsent.consent_id,
+        //                     country_iso2: {
+        //                         [Op.iLike]: hcp.country_iso2
+        //                     },
+        //                 }
+        //             });
+        //             opt_types.add(country_consent.opt_type);
+        //         }
+        //     }));
+
+        //     hcp.dataValues.opt_types = [...opt_types];
+        //     delete hcp.dataValues['hcpConsents'];
+        // }));
+
+        hcps.map(hcp => {
             const opt_types = new Set();
 
-            await Promise.all(hcp['hcpConsents'].map(async hcpConsent => {
-
-                if (hcpConsent.response && hcpConsent.consent_confirmed) {
-                    const country_consent = await ConsentCountry.findOne({
-                        where: {
-                            consent_id: hcpConsent.consent_id,
-                            country_iso2: {
-                                [Op.iLike]: hcp.country_iso2
-                            },
-                        }
-                    });
-                    opt_types.add(country_consent.opt_type);
+            hcp['hcpConsents'].map(hcpConsent => {
+                if (hcpConsent.consent_confirmed) {
+                    opt_types.add(hcpConsent.opt_type);
                 }
-            }));
+            });
 
             hcp.dataValues.opt_types = [...opt_types];
             delete hcp.dataValues['hcpConsents'];
-        }));
+        });
 
         const totalUser = await Hcp.count({//counting total data for pagintaion
             where: hcp_filter
@@ -516,8 +529,8 @@ async function createHcpProfile(req, res) {
                     user_id: hcpUser.id,
                     consent_id: consentDetails.id,
                     title: consentLocale.rich_text,
-                    response: consentResponse,
                     consent_confirmed: consentCountry.opt_type === 'double-opt-in' ? false : true,
+                    opt_type: consentCountry.opt_type,
                     created_by: req.user.id,
                     updated_by: req.user.id
                 });
@@ -728,7 +741,7 @@ async function getHcpProfile(req, res) {
 
         response.data = getHcpViewModel(doc.dataValues);;
 
-        const userConsents = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id', 'response', 'consent_confirmed', 'updated_at'] });
+        const userConsents = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id', 'consent_confirmed', 'opt_type', 'updated_at'] });
 
         if (!userConsents) {
             response.data = { ...response.data, consents: [] };
@@ -747,7 +760,6 @@ async function getHcpProfile(req, res) {
             }, attributes: ['consent_id', 'rich_text']
         });
 
-        const consentCountries = await ConsentCountry.findAll({ where: { consent_id: userConsents.map(consent => consent.consent_id), country_iso2: { [Op.or]: [doc.country_iso2.toUpperCase(), doc.country_iso2.toLowerCase()] } } });
 
         const consentResponse = userConsentDetails.map(({
             consent_id: id,
@@ -759,10 +771,9 @@ async function getHcpProfile(req, res) {
             ...response.data,
             consents: consentResponse.map(conRes => {
                 const matchedConsent = userConsents.find(consent => consent.consent_id === conRes.id);
-                const matchedConsentCountries = consentCountries.find(c => c.consent_id === conRes.id);
                 conRes.consent_given_time = matchedConsent ? matchedConsent.updated_at : null;
-                conRes.opt_type = matchedConsentCountries ? matchedConsentCountries.opt_type : null;
-                conRes.consent_given = matchedConsent ? matchedConsent.consent_confirmed && matchedConsent.response ? true : false : null;
+                conRes.opt_type = matchedConsent ? matchedConsent.opt_type : null;
+                conRes.consent_given = matchedConsent ? matchedConsent.consent_confirmed ? true : false : null;
                 return conRes;
             })
         };
@@ -789,7 +800,7 @@ async function getHCPUserConsents(req, res) {
             return res.status(404).send(response);
         }
 
-        const userConsents = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id', 'response', 'consent_confirmed', 'updated_at'] });
+        const userConsents = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id', 'consent_confirmed', 'opt_type', 'updated_at'] });
 
         if (!userConsents) return res.json([]);
 
@@ -805,7 +816,6 @@ async function getHCPUserConsents(req, res) {
             }, attributes: ['consent_id', 'rich_text']
         });
 
-        const consentCountries = await ConsentCountry.findAll({ where: { consent_id: userConsents.map(consent => consent.consent_id), country_iso2: { [Op.or]: [doc.country_iso2.toUpperCase(), doc.country_iso2.toLowerCase()] } } });
 
         const consentResponse = userConsentDetails.map(({
             consent_id: id,
@@ -815,10 +825,9 @@ async function getHCPUserConsents(req, res) {
 
         response.data = consentResponse.map(conRes => {
             const matchedConsent = userConsents.find(consent => consent.consent_id === conRes.id);
-            const matchedConsentCountries = consentCountries.find(c => c.consent_id === conRes.id);
             conRes.consent_given_time = matchedConsent ? matchedConsent.updated_at : null;
-            conRes.opt_type = matchedConsentCountries ? matchedConsentCountries.opt_type : null;
-            conRes.consent_given = matchedConsent ? matchedConsent.consent_confirmed && matchedConsent.response ? true : false : null;
+            conRes.opt_type = matchedConsent ? matchedConsent.opt_type : null;
+            conRes.consent_given = matchedConsent ? matchedConsent.consent_confirmed ? true : false : null;
             return conRes;
         });
 
