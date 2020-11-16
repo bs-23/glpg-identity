@@ -19,12 +19,13 @@ const HcpConsents = sequelize.cdpConnector.define("hcp_consents", {
         allowNull: false,
         type: DataTypes.UUID
     },
-    response: {
-        allowNull: false,
-        type: DataTypes.BOOLEAN
-    },
     consent_confirmed: {
         type: DataTypes.BOOLEAN
+    },
+    opt_type: {
+        allowNull: false,
+        type: DataTypes.ENUM,
+        values: ['single-opt-in', 'double-opt-in', 'soft-opt-in', 'opt-out'],
     },
     created_by: {
         type: DataTypes.UUID
