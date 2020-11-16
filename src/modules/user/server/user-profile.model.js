@@ -14,7 +14,7 @@ const UserProfile = sequelize.cdpConnector.define('user_profiles', {
         defaultValue: DataTypes.UUIDV4
     },
     title: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING(50)
     },
     slug: {
         type: DataTypes.STRING
@@ -25,7 +25,7 @@ const UserProfile = sequelize.cdpConnector.define('user_profiles', {
         defaultValue: "custom"
     },
     description: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING(500)
     },
     created_by: {
         type: DataTypes.UUID
