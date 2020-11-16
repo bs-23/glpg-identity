@@ -99,7 +99,7 @@ async function editRole(req, res) {
             object_id: foundRole.id,
             table_name: 'roles',
             actor: req.user.id,
-            description: `"${foundRole.title}" role updated`
+            description: `Role updated`
         });
 
         res.json(foundRole);

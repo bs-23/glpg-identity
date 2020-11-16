@@ -196,7 +196,7 @@ async function createPermissionSet(req, res) {
             object_id: doc.id,
             table_name: 'permission_sets',
             actor: req.user.id,
-            description: `"${doc.title}" permission set created`
+            description: `"${doc.title}" Permission-Set created`
         });
 
         res.json(doc);
@@ -256,7 +256,7 @@ async function editPermissionSet(req, res) {
             object_id: doc.id,
             table_name: 'permission_sets',
             actor: req.user.id,
-            description: `"${doc.title}" permission set updated`
+            description: `Permission-Set updated`
         });
 
         res.json(doc);
