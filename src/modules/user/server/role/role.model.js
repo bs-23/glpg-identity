@@ -20,7 +20,7 @@ const Role = sequelize.cdpConnector.define('roles', {
         type: DataTypes.STRING
     },
     description: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING(500)
     },
     created_by: {
         type: DataTypes.UUID
