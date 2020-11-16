@@ -6,7 +6,7 @@ import { NavLink } from 'react-router-dom';
 import { Form, Formik, Field, ErrorMessage } from "formik";
 import { PermissionSetDetailsModal } from "./permission-sets-details";
 
-const FormField = ({ label, name, type, children, required=true, ...rest }) => <div className="col-12 col-sm-6">
+const FormField = ({ label, name, type, children, required=true, ...rest }) => <div className="col-12">
     <div className="form-group">
         <label hidden className="font-weight-bold" htmlFor="last_name">{ label }{required && <span className="text-danger">*</span>}</label>
         { children || <Field className="form-control" type={type} name={name} {...rest} /> }

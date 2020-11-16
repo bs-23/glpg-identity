@@ -154,7 +154,7 @@ export default function ManageProfiles() {
         if(!data || !data.up_ps || !data.up_ps.length) return '';
         return data.up_ps.map((item, index) => {
             return <React.Fragment key={item.permissionSetId}>
-                <a className="link-with-underline" key={item.permissionSetId} onClick={() => handlePermissionSetClick(item.permissionSetId)}>
+                <a type="button" className="link-with-underline" key={item.permissionSetId} onClick={() => handlePermissionSetClick(item.permissionSetId)}>
                     {item.ps.title}
                 </a>
             {index < data.up_ps.length-1 ? <span>,&nbsp;</span> : null}
@@ -221,11 +221,11 @@ export default function ManageProfiles() {
                                 <table className="table table-hover table-sm mb-0 cdp-table">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
-                                            <th className="py-2">Title</th>
-                                            <th className="py-2">Type</th>
-                                            <th className="py-2">Description</th>
-                                            <th className="py-2">Permission Sets</th>
-                                            <th className="py-2">Action</th>
+                                            <th width="20%" className="py-2">Title</th>
+                                            <th width="10%" className="py-2">Type</th>
+                                            <th width="40%" className="py-2">Description</th>
+                                            <th width="20%" className="py-2">Permission Sets</th>
+                                            <th width="10%" className="py-2">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
@@ -257,6 +257,7 @@ export default function ManageProfiles() {
                             onHide={handleProfileModalHide}
                             dialogClassName="modal-90w modal-customize"
                             aria-labelledby="example-custom-modal-styling-title"
+                            centered
                         >
                             <Modal.Header closeButton>
                                 <Modal.Title id="example-custom-modal-styling-title">
