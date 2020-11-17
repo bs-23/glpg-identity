@@ -279,6 +279,26 @@ async function editHcp(req, res) {
     const { first_name, last_name, telephone } = req.body;
     const response = new Response({}, []);
 
+    if (!first_name) {
+        response.errors.push(new CustomError('First name is missing.', 400, 'first_name'));
+    } else if (first_name.length > 50) {
+        response.errors.push(new CustomError('First name should be at most 50 characters', 400, 'first_name'));
+    }
+
+    if (!last_name) {
+        response.errors.push(new CustomError('Last name is missing.', 400, 'last_name'));
+    } else if (last_name.length > 50) {
+        response.errors.push(new CustomError('Last name should be at most 50 characters', 400, 'last_name'));
+    }
+
+    if (telephone && telephone.length > 25) {
+        response.errors.push(new CustomError('Telephone number should be at most 25 digits including country code', 400, 'telephone'));
+    }
+
+    if (response.errors.length) {
+        return res.status(400).send(response);
+    }
+
     try {
         const HcpUser = await Hcp.findOne({ where: { id: req.params.id } });
 
