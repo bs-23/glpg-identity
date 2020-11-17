@@ -20,7 +20,8 @@ const CdpConsentPerformanceReport = () => {
     const [currentAction, setCurrentAction] = useState({ userId: null, action: null });
     const [currentUser, setCurrentUser] = useState({});
 
-    const consents_report = useSelector(state => state.consentReducer.consents);
+    const consents_init_report = useSelector(state => state.consentReducer.consents);
+    const [consents_report, modify_consents_report] = useState(consents_init_report);
     const countries = useSelector(state => state.countryReducer.countries);
     const allCountries = useSelector(state => state.countryReducer.allCountries);
 
@@ -32,7 +33,7 @@ const CdpConsentPerformanceReport = () => {
         if (consents_report.end !== consents_report.total) dispatch(getConsentReport(consents_report.page + 1, consents_report.codbase, consents_report.opt_type, consents_report.orderBy, consents_report.orderType));
     };
 
-    async function getAllOptTypes(){
+    async function getAllOptTypes() {
         const response = await axios.get('/api/get-all-opt-types');
         setAllOptTypes(response.data);
     }
@@ -65,33 +66,33 @@ const CdpConsentPerformanceReport = () => {
         return country && country.countryname;
     }
 
-    function makeUrl(url_parameters){
+    function makeUrl(url_parameters) {
         let url = '';
-        if(!Array.isArray(url_parameters)) return url;
+        if (!Array.isArray(url_parameters)) return url;
 
 
-        url_parameters.forEach( item => {
-            if(item.value){
-                if(url.length) url+='&';
-                if(url.length === 0) url+='?'
-                url+=`${item.name}=${item.value}`;
+        url_parameters.forEach(item => {
+            if (item.value) {
+                if (url.length) url += '&';
+                if (url.length === 0) url += '?'
+                url += `${item.name}=${item.value}`;
             }
         });
         return url;
     }
 
-    function getorderType(orderBy){
-        return consents_report.orderBy !== orderBy  ? 'ASC' : (consents_report.orderBy === orderBy && consents_report.orderType === 'DESC') ? 'ASC' : 'DESC';
+    function getorderType(orderBy) {
+        return consents_report.orderBy !== orderBy ? 'ASC' : (consents_report.orderBy === orderBy && consents_report.orderType === 'DESC') ? 'ASC' : 'DESC';
     }
 
-    function getUrl(orderBy){
-        return `/consent/consent-performance-report/cdp${makeUrl( [
+    function getUrl(orderBy) {
+        return `/consent/consent-performance-report/cdp${makeUrl([
             { name: 'page', value: consents_report.page - 1 },
             { name: 'codbase', value: consents_report.codbase },
             { name: 'opt_type', value: consents_report.opt_type },
             { name: 'orderBy', value: orderBy },
             { name: 'orderType', value: getorderType(orderBy) }
-        ] )}`
+        ])}`
     }
 
     function titleCase(str) {
@@ -108,6 +109,28 @@ const CdpConsentPerformanceReport = () => {
         getAllOptTypes();
         loadConsentsReport();
     }, []);
+
+    const checkVerifiedUser = () => {
+        consents_init_report['hcp_consents'].map(x => x.user_verified = false);
+
+        let report = consents_init_report['hcp_consents'].map(x => {
+            if (x.opt_type === "double-opt-in") {
+                consents_init_report['hcp_consents'].filter(y => y.hcp_profile.id === x.hcp_profile.id)
+                    .map(y => y.user_verified = true);
+            }
+            return x;
+        });
+
+        report = Object.assign({}, consents_init_report, { hcp_consents: report });
+        modify_consents_report(report);
+
+    }
+    useEffect(() => {
+        modify_consents_report(consents_init_report);
+        if (consents_init_report && consents_init_report['hcp_consents']) {
+            checkVerifiedUser();
+        }
+    }, [consents_init_report]);
 
     return (
         <main className="app__content cdp-light-bg">
@@ -139,25 +162,25 @@ const CdpConsentPerformanceReport = () => {
                                         {countries && consents_report['countries'] &&
                                             <Dropdown className="ml-auto dropdown-customize mr-2">
                                                 <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center">
-                                                <i className="icon icon-filter mr-2 mb-n1"></i> {consents_report.codbase && (countries.find(i => i.codbase === consents_report.codbase)) ? (countries.find(i => i.codbase === consents_report.codbase)).codbase_desc : 'Filter by Country'}
+                                                    <i className="icon icon-filter mr-2 mb-n1"></i> {consents_report.codbase && (countries.find(i => i.codbase === consents_report.codbase)) ? (countries.find(i => i.codbase === consents_report.codbase)).codbase_desc : 'Filter by Country'}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
-                                                    <LinkContainer to={`/consent/consent-performance-report/cdp${makeUrl( [
+                                                    <LinkContainer to={`/consent/consent-performance-report/cdp${makeUrl([
                                                         { name: 'opt_type', value: consents_report.opt_type },
                                                         { name: 'orderBy', value: consents_report.orderBy },
                                                         { name: 'orderType', value: consents_report.orderType }
-                                                    ] )}`}>
+                                                    ])}`}>
                                                         <Dropdown.Item className={consents_report.codbase === '' ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('', '', consents_report.opt_type, consents_report.orderBy, consents_report.orderType))}>All</Dropdown.Item>
                                                     </LinkContainer>
                                                     {
                                                         countries.map((item, index) => (
-                                                            consents_report.countries.includes(item.country_iso2) && <LinkContainer  key={index} to={`/consent/consent-performance-report/cdp${makeUrl( [
+                                                            consents_report.countries.includes(item.country_iso2) && <LinkContainer key={index} to={`/consent/consent-performance-report/cdp${makeUrl([
                                                                 { name: 'codbase', value: item.codbase },
                                                                 { name: 'opt_type', value: consents_report.opt_type },
-                                                                { name: 'orderBy', value: consents_report.orderBy},
+                                                                { name: 'orderBy', value: consents_report.orderBy },
                                                                 { name: 'orderType', value: consents_report.orderType }
-                                                            ] )}`}>
-                                                                <Dropdown.Item className={consents_report.countries.includes(item.country_iso2) && consents_report.codbase === item.codbase ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('',  item.codbase, consents_report.opt_type, consents_report.orderBy, consents_report.orderType))}>
+                                                            ])}`}>
+                                                                <Dropdown.Item className={consents_report.countries.includes(item.country_iso2) && consents_report.codbase === item.codbase ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('', item.codbase, consents_report.opt_type, consents_report.orderBy, consents_report.orderType))}>
                                                                     {
 
                                                                         consents_report.countries.includes(item.country_iso2) ? item.codbase_desc : null
@@ -172,16 +195,16 @@ const CdpConsentPerformanceReport = () => {
 
                                         <Dropdown className="ml-auto dropdown-customize mr-2">
                                             <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center">
-                                            <i className="icon icon-filter mr-2 mb-n1"></i> {consents_report.opt_type && (allOptTypes.includes(consents_report.opt_type)) ? consents_report.opt_type : 'Filter by Opt Type'}
+                                                <i className="icon icon-filter mr-2 mb-n1"></i> {consents_report.opt_type && (allOptTypes.includes(consents_report.opt_type)) ? consents_report.opt_type : 'Filter by Opt Type'}
                                             </Dropdown.Toggle>
                                             <Dropdown.Menu>
-                                                <LinkContainer to={`/consent/consent-performance-report/cdp${makeUrl( [{name: 'codbase', value: consents_report.codbase }, { name: 'orderBy', value: consents_report.orderBy}, { name: 'orderType', value: consents_report.orderType }] )}`}>
+                                                <LinkContainer to={`/consent/consent-performance-report/cdp${makeUrl([{ name: 'codbase', value: consents_report.codbase }, { name: 'orderBy', value: consents_report.orderBy }, { name: 'orderType', value: consents_report.orderType }])}`}>
                                                     <Dropdown.Item className={consents_report.opt_type === '' ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('', consents_report.codbase, ''))}>All</Dropdown.Item>
                                                 </LinkContainer>
                                                 {
                                                     allOptTypes.map((item, index) => (
-                                                        <LinkContainer key={index} to={`/consent/consent-performance-report/cdp${makeUrl( [{ name: 'codbase', value: consents_report.codbase }, { name: 'opt_type', value: item }, { name: 'orderBy', value: consents_report.orderBy}, { name: 'orderType', value: consents_report.orderType }] )}`}>
-                                                            <Dropdown.Item className={consents_report.opt_type === item ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('',  consents_report.codbase, item, consents_report.orderBy, consents_report.orderType))}>
+                                                        <LinkContainer key={index} to={`/consent/consent-performance-report/cdp${makeUrl([{ name: 'codbase', value: consents_report.codbase }, { name: 'opt_type', value: item }, { name: 'orderBy', value: consents_report.orderBy }, { name: 'orderType', value: consents_report.orderType }])}`}>
+                                                            <Dropdown.Item className={consents_report.opt_type === item ? 'd-none' : ''} onClick={() => dispatch(getConsentReport('', consents_report.codbase, item, consents_report.orderBy, consents_report.orderType))}>
                                                                 {
                                                                     item === consents_report.opt_type ? null : titleCase(item)
                                                                 }
@@ -211,71 +234,71 @@ const CdpConsentPerformanceReport = () => {
                                     </Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
-                                    { currentUser.hcp_profile &&
-                                    <div className="px-4 py-3">
-                                        <div className="row">
-                                            <div className="col">
-                                                <h4 className="mt-1 font-weight-bold">{`${currentUser.hcp_profile.first_name || ''} ${currentUser.hcp_profile.last_name || ''}`}</h4>
-                                                <div className="">{currentUser.hcp_profile.specialty_description}</div>
+                                    {currentUser.hcp_profile &&
+                                        <div className="px-4 py-3">
+                                            <div className="row">
+                                                <div className="col">
+                                                    <h4 className="mt-1 font-weight-bold">{`${currentUser.hcp_profile.first_name || ''} ${currentUser.hcp_profile.last_name || ''}`}</h4>
+                                                    <div className="">{currentUser.hcp_profile.specialty_description}</div>
+                                                </div>
+                                            </div>
+                                            <div className="row mt-3">
+                                                <div className="col-6">
+                                                    <div className="mt-1 font-weight-bold">UUID</div>
+                                                    <div className="">{currentUser.hcp_profile.uuid || '--'}</div>
+                                                </div>
+                                                <div className="col-6">
+                                                    <div className="mt-1 font-weight-bold">OneKeyID</div>
+                                                    <div className="">{currentUser.hcp_profile.individual_id_onekey || '--'}</div>
+                                                </div>
+                                            </div>
+                                            <div className="row mt-3">
+                                                <div className="col-6">
+                                                    <div className="mt-1 font-weight-bold">Email</div>
+                                                    <div className="">{currentUser.hcp_profile.email || '--'}</div>
+                                                </div>
+                                                <div className="col-6">
+                                                    <div className="mt-1 font-weight-bold">Phone Number</div>
+                                                    <div className="">{currentUser.hcp_profile.telephone || '--'}</div>
+                                                </div>
+                                            </div>
+                                            <div className="row mt-3">
+                                                <div className="col-6">
+                                                    <div className="mt-1 font-weight-bold">Country</div>
+                                                    <div className="">{getCountryName(currentUser.hcp_profile.country_iso2) || '--'}</div>
+                                                </div>
+                                                <div className="col-6">
+                                                    <div className="mt-1 font-weight-bold">Date of Registration</div>
+                                                    <div className="">{currentUser.hcp_profile.created_at ? (new Date(currentUser.hcp_profile.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.') : '--'}</div>
+                                                </div>
+                                            </div>
+                                            <div className="row mt-3">
+                                                <div className="col-6">
+                                                    <div className="mt-1 font-weight-bold">Status</div>
+                                                    <div className="text-capitalize">{currentUser.hcp_profile.status ? _.startCase(_.toLower(currentUser.hcp_profile.status.replace(/_/g, ' '))) : '--'}</div>
+                                                </div>
+                                            </div>
+                                            <div className="row mt-4">
+                                                <div className="col accordion-consent rounded shadow-sm p-0">
+                                                    <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Consents</h4>
+                                                    {currentUser.consents && currentUser.consents.length ? <Accordion>{currentUser.consents.map(consent =>
+                                                        <Card key={consent.id}>
+                                                            <Accordion.Collapse eventKey={consent.id}>
+                                                                <Card.Body>
+                                                                    <div>{parse(consent.rich_text)}</div>
+                                                                    <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Opt Type:</span> <span className="text-capitalize">{consent.opt_type}</span></div>
+                                                                    {consent.consent_given && <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Consent given date:</span>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>}
+                                                                </Card.Body>
+                                                            </Accordion.Collapse>
+                                                            <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
+                                                                <span className="d-flex align-items-center"><i class={`icon ${consent.consent_given ? 'icon-check-filled' : 'icon-close-circle text-danger'} cdp-text-primary mr-4 consent-check`}></i> <span className="consent-summary">{consent.preference}</span></span>
+                                                                <i className="icon icon-arrow-down ml-2 accordion-consent__icon-down"></i>
+                                                            </Accordion.Toggle>
+                                                        </Card>
+                                                    )}</Accordion> : <div className="m-3 alert alert-warning">The HCP has not given any consent.</div>}
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="row mt-3">
-                                            <div className="col-6">
-                                                <div className="mt-1 font-weight-bold">UUID</div>
-                                                <div className="">{currentUser.hcp_profile.uuid || '--'}</div>
-                                            </div>
-                                            <div className="col-6">
-                                                <div className="mt-1 font-weight-bold">OneKeyID</div>
-                                                <div className="">{currentUser.hcp_profile.individual_id_onekey || '--'}</div>
-                                            </div>
-                                        </div>
-                                        <div className="row mt-3">
-                                            <div className="col-6">
-                                                <div className="mt-1 font-weight-bold">Email</div>
-                                                <div className="">{currentUser.hcp_profile.email || '--'}</div>
-                                            </div>
-                                            <div className="col-6">
-                                                <div className="mt-1 font-weight-bold">Phone Number</div>
-                                                <div className="">{currentUser.hcp_profile.telephone || '--'}</div>
-                                            </div>
-                                        </div>
-                                        <div className="row mt-3">
-                                            <div className="col-6">
-                                                <div className="mt-1 font-weight-bold">Country</div>
-                                                <div className="">{getCountryName(currentUser.hcp_profile.country_iso2) || '--'}</div>
-                                            </div>
-                                            <div className="col-6">
-                                                <div className="mt-1 font-weight-bold">Date of Registration</div>
-                                                <div className="">{currentUser.hcp_profile.created_at ? (new Date(currentUser.hcp_profile.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.') : '--'}</div>
-                                            </div>
-                                        </div>
-                                        <div className="row mt-3">
-                                            <div className="col-6">
-                                                <div className="mt-1 font-weight-bold">Status</div>
-                                                <div className="text-capitalize">{currentUser.hcp_profile.status ? _.startCase(_.toLower(currentUser.hcp_profile.status.replace(/_/g, ' '))) : '--'}</div>
-                                            </div>
-                                        </div>
-                                        <div className="row mt-4">
-                                            <div className="col accordion-consent rounded shadow-sm p-0">
-                                                <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Consents</h4>
-                                                {currentUser.consents && currentUser.consents.length ? <Accordion>{currentUser.consents.map(consent =>
-                                                    <Card key={consent.id}>
-                                                        <Accordion.Collapse eventKey={consent.id}>
-                                                            <Card.Body>
-                                                                <div>{parse(consent.rich_text)}</div>
-                                                                <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Opt Type:</span> <span className="text-capitalize">{consent.opt_type}</span></div>
-                                                                {consent.consent_given && <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Consent given date:</span>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>}
-                                                            </Card.Body>
-                                                        </Accordion.Collapse>
-                                                        <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
-                                                            <span className="d-flex align-items-center"><i class={`icon ${consent.consent_given ? 'icon-check-filled' : 'icon-close-circle text-danger'} cdp-text-primary mr-4 consent-check`}></i> <span className="consent-summary">{consent.preference}</span></span>
-                                                            <i className="icon icon-arrow-down ml-2 accordion-consent__icon-down"></i>
-                                                        </Accordion.Toggle>
-                                                    </Card>
-                                                )}</Accordion> : <div className="m-3 alert alert-warning">The HCP has not given any consent.</div>}
-                                            </div>
-                                        </div>
-                                    </div>
                                     }
                                 </Modal.Body>
                             </Modal>
@@ -290,7 +313,7 @@ const CdpConsentPerformanceReport = () => {
                                                         <LinkContainer to={getUrl('first_name')}>
                                                             <span
                                                                 className={consents_report.orderBy === 'first_name' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'first_name', getorderType('first_name') ))}
+                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'first_name', getorderType('first_name')))}
                                                             >
                                                                 First Name
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -301,7 +324,7 @@ const CdpConsentPerformanceReport = () => {
                                                         <LinkContainer to={getUrl('last_name')}>
                                                             <span
                                                                 className={consents_report.orderBy === 'last_name' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'last_name', getorderType('last_name') ))}
+                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'last_name', getorderType('last_name')))}
                                                             >
                                                                 Last Name
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -312,7 +335,7 @@ const CdpConsentPerformanceReport = () => {
                                                         <LinkContainer to={getUrl('email')}>
                                                             <span
                                                                 className={consents_report.orderBy === 'email' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'email', getorderType('email') ))}
+                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'email', getorderType('email')))}
                                                             >
                                                                 Email
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -323,7 +346,7 @@ const CdpConsentPerformanceReport = () => {
                                                         <LinkContainer to={getUrl('consent_type')}>
                                                             <span
                                                                 className={consents_report.orderBy === 'consent_type' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'consent_type', getorderType('consent_type') ))}
+                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'consent_type', getorderType('consent_type')))}
                                                             >
                                                                 Consent Type
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -334,7 +357,7 @@ const CdpConsentPerformanceReport = () => {
                                                         <LinkContainer to={getUrl('opt_type')}>
                                                             <span
                                                                 className={consents_report.orderBy === 'opt_type' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'opt_type', getorderType('opt_type') ))}
+                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'opt_type', getorderType('opt_type')))}
                                                             >
                                                                 Opt Type
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -345,7 +368,7 @@ const CdpConsentPerformanceReport = () => {
                                                         <LinkContainer to={getUrl('legal_basis')}>
                                                             <span
                                                                 className={consents_report.orderBy === 'legal_basis' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'legal_basis', getorderType('legal_basis') ))}
+                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'legal_basis', getorderType('legal_basis')))}
                                                             >
                                                                 Legal Basis
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -356,7 +379,7 @@ const CdpConsentPerformanceReport = () => {
                                                         <LinkContainer to={getUrl('preferences')}>
                                                             <span
                                                                 className={consents_report.orderBy === 'preferences' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'preferences', getorderType('preferences') ))}
+                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'preferences', getorderType('preferences')))}
                                                             >
                                                                 Preferences
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -367,7 +390,7 @@ const CdpConsentPerformanceReport = () => {
                                                         <LinkContainer to={getUrl('date')}>
                                                             <span
                                                                 className={consents_report.orderBy === 'date' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'date', getorderType('date') ))}
+                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'date', getorderType('date')))}
                                                             >
                                                                 Date
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -382,7 +405,9 @@ const CdpConsentPerformanceReport = () => {
                                                     <tr key={index}>
                                                         <td>{row.hcp_profile.first_name}</td>
                                                         <td>{row.hcp_profile.last_name}</td>
-                                                        <td><i className="icon icon-check-filled icon-position-bit-down mr-2 cdp-text-secondary"></i>{row.hcp_profile.email}</td>
+                                                        <td>
+                                                            <i className={`icon icon-check-filled icon-position-bit-down mr-2 ` + (row.user_verified ? `cdp-text-primary` : `cdp-text-secondary`)}></i>
+                                                            {row.hcp_profile.email}</td>
                                                         <td>{row.category}</td>
                                                         <td>{titleCase(row.opt_type)}</td>
                                                         <td>{titleCase(row.legal_basis)}</td>
@@ -391,12 +416,12 @@ const CdpConsentPerformanceReport = () => {
                                                         <td>
                                                             <span>
                                                                 <Dropdown className="ml-auto dropdown-customize">
-                                                                        <Dropdown.Toggle variant="" className="cdp-btn-outline-primary font-weight-bold-light dropdown-toggle-without-icon btn-sm py-0 px-1 ">
-                                                                            <i className="icon icon-setting"></i> Action
+                                                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary font-weight-bold-light dropdown-toggle-without-icon btn-sm py-0 px-1 ">
+                                                                        <i className="icon icon-setting"></i> Action
                                                                     </Dropdown.Toggle>
                                                                     <Dropdown.Menu>
                                                                         <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(row)}>Profile</Dropdown.Item></LinkContainer>
-                                                                         {row.status === 'not_verified' && <LinkContainer to="#"><Dropdown.Item onClick={() => onUpdateStatus(row)}>Manage Status</Dropdown.Item></LinkContainer>}
+                                                                        {row.status === 'not_verified' && <LinkContainer to="#"><Dropdown.Item onClick={() => onUpdateStatus(row)}>Manage Status</Dropdown.Item></LinkContainer>}
                                                                     </Dropdown.Menu>
                                                                 </Dropdown>
                                                             </span>
@@ -414,13 +439,13 @@ const CdpConsentPerformanceReport = () => {
 
                                                 {
                                                     consents_report.page <= 1 ? (<span className="pagination-btn" data-testid='Prev' disabled={consents_report.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>) : <LinkContainer
-                                                        to={`/consent/consent-performance-report/cdp${makeUrl( [
+                                                        to={`/consent/consent-performance-report/cdp${makeUrl([
                                                             { name: 'page', value: consents_report.page - 1 },
                                                             { name: 'codbase', value: consents_report.codbase },
                                                             { name: 'opt_type', value: consents_report.opt_type },
                                                             { name: 'orderBy', value: consents_report.orderBy },
                                                             { name: 'orderType', value: consents_report.orderType }
-                                                        ] )}`}
+                                                        ])}`}
                                                     >
                                                         <span className="pagination-btn" data-testid='Prev' onClick={() => pageLeft()}><i className="icon icon-arrow-down ml-2 prev"></i></span>
                                                     </LinkContainer>
@@ -428,13 +453,13 @@ const CdpConsentPerformanceReport = () => {
 
                                                 {
                                                     consents_report.end === consents_report.total ? (<span className="pagination-btn" data-testid='Next' disabled={consents_report.end === consents_report.total}><i className="icon icon-arrow-down ml-2 next"></i></span>) : <LinkContainer
-                                                        to={`/consent/consent-performance-report/cdp${makeUrl( [
+                                                        to={`/consent/consent-performance-report/cdp${makeUrl([
                                                             { name: 'page', value: consents_report.page + 1 },
                                                             { name: 'codbase', value: consents_report.codbase },
                                                             { name: 'opt_type', value: consents_report.opt_type },
-                                                            { name: 'orderBy', value: consents_report.orderBy},
+                                                            { name: 'orderBy', value: consents_report.orderBy },
                                                             { name: 'orderType', value: consents_report.orderType }
-                                                        ] )}`}
+                                                        ])}`}
                                                     >
                                                         <span className="pagination-btn" data-testid='Next' onClick={() => pageRight()}><i className="icon icon-arrow-down ml-2 next"></i></span>
                                                     </LinkContainer>
