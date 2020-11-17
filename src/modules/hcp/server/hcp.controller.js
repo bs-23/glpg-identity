@@ -379,30 +379,44 @@ async function createHcpProfile(req, res) {
 
     if (!email || !validator.isEmail(email)) {
         response.errors.push(new CustomError('Email address is missing or invalid.', 400, 'email'));
+    } else if (email.length > 100) {
+        response.errors.push(new CustomError('Email should be at most 100 characters', 400, 'email'));
     }
 
     if (!uuid) {
         response.errors.push(new CustomError('UUID is missing.', 400, 'uuid'));
+    } else if (uuid.length > 20) {
+        response.errors.push(new CustomError('UUID should be at most 20 characters', 400, 'uuid'));
     }
 
     if (!salutation) {
         response.errors.push(new CustomError('Salutation is missing.', 400, 'salutation'));
+    } else if (salutation.length > 5) {
+        response.errors.push(new CustomError('Salutation should be at most 5 characters', 400, 'salutation'));
     }
 
     if (!first_name) {
         response.errors.push(new CustomError('First name is missing.', 400, 'first_name'));
+    } else if (first_name.length > 50) {
+        response.errors.push(new CustomError('First name should be at most 50 characters', 400, 'first_name'));
     }
 
     if (!last_name) {
         response.errors.push(new CustomError('Last name is missing.', 400, 'last_name'));
+    } else if (last_name.length > 50) {
+        response.errors.push(new CustomError('Last name should be at most 50 characters', 400, 'last_name'));
     }
 
     if (!country_iso2) {
         response.errors.push(new CustomError('country_iso2 is missing.', 400, 'country_iso2'));
+    } else if (country_iso2.length > 2) {
+        response.errors.push(new CustomError('Country code should be at most 2 characters', 400, 'country_iso2'));
     }
 
     if (!language_code) {
         response.errors.push(new CustomError('language_code is missing.', 400, 'language_code'));
+    } else if (language_code.length > 2) {
+        response.errors.push(new CustomError('Language code should be at most 2 characters', 400, 'language_code'));
     }
 
     if (!specialty_onekey) {
@@ -413,7 +427,13 @@ async function createHcpProfile(req, res) {
         response.errors.push(new CustomError('Origin URL is missing.', 400, 'origin_url'));
     }
 
-    if (specialty_onekey) {
+    if (telephone && telephone.length > 25) {
+        response.errors.push(new CustomError('Telephone number should be at most 25 digits including country code', 400, 'telephone'));
+    }
+
+    if (specialty_onekey.length > 20) {
+        response.errors.push(new CustomError('Specialty Onekey should be at most 20 characters', 400, 'specialty_onekey'));
+    } else if (specialty_onekey) {
         const specialty_master_data = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwspecialtymaster WHERE cod_id_onekey = $specialty_onekey", {
             bind: { specialty_onekey },
             type: QueryTypes.SELECT

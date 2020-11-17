@@ -6,7 +6,7 @@ CREATE TABLE ciam.users
     last_name character varying(50) COLLATE pg_catalog."default" NOT NULL,
     email character varying(100) COLLATE pg_catalog."default" NOT NULL,
     password character varying(255) COLLATE pg_catalog."default",
-    phone character varying(20) COLLATE pg_catalog."default",
+    phone character varying(25) COLLATE pg_catalog."default",
     type ciam.enum_users_type DEFAULT 'basic'::ciam.enum_users_type,
     countries character varying(255)[] COLLATE pg_catalog."default",
     permissions character varying(255)[] COLLATE pg_catalog."default",

@@ -1,12 +1,13 @@
 import { string, object, ref, array } from 'yup';
-import XRegExp from 'xregexp'
-// import phoneNumber from 'awesome-phonenumber'
+import XRegExp from 'xregexp';
+
+const PHONE_MAX_LENGTH = 25;
 
 const isPhoneMaxLengthValid = (parent) => {
     const { country_code, phone } = parent;
     if (!phone || !country_code) return true;
     const phonenumberWithCountryCode = country_code + phone;
-    return phonenumberWithCountryCode.length <= 20;
+    return phonenumberWithCountryCode.length <= PHONE_MAX_LENGTH;
 }
 
 function validatePassword(password) {
@@ -66,7 +67,7 @@ export const registerSchema = object().shape({
     phone: string()
         .matches(/^[0-9]*$/, 'This field only contains digits')
         .min(4, 'This field must be at least 4 characters long')
-        .test('is-length-valid', 'This field must be at most 20 characters long',
+        .test('is-length-valid', `This field must be at most ${PHONE_MAX_LENGTH} characters long`,
             function () {
                 return isPhoneMaxLengthValid(this.parent);
             }),
@@ -184,14 +185,14 @@ export const updateMyProfileSchema = object().shape({
         is: true,
         then: string().matches(/^[0-9]*$/, 'This field only contains digits')
             .min(4, 'This field must be at least 4 characters long')
-            .test('is-length-valid', 'This field must be at most 20 characters long',
+            .test('is-length-valid', `This field must be at most ${PHONE_MAX_LENGTH} characters long`,
             function() {
                 return isPhoneMaxLengthValid(this.parent);
             }),
         otherwise: string().matches(/^[+0-9]*$/, 'This field only contains digits or plus')
             .min(7, 'This field must be at least 7 characters long')
-            .test('is-length-valid', 'This field must be at most 20 characters long', phone => {
-                return phone.length <= 20;
+            .test('is-length-valid', `This field must be at most ${PHONE_MAX_LENGTH} characters long`, phone => {
+                return phone.length <= PHONE_MAX_LENGTH;
             })
     })
 });

@@ -9,7 +9,7 @@ CREATE TABLE ciam.hcp_profiles
     last_name character varying(50) COLLATE pg_catalog."default" NOT NULL,
     email character varying(100) COLLATE pg_catalog."default" NOT NULL,
     password character varying(255) COLLATE pg_catalog."default",
-    telephone character varying(20) COLLATE pg_catalog."default",
+    telephone character varying(25) COLLATE pg_catalog."default",
     country_iso2 character varying(2) COLLATE pg_catalog."default" NOT NULL,
     language_code character varying(2) COLLATE pg_catalog."default" NOT NULL,
     locale character varying(5) COLLATE pg_catalog."default" NOT NULL,
