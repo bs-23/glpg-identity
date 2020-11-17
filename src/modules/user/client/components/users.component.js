@@ -63,12 +63,8 @@ export default function Users() {
         let countryArr = [];
         let countryString = "";
         if (countries.length > 0 && (user_countries.length)) {
-            if(user_countries.includes('all')) {
-                countryArr = [...countries];
-            }else {
-                user_countries.map((country_iso2) =>
-                    countryArr.push(countries.find(i => i.country_iso2 === country_iso2)).codbase_desc);
-            }
+            user_countries.map((country_iso2) =>
+                countryArr.push(countries.find(i => i.country_iso2 === country_iso2)).codbase_desc);
         }
 
         countryArr.sort((a, b) => (a.codbase_desc > b.codbase_desc) ? 1 : -1);

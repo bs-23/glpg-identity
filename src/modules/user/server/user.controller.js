@@ -498,8 +498,6 @@ async function getUsers(req, res) {
             type: QueryTypes.SELECT
         })).map(c => c.country_iso2);
 
-        if(country_iso2_list_for_codbase.length) country_iso2_list_for_codbase.push('all');
-        if(userCountries.length) userCountries.push('all');
 
         const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase
             .map(i => ignoreCaseArray(i)));

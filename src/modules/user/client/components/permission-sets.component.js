@@ -34,12 +34,12 @@ export default function ManagePermissionSets() {
 
     const getServiceCategoryNames = (data) => {
         if(!data.ps_sc) return '';
-        return data.ps_sc.filter(sc => sc.serviceCategory.slug !== 'all').map(item => item.serviceCategory.title).sort().join(', ');
+        return data.ps_sc.map(item => item.serviceCategory.title).sort().join(', ');
     }
 
     const getApplicationNames = (data) => {
         if(!data.ps_app) return '';
-        return data.ps_app.filter(app => app.application.slug !== 'all').map(item => item.application.name).sort().join(', ');
+        return data.ps_app.map(item => item.application.name).sort().join(', ');
     }
 
     const handleFormSubmitSuccess = () => {

@@ -96,7 +96,6 @@ async function init() {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
 
             const serviceCategories = [
-                { title: "All Service Categories", slug: "all", created_by: admin.id, updated_by: admin.id },
                 { title: "Management of Customer Data Platform", slug: "platform", created_by: admin.id, updated_by: admin.id },
                 { title: "Information Management", slug: "information", created_by: admin.id, updated_by: admin.id },
                 { title: "Data Privacy & Consent Management", slug: "privacy", created_by: admin.id, updated_by: admin.id }
@@ -118,9 +117,9 @@ async function init() {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
 
             const permissionSet = [
-                { title: "System Admin Permission Set", slug: "system_admin", type: 'standard', countries:["all"], description: "This is the default permission set for System Admin", created_by: admin.id, updated_by: admin.id },
-                { title: "Site Admin Permission Set", slug: "site_admin", type: 'standard', description: "This is the default permission set for Site Admin", countries:["all"], created_by: admin.id, updated_by: admin.id },
-                { title: "GDS Permission Set", slug: "gds", type: 'standard', countries:["all"], description: "This is the default permission set for Global Data Steward", created_by: admin.id, updated_by: admin.id },
+                { title: "System Admin Permission Set", slug: "system_admin", type: 'standard', countries:["BE", "FR", "DE", "IT", "NL", "ES", "GB"], description: "This is the default permission set for System Admin", created_by: admin.id, updated_by: admin.id },
+                { title: "Site Admin Permission Set", slug: "site_admin", type: 'standard', description: "This is the default permission set for Site Admin", countries:["BE", "FR", "DE", "IT", "NL", "ES", "GB"], created_by: admin.id, updated_by: admin.id },
+                { title: "GDS Permission Set", slug: "gds", type: 'standard', countries:["BE", "FR", "DE", "IT", "NL", "ES", "GB"], description: "This is the default permission set for Global Data Steward", created_by: admin.id, updated_by: admin.id },
                 { title: "LDS Permission Set", slug: "lds", type: 'standard', description: "This is the default permission set for Local Data Steward", created_by: admin.id, updated_by: admin.id },
                 { title: "DPO Permission Set", slug: "data_privacy_officer", type: 'standard', description: "This is the default permission set for Data Privacy Officer", created_by: admin.id, updated_by: admin.id },
             ];
@@ -140,7 +139,6 @@ async function init() {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
             const systemAdmin_permissionSet = PermissionSet.findOne({ where: { slug: 'system_admin' } });
             const siteAdmin_permissionSet = PermissionSet.findOne({ where: { slug: 'site_admin' } });
-            const allServiceCategory = ServiceCategory.findOne({ where: { slug: 'all' } });
             const hcpServiceCategory = ServiceCategory.findOne({ where: { slug: 'information' } });
             const userServiceCategory = ServiceCategory.findOne({ where: { slug: 'platform' } });
             const consentServiceCategory = ServiceCategory.findOne({ where: { slug: 'privacy' } });
@@ -148,11 +146,15 @@ async function init() {
             const gds_permissionSet = PermissionSet.findOne({ where: { slug: 'gds' } });
             const lds_permissionSet = PermissionSet.findOne({ where: { slug: 'lds' } });
 
-            Promise.all([systemAdmin_permissionSet, siteAdmin_permissionSet, hcpServiceCategory, userServiceCategory, consentServiceCategory, dpo_permissionSet, gds_permissionSet, lds_permissionSet, allServiceCategory]).then((values) => {
+            Promise.all([systemAdmin_permissionSet, siteAdmin_permissionSet, hcpServiceCategory, userServiceCategory, consentServiceCategory, dpo_permissionSet, gds_permissionSet, lds_permissionSet]).then((values) => {
                 const permissionSet_serviceCategory = [
-                    { permissionSetId: values[0].id, serviceCategoryId: values[8].id },
+                    { permissionSetId: values[0].id, serviceCategoryId: values[2].id },
+                    { permissionSetId: values[0].id, serviceCategoryId: values[3].id },
+                    { permissionSetId: values[0].id, serviceCategoryId: values[4].id },
 
-                    { permissionSetId: values[1].id, serviceCategoryId: values[8].id },
+                    { permissionSetId: values[1].id, serviceCategoryId: values[2].id },
+                    { permissionSetId: values[1].id, serviceCategoryId: values[3].id },
+                    { permissionSetId: values[1].id, serviceCategoryId: values[4].id },
 
                     { permissionSetId: values[5].id, serviceCategoryId: values[4].id },
                     { permissionSetId: values[5].id, serviceCategoryId: values[2].id },
@@ -213,19 +215,6 @@ async function init() {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
             const applications = [
                 {
-                    name: 'All Applications',
-                    slug: 'all',
-                    email: '',
-                    consent_confirmation_path: '',
-                    journey_redirect_path: '',
-                    login_link: '',
-                    logo_link: '',
-                    auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6c',
-                    approve_user_path: '',
-                    created_by: admin.id,
-                    updated_by: admin.id
-                },
-                {
                     id: '3252888b-530a-441b-8358-3e423dbce08a',
                     name: 'HCP Portal',
                     slug: convertToSlug('HCP Portal'),
@@ -276,11 +265,13 @@ async function init() {
     function permissionSetApplicationsSeeder(callback) {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
             const systemAdmin_permissionSet = PermissionSet.findOne({ where: { slug: 'system_admin' } });
-            const allApplications = Application.findOne({ where: { slug: 'all' } });
+            const jyselecaApplication = Application.findOne({ where: { slug: 'jyseleca' } });
+            const hcpPortalApplication = Application.findOne({ where: { slug: 'hcp-portal' } });
 
-            Promise.all([systemAdmin_permissionSet, allApplications]).then((values) => {
+            Promise.all([systemAdmin_permissionSet, jyselecaApplication, hcpPortalApplication]).then((values) => {
                 const permissionSet_applications = [
                     { permissionSetId: values[0].id, applicationId: values[1].id },
+                    { permissionSetId: values[0].id, applicationId: values[2].id },
                 ];
 
                 PermissionSet_Application.destroy({ truncate: { cascade: true } }).then(() => {

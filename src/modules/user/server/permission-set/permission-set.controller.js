@@ -1,6 +1,5 @@
 const path = require('path');
-const { Op, QueryTypes } = require('sequelize');
-const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
+const { Op } = require('sequelize');
 const validator = require('validator');
 const PermissionSet = require('./permission-set.model');
 const PermissionSet_ServiceCategory = require('./permissionSet-serviceCategory.model');
@@ -8,23 +7,6 @@ const PermissionSet_Application = require('./permissionSet-application.model');
 const ServiceCategory = require('../permission/service-category.model');
 const Application = require('../../../application/server/application.model');
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
-
-const allCountries = async () => {
-    const countries = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry WHERE codbase_desc=countryname ORDER BY codbase_desc, countryname;", { type: QueryTypes.SELECT });
-    const allCountryObject = { country_iso2: 'all' };
-    countries.push(allCountryObject);
-    return countries;
-}
-
-const allServiceCategories = async () => {
-    const serviceCategories = await ServiceCategory.findAll();
-    return serviceCategories.map(i => i.dataValues);
-}
-
-const allApplications = async () => {
-    const applications = await Application.findAll();
-    return applications.map(i => i.dataValues);
-}
 
 async function getPermissionSets(req, res) {
     try {
@@ -59,25 +41,8 @@ async function getPermissionSets(req, res) {
             ]
         });
 
-        const permissionSetList = await Promise.all(
-            permissionSets.map(async ps => {
-                if(ps.countries && ps.countries.includes('all')){
-                    const countries = await allCountries();
-                    ps.dataValues.countries = countries.map(c => c.country_iso2);
-                }
-                if(ps.ps_sc && ps.ps_sc.find(psc => psc.serviceCategory.slug === 'all')) {
-                    const serviceCategories = await allServiceCategories();
-                    ps.dataValues.ps_sc = serviceCategories && serviceCategories.map(sc => ({ serviceCategory: { id: sc.id, title: sc.title, slug: sc.slug } }));
-                }
-                if(ps.ps_app && ps.ps_app.find(papp => papp.application.slug === 'all')) {
-                    const applications = await allApplications();
-                    ps.dataValues.ps_app = applications && applications.map(app=> ({ application: { id: app.id, name: app.name, slug: app.slug } }));
-                }
-                return ps.dataValues;
-            })
-        )
 
-        res.json(permissionSetList);
+        res.json(permissionSets);
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal server error');
@@ -120,21 +85,6 @@ async function getPermissionSet(req, res) {
 
         if(!permissionSet) return res.status(404).send('Permission set not found.');
 
-        if(permissionSet.countries && permissionSet.countries.includes('all')){
-            const countries = await allCountries();
-            permissionSet.dataValues.countries = countries.map(c => c.country_iso2);
-        }
-
-        if(permissionSet.ps_sc && permissionSet.ps_sc.find(psc => psc.serviceCategory.slug === 'all')) {
-            const serviceCategories = await allServiceCategories();
-            permissionSet.dataValues.ps_sc = serviceCategories && serviceCategories.map(sc => ({ serviceCategory: { id: sc.id, title: sc.title, slug: sc.slug } }));
-        }
-
-        if(permissionSet.ps_app && permissionSet.ps_app.find(papp => papp.application.slug === 'all')) {
-            const applications = await allApplications();
-            permissionSet.dataValues.ps_app = applications && applications.map(app=> ({ application: { id: app.id, name: app.name } }));
-        }
-
         res.json(permissionSet.dataValues);
     } catch (error) {
         console.error(error);
@@ -160,7 +110,7 @@ async function createPermissionSet(req, res) {
                 title: title,
                 slug: title.replace(/ +/g, '_').toLowerCase(),
                 description,
-                countries: countries ? countries.includes('all') ? ['all'] : countries : [],
+                countries: countries ? countries : [],
                 created_by: req.user.id,
                 updated_by: req.user.id
             }
@@ -168,26 +118,18 @@ async function createPermissionSet(req, res) {
 
         if(!created) return res.status(400).send('Permission set with the same title already exists.');
 
-        const allServiceCategoryOption = await ServiceCategory.findOne({ where: { slug: 'all' }});
-        const allApplicationOption = await Application.findOne({ where: { slug: 'all' }});
 
         let serviceCategories_permissionSet = [];
 
-        if(allServiceCategoryOption && serviceCategories.find(id => id === allServiceCategoryOption.id)) {
-            serviceCategories_permissionSet = [{ permissionSetId: doc.id, serviceCategoryId: allServiceCategoryOption.id }];
-        }else {
-            serviceCategories_permissionSet = serviceCategories.map(id => ({ permissionSetId: doc.id, serviceCategoryId: id }));
-        }
+        serviceCategories_permissionSet = serviceCategories.map(id => ({ permissionSetId: doc.id, serviceCategoryId: id }));
+
 
         await PermissionSet_ServiceCategory.bulkCreate(serviceCategories_permissionSet);
 
         let applications_permissionSet = [];
 
-        if(allApplicationOption && applications.find(id => id === allApplicationOption.id)) {
-            applications_permissionSet = [{ permissionSetId: doc.id, applicationId: allApplicationOption.id }];
-        }else {
-            applications_permissionSet = applications.map(id => ({ permissionSetId: doc.id, applicationId: id }));
-        }
+        applications_permissionSet = applications.map(id => ({ permissionSetId: doc.id, applicationId: id }));
+
 
         await PermissionSet_Application.bulkCreate(applications_permissionSet);
 
@@ -231,25 +173,14 @@ async function editPermissionSet(req, res) {
         await doc.update({
             title: title.trim(),
             slug: title.trim().replace(/ /g, '_').toLowerCase(),
-            countries: countries ? countries.includes('all') ? ['all'] : countries : [],
+            countries: countries ? countries : [],
             description,
             updated_by: req.user.id
         });
 
-        const allServiceCategoryOption = await ServiceCategory.findOne({ where: { slug: 'all' }});
-        const allApplicationOption = await Application.findOne({ where: { slug: 'all' }});
+        await doc.setService_categories(serviceCategories);
 
-        if(allServiceCategoryOption && serviceCategories.includes(allServiceCategoryOption.id)){
-            await doc.setService_categories([allServiceCategoryOption.id]);
-        }else {
-            await doc.setService_categories(serviceCategories);
-        }
-
-        if(allApplicationOption && applications.includes(allApplicationOption.id)){
-            await doc.setApplications([allApplicationOption.id]);
-        }else{
-            await doc.setApplications(applications);
-        }
+        await doc.setApplications(applications);
 
         res.json(doc);
     } catch (error) {
