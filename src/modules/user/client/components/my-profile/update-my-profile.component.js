@@ -115,7 +115,10 @@ const UpdateMyProfile = () => {
         last_name: myProfileInfo && myProfileInfo.last_name,
         email: myProfileInfo && myProfileInfo.email,
         phone: myProfileInfo && getPhoneNumberWithoutCountryCode(myProfileInfo.phone),
-        isCountryFlagActive: myProfileInfo && (myProfileInfo.phone === '' || isCountryDetectedFromPhone(myProfileInfo.phone))
+        isCountryFlagActive: myProfileInfo && (myProfileInfo.phone === '' || isCountryDetectedFromPhone(myProfileInfo.phone)),
+        country_code: selectedCountryCode >= 0 && countries && countries.length
+            ? CountryCodesObject[countries[selectedCountryCode].country_iso2]
+            : ''
     }
 
     const generateCountryIconPath = (country) => {
@@ -163,6 +166,8 @@ const UpdateMyProfile = () => {
         const { setFieldValue } = formikProps;
         setFieldValue('isCountryFlagActive', true);
         setSelectedCountryCode(index);
+        const countryCode = CountryCodesObject[countries[index].country_iso2];
+        setFieldValue('country_code', countryCode);
     }
 
     const handlePhoneFieldChange = (e, formikProps) => {
