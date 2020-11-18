@@ -1,6 +1,9 @@
 const path = require('path');
 const jwt = require('jsonwebtoken');
 const Application = require('./application.model');
+const Information = require('./information.model');
+const InformationType = require('./information-type.model');
+const { Op } = require('sequelize');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 
@@ -103,5 +106,48 @@ async function getApplications(req, res) {
     }
 }
 
+async function createData(req, res) {
+    const response = new Response({}, []);
+
+    try{
+        const {type, data} = req.body;
+
+        if(!type) {
+            response.errors.push(new CustomError('Type is missing.', 400, 'type'));
+            return res.status(400).send(response);
+        }
+
+        const [typeFound, created] = await InformationType.findOrCreate({
+            where: {
+                name: {
+                    [Op.iLike]: type
+                }
+            },
+            defaults: {
+                name: type
+            }
+        });
+
+        const information = await Information.create({
+            application_id: req.user.id,
+            information_type_id: typeFound.id,
+            data: JSON.stringify(data),
+            created_by: req.user.id,
+            updated_by: req.user.id
+        });
+
+        information.dataValues.type =  typeFound;
+        information.dataValues.data = JSON.parse(information.dataValues.data);
+
+        response.data = information;
+        res.json(response);
+    }
+    catch(err){
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 exports.getToken = getToken;
 exports.getApplications = getApplications;
+exports.createData = createData;
