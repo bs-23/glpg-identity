@@ -5,7 +5,9 @@ const specHelper = require(path.join(process.cwd(), 'jest/spec.helper'));
 const app = require(path.join(process.cwd(), 'src/config/server/lib/express'));
 
 const { defaultApplication } = specHelper;
+const { signCookie } = specHelper;
 const { consent: { demoConsent } } = specHelper;
+const { defaultUser } = specHelper.users;
 
 let request;
 
@@ -26,6 +28,15 @@ describe('Consent Routes', () => {
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveProperty('data');
         expect(response.body.errors).toHaveLength(0);
+        expect(response.res.headers['content-type']).toMatch('application/json');
+    });
+
+    it('Should get all country consents', async () => {
+        const response = await request
+            .get(`/api/consent/country`)
+            .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
+
+        expect(response.statusCode).toBe(200);
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
 });
