@@ -47,7 +47,7 @@ paths:
                     description: The access_token is invalid or expired.
                 4401:
                     description: The refresh_token is invalid or expired.
-    /api/data:
+    /api/applications/data:
         post:
             tags:
                 - applications
@@ -62,7 +62,7 @@ paths:
                                 type:
                                     type: string
                                 data:
-                                    type: object
+                                    type: string
                             required:
                                 - type
                                 - data
@@ -81,10 +81,10 @@ paths:
                                                 type: string
                                             application_id:
                                                 type: string
-                                            information_type_id:
+                                            type:
                                                 type: string
                                             data:
-                                                type: object
+                                                type: string
                                             created_by:
                                                 type: string
                                             updated_by:
@@ -93,18 +93,6 @@ paths:
                                                 type: string
                                             updated_at:
                                                 type: string
-                                            type:
-                                                type: object
-                                                properties:
-                                                    id:
-                                                        type: string
-                                                    name:
-                                                        type: string
-                                                    created_at:
-                                                        type: string
-                                                    updated_at:
-                                                        type: string
-
                                     errors:
                                         $ref: "#/components/schemas/errorBodyInSuccess"
                 400:

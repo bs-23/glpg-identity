@@ -1,11 +1,10 @@
 const path = require('path');
 const { DataTypes } = require('sequelize');
 const Application = require('./application.model');
-const InformationType = require('./information-type.model');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
-const Information = sequelize.cdpConnector.define('informations', {
+const Data = sequelize.cdpConnector.define('datas', {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -16,9 +15,10 @@ const Information = sequelize.cdpConnector.define('informations', {
         allowNull: false,
         type: DataTypes.UUID
     },
-    information_type_id: {
+    type: {
+        unique: true,
         allowNull: false,
-        type: DataTypes.UUID
+        type: DataTypes.STRING,
     },
     data: {
         allowNull: false,
@@ -32,30 +32,20 @@ const Information = sequelize.cdpConnector.define('informations', {
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
-    tableName: 'informations',
+    tableName: 'datas',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
 
-Application.hasMany(Information, {
-    as: 'informations_in_application',
+Application.hasMany(Data, {
+    as: 'datas_in_application',
     foreignKey: 'application_id'
 });
 
-Information.belongsTo(Application, {
-    as: 'information_in_application',
+Data.belongsTo(Application, {
+    as: 'data_in_application',
     foreignKey: 'application_id'
 });
 
-InformationType.hasMany(Information, {
-    as: 'informations_in_information_type',
-    foreignKey: 'information_type_id'
-});
-
-Information.belongsTo(InformationType, {
-    as: 'information_in_information_type',
-    foreignKey: 'information_type_id'
-});
-
-module.exports = Information;
+module.exports = Data;
