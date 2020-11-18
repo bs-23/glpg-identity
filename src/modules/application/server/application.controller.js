@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const Application = require('./application.model');
 const Data = require('./data.model');
 const { Op } = require('sequelize');
+const { assign } = require('lodash');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 
@@ -161,6 +162,33 @@ async function saveData(req, res) {
     }
 }
 
+async function getData(req, res) {
+    const response = new Response({}, []);
+    try{
+        doc = await Data.findOne({
+            where: { id: req.params.id },
+            include: {
+                model: Application,
+                as: 'application',
+                attributes: ['id', 'name'],
+            }
+        });
+
+        if (!doc) {
+            response.errors.push(new CustomError('Profile not found.', 404));
+            return res.status(404).send(response);
+        }
+        response.data = doc;
+
+        res.json(response);
+    }
+    catch(err){
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 exports.getToken = getToken;
 exports.getApplications = getApplications;
 exports.saveData = saveData;
+exports.getData = getData;

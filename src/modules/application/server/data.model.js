@@ -38,12 +38,12 @@ const Data = sequelize.cdpConnector.define('datas', {
 });
 
 Application.hasMany(Data, {
-    as: 'datas_in_application',
+    as: 'datas',
     foreignKey: 'application_id'
 });
 
 Data.belongsTo(Application, {
-    as: 'data_in_application',
+    as: 'application',
     foreignKey: 'application_id'
 });
 

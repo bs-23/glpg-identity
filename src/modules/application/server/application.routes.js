@@ -12,4 +12,7 @@ module.exports = app => {
     app.route('/api/applications/data')
         .post(passport.authenticate('application-jwt', { session: false }), controller.saveData);
 
+    app.route('/api/applications/data/:id')
+        .get(passport.authenticate('application-jwt', { session: false }), controller.getData);
+
 };
