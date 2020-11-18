@@ -9,8 +9,7 @@ module.exports = app => {
     app.route('/api/applications')
         .get(CDPAuthStrategy, controller.getApplications);
 
-    app.route('/api/data')
-        // .get(passport.authenticate('application-jwt', { session: false }), controller.getAllData)
+    app.route('/api/applications/data')
         .post(passport.authenticate('application-jwt', { session: false }), controller.createData);
 
 };

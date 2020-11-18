@@ -1,8 +1,7 @@
 const path = require('path');
 const jwt = require('jsonwebtoken');
 const Application = require('./application.model');
-const Information = require('./information.model');
-const InformationType = require('./information-type.model');
+const Data = require('./data.model');
 const { Op } = require('sequelize');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
@@ -114,32 +113,25 @@ async function createData(req, res) {
 
         if(!type) {
             response.errors.push(new CustomError('Type is missing.', 400, 'type'));
+        }
+
+        if(!data) {
+            response.errors.push(new CustomError('Data is missing.', 400, 'data'));
+        }
+
+        if (response.errors.length) {
             return res.status(400).send(response);
         }
 
-        const [typeFound, created] = await InformationType.findOrCreate({
-            where: {
-                name: {
-                    [Op.iLike]: type
-                }
-            },
-            defaults: {
-                name: type
-            }
-        });
-
-        const information = await Information.create({
+        const info = await Data.create({
             application_id: req.user.id,
-            information_type_id: typeFound.id,
-            data: JSON.stringify(data),
+            type,
+            data,
             created_by: req.user.id,
             updated_by: req.user.id
         });
 
-        information.dataValues.type =  typeFound;
-        information.dataValues.data = JSON.parse(information.dataValues.data);
-
-        response.data = information;
+        response.data = info;
         res.json(response);
     }
     catch(err){
