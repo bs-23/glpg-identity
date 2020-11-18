@@ -313,10 +313,10 @@ const UpdateMyProfile = () => {
                                                     as="select"
                                                     name="role"
                                                     className="form-control"
-                                                    value={myProfileInfo && myProfileInfo.role.length ? myProfileInfo.role[0].title : ''}
+                                                    value={myProfileInfo && myProfileInfo.role && myProfileInfo.role.length ? myProfileInfo.role[0].title : ''}
                                                     disabled
                                                 >
-                                                    <option value={myProfileInfo && myProfileInfo.role.length ? myProfileInfo.role[0].title : ''}>{myProfileInfo && myProfileInfo.role.length ? myProfileInfo.role[0].title : ''}</option>
+                                                    <option value={myProfileInfo && myProfileInfo.role && myProfileInfo.role.length ? myProfileInfo.role[0].title : ''}>{myProfileInfo && myProfileInfo.role && myProfileInfo.role.length ? myProfileInfo.role[0].title : ''}</option>
                                                 </Field>
                                             </div>
                                         </div>
