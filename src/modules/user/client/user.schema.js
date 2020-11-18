@@ -1,6 +1,14 @@
 import { string, object, ref, array } from 'yup';
-import XRegExp from 'xregexp'
-// import phoneNumber from 'awesome-phonenumber'
+import XRegExp from 'xregexp';
+
+const PHONE_MAX_LENGTH = 25;
+
+const isPhoneMaxLengthValid = (parent) => {
+    const { country_code, phone } = parent;
+    if (!phone || !country_code) return true;
+    const phonenumberWithCountryCode = country_code + phone;
+    return phonenumberWithCountryCode.length <= PHONE_MAX_LENGTH;
+}
 
 function validatePassword(password) {
     const minLength = 8;
@@ -23,10 +31,12 @@ function hasValidCharacters(password) {
     return containsValidCharacters;
 }
 
-// const validatePhone = phone => {
-//     if (!phone) return true
-//     return phoneNumber(phone).isValid()
-// }
+function isEmailLengthValid(email) {
+    if(!email) return false;
+    const parts = email.split('@');
+    const local = parts[0];
+    return local.length <= 64;
+}
 
 export const loginSchema = object().shape({
     email: string()
@@ -51,15 +61,16 @@ export const registerSchema = object().shape({
     email: string()
         .email('This field should be a valid email address')
         .max(100, 'This field must be at most 100 characters long')
-        .required('This field must not be empty'),
-    country_code: string()
-        .matches(/^[+]+/, 'This field must start with a plus')
-        .matches(/^[+]?[ 0-9]+$/, 'Must conform to international phone number format and can only contain digits, spaces or plus'),
+        .required('This field must not be empty')
+        .test('is-valid-email-length', 'The part before @ of the email can be maximum 64 characters ',
+            email => isEmailLengthValid(email)),
     phone: string()
         .matches(/^[0-9]*$/, 'This field only contains digits')
         .min(4, 'This field must be at least 4 characters long')
-        .max(20, 'This field must be at most 20 characters long'),
-        // .test('is-valid-phone', 'Must be a valid international phone number.', validatePhone),
+        .test('is-length-valid', `This field must be at most ${PHONE_MAX_LENGTH} characters long`,
+            function () {
+                return isPhoneMaxLengthValid(this.parent);
+            }),
     profile: string()
         .required('Must select at least one profile'),
     role: string()
@@ -114,7 +125,11 @@ export const roleSchema = object().shape({
 });
 
 export const permissionSetCreateSchema = object().shape({
-    title: string().required('This field must not be empty.'),
+    title: string()
+        .required('This field must not be empty.')
+        .max(50, 'This field must be at most 50 characters long'),
+    description: string()
+        .max(500, 'This field must be at most 500 characters long'),
     applications: string(),
     countries: string(),
     serviceCategories: string(),
@@ -129,39 +144,55 @@ export const permissionSetCreateSchema = object().shape({
 });
 
 export const profileCreateSchema = object().shape({
-    title: string().required('This field must not be empty.'),
+    title: string()
+        .required('This field must not be empty.')
+        .max(50, 'This field must be at most 50 characters long'),
     permissionSets: string().required('Must select at least one permission set.'),
-    description: string().nullable()
+    description: string()
+        .nullable()
+        .max(500, 'This field must be at most 500 characters long'),
 });
 
 export const roleCreateSchema = object().shape({
-    title: string().required('This field must not be empty.'),
+    title: string()
+        .required('This field must not be empty.')
+        .max(50, 'This field must be at most 50 characters long'),
     permissionSets: string().required('Must select at least one permission set.'),
-    description: string().nullable()
+    description: string()
+        .nullable()
+        .max(500, 'This field must be at most 500 characters long'),
 });
+
 export const updateMyProfileSchema = object().shape({
     first_name: string()
         .matches(XRegExp('^[\\pL]+(?:\\s[\\pL]+)*$'), 'This field should contain letters only')
         .min(2, 'This field must be at least 2 characters long')
-        .max(20, 'This field must be at most 20 characters long')
+        .max(50, 'This field must be at most 50 characters long')
         .required('This field must not be empty'),
     last_name: string()
         .matches(XRegExp('^[\\pL]+(?:\\s[\\pL]+)*$'), 'This field should contain letters only')
         // .matches(XRegExp('^\\pL+$'), 'This field only contains letters')
         .min(2, 'This field must be at least 2 characters long')
-        .max(20, 'This field must be at most 20 characters long')
+        .max(50, 'This field must be at most 50 characters long')
         .required('This field must not be empty'),
     email: string()
         .email('This field should be a valid email address')
-        .required('This field must not be empty'),
+        .max(100, 'This field must be at most 100 characters long')
+        .required('This field must not be empty')
+        .test('is-valid-email-length', 'The part before @ of the email can be maximum 64 characters ',
+            email => isEmailLengthValid(email)),
     phone: string().when('isCountryFlagActive', {
         is: true,
         then: string().matches(/^[0-9]*$/, 'This field only contains digits')
             .min(4, 'This field must be at least 4 characters long')
-            .max(15, 'This field must be at most 15 characters long'),
+            .test('is-length-valid', `This field must be at most ${PHONE_MAX_LENGTH} characters long`,
+            function() {
+                return isPhoneMaxLengthValid(this.parent);
+            }),
         otherwise: string().matches(/^[+0-9]*$/, 'This field only contains digits or plus')
             .min(7, 'This field must be at least 7 characters long')
-            .max(19, 'This field must be at most 19 characters long'),
+            .test('is-length-valid', `This field must be at most ${PHONE_MAX_LENGTH} characters long`, phone => {
+                return phone.length <= PHONE_MAX_LENGTH;
+            })
     })
-
-})
+});

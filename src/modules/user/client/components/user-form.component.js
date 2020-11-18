@@ -17,7 +17,7 @@ export default function UserForm() {
     const history = useHistory();
     const { addToast } = useToasts();
 
-    const CountryCodesObject = CountryCodes.customList('countryCode', '+{countryCallingCode}')
+    const CountryCodesObject = CountryCodes.customList('countryCode', '+{countryCallingCode}');
     const countries = useSelector(state => state.countryReducer.countries);
 
     const generateCountryIconPath = (country) => {
@@ -54,7 +54,7 @@ export default function UserForm() {
                         </nav>
                     </div>
                 </div>
-                {countries &&
+                {countries && countries.length &&
                     <div className="row">
                         <div className="col-12">
                             <div className="shadow-sm bg-white mb-3">
@@ -67,12 +67,12 @@ export default function UserForm() {
                                             first_name: "",
                                             last_name: "",
                                             email: "",
+                                            country_code: countries[selectedCountryCode] ? CountryCodesObject[countries[selectedCountryCode].country_iso2] : "",
                                             phone: '',
                                             profile: '',
                                             role: '',
                                             permission_sets: []
                                         }}
-                                        enableReinitialize
                                         displayName="UserForm"
                                         validationSchema={registerSchema}
                                         onSubmit={(values, actions) => {
@@ -141,7 +141,11 @@ export default function UserForm() {
                                                                                         {
                                                                                             countries.map( (country, index) => {
                                                                                                 return index === selectedCountryCode ? null :
-                                                                                                (<Dropdown.Item onClick={() => setSelectedCountryCode(index)} key={index} className="px-2 d-flex align-items-center">
+                                                                                                (<Dropdown.Item onClick={() => {
+                                                                                                    setSelectedCountryCode(index);
+                                                                                                    const countryCode = CountryCodesObject[countries[index].country_iso2];
+                                                                                                    formikProps.setFieldValue('country_code', countryCode);
+                                                                                                }} key={index} className="px-2 d-flex align-items-center">
                                                                                                     <img height="20" width="20" src={generateCountryIconPath(country.codbase_desc)} title={country.codbase_desc} />
                                                                                                     <span className="country-name pl-2">{ country.codbase_desc }</span>
                                                                                                     <span className="country-phone-code pl-1">{ CountryCodesObject[country.country_iso2] }</span>

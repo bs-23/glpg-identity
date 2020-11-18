@@ -195,7 +195,7 @@ async function getHcps(req, res) {
             include: [{
                 model: HcpConsents,
                 as: 'hcpConsents',
-                attributes: ['consent_id', 'response', 'consent_confirmed'],
+                attributes: ['consent_id', 'consent_confirmed', 'opt_type'],
             }],
             attributes: { exclude: ['password', 'created_by', 'updated_by'] },
             offset,
@@ -203,27 +203,40 @@ async function getHcps(req, res) {
             order: order
         });
 
-        await Promise.all(hcps.map(async hcp => {
+        // await Promise.all(hcps.map(async hcp => {
+        //     const opt_types = new Set();
+
+        //     await Promise.all(hcp['hcpConsents'].map(async hcpConsent => {
+
+        //         if (hcpConsent.consent_confirmed) {
+        //             const country_consent = await ConsentCountry.findOne({
+        //                 where: {
+        //                     consent_id: hcpConsent.consent_id,
+        //                     country_iso2: {
+        //                         [Op.iLike]: hcp.country_iso2
+        //                     },
+        //                 }
+        //             });
+        //             opt_types.add(country_consent.opt_type);
+        //         }
+        //     }));
+
+        //     hcp.dataValues.opt_types = [...opt_types];
+        //     delete hcp.dataValues['hcpConsents'];
+        // }));
+
+        hcps.map(hcp => {
             const opt_types = new Set();
 
-            await Promise.all(hcp['hcpConsents'].map(async hcpConsent => {
-
-                if (hcpConsent.response && hcpConsent.consent_confirmed) {
-                    const country_consent = await ConsentCountry.findOne({
-                        where: {
-                            consent_id: hcpConsent.consent_id,
-                            country_iso2: {
-                                [Op.iLike]: hcp.country_iso2
-                            },
-                        }
-                    });
-                    opt_types.add(country_consent.opt_type);
+            hcp['hcpConsents'].map(hcpConsent => {
+                if (hcpConsent.consent_confirmed) {
+                    opt_types.add(hcpConsent.opt_type);
                 }
-            }));
+            });
 
             hcp.dataValues.opt_types = [...opt_types];
             delete hcp.dataValues['hcpConsents'];
-        }));
+        });
 
         const totalUser = await Hcp.count({//counting total data for pagintaion
             where: hcp_filter
@@ -265,6 +278,26 @@ async function getHcps(req, res) {
 async function editHcp(req, res) {
     const { first_name, last_name, telephone } = req.body;
     const response = new Response({}, []);
+
+    if (!first_name) {
+        response.errors.push(new CustomError('First name is missing.', 400, 'first_name'));
+    } else if (first_name.length > 50) {
+        response.errors.push(new CustomError('First name should be at most 50 characters', 400, 'first_name'));
+    }
+
+    if (!last_name) {
+        response.errors.push(new CustomError('Last name is missing.', 400, 'last_name'));
+    } else if (last_name.length > 50) {
+        response.errors.push(new CustomError('Last name should be at most 50 characters', 400, 'last_name'));
+    }
+
+    if (telephone && telephone.length > 25) {
+        response.errors.push(new CustomError('Telephone number should be at most 25 digits including country code', 400, 'telephone'));
+    }
+
+    if (response.errors.length) {
+        return res.status(400).send(response);
+    }
 
     try {
         const HcpUser = await Hcp.findOne({ where: { id: req.params.id } });
@@ -374,30 +407,44 @@ async function createHcpProfile(req, res) {
 
     if (!email || !validator.isEmail(email)) {
         response.errors.push(new CustomError('Email address is missing or invalid.', 400, 'email'));
+    } else if (email.length > 100) {
+        response.errors.push(new CustomError('Email should be at most 100 characters', 400, 'email'));
     }
 
     if (!uuid) {
         response.errors.push(new CustomError('UUID is missing.', 400, 'uuid'));
+    } else if (uuid.length > 20) {
+        response.errors.push(new CustomError('UUID should be at most 20 characters', 400, 'uuid'));
     }
 
     if (!salutation) {
         response.errors.push(new CustomError('Salutation is missing.', 400, 'salutation'));
+    } else if (salutation.length > 5) {
+        response.errors.push(new CustomError('Salutation should be at most 5 characters', 400, 'salutation'));
     }
 
     if (!first_name) {
         response.errors.push(new CustomError('First name is missing.', 400, 'first_name'));
+    } else if (first_name.length > 50) {
+        response.errors.push(new CustomError('First name should be at most 50 characters', 400, 'first_name'));
     }
 
     if (!last_name) {
         response.errors.push(new CustomError('Last name is missing.', 400, 'last_name'));
+    } else if (last_name.length > 50) {
+        response.errors.push(new CustomError('Last name should be at most 50 characters', 400, 'last_name'));
     }
 
     if (!country_iso2) {
         response.errors.push(new CustomError('country_iso2 is missing.', 400, 'country_iso2'));
+    } else if (country_iso2.length > 2) {
+        response.errors.push(new CustomError('Country code should be at most 2 characters', 400, 'country_iso2'));
     }
 
     if (!language_code) {
         response.errors.push(new CustomError('language_code is missing.', 400, 'language_code'));
+    } else if (language_code.length > 2) {
+        response.errors.push(new CustomError('Language code should be at most 2 characters', 400, 'language_code'));
     }
 
     if (!specialty_onekey) {
@@ -408,7 +455,13 @@ async function createHcpProfile(req, res) {
         response.errors.push(new CustomError('Origin URL is missing.', 400, 'origin_url'));
     }
 
-    if (specialty_onekey) {
+    if (telephone && telephone.length > 25) {
+        response.errors.push(new CustomError('Telephone number should be at most 25 digits including country code', 400, 'telephone'));
+    }
+
+    if (specialty_onekey.length > 20) {
+        response.errors.push(new CustomError('Specialty Onekey should be at most 20 characters', 400, 'specialty_onekey'));
+    } else if (specialty_onekey) {
         const specialty_master_data = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwspecialtymaster WHERE cod_id_onekey = $specialty_onekey", {
             bind: { specialty_onekey },
             type: QueryTypes.SELECT
@@ -524,8 +577,8 @@ async function createHcpProfile(req, res) {
                     user_id: hcpUser.id,
                     consent_id: consentDetails.id,
                     title: consentLocale.rich_text,
-                    response: consentResponse,
                     consent_confirmed: consentCountry.opt_type === 'double-opt-in' ? false : true,
+                    opt_type: consentCountry.opt_type,
                     created_by: req.user.id,
                     updated_by: req.user.id
                 });
@@ -736,7 +789,7 @@ async function getHcpProfile(req, res) {
 
         response.data = getHcpViewModel(doc.dataValues);;
 
-        const userConsents = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id', 'response', 'consent_confirmed', 'updated_at'] });
+        const userConsents = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id', 'consent_confirmed', 'opt_type', 'updated_at'] });
 
         if (!userConsents) {
             response.data = { ...response.data, consents: [] };
@@ -755,7 +808,6 @@ async function getHcpProfile(req, res) {
             }, attributes: ['consent_id', 'rich_text']
         });
 
-        const consentCountries = await ConsentCountry.findAll({ where: { consent_id: userConsents.map(consent => consent.consent_id), country_iso2: { [Op.or]: [doc.country_iso2.toUpperCase(), doc.country_iso2.toLowerCase()] } } });
 
         const consentResponse = userConsentDetails.map(({
             consent_id: id,
@@ -767,10 +819,9 @@ async function getHcpProfile(req, res) {
             ...response.data,
             consents: consentResponse.map(conRes => {
                 const matchedConsent = userConsents.find(consent => consent.consent_id === conRes.id);
-                const matchedConsentCountries = consentCountries.find(c => c.consent_id === conRes.id);
                 conRes.consent_given_time = matchedConsent ? matchedConsent.updated_at : null;
-                conRes.opt_type = matchedConsentCountries ? matchedConsentCountries.opt_type : null;
-                conRes.consent_given = matchedConsent ? matchedConsent.consent_confirmed && matchedConsent.response ? true : false : null;
+                conRes.opt_type = matchedConsent ? matchedConsent.opt_type : null;
+                conRes.consent_given = matchedConsent ? matchedConsent.consent_confirmed ? true : false : null;
                 return conRes;
             })
         };
@@ -797,7 +848,7 @@ async function getHCPUserConsents(req, res) {
             return res.status(404).send(response);
         }
 
-        const userConsents = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id', 'response', 'consent_confirmed', 'updated_at'] });
+        const userConsents = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id', 'consent_confirmed', 'opt_type', 'updated_at'] });
 
         if (!userConsents) return res.json([]);
 
@@ -813,7 +864,6 @@ async function getHCPUserConsents(req, res) {
             }, attributes: ['consent_id', 'rich_text']
         });
 
-        const consentCountries = await ConsentCountry.findAll({ where: { consent_id: userConsents.map(consent => consent.consent_id), country_iso2: { [Op.or]: [doc.country_iso2.toUpperCase(), doc.country_iso2.toLowerCase()] } } });
 
         const consentResponse = userConsentDetails.map(({
             consent_id: id,
@@ -823,10 +873,9 @@ async function getHCPUserConsents(req, res) {
 
         response.data = consentResponse.map(conRes => {
             const matchedConsent = userConsents.find(consent => consent.consent_id === conRes.id);
-            const matchedConsentCountries = consentCountries.find(c => c.consent_id === conRes.id);
             conRes.consent_given_time = matchedConsent ? matchedConsent.updated_at : null;
-            conRes.opt_type = matchedConsentCountries ? matchedConsentCountries.opt_type : null;
-            conRes.consent_given = matchedConsent ? matchedConsent.consent_confirmed && matchedConsent.response ? true : false : null;
+            conRes.opt_type = matchedConsent ? matchedConsent.opt_type : null;
+            conRes.consent_given = matchedConsent ? matchedConsent.consent_confirmed ? true : false : null;
             return conRes;
         });
 

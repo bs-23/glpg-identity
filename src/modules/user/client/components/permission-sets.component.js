@@ -34,12 +34,12 @@ export default function ManagePermissionSets() {
 
     const getServiceCategoryNames = (data) => {
         if(!data.ps_sc) return '';
-        return data.ps_sc.filter(sc => sc.serviceCategory.slug !== 'all').map(item => item.serviceCategory.title).sort().join(', ');
+        return data.ps_sc.map(item => item.serviceCategory.title).sort().join(', ');
     }
 
     const getApplicationNames = (data) => {
         if(!data.ps_app) return '';
-        return data.ps_app.filter(app => app.application.slug !== 'all').map(item => item.application.name).sort().join(', ');
+        return data.ps_app.map(item => item.application.name).sort().join(', ');
     }
 
     const handleFormSubmitSuccess = () => {
@@ -92,12 +92,12 @@ export default function ManagePermissionSets() {
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
                                             <th className="py-2" width="15%">Title</th>
-                                            <th className="py-2" width="10%">Type</th>
-                                            <th className="py-2" width="25%">Description</th>
-                                            <th className="py-2" width="10%">Applications</th>
-                                            <th className="py-2" width="15%">Countries</th>
-                                            <th className="py-2" width="25%">Service Categories</th>
-                                            <th className="py-2" width="10%">Action</th>
+                                            <th className="py-2" width="6%">Type</th>
+                                            <th className="py-2" width="15%">Description</th>
+                                            <th className="py-2" width="9%">Applications</th>
+                                            <th className="py-2" width="17%">Countries</th>
+                                            <th className="py-2" width="32%">Service Categories</th>
+                                            <th className="py-2" width="5%">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">

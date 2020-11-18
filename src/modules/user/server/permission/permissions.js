@@ -1,8 +1,6 @@
 const path = require('path');
-const { QueryTypes, Op } = require('sequelize');
 const _ = require('lodash');
 const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
-const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const UserProfile = require(path.join(process.cwd(), "src/modules/user/server/user-profile.model"));
 const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/userProfile-permissionSet.model"));
 const User_Role = require(path.join(process.cwd(), "src/modules/user/server/role/user-role.model"));
@@ -146,11 +144,6 @@ async function getPermissionsFromPermissionSet(permissionSet) {
 
             const userApplication = { id, name, slug, logo_link };
 
-            if(userApplication.slug === 'all'){
-                const allApplications = await Application.findAll({ where: { slug: { [Op.ne]: 'all' } }, attributes: ['id', 'name', 'slug', 'logo_link'] });
-                applications = allApplications;
-                break;
-            }
 
             applications.push(userApplication);
         }
@@ -160,11 +153,6 @@ async function getPermissionsFromPermissionSet(permissionSet) {
         for (const ps_sc of permissionSet.ps_sc) {
             const userServiceCategory = ps_sc.serviceCategory;
 
-            if(userServiceCategory.slug === 'all') {
-                const allServiceCategories = await ServiceCategory.findAll({ where: { slug: { [Op.ne]: 'all' } }, attributes: ['id', 'title', 'slug'] });
-                serviceCategories = allServiceCategories;
-                break;
-            }
 
             serviceCategories.push(userServiceCategory);
         }
@@ -174,10 +162,6 @@ async function getPermissionsFromPermissionSet(permissionSet) {
         countries = permissionSet.countries;
     }
 
-    if(countries.includes('all')) {
-        const allCountries = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry WHERE codbase_desc=countryname ORDER BY codbase_desc, countryname;", { type: QueryTypes.SELECT });
-        countries = allCountries.map(c => c.country_iso2);
-    }
 
     return [applications, countries, serviceCategories];
 }

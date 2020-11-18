@@ -95,6 +95,7 @@ export const PermissionSetDetailsModal = ({ permissionSetId, show, onHide, ...re
         onHide={onHide}
         dialogClassName="modal-90w modal-customize"
         aria-labelledby="example-custom-modal-styling-title"
+        centered
         size="lg"
         {...rest}
     >

@@ -167,7 +167,6 @@ async function getConsentsReport(req, res) {
         const opt_types = [...new Set((await ConsentCountry.findAll()).map(i => i.opt_type))];
 
         const consent_filter = {
-            response: true,
             consent_confirmed: true,
             '$hcp_profile.application_id$': req.user.type === 'admin' ? { [Op.or]: application_list } : userPermittedApplications,
             '$hcp_profile.country_iso2$': codbase ? { [Op.any]: [countries_ignorecase_for_codbase] } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : countries_ignorecase_for_user_countries_codbase,
@@ -198,7 +197,7 @@ async function getConsentsReport(req, res) {
                     ]
                 }
             ],
-            attributes: ['consent_id', 'response', 'consent_confirmed', 'updated_at'],
+            attributes: ['consent_id', 'opt_type', 'consent_confirmed', 'updated_at'],
             offset,
             limit,
             order: order,
@@ -207,7 +206,6 @@ async function getConsentsReport(req, res) {
 
         hcp_consents.forEach(hcp_consent => {
             hcp_consent.dataValues.consent_id = hcp_consent.consent_id;
-            hcp_consent.dataValues.response = hcp_consent.response;
             hcp_consent.dataValues.consent_confirmed = hcp_consent.consent_confirmed;
             hcp_consent.dataValues.legal_basis = hcp_consent.consent.legal_basis;
             hcp_consent.dataValues.given_date = hcp_consent.updated_at;
@@ -215,7 +213,6 @@ async function getConsentsReport(req, res) {
             hcp_consent.dataValues.category = hcp_consent.consent.consent_category.title;
             hcp_consent.dataValues.type = hcp_consent.consent.consent_category.slug;
             hcp_consent.dataValues.country_iso2 = hcp_consent.consent.consent_country[0].country_iso2;
-            hcp_consent.dataValues.opt_type = hcp_consent.consent.consent_country[0].opt_type;
 
             delete hcp_consent.dataValues['consent'];
         });

@@ -144,14 +144,9 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
     const [permissionSet, setPermissionSet] = useState(null);
     const countries = useSelector(state => state.countryReducer.countries);
     const { addToast } = useToasts();
-    // const dispatch = useDispatch();
 
     const initializeServiceCategoryValues = () => {
         if(permissionSet && permissionSet.serviceCategories){
-            const allServiceCategoryOption = serviceCategories.find(sc => sc.slug === 'all');
-            if(allServiceCategoryOption && permissionSet.serviceCategories.includes(allServiceCategoryOption.id)){
-                return serviceCategories.map(sc => sc.id);
-            }
             return permissionSet.serviceCategories;
         }
         return [];
@@ -159,10 +154,6 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
 
     const initializeApplicationValues = () => {
         if(permissionSet && permissionSet.applications){
-            const allApplicationOption = applications.find(app => app.slug === 'all');
-            if(allApplicationOption && permissionSet.applications.includes(allApplicationOption.id)){
-                return applications.map(sc => sc.id);
-            }
             return permissionSet.applications;
         }
         return [];
@@ -170,9 +161,6 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
 
     const initializeCountryValues = () => {
         if(permissionSet && permissionSet.countries) {
-            if(permissionSet.countries.includes('all')) {
-                return ['all',...countries.map(c => c.country_iso2)];
-            }
             return permissionSet.countries;
         }
         return [];
@@ -256,13 +244,28 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
                                                     <div className="row">
                                                     <FormFieldFluid label="Title" type="text" name="title"/>
                                                     <FormField label="Select Countries" name="countries" required={false} >
-                                                        <CheckList name="countries" options={[{ country_iso2: 'all', codbase_desc: 'All Countries' }, ...countries]} idExtractor={item => item.country_iso2} labelExtractor={item => item.codbase_desc} allOptionID={'all'} />
+                                                        <CheckList
+                                                            name="countries"
+                                                            options={countries}
+                                                            idExtractor={item => item.country_iso2}
+                                                            labelExtractor={item => item.codbase_desc}
+                                                        />
                                                     </FormField>
                                                     <FormField label="Select Applications" name="applications" required={false} >
-                                                        <CheckList name="applications" options={applications} idExtractor={item => item.id} labelExtractor={item => item.name} allOptionID={applications.find(app => app.slug === 'all') && applications.find(app => app.slug === 'all').id} />
+                                                        <CheckList
+                                                            name="applications"
+                                                            options={applications}
+                                                            idExtractor={item => item.id}
+                                                            labelExtractor={item => item.name}
+                                                        />
                                                     </FormField>
                                                     <FormFieldFluid label="Select Service Categories" name="serviceCategories" required={false} >
-                                                        <ToggleList name="serviceCategories" options={serviceCategories} idExtractor={item => item.id} labelExtractor={item => item.title} allOptionID={serviceCategories.find(sc => sc.slug === 'all') && serviceCategories.find(sc => sc.slug === 'all').id}/>
+                                                        <ToggleList
+                                                            name="serviceCategories"
+                                                            options={serviceCategories}
+                                                            idExtractor={item => item.id}
+                                                            labelExtractor={item => item.title}
+                                                        />
                                                     </FormFieldFluid>
                                                     <FormFieldFluid label="Description" type="text" name="description" required={false} component="textarea" />
                                                     </div>
