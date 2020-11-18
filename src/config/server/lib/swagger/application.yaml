@@ -91,7 +91,7 @@ paths:
                         applicaiton/json:
                             schema:
                                 $ref: "#/components/schemas/errorResponse"
-    /api/applicaitons/data/{id}:
+    /api/applications/data/{id}:
         get:
             tags:
                 - applications
@@ -112,10 +112,20 @@ paths:
                                 type: object
                                 properties:
                                     data:
-                                        $ref: "#/components/schemas/consentsForCountry/properties/data"
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: string
+                                            type:
+                                                type: string
+                                            data:
+                                                type: string
+                                            applicaiton:
+                                                type: object
+                                                properties:
+                                                    id:
+                                                        type: string
+                                                    name:
+                                                        type: string
                                     errors:
                                         $ref: "#/components/schemas/errorBodyInSuccess"
-                400:
-                    description: Invalid query parameter.
-                401:
-                    description: User is not authenticated.

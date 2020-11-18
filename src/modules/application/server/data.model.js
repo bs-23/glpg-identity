@@ -4,7 +4,7 @@ const Application = require('./application.model');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
-const Data = sequelize.cdpConnector.define('datas', {
+const Data = sequelize.cdpConnector.define('data', {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -31,7 +31,7 @@ const Data = sequelize.cdpConnector.define('datas', {
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
-    tableName: 'datas',
+    tableName: 'data',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
