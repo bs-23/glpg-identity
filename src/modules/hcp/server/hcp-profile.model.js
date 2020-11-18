@@ -51,7 +51,7 @@ const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
     },
     telephone: {
         allowNull: true,
-        type: DataTypes.STRING(20)
+        type: DataTypes.STRING(25)
     },
     birthdate: {
         type: DataTypes.STRING
@@ -97,7 +97,7 @@ const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
         type: DataTypes.STRING
     },
     origin_url: {
-        allowNull: true,
+        allowNull: false,
         type: DataTypes.STRING
     }
 }, {

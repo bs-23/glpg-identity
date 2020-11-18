@@ -1,10 +1,12 @@
 const path = require('path');
 const bcrypt = require('bcryptjs');
-const Sequelize = require('sequelize');
 const { DataTypes } = require('sequelize');
+const Sequelize = require('sequelize');
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
-const Userrole = require('./user-role.model');
+const UserProfile = require('./user-profile.model');
+const User_Role = require('./role/user-role.model');
+const Role = require('./role/role.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
 const User = sequelize.cdpConnector.define('users', {
@@ -17,28 +19,22 @@ const User = sequelize.cdpConnector.define('users', {
             isUUID: 4
         }
     },
-    application_id: {
+    profileId: {
         type: DataTypes.UUID,
-        validate: {
-            customValidator(value) {
-                if (value === null && this.type !== 'admin') {
-                    throw new Error("application_id is required for basic user");
-                }
-            }
-        }
+        allowNull: true
     },
     first_name: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING(50)
     },
     last_name: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING(50)
     },
     email: {
         unique: true,
         allowNull: false,
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(100),
         validate: {
             isEmail: true
         }
@@ -50,7 +46,7 @@ const User = sequelize.cdpConnector.define('users', {
         }
     },
     phone: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING(25)
     },
     type: {
         type: DataTypes.ENUM,
@@ -61,9 +57,6 @@ const User = sequelize.cdpConnector.define('users', {
         type: DataTypes.ENUM,
         values: ['active', 'inactive'],
         defaultValue: 'active'
-    },
-    countries: {
-        type: DataTypes.ARRAY(DataTypes.STRING)
     },
     failed_auth_attempt: {
         type: DataTypes.INTEGER,
@@ -112,12 +105,13 @@ const User = sequelize.cdpConnector.define('users', {
     updatedAt: 'updated_at'
 });
 
-User.prototype.validPassword = function (password) {
+User.prototype.validPassword = function(password) {
     return bcrypt.compareSync(password, this.password);
 };
 
-User.hasMany(Userrole, { as: 'userrole', foreignKey: 'userId', sourceKey: 'id' });
-
 User.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by' });
+User.belongsTo(UserProfile, { as: 'userProfile', foreignKey: 'profileId' });
+User.hasMany(User_Role, {as: 'userRoles', foreignKey: 'userId', sourceKey: 'id'});
+User.belongsToMany(Role, { through: User_Role });
 
 module.exports = User;

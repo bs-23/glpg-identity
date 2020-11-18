@@ -55,6 +55,12 @@
                 }
 
                 &[disabled] {
+                    &:hover, &:active, &:focus, &.selected {
+                        color: $primary-color !important;
+                        background-color: transparent !important;
+                        border-color: $primary-color;
+                        opacity: 0.65;
+                    }
                 }
             }
 
@@ -73,6 +79,12 @@
                 }
 
                 &[disabled] {
+                    &:hover, &:active, &:focus, &.selected {
+                        color: $secondary-color !important;
+                        background-color: transparent !important;
+                        border-color: $secondary-color;
+                        opacity: 0.65;
+                    }
                 }
             }
 
@@ -153,6 +165,14 @@
 
         &-secondary {
             color: $secondary-color;
+
+            &-light {
+                color: $secondary-color-light;
+            }
+
+            &-lighter {
+                color: $secondary-color-lighter;
+            }
         }
 
         &-light {
@@ -212,6 +232,24 @@ a {
 
     &:hover {
         color: $primary-color-light;
+    }
+
+    &.link-with-underline {
+        text-decoration: underline;
+
+        &:hover {
+            color: $secondary-color;
+            text-decoration: none;
+        }
+    }
+
+    &.link-secondary {
+        color: $secondary-color;
+        text-decoration: underline;
+
+        &:hover {
+            text-decoration: none;
+        }
     }
 }
 

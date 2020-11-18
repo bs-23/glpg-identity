@@ -13,6 +13,7 @@ const User = require(path.join(process.cwd(), 'src/modules/user/server/user.mode
 const HCPS = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-profile.model'));
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-consents.model'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
+const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/user/server/permission/permissions.js'));
 
 function getTranslationViewmodels(translations) {
     return translations.map(t => ({
@@ -146,6 +147,10 @@ async function getConsentsReport(req, res) {
         order.push([HCPS, 'created_at', 'DESC']);
         order.push([HCPS, 'id', 'DESC']);
 
+        const userCountriesApplication = await getUserPermissions(req.user.id);
+        const userPermittedCountries = userCountriesApplication[1];
+        const userPermittedApplications = userCountriesApplication[0].map(app => app.id);
+
         const application_list = (await HCPS.findAll()).map(i => i.get("application_id"));
 
         const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => i.codbase === codbase).map(i => i.country_iso2);
@@ -154,18 +159,17 @@ async function getConsentsReport(req, res) {
         const country_iso2_list = req.user.type === 'admin' ? (await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry", { type: QueryTypes.SELECT })).map(i => i.country_iso2) : (await HCPS.findAll()).map(i => i.get("country_iso2"));
         const countries_ignorecase = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
 
-        const codbase_list_mapped_with_user_country_iso2_list = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => req.user.countries.includes(i.country_iso2)).map(i => i.codbase) : [];
+        const codbase_list_mapped_with_user_country_iso2_list = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => userPermittedCountries.includes(i.country_iso2)).map(i => i.codbase) : [];
         const country_iso2_list_for_user_countries_codbase = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => codbase_list_mapped_with_user_country_iso2_list.includes(i.codbase)).map(i => i.country_iso2) : [];
         const countries_ignorecase_for_user_countries_codbase = [].concat.apply([], country_iso2_list_for_user_countries_codbase.map(i => ignoreCaseArray(i)));
 
         const opt_types = [...new Set((await ConsentCountry.findAll()).map(i => i.opt_type))];
 
         const consent_filter = {
-            response: true,
             consent_confirmed: true,
-            '$hcp_profile.application_id$': req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
+            '$hcp_profile.application_id$': req.user.type === 'admin' ? { [Op.or]: application_list } : userPermittedApplications,
             '$hcp_profile.country_iso2$': codbase ? { [Op.any]: [countries_ignorecase_for_codbase] } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : countries_ignorecase_for_user_countries_codbase,
-            '$consent.consent_country.country_iso2$': { [Op.eq]: Sequelize.col('hcp_profile.country_iso2') },
+            '$consent.consent_country.country_iso2$': { [Op.or]: [ Sequelize.fn('LOWER', Sequelize.col('hcp_profile.country_iso2')), Sequelize.fn('UPPER', Sequelize.col('hcp_profile.country_iso2')) ] },
             '$consent.consent_country.opt_type$': opt_type ? { [Op.eq]: opt_type } : { [Op.or]: opt_types }
         };
 
@@ -192,7 +196,7 @@ async function getConsentsReport(req, res) {
                     ]
                 }
             ],
-            attributes: ['consent_id', 'response', 'consent_confirmed', 'updated_at'],
+            attributes: ['consent_id', 'opt_type', 'consent_confirmed', 'updated_at'],
             offset,
             limit,
             order: order,
@@ -201,7 +205,6 @@ async function getConsentsReport(req, res) {
 
         hcp_consents.forEach(hcp_consent => {
             hcp_consent.dataValues.consent_id = hcp_consent.consent_id;
-            hcp_consent.dataValues.response = hcp_consent.response;
             hcp_consent.dataValues.consent_confirmed = hcp_consent.consent_confirmed;
             hcp_consent.dataValues.legal_basis = hcp_consent.consent.legal_basis;
             hcp_consent.dataValues.given_date = hcp_consent.updated_at;
@@ -209,7 +212,6 @@ async function getConsentsReport(req, res) {
             hcp_consent.dataValues.category = hcp_consent.consent.consent_category.title;
             hcp_consent.dataValues.type = hcp_consent.consent.consent_category.slug;
             hcp_consent.dataValues.country_iso2 = hcp_consent.consent.consent_country[0].country_iso2;
-            hcp_consent.dataValues.opt_type = hcp_consent.consent.consent_country[0].opt_type;
 
             delete hcp_consent.dataValues['consent'];
         });
@@ -244,7 +246,7 @@ async function getConsentsReport(req, res) {
             end: offset + limit > total_consents ? total_consents : offset + limit,
             codbase: codbase ? codbase : '',
             opt_type: opt_type ? opt_type : '',
-            countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : req.user.countries,
+            countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : userPermittedCountries,
             orderBy: orderBy,
             orderType: orderType
         };
@@ -265,16 +267,24 @@ async function getDatasyncConsentsReport(req, res) {
         const page = req.query.page ? req.query.page - 1 : 0;
         const limit = 30;
         const codbase = req.query.codbase === undefined ? '' : req.query.codbase;
-        // const process_activity = req.query.process_activity === undefined ? '' : req.query.process_activity;
-        // const opt_type = req.query.opt_type === undefined ? '' : req.query.opt_type;
+        const opt_type = req.query.opt_type === undefined ? '' : req.query.opt_type;
         const offset = page * limit;
+
+        const setOpt = () => {
+            if(opt_type === 'opt-out') return { type: 'Opt_Out_vod', double_opt_in: false }
+            if(opt_type === 'single-opt-in') return { type: 'Opt_In_vod', double_opt_in: false };
+            return { type: 'Opt_In_vod', double_opt_in: true };
+        }
+        const opt = setOpt();
+
+        const [, userPermittedCountries] = await getUserPermissions(req.user.id);
 
         async function getCountryIso2() {
             const user_codbase_list_for_iso2 = (await sequelize.datasyncConnector.query(
                 `SELECT * FROM ciam.vwcountry where ciam.vwcountry.country_iso2 = ANY($countries);`,
                 {
                     bind: {
-                        countries: req.user.countries
+                        countries: userPermittedCountries
                     },
                     type: QueryTypes.SELECT
                 }
@@ -320,6 +330,11 @@ async function getDatasyncConsentsReport(req, res) {
             if (orderBy === 'date') sortBy = 'ciam.vw_veeva_consent_master.capture_datetime';
         }
 
+        const consent_filter = opt_type ? `ciam.vw_veeva_consent_master.country_code = ANY($countries) and
+        ciam.vw_veeva_consent_master.opt_type = '${opt.type}' and
+        ciam.vw_veeva_consent_master.double_opt_in = ${opt.double_opt_in}` : `ciam.vw_veeva_consent_master.country_code = ANY($countries)`;
+
+
         const hcp_consents = await sequelize.datasyncConnector.query(
             `SELECT
                 account_name,
@@ -334,8 +349,7 @@ async function getDatasyncConsentsReport(req, res) {
                 channel_value
             FROM
                 ciam.vw_veeva_consent_master
-            WHERE
-                ciam.vw_veeva_consent_master.country_code = ANY($countries)
+            WHERE ${consent_filter}
             ORDER BY
                 ${sortBy} ${orderType}
             offset $offset
@@ -344,7 +358,7 @@ async function getDatasyncConsentsReport(req, res) {
                 bind: {
                     countries: codbase ? country_iso2_list_for_codbase : country_iso2_list,
                     offset: offset,
-                    limit: limit
+                    limit: limit,
                 },
                 type: QueryTypes.SELECT
             });
@@ -354,8 +368,7 @@ async function getDatasyncConsentsReport(req, res) {
                 COUNT(*)
             FROM
                 ciam.vw_veeva_consent_master
-            WHERE
-            ciam.vw_veeva_consent_master.country_code = ANY($countries);`
+            WHERE ${consent_filter}`
             , {
                 bind: {
                     countries: codbase ? country_iso2_list_for_codbase : country_iso2_list
@@ -391,9 +404,8 @@ async function getDatasyncConsentsReport(req, res) {
             start: limit * page + 1,
             end: offset + limit > total_consents.count ? total_consents.count : offset + limit,
             codbase: codbase ? codbase : '',
-            // process_activity: process_activity ? process_activity : '',
-            // opt_type: opt_type ? opt_type : '',
-            countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : req.user.countries,
+            opt_type: opt_type ? opt_type : '',
+            countries: userPermittedCountries,
             orderBy: orderBy,
             orderType: orderType,
         };
@@ -495,7 +507,11 @@ async function getCdpConsents(req, res) {
 
         const consents = await Consent.findAll({
             include: inclusions,
-            attributes: { exclude: ['category_id', 'created_by', 'updated_by'] }
+            attributes: {
+                exclude: ['category_id', 'created_by', 'updated_by']
+
+            },
+            order: [['preference', 'ASC']]
         });
 
         const data = consents.map(c => {
@@ -875,8 +891,9 @@ async function getConsentCategories(req, res) {
             include: [{
                 model: User,
                 as: 'createdByUser',
-                attributes: ['first_name', 'last_name']
-            }]
+                attributes: ['first_name', 'last_name'],
+            }],
+            order: [['title', 'ASC']]
         });
 
         const data = categories.map(c => {

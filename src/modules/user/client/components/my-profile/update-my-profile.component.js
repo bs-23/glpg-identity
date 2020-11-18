@@ -10,12 +10,74 @@ import { updateMyProfileSchema } from '../../user.schema';
 
 const UpdateMyProfile = () => {
     const myProfileInfo = useSelector(state => state.userReducer.loggedInUser);
-    const countries = useSelector(state => state.userReducer.countries);
+    const countries = useSelector(state => state.countryReducer.countries);
     const [selectedCountryCode, setSelectedCountryCode] = useState(0);
     const { addToast } = useToasts();
     const dispatch = useDispatch();
 
     const CountryCodesObject = CountryCodes.customList('countryCode', '+{countryCallingCode}');
+
+    const getMyCountryISO2 = () => {
+        const myProfile = myProfileInfo.profile;
+        const myRoles = myProfileInfo.role;
+        const myProfileCountries = [];
+        const myRoleCountries = [];
+
+        if(myProfile && myProfile.permissionSets) {
+            myProfile.permissionSets.map(ps => {
+                if(ps.countries) {
+                    ps.countries.map(country_iso2 => myProfileCountries.push(country_iso2));
+                }
+            })
+        }
+
+        if(myRoles) {
+            myRoles.map(myRole => {
+                if(myRole.permissionSets) {
+                    myRole.permissionSets.map(ps => {
+                        if(ps.countries){
+                            ps.countries.map(country_iso2 => myRoleCountries.push(country_iso2));
+                        }
+                    });
+                }
+            })
+        }
+
+        const myCountries = [...new Set([...myProfileCountries, ...myRoleCountries])];
+
+        return myCountries;
+    }
+
+    const getMyApplicationNames = () => {
+        const myProfile = myProfileInfo.profile;
+        const myRoles = myProfileInfo.role;
+        const myProfileApplications = [];
+        const myRoleApplications = [];
+
+        if(myProfile && myProfile.permissionSets) {
+            myProfile.permissionSets.map(ps => {
+                if(ps.application){
+                    ps.application.map(({name}) => myProfileApplications.push(name));
+                }
+            })
+        }
+
+        if(myRoles) {
+            myRoles.map(myRole => {
+                if(myRole.permissionSets) {
+                    myRole.permissionSets.map(ps => {
+                        if(ps.application) {
+                            ps.application.map(({name}) => myRoleApplications.push(name));
+                        }
+                    });
+                }
+            })
+        }
+
+        const myApplicationNames = [...new Set([...myProfileApplications, ...myRoleApplications])];
+
+        return myApplicationNames;
+    }
 
     const getDatasyncCountryIndexFromPhone = (phone) => {
         if(!phone) return -1;
@@ -53,7 +115,10 @@ const UpdateMyProfile = () => {
         last_name: myProfileInfo && myProfileInfo.last_name,
         email: myProfileInfo && myProfileInfo.email,
         phone: myProfileInfo && getPhoneNumberWithoutCountryCode(myProfileInfo.phone),
-        isCountryFlagActive: myProfileInfo && (myProfileInfo.phone === '' || isCountryDetectedFromPhone(myProfileInfo.phone))
+        isCountryFlagActive: myProfileInfo && (myProfileInfo.phone === '' || isCountryDetectedFromPhone(myProfileInfo.phone)),
+        country_code: selectedCountryCode >= 0 && countries && countries.length
+            ? CountryCodesObject[countries[selectedCountryCode].country_iso2]
+            : ''
     }
 
     const generateCountryIconPath = (country) => {
@@ -101,6 +166,8 @@ const UpdateMyProfile = () => {
         const { setFieldValue } = formikProps;
         setFieldValue('isCountryFlagActive', true);
         setSelectedCountryCode(index);
+        const countryCode = CountryCodesObject[countries[index].country_iso2];
+        setFieldValue('country_code', countryCode);
     }
 
     const handlePhoneFieldChange = (e, formikProps) => {
@@ -222,11 +289,43 @@ const UpdateMyProfile = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    {myProfileInfo && myProfileInfo.countries && <div className="row">
+                                    <div className="row">
+                                        <div className="col-12">
+                                            <div className="form-group">
+                                                <label className="font-weight-bold-light" htmlFor="profile">Profile<span className="text-danger"></span></label>
+                                                <Field
+                                                    as="select"
+                                                    name="profile"
+                                                    className="form-control"
+                                                    value={myProfileInfo && myProfileInfo.profile ? myProfileInfo.profile.title : ''}
+                                                    disabled
+                                                >
+                                                    <option value={myProfileInfo && myProfileInfo.profile ? myProfileInfo.profile.title : ''}>{myProfileInfo && myProfileInfo.profile ? myProfileInfo.profile.title : ''}</option>
+                                                </Field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="row">
+                                        <div className="col-12">
+                                            <div className="form-group">
+                                                <label className="font-weight-bold-light" htmlFor="role">Role<span className="text-danger"></span></label>
+                                                <Field
+                                                    as="select"
+                                                    name="role"
+                                                    className="form-control"
+                                                    value={myProfileInfo && myProfileInfo.role && myProfileInfo.role.length ? myProfileInfo.role[0].title : ''}
+                                                    disabled
+                                                >
+                                                    <option value={myProfileInfo && myProfileInfo.role && myProfileInfo.role.length ? myProfileInfo.role[0].title : ''}>{myProfileInfo && myProfileInfo.role && myProfileInfo.role.length ? myProfileInfo.role[0].title : ''}</option>
+                                                </Field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {getMyCountryISO2().length > 0 && <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
                                                 <label className="font-weight-bold-light" htmlFor="countries">Countries<span className="text-danger"></span></label>
-                                                {getCodbaseDescriptionsFromISOCodes((myProfileInfo || {}).countries).map(country => <div key={country} className="custom-control custom-checkbox">
+                                                {getCodbaseDescriptionsFromISOCodes(getMyCountryISO2()).map(country => <div key={country} className="custom-control custom-checkbox">
                                                     <input
                                                         name="countries"
                                                         type="checkbox"
@@ -240,16 +339,16 @@ const UpdateMyProfile = () => {
                                             </div>
                                         </div>
                                     </div>}
-                                    {myProfileInfo && myProfileInfo.roles && myProfileInfo.roles.length > 0 && <div className="row">
+                                    {getMyApplicationNames().length > 0 && <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
-                                                <label className="font-weight-bold-light" htmlFor="roles">Roles<span className="text-danger"></span></label>
+                                                <label className="font-weight-bold-light" htmlFor="applications">Applications<span className="text-danger"></span></label>
                                                 <ul className="list-unstyled pl-0 py-2 mb-0">
-                                                    {myProfileInfo.roles.map(role => <li key={role.title} className="">
+                                                    {getMyApplicationNames().map(appName => <li key={appName} className="">
                                                         <label className="d-flex justify-content-between align-items-center">
-                                                            <span className="switch-label">{role.title}</span>
+                                                            <span className="switch-label">{appName}</span>
                                                             <span className="switch">
-                                                                <input name="roles" type="checkbox" value={role.title} checked disabled />
+                                                                <input name="roles" type="checkbox" value={appName} checked disabled />
                                                                 <span className="slider round"></span>
                                                             </span>
                                                         </label>
@@ -258,20 +357,20 @@ const UpdateMyProfile = () => {
                                             </div>
                                         </div>
                                     </div>}
-                                    {myProfileInfo && myProfileInfo.application && <div className="row">
+                                    {myProfileInfo && myProfileInfo.serviceCategories && myProfileInfo.serviceCategories.length > 0 && <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
-                                                <label className="font-weight-bold-light" htmlFor="applications">Applications<span className="text-danger"></span></label>
+                                                <label className="font-weight-bold-light" htmlFor="serviceCategories">Service Categories<span className="text-danger"></span></label>
                                                 <ul className="list-unstyled pl-0 py-2 mb-0">
-                                                    <li key={myProfileInfo.application.name} className="">
+                                                    {myProfileInfo.serviceCategories.map(sc => <li key={sc.slug} className="">
                                                         <label className="d-flex justify-content-between align-items-center">
-                                                            <span className="switch-label">{myProfileInfo.application.name}</span>
+                                                            <span className="switch-label">{sc.title}</span>
                                                             <span className="switch">
-                                                                <input name="roles" type="checkbox" value={myProfileInfo.application.name} checked disabled />
+                                                                <input name="serviceCategories" type="checkbox" value={sc.title} checked disabled />
                                                                 <span className="slider round"></span>
                                                             </span>
                                                         </label>
-                                                    </li>
+                                                    </li>)}
                                                 </ul>
                                             </div>
                                         </div>

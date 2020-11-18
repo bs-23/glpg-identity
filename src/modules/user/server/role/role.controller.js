@@ -1,96 +1,97 @@
 const path = require('path');
+const { Op } = require('sequelize');
 const Role = require('./role.model');
-const RolePermissions = require('./role-permission.model');
-const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
-const RolePermission = require(path.join(process.cwd(), "src/modules/user/server/role/role-permission.model"));
-
-
-const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, "").replace(/ +/g, "-");
+const RolePermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/role-permissionSet.model"));
+const PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permission-set.model"));
 
 async function getRoles(req, res) {
     try {
         const roles = await Role.findAll({
             include: [{
-                model: RolePermissions,
-                as: 'rolePermission'
+                model: RolePermissionSet,
+                as: 'role_ps',
+                attributes: ['permissionSetId'],
+            include: [{
+                    model: PermissionSet,
+                    as: 'ps',
+                    attributes: ['title']
+                }]
             }],
-            order: [
-                ['created_at', 'ASC'],
-                ['id', 'ASC']
-            ]
+            attributes: ['id', 'title', 'slug', 'description']
         });
+
         res.json(roles);
-    } catch (err) {
-        res.status(500).send(err);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal server error');
     }
 }
 
 async function createRole(req, res) {
+    const { title, description, permissionSets } = req.body;
+
     try {
-        const doc = await Role.create({
-            name: req.body.name,
-            description: req.body.description,
-            slug: convertToSlug(req.body.name),
-            created_by: req.user.id,
-            updated_by: req.user.id
+        if(!title.trim()) return res.status(400).send('Role title must not be empty.');
+        if(!Array.isArray(permissionSets)) return res.status(400).send('Invalid format for permission sets.');
+        if(!permissionSets.length) return res.status(400).send('Must provide permission sets.');
+
+        const [role, created] = await Role.findOrCreate({
+            where: { title },
+            defaults: {
+                title: title.trim(),
+                slug: title.trim().replace(/ +/g, '_').toLowerCase(),
+                description,
+                created_by: req.user.id,
+                updated_by: req.user.id
+            }
         });
 
-        req.body.permissions && req.body.permissions.forEach(async function (permissionId) {
-            await RolePermissions.create({
-                permissionId: permissionId,
-                roleId: doc.id
-            });
-        });
+        if(!created) return res.status(400).send('role name already exists.');
 
-        await logService.log({
-            event_type: 'CREATE',
-            object_id: doc.id,
-            table_name: 'roles',
-            created_by: req.user.id,
-            description: `${doc.name} role created`
-        });
+        const permission_sets = permissionSets.map(id => ({ roleId: role.id, permissionSetId: id }));
 
-        res.json(doc);
-    } catch (err) {
-        res.status(500).send(err);
+        await RolePermissionSet.bulkCreate(permission_sets);
+
+        res.json(role);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal server error');
     }
 }
 
 async function editRole(req, res) {
-    const { name, description, permissions } = req.body;
+    const { title, description, permissionSets } = req.body;
+    const id = req.params.id;
 
     try {
-        const doc = await Role.findOne({ where: { id: req.params.id },
-            include: [{
-                model: RolePermission,
-                as: 'rolePermission'
-            }]
-         });
+        if(!title.trim()) return res.status(400).send('Profile title must not be empty.');
+        if(!Array.isArray(permissionSets)) return res.status(400).send('Invalid format for permission sets.');
+        if(!permissionSets.length) return res.status(400).send('Must provide permission sets.');
 
-        if (!doc) {
-            return res.sendStatus(400);
-        }
+        const foundRole = await Role.findOne({ where: { id } });
 
-        await doc.update({ name, description, slug: convertToSlug(name), updated_by: req.user.id });
+        if(!foundRole) return res.status(400).send('Role not found.');
 
-        doc.rolePermission.forEach(async rp => {
-            await rp.destroy();
+        const roleWithSameName = await Role.findOne({ where: { title, id: { [Op.ne]: id } }});
 
+        if(roleWithSameName) return res.status(400).send('Role with the same title already exists.');
+
+        await foundRole.update({
+            title: title.trim(),
+            slug: title.trim().replace(/ +/g, '_').toLowerCase(),
+            description,
+            updated_by: req.user.id
         });
 
-        permissions && permissions.forEach(async function (permissionId) {
-            await RolePermissions.create({
-                permissionId: permissionId,
-                roleId: doc.id
-            });
-        });
+        await foundRole.setPermission_sets(permissionSets);
 
-        res.json(doc);
-    } catch (err) {
-         res.status(500).send(err);
+        res.json(foundRole);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal server error');
     }
 }
 
 exports.getRoles = getRoles;
-exports.editRole = editRole;
 exports.createRole = createRole;
+exports.editRole = editRole;

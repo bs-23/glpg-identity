@@ -101,15 +101,3 @@ export function cdpSort(type, val) {
         }
     };
 }
-
-export function getCountries() {
-    return {
-        type: Types.GET_COUNTRIES,
-        payload: axios({
-            method: 'get',
-            url: '/api/countries',
-        })
-    };
-}
-
-

@@ -40,7 +40,10 @@
 }
 
 input:checked + .slider {
-    background-color: #144D43;
+    background-color: $primary-color;
+}
+input[disabled]:checked + .slider {
+    background: $primary-color-lighter;
 }
 
 input[disabled]:checked + .slider {

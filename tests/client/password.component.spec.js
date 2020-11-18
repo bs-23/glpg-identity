@@ -20,7 +20,13 @@ describe('PasswordForm component', () => {
     beforeEach(async () => {
         fakeAxios = new MockAdapter(axios)
 
-        savedUser = { name: 'a', email: 'test@gmail.com'};
+        savedUser = {
+            "applications": [],
+            "countries": [],
+            "email": "test@gmail.com",
+            "name": "a",
+            "serviceCategories": [],
+        };
         fakeAxios.onPost('/api/login').reply(200, savedUser);
 
         await store.dispatch(login({
