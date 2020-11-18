@@ -46,7 +46,7 @@ const User = sequelize.cdpConnector.define('users', {
         }
     },
     phone: {
-        type: DataTypes.STRING(20)
+        type: DataTypes.STRING(25)
     },
     type: {
         type: DataTypes.ENUM,
