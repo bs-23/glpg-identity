@@ -19,7 +19,7 @@ const Audit = sequelize.cdpConnector.define('audits', {
     event_type: {
         allowNull: false,
         type: DataTypes.ENUM,
-        values: ['CREATE', 'DELETE', 'UPDATE']
+        values: ['CREATE', 'DELETE', 'UPDATE', 'LOGIN', 'LOGOUT']
     },
     object_id: {
         type: DataTypes.STRING

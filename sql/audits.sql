@@ -1,5 +1,5 @@
 CREATE TYPE ciam.enum_audits_event_type AS ENUM
-    ('CREATE', 'DELETE', 'UPDATE');
+    ('CREATE', 'DELETE', 'UPDATE', 'LOGIN', 'LOGOUT');
 
 CREATE TYPE ciam.enum_audits_table_name AS ENUM
     ('users', 'hcp_profiles', 'consents', 'applications', 'hcp_archives', 'permission_sets', 'roles', 'consent_countries', 'consent_categories');
