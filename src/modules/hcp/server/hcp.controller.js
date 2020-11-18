@@ -606,6 +606,14 @@ async function createHcpProfile(req, res) {
             response.data.retention_period = '1 hour';
         }
 
+        await logService.log({
+            event_type: 'CREATE',
+            object_id: hcpUser.id,
+            table_name: 'hcp_profiles',
+            actor: req.user.id,
+            description: 'HCP user created'
+        });
+
         res.json(response);
     } catch (err) {
         console.error(err);
