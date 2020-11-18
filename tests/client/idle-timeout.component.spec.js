@@ -22,7 +22,13 @@ describe('Idle time out component', () => {
     beforeEach( async () => {
         mockAxios = new MockAdapter(axios);
 
-        savedUser = { name: 'a', email: 'test@gmail.com'};
+        savedUser = {
+            "applications": [],
+            "countries": [],
+            "email": "test@gmail.com",
+            "name": "a",
+            "serviceCategories": []
+        };
         mockAxios.onPost('/api/login').reply(200, savedUser);
         mockAxios.onGet('/api/logout').reply(200);
 

@@ -1,18 +1,20 @@
 const path = require('path');
 const faker = require('faker');
 const supertest = require('supertest');
+const axios = require('axios');
+const MockAdapter =  require('axios-mock-adapter');
 
 const specHelper = require(path.join(process.cwd(), 'jest/spec.helper'));
 const app = require(path.join(process.cwd(), 'src/config/server/lib/express'));
-const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 
 const { defaultUser, userWithInvalidUUID, userWithValidUUID } = specHelper.hcp;
 const { defaultApplication, users: { defaultAdmin } } = specHelper;
 const { demoConsent } = specHelper.consent;
-const { signCookie } = specHelper;
+const { signCookie, generateConsentConfirmationToken } = specHelper;
 
 let appInstance;
 let request;
+let fakeAxios;
 
 jest.setTimeout(20000);
 
@@ -21,6 +23,7 @@ beforeAll(async () => {
     await config.initEnvironmentVariables();
     appInstance = await app();
     request = supertest(appInstance);
+    fakeAxios = new MockAdapter(axios);
 });
 
 describe('HCP Routes', () => {
@@ -93,13 +96,14 @@ describe('HCP Routes', () => {
             .send({
                 first_name: faker.name.lastName(),
                 last_name: faker.name.firstName(),
-                uuid: faker.random.uuid(),
+                uuid: '218312938c',
                 email: defaultUser.email,
                 country_iso2: 'NL',
                 language_code: 'nl',
                 locale: 'nl_nl',
                 salutation: 'Mr',
                 specialty_onekey: 'SP.WNL.01',
+                origin_url: 'www.example.com'
             });
 
         expect(response.statusCode).toBe(400);
@@ -175,7 +179,7 @@ describe('HCP Routes', () => {
 
     it('Should get specialties for given locale', async () => {
         const response = await request
-            .get('/api/hcp-profiles/specialties?locale=nl_NL')
+            .get('/api/hcp-profiles/specialties?locale=nl_NL&country_iso2=nl')
             .set('Authorization', `bearer ${defaultApplication.access_token}`)
 
 
@@ -191,12 +195,12 @@ describe('HCP Routes', () => {
 
         expect(response.statusCode).toBe(400);
         expect(response.body).toHaveProperty('errors');
-        expect(response.body.errors).toHaveLength(1);
+        expect(response.body.errors).toHaveLength(2);
     });
 
     it('Should get "Not Found" status for unknown locale', async () => {
         const response = await request
-            .get('/api/hcp-profiles/specialties?locale=unknown_locale')
+            .get('/api/hcp-profiles/specialties?locale=unknown_locale&country_iso2=nl')
             .set('Authorization', `bearer ${defaultApplication.access_token}`);
 
         expect(response.statusCode).toBe(204);
@@ -205,18 +209,12 @@ describe('HCP Routes', () => {
     describe('HCP Registration Journeys', () => {
         let HCPModel;
         let HCPConsents;
-        let emailData;
         let singleOptInConsent;
         let doubleOptInConsent;
-        let getConsentConfirmationToken;
+        let consentConfirmationToken;
         let getNumberOfConfirmedUnconfirmedConsents;
 
         beforeAll(() => {
-            jest.spyOn(emailService, 'send').mockImplementation((options) => {
-                emailData = options;
-                return Promise.resolve();
-            });
-
             HCPModel = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-profile.model.js'));
             HCPConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-consents.model.js'));
 
@@ -234,14 +232,6 @@ describe('HCP Routes', () => {
                 consents: [
                     { [demoConsent.slug] : true }
                 ]
-            }
-
-            getConsentConfirmationToken = (consentConfirmLink) => {
-                const consentConfirmationLink = consentConfirmLink;
-                const startIndexOfConsentConfirmToken = consentConfirmationLink.indexOf("?token=") + "?token=".length;
-                const endIndexOfConsentConfirmToken = consentConfirmationLink.indexOf("&journey=consent_confirmation");
-                const consentConfirmationToken = consentConfirmationLink.substring(startIndexOfConsentConfirmToken, endIndexOfConsentConfirmToken);
-                return consentConfirmationToken;
             }
 
             getNumberOfConfirmedUnconfirmedConsents = async (userID) => {
@@ -315,6 +305,8 @@ describe('HCP Routes', () => {
                         ...doubleOptInConsent
                     });
 
+                consentConfirmationToken = response.body.data.consent_confirmation_token;
+
                 const hcpUserID = response.body.data.id;
                 const [numberOfConfirmedConsents, numberOfUnConfirmedConsents] = await getNumberOfConfirmedUnconfirmedConsents(hcpUserID);
 
@@ -329,8 +321,6 @@ describe('HCP Routes', () => {
             });
 
             it('Should confirm consents of HCP user', async () => {
-                const consentConfirmationToken = getConsentConfirmationToken(emailData.data.link);
-
                 const response = await request.post('/api/hcp-profiles/confirm-consents')
                     .set('Authorization', 'bearer ' + defaultApplication.access_token)
                     .send({ token: consentConfirmationToken });
@@ -378,6 +368,8 @@ describe('HCP Routes', () => {
 
             it('Should approve not verified HCP user', async () => {
                 const hcp = await HCPModel.findOne({ where: { email: userWithInvalidUUID.email.toLowerCase() }});
+
+                fakeAxios.onPost(`https://www-dev.jyseleca.nl/bin/public/glpg-brandx/mail/approve-user`).reply(200);
 
                 const response = await request.put(`/api/hcp-profiles/${hcp.id}/approve`)
                     .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`])
@@ -441,6 +433,8 @@ describe('HCP Routes', () => {
             it('Should approve not verified HCP user', async () => {
                 const hcp = await HCPModel.findOne({ where: { email: userWithInvalidUUID.email.toLowerCase() }});
 
+                fakeAxios.onPost(`https://www-dev.jyseleca.nl/bin/public/glpg-brandx/mail/approve-user`).reply(200);
+
                 const response = await request.put(`/api/hcp-profiles/${hcp.id}/approve`)
                     .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`])
 
@@ -451,7 +445,9 @@ describe('HCP Routes', () => {
             });
 
             it('Should confirm consents of HCP user', async () => {
-                const consentConfirmationToken = getConsentConfirmationToken(emailData.data.link);
+                const hcp = await HCPModel.findOne({ where: { email: userWithInvalidUUID.email.toLowerCase() }});
+
+                consentConfirmationToken = generateConsentConfirmationToken(hcp);
 
                 const response = await request.post('/api/hcp-profiles/confirm-consents')
                     .set('Authorization', 'bearer ' + defaultApplication.access_token)

@@ -202,9 +202,9 @@ export default function Users() {
                                         <tbody className="cdp-table__body bg-white">
                                             {userdata.users.map(row => (
                                                 <tr key={row.id}>
-                                                    <td>{row.first_name}</td>
-                                                    <td>{row.last_name}</td>
-                                                    <td>{row.email}</td>
+                                                    <td className="text-break">{row.first_name}</td>
+                                                    <td className="text-break">{row.last_name}</td>
+                                                    <td className="text-break">{row.email}</td>
                                                     <td className="text-capitalize">{row.status}</td>
                                                     <td>{sortCountries(extractUserCountries(row))}</td>
                                                     <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
