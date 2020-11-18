@@ -8,7 +8,7 @@ const cellInvalidStyle = {
 }
 
 const cellChangedStyle = {
-    background: 'lightyellow'
+    background: '#F8FFB5'
 }
 
 const ErrorMessage = ({ name }) => (
