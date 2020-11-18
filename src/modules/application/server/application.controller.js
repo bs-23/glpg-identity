@@ -105,7 +105,7 @@ async function getApplications(req, res) {
     }
 }
 
-async function createData(req, res) {
+async function saveData(req, res) {
     const response = new Response({}, []);
 
     try{
@@ -119,9 +119,23 @@ async function createData(req, res) {
             response.errors.push(new CustomError('Data is missing.', 400, 'data'));
         }
 
+        const isJSON = (str) => {
+            try {
+                return (JSON.parse(str) && !!str);
+            } catch (e) {
+                return false;
+            }
+        }
+
+        if(!isJSON(data)){
+            response.errors.push(new CustomError('Data is not valid.', 400, 'data'));
+        }
+
         if (response.errors.length) {
             return res.status(400).send(response);
         }
+
+
 
         const info = await Data.create({
             application_id: req.user.id,
@@ -131,7 +145,14 @@ async function createData(req, res) {
             updated_by: req.user.id
         });
 
-        response.data = info;
+        response.data = {
+            id: info.id,
+            type: info.type,
+            data: info.data,
+            created_at: info.created_at,
+            updated_at: info.updated_at
+        };
+
         res.json(response);
     }
     catch(err){
@@ -142,4 +163,4 @@ async function createData(req, res) {
 
 exports.getToken = getToken;
 exports.getApplications = getApplications;
-exports.createData = createData;
+exports.saveData = saveData;

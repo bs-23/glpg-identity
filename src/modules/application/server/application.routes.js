@@ -10,6 +10,6 @@ module.exports = app => {
         .get(CDPAuthStrategy, controller.getApplications);
 
     app.route('/api/applications/data')
-        .post(passport.authenticate('application-jwt', { session: false }), controller.createData);
+        .post(passport.authenticate('application-jwt', { session: false }), controller.saveData);
 
 };

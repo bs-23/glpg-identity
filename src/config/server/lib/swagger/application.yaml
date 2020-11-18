@@ -79,19 +79,9 @@ paths:
                                         properties:
                                             id:
                                                 type: string
-                                            application_id:
-                                                type: string
                                             type:
                                                 type: string
                                             data:
-                                                type: string
-                                            created_by:
-                                                type: string
-                                            updated_by:
-                                                type: string
-                                            created_at:
-                                                type: string
-                                            updated_at:
                                                 type: string
                                     errors:
                                         $ref: "#/components/schemas/errorBodyInSuccess"

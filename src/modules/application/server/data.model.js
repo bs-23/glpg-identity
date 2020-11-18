@@ -16,13 +16,12 @@ const Data = sequelize.cdpConnector.define('datas', {
         type: DataTypes.UUID
     },
     type: {
-        unique: true,
         allowNull: false,
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(15),
     },
     data: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING(5000)
     },
     created_by: {
         type: DataTypes.UUID
