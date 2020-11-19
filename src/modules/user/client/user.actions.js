@@ -70,15 +70,6 @@ export function getUsers(page = 1, codbase, orderBy, orderType) {
     };
 }
 
-export function deleteUser(id) {
-    return {
-        type: Types.DELETE_USER,
-        payload: axios({
-            method: 'delete',
-            url: `/api/users/${id}`
-        })
-    };
-}
 
 export function getRoles() {
     return {
@@ -110,15 +101,3 @@ export function cdpSort(type, val) {
         }
     };
 }
-
-export function getCountries() {
-    return {
-        type: Types.GET_COUNTRIES,
-        payload: axios({
-            method: 'get',
-            url: '/api/countries',
-        })
-    };
-}
-
-

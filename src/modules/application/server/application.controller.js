@@ -1,6 +1,9 @@
 const path = require('path');
 const jwt = require('jsonwebtoken');
 const Application = require('./application.model');
+const Data = require('./data.model');
+const { Op } = require('sequelize');
+const { assign } = require('lodash');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 
@@ -103,5 +106,89 @@ async function getApplications(req, res) {
     }
 }
 
+async function saveData(req, res) {
+    const response = new Response({}, []);
+
+    try{
+        const {type, data} = req.body;
+
+        if(!type) {
+            response.errors.push(new CustomError('Type is missing.', 400, 'type'));
+        }
+
+        if(!data) {
+            response.errors.push(new CustomError('Data is missing.', 400, 'data'));
+        }
+
+        const isJSON = (str) => {
+            try {
+                return (JSON.parse(str) && !!str);
+            } catch (e) {
+                return false;
+            }
+        }
+
+        if(!isJSON(data)){
+            response.errors.push(new CustomError('Data is not valid.', 400, 'data'));
+        }
+
+        if (response.errors.length) {
+            return res.status(400).send(response);
+        }
+
+
+
+        const info = await Data.create({
+            application_id: req.user.id,
+            type,
+            data,
+            created_by: req.user.id,
+            updated_by: req.user.id
+        });
+
+        response.data = {
+            id: info.id,
+            type: info.type,
+            data: info.data,
+            created_at: info.created_at,
+            updated_at: info.updated_at
+        };
+
+        res.json(response);
+    }
+    catch(err){
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function getData(req, res) {
+    const response = new Response({}, []);
+    try{
+        const doc = await Data.findOne({
+            where: { id: req.params.id },
+            include: {
+                model: Application,
+                as: 'application',
+                attributes: ['id', 'name'],
+            }
+        });
+
+        if (!doc) {
+            response.errors.push(new CustomError('Profile not found.', 404));
+            return res.status(404).send(response);
+        }
+        response.data = doc;
+
+        res.json(response);
+    }
+    catch(err){
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 exports.getToken = getToken;
 exports.getApplications = getApplications;
+exports.saveData = saveData;
+exports.getData = getData;

@@ -1,10 +1,17 @@
 const path = require("path");
+const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const User = require(path.join(process.cwd(), "src/modules/user/server/user.model"));
-const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
-const UserRole = require(path.join(process.cwd(), "src/modules/user/server/user-role.model"));
+const UserProfile = require(path.join(process.cwd(), "src/modules/user/server/user-profile.model"));
+const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/userProfile-permissionSet.model"));
+const PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permission-set.model"));
+const PermissionSet_ServiceCateory = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-serviceCategory.model"));
+const ServiceCategory = require(path.join(process.cwd(), "src/modules/user/server/permission/service-category.model"));
+const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-application.model"));
+const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
+const User_Role = require(path.join(process.cwd(), "src/modules/user/server/role/user-role.model"));
+const Role_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/role-permissionSet.model"));
 const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
-const RolePermission = require(path.join(process.cwd(), "src/modules/user/server/role/role-permission.model"));
 
 const AdminGuard = (req, res, next) => {
     if (!req.user) return res.status(401).send('unauthorized');
@@ -16,53 +23,146 @@ const AdminGuard = (req, res, next) => {
 const AuthGuard = passport.authenticate('user-jwt', { session: false });
 
 const isPermitted = (module, permissions) => {
-    if (permissions.some(p => p === module)) {
+    if (permissions.some(p => p.slug === module)) {
         return true;
     }
     return false;
 };
 
-async function getUserWithPermissions(id) {
+async function getUserWithProfiles(id) {
     const userWithPermissions = await User.findOne({
         where: { id },
-        include: [{
-            model: UserRole,
-            as: 'userrole',
-            include: [{
-                model: Role,
-                as: 'role',
+        include: [
+            {
+                model: User_Role,
+                as: 'userRoles',
                 include: [{
-                    model: RolePermission,
-                    as: 'rolePermission',
+                    model: Role,
+                    as: 'role',
                     include: [{
-                        model: Permission,
-                        as: 'permission',
+                        model: Role_PermissionSet,
+                        as: 'role_ps',
+                        include: [{
+                            model: PermissionSet,
+                            as: 'ps',
+                            include: [
+                                {
+                                    model: PermissionSet_ServiceCateory,
+                                    as: 'ps_sc',
+                                    include: [
+                                        {
+                                            model: ServiceCategory,
+                                            as: 'serviceCategory',
+
+                                        }
+                                    ]
+
+                                },
+                                {
+                                    model: PermissionSet_Application,
+                                    as: 'ps_app',
+                                    include: [
+                                        {
+                                            model: Application,
+                                            as: 'application',
+
+                                        }
+                                    ]
+
+                                }
+                            ]
+
+                        }]
                     }]
 
                 }]
-            }]
-        }]
+            },
+            {
+
+                model: UserProfile,
+                as: 'userProfile',
+                include: [{
+                    model: UserProfile_PermissionSet,
+                    as: 'up_ps',
+                    include: [{
+                        model: PermissionSet,
+                        as: 'ps',
+                        include: [
+                            {
+                                model: PermissionSet_ServiceCateory,
+                                as: 'ps_sc',
+                                include: [
+                                    {
+                                        model: ServiceCategory,
+                                        as: 'serviceCategory',
+
+                                    }
+                                ]
+
+                            },
+                            {
+                                model: PermissionSet_Application,
+                                as: 'ps_app',
+                                include: [
+                                    {
+                                        model: Application,
+                                        as: 'application',
+
+                                    }
+                                ]
+
+                            }
+                        ]
+
+                    }]
+                }]
+            }
+
+        ]
     });
 
     return userWithPermissions;
 }
 
-function getPermissions(userrole) {
-    const permissions = [];
-    if (userrole) {
-        userrole.forEach(ur => {
-            permissions.push(ur.role.rolePermission.map(rp => rp.permission.module));
-        })
-        return permissions.flat(1);
+async function getProfilePermissions(profile) {
+    const serviceCategories = [];
+    if (profile) {
+        for (const userProPermSet of profile.up_ps) {
+            let permissionSet = userProPermSet.ps;
+            for (const psc of permissionSet.ps_sc) {
+                serviceCategories.push(psc.serviceCategory);
+            }
+
+        }
+
+        return serviceCategories;
     }
+}
+
+async function getRolePermissions(roles) {
+    const serviceCategories = [];
+    for (const userRole of roles) {
+        for (const rolePermSet of userRole.role.role_ps) {
+            let permissionSet = rolePermSet.ps;
+            for (const psc of permissionSet.ps_sc) {
+                serviceCategories.push(psc.serviceCategory);
+            }
+
+        }
+
+    }
+    return serviceCategories;
+
 }
 
 const ModuleGuard = (moduleName) => {
     return async function (req, res, next) {
-        const user = await getUserWithPermissions(req.user.id);
-        const userPermissions = getPermissions(user.userrole);
+        const user = await getUserWithProfiles(req.user.id);
+        const userPermissions = await getProfilePermissions(user.userProfile);
+        const rolePermissions = await getRolePermissions(user.userRoles);
+        let all_permissions = userPermissions.concat(rolePermissions);
 
-        if (!isPermitted(moduleName, userPermissions)) {
+        if (!isPermitted(moduleName, all_permissions)) {
             return res
                 .status(403)
                 .send('Forbidden! You are not authorized to view this page');

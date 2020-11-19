@@ -20,11 +20,11 @@ export default function PublicRoute({ component: Component, ...rest }) {
     }
 
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
-
+    
     return (
         <Route {...rest} render={props => {
             return (
-                loggedInUser ? (
+                loggedInUser && cookies.logged_in ? (
                     <Redirect push to={{
                         pathname: props.location.state
                             ? props.location.state.from.pathname

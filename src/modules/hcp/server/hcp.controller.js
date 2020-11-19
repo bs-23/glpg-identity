@@ -1,24 +1,23 @@
 const path = require('path');
-const fs = require('fs');
 const _ = require('lodash');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
+const axios = require('axios');
 const validator = require('validator');
 const { QueryTypes, Op, where, col, fn } = require('sequelize');
-const Hcp = require('./hcp_profile.model');
-const ApplicationDomain = require('../../application/server/application-domain.model');
-const HcpArchives = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_archives.model'));
-const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp_consents.model'));
+const Hcp = require('./hcp-profile.model');
+const HcpArchives = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-archives.model'));
+const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-consents.model'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
 const ConsentLocale = require(path.join(process.cwd(), 'src/modules/consent/server/consent-locale.model'));
 const ConsentCountry = require(path.join(process.cwd(), 'src/modules/consent/server/consent-country.model'));
 const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
-const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const PasswordPolicies = require(path.join(process.cwd(), 'src/modules/core/server/password/password-policies.js'));
+const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/user/server/permission/permissions.js'));
 
 function generateAccessToken(doc) {
     return jwt.sign({
@@ -67,85 +66,25 @@ function mapMasterDataToHcpProfile(masterData) {
     return model;
 }
 
-async function generateEmailOptions(emailType, application, user) {
-    const emailDataUrl = path.join(process.cwd(), `src/config/server/lib/email-service/email-options.json`);
-    const emailOptionsText = fs.readFileSync(emailDataUrl, 'utf8');
-    const emailOptions = JSON.parse(emailOptionsText);
-    const emailData = emailOptions[emailType];
+async function notifyHcpUserApproval(hcpUser) {
+    const userApplication = await Application.findOne({ where: { id: hcpUser.application_id } });
+    const token = jwt.sign({
+        id: hcpUser.id
+    }, userApplication.auth_secret, {
+        expiresIn: '1h'
+    });
 
-    let templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/en/${emailData.template_url}`)
-    const templateUrlInLocale = path.join(process.cwd(), `src/config/server/lib/email-service/templates/${application.slug}/${user.locale.toLowerCase()}/${emailData.template_url}`);
+    const payload = hcpUser.status === 'consent_pending'
+        ? { consent_confirmation_token: generateConsentConfirmationAccessToken(hcpUser) }
+        : { password_setup_token: hcpUser.reset_password_token };
 
-    if (fs.existsSync(templateUrlInLocale)) {
-        templateUrl = templateUrlInLocale;
-    }
+    payload.jwt_token = token;
 
-    const subject = emailData.subject[user.locale] || emailData.subject['en'];
-    const plaintext = emailData.plain_text[user.locale] || emailData.plain_text['en'];
-
-    const { domain } = await ApplicationDomain.findOne({ where: { application_id: application.id, country_iso2: user.country_iso2 }});
-
-    return {
-        toAddresses: [user.email],
-        subject: subject,
-        templateUrl: templateUrl,
-        plaintext: plaintext,
-        domain,
-        data: {
-            firstName: user.first_name || '',
-            lastName: user.last_name || '',
-            s3bucketUrl: nodecache.getValue('S3_BUCKET_URL')
+    await axios.post(`${hcpUser.origin_url}${userApplication.approve_user_path}`, payload, {
+        headers: {
+            jwt_token: token
         }
-    };
-}
-
-async function sendConsentConfirmationMail(user, consents, application) {
-    const consentConfirmationToken = generateConsentConfirmationAccessToken(user);
-
-    const mailOptions = await generateEmailOptions('double-opt-in-consent-confirm', application, user);
-    mailOptions.data.consents = consents || [];
-    mailOptions.data.link = `${mailOptions.domain}${application.consent_confirmation_path}?token=${consentConfirmationToken}&journey=consent_confirmation&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
-
-    await emailService.send(mailOptions);
-}
-
-async function sendRegistrationSuccessMail(user, application) {
-    const mailOptions = await generateEmailOptions('registration-success', application, user);
-    mailOptions.data.loginLink = `${mailOptions.domain}${application.journey_redirect_path}?journey=login&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
-
-    await emailService.send(mailOptions);
-}
-
-async function sendChangePasswordSuccessMail(user, application) {
-    const mailOptions = await generateEmailOptions('password-change-success', application, user);
-    await emailService.send(mailOptions);
-}
-
-async function sendRegistrationNotVerifiedMail(user, application) {
-    const mailOptions = await generateEmailOptions('registration-not-verified', application, user);
-    await emailService.send(mailOptions);
-}
-
-async function sendResetPasswordSuccessMail(user, application) {
-    const mailOptions = await generateEmailOptions('password-reset-success', application, user);
-    mailOptions.data.loginLink = `${mailOptions.domain}${application.journey_redirect_path}?journey=login&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
-
-    await emailService.send(mailOptions);
-}
-
-async function sendPasswordSetupInstructionMail(user, application) {
-    const mailOptions = await generateEmailOptions('password-setup-instructions', application, user);
-    mailOptions.data.link = `${mailOptions.domain}${application.journey_redirect_path}?token=${user.reset_password_token}&journey=single_optin_verified&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
-    mailOptions.data.forgot_password_link = `${mailOptions.domain}${application.journey_redirect_path}?journey=forgot_password&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
-
-    await emailService.send(mailOptions);
-}
-
-async function sendPasswordResetInstructionMail(user, application) {
-    const mailOptions = await generateEmailOptions('password-reset-instructions', application, user);
-    mailOptions.data.link = `${mailOptions.domain}${application.journey_redirect_path}?token=${user.reset_password_token}&journey=set_password&country_lang=${user.country_iso2.toLowerCase()}_${user.language_code.toLowerCase()}`;
-
-    await emailService.send(mailOptions);
+    });
 }
 
 async function addPasswordResetTokenToUser(user) {
@@ -163,20 +102,22 @@ async function getHcps(req, res) {
     const response = new Response({}, []);
 
     try {
-        const page = req.query.page ? parseInt(req.query.page) - 1 : 0;
+        const page = req.query.page ? +req.query.page - 1 : 0;
         const limit = 15;
         let status = req.query.status === undefined ? null : req.query.status;
         if (status && status.indexOf(',') !== -1) status = status.split(',');
         const codbase = req.query.codbase === 'undefined' ? null : req.query.codbase;
         const offset = page * limit;
 
-        const application_list = (await Hcp.findAll()).map(i => i.get("application_id"));
+        // const application_list = (await Hcp.findAll()).map(i => i.get("application_id"));
 
-        async function getCountryIso2(){
+        const [userPermittedApplications, userPermittedCountries] = await getUserPermissions(req.user.id);
+
+        async function getCountryIso2() {
             const user_codbase_list_for_iso2 = (await sequelize.datasyncConnector.query(
                 `SELECT * FROM ciam.vwcountry where ciam.vwcountry.country_iso2 = ANY($countries);`, {
                     bind: {
-                        countries: req.user.countries
+                        countries: userPermittedCountries
                     },
                     type: QueryTypes.SELECT
                 }
@@ -186,7 +127,7 @@ async function getHcps(req, res) {
                 `SELECT * FROM ciam.vwcountry where ciam.vwcountry.codbase = ANY($codbases);`,
                 {
                     bind: {
-                        codbases : user_codbase_list_for_iso2
+                        codbases: user_codbase_list_for_iso2
                     },
                     type: QueryTypes.SELECT
                 }
@@ -198,13 +139,17 @@ async function getHcps(req, res) {
         const country_iso2_list = await getCountryIso2();
         const ignorecase_of_country_iso2_list = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
 
+        // const codbase_list_mapped_with_user_country_iso2_list = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => userPermittedCountries.includes(i.country_iso2)).map(i => i.codbase) : [];
+        // const country_iso2_list_for_user_countries_codbase = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => codbase_list_mapped_with_user_country_iso2_list.includes(i.codbase)).map(i => i.country_iso2) : [];
+        // const countries_ignorecase_for_user_countries_codbase = [].concat.apply([], country_iso2_list_for_user_countries_codbase.map(i => ignoreCaseArray(i)));
+
         const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(
             `SELECT * FROM ciam.vwcountry WHERE ciam.vwcountry.codbase = $codbase;`, {
-                bind: {
-                    codbase: codbase || ''
-                },
-                type: QueryTypes.SELECT
-            }
+            bind: {
+                codbase: codbase || ''
+            },
+            type: QueryTypes.SELECT
+        }
         )).map(i => i.country_iso2);
 
         const selected_iso2_list_for_codbase = country_iso2_list_for_codbase.filter(i => country_iso2_list.includes(i));
@@ -213,9 +158,19 @@ async function getHcps(req, res) {
         const specialty_list = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwspecialtymaster", { type: QueryTypes.SELECT });
 
         const hcp_filter = {
-            status: status === null ? { [Op.or]: ['self_verified', 'manually_verified', 'consent_pending', 'not_verified', null] } : status,
-            application_id: req.user.type === 'admin' ? { [Op.or]: application_list } : req.user.application_id,
-            country_iso2: codbase ? { [Op.any]: [ignorecase_of_selected_iso2_list_for_codbase] } : { [Op.any]: [ignorecase_of_country_iso2_list] },
+            status: status === null
+                ? { [Op.or]: ['self_verified', 'manually_verified', 'consent_pending', 'not_verified', null] }
+                : status,
+            application_id: userPermittedApplications.length
+                ? userPermittedApplications.map(app => app.id)
+                : null,
+            country_iso2: codbase
+                ? ignorecase_of_selected_iso2_list_for_codbase.length
+                    ? ignorecase_of_selected_iso2_list_for_codbase
+                    : null
+                : ignorecase_of_country_iso2_list.length
+                    ? ignorecase_of_country_iso2_list
+                    : null,
         };
 
         const orderBy = req.query.orderBy === 'null'
@@ -240,7 +195,7 @@ async function getHcps(req, res) {
             include: [{
                 model: HcpConsents,
                 as: 'hcpConsents',
-                attributes: ['consent_id', 'response', 'consent_confirmed'],
+                attributes: ['consent_id', 'consent_confirmed', 'opt_type'],
             }],
             attributes: { exclude: ['password', 'created_by', 'updated_by'] },
             offset,
@@ -248,20 +203,40 @@ async function getHcps(req, res) {
             order: order
         });
 
-        await Promise.all(hcps.map(async hcp => {
+        // await Promise.all(hcps.map(async hcp => {
+        //     const opt_types = new Set();
+
+        //     await Promise.all(hcp['hcpConsents'].map(async hcpConsent => {
+
+        //         if (hcpConsent.consent_confirmed) {
+        //             const country_consent = await ConsentCountry.findOne({
+        //                 where: {
+        //                     consent_id: hcpConsent.consent_id,
+        //                     country_iso2: {
+        //                         [Op.iLike]: hcp.country_iso2
+        //                     },
+        //                 }
+        //             });
+        //             opt_types.add(country_consent.opt_type);
+        //         }
+        //     }));
+
+        //     hcp.dataValues.opt_types = [...opt_types];
+        //     delete hcp.dataValues['hcpConsents'];
+        // }));
+
+        hcps.map(hcp => {
             const opt_types = new Set();
 
-            await Promise.all(hcp['hcpConsents'].map(async hcpConsent => {
-
-                if (hcpConsent.response && hcpConsent.consent_confirmed) {
-                    const country_consent = await ConsentCountry.findOne({ where: { consent_id: hcpConsent.consent_id } });
-                    opt_types.add(country_consent.opt_type);
+            hcp['hcpConsents'].map(hcpConsent => {
+                if (hcpConsent.consent_confirmed) {
+                    opt_types.add(hcpConsent.opt_type);
                 }
-            }));
+            });
 
             hcp.dataValues.opt_types = [...opt_types];
             delete hcp.dataValues['hcpConsents'];
-        }));
+        });
 
         const totalUser = await Hcp.count({//counting total data for pagintaion
             where: hcp_filter
@@ -269,8 +244,13 @@ async function getHcps(req, res) {
 
         const hcp_users = [];
         hcps.forEach(user => {//add specialty name from data sync
-            const specialty = specialty_list.find(i => i.cod_id_onekey === user.specialty_onekey);
-            (specialty) ? user.dataValues.specialty_description = specialty.cod_description : user.dataValues.specialty_description = null;
+            const specialties = specialty_list.filter(i => i.cod_id_onekey === user.specialty_onekey);
+            const specialtyInEnglish = specialties && specialties.find(s => s.cod_locale === 'en');
+            (specialtyInEnglish)
+                ? user.dataValues.specialty_description = specialtyInEnglish.cod_description
+                : specialties.length
+                    ? user.dataValues.specialty_description = specialties[0].cod_description
+                    : user.dataValues.specialty_description = null;
             hcp_users.push(user);
         });
 
@@ -283,7 +263,7 @@ async function getHcps(req, res) {
             end: offset + limit > totalUser ? totalUser : offset + limit,
             status: status ? status : null,
             codbase: codbase ? codbase : null,
-            countries: req.user.countries
+            countries: userPermittedCountries
         };
 
         response.data = data;
@@ -298,6 +278,26 @@ async function getHcps(req, res) {
 async function editHcp(req, res) {
     const { first_name, last_name, telephone } = req.body;
     const response = new Response({}, []);
+
+    if (!first_name) {
+        response.errors.push(new CustomError('First name is missing.', 400, 'first_name'));
+    } else if (first_name.length > 50) {
+        response.errors.push(new CustomError('First name should be at most 50 characters', 400, 'first_name'));
+    }
+
+    if (!last_name) {
+        response.errors.push(new CustomError('Last name is missing.', 400, 'last_name'));
+    } else if (last_name.length > 50) {
+        response.errors.push(new CustomError('Last name should be at most 50 characters', 400, 'last_name'));
+    }
+
+    if (telephone && telephone.length > 25) {
+        response.errors.push(new CustomError('Telephone number should be at most 25 digits including country code', 400, 'telephone'));
+    }
+
+    if (response.errors.length) {
+        return res.status(400).send(response);
+    }
 
     try {
         const HcpUser = await Hcp.findOne({ where: { id: req.params.id } });
@@ -341,32 +341,48 @@ async function registrationLookup(req, res) {
 
     try {
         const profileByEmail = await Hcp.findOne({ where: where(fn('lower', col('email')), fn('lower', email)) });
-        const profileByUUID = await Hcp.findOne({ where: { uuid } });
 
         if (profileByEmail) {
             response.errors.push(new CustomError('Email address is already registered.', 4001, 'email'));
             return res.status(400).send(response);
-        } else if (profileByUUID) {
+        }
+
+        const uuidWithoutSpecialCharacter = uuid.replace(/[-]/gi, '');
+
+        const master_data = await sequelize.datasyncConnector.query(`
+            SELECT h.*, s.specialty_code
+            FROM ciam.vwhcpmaster AS h
+            INNER JOIN ciam.vwmaphcpspecialty AS s
+            ON s.individual_id_onekey = h.individual_id_onekey
+            WHERE regexp_replace(h.uuid_1, '[-]', '', 'gi') = $uuid
+            OR regexp_replace(h.uuid_2, '[-]', '', 'gi') = $uuid
+        `, {
+            bind: { uuid: uuidWithoutSpecialCharacter },
+            type: QueryTypes.SELECT
+        });
+
+        let uuid_from_master_data;
+
+        if (master_data && master_data.length) {
+            const uuid_1_from_master_data = (master_data[0].uuid_1 || '');
+            const uuid_2_from_master_data = (master_data[0].uuid_2 || '');
+
+            uuid_from_master_data = [uuid_1_from_master_data, uuid_2_from_master_data]
+                .find(id => id.replace(/[-]/gi, '') === uuidWithoutSpecialCharacter);
+        }
+
+        const profileByUUID = await Hcp.findOne({ where: { uuid: uuid_from_master_data || uuid } });
+
+        if (profileByUUID) {
             response.errors.push(new CustomError('UUID is already registered.', 4101, 'uuid'));
             return res.status(400).send(response);
-        } else {
-            const master_data = await sequelize.datasyncConnector.query(`
-                SELECT h.*, s.specialty_code
-                FROM ciam.vwhcpmaster AS h
-                INNER JOIN ciam.vwmaphcpspecialty AS s
-                ON s.individual_id_onekey = h.individual_id_onekey
-                WHERE h.uuid_1 = $uuid OR h.uuid_2 = $uuid
-            `, {
-                bind: { uuid },
-                type: QueryTypes.SELECT
-            });
+        }
 
-            if (master_data && master_data.length) {
-                response.data = mapMasterDataToHcpProfile(master_data[0]);
-            } else {
-                response.errors.push(new CustomError('Invalid UUID.', 4100, 'uuid'));
-                return res.status(400).send(response);
-            }
+        if (master_data && master_data.length) {
+            response.data = mapMasterDataToHcpProfile(master_data[0]);
+        } else {
+            response.errors.push(new CustomError('Invalid UUID.', 4100, 'uuid'));
+            return res.status(400).send(response);
         }
 
         res.json(response);
@@ -379,45 +395,65 @@ async function registrationLookup(req, res) {
 
 async function createHcpProfile(req, res) {
     const response = new Response({}, []);
-    const { email, uuid, salutation, first_name, last_name, country_iso2, language_code, specialty_onekey, telephone, locale } = req.body;
+    const { email, uuid, salutation, first_name, last_name, country_iso2, language_code, specialty_onekey, telephone, birthdate, origin_url } = req.body;
 
     if (!email || !validator.isEmail(email)) {
         response.errors.push(new CustomError('Email address is missing or invalid.', 400, 'email'));
+    } else if (email.length > 100) {
+        response.errors.push(new CustomError('Email should be at most 100 characters', 400, 'email'));
     }
 
     if (!uuid) {
         response.errors.push(new CustomError('UUID is missing.', 400, 'uuid'));
+    } else if (uuid.length > 20) {
+        response.errors.push(new CustomError('UUID should be at most 20 characters', 400, 'uuid'));
     }
 
     if (!salutation) {
         response.errors.push(new CustomError('Salutation is missing.', 400, 'salutation'));
+    } else if (salutation.length > 5) {
+        response.errors.push(new CustomError('Salutation should be at most 5 characters', 400, 'salutation'));
     }
 
     if (!first_name) {
         response.errors.push(new CustomError('First name is missing.', 400, 'first_name'));
+    } else if (first_name.length > 50) {
+        response.errors.push(new CustomError('First name should be at most 50 characters', 400, 'first_name'));
     }
 
     if (!last_name) {
         response.errors.push(new CustomError('Last name is missing.', 400, 'last_name'));
+    } else if (last_name.length > 50) {
+        response.errors.push(new CustomError('Last name should be at most 50 characters', 400, 'last_name'));
     }
 
     if (!country_iso2) {
         response.errors.push(new CustomError('country_iso2 is missing.', 400, 'country_iso2'));
+    } else if (country_iso2.length > 2) {
+        response.errors.push(new CustomError('Country code should be at most 2 characters', 400, 'country_iso2'));
     }
 
     if (!language_code) {
         response.errors.push(new CustomError('language_code is missing.', 400, 'language_code'));
-    }
-
-    if (!locale) {
-        response.errors.push(new CustomError('locale is missing.', 400, 'locale'));
+    } else if (language_code.length > 2) {
+        response.errors.push(new CustomError('Language code should be at most 2 characters', 400, 'language_code'));
     }
 
     if (!specialty_onekey) {
         response.errors.push(new CustomError('specialty_onekey is missing.', 400, 'specialty_onekey'));
     }
 
-    if (specialty_onekey) {
+    if (!origin_url) {
+        response.errors.push(new CustomError('Origin URL is missing.', 400, 'origin_url'));
+    }
+
+    if (telephone && telephone.length > 25) {
+        response.errors.push(new CustomError('Telephone number should be at most 25 digits including country code', 400, 'telephone'));
+    }
+
+    if (specialty_onekey.length > 20) {
+        response.errors.push(new CustomError('Specialty Onekey should be at most 20 characters', 400, 'specialty_onekey'));
+    } else if (specialty_onekey) {
         const specialty_master_data = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwspecialtymaster WHERE cod_id_onekey = $specialty_onekey", {
             bind: { specialty_onekey },
             type: QueryTypes.SELECT
@@ -434,11 +470,33 @@ async function createHcpProfile(req, res) {
 
     try {
         const isEmailExists = await Hcp.findOne({ where: where(fn('lower', col('email')), fn('lower', email)) });
-        const isUUIDExists = await Hcp.findOne({ where: { uuid: req.body.uuid } });
 
         if (isEmailExists) {
             response.errors.push(new CustomError('Email already exists.', 4001, 'email'));
         }
+
+        let master_data = {};
+        let uuid_from_master_data;
+
+        if (uuid) {
+            const uuidWithoutSpecialCharacter = uuid.replace(/[-]/gi, '');
+
+            master_data = await sequelize.datasyncConnector.query(`select * from ciam.vwhcpmaster
+                    where regexp_replace(uuid_1, '[-]', '', 'gi') = $uuid
+                    OR regexp_replace(uuid_2, '[-]', '', 'gi') = $uuid`, {
+                bind: { uuid: uuidWithoutSpecialCharacter },
+                type: QueryTypes.SELECT
+            });
+            master_data = master_data && master_data.length ? master_data[0] : {};
+
+            const uuid_1_from_master_data = (master_data.uuid_1 || '');
+            const uuid_2_from_master_data = (master_data.uuid_2 || '');
+
+            uuid_from_master_data = [uuid_1_from_master_data, uuid_2_from_master_data]
+                .find(id => id.replace(/[-]/gi, '') === uuidWithoutSpecialCharacter);
+        }
+
+        const isUUIDExists = await Hcp.findOne({ where: { uuid: uuid_from_master_data || uuid } });
 
         if (isUUIDExists) {
             response.errors.push(new CustomError('UUID already exists.', 4101, 'uuid'));
@@ -448,29 +506,21 @@ async function createHcpProfile(req, res) {
             return res.status(400).send(response);
         }
 
-        let master_data = {};
-
-        if (req.body.uuid) {
-            master_data = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwhcpmaster WHERE uuid_1 = $uuid OR uuid_2 = $uuid', {
-                bind: { uuid: req.body.uuid },
-                type: QueryTypes.SELECT
-            });
-            master_data = master_data && master_data.length ? master_data[0] : {};
-        }
-
         const model = {
             email: email.toLowerCase(),
-            uuid,
+            uuid: uuid_from_master_data || uuid,
             salutation,
             first_name,
             last_name,
             language_code: language_code.toLowerCase(),
             country_iso2: country_iso2.toLowerCase(),
-            locale: locale.toLowerCase(),
+            locale: `${language_code.toLowerCase()}_${country_iso2.toUpperCase()}`,
             specialty_onekey,
             telephone,
+            birthdate,
             application_id: req.user.id,
             individual_id_onekey: master_data.individual_id_onekey,
+            origin_url,
             created_by: req.user.id,
             updated_by: req.user.id
         };
@@ -482,24 +532,29 @@ async function createHcpProfile(req, res) {
 
         if (req.body.consents && req.body.consents.length) {
             await Promise.all(req.body.consents.map(async consent => {
-                const consentSlug = Object.keys(consent)[0];
+                const preferenceSlug = Object.keys(consent)[0];
                 const consentResponse = Object.values(consent)[0];
 
                 if (!consentResponse) return;
 
-                const consentDetails = await Consent.findOne({ where: { slug: consentSlug } });
+                const consentDetails = await Consent.findOne({ where: { slug: preferenceSlug } });
+
                 if (!consentDetails) return;
 
                 const consentLocale = await ConsentLocale.findOne({
                     where: {
-                        locale: model.locale.toLowerCase(),
+                        locale: {
+                            [Op.iLike]: `%${model.locale}`
+                        },
                         consent_id: consentDetails.id
                     }
                 });
 
                 const consentCountry = await ConsentCountry.findOne({
                     where: {
-                        country_iso2: model.country_iso2.toLowerCase(),
+                        country_iso2: {
+                            [Op.iLike]:model.country_iso2
+                        },
                         consent_id: consentDetails.id
                     }
                 });
@@ -514,8 +569,8 @@ async function createHcpProfile(req, res) {
                     user_id: hcpUser.id,
                     consent_id: consentDetails.id,
                     title: consentLocale.rich_text,
-                    response: consentResponse,
                     consent_confirmed: consentCountry.opt_type === 'double-opt-in' ? false : true,
+                    opt_type: consentCountry.opt_type,
                     created_by: req.user.id,
                     updated_by: req.user.id
                 });
@@ -532,15 +587,8 @@ async function createHcpProfile(req, res) {
 
         response.data = getHcpViewModel(hcpUser.dataValues);
 
-        if (hcpUser.dataValues.status === 'not_verified') {
-            await sendRegistrationNotVerifiedMail(hcpUser.dataValues, req.user);
-        }
-
         if (hcpUser.dataValues.status === 'consent_pending') {
-            const unconfirmedConsents = consentArr.filter(consent => !consent.consent_confirmed);
-            const consentTitles = unconfirmedConsents.map(consent => validator.unescape(consent.title));
-
-            await sendConsentConfirmationMail(hcpUser.dataValues, consentTitles, req.user);
+            response.data.consent_confirmation_token = generateConsentConfirmationAccessToken(hcpUser);
         }
 
         if (hcpUser.dataValues.status === 'self_verified') {
@@ -611,46 +659,54 @@ async function approveHCPUser(req, res) {
 
         if (!hcpUser) {
             response.errors.push(new CustomError('User does not exist.', 404));
-            return res.status(404).send(response);
         }
 
         if (hcpUser.dataValues.status !== 'not_verified') {
             response.errors.push(new CustomError('Invalid user status for this request.', 400));
-            return res.status(400).send(response);
         }
 
-        const userApplication = await Application.findOne({ where: { id: hcpUser.application_id } });
+        if (response.errors.length) {
+            return res.status(400).send(response);
+        }
 
         let userConsents = await HcpConsents.findAll({ where: { [Op.and]: [{ user_id: id }, { consent_confirmed: false }] } });
 
         let hasDoubleOptIn = false;
-        const consentTitles = [];
 
         if (userConsents && userConsents.length) {
             const consentIds = userConsents.map(consent => consent.consent_id)
             const allConsentDetails = await ConsentLocale.findAll({
                 where: {
                     consent_id: consentIds,
-                    locale: hcpUser.locale.toLowerCase()
+                    locale: {
+                        [Op.iLike] : hcpUser.locale
+                    }
                 }
             });
 
             if (allConsentDetails && allConsentDetails.length) {
                 hasDoubleOptIn = true;
-                allConsentDetails.forEach(consent => consentTitles.push(validator.unescape(consent.rich_text)));
             }
         }
 
         hcpUser.status = hasDoubleOptIn ? 'consent_pending' : 'manually_verified';
         await hcpUser.save();
 
-        if (hcpUser.dataValues.status === 'consent_pending') {
-            await sendConsentConfirmationMail(hcpUser, consentTitles, userApplication);
-        }
-
         if (hcpUser.dataValues.status === 'manually_verified') {
             await addPasswordResetTokenToUser(hcpUser);
-            await sendPasswordSetupInstructionMail(hcpUser.dataValues, userApplication);
+        }
+
+        try {
+            await notifyHcpUserApproval(hcpUser);
+        } catch(e) {
+            await hcpUser.update({
+                status: 'not_verified',
+                reset_password_token: null,
+                reset_password_expires: null
+            });
+            console.error(e);
+            response.errors.push(new CustomError('Failed to approve user.', 400));
+            return res.status(400).send(response);
         }
 
         response.data = getHcpViewModel(hcpUser.dataValues);
@@ -715,7 +771,7 @@ async function getHcpProfile(req, res) {
     try {
         const doc = await Hcp.findOne({
             where: { id: req.params.id },
-            attributes: { exclude: ['password', 'created_at', 'updated_at', 'created_by', 'updated_by', 'reset_password_token', 'reset_password_expires', 'application_id'] }
+            attributes: { exclude: ['password', 'created_at', 'updated_at', 'created_by', 'updated_by', 'reset_password_token', 'reset_password_expires', 'failed_auth_attempt', 'password_updated_at', 'application_id'] }
         });
 
         if (!doc) {
@@ -723,7 +779,45 @@ async function getHcpProfile(req, res) {
             return res.status(404).send(response);
         }
 
-        response.data = getHcpViewModel(doc.dataValues);
+        response.data = getHcpViewModel(doc.dataValues);;
+
+        const userConsents = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id', 'consent_confirmed', 'opt_type', 'updated_at'] });
+
+        if (!userConsents) {
+            response.data = { ...response.data, consents: [] };
+            return res.json(response);
+        }
+
+        const userConsentDetails = await ConsentLocale.findAll({
+            include: {
+                model: Consent,
+                as: 'consent'
+            }, where: {
+                consent_id: userConsents.map(consent => consent.consent_id),
+                locale: {
+                    [Op.iLike]: `%${doc.locale}`
+                }
+            }, attributes: ['consent_id', 'rich_text']
+        });
+
+
+        const consentResponse = userConsentDetails.map(({
+            consent_id: id,
+            rich_text,
+            consent: { preference }
+        }) => ({ id, preference, rich_text: validator.unescape(rich_text) }));
+
+        response.data = {
+            ...response.data,
+            consents: consentResponse.map(conRes => {
+                const matchedConsent = userConsents.find(consent => consent.consent_id === conRes.id);
+                conRes.consent_given_time = matchedConsent ? matchedConsent.updated_at : null;
+                conRes.opt_type = matchedConsent ? matchedConsent.opt_type : null;
+                conRes.consent_given = matchedConsent ? matchedConsent.consent_confirmed ? true : false : null;
+                return conRes;
+            })
+        };
+
         res.json(response);
     } catch (err) {
         console.error(err);
@@ -746,22 +840,34 @@ async function getHCPUserConsents(req, res) {
             return res.status(404).send(response);
         }
 
-        const userConsents = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id', 'response', 'consent_confirmed', 'updated_at'] });
+        const userConsents = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id', 'consent_confirmed', 'opt_type', 'updated_at'] });
 
         if (!userConsents) return res.json([]);
 
-        const userConsentDetails = await ConsentLocale.findAll({ include: { model: Consent, as: 'consent', attributes: ['title'] }, where: { consent_id: userConsents.map(consent => consent.consent_id), locale: locale ? locale.toLowerCase() : doc.locale }, attributes: ['consent_id', 'rich_text'] });
+        const userConsentDetails = await ConsentLocale.findAll({
+            include: {
+                model: Consent,
+                as: 'consent'
+            }, where: {
+                consent_id: userConsents.map(consent => consent.consent_id),
+                locale: {
+                    [Op.iLike]: `%${locale ? locale : doc.locale}`
+                }
+            }, attributes: ['consent_id', 'rich_text']
+        });
 
-        const consentCountries = await ConsentCountry.findAll({ where: { consent_id: userConsents.map(consent => consent.consent_id), country_iso2: { [Op.or]: [doc.country_iso2.toUpperCase(), doc.country_iso2.toLowerCase()] } } });
 
-        const consentResponse = userConsentDetails.map(({ consent_id: id, rich_text, consent: { title } }) => ({ id, title, rich_text: validator.unescape(rich_text) }));
+        const consentResponse = userConsentDetails.map(({
+            consent_id: id,
+            rich_text,
+            consent: { preference }
+        }) => ({ id, preference, rich_text: validator.unescape(rich_text) }));
 
         response.data = consentResponse.map(conRes => {
             const matchedConsent = userConsents.find(consent => consent.consent_id === conRes.id);
-            const matchedConsentCountries = consentCountries.find(c => c.consent_id === conRes.id);
             conRes.consent_given_time = matchedConsent ? matchedConsent.updated_at : null;
-            conRes.opt_type = matchedConsentCountries ? matchedConsentCountries.opt_type : null;
-            conRes.consent_given = matchedConsent ? matchedConsent.consent_confirmed && matchedConsent.response ? true : false : null;
+            conRes.opt_type = matchedConsent ? matchedConsent.opt_type : null;
+            conRes.consent_given = matchedConsent ? matchedConsent.consent_confirmed ? true : false : null;
             return conRes;
         });
 
@@ -825,8 +931,6 @@ async function changePassword(req, res) {
 
         doc.update({ password: new_password, password_updated_at: new Date(Date.now()) });
 
-        await sendChangePasswordSuccessMail(doc, req.user);
-
         response.data = 'Password changed successfully.';
         res.send(response);
     } catch (err) {
@@ -889,11 +993,7 @@ async function resetPassword(req, res) {
 
         if (doc.password) await PasswordPolicies.saveOldPassword(doc);
 
-        if (doc.password) {
-            await sendResetPasswordSuccessMail(doc, req.user);
-        } else {
-            await sendRegistrationSuccessMail(doc, req.user);
-        }
+        const is_firsttime_setup = !doc.password;
 
         await doc.update({ password: req.body.new_password, password_updated_at: new Date(Date.now()), reset_password_token: null, reset_password_expires: null });
 
@@ -902,8 +1002,12 @@ async function resetPassword(req, res) {
             { where: { email: doc.dataValues.email } }
         );
 
-        response.data = 'Password reset successfully.';
-        res.send(response);
+        response.data = {
+            message: 'Password reset successfully.',
+            is_firsttime_setup
+        };
+
+        res.json(response);
     } catch (err) {
         console.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
@@ -931,18 +1035,21 @@ async function forgetPassword(req, res) {
         });
 
         if (!doc) {
-            response.data = 'Successfully sent password reset email.';
+            response.data = {
+                message: 'Successfully sent password reset email.'
+            };
             return res.json(response);
         }
 
-        const userApplication = await Application.findOne({ where: { id: doc.application_id } });
 
         if (doc.dataValues.status === 'self_verified' || doc.dataValues.status === 'manually_verified') {
-            await addPasswordResetTokenToUser(doc)
+            await addPasswordResetTokenToUser(doc);
 
-            await sendPasswordResetInstructionMail(doc, userApplication)
-
-            response.data = 'Successfully sent password reset email.'
+            response.data = {
+                message: 'Successfully sent password reset email.',
+                password_reset_token: doc.dataValues.reset_password_token,
+                user_id: doc.dataValues.id
+            };
 
             return res.json(response);
         }
@@ -960,21 +1067,37 @@ async function forgetPassword(req, res) {
 async function getSpecialties(req, res) {
     const response = new Response([], []);
     try {
-        const locale = req.query.locale;
+        const { country_iso2, locale } = req.query;
 
-        if (!locale) {
-            response.errors.push(new CustomError(`Missing required query parameter`, 4300, 'locale'));
-            return res.status(400).send(response);
+        if (!country_iso2) response.errors.push(new CustomError(`Missing required query parameter`, 4300, 'country_iso2'));
+
+        if (!locale) response.errors.push(new CustomError(`Missing required query parameter`, 4300, 'locale'));
+
+        if (response.errors && response.errors.length) return res.status(400).send(response);
+
+        const countries = await sequelize.datasyncConnector.query(`
+            SELECT * FROM ciam.vwcountry
+            WHERE LOWER(ciam.vwcountry.country_iso2) = $country_iso2;`, {
+            bind: {
+                country_iso2: country_iso2.toLowerCase()
+            },
+            type: QueryTypes.SELECT
+        });
+
+        if (!countries || !countries.length) {
+            response.data = [];
+            return res.status(204).send(response);
         }
 
         let masterDataSpecialties = await sequelize.datasyncConnector.query(`
             SELECT codbase, cod_id_onekey, cod_locale, cod_description
             FROM ciam.vwspecialtymaster as Specialty
-            WHERE LOWER(cod_locale) = $locale
+            WHERE LOWER(cod_locale) = $locale AND LOWER(codbase) = $codbase
             ORDER BY cod_description ASC;
             `, {
             bind: {
-                locale: locale.toLowerCase()
+                locale: locale.toLowerCase(),
+                codbase: countries[0].codbase.toLowerCase()
             },
             type: QueryTypes.SELECT
         });
@@ -985,11 +1108,12 @@ async function getSpecialties(req, res) {
             masterDataSpecialties = await sequelize.datasyncConnector.query(`
             SELECT codbase, cod_id_onekey, cod_locale, cod_description
             FROM ciam.vwspecialtymaster as Specialty
-            WHERE LOWER(cod_locale) = $locale
+            WHERE LOWER(cod_locale) = $locale AND LOWER(codbase) = $codbase
             ORDER BY cod_description ASC;
             `, {
                 bind: {
-                    locale: languageCode.toLowerCase()
+                    locale: languageCode.toLowerCase(),
+                    codbase: countries[0].codbase.toLowerCase()
                 },
                 type: QueryTypes.SELECT
             });

@@ -22,6 +22,8 @@ import ConsentRoutes from "../../consent/client/consent.routes";
 import ForgotPassword from '../../user/client/components/forgot-password.component';
 import ResetPasswordForm from '../../user/client/components/reset-password.component';
 import SwaggerLogin from '../../../config/server/lib/swagger/swagger-login.component';
+import store from './store';
+import { getCountries } from '../../core/client/country/country.actions';
 
 let refCount = 0;
 
@@ -52,13 +54,26 @@ axios.interceptors.response.use(response => {
     return Promise.reject(error);
 });
 
+axios.interceptors.response.use(
+    response => response,
+    error => {
+        const {loggedInUser} = store.getState().userReducer;
+
+        if (error.response && error.response.status === 401 && loggedInUser) window.location = "/login";
+
+        return Promise.reject(error);
+    }
+);
+
 export default function App() {
     const dispatch = useDispatch();
     const [, , removeCookie] = useCookies();
 
     useEffect(() => {
-        dispatch(getSignedInUserProfile()).catch(err => {
-            if(err.response && err.response.status === 401) removeCookie('logged_in', { path: '/' });
+        dispatch(getSignedInUserProfile()).then(() => {
+            dispatch(getCountries());
+        }).catch(err => {
+            if (err.response && err.response.status === 401) removeCookie('logged_in', { path: '/' });
         });
     }, []);
 

@@ -1,36 +1,75 @@
-import axios from 'axios';
 import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import Dropdown from 'react-bootstrap/Dropdown';
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { getUsers } from '../user.actions';
+import axios from 'axios';
+
+const safeGet = (object, property) => {
+    const propData = (object || {})[property];
+    return (prop) => prop ? safeGet(propData, prop) : propData;
+};
+
+const flatten = (array) => {
+    return Array.isArray(array) ? [].concat(...array.map(flatten)) : array;
+}
+
+const union = (a, b) => [...new Set([...a, ...b])];
 
 export default function Users() {
     const dispatch = useDispatch();
     const location = useLocation();
     const history = useHistory();
 
-    const userdata = useSelector(state => state.userReducer.users);
-
-    const [countries, setCountries] = useState([]);
     const [codBase, setCodBase] = useState(null);
     const [userCountries, setUserCountries] = useState([]);
-
-    const params = new URLSearchParams(window.location.search);
     const [sort, setSort] = useState({ type: 'asc', value: null });
 
+    const userdata = useSelector(state => state.userReducer.users);
+    const countries = useSelector(state => state.countryReducer.countries);
+    const params = new URLSearchParams(window.location.search);
+
+    const extractUserCountries = (data) => {
+        const profile_permission_sets = safeGet(data, 'userProfile')('up_ps')();
+        const profile_countries = profile_permission_sets ? profile_permission_sets.map(pps => safeGet(pps, 'ps')('countries')()) : [];
+
+        const userRoles = safeGet(data, 'userRoles')();
+        const roles_countries = userRoles ? userRoles.map(role => {
+            const role_permission_sets = safeGet(role, 'role')('role_ps')();
+            return role_permission_sets.map(rps => safeGet(rps, 'ps')('countries')());
+        }) : [];
+
+        const userCountries = union(flatten(profile_countries), flatten(roles_countries)).filter(e => e);
+
+        return userCountries;
+    }
+
+    const extractLoggedInUserCountries = (data) => {
+        const profile_permission_sets = safeGet(data, 'profile')('permissionSets')();
+        const profile_countries = profile_permission_sets ? profile_permission_sets.map(pps => safeGet(pps, 'countries')() || []) : [];
+
+        const userRoles = safeGet(data, 'role')();
+        const roles_countries = userRoles ? userRoles.map(role => {
+            const role_permission_sets = safeGet(role, 'permissionSets')();
+            return role_permission_sets.map(rps => safeGet(rps, 'countries')() || []);
+        }) : [];
+
+        const userCountries = union(flatten(profile_countries), flatten(roles_countries)).filter(e => e);
+
+        return userCountries;
+    }
 
     const sortCountries = (user_countries) => {
         let countryArr = [];
         let countryString = "";
         if (countries.length > 0 && (user_countries.length)) {
-            (user_countries).map((country, key) => (
-                countryArr.push(countries.find(i => i.country_iso2 === country)).codbase_desc)
-            );
+            user_countries.map((country_iso2) =>
+                countryArr.push(countries.find(i => i.country_iso2 === country_iso2)).codbase_desc);
         }
 
         countryArr.sort((a, b) => (a.codbase_desc > b.codbase_desc) ? 1 : -1);
         countryArr.forEach((element, key) => {
+            if(!element) return;
             countryString = countryString + element.codbase_desc;
             if (key < countryArr.length - 1) countryString = countryString + ', ';
         });
@@ -40,10 +79,9 @@ export default function Users() {
 
     useEffect(() => {
         async function getCountries() {
-            const response = (await axios.get('/api/countries')).data;
             const userProfile = (await axios.get('/api/users/profile')).data;
-            setCountries(response);
-            (userProfile.type === "admin") ? setUserCountries(response) : setUserCountries(fetchUserCountries(userProfile.countries, response));
+            const userCountries = extractLoggedInUserCountries(userProfile);
+            setUserCountries(fetchUserCountries(userCountries, countries));
         }
         getCountries();
     }, []);
@@ -65,7 +103,7 @@ export default function Users() {
         args.forEach(element => {
             countryList.push(allCountries.find(x => x.country_iso2 == element));
         });
-        return countryList;
+        return countryList.filter(c => c);
     }
 
     const urlChange = (pageNo, country_codbase, orderColumn, pageChange = false) => {
@@ -150,32 +188,28 @@ export default function Users() {
                                     <table className="table table-hover table-sm mb-0 cdp-table">
                                         <thead className="cdp-bg-primary text-white cdp-table__header">
                                             <tr>
-                                                <th><span className={sort.value === 'first_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'first_name')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                <th><span className={sort.value === 'last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                <th><span className={sort.value === 'email' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'email')}>Email<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                <th><span className={sort.value === 'status' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'status')}>Status<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                <th><span className="cdp-table__col-sorting">Countries</span></th>
-                                                <th><span className={sort.value === 'created_at' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'created_at')}>Creation Date<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                <th><span className={sort.value === 'expiry_date' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'expiry_date')}>Expiry Date<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                <th><span className={sort.value === 'created_by' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'created_by')}>Created By<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                <th>Action</th>
+                                                <th width="12%"><span className={sort.value === 'first_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'first_name')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th width="12%"><span className={sort.value === 'last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th width="20%"><span className={sort.value === 'email' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'email')}>Email<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th width="6%"><span className={sort.value === 'status' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'status')}>Status<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th width="10%"><span className="cdp-table__col-sorting">Countries</span></th>
+                                                <th width="10%"><span className={sort.value === 'created_at' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'created_at')}>Creation Date<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th width="10%"><span className={sort.value === 'expiry_date' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'expiry_date')}>Expiry Date<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th width="10%"><span className={sort.value === 'created_by' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'created_by')}>Created By<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th width="10%">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody className="cdp-table__body bg-white">
                                             {userdata.users.map(row => (
                                                 <tr key={row.id}>
-                                                    <td>{row.first_name}</td>
-                                                    <td>{row.last_name}</td>
-                                                    <td>{row.email}</td>
+                                                    <td className="text-break">{row.first_name}</td>
+                                                    <td className="text-break">{row.last_name}</td>
+                                                    <td className="text-break">{row.email}</td>
                                                     <td className="text-capitalize">{row.status}</td>
-                                                    <td>{sortCountries(row.countries)}</td>
+                                                    <td>{sortCountries(extractUserCountries(row))}</td>
                                                     <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                     <td>{(new Date(row.expiry_date)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
-                                                    <td>
-                                                        <NavLink to={`/users/${row.createdByUser.id}`}>
-                                                            {`${row.createdByUser.first_name} ${row.createdByUser.last_name}`}
-                                                        </NavLink>
-                                                    </td>
+                                                    <td>{row.createdBy}</td>
                                                     <td>
                                                         <NavLink to={`/users/${row.id}`} className="btn cdp-btn-outline-primary btn-sm"><i class="icon icon-user mr-2"></i>Profile</NavLink>
                                                     </td>

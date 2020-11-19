@@ -24,7 +24,13 @@ describe('Hcp user component', () => {
         fakeAxios = new MockAdapter(axios);
         window.alert = jest.fn();
 
-        savedUser = { name: 'a', email: 'test@gmail.com'};
+        savedUser = {
+            "applications": [],
+            "countries": [],
+            "email": "test@gmail.com",
+            "name": "a",
+            "serviceCategories": []
+        }
         fakeAxios.onPost('/api/login').reply(200, savedUser);
 
         await store.dispatch(login({
@@ -127,7 +133,7 @@ describe('Hcp user component', () => {
         const rows = tbody.childNodes;
         const first_row = rows[0];
         const actionBtn = first_row.lastChild.childNodes[0].childNodes[0].childNodes[0];
-        // actionBtn.setAttribute("aria-expanded", true);
+
         fireEvent.click(actionBtn);
 
         const updateBtn = await waitFor(() => getByText('Manage Status'));
@@ -135,13 +141,10 @@ describe('Hcp user component', () => {
         fireEvent.click(updateBtn);
 
         const approveBtn = await waitFor(() => getByText('Approve User'));
-        // const commentInput = await waitFor(() => getByTestId('comment'));
+
         const submitBtn = await waitFor(() => getByTestId('submit'));
 
         await waitFor(() => fireEvent.click(approveBtn));
-        // await waitFor(() => fireEvent.change(commentInput, { target: { value: 'a' } }));
-
-        // expect(commentInput.value).toEqual('a');
 
         await waitFor(() => fireEvent.click(submitBtn));
 

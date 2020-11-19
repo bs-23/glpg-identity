@@ -7,20 +7,17 @@ import Navbar from './components/navbar.component';
 export default function PrivateRoute({ component: Component, module, ...rest }) {
     const [cookies] = useCookies();
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
-    const roles = loggedInUser ? loggedInUser.roles : [];
-    let permissions = [];
 
-    roles.forEach(role => {
-        const union = (a, b) => [...new Set([...a, ...b])];
-        if(role.permissions) permissions = union(permissions, role.permissions);
-    })
+    let serviceCategories = loggedInUser && loggedInUser.serviceCategories
+        ? loggedInUser.serviceCategories.map(sc => sc.slug)
+        : [];
 
     return (
         <Route {...rest} render={props => {
             return (
-                loggedInUser ? (!module || permissions.some( module_permission => module_permission === module)) ? (
+                loggedInUser && cookies.logged_in ? (!module || serviceCategories.some( module_permission => module_permission === module)) ? (
                     <>
-                        <Navbar/>
+                        <Navbar />
                         <Component {...props} />
                     </>
                 ) : (
@@ -35,6 +32,6 @@ export default function PrivateRoute({ component: Component, module, ...rest }) 
                     }}/>
                 )
             )
-        }}/>
+        }} />
     );
 }

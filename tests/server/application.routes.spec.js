@@ -38,4 +38,32 @@ describe('Application Routes', () => {
         expect(response.statusCode).toBe(400);
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
+
+    it('Should save data', async () => {
+        const response = await request
+            .post(`/api/applications/data`)
+            .set('Authorization', 'bearer ' + defaultApplication.access_token)
+            .send({
+                type: 'a',
+                data: '[1]'
+            });
+
+        expect(response.statusCode).toBe(200);
+    });
+
+    it('Should get data by id', async () => {
+        const result = await request
+            .post(`/api/applications/data`)
+            .set('Authorization', 'bearer ' + defaultApplication.access_token)
+            .send({
+                type: 'a',
+                data: '[1]'
+            });
+
+        const response = await request
+            .get(`/api/applications/data/${result.body.data.id}`)
+            .set('Authorization', 'bearer ' + defaultApplication.access_token);
+
+        expect(response.statusCode).toBe(200);
+    });
 });

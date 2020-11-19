@@ -17,7 +17,7 @@ const Sidebar = ({ menuItems, idExtractor, header }) => {
     }, [location]);
 
     return <aside className="border rounded my-profile__sidebar shadow-sm bg-white mb-3">
-        <h4 className="pt-3 pb-2 px-3">{header}</h4>
+        <h4 className="pt-3 pb-2 px-3 text-break">{header}</h4>
         {menuItems && menuItems.map(item =>
             <MenuItem
                 key={idExtractor(item)}

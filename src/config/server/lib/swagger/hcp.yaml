@@ -128,7 +128,12 @@ paths:
                                 type: object
                                 properties:
                                     data:
-                                        type: string
+                                        type: object
+                                        properties:
+                                            is_firsttime_setup:
+                                                type: boolean
+                                            message:
+                                                type: string
                                     errors:
                                         $ref: "#/components/schemas/errorBodyInSuccess"
                 401:
@@ -175,7 +180,9 @@ paths:
                                         properties:
                                             password_reset_token:
                                                 type: string
-                                            retention_period:
+                                            user_id:
+                                                type: string
+                                            message:
                                                 type: string
                                     errors:
                                         $ref: "#/components/schemas/errorBodyInSuccess"
@@ -307,6 +314,12 @@ paths:
                 - hcp-profiles
             summary: Get specialties by locale.
             parameters:
+                - name: country_iso2
+                  in: query
+                  required: true
+                  description: Case insensitive ISO-2 code of the country
+                  schema:
+                    type: string
                 - name: locale
                   in: query
                   required: true
@@ -414,6 +427,22 @@ components:
                     type: string
                 status:
                     type: string
+                telephone:
+                    type: string
+                birthdate:
+                    type: string
+                password_reset_token:
+                    type: string
+                consent_confirmation_token:
+                    type: string
+                language_code:
+                    type: string
+                locale:
+                    type: string
+                individual_id_onekey:
+                    type: string
+                origin_url:
+                    type: string
         resetHcpPassword:
             type: object
             properties:
@@ -463,9 +492,9 @@ components:
                     type: string
                 language_code:
                     type: string
-                locale:
-                    type: string
                 specialty_onekey:
+                    type: string
+                origin_url:
                     type: string
                 consents:
                     type: array
@@ -481,6 +510,7 @@ components:
               - language_code
               - locale
               - specialty_onekey
+              - origin_url
         confirmConsent:
             type: object
             properties:

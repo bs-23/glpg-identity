@@ -6,7 +6,7 @@ import { CookiesProvider } from 'react-cookie';
 
 import store from "./store";
 import App from './app.component';
-import IdleTimeOutModal from './components/idle-timeout.modal.component';
+import IdleTimeOutModal from './components/idle-timeout.component';
 
 ReactDOM.render(
     <CookiesProvider>

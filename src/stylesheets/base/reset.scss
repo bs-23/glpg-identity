@@ -55,6 +55,12 @@
                 }
 
                 &[disabled] {
+                    &:hover, &:active, &:focus, &.selected {
+                        color: $primary-color !important;
+                        background-color: transparent !important;
+                        border-color: $primary-color;
+                        opacity: 0.65;
+                    }
                 }
             }
 
@@ -73,6 +79,12 @@
                 }
 
                 &[disabled] {
+                    &:hover, &:active, &:focus, &.selected {
+                        color: $secondary-color !important;
+                        background-color: transparent !important;
+                        border-color: $secondary-color;
+                        opacity: 0.65;
+                    }
                 }
             }
 
@@ -112,6 +124,14 @@
         }
 
         &-link {
+            &-primary {
+                color: $primary-color !important;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+
             &-secondary {
                 color: $secondary-color !important;
 
@@ -145,6 +165,14 @@
 
         &-secondary {
             color: $secondary-color;
+
+            &-light {
+                color: $secondary-color-light;
+            }
+
+            &-lighter {
+                color: $secondary-color-lighter;
+            }
         }
 
         &-light {
@@ -205,6 +233,24 @@ a {
     &:hover {
         color: $primary-color-light;
     }
+
+    &.link-with-underline {
+        text-decoration: underline;
+
+        &:hover {
+            color: $secondary-color;
+            text-decoration: none;
+        }
+    }
+
+    &.link-secondary {
+        color: $secondary-color;
+        text-decoration: underline;
+
+        &:hover {
+            text-decoration: none;
+        }
+    }
 }
 
 .consent-not-given {
@@ -260,5 +306,26 @@ a {
     &.active {
         background: $primary-color !important;
         color: $white-color;
+    }
+}
+
+.react-toast-notifications__container {
+    z-index: 2000!important;
+}
+
+.border-primary {
+    border-color: $primary-color !important;
+}
+.badge-secondary-light {
+    background-color: $secondary-color-lighter !important;
+}
+
+.hover-opacity {
+    cursor: pointer;
+    opacity: 1;
+    transition: all .25s ease;
+
+    &:hover {
+        opacity: .8;
     }
 }

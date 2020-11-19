@@ -7,10 +7,15 @@ const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodeca
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const ResetPassword = require('./reset-password.model');
-const UserRole = require(path.join(process.cwd(), "src/modules/user/server/user-role.model"));
+const UserProfile = require(path.join(process.cwd(), "src/modules/user/server/user-profile.model"));
+const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/userProfile-permissionSet.model"));
+const User_Role = require(path.join(process.cwd(), "src/modules/user/server/role/user-role.model"));
+const Role_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/role-permissionSet.model"));
 const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
-const RolePermission = require(path.join(process.cwd(), "src/modules/user/server/role/role-permission.model"));
-const Permission = require(path.join(process.cwd(), "src/modules/user/server/permission/permission.model"));
+const PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permission-set.model"));
+const PermissionSet_ServiceCateory = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-serviceCategory.model"));
+const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-application.model"));
+const ServiceCategory = require(path.join(process.cwd(), "src/modules/user/server/permission/service-category.model"));
 const axios = require("axios");
 const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
 const PasswordPolicies = require(path.join(process.cwd(), "src/modules/core/server/password/password-policies.js"));
@@ -18,61 +23,168 @@ const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequel
 const { QueryTypes, Op, where, col, fn } = require('sequelize');
 const Filter = require(path.join(process.cwd(), "src/modules/core/server/filter/filter.model.js"));
 const filterService = require(path.join(process.cwd(), 'src/modules/user/server/filter.js'));
+const { getUserPermissions, getRequestingUserPermissions, getPermissionsFromPermissionSet } = require(path.join(process.cwd(), "src/modules/user/server/permission/permissions.js"));
 
-function generateAccessToken(user) {
+function generateAccessToken(doc) {
     return jwt.sign({
-        id: user.id
+        id: doc.id
     }, nodecache.getValue('CDP_TOKEN_SECRET'), {
-        expiresIn: '1d',
-        issuer: user.id.toString()
+        expiresIn: '1h',
+        issuer: doc.id.toString()
     });
 }
 
-function getRolesPermissions(userrole) {
-    const roles = [];
+function generateRefreshToken(doc) {
+    return jwt.sign({
+        id: doc.id,
+    }, nodecache.getValue('CDP_REFRESH_SECRET'), {
+        expiresIn: '1d',
+        issuer: doc.id.toString()
+    });
+}
 
-    if (userrole) {
-        userrole.forEach(ur => {
-            roles.push({
-                title: ur.role.name,
-                permissions: ur.role.rolePermission.map(rp => rp.permission.module)
+async function getProfilePermissions(user) {
+    let serviceCategories = [];
+    const permissionSets = [];
+    const userProfile = user.userProfile;
+    let applications = [];
+    let countries = [];
+
+    if (userProfile) {
+        for (const userProPermSet of userProfile.up_ps) {
+            const permissions = await getPermissionsFromPermissionSet(userProPermSet.ps);
+
+            applications = permissions[0];
+            countries = permissions[1];
+            serviceCategories = permissions[2];
+
+            permissionSets.push({
+                serviceCategories: serviceCategories.map(sc => ({ title: sc.title, slug: sc.slug })),
+                application: applications.length > 0 ? applications : null,
+                countries: countries
             });
-        });
+        }
 
-        return roles;
+        const profile = {
+            title: userProfile.title,
+            permissionSets: permissionSets
+        }
+
+        return profile;
     }
 }
 
-function getCommaSeparatedRoles(userrole) {
-    if (userrole) {
-        const roles = userrole.map(ur => ur.role.name);
-        return roles.join();
+async function getRolePermissions(user) {
+    let serviceCategories = [];
+    const permissionSets = [];
+    let applications = [];
+    let countries = [];
+    const userRoles = user.userRoles;
+    const roles = [];
+
+    if (userRoles && userRoles.length) {
+        for (const userRole of userRoles) {
+            for (const rolePermSet of userRole.role.role_ps) {
+                const permissions = await getPermissionsFromPermissionSet(rolePermSet.ps);
+
+                applications = permissions[0];
+                countries = permissions[1];
+                serviceCategories = permissions[2];
+
+                permissionSets.push({
+                    serviceCategories: serviceCategories.map(sc => ({ title: sc.title, slug: sc.slug })),
+                    application: applications.length > 0 ? applications : null,
+                    countries: countries
+                });
+            }
+
+            roles.push({
+                title: userRole.role.title,
+                permissionSets: permissionSets
+            })
+        }
+
     }
+    return roles;
+}
+
+async function getCommaSeparatedAppCountryPermissions(user) {
+    let all_applications = [];
+    let all_countries = [];
+    let role_applications = [];
+    let profile_applications = [];
+    let role_countries = [];
+    let profile_countries = [];
+    let profile_ps = [];
+    let role_ps = [];
+    let all_ps = [];
+
+    for (const userRole of user.userRoles) {
+        for (const rolePermSet of userRole.role.role_ps) {
+            const applicationsCountries = await getPermissionsFromPermissionSet(rolePermSet.ps);
+            role_applications = role_applications.concat(applicationsCountries[0]);
+            role_countries = role_countries.concat(applicationsCountries[1])
+            role_ps.push({
+                id: rolePermSet.ps.id,
+                title: rolePermSet.ps.title,
+                type: rolePermSet.ps.type,
+            });
+
+        }
+
+    }
+
+    if (user.userProfile) {
+        const profilePermissionSets = user.userProfile.up_ps;
+        for (const userProPermSet of profilePermissionSets) {
+
+            const applicationsCountries = await getPermissionsFromPermissionSet(userProPermSet.ps);
+            profile_applications = profile_applications.concat(applicationsCountries[0]);
+            profile_countries = profile_countries.concat(applicationsCountries[1]);
+            profile_ps.push({
+                id: userProPermSet.ps.id,
+                title: userProPermSet.ps.title,
+                type: userProPermSet.ps.type,
+            });
+        }
+    }
+
+
+    all_countries = [...new Set(role_countries.concat(profile_countries))];
+    all_applications = role_applications.concat(profile_applications);
+    all_ps = role_ps.concat(profile_ps);
+    let apps = [...new Set(all_applications.length > 0 ? all_applications.map(app => app.name) : [])];
+
+    apps = apps.join();
+
+    return [apps, all_countries, all_ps];
+
+
 }
 
 function ignoreCaseArray(str) {
     return [str.toLowerCase(), str.toUpperCase(), str.charAt(0).toLowerCase() + str.charAt(1).toUpperCase(), str.charAt(0).toUpperCase() + str.charAt(1).toLowerCase()];
 }
 
-function formatProfile(user) {
-    const profile = {
+async function formatProfile(user) {
+    const data = {
         id: user.id,
         first_name: user.first_name,
         last_name: user.last_name,
         email: user.email,
         phone: user.phone,
         type: user.type,
+        profile: await getProfilePermissions(user),
+        role: await getRolePermissions(user),
         status: user.status,
-        roles: getRolesPermissions(user.userrole),
-        application: user.application,
-        countries: user.countries,
         last_login: user.last_login,
         expiry_date: user.expiry_date,
     };
-    return profile;
+    return data;
 }
 
-function formatProfileDetail(user) {
+async function formatProfileDetail(user) {
+    const appCounPermissionFormatted = await getCommaSeparatedAppCountryPermissions(user);
     const profile = {
         id: user.id,
         first_name: user.first_name,
@@ -83,9 +195,11 @@ function formatProfileDetail(user) {
         phone: user.phone,
         last_login: user.last_login,
         expiry_date: user.expiry_date,
-        roles: getCommaSeparatedRoles(user.userrole),
-        application: user.application_name,
-        countries: user.countries
+        profiles: user.userProfile.title,
+        application: appCounPermissionFormatted[0],
+        countries: appCounPermissionFormatted[1],
+        role: user.userRoles && user.userRoles.length && { id: user.userRoles[0].role.id, title: user.userRoles[0].role.title },
+        permissionSets: appCounPermissionFormatted[2]
     };
 
     return profile;
@@ -99,20 +213,9 @@ var trimRequestBody = function(reqBody){
     return reqBody;
 }
 
-async function attachApplicationInfoToUser(user) {
-    const userApplication = await Application.findOne({ where: { id: user.application_id } });
-    user.application = userApplication ? {
-        name: userApplication.name,
-        slug: userApplication.slug,
-        logo_link: userApplication.logo_link
-    } : null;
-    return user;
-}
-
 async function getSignedInUserProfile(req, res) {
     try {
-        const user = await attachApplicationInfoToUser(req.user);
-        res.json(formatProfile(user));
+        res.json(await formatProfile(req.user));
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -121,82 +224,152 @@ async function getSignedInUserProfile(req, res) {
 
 async function login(req, res) {
     try {
-        const { email, password, recaptchaToken } = req.body;
+        let user;
+        const { username, password, recaptchaToken, grant_type } = req.body;
 
-        if (!recaptchaToken) {
-            return res.status(400).send('Captcha verification required.');
+        if(!grant_type) return res.status(400).send('Invalid grant_type.');
+
+        if(grant_type && grant_type !== 'password') {
+            return res.status(400).send('The requested grant_type is not supported.')
         }
 
-        const user = await User.findOne({
-            where: {
-                email: {
-                    [Op.iLike]: `${email}`
-                }
-            },
-            include: [{
-                model: UserRole,
-                as: 'userrole',
+        if(grant_type === 'password') {
+            if(!username || !password || !recaptchaToken) return res.status(400).send('Invalid credentials.');
+
+            user = await User.findOne({
+                where: {
+                    email: {
+                        [Op.iLike]: `${username}`
+                    }
+                },
                 include: [{
-                    model: Role,
-                    as: 'role',
+                    model: UserProfile,
+                    as: 'userProfile',
                     include: [{
-                        model: RolePermission,
-                        as: 'rolePermission',
+                        model: UserProfile_PermissionSet,
+                        as: 'up_ps',
                         include: [{
-                            model: Permission,
-                            as: 'permission',
+                            model: PermissionSet,
+                            as: 'ps',
+                            include: [
+                                {
+                                    model: PermissionSet_ServiceCateory,
+                                    as: 'ps_sc',
+                                    include: [
+                                        {
+                                            model: ServiceCategory,
+                                            as: 'serviceCategory',
+
+                                        }
+                                    ]
+
+                                },
+                                {
+                                    model: PermissionSet_Application,
+                                    as: 'ps_app',
+                                    include: [
+                                        {
+                                            model: Application,
+                                            as: 'application',
+                                            attributes: ['id', 'name', 'slug', 'logo_link']
+                                        }
+                                    ]
+
+                                }
+                            ]
+
+                        }]
+                    }]
+                },
+                {
+                    model: User_Role,
+                    as: 'userRoles',
+                    include: [{
+                        model: Role,
+                        as: 'role',
+                        include: [{
+                            model: Role_PermissionSet,
+                            as: 'role_ps',
+                            include: [{
+                                model: PermissionSet,
+                                as: 'ps',
+                                include: [
+                                    {
+                                        model: PermissionSet_ServiceCateory,
+                                        as: 'ps_sc',
+                                        include: [
+                                            {
+                                                model: ServiceCategory,
+                                                as: 'serviceCategory',
+
+                                            }
+                                        ]
+
+                                    },
+                                    {
+                                        model: PermissionSet_Application,
+                                        as: 'ps_app',
+                                        include: [
+                                            {
+                                                model: Application,
+                                                as: 'application',
+                                                attributes: ['id', 'name', 'slug', 'logo_link']
+                                            }
+                                        ]
+
+                                    }
+                                ]
+
+                            }]
                         }]
 
                     }]
-                }]
-            }]
-        });
+                }
+                ],
+            });
 
-        const userLockedMessage = 'Your account has been locked for consecutive failed auth attempts. Please use the Forgot Password link to unlock.';
+            if (user && user.status === 'inactive') return res.status(401).send('Account not active.');
 
-        if (user && user.status === 'inactive') return res.status(401).send('Account not active.');
+            const userLockedMessage = 'Your account has been locked for consecutive failed auth attempts. Please use the Forgot Password link to unlock.';
 
-        if (user && user.dataValues.failed_auth_attempt >= 5) {
-            return res.status(401).send(userLockedMessage);
-        }
+            if (!user || !user.validPassword(password)) {
+                if (user) {
+                    await user.update({ failed_auth_attempt: user.dataValues.failed_auth_attempt + 1 });
+                }
 
-        if (user && user.password_expiry_date && user.password_expiry_date < Date.now()) {
-            return res.status(401).send("Password has been expired. Please reset the password.");
-        }
+                const errorMessage = user && user.dataValues.failed_auth_attempt >= 5
+                    ? userLockedMessage
+                    : 'Invalid username or password.';
 
-        if (!user || !user.password || !user.validPassword(password)) {
-            if (user && user.password) {
-                await user.update(
-                    { failed_auth_attempt: parseInt(user.dataValues.failed_auth_attempt ? user.dataValues.failed_auth_attempt : '0') + 1 }
-                );
+                return res.status(401).send(errorMessage);
             }
 
-            const errorMessage = user && user.dataValues.failed_auth_attempt >= 5
-                ? userLockedMessage
-                : 'Invalid email or password.';
+            if (user && user.dataValues.failed_auth_attempt >= 5) {
+                return res.status(401).send(userLockedMessage);
+            }
 
-            return res.status(401).send(errorMessage);
+            if (user && user.password_expiry_date && user.password_expiry_date < Date.now()) {
+                return res.status(401).send('Password has been expired. Please reset the password.');
+            }
+
+            const isSiteVerified = await verifySite(recaptchaToken);
+
+            if (!isSiteVerified) {
+                return res.status(400).send('Failed captcha verification.');
+            }
+
+            await user.update({ refresh_token: generateRefreshToken(user) });
         }
 
-        const isSiteVerified = await verifySite(recaptchaToken);
-
-        if (!isSiteVerified) {
-            return res.status(400).send('Failed captcha verification.');
-        }
-
-        res.cookie('access_token', generateAccessToken(user), {
-            expires: new Date(Date.now() + 8.64e7),
-            httpOnly: true
-        });
+        res.cookie('access_token', generateAccessToken(user), { httpOnly: true, sameSite: true, signed: true });
+        res.cookie('refresh_token', user.refresh_token, { httpOnly: true, sameSite: true, signed: true });
 
         await user.update({
             last_login: Date(),
             failed_auth_attempt: 0
         });
 
-        const userWithApplication = await attachApplicationInfoToUser(user);
-
-        res.json(formatProfile(userWithApplication));
+        res.json(await formatProfile(user));
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -204,7 +377,8 @@ async function login(req, res) {
 }
 
 async function logout(req, res) {
-    res.clearCookie('access_token').redirect('/');
+    res.clearCookie('access_token');
+    res.clearCookie('refresh_token').redirect('/');
 }
 
 async function createUser(req, res) {
@@ -214,43 +388,42 @@ async function createUser(req, res) {
         email,
         country_code,
         phone,
-        countries,
-        roles,
-        application_id,
+        profile,
+        role,
     } = req.body;
+
     const phone_number = phone ? country_code + phone : '';
     const validForMonths = 6
     const currentDate = new Date()
 
     try {
-        const [doc, created] = await User.findOrCreate({
+        const [user, created] = await User.findOrCreate({
             where: { email: email.toLowerCase() },
             defaults: {
                 first_name,
                 last_name,
                 phone: phone_number ? phone_number.replace(/\s+/g, '') : null,
-                countries,
-                application_id,
+                profileId: profile,
                 created_by: req.user.id,
                 updated_by: req.user.id,
                 expiry_date: new Date(currentDate.setMonth(currentDate.getMonth() + validForMonths))
             }
         });
 
+        if (role) {
+            await User_Role.create({
+                userId: user.id,
+                roleId: role,
+            });
+        }
+
         if (!created) {
             return res.status(400).send('Email already exists.');
         }
 
-        roles && roles.forEach(async function (roleId) {
-            await UserRole.create({
-                roleId: roleId,
-                userId: doc.id,
-            });
-        });
-
         const logData = {
             event_type: 'CREATE',
-            object_id: doc.id,
+            object_id: user.id,
             table_name: 'users',
             created_by: req.user.id,
             description: 'Created new CDP user',
@@ -261,7 +434,7 @@ async function createUser(req, res) {
         const expireAt = Date.now() + 3600000;
 
         const [resetRequest, reqCreated] = await ResetPassword.findOrCreate({
-            where: { user_id: doc.id },
+            where: { user_id: user.id },
             defaults: {
                 token,
                 expires_at: expireAt,
@@ -281,11 +454,11 @@ async function createUser(req, res) {
 
         const templateUrl = path.join(process.cwd(), `src/config/server/lib/email-service/templates/cdp/password-set.html`);
         const options = {
-            toAddresses: [doc.email],
+            toAddresses: [user.email],
             templateUrl,
             subject: 'Setup password for your CDP account',
             data: {
-                name: `${doc.first_name} ${doc.last_name}` || '',
+                name: `${user.first_name} ${user.last_name}` || '',
                 link,
                 s3bucketUrl: nodecache.getValue('S3_BUCKET_URL')
             }
@@ -293,7 +466,7 @@ async function createUser(req, res) {
 
         emailService.send(options);
 
-        res.json(doc);
+        res.json(user);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -387,14 +560,12 @@ async function getUsers(req, res) {
 
         const codbase = req.query.codbase === 'null' ? null : req.query.codbase;
 
-        const signedInId = (formatProfile(req.user)).id;
+        const signedInId = (await formatProfile(req.user)).id;
 
-        const orderBy = req.query.orderBy === 'null'
-            ? null
-            : req.query.orderBy;
-        const orderType = req.query.orderType === 'asc' || req.query.orderType === 'desc'
-            ? req.query.orderType
-            : 'asc';
+        // const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => i.codbase === codbase).map(i => i.country_iso2);
+        // const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
+
+        const [, userCountries,] = await getRequestingUserPermissions(req.user);
 
         const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`
             SELECT * FROM ciam.vwcountry
@@ -406,8 +577,23 @@ async function getUsers(req, res) {
             type: QueryTypes.SELECT
         })).map(c => c.country_iso2);
 
+
         const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase
             .map(i => ignoreCaseArray(i)));
+
+        const user_countries_ignorecase = [].concat.apply([], userCountries
+            .map(i => ignoreCaseArray(i)));
+
+        let countries_ignorecase_for_codbase_formatted = '{' + countries_ignorecase_for_codbase.join(", ") + '}';
+
+        const user_countries_ignorecase_formatted = '{' + user_countries_ignorecase.join(", ") + '}';
+
+        const orderBy = req.query.orderBy === 'null'
+            ? null
+            : req.query.orderBy;
+        const orderType = req.query.orderType === 'asc' || req.query.orderType === 'desc'
+            ? req.query.orderType
+            : 'asc';
 
         const order = [
             ['created_at', 'DESC'],
@@ -443,22 +629,94 @@ async function getUsers(req, res) {
             attributes: ['id', 'first_name', 'last_name'],
         }];
 
-        const users = await User.findAll({
-            where: filterOptions,
+        const userCountryFilter = [
+            {
+                '$userRoles.role.role_ps.ps.countries$': codbase
+                    ? { [Op.overlap]: countries_ignorecase_for_codbase_formatted }
+                    : { [Op.overlap]: user_countries_ignorecase_formatted }
+            },
+            {
+                '$userProfile.up_ps.ps.countries$': codbase
+                    ? { [Op.overlap]: countries_ignorecase_for_codbase_formatted }
+                    : { [Op.overlap]: user_countries_ignorecase_formatted }
+            }
+        ]
+
+        if(!codbase) {
+            userCountryFilter.push({
+                [Op.and]: [{
+                    '$userProfile.up_ps.ps.countries$': { [Op.or]: [null, '{}']}
+                }, {
+                    '$userRoles.role.role_ps.ps.countries$': { [Op.or]: [null, '{}'] }
+                }]
+            });
+        }
+
+        const userFilter = {
+            id: { [Op.ne]: signedInId },
+            type: 'basic',
+            [Op.or]: userCountryFilter
+        }
+
+        const {count: totalUser, rows: users} = await User.findAndCountAll({
+            where: userFilter,
             offset,
             limit,
             order: order,
-            include: inclusions,
-            attributes: { exclude: ['password'] },
+            subQuery: false,
+            include: [{
+                model: User,
+                as: 'createdByUser',
+                attributes: ['id', 'first_name', 'last_name'],
+            },
+            {
+                model: UserProfile,
+                as: 'userProfile',
+                include: [{
+                    model: UserProfile_PermissionSet,
+                    as: 'up_ps',
+                    include: [{
+                        model: PermissionSet,
+                        as: 'ps',
+
+                    }]
+                }]
+            },
+
+            {
+                model: User_Role,
+                as: 'userRoles',
+                include: [{
+                    model: Role,
+                    as: 'role',
+                    include: [{
+                        model: Role_PermissionSet,
+                        as: 'role_ps',
+                        include: [{
+                            model: PermissionSet,
+                            as: 'ps'
+                        }]
+                    }]
+
+
+                }]
+            }],
+            attributes: { exclude: ['password'] }
         });
 
-        const totalUser = await User.count({
-            where: filterOptions,
-            include: inclusions
+        const userViewModels = users.map(u => {
+            const createdBy = `${u.createdByUser.first_name} ${u.createdByUser.last_name}`
+            delete u.dataValues.createdByUser;
+            delete u.dataValues.created_by;
+            delete u.dataValues.updated_by;
+            return {
+                ...u.dataValues,
+                createdBy
+            }
         });
 
         const data = {
-            users: users,
+            users: userViewModels,
             page: page + 1,
             limit: limit,
             total: totalUser,
@@ -468,7 +726,6 @@ async function getUsers(req, res) {
         };
 
         res.json(data);
-
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -482,21 +739,95 @@ async function getUser(req, res) {
                 id: req.params.id
             },
             include: [{
-                model: UserRole,
-                as: 'userrole',
+                model: UserProfile,
+                as: 'userProfile',
+                include: [{
+                    model: UserProfile_PermissionSet,
+                    as: 'up_ps',
+                    include: [{
+                        model: PermissionSet,
+                        as: 'ps',
+                        include: [
+                            {
+                                model: PermissionSet_ServiceCateory,
+                                as: 'ps_sc',
+                                include: [
+                                    {
+                                        model: ServiceCategory,
+                                        as: 'serviceCategory',
+
+                                    }
+                                ]
+
+                            },
+                            {
+                                model: PermissionSet_Application,
+                                as: 'ps_app',
+                                include: [
+                                    {
+                                        model: Application,
+                                        as: 'application',
+
+                                    }
+                                ]
+
+                            }
+                        ]
+
+                    }]
+                }]
+            },
+            {
+                model: User_Role,
+                as: 'userRoles',
                 include: [{
                     model: Role,
                     as: 'role',
+                    include: [{
+                        model: Role_PermissionSet,
+                        as: 'role_ps',
+                        include: [{
+                            model: PermissionSet,
+                            as: 'ps',
+                            include: [
+                                {
+                                    model: PermissionSet_ServiceCateory,
+                                    as: 'ps_sc',
+                                    include: [
+                                        {
+                                            model: ServiceCategory,
+                                            as: 'serviceCategory',
+
+                                        }
+                                    ]
+
+                                },
+                                {
+                                    model: PermissionSet_Application,
+                                    as: 'ps_app',
+                                    include: [
+                                        {
+                                            model: Application,
+                                            as: 'application',
+
+                                        }
+                                    ]
+
+                                }
+                            ]
+
+                        }]
+                    }]
+
                 }]
-            }],
+            }
+            ],
         });
+
 
         if (!user) return res.status(404).send("User is not found or may be removed");
 
-        const userApplication = await Application.findOne({ where: { id: user.application_id } });
-        user.application_name = userApplication ? userApplication.name : null;
-
-        const formattedUser = formatProfileDetail(user);
+        const formattedUser = await formatProfileDetail(user);
 
         res.json(formattedUser);
     }
@@ -553,21 +884,23 @@ async function updateSignedInUserProfile(req, res) {
             await emailService.send(options);
         }
 
-        const signedInUserWithApplicationDetails = await attachApplicationInfoToUser(signedInUser);
-        res.json(formatProfile(signedInUserWithApplicationDetails));
+        res.json(await formatProfile(signedInUser));
     }catch(err){
         console.error(err);
         res.status(500).send('Internal server error');
     }
 }
 
-async function partialUpdateUser(req, res) {
+async function updateUserDetails(req, res) {
     const id = req.params.id;
-    const { first_name, last_name, email, phone, type, status } = req.body;
+    const { first_name, last_name, email, phone, type, status, roleId } = req.body;
     const partialUserData = { first_name, last_name, email, phone, type, status };
+    const userRoles = roleId ? [roleId] : [];
 
     try {
-        if ([first_name, last_name, email].includes(null)) return res.sendStatus(400);
+        if([first_name, last_name, email].includes(null)) return res.sendStatus(400);
+
+        if(req.user.id === id) return res.sendStatus(403);
 
         const user = await User.findOne({ where: { id } });
 
@@ -583,6 +916,8 @@ async function partialUpdateUser(req, res) {
         if(doesEmailExist) return res.status(400).send("Email already exists.");
 
         await user.update(partialUserData);
+
+        await user.setRoles(userRoles);
 
         res.json(formatProfile(user));
     }
@@ -695,7 +1030,7 @@ async function changePassword(req, res) {
 
         await emailService.send(options);
 
-        res.json(formatProfile(user));
+        res.json(await formatProfile(user));
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -860,7 +1195,8 @@ exports.getUsers = getUsers;
 exports.getUser = getUser;
 exports.sendPasswordResetLink = sendPasswordResetLink;
 exports.resetPassword = resetPassword;
-exports.partialUpdateUser = partialUpdateUser;
 exports.getFilterOptions = getFilterOptions;
 exports.updateFilterOptions = updateFilterOptions;
+exports.updateUserDetails = updateUserDetails;
 exports.updateSignedInUserProfile = updateSignedInUserProfile;
+exports.generateAccessToken = generateAccessToken;

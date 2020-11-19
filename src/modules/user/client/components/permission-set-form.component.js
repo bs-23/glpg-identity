@@ -1,0 +1,285 @@
+import axios from "axios";
+import React, { useState, useEffect } from 'react';
+import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
+import { useSelector, useDispatch } from "react-redux";
+import { useToasts } from "react-toast-notifications";
+import { permissionSetCreateSchema } from "../user.schema";
+// import { getCountries } from "../user.actions";
+
+
+const FormField = ({ label, name, type, children, required=true, ...rest }) => <div className="col-12 col-sm-6">
+    <div className="form-group">
+        <label className="font-weight-bold" htmlFor="last_name">{ label }{required && <span className="text-danger">*</span>}</label>
+        { children || <Field className="form-control" type={type} name={name} {...rest} /> }
+        <div className="invalid-feedback"><ErrorMessage name={name} /></div>
+    </div>
+</div>
+
+const FormFieldFluid = ({ label, name, type, children, required = true, ...rest }) => <div className="col-12">
+    <div className="form-group">
+        <label className="font-weight-bold" htmlFor="last_name">{label}{required && <span className="text-danger">*</span>}</label>
+        {children || <Field className="form-control" type={type} name={name} {...rest} />}
+        <div className="invalid-feedback"><ErrorMessage name={name} /></div>
+    </div>
+</div>
+
+const CheckList = ({ name, options, labelExtractor, idExtractor, allOptionID }) => {
+    const isChecked = (id, arrayHelpers) => arrayHelpers.form.values[name].includes(id);
+
+    const handleChange = (e, arrayHelpers) => {
+        const optionId = e.target.value;
+        if (e.target.checked) {
+            if(allOptionID && (optionId === allOptionID)) {
+                arrayHelpers.form.setFieldValue(name, options.map(op => idExtractor(op)));
+            }
+            else {
+                if(arrayHelpers.form.values[name].includes(allOptionID)) {
+                    const idx = arrayHelpers.form.values[name].indexOf(allOptionID);
+                    arrayHelpers.remove(idx);
+                }
+                arrayHelpers.push(optionId);
+            }
+        }
+        else {
+            if(allOptionID && (optionId === allOptionID)){
+                arrayHelpers.form.setFieldValue(name, []);
+            }else{
+                let filteredOptionIds = arrayHelpers.form.values[name].filter(id => id !== allOptionID).filter(id => id !== optionId);
+                arrayHelpers.form.setFieldValue(name, filteredOptionIds);
+            }
+        }
+    }
+
+    const allOptionsObject = options.find(op => idExtractor(op) === allOptionID);
+
+    if(allOptionsObject){
+        options = options.filter(op => idExtractor(op) !== allOptionID);
+        options.unshift(allOptionsObject);
+    }
+
+    return <FieldArray
+                name={name}
+                render={arrayHelpers => (
+                <div>
+                    {
+                        options.map(item =>
+                            <div key={idExtractor(item)} className="custom-control custom-checkbox">
+                                <input name={name}
+                                    className="custom-control-input"
+                                    type="checkbox"
+                                    value={idExtractor(item)}
+                                    id={idExtractor(item)}
+                                    checked={isChecked(idExtractor(item), arrayHelpers)}
+                                    onChange={(e) => handleChange(e, arrayHelpers)}
+                                />
+                                <label className="custom-control-label" for={idExtractor(item)}>{labelExtractor(item)}</label>
+                            </div>
+                        )
+                    }
+                </div>
+            )}
+        />
+}
+
+const ToggleList = ({ name, options, labelExtractor, idExtractor, allOptionID }) => {
+    const isChecked = (id, arrayHelpers) => arrayHelpers.form.values[name].includes(id);
+
+    const handleChange = (e, arrayHelpers) => {
+        const optionId = e.target.value;
+        if (e.target.checked) {
+            if(allOptionID && (optionId === allOptionID)) {
+                arrayHelpers.form.setFieldValue(name, options.map(op => idExtractor(op)));
+            }
+            else{
+                if(arrayHelpers.form.values[name].includes(allOptionID)) {
+                    const idx = arrayHelpers.form.values[name].indexOf(allOptionID);
+                    arrayHelpers.remove(idx);
+                }
+                arrayHelpers.push(optionId);
+            };
+        }
+        else {
+            if(allOptionID && (optionId === allOptionID)){
+                arrayHelpers.form.setFieldValue(name, []);
+            }else{
+                let filteredOptionIds = arrayHelpers.form.values[name].filter(id => id !== allOptionID).filter(id => id !== optionId);
+                arrayHelpers.form.setFieldValue(name, filteredOptionIds);
+            }
+        }
+    }
+
+    const allOptionsObject = options.find(op => idExtractor(op) === allOptionID);
+
+    if(allOptionsObject){
+        options = options.filter(op => idExtractor(op) !== allOptionID);
+        options.unshift(allOptionsObject);
+    }
+
+    return <FieldArray
+                name={name}
+                render={arrayHelpers => (
+                    options.map(item => <label key={idExtractor(item)} className="d-flex  align-items-center">
+                        <span className="switch">
+                            <input name={name}
+                                className="custom-control-input"
+                                type="checkbox"
+                                value={idExtractor(item)}
+                                id={idExtractor(item)}
+                                checked={isChecked(idExtractor(item), arrayHelpers)}
+                                onChange={(e) => handleChange(e, arrayHelpers)}
+                                disabled={item.hasOwnProperty('disabled') ? item.disabled : false}
+                            />
+                            <span className="slider round"></span>
+                        </span>
+                        <span className="switch-label text-left pl-2">{labelExtractor(item)}</span>
+                    </label>)
+                )}
+            />
+}
+
+
+export default function PermissionSetForm({ onSuccess, onError, permissionSetId }) {
+    const [applications, setApplications] = useState([]);
+    const [serviceCategories, setServiceCategories] = useState([]);
+    const [permissionSet, setPermissionSet] = useState(null);
+    const countries = useSelector(state => state.countryReducer.countries);
+    const { addToast } = useToasts();
+
+    const initializeServiceCategoryValues = () => {
+        if(permissionSet && permissionSet.serviceCategories){
+            return permissionSet.serviceCategories;
+        }
+        return [];
+    }
+
+    const initializeApplicationValues = () => {
+        if(permissionSet && permissionSet.applications){
+            return permissionSet.applications;
+        }
+        return [];
+    }
+
+    const initializeCountryValues = () => {
+        if(permissionSet && permissionSet.countries) {
+            return permissionSet.countries;
+        }
+        return [];
+    }
+
+    const formValues = {
+        title: permissionSet && permissionSet.title || '',
+        description: permissionSet && permissionSet.description || '',
+        countries: initializeCountryValues(),
+        serviceCategories: initializeServiceCategoryValues(),
+        applications: initializeApplicationValues(),
+        app_country_service: ''
+    };
+
+    const getApplications = async () => {
+        const response = await axios.get('/api/applications');
+        setApplications(response.data);
+    }
+
+    const getServiceCategories = async () => {
+        const response = await axios.get('/api/serviceCategories');
+        setServiceCategories(response.data);
+    }
+
+    const getPermissionSet = async () => {
+        const { data: permSet } = await axios.get(`/api/permissionSets/${permissionSetId}`);
+        setPermissionSet({
+            ...permSet,
+            applications: permSet.ps_app.map(app => app.application.id),
+            serviceCategories: permSet.ps_sc.map(sc => sc.serviceCategory.id),
+        });
+    }
+
+    const handleSubmit = (values, actions) => {
+        const { app_country_service, ...requestBody } = values;
+        const promise = permissionSetId ? axios.put(`/api/permissionSets/${permissionSetId}`, values) : axios.post('/api/permissionSets', requestBody);
+        promise.then(() => {
+                const successMessage = permissionSetId ? 'Permission set updated successfully' : 'Permission set created successfully';
+                addToast(successMessage, {
+                    appearance: 'success',
+                    autoDismiss: true
+                });
+                actions.resetForm();
+                onSuccess && onSuccess();
+            })
+            .catch(err => {
+                const errorMessage = typeof err.response.data === 'string' ? err.response.data : err.response.statusText;
+                addToast(errorMessage, {
+                    appearance: 'error',
+                    autoDismiss: true
+                });
+                onError && onError();
+            }).finally(() => actions.setSubmitting(false))
+        actions.setSubmitting(true);
+    }
+
+    useEffect(() => {
+        if(permissionSetId) getPermissionSet();
+        getApplications();
+        // dispatch(getCountries());
+        getServiceCategories();
+    }, []);
+
+    return (
+            <div className="">
+                <div className="row">
+                    <div className="col-12">
+                        <div className="">
+                            <div className="add-user px-3 py-1">
+                                <Formik
+                                    initialValues={formValues}
+                                    displayName="PermissionSetForm"
+                                    validationSchema={permissionSetCreateSchema}
+                                    onSubmit={handleSubmit}
+                                    enableReinitialize
+                                >
+                                    {formikProps => (
+                                        <Form onSubmit={formikProps.handleSubmit}>
+                                            <div className="row">
+                                                <div className="col-12">
+                                                    <div className="row">
+                                                    <FormFieldFluid label="Title" type="text" name="title"/>
+                                                    <FormField label="Select Countries" name="countries" required={false} >
+                                                        <CheckList
+                                                            name="countries"
+                                                            options={countries}
+                                                            idExtractor={item => item.country_iso2}
+                                                            labelExtractor={item => item.codbase_desc}
+                                                        />
+                                                    </FormField>
+                                                    <FormField label="Select Applications" name="applications" required={false} >
+                                                        <CheckList
+                                                            name="applications"
+                                                            options={applications}
+                                                            idExtractor={item => item.id}
+                                                            labelExtractor={item => item.name}
+                                                        />
+                                                    </FormField>
+                                                    <FormFieldFluid label="Select Service Categories" name="serviceCategories" required={false} >
+                                                        <ToggleList
+                                                            name="serviceCategories"
+                                                            options={serviceCategories}
+                                                            idExtractor={item => item.id}
+                                                            labelExtractor={item => item.title}
+                                                        />
+                                                    </FormFieldFluid>
+                                                    <FormFieldFluid label="Description" type="text" name="description" required={false} component="textarea" />
+                                                    </div>
+                                                    <ErrorMessage name="app_country_service" >{(message) => <div className="invalid-feedback alert alert-warning" >{message}</div>}</ErrorMessage>
+                                                    <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting} > Submit </button>
+                                                </div>
+                                            </div>
+                                        </Form>
+                                    )}
+                                </Formik>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    )
+}

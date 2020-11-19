@@ -2,7 +2,8 @@ const path = require('path');
 const { DataTypes } = require('sequelize');
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
-const RolePermission = require('./role-permission.model');
+const Role_PermissionSet = require('../permission-set/role-permissionSet.model');
+const PermissionSet = require('../permission-set/permission-set.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
 const Role = sequelize.cdpConnector.define('roles', {
@@ -12,18 +13,14 @@ const Role = sequelize.cdpConnector.define('roles', {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4
     },
-    name: {
-        unique: true,
-        allowNull: false,
-        type: DataTypes.STRING
+    title: {
+        type: DataTypes.STRING(50)
     },
     slug: {
-        unique: true,
-        allowNull: false,
         type: DataTypes.STRING
     },
     description: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING(500)
     },
     created_by: {
         type: DataTypes.UUID
@@ -39,6 +36,7 @@ const Role = sequelize.cdpConnector.define('roles', {
     updatedAt: 'updated_at'
 });
 
-Role.hasMany(RolePermission, {as: 'rolePermission', foreignKey: 'roleId', sourceKey: 'id'});
+Role.hasMany(Role_PermissionSet, {as: 'role_ps', foreignKey: 'roleId', sourceKey: 'id'});
+Role.belongsToMany(PermissionSet, { through: Role_PermissionSet });
 
 module.exports = Role;

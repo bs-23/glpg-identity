@@ -16,14 +16,20 @@ configure({ adapter: new Adapter() });
 describe('UserForm component', () => {
     let mockAxios;
     let savedUser;
-    let countries;
     let roles;
     let applications;
+    let profiles;
 
     beforeEach( async () => {
         mockAxios = new MockAdapter(axios);
 
-        savedUser = { name: 'a', email: 'test@gmail.com'};
+        savedUser = {
+            "applications": [],
+            "countries": [],
+            "email": "test@gmail.com",
+            "name": "a",
+            "serviceCategories": [],
+        };
         mockAxios.onPost('/api/login').reply(200, savedUser);
 
         await store.dispatch(login({
@@ -31,14 +37,31 @@ describe('UserForm component', () => {
             password: 'test'
         }));
 
+        await store.dispatch(
+            {
+                type: 'GET_COUNTRIES',
+                payload: Promise.resolve({
+                    data: [
+                        {
+                            codbase: "WUK",
+                            codbase_desc: "Ireland",
+                            country_iso2: "IE",
+                            country_iso3: "IRL",
+                            countryid: 1,
+                            countryname: "Ireland"
+                        }
+                    ]
+                })
+            }
+        );
 
-        countries = [{ countryid: 1, country_iso2: "IE", country_iso3: "IRL", codbase: "WUK", codbase_desc: 'Ireland', countryname: "Ireland"}]
         roles = [{ id: 1, name: 'role-test', slug: 'role-test'}]
         applications = [{ id: 1, name: "application-test", email: "a@glpg.com", is_active : true, slug: "application-test" }];
+        profiles = [{ id: 1, title: 'System Admin Profile' }];
 
         mockAxios.onGet('/api/applications').reply(200, applications);
-        mockAxios.onGet('/api/countries').reply(200, countries);
-        mockAxios.onGet('/api/roles').reply(200, roles)
+        mockAxios.onGet('/api/roles').reply(200, roles);
+        mockAxios.onGet('/api/profiles').reply(200, profiles);
     });
 
     const userSlice = () => store.getState().userReducer;
@@ -69,16 +92,12 @@ describe('UserForm component', () => {
         const last_name = await waitFor(() => getByTestId('last_name'));
         const email = await waitFor(() => getByTestId('email'));
         const phone = await waitFor(() => getByTestId('phone'));
-        const countryBtn = await waitFor(() => getByText('Ireland'));
-        const roleBtn = await waitFor(() => getByText('role-test'));
 
         await waitFor(() => {
             fireEvent.change(first_name, { target: { value: 'a' } });
             fireEvent.change(last_name, { target: { value: 'a' } });
             fireEvent.change(email, { target: { value: 'a' } });
             fireEvent.change(phone, { target: { value: 'a' } });
-            fireEvent.click(countryBtn);
-            fireEvent.click(roleBtn);
         });
 
         expect(first_name.value).toEqual('a');

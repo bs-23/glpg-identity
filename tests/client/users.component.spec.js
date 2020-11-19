@@ -18,7 +18,20 @@ describe('Users component', () => {
 
     beforeAll(async () => {
         mockAxios = new MockAdapter(axios);
-        mockAxios.onGet('/api/users/profile').reply(200, { id: '1', email: 'email@gmail.com', first_name: 'a', last_name: 'b', application: null, countries: null, type: 'admin', roles: [{ title: 'User & HCP Manager', permissions: ['user', 'hcp'] }]});
+        mockAxios.onGet('/api/users/profile').reply(200, {
+            id: '1',
+            email: 'email@gmail.com',
+            first_name: 'a',
+            last_name: 'b',
+            application: null,
+            countries: null,
+            type: 'admin',
+            profile: {
+                permissionSets: [{
+                    countries: ["country1"]
+                }]
+            }
+        });
         await store.dispatch(getSignedInUserProfile());
 
         const countries = [
@@ -29,7 +42,14 @@ describe('Users component', () => {
             { countryid: 4, codbase: 'dd', country_iso2: 'country4', countryname: 'countryName4', codbase_desc: 'countryDesc4' }
         ]
 
-        mockAxios.onGet('/api/countries').reply(200, countries)
+        await store.dispatch(
+            {
+                type: 'GET_COUNTRIES',
+                payload: Promise.resolve({
+                    data: countries
+                })
+            }
+        );
 
         const userList = {
             "users":[
