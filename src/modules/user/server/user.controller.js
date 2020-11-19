@@ -548,9 +548,9 @@ async function getUsers(req, res) {
         if(!codbase) {
             userCountryFilter.push({
                 [Op.and]: [{
-                    '$userProfile.up_ps.ps.countries$': null
+                    '$userProfile.up_ps.ps.countries$': { [Op.or]: [null, '{}']}
                 }, {
-                    '$userRoles.role.role_ps.ps.countries$': null
+                    '$userRoles.role.role_ps.ps.countries$': { [Op.or]: [null, '{}'] }
                 }]
             });
         }
@@ -561,7 +561,7 @@ async function getUsers(req, res) {
             [Op.or]: userCountryFilter
         }
 
-        const users = await User.findAll({
+        const {count: totalUser, rows: users} = await User.findAndCountAll({
             where: userFilter,
             offset,
             limit,
@@ -605,73 +605,6 @@ async function getUsers(req, res) {
                 }]
             }],
             attributes: { exclude: ['password'] }
-        });
-
-        const totalUser = await User.count({
-            where: {
-                id: { [Op.ne]: signedInId },
-                type: 'basic',
-                [Op.or]: [
-                    {
-                        '$userRoles.role.role_ps.ps.countries$': codbase ? { [Op.overlap]: countries_ignorecase_for_codbase_formatted } : {
-                            [Op.or]: [{
-                                [Op.ne]: '{0}'
-                            }, {
-                                [Op.eq]: null
-                            }]
-                        }
-
-                    },
-                    {
-                        '$userProfile.up_ps.ps.countries$': codbase ? { [Op.overlap]: countries_ignorecase_for_codbase_formatted } : {
-                            [Op.or]: [{
-                                [Op.ne]: '{0}'
-                            }, {
-                                [Op.eq]: null
-                            }]
-                        }
-
-                    }
-
-                ]
-            },
-            include: [{
-                model: User,
-                as: 'createdByUser',
-                attributes: ['id', 'first_name', 'last_name'],
-            },
-            {
-                model: UserProfile,
-                as: 'userProfile',
-                include: [{
-                    model: UserProfile_PermissionSet,
-                    as: 'up_ps',
-                    include: [{
-                        model: PermissionSet,
-                        as: 'ps',
-
-                    }]
-                }]
-            },
-
-            {
-                model: User_Role,
-                as: 'userRoles',
-                include: [{
-                    model: Role,
-                    as: 'role',
-                    include: [{
-                        model: Role_PermissionSet,
-                        as: 'role_ps',
-                        include: [{
-                            model: PermissionSet,
-                            as: 'ps'
-                        }]
-                    }]
-
-
-                }]
-            }],
         });
 
         const userViewModels = users.map(u => {

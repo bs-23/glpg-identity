@@ -192,7 +192,7 @@ export const updateMyProfileSchema = object().shape({
         otherwise: string().matches(/^[+0-9]*$/, 'This field only contains digits or plus')
             .min(7, 'This field must be at least 7 characters long')
             .test('is-length-valid', `This field must be at most ${PHONE_MAX_LENGTH} characters long`, phone => {
-                return phone.length <= PHONE_MAX_LENGTH;
+                return !phone || phone.length <= PHONE_MAX_LENGTH;
             })
     })
 });
