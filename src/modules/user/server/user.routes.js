@@ -14,8 +14,8 @@ module.exports = app => {
         .post(CDPAuthStrategy, ModuleGuard(Modules.PLATFORM.value), controller.createUser);
 
     app.route('/api/users/filter-options')
-        .get(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.PLATFORM.value), controller.getFilterOptions)
-        .post(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.PLATFORM.value), controller.updateFilterOptions);
+        .get(CDPAuthStrategy, controller.getFilterOptions)
+        .post(CDPAuthStrategy, controller.updateFilterOptions);
 
     app.route('/api/users/profile')
         .get(CDPAuthStrategy, controller.getSignedInUserProfile)
