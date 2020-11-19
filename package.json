@@ -1,6 +1,6 @@
 {
   "name": "glpg-cdp",
-  "version": "0.1.0",
+  "version": "0.3.1",
   "author": "Brain Station 23 Limited",
   "scripts": {
     "start": "run-p webpack:development pm2:development",
