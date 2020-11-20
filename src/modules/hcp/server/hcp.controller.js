@@ -347,7 +347,7 @@ async function registrationLookup(req, res) {
             return res.status(400).send(response);
         }
 
-        const uuidWithoutSpecialCharacter = uuid.replace(/[-]/gi, '');
+        const uuidWithoutSpecialCharacter = uuid.replace(/[-/]/gi, '');
 
         const master_data = await sequelize.datasyncConnector.query(`
             SELECT h.*, s.specialty_code
@@ -368,7 +368,7 @@ async function registrationLookup(req, res) {
             const uuid_2_from_master_data = (master_data[0].uuid_2 || '');
 
             uuid_from_master_data = [uuid_1_from_master_data, uuid_2_from_master_data]
-                .find(id => id.replace(/[-]/gi, '') === uuidWithoutSpecialCharacter);
+                .find(id => id.replace(/[-/]/gi, '') === uuidWithoutSpecialCharacter);
         }
 
         const profileByUUID = await Hcp.findOne({ where: { uuid: uuid_from_master_data || uuid } });
@@ -479,7 +479,7 @@ async function createHcpProfile(req, res) {
         let uuid_from_master_data;
 
         if (uuid) {
-            const uuidWithoutSpecialCharacter = uuid.replace(/[-]/gi, '');
+            const uuidWithoutSpecialCharacter = uuid.replace(/[-/]/gi, '');
 
             master_data = await sequelize.datasyncConnector.query(`select * from ciam.vwhcpmaster
                     where regexp_replace(uuid_1, '[-]', '', 'gi') = $uuid
@@ -493,7 +493,7 @@ async function createHcpProfile(req, res) {
             const uuid_2_from_master_data = (master_data.uuid_2 || '');
 
             uuid_from_master_data = [uuid_1_from_master_data, uuid_2_from_master_data]
-                .find(id => id.replace(/[-]/gi, '') === uuidWithoutSpecialCharacter);
+                .find(id => id.replace(/[-/]/gi, '') === uuidWithoutSpecialCharacter);
         }
 
         const isUUIDExists = await Hcp.findOne({ where: { uuid: uuid_from_master_data || uuid } });
