@@ -39,7 +39,7 @@ export default function Login() {
                                             username: values.email,
                                             password: values.password,
                                             grant_type: 'password',
-                                            recaptchaToken: '1234'// values.recaptchaToken
+                                            recaptchaToken: values.recaptchaToken
                                         })).then( response => {
                                             dispatch(getCountries());
                                             setCookie('logged_in', true, { path: '/' });
@@ -66,7 +66,7 @@ export default function Login() {
                                                 <div className="invalid-feedback" data-testid="password-error"><ErrorMessage name="password" /></div>
                                             </div>
 
-                                            {/* { process.env.RECAPTCHA_SITE_KEY &&
+                                            { process.env.RECAPTCHA_SITE_KEY &&
                                                 <div className="form-group mt-2">
                                                     <ReCAPTCHA
                                                         sitekey={process.env.RECAPTCHA_SITE_KEY}
@@ -82,7 +82,7 @@ export default function Login() {
                                                         <div className="invalid-feedback">{formikProps.errors.recaptchaToken}</div>
                                                     )}
                                                 </div>
-                                            } */}
+                                            }
 
                                             <button type="submit" className="btn btn-block text-white app-login__btn mt-4 p-2 font-weight-bold">Sign In</button>
                                         </Form>
