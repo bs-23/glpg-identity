@@ -408,15 +408,15 @@ async function createUser(req, res) {
             }
         });
 
+        if (!created) {
+            return res.status(400).send('Email already exists.');
+        }
+
         if (role) {
             await User_Role.create({
                 userId: user.id,
                 roleId: role,
             });
-        }
-
-        if (!created) {
-            return res.status(400).send('Email already exists.');
         }
 
         const logData = {
