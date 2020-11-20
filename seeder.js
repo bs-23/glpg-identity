@@ -35,6 +35,7 @@ async function init() {
     require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
     require(path.join(process.cwd(), 'src/modules/core/server/password/password-history.model.js'));
     require(path.join(process.cwd(), 'src/modules/application/server/data.model.js'));
+    require(path.join(process.cwd(), 'src/modules/platform/faq/server/faq.model.js'));
 
     await sequelize.cdpConnector.sync();
 
@@ -65,7 +66,7 @@ async function init() {
                 { title: "Site Admin", slug: "site_admin", type: 'standard', description: "This is the default profile for Site Admin", created_by: admin.id, updated_by: admin.id },
                 { title: "Global Data Steward", type: 'standard', slug: "global_data_steward", description: "This is the default profile for Global Data Steward", created_by: admin.id, updated_by: admin.id },
                 { title: "Local Data Steward", type: 'standard', slug: "local_data_steward", description: "This is the default profile for Local Data Steward", created_by: admin.id, updated_by: admin.id },
-                { title: "Data Privacy Officer", type: 'standard', slug: "data_privacy_officer", description: "This is the default profile for Data Privacy Officer",  created_by: admin.id, updated_by: admin.id }
+                { title: "Data Privacy Officer", type: 'standard', slug: "data_privacy_officer", description: "This is the default profile for Data Privacy Officer", created_by: admin.id, updated_by: admin.id }
             ];
 
             UserProfile.destroy({ truncate: { cascade: true } }).then(() => {
@@ -85,7 +86,7 @@ async function init() {
             where: { email: 'glpg@brainstation-23.com' }
         }).then(admin => {
             UserProfile.findOne({ where: { slug: 'system_admin' } }).then(sysAdminProfile => {
-                admin.update({profileId: sysAdminProfile.id});
+                admin.update({ profileId: sysAdminProfile.id });
             })
 
         }).then(function () {
@@ -118,9 +119,9 @@ async function init() {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
 
             const permissionSet = [
-                { title: "System Admin Permission Set", slug: "system_admin", type: 'standard', countries:["BE", "FR", "DE", "IT", "NL", "ES", "GB"], description: "This is the default permission set for System Admin", created_by: admin.id, updated_by: admin.id },
-                { title: "Site Admin Permission Set", slug: "site_admin", type: 'standard', description: "This is the default permission set for Site Admin", countries:["BE", "FR", "DE", "IT", "NL", "ES", "GB"], created_by: admin.id, updated_by: admin.id },
-                { title: "GDS Permission Set", slug: "gds", type: 'standard', countries:["BE", "FR", "DE", "IT", "NL", "ES", "GB"], description: "This is the default permission set for Global Data Steward", created_by: admin.id, updated_by: admin.id },
+                { title: "System Admin Permission Set", slug: "system_admin", type: 'standard', countries: ["BE", "FR", "DE", "IT", "NL", "ES", "GB"], description: "This is the default permission set for System Admin", created_by: admin.id, updated_by: admin.id },
+                { title: "Site Admin Permission Set", slug: "site_admin", type: 'standard', description: "This is the default permission set for Site Admin", countries: ["BE", "FR", "DE", "IT", "NL", "ES", "GB"], created_by: admin.id, updated_by: admin.id },
+                { title: "GDS Permission Set", slug: "gds", type: 'standard', countries: ["BE", "FR", "DE", "IT", "NL", "ES", "GB"], description: "This is the default permission set for Global Data Steward", created_by: admin.id, updated_by: admin.id },
                 { title: "LDS Permission Set", slug: "lds", type: 'standard', description: "This is the default permission set for Local Data Steward", created_by: admin.id, updated_by: admin.id },
                 { title: "DPO Permission Set", slug: "data_privacy_officer", type: 'standard', description: "This is the default permission set for Data Privacy Officer", created_by: admin.id, updated_by: admin.id },
             ];
@@ -439,7 +440,7 @@ async function init() {
         });
     }
 
-    async.waterfall([userSeeder,userProfileSeeder,userUpdateSeeder,serviceCategorySeeder, permissionSetSeeder, permissionSetServiceCategorySeeder, userProfilePermissionSetSeeder, applicationSeeder, permissionSetApplicationsSeeder, consentSeeder], function (err) {
+    async.waterfall([userSeeder, userProfileSeeder, userUpdateSeeder, serviceCategorySeeder, permissionSetSeeder, permissionSetServiceCategorySeeder, userProfilePermissionSetSeeder, applicationSeeder, permissionSetApplicationsSeeder, consentSeeder], function (err) {
         if (err) console.error(err);
         else console.info('DB seed completed!');
         process.exit();

@@ -19,7 +19,7 @@ const Faq = sequelize.cdpConnector.define('faq', {
         type: DataTypes.STRING(1500)
     },
     service_categories: {
-        type: DataTypes.ARRAY(DataTypes.UUIDV4)
+        type: DataTypes.ARRAY(DataTypes.UUID)
     },
     created_by: {
         type: DataTypes.UUID
