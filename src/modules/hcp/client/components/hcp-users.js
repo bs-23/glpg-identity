@@ -428,10 +428,10 @@ export default function hcpUsers() {
                                             <tbody className="cdp-table__body bg-white">
                                                 {hcps['users'].map((row, index) => (
                                                     <tr key={index}>
-                                                        <td>{row.email}</td>
+                                                        <td className="text-break">{row.email}</td>
                                                         <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
-                                                        <td>{row.first_name}</td>
-                                                        <td>{row.last_name}</td>
+                                                        <td className="text-break">{row.first_name}</td>
+                                                        <td className="text-break">{row.last_name}</td>
                                                         <td className="text-nowrap">
                                                             {row.status === 'self_verified' ? <span><i className="fa fa-xs fa-circle text-success pr-2 hcp-status-icon"></i>Self Verified</span> :
                                                                 row.status === 'manually_verified' ? <span><i className="fa fa-xs fa-circle text-success pr-2 hcp-status-icon"></i>Manually Verified</span> :
