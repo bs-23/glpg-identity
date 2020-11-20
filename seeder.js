@@ -12,6 +12,17 @@ async function init() {
 
     await sequelize.cdpConnector.query(`CREATE SCHEMA IF NOT EXISTS ${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`);
 
+    await sequelize.cdpConnector.query(`
+        DO $$ BEGIN
+        CREATE AGGREGATE array_concat_agg(anyarray) (
+            SFUNC = array_cat,
+            STYPE = anyarray
+        );
+        EXCEPTION
+            WHEN duplicate_function THEN NULL;
+        END $$;
+    `);
+
     const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
     const ApplicationDomain = require(path.join(process.cwd(), 'src/modules/application/server/application-domain.model'));
     const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
