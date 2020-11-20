@@ -330,8 +330,8 @@ async function login(req, res) {
 
             const userLockedMessage = 'Your account has been locked for consecutive failed auth attempts. Please use the Forgot Password link to unlock.';
 
-            if (!user || !user.validPassword(password)) {
-                if (user) {
+            if (!user || !user.password || !user.validPassword(password)) {
+                if (user && user.password) {
                     await user.update({ failed_auth_attempt: user.dataValues.failed_auth_attempt + 1 });
                 }
 

@@ -159,7 +159,6 @@ async function init() {
                     { permissionSetId: values[1].id, serviceCategoryId: values[4].id },
 
                     { permissionSetId: values[5].id, serviceCategoryId: values[4].id },
-                    { permissionSetId: values[5].id, serviceCategoryId: values[2].id },
 
                     { permissionSetId: values[6].id, serviceCategoryId: values[2].id },
                     { permissionSetId: values[7].id, serviceCategoryId: values[2].id }
