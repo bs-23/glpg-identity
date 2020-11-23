@@ -2,6 +2,7 @@ const path = require('path');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const validator = require('validator');
+const _ = require('lodash');
 const User = require('./user.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
@@ -21,7 +22,7 @@ const Application = require(path.join(process.cwd(), "src/modules/application/se
 const PasswordPolicies = require(path.join(process.cwd(), "src/modules/core/server/password/password-policies.js"));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const { QueryTypes, Op, where, col, fn, literal } = require('sequelize');
-const { getUserPermissions, getRequestingUserPermissions, getPermissionsFromPermissionSet } = require(path.join(process.cwd(), "src/modules/user/server/permission/permissions.js"));
+const { getRequestingUserPermissions, getPermissionsFromPermissionSet } = require(path.join(process.cwd(), "src/modules/user/server/permission/permissions.js"));
 
 function generateAccessToken(doc) {
     return jwt.sign({
@@ -151,6 +152,7 @@ async function getCommaSeparatedAppCountryPermissions(user) {
     all_countries = [...new Set(role_countries.concat(profile_countries))];
     all_applications = role_applications.concat(profile_applications);
     all_ps = role_ps.concat(profile_ps);
+    all_ps = _.uniqBy(all_ps, ps => ps.id);
     let apps = [...new Set(all_applications.length > 0 ? all_applications.map(app => app.name) : [])];
 
     apps = apps.join();
