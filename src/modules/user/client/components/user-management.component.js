@@ -82,6 +82,14 @@ const UserManagement = () => {
                                                 <strong className="mb-2 h4 d-block cdp-list-group__link-title">Manage Mailchimp API Credentials</strong>
                                             </span>
                                         </NavLink>
+                                        <NavLink to="#" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link disabled">
+                                            <i className="icon icon-help icon-3x cdp-list-group__icon"></i>
+                                            <span>
+                                                <strong className="mb-2 h4 d-block cdp-list-group__link-title">Manage FAQs</strong>
+                                                <span className="d-block cdp-list-group__link-description">Manage new and update eixsting User Guides how to use specific Services in a Service Category within CDP</span>
+                                                <span className="d-block cdp-list-group__link-activity">Within 5 - 7 minutes</span>
+                                            </span>
+                                        </NavLink>
                                     </div>
                                 </div>
                             </div>
