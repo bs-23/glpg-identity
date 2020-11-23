@@ -1,6 +1,7 @@
 import React from 'react';
 import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
+import { NavLink } from 'react-router-dom';
 
 const Faq = () => {
     return (
@@ -48,6 +49,11 @@ const Faq = () => {
                         <i className="icon icon-arrow-down ml-2 faq__icon-down"></i>
                         </Accordion.Toggle>
                         
+                    </Card>
+                    <Card className="border-0">
+                        <NavLink to="#" className="p-3 pb-0 mb-0 w-100 d-flex align-items-center bg-white cdp-text-secondary">
+                           More FAQ's 
+                        </NavLink>
                     </Card>
                 </Accordion> 
             </div>
