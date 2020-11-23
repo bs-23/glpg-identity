@@ -15,7 +15,7 @@ import { getConsentReport } from '../consent.actions';
 
 const CdpConsentPerformanceReport = () => {
     const dispatch = useDispatch();
-    const [allOptTypes, setAllOptTypes] = useState([]);
+    const [allOptTypes, setAllOptTypes] = useState(["single-opt-in", "double-opt-in"]);
     const [show, setShow] = useState({ profileManage: false, updateStatus: false });
     const [currentAction, setCurrentAction] = useState({ userId: null, action: null });
     const [currentUser, setCurrentUser] = useState({});
@@ -32,11 +32,6 @@ const CdpConsentPerformanceReport = () => {
     const pageRight = () => {
         if (consents_report.end !== consents_report.total) dispatch(getConsentReport(consents_report.page + 1, consents_report.codbase, consents_report.opt_type, consents_report.orderBy, consents_report.orderType));
     };
-
-    async function getAllOptTypes() {
-        const response = await axios.get('/api/get-all-opt-types');
-        setAllOptTypes(response.data);
-    }
 
     async function loadConsentsReport() {
         const params = new URLSearchParams(window.location.search);
@@ -106,7 +101,6 @@ const CdpConsentPerformanceReport = () => {
 
     useEffect(() => {
         dispatch(getAllCountries());
-        getAllOptTypes();
         loadConsentsReport();
     }, []);
 
