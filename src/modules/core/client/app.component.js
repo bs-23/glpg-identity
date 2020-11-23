@@ -104,6 +104,7 @@ export default function App() {
 
                 <PlatformRoutes />
 
+
                 <Route component={NoMatch} />
 
             </Switch>

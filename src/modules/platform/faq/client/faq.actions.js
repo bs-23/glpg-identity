@@ -10,3 +10,14 @@ export function fetchFaqItem(id) {
         })
     };
 }
+
+export function createFaqItem(data) {
+    return {
+        type: Types.POST_FAQ_ITEM,
+        payload: axios({
+            method: 'post',
+            url: `/api/faq`,
+            data
+        })
+    };
+}

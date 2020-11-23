@@ -1,15 +1,94 @@
 import React, { useEffect, useState } from 'react';
 import Modal from 'react-bootstrap/Modal'
-import { Form, Formik, Field, ErrorMessage } from "formik";
+import { Form, Formik, Field, ErrorMessage, FieldArray } from "formik";
 import { useToasts } from 'react-toast-notifications';
 import faqSchema from './faq.schema';
+import DraftEditor from '../../../core/client/components/draft-editor';
+import { createFaqItem } from './faq.actions';
+import { useDispatch } from 'react-redux';
 
 const FaqForm = (props) => {
     const [, setShow] = useState(false);
+    const { addToast } = useToasts();
+    const dispatch = useDispatch();
     const handleClose = () => {
         setShow(false);
         props.changeShow(false);
     };
+
+
+    const FormFieldFluid = ({ label, name, type, children, required = true, ...rest }) => <div className="col-12">
+        <div className="form-group">
+            <label className="font-weight-bold" htmlFor="last_name">{label}{required && <span className="text-danger">*</span>}</label>
+            {children || <Field className="form-control" type={type} name={name} {...rest} />}
+            <div className="invalid-feedback"><ErrorMessage name={name} /></div>
+        </div>
+    </div>
+
+    const ToggleList = ({ name, options, labelExtractor, idExtractor, allOptionID }) => {
+        const isChecked = (id, arrayHelpers) => arrayHelpers.form.values[name].includes(id);
+
+        const handleChange = (e, arrayHelpers) => {
+            const optionId = e.target.value;
+            if (e.target.checked) {
+                if (allOptionID && (optionId === allOptionID)) {
+                    arrayHelpers.form.setFieldValue(name, options.map(op => idExtractor(op)));
+                }
+                else {
+                    if (arrayHelpers.form.values[name].includes(allOptionID)) {
+                        const idx = arrayHelpers.form.values[name].indexOf(allOptionID);
+                        arrayHelpers.remove(idx);
+                    }
+                    arrayHelpers.push(optionId);
+                };
+            }
+            else {
+                if (allOptionID && (optionId === allOptionID)) {
+                    arrayHelpers.form.setFieldValue(name, []);
+                } else {
+                    let filteredOptionIds = arrayHelpers.form.values[name].filter(id => id !== allOptionID).filter(id => id !== optionId);
+                    arrayHelpers.form.setFieldValue(name, filteredOptionIds);
+                }
+            }
+        }
+
+        const allOptionsObject = options.find(op => idExtractor(op) === allOptionID);
+
+        if (allOptionsObject) {
+            options = options.filter(op => idExtractor(op) !== allOptionID);
+            options.unshift(allOptionsObject);
+        }
+
+        return <FieldArray
+            name={name}
+            render={arrayHelpers => (
+                options.map(item => <label key={idExtractor(item)} className="d-flex  align-items-center">
+                    <span className="switch">
+                        <input name={name}
+                            className="custom-control-input"
+                            type="checkbox"
+                            value={idExtractor(item)}
+                            id={idExtractor(item)}
+                            checked={isChecked(idExtractor(item), arrayHelpers)}
+                            onChange={(e) => handleChange(e, arrayHelpers)}
+                            disabled={item.hasOwnProperty('disabled') ? item.disabled : false}
+                        />
+                        <span className="slider round"></span>
+                    </span>
+                    <span className="switch-label text-left pl-2">{labelExtractor(item)}</span>
+                </label>)
+            )}
+        />
+    }
+
+    const showToast = (msg, type) => {
+        addToast(msg, {
+            appearance: type,
+            autoDismiss: true
+        });
+    };
+
+
     return (
         <Modal centered show={props.show} onHide={handleClose}>
             <Modal.Header closeButton>
@@ -27,6 +106,17 @@ const FaqForm = (props) => {
                         validationSchema={faqSchema}
                         displayName="FaqForm"
                         onSubmit={(values, actions) => {
+                            dispatch(createFaqItem(values)).then(() => {
+                                actions.resetForm();
+                                showToast('FAQ created successfully', 'success');
+                                handleClose();
+                            }).catch(error => {
+                                showToast(error.response.data, 'error');
+                            }).finally(function () {
+                                actions.setSubmitting(false);
+
+                            });
+
                         }}
                     >
                         {formikProps => (
@@ -35,9 +125,29 @@ const FaqForm = (props) => {
                                     <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
-                                                <label className="font-weight-bold" htmlFor="country_iso2">Select Country <span className="text-danger">*</span></label>
+                                                <label className="font-weight-bold" htmlFor='question'> Question <span className="text-danger">*</span></label>
+                                                <Field className="form-control preference" type='text' name='question' id='question' />
+                                                <div className="invalid-feedback"><ErrorMessage name="question" /></div>
+                                            </div>
+                                            <FormFieldFluid label="Select Service Categories" name="service_categories" required={false} >
+                                                <ToggleList
+                                                    name="service_categories"
+                                                    options={props.serviceCategory}
+                                                    idExtractor={item => item.id}
+                                                    labelExtractor={item => item.title}
+                                                />
+                                            </FormFieldFluid>
+                                            <div className="form-group">
+                                                <label className="font-weight-bold" htmlFor='answer'>Answer <span className="text-danger">*</span></label>
+                                                <div className="border rounded draft-editor">
+                                                    <DraftEditor htmlContent={formikProps.initialValues.answer} onChangeHTML={(html) => {
 
-                                                <div className="invalid-feedback"><ErrorMessage name="country_iso2" /></div>
+
+                                                        formikProps.setFieldValue('answer', html);
+                                                    }}
+                                                    />
+                                                </div>
+
                                             </div>
                                         </div>
                                     </div>
@@ -51,7 +161,7 @@ const FaqForm = (props) => {
                     </Formik>
                 </div>
             }
-        </Modal>
+        </Modal >
     )
 }
 

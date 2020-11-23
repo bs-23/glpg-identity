@@ -7,7 +7,7 @@ async function getFaqItem(req, res) {
         });
 
         res.json(response);
-    } catch(err){
+    } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
     }
@@ -27,6 +27,7 @@ async function getFaqItems(req, res) {
 async function createFaqItem(req, res) {
     try {
         const { question, answer, service_categories } = req.body;
+        console.log(req.body);
 
         const response = await Faq.create({
             question,
@@ -37,15 +38,15 @@ async function createFaqItem(req, res) {
         });
 
         res.json(response);
-    } catch(err){
+    } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
     }
 }
 
-async function updateFaqItem(req, res) {}
+async function updateFaqItem(req, res) { }
 
-async function deleteFaqItem(req, res) {}
+async function deleteFaqItem(req, res) { }
 
 exports.getFaqItem = getFaqItem;
 exports.getFaqItems = getFaqItems;
