@@ -1,6 +1,6 @@
 import React from 'react';
 
-const SearchMissingUsers = () => {
+const SearchHcp = () => {
     return (
         <main className="app__content cdp-light-bg h-100">
             Search component
@@ -8,4 +8,4 @@ const SearchMissingUsers = () => {
     );
 }
 
-export default SearchMissingUsers;
+export default SearchHcp;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import SearchMissingUsers from './search-missing-users.component'
+import SearchHcp from './search-hcp.component';
 
 const DiscoverHcpUsers = () => {
     return (
@@ -18,7 +18,7 @@ const DiscoverHcpUsers = () => {
                     </div>
                 </div>
                 <div className="row">
-                    <SearchMissingUsers />
+                    <SearchHcp />
                 </div>
             </div>
         </main>
