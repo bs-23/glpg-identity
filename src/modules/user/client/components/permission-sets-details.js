@@ -48,6 +48,16 @@ const PermissionSetDetails = ({ permissionSetId }) => {
         return appNames.length ? appNames.join(', ') : nullValueToken;
     }
 
+    const getUsedInProfileNames = () => {
+        if(!permissionDetails || !permissionDetails.ps_up_ps || permissionDetails.ps_up_ps.length === 0) return [];
+        return permissionDetails.ps_up_ps.map(({profile}) => profile.title);
+    }
+
+    const getUsedInRoleNames = () => {
+        if(!permissionDetails || !permissionDetails.ps_role_ps || permissionDetails.ps_role_ps.length === 0) return [];
+        return permissionDetails.ps_role_ps.map(({role}) => role.title);
+    }
+
     useEffect(() => {
         getPermissionDetails();
     }, []);
@@ -79,9 +89,27 @@ const PermissionSetDetails = ({ permissionSetId }) => {
             </div>
         </div>
         <div className="pb-0 pb-sm-2 d-block d-sm-flex">
-            <div className="pb-3">
+            <div className="profile-detail__col pb-3">
                 <span className="mr-2 d-block profile-detail__label">Service Categories</span>
                 <span className="profile-detail__value">{getServiceCategoryNames()}</span>
+            </div>
+            <div className="profile-detail__col pb-3">
+                <span className="mr-2 d-block profile-detail__label">Used in Profiles</span>
+                <span className="profile-detail__value">{
+                    getUsedInProfileNames().length
+                        ? getUsedInProfileNames().map(profileTitle => <div key={profileTitle}>{profileTitle}</div>)
+                        : nullValueToken
+                }</span>
+            </div>
+        </div>
+        <div className="pb-0 pb-sm-2 d-block d-sm-flex">
+            <div className="profile-detail__col pb-3">
+                <span className="mr-2 d-block profile-detail__label">Used in Roles</span>
+                <span className="profile-detail__value">{
+                    getUsedInRoleNames().length
+                        ? getUsedInRoleNames().map(roleTitle => <div key={roleTitle}>{roleTitle}</div>)
+                        : nullValueToken
+                }</span>
             </div>
         </div>
     </div>

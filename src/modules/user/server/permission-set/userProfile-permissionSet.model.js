@@ -29,5 +29,6 @@ const UserProfile_PermissionSet = sequelize.cdpConnector.define('userProfiles_pe
 });
 
 UserProfile_PermissionSet.belongsTo(PermissionSet, {as: 'ps', foreignKey: 'permissionSetId'});
+PermissionSet.hasMany(UserProfile_PermissionSet, {as: 'ps_up_ps', foreignKey: 'permissionSetId', sourceKey: 'id'});
 
 module.exports = UserProfile_PermissionSet;
