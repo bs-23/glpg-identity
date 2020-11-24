@@ -2,7 +2,7 @@ const path = require('path');
 const { DataTypes } = require('sequelize');
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
-const Role_PermissionSet = require('../permission-set/role-permissionSet.model');
+const Role_PermissionSet = require(path.join(process.cwd(), 'src/modules/user/server/permission-set/role-permissionSet.model.js'));
 const PermissionSet = require('../permission-set/permission-set.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
@@ -38,5 +38,6 @@ const Role = sequelize.cdpConnector.define('roles', {
 
 Role.hasMany(Role_PermissionSet, {as: 'role_ps', foreignKey: 'roleId', sourceKey: 'id'});
 Role.belongsToMany(PermissionSet, { through: Role_PermissionSet });
+Role_PermissionSet.belongsTo(Role, {as: 'role', foreignKey: ''});
 
 module.exports = Role;

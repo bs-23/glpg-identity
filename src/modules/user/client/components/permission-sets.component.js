@@ -143,7 +143,7 @@ export default function ManagePermissionSets() {
                         >
                             <Modal.Header closeButton>
                                 <Modal.Title id="example-custom-modal-styling-title">
-                                    {permissionSetEditID ? 'Update Permission Set' : 'Create New Permission Set'}
+                                    {permissionSetEditID ? 'Rights of this permission set' : 'Create New Permission Set'}
                                 </Modal.Title>
                             </Modal.Header>
                             <Modal.Body>
@@ -161,7 +161,7 @@ export default function ManagePermissionSets() {
                             >
                                 <Modal.Header closeButton>
                                     <Modal.Title id="example-custom-modal-styling-title">
-                                        Permission Set Details
+                                        Rights of this permission set
                                     </Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
