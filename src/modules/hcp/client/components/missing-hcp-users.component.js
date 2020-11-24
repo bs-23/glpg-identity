@@ -11,7 +11,7 @@ const InformationManagement = () => {
                             <ol className="breadcrumb rounded-0">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/hcps">Information Management</NavLink></li>
-                                <li className="breadcrumb-item active"><span>Missing Users</span></li>
+                                <li className="breadcrumb-item active"><span>Discover HCPs</span></li>
                             </ol>
                         </nav>
                     </div>
