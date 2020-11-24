@@ -68,11 +68,23 @@
     }
 }
 .faq {
+    .fa-compress {
+        display: none;
+    }
+
     &-expand {
         position: absolute;
         left: 15px;
         width: calc(100% - 30px);
-        height: calc(100% - 70px) !important;
+        height: calc(100% - 32px) !important;
+
+        .fa-compress {
+            display: inline-block;
+        }
+
+        .fa-expand {
+            display: none !important;
+        }
     }
 
     &-body {

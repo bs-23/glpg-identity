@@ -3,11 +3,19 @@ import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
 import { NavLink } from 'react-router-dom';
 
+
 const Faq = () => {
+    const [show, setShow] = React.useState();
+
     return (
         <React.Fragment>
-            <div className="faq h-100 shadow-sm bg-white">
-                <h4 className="faq__header p-3 font-weight-bold mb-0 d-flex justify-content-between">FAQ Hints <i className="icon icon-help faq__icon-help"></i></h4>
+            <div className={`faq h-100 shadow-sm bg-white ${show ? "faq-expand" : ""}`}>
+                <h4 className="faq__header p-3 font-weight-bold mb-0 d-flex justify-content-between">
+                    FAQ Hints
+                    <i onClick={() => setShow(true)} type="button" class="fas fa-expand faq__icon-help  d-none d-lg-block"></i>
+                    <i class="fas fa-compress faq__icon-help" type="button" onClick={() => setShow(false)}></i>
+                    <i className="icon icon-help faq__icon-help d-block d-lg-none"></i>
+                </h4>
                 <Accordion defaultActiveKey="0" className="faq__body">
                     <Card>
                         <Accordion.Collapse eventKey="0">
@@ -51,7 +59,7 @@ const Faq = () => {
                         
                     </Card>
                     <Card className="border-0">
-                        <NavLink to="#" className="p-3 pb-0 mb-0 w-100 d-flex align-items-center bg-white cdp-text-secondary">
+                        <NavLink to="platform-management/manage-faq" className="p-3 pb-0 mb-0 w-100 d-flex align-items-center bg-white cdp-text-secondary">
                            More FAQ's 
                         </NavLink>
                     </Card>
