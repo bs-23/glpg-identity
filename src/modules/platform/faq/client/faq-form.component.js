@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Modal from 'react-bootstrap/Modal'
 import { Form, Formik, Field, ErrorMessage, FieldArray } from "formik";
 import { useToasts } from 'react-toast-notifications';
-import faqSchema from './faq.schema';
+import { faqSchema } from './faq.schema';
 import DraftEditor from '../../../core/client/components/draft-editor';
 import { createFaqItem } from './faq.actions';
 import { useDispatch } from 'react-redux';
@@ -15,7 +15,6 @@ const FaqForm = (props) => {
         setShow(false);
         props.changeShow(false);
     };
-
 
     const FormFieldFluid = ({ label, name, type, children, required = true, ...rest }) => <div className="col-12">
         <div className="form-group">
@@ -33,16 +32,14 @@ const FaqForm = (props) => {
             if (e.target.checked) {
                 if (allOptionID && (optionId === allOptionID)) {
                     arrayHelpers.form.setFieldValue(name, options.map(op => idExtractor(op)));
-                }
-                else {
+                } else {
                     if (arrayHelpers.form.values[name].includes(allOptionID)) {
                         const idx = arrayHelpers.form.values[name].indexOf(allOptionID);
                         arrayHelpers.remove(idx);
                     }
                     arrayHelpers.push(optionId);
                 };
-            }
-            else {
+            } else {
                 if (allOptionID && (optionId === allOptionID)) {
                     arrayHelpers.form.setFieldValue(name, []);
                 } else {
@@ -88,7 +85,6 @@ const FaqForm = (props) => {
         });
     };
 
-
     return (
         <Modal centered show={props.show} onHide={handleClose}>
             <Modal.Header closeButton>
@@ -99,9 +95,9 @@ const FaqForm = (props) => {
                 <div className="consent-manage">
                     <Formik
                         initialValues={{
-                            question: "",
-                            service_categories: "",
-                            answer: ""
+                            question: '',
+                            service_categories: '',
+                            answer: ''
                         }}
                         validationSchema={faqSchema}
                         displayName="FaqForm"
@@ -114,9 +110,7 @@ const FaqForm = (props) => {
                                 showToast(error.response.data, 'error');
                             }).finally(function () {
                                 actions.setSubmitting(false);
-
                             });
-
                         }}
                     >
                         {formikProps => (
@@ -141,13 +135,9 @@ const FaqForm = (props) => {
                                                 <label className="font-weight-bold" htmlFor='answer'>Answer <span className="text-danger">*</span></label>
                                                 <div className="border rounded draft-editor">
                                                     <DraftEditor htmlContent={formikProps.initialValues.answer} onChangeHTML={(html) => {
-
-
                                                         formikProps.setFieldValue('answer', html);
-                                                    }}
-                                                    />
+                                                    }}/>
                                                 </div>
-
                                             </div>
                                         </div>
                                     </div>
