@@ -10,21 +10,6 @@ const auth = {
 };
 
 async function search(queryObj) {
-    // const OklaService = require(path.join(process.cwd(), 'src/config/server/lib/okla.service'));
-    // const queryObj = {
-    //     entityType: 'activity',
-    //     isoCod2: 'FR',
-    //     resultSize: 50,
-    //     fields: [
-    //         {
-    //             name: 'individual.lastName',
-    //             values: ['harold']
-    //         }
-    //     ]
-    // };
-    // const searchResult = await OklaService.search(queryObj);
-    // console.log('=============================', JSON.stringify(searchResult, null, 4));
-
     const { data } = await axios.post(`${baseUrl}/ok/search/${cid}`, queryObj, { auth });
     return data;
 }

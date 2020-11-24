@@ -18,6 +18,7 @@ const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const PasswordPolicies = require(path.join(process.cwd(), 'src/modules/core/server/password/password-policies.js'));
 const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/user/server/permission/permissions.js'));
+const OklaService = require(path.join(process.cwd(), 'src/config/server/lib/okla.service'));
 
 function generateAccessToken(doc) {
     return jwt.sign({
@@ -1196,6 +1197,40 @@ async function getAccessToken(req, res) {
     }
 }
 
+async function searchOkla(req, res) {
+    try {
+        const fieldMap = {
+            firstName: 'individual.firstName',
+            lastName: 'individual.lastName'
+        }
+
+        const fields = Object.keys(fieldMap).map(key => {
+            const value = req.body[key];
+            if (value) {
+                return {
+                    name: fieldMap[key],
+                    method: 'EXACT',
+                    values: [value]
+                }
+            }
+        }).filter(field => field);
+
+
+        const queryObj = {
+            entityType: 'activity',
+            isoCod2: 'FR',
+            resultSize: 50,
+            fields
+        };
+        const { response: searchResult } = await OklaService.search(queryObj);
+        res.json(searchResult);
+    } catch (err) {
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
+    }
+}
+
 exports.getHcps = getHcps;
 exports.editHcp = editHcp;
 exports.registrationLookup = registrationLookup;
@@ -1210,3 +1245,4 @@ exports.confirmConsents = confirmConsents;
 exports.approveHCPUser = approveHCPUser;
 exports.rejectHCPUser = rejectHCPUser;
 exports.getHCPUserConsents = getHCPUserConsents;
+exports.searchOkla = searchOkla;

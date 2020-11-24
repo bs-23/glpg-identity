@@ -12,6 +12,9 @@ module.exports = app => {
     app.route('/api/hcps/:id')
         .put(CDPAuthStrategy, controller.editHcp);
 
+    app.route('/api/hcps/search-okla')
+        .post(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.searchOkla);
+
     app.route('/api/hcp-profiles/registration-lookup')
         .post(passport.authenticate('application-jwt', { session: false }), controller.registrationLookup);
 
