@@ -2,6 +2,7 @@ const path = require('path');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const validator = require('validator');
+const _ = require('lodash');
 const User = require('./user.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const emailService = require(path.join(process.cwd(), 'src/config/server/lib/email-service/email.service'));
@@ -20,8 +21,8 @@ const axios = require("axios");
 const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
 const PasswordPolicies = require(path.join(process.cwd(), "src/modules/core/server/password/password-policies.js"));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
-const { QueryTypes, Op, where, col, fn } = require('sequelize');
-const { getUserPermissions, getRequestingUserPermissions, getPermissionsFromPermissionSet } = require(path.join(process.cwd(), "src/modules/user/server/permission/permissions.js"));
+const { QueryTypes, Op, where, col, fn, literal } = require('sequelize');
+const { getRequestingUserPermissions, getPermissionsFromPermissionSet } = require(path.join(process.cwd(), "src/modules/user/server/permission/permissions.js"));
 
 function generateAccessToken(doc) {
     return jwt.sign({
@@ -151,6 +152,7 @@ async function getCommaSeparatedAppCountryPermissions(user) {
     all_countries = [...new Set(role_countries.concat(profile_countries))];
     all_applications = role_applications.concat(profile_applications);
     all_ps = role_ps.concat(profile_ps);
+    all_ps = _.uniqBy(all_ps, ps => ps.id);
     let apps = [...new Set(all_applications.length > 0 ? all_applications.map(app => app.name) : [])];
 
     apps = apps.join();
@@ -408,15 +410,15 @@ async function createUser(req, res) {
             }
         });
 
+        if (!created) {
+            return res.status(400).send('Email already exists.');
+        }
+
         if (role) {
             await User_Role.create({
                 userId: user.id,
                 roleId: role,
             });
-        }
-
-        if (!created) {
-            return res.status(400).send('Email already exists.');
         }
 
         const logData = {
@@ -483,9 +485,6 @@ async function getUsers(req, res) {
 
         const signedInId = (await formatProfile(req.user)).id;
 
-        // const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => i.codbase === codbase).map(i => i.country_iso2);
-        // const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
-
         const [, userCountries,] = await getRequestingUserPermissions(req.user);
 
         const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`
@@ -497,7 +496,6 @@ async function getUsers(req, res) {
             },
             type: QueryTypes.SELECT
         })).map(c => c.country_iso2);
-
 
         const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase
             .map(i => ignoreCaseArray(i)));
@@ -532,37 +530,11 @@ async function getUsers(req, res) {
             order.splice(1, 0, [{ model: User, as: 'createdByUser' }, 'last_name', orderType]);
         }
 
-        const userCountryFilter = [
-            {
-                '$userRoles.role.role_ps.ps.countries$': codbase
-                    ? { [Op.overlap]: countries_ignorecase_for_codbase_formatted }
-                    : { [Op.overlap]: user_countries_ignorecase_formatted }
+        const {count: countByUser, rows: users} = await User.findAndCountAll({
+            where: {
+                id: { [Op.ne]: signedInId },
+                type: 'basic'
             },
-            {
-                '$userProfile.up_ps.ps.countries$': codbase
-                    ? { [Op.overlap]: countries_ignorecase_for_codbase_formatted }
-                    : { [Op.overlap]: user_countries_ignorecase_formatted }
-            }
-        ]
-
-        if(!codbase) {
-            userCountryFilter.push({
-                [Op.and]: [{
-                    '$userProfile.up_ps.ps.countries$': { [Op.or]: [null, '{}']}
-                }, {
-                    '$userRoles.role.role_ps.ps.countries$': { [Op.or]: [null, '{}'] }
-                }]
-            });
-        }
-
-        const userFilter = {
-            id: { [Op.ne]: signedInId },
-            type: 'basic',
-            [Op.or]: userCountryFilter
-        }
-
-        const {count: totalUser, rows: users} = await User.findAndCountAll({
-            where: userFilter,
             offset,
             limit,
             order: order,
@@ -570,7 +542,90 @@ async function getUsers(req, res) {
             include: [{
                 model: User,
                 as: 'createdByUser',
-                attributes: ['id', 'first_name', 'last_name'],
+                attributes: [],
+            },
+            {
+                model: UserProfile,
+                as: 'userProfile',
+                attributes: [],
+                include: [{
+                    model: UserProfile_PermissionSet,
+                    as: 'up_ps',
+                    attributes: [],
+                    include: [{
+                        model: PermissionSet,
+                        as: 'ps',
+                        attributes: []
+                    }]
+                }]
+            },
+            {
+                model: User_Role,
+                as: 'userRoles',
+                attributes: [],
+                include: [{
+                    model: Role,
+                    as: 'role',
+                    attributes: [],
+                    include: [{
+                        model: Role_PermissionSet,
+                        as: 'role_ps',
+                        attributes: [],
+                        include: [{
+                            model: PermissionSet,
+                            as: 'ps',
+                            attributes: [],
+                        }]
+                    }]
+
+
+                }]
+            }],
+            attributes: [
+                'id',
+                'email',
+            ],
+            group: ['users.id'],
+            having: literal(
+                `
+                ARRAY_CONCAT_AGG("userRoles->role->role_ps->ps"."countries") && '${codbase ? countries_ignorecase_for_codbase_formatted : user_countries_ignorecase_formatted}'
+                OR
+                ARRAY_CONCAT_AGG("userProfile->up_ps->ps"."countries") && '${codbase ? countries_ignorecase_for_codbase_formatted : user_countries_ignorecase_formatted}'
+                ${codbase ? '' :
+                `
+                OR
+                (
+                    (
+                        ARRAY_CONCAT_AGG("userRoles->role->role_ps->ps"."countries") = '{}'
+                        OR
+                        ARRAY_CONCAT_AGG("userRoles->role->role_ps->ps"."countries") IS NULL
+                    )
+                    AND
+                    (
+                        ARRAY_CONCAT_AGG("userProfile->up_ps->ps"."countries") = '{}'
+                        OR
+                        ARRAY_CONCAT_AGG("userProfile->up_ps->ps"."countries") IS NULL
+                    )
+                )
+                `
+                }
+                `
+            )
+        });
+
+        const totalUser = countByUser.length;
+
+        const filteredUserIds = users.map(u => u.dataValues.id);
+
+        const filteredUserList = await User.findAll({
+            where: {
+                id: filteredUserIds
+            },
+            order: order,
+            subQuery: false,
+            include: [{
+                model: User,
+                as: 'createdByUser',
             },
             {
                 model: UserProfile,
@@ -581,11 +636,9 @@ async function getUsers(req, res) {
                     include: [{
                         model: PermissionSet,
                         as: 'ps',
-
                     }]
                 }]
             },
-
             {
                 model: User_Role,
                 as: 'userRoles',
@@ -597,17 +650,14 @@ async function getUsers(req, res) {
                         as: 'role_ps',
                         include: [{
                             model: PermissionSet,
-                            as: 'ps'
+                            as: 'ps',
                         }]
                     }]
-
-
                 }]
-            }],
-            attributes: { exclude: ['password'] }
+            }]
         });
 
-        const userViewModels = users.map(u => {
+        const userViewModels = filteredUserList.map(u => {
             const createdBy = `${u.createdByUser.first_name} ${u.createdByUser.last_name}`
             delete u.dataValues.createdByUser;
             delete u.dataValues.created_by;
