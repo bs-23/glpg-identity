@@ -35,6 +35,7 @@
         border-bottom: 1px solid rgba(0, 0, 0, 0.125) !important;
         position: relative;
         overflow: hidden;
+        z-index: 2;
 
         &-header {
             font-weight: 600;
@@ -63,6 +64,30 @@
             .accordion-consent__icon-down {
                 transform: rotate(180deg)
             }
+        }
+    }
+}
+.faq {
+    &-expand {
+        position: absolute;
+        left: 15px;
+        width: calc(100% - 30px);
+        height: calc(100% - 70px) !important;
+    }
+
+    &-body {
+        position: relative;
+
+        &:after {
+            content: "";
+            display: block;
+            width: 131px;
+            height: 215px;
+            background: url(/assets/images/question.svg) no-repeat;
+            right: 20px;
+            position: absolute;
+            bottom: 50px;
+            z-index: 1;
         }
     }
 }

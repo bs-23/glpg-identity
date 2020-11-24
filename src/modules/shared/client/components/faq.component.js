@@ -8,7 +8,7 @@ const Faq = () => {
         <React.Fragment>
             <div className="faq h-100 shadow-sm bg-white">
                 <h4 className="faq__header p-3 font-weight-bold mb-0 d-flex justify-content-between">FAQ Hints <i className="icon icon-help faq__icon-help"></i></h4>
-                <Accordion defaultActiveKey="0">
+                <Accordion defaultActiveKey="0" className="faq__body">
                     <Card>
                         <Accordion.Collapse eventKey="0">
                             <Card.Body>A Customer Data Platform (CDP) is a software that aggregates and organizes customer data across a variety of touchpoints and is used by other software, systems, and marketing efforts. CDPs collect and structure real-time data into individual, centralized customer profiles.</Card.Body>
