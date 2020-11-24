@@ -417,9 +417,6 @@ export default function hcpUsers() {
                                 aria-labelledby="example-custom-modal-styling-title"
                                 centered>
                                 <Modal.Header closeButton>
-                                    <Modal.Title id="example-custom-modal-styling-title">
-                                        Search OKLA
-                                    </Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
                                     <SearchHcp />
