@@ -216,11 +216,11 @@ export default function hcpUsers() {
                                                 </Dropdown.Menu>
                                             </Dropdown>
 
-                                            <Dropdown className="d-inline-block show dropdown rounded pl-2 mr-2 dropdown cdp-bg-secondary text-white dropdown shadow-sm">
-                                                Status
+                                        <Dropdown className="d-flex align-items-center show dropdown rounded pl-2 pr-1 dropdown cdp-bg-secondary text-white dropdown shadow-sm">
+                                            Status
                                                 <Dropdown.Toggle variant="" className="ml-2 cdp-bg-secondary rounded-0 border-left text-white">
-                                                    {getSelectedStatus()}
-                                                </Dropdown.Toggle>
+                                                {getSelectedStatus()}
+                                            </Dropdown.Toggle>
                                                 <Dropdown.Menu>
                                                     <Dropdown.Item className={hcps.status === null ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, null, params.get('orderBy'), params.get('orderType'))}>All</Dropdown.Item>
                                                     <Dropdown.Item className={isAllVerifiedStatus() ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, 'self_verified,manually_verified', params.get('orderBy'), params.get('orderType'))}>All Verified</Dropdown.Item>
@@ -428,10 +428,10 @@ export default function hcpUsers() {
                                             <tbody className="cdp-table__body bg-white">
                                                 {hcps['users'].map((row, index) => (
                                                     <tr key={index}>
-                                                        <td>{row.email}</td>
+                                                        <td className="text-break">{row.email}</td>
                                                         <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
-                                                        <td>{row.first_name}</td>
-                                                        <td>{row.last_name}</td>
+                                                        <td className="text-break">{row.first_name}</td>
+                                                        <td className="text-break">{row.last_name}</td>
                                                         <td className="text-nowrap">
                                                             {row.status === 'self_verified' ? <span><i className="fa fa-xs fa-circle text-success pr-2 hcp-status-icon"></i>Self Verified</span> :
                                                                 row.status === 'manually_verified' ? <span><i className="fa fa-xs fa-circle text-success pr-2 hcp-status-icon"></i>Manually Verified</span> :

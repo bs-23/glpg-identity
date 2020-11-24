@@ -432,17 +432,6 @@ async function getAllProcessActivities(req, res) {
     }
 }
 
-async function getAllOptTypes(req, res) {
-    try {
-        const opt_types = new Set((await ConsentCountry.findAll()).map(i => i.opt_type));
-        res.json([...opt_types]);
-    }
-    catch (err) {
-        console.error(err);
-        res.status(500).send('Internal server error');
-    }
-}
-
 async function getUserConsents(req, res) {
     const response = new Response({}, []);
     const userOneKeyID = req.params.id;
@@ -974,7 +963,6 @@ exports.getConsents = getConsents;
 exports.getConsentsReport = getConsentsReport;
 exports.getDatasyncConsentsReport = getDatasyncConsentsReport;
 exports.getAllProcessActivities = getAllProcessActivities;
-exports.getAllOptTypes = getAllOptTypes;
 exports.getUserConsents = getUserConsents;
 exports.getCdpConsents = getCdpConsents;
 exports.getCdpConsent = getCdpConsent;
