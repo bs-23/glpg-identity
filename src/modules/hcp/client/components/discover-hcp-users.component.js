@@ -1,7 +1,8 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import SearchMissingUsers from './search-missing-users.component'
 
-const InformationManagement = () => {
+const DiscoverHcpUsers = () => {
     return (
         <main className="app__content cdp-light-bg h-100">
             <div className="container-fluid">
@@ -17,11 +18,11 @@ const InformationManagement = () => {
                     </div>
                 </div>
                 <div className="row">
-                    Hello Brothers, ki khobor valo aso?
+                    <SearchMissingUsers />
                 </div>
             </div>
         </main>
     );
 }
 
-export default InformationManagement;
+export default DiscoverHcpUsers;
