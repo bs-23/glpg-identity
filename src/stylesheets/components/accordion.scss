@@ -77,18 +77,18 @@
 
     &-body {
         position: relative;
+    }
 
-        &:after {
-            content: "";
-            display: block;
-            width: 131px;
-            height: 215px;
-            background: url(/assets/images/question.svg) no-repeat;
-            right: 20px;
-            position: absolute;
-            bottom: 50px;
-            z-index: 1;
-        }
+    &:after {
+        content: "";
+        display: block;
+        width: 131px;
+        height: 215px;
+        background: url(/assets/images/question.svg) no-repeat;
+        right: 50px;
+        position: absolute;
+        bottom: 50px;
+        z-index: 1;
     }
 }
 
