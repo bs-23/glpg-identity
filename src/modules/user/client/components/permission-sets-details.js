@@ -66,7 +66,7 @@ const PermissionSetDetails = ({ permissionSetId }) => {
 
     if(error) return <WarningMessage message="Something went wrong." />
 
-    return <div className="profile-detail p-3 py-sm-4 px-sm-5 mb-3 mb-sm-0">
+    return <div className="profile-detail p-3 mb-3 mb-sm-0">
         <h2 className="profile-detail__name pb-3">{ permissionDetails && permissionDetails.title ? permissionDetails.title  : '' }</h2>
         <div className="profile-detail__row pb-0 pb-sm-2 d-block d-sm-flex">
             <div className="profile-detail__col pb-3 pr-0 pr-sm-3">
@@ -89,10 +89,7 @@ const PermissionSetDetails = ({ permissionSetId }) => {
             </div>
         </div>
         <div className="pb-0 pb-sm-2 d-block d-sm-flex">
-            <div className="profile-detail__col pb-3">
-                <span className="mr-2 d-block profile-detail__label">Service Categories</span>
-                <span className="profile-detail__value">{getServiceCategoryNames()}</span>
-            </div>
+            
             <div className="profile-detail__col pb-3">
                 <span className="mr-2 d-block profile-detail__label">Used in Profiles</span>
                 <span className="profile-detail__value">{
@@ -101,8 +98,6 @@ const PermissionSetDetails = ({ permissionSetId }) => {
                         : nullValueToken
                 }</span>
             </div>
-        </div>
-        <div className="pb-0 pb-sm-2 d-block d-sm-flex">
             <div className="profile-detail__col pb-3">
                 <span className="mr-2 d-block profile-detail__label">Used in Roles</span>
                 <span className="profile-detail__value">{
@@ -110,6 +105,12 @@ const PermissionSetDetails = ({ permissionSetId }) => {
                         ? getUsedInRoleNames().map(roleTitle => <div key={roleTitle}>{roleTitle}</div>)
                         : nullValueToken
                 }</span>
+            </div>
+        </div>
+        <div className="pb-0 pb-sm-2 d-block d-sm-flex">
+            <div className="pb-3">
+                <span className="mr-2 d-block profile-detail__label">Service Categories</span>
+                <span className="profile-detail__value">{getServiceCategoryNames()}</span>
             </div>
         </div>
     </div>

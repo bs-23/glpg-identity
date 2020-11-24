@@ -276,20 +276,26 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
                                                         />
                                                     </FormFieldFluid>
                                                     {permissionSetId &&
-                                                        <div className="col-12 col-sm-6">
-                                                            <div className="form-group">
-                                                                <div className="font-weight-bold">Used in Profiles</div>
-                                                                {getUsedInProfileNames().length
-                                                                    ? getUsedInProfileNames().map(profile => <div key={profile}>{profile}</div>)
-                                                                    : <span>--</span>
-                                                                }
-                                                            </div>
-                                                            <div className="form-group">
-                                                                <div className="font-weight-bold">Used in Roles</div>
-                                                                {getUsedInRoleNames().length
-                                                                    ? getUsedInRoleNames().map(role => <div key={role}>{role}</div>)
-                                                                    : <span>--</span>
-                                                                }
+                                                        <div className="col-12 py-2">
+                                                            <div className="row">
+                                                                <div className="col-12 col-sm-6">
+                                                                    <div className="form-group">
+                                                                        <div className="font-weight-bold">Used in Profiles</div>
+                                                                        {getUsedInProfileNames().length
+                                                                            ? getUsedInProfileNames().map(profile => <div key={profile}>{profile}</div>)
+                                                                            : <span>--</span>
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                                <div className="col-12 col-sm-6">
+                                                                    <div className="form-group">
+                                                                        <div className="font-weight-bold">Used in Roles</div>
+                                                                        {getUsedInRoleNames().length
+                                                                            ? getUsedInRoleNames().map(role => <div key={role}>{role}</div>)
+                                                                            : <span>--</span>
+                                                                        }
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     }
