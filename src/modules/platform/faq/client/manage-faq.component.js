@@ -2,12 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import FaqForm from './faq-form.component';
 import axios from "axios";
+import { getFaqItems } from './faq.actions';
+import { useSelector, useDispatch } from 'react-redux';
 
 export default function ManageFaq() {
     const [show, setShow] = useState(false);
+    const faqData = useSelector(state => state.faqReducer.faq_items);
     const [serviceCategory, setServiceCategory] = useState(false);
 
+
     useEffect(() => {
+
         async function getServiceCategory() {
             const response = (await axios.get('/api/serviceCategories')).data;
             setServiceCategory(response);
@@ -23,8 +28,8 @@ export default function ManageFaq() {
                         <nav aria-label="breadcrumb">
                             <ol className="breadcrumb rounded-0">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
-                                <li className="breadcrumb-item"><NavLink to="/consent">Data Privacy & Consent Management</NavLink></li>
-                                <li className="breadcrumb-item active"><span>Manage Consent Per Country</span></li>
+                                <li className="breadcrumb-item"><NavLink to="/users">Management of Customer Data platform</NavLink></li>
+                                <li className="breadcrumb-item active"><span>FAQ</span></li>
                             </ol>
                         </nav>
                     </div>
