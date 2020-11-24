@@ -1196,6 +1196,56 @@ async function getAccessToken(req, res) {
     }
 }
 
+async function updateHCPUserConsents(req, res) {
+    const response = new Response({}, []);
+
+    try {
+        const hcpUser = await Hcp.findOne({ where: { id: req.params.id } });
+
+        if (!hcpUser) {
+            response.errors.push(new CustomError('Invalid HCP User.', 400));
+        }
+
+        if(!req.body.consents) response.errors.push(new CustomError('consents are missing.', 400, 'consents'));
+
+        if (response.errors.length) {
+            return res.status(400).send(response);
+        }
+
+        if(req.body.consents && req.body.consents.length) {
+            await Promise.all(req.body.consents.map(async x => {
+                const consentId = Object.keys(x)[0];
+                const consentResponse = Object.values(x)[0];
+
+                const hcpConsent = await HcpConsents.findOne({ where: { user_id: hcpUser.id, consent_id: consentId } });
+
+                if(!hcpConsent || consentResponse) return;
+
+                if (hcpConsent && consentResponse === false) {
+                    hcpConsent.opt_type = 'opt-out';
+                    hcpConsent.consent_confirmed = false;
+                }
+
+                await hcpConsent.update({ opt_type: 'opt-out', consent_confirmed: false });
+            }));
+        }
+
+        response.data = {
+            id: req.params.id,
+            consents: await HcpConsents.findAll({
+                where: { user_id: req.params.id },
+                attributes: { exclude: ['created_by', 'updated_by'] }
+            })
+        };
+
+        res.json(response);
+    } catch (err) {
+        console.error(err);
+        response.errors.push(new CustomError('An error occurred. Please try again.', 500));
+        res.status(500).send(response);
+    }
+}
+
 exports.getHcps = getHcps;
 exports.editHcp = editHcp;
 exports.registrationLookup = registrationLookup;
@@ -1210,3 +1260,4 @@ exports.confirmConsents = confirmConsents;
 exports.approveHCPUser = approveHCPUser;
 exports.rejectHCPUser = rejectHCPUser;
 exports.getHCPUserConsents = getHCPUserConsents;
+exports.updateHCPUserConsents = updateHCPUserConsents;
