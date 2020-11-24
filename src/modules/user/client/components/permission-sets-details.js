@@ -13,7 +13,6 @@ const PermissionSetDetails = ({ permissionSetId }) => {
     const [notFound, setNotFound] = useState(false);
     const [error, setError] = useState(false);
     const countries = useSelector(state => state.countryReducer.countries);
-    // const dispatch = useDispatch();
     const nullValueToken = '--';
 
     const getPermissionDetails = async () => {
@@ -50,7 +49,6 @@ const PermissionSetDetails = ({ permissionSetId }) => {
     }
 
     useEffect(() => {
-        // dispatch(getCountries());
         getPermissionDetails();
     }, []);
 
