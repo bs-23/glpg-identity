@@ -123,7 +123,7 @@ const FaqForm = (props) => {
                                                 <Field className="form-control preference" type='text' name='question' id='question' />
                                                 <div className="invalid-feedback"><ErrorMessage name="question" /></div>
                                             </div>
-                                            <FormFieldFluid label="Select Service Categories" name="service_categories" required={false} >
+                                            <FormFieldFluid label="Categories" name="service_categories" required={false} >
                                                 <ToggleList
                                                     name="service_categories"
                                                     options={props.serviceCategory}
