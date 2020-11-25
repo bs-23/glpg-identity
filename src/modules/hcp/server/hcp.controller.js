@@ -1264,20 +1264,25 @@ async function updateHCPUserConsents(req, res) {
 }
 
 async function searchOkla(req, res) {
-    // codbase
+    //      codbase
     // in my contract
-    // method (phonetic, fuzzy)
+    //      method (phonetic, fuzzy)
     // duplicates
-    // first name
-    // last name
+    //      first name
+    //      last name
     // specialty
-    // address
-    // city
-    // post code
-    // onekey id
-    // individual identifier
+    //      address
+    //      city
+    //      post code
+    //      onekey id
+    //      individual identifier
     try {
         const { duplicates, isInContract, phonetic } = req.body;
+
+        if ((duplicates && typeof duplicates !== 'boolean')
+            || (phonetic && typeof phonetic !== 'boolean')
+            || (isInContract && typeof isInContract !== 'boolean'))
+            return res.status(400).send('Invalid request');
 
         const codbases = req.body.codbases && Array.isArray(req.body.codbases)
             ? req.body.codbases.filter(cb => 'string' === typeof cb)
@@ -1300,7 +1305,7 @@ async function searchOkla(req, res) {
             if (value) {
                 return {
                     name: fieldMap[key],
-                    method: 'EXACT',
+                    method: phonetic === true ? 'PHONETIC' : "FUZZY",
                     values: [value]
                 }
             }
@@ -1308,6 +1313,8 @@ async function searchOkla(req, res) {
 
         const queryObj = {
             entityType: 'activity',
+            isInContract,
+            duplicates,
             resultSize: 50,
             codBases: codbases,
             fields
