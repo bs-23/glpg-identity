@@ -48,6 +48,16 @@ const PermissionSetDetails = ({ permissionSetId }) => {
         return appNames.length ? appNames.join(', ') : nullValueToken;
     }
 
+    const getUsedInProfileNames = () => {
+        if(!permissionDetails || !permissionDetails.ps_up_ps || permissionDetails.ps_up_ps.length === 0) return [];
+        return permissionDetails.ps_up_ps.map(({profile}) => profile.title);
+    }
+
+    const getUsedInRoleNames = () => {
+        if(!permissionDetails || !permissionDetails.ps_role_ps || permissionDetails.ps_role_ps.length === 0) return [];
+        return permissionDetails.ps_role_ps.map(({role}) => role.title);
+    }
+
     useEffect(() => {
         getPermissionDetails();
     }, []);
@@ -56,7 +66,7 @@ const PermissionSetDetails = ({ permissionSetId }) => {
 
     if(error) return <WarningMessage message="Something went wrong." />
 
-    return <div className="profile-detail p-3 py-sm-4 px-sm-5 mb-3 mb-sm-0">
+    return <div className="profile-detail p-3 mb-3 mb-sm-0">
         <h2 className="profile-detail__name pb-3">{ permissionDetails && permissionDetails.title ? permissionDetails.title  : '' }</h2>
         <div className="profile-detail__row pb-0 pb-sm-2 d-block d-sm-flex">
             <div className="profile-detail__col pb-3 pr-0 pr-sm-3">
@@ -76,6 +86,25 @@ const PermissionSetDetails = ({ permissionSetId }) => {
             <div className="profile-detail__col pb-3">
                 <span className="mr-2 d-block profile-detail__label">Applications</span>
                 <span className="profile-detail__value">{getApplicationNames()}</span>
+            </div>
+        </div>
+        <div className="pb-0 pb-sm-2 d-block d-sm-flex">
+            
+            <div className="profile-detail__col pb-3">
+                <span className="mr-2 d-block profile-detail__label">Used in Profiles</span>
+                <span className="profile-detail__value">{
+                    getUsedInProfileNames().length
+                        ? getUsedInProfileNames().map(profileTitle => <div key={profileTitle}>{profileTitle}</div>)
+                        : nullValueToken
+                }</span>
+            </div>
+            <div className="profile-detail__col pb-3">
+                <span className="mr-2 d-block profile-detail__label">Used in Roles</span>
+                <span className="profile-detail__value">{
+                    getUsedInRoleNames().length
+                        ? getUsedInRoleNames().map(roleTitle => <div key={roleTitle}>{roleTitle}</div>)
+                        : nullValueToken
+                }</span>
             </div>
         </div>
         <div className="pb-0 pb-sm-2 d-block d-sm-flex">

@@ -4,7 +4,6 @@ import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
 import { useSelector, useDispatch } from "react-redux";
 import { useToasts } from "react-toast-notifications";
 import { permissionSetCreateSchema } from "../user.schema";
-// import { getCountries } from "../user.actions";
 
 
 const FormField = ({ label, name, type, children, required=true, ...rest }) => <div className="col-12 col-sm-6">
@@ -194,6 +193,16 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
         });
     }
 
+    const getUsedInProfileNames = () => {
+        if(!permissionSet || !permissionSet.ps_up_ps || permissionSet.ps_up_ps.length === 0) return [];
+        return permissionSet.ps_up_ps.map(({profile}) => profile.title);
+    }
+
+    const getUsedInRoleNames = () => {
+        if(!permissionSet || !permissionSet.ps_role_ps || permissionSet.ps_role_ps.length === 0) return [];
+        return permissionSet.ps_role_ps.map(({role}) => role.title);
+    }
+
     const handleSubmit = (values, actions) => {
         const { app_country_service, ...requestBody } = values;
         const promise = permissionSetId ? axios.put(`/api/permissionSets/${permissionSetId}`, values) : axios.post('/api/permissionSets', requestBody);
@@ -220,7 +229,6 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
     useEffect(() => {
         if(permissionSetId) getPermissionSet();
         getApplications();
-        // dispatch(getCountries());
         getServiceCategories();
     }, []);
 
@@ -267,6 +275,30 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
                                                             labelExtractor={item => item.title}
                                                         />
                                                     </FormFieldFluid>
+                                                    {permissionSetId &&
+                                                        <div className="col-12 py-2">
+                                                            <div className="row">
+                                                                <div className="col-12 col-sm-6">
+                                                                    <div className="form-group">
+                                                                        <div className="font-weight-bold">Used in Profiles</div>
+                                                                        {getUsedInProfileNames().length
+                                                                            ? getUsedInProfileNames().map(profile => <div key={profile}>{profile}</div>)
+                                                                            : <span>--</span>
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                                <div className="col-12 col-sm-6">
+                                                                    <div className="form-group">
+                                                                        <div className="font-weight-bold">Used in Roles</div>
+                                                                        {getUsedInRoleNames().length
+                                                                            ? getUsedInRoleNames().map(role => <div key={role}>{role}</div>)
+                                                                            : <span>--</span>
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    }
                                                     <FormFieldFluid label="Description" type="text" name="description" required={false} component="textarea" />
                                                     </div>
                                                     <ErrorMessage name="app_country_service" >{(message) => <div className="invalid-feedback alert alert-warning" >{message}</div>}</ErrorMessage>

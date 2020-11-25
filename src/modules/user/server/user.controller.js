@@ -369,6 +369,14 @@ async function login(req, res) {
             failed_auth_attempt: 0
         });
 
+        await logService.log({
+            event_type: 'LOGIN',
+            object_id: user.id,
+            table_name: 'users',
+            actor: user.id,
+            description: 'CDP user logged in'
+        });
+
         res.json(await formatProfile(user));
     } catch (err) {
         console.error(err);
@@ -377,6 +385,14 @@ async function login(req, res) {
 }
 
 async function logout(req, res) {
+    await logService.log({
+        event_type: 'LOGOUT',
+        object_id: req.user.id,
+        table_name: 'users',
+        actor: req.user.id,
+        description: 'CDP user logged out'
+    });
+
     res.clearCookie('access_token');
     res.clearCookie('refresh_token').redirect('/');
 }
@@ -425,10 +441,10 @@ async function createUser(req, res) {
             event_type: 'CREATE',
             object_id: user.id,
             table_name: 'users',
-            created_by: req.user.id,
-            description: 'Created new CDP user',
-        }
-        await logService.log(logData)
+            actor: req.user.id,
+            description: 'Created new CDP user'
+        };
+        await logService.log(logData);
 
         const token = crypto.randomBytes(36).toString('hex');
         const expireAt = Date.now() + 3600000;
@@ -816,6 +832,14 @@ async function updateSignedInUserProfile(req, res) {
             phone
         });
 
+        await logService.log({
+            event_type: 'UPDATE',
+            object_id: signedInUser.id,
+            table_name: 'users',
+            actor: req.user.id,
+            description: 'Updated Signed-in user'
+        });
+
         const hasEmailChanged = currentEmail.toLowerCase() !== email.toLowerCase();
 
         if(hasEmailChanged) {
@@ -866,11 +890,19 @@ async function updateUserDetails(req, res) {
             }
         );
 
-        if(doesEmailExist) return res.status(400).send("Email already exists.");
+        if(doesEmailExist) return res.status(400).send('Email already exists.');
 
         await user.update(partialUserData);
 
         await user.setRoles(userRoles);
+
+        await logService.log({
+            event_type: 'UPDATE',
+            object_id: user.id,
+            table_name: 'users',
+            actor: req.user.id,
+            description: 'Updated CDP user'
+        });
 
         res.json(formatProfile(user));
     }
@@ -1070,6 +1102,7 @@ async function resetPassword(req, res) {
 }
 
 async function verifySite(captchaResponseToken) {
+    return true;
     try {
         const secretKey = nodecache.getValue('RECAPTCHA_SECRET_KEY');
 

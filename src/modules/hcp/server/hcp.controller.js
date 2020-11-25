@@ -314,6 +314,14 @@ async function editHcp(req, res) {
         delete HcpUser.dataValues.created_by;
         delete HcpUser.dataValues.updated_by;
 
+        await logService.log({
+            event_type: 'UPDATE',
+            object_id: HcpUser.id,
+            table_name: 'hcp_profiles',
+            actor: req.user.id,
+            description: 'Updated HCP profile'
+        });
+
         response.data = HcpUser;
         res.json(response);
     } catch (err) {
@@ -599,6 +607,14 @@ async function createHcpProfile(req, res) {
             response.data.retention_period = '1 hour';
         }
 
+        await logService.log({
+            event_type: 'CREATE',
+            object_id: hcpUser.id,
+            table_name: 'hcp_profiles',
+            actor: req.user.id,
+            description: 'HCP user created'
+        });
+
         res.json(response);
     } catch (err) {
         console.error(err);
@@ -716,7 +732,7 @@ async function approveHCPUser(req, res) {
             event_type: 'UPDATE',
             object_id: hcpUser.id,
             table_name: 'hcp_profiles',
-            created_by: req.user.id,
+            actor: req.user.id,
             description: req.body.comment
         });
 
@@ -753,7 +769,7 @@ async function rejectHCPUser(req, res) {
             event_type: 'CREATE',
             object_id: hcpUser.id,
             table_name: 'hcp_archives',
-            created_by: req.user.id,
+            actor: req.user.id,
             description: req.body.comment
         });
 
@@ -1197,11 +1213,86 @@ async function getAccessToken(req, res) {
     }
 }
 
-async function searchOkla(req, res) {
+async function updateHCPUserConsents(req, res) {
+    const response = new Response({}, []);
+
     try {
+        const hcpUser = await Hcp.findOne({ where: { id: req.params.id } });
+
+        if (!hcpUser) {
+            response.errors.push(new CustomError('Invalid HCP User.', 400));
+        }
+
+        if(!req.body.consents) response.errors.push(new CustomError('consents are missing.', 400, 'consents'));
+
+        if (response.errors.length) {
+            return res.status(400).send(response);
+        }
+
+        if(req.body.consents && req.body.consents.length) {
+            await Promise.all(req.body.consents.map(async x => {
+                const consentId = Object.keys(x)[0];
+                const consentResponse = Object.values(x)[0];
+
+                const hcpConsent = await HcpConsents.findOne({ where: { user_id: hcpUser.id, consent_id: consentId } });
+
+                if(!hcpConsent || consentResponse) return;
+
+                if (hcpConsent && consentResponse === false) {
+                    hcpConsent.opt_type = 'opt-out';
+                    hcpConsent.consent_confirmed = false;
+                }
+
+                await hcpConsent.update({ opt_type: 'opt-out', consent_confirmed: false });
+            }));
+        }
+
+        response.data = {
+            id: req.params.id,
+            consents: await HcpConsents.findAll({
+                where: { user_id: req.params.id },
+                attributes: { exclude: ['created_by', 'updated_by'] }
+            })
+        };
+
+        res.json(response);
+    } catch (err) {
+        console.error(err);
+        response.errors.push(new CustomError('An error occurred. Please try again.', 500));
+        res.status(500).send(response);
+    }
+}
+
+async function searchOkla(req, res) {
+    // codbase
+    // in my contract
+    // method (phonetic, fuzzy)
+    // duplicates
+    // first name
+    // last name
+    // specialty
+    // address
+    // city
+    // post code
+    // onekey id
+    // individual identifier
+    try {
+        const { duplicates, isInContract, phonetic } = req.body;
+
+        const codbases = req.body.codbases && Array.isArray(req.body.codbases)
+            ? req.body.codbases.filter(cb => 'string' === typeof cb)
+            : null;
+
+        if (!codbases || !codbases.length) return res.status(400).send('Invalid Codbases.');
+
         const fieldMap = {
             firstName: 'individual.firstName',
-            lastName: 'individual.lastName'
+            lastName: 'individual.lastName',
+            address: 'address.dispatchLabel',
+            city: 'address.villageLabel',
+            postCode: 'address.longPostalCode',
+            onekeyId: 'activity.activityEid',
+            individualEid: 'individual.individualEid',
         }
 
         const fields = Object.keys(fieldMap).map(key => {
@@ -1215,19 +1306,17 @@ async function searchOkla(req, res) {
             }
         }).filter(field => field);
 
-
         const queryObj = {
             entityType: 'activity',
-            isoCod2: 'FR',
             resultSize: 50,
+            codBases: codbases,
             fields
         };
         const { response: searchResult } = await OklaService.search(queryObj);
         res.json(searchResult);
     } catch (err) {
         console.error(err);
-        response.errors.push(new CustomError('Internal server error', 500));
-        res.status(500).send(response);
+        res.status(500).send('Internal server error');
     }
 }
 
@@ -1245,4 +1334,5 @@ exports.confirmConsents = confirmConsents;
 exports.approveHCPUser = approveHCPUser;
 exports.rejectHCPUser = rejectHCPUser;
 exports.getHCPUserConsents = getHCPUserConsents;
+exports.updateHCPUserConsents = updateHCPUserConsents;
 exports.searchOkla = searchOkla;

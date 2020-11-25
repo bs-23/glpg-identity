@@ -19,16 +19,16 @@ const Audit = sequelize.cdpConnector.define('audits', {
     event_type: {
         allowNull: false,
         type: DataTypes.ENUM,
-        values: ['CREATE', 'DELETE', 'UPDATE']
+        values: ['CREATE', 'DELETE', 'UPDATE', 'LOGIN', 'LOGOUT']
     },
     object_id: {
         type: DataTypes.STRING
     },
     table_name: {
         type: DataTypes.ENUM,
-        values: ['users', 'hcp_profiles', 'consents', 'applications', 'personas', 'hcp_archives']
+        values: ['users', 'hcp_profiles', 'consents', 'applications', 'hcp_archives', 'permission_sets', 'roles', 'consent_countries', 'consent_categories']
     },
-    created_by: {
+    actor: {
         allowNull: false,
         type: DataTypes.UUID
     },
