@@ -29,7 +29,7 @@ const addValidationToSchema = (schema, columns) => {
     return modifiedSchema;
 }
 
-const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children, onSubmit, onDirtyChange, sortOn, sortType, ...props }) => {
+const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children, onSubmit, onDirtyChange, sortOn, sortType, singleRowEditing, ...props }) => {
     const [editingCell, setEditingCell] = useState(null);
     const [rawRows, setRawRows] = useState([]);
     const formikRef = useRef();
@@ -168,7 +168,7 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
         return updatedRows;
     }
 
-    const getUpdatedCells = (idProperty = 'id') => {
+    const getUpdatedCells = (mustIncludeProperties = ["id"]) => {
         if(!formikBag) return [];
 
         const initialValues = formikBag.initialValues.rows;
@@ -185,7 +185,7 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
                     hasRowChanged = true;
                     return;
                 }
-                if(key === idProperty) updatedCells[key] = currRow[key];
+                if(mustIncludeProperties.includes(key)) updatedCells[key] = currRow[key];
             });
 
             updatedCells._rowIndex = idx;
@@ -197,7 +197,7 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
 
         return updatedCellsOfRows;
     }
-
+    if(formikBag) console.log(formikBag)
     return <div className="shadow-sm bg-white table-responsive">
         <Formik
             initialValues={{ rows: rawRows }}
@@ -213,6 +213,7 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
                     getUpdatedCells,
                     ...formikProps
                 }
+
                 const dirty = formikProps.dirty;
 
                 if(onDirtyChange) setTimeout(() => {
@@ -231,6 +232,7 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
                                     rowIndex={index}
                                     editingCell={editingCell}
                                     formikProps={formikProps}
+                                    singleRowEditing={singleRowEditing}
                                     onCellBlur={handleCellBlur}
                                     onInputChange={handleInputChange}
                                     onCellSwitchToEdit={handleCellSwitchToEdit}

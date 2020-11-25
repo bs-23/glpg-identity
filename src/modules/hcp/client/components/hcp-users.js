@@ -18,17 +18,59 @@ import { ApprovalRejectSchema, HcpInlineEditSchema } from '../hcp.schema';
 import uuidAuthorities from '../uuid-authorities.json';
 import EditableTable from '../../../core/client/components/EditableTable/EditableTable';
 
+const SaveConfirmation = ({ show, onHideHandler, editableTableProps }) => {
+    const [comment, setComment] = useState("");
+
+    const handleSubmit = () => {
+        editableTableProps.submitForm();
+        onHideHandler();
+    }
+
+    return <Modal
+        show={show}
+        onHide={onHideHandler}
+        dialogClassName="modal-customize"
+        aria-labelledby="example-custom-modal-styling-title"
+        centered
+    >
+        <Modal.Header closeButton>
+            <Modal.Title id="example-custom-modal-styling-title">
+                Save confirmation
+            </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+            <div className="p-3">
+                <h4 className="font-weight-bold">Do you want to proceed?</h4>
+                <div>
+                    <div>
+                        <label className="font-weight-bold">Comment</label>
+                    </div>{console.log('Editable Table Props: ', editableTableProps)}
+                    <div>
+                        <textarea rows="4" cols="45" value={comment} onChange={(e) => setComment(e.target.value)} />
+                    </div>
+                    <button disabled={!comment} onClick={handleSubmit}> Update </button>
+                    {!comment && <div className="invalid-feedback">
+                        Must provide a comment.
+                    </div>}
+                </div>
+            </div>
+        </Modal.Body>
+    </Modal>
+}
+
 export default function hcpUsers() {
     const dispatch = useDispatch();
     const location = useLocation();
     const history = useHistory();
     const params = new URLSearchParams(window.location.search);
 
-    const [show, setShow] = useState({ profileManage: false, updateStatus: false });
+    const [show, setShow] = useState({ profileManage: false, updateStatus: false, saveConfirmation: false });
     const [currentUser, setCurrentUser] = useState({});
     const { addToast } = useToasts();
     const [sort, setSort] = useState({ type: 'ASC', value: null });
     const [showFilters, setShowFilters] = useState(true);
+    const [editableTableProps, setEditableTableProps] = useState({});
+
 
     const hcps = useSelector(state => state.hcpReducer.hcps);
     const specialties = useSelector(state => state.hcpReducer.specialties);
@@ -97,6 +139,12 @@ export default function hcpUsers() {
     const onManageProfile = (user) => {
         setShow({ ...show, profileManage: true });
         setCurrentUser(user);
+    }
+
+    const onTableRowSave = (user, tableProps) => {
+        setShow({ ...show, saveConfirmation: true });
+        setCurrentUser(user);
+        setEditableTableProps({ ...editableTableProps, ...tableProps });
     }
 
     const getCountryName = (country_iso2) => {
@@ -171,7 +219,7 @@ export default function hcpUsers() {
     }
 
     const submitHandler = ({ getUpdatedCells }, done) => {
-        const updatedCells = getUpdatedCells();
+        const updatedCells = getUpdatedCells(["id", "comment"]);
         axios.put('/api/hcp-profiles/update-hcps', updatedCells)
             .then(({data}) => {
                 addToast('Successfully saved changes.', {
@@ -217,7 +265,7 @@ export default function hcpUsers() {
             : <i className="icon icon-close-circle text-danger consent-not-given"> </i>
     }
 
-    const renderActions = ({ row, rowIndex, formikProps: { dirty } }) => {
+    const renderActions = ({ row, rowIndex, formikProps: { dirty, submitForm }, value, hasRowChanged, onChange }) => {
         return <span>
             <Dropdown className="ml-auto dropdown-customize">
                 <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
@@ -225,6 +273,7 @@ export default function hcpUsers() {
                 <Dropdown.Menu>
                     <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(hcps.users[rowIndex])}>Profile</Dropdown.Item></LinkContainer>
                     {row.status === 'not_verified' && <LinkContainer disabled={dirty} to="#"><Dropdown.Item onClick={() => onUpdateStatus(hcps.users[rowIndex])}>Manage Status</Dropdown.Item></LinkContainer>}
+                    <LinkContainer to="#"><Dropdown.Item disabled={!hasRowChanged} onClick={() => onTableRowSave(hcps.users[rowIndex], {submitForm, value, onChange, rowIndex})}>Save</Dropdown.Item></LinkContainer>
                 </Dropdown.Menu>
             </Dropdown>
         </span>
@@ -602,6 +651,13 @@ export default function hcpUsers() {
                                 </Modal.Body>
 
                             </Modal>
+
+                            <SaveConfirmation
+                                show={show.saveConfirmation}
+                                onHideHandler={() => { setShow({ ...show, saveConfirmation: false }) }}
+                                editableTableProps={editableTableProps}
+                            />
+
                             {/* {hcps['users'] && hcps['users'].length > 0 &&
                                 <React.Fragment>
                                     <div className="shadow-sm bg-white table-responsive">
@@ -681,6 +737,7 @@ export default function hcpUsers() {
                                         sortType={sort.type}
                                         onSubmit={submitHandler}
                                         schema={HcpInlineEditSchema}
+                                        singleRowEditing={true}
                                         onDirtyChange={handleTableDirtyStatusChange}
                                         enableReinitialize
                                     >

@@ -31,8 +31,8 @@ const BackendErrorMessage = ({ name }) => (
     </Field>
 )
 
-const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCell, formikProps, onInputChange, onInputKeyDown }) => {
-    const { handleBlur, handleChange, initialValues, values } = formikProps;
+const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCell, formikProps, singleRowEditing, onInputChange, onInputKeyDown }) => {
+    const { handleBlur, handleChange, initialValues, values, dirty } = formikProps;
 
     const isCellInvalid = (name) => {
         const feError = getIn(formikProps.errors, name);
@@ -59,11 +59,25 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
         }
     }
 
+    const hasRowChanged = () => {
+        const rowInitValue = initialValues.rows[rowIndex];
+        const rowValues = values.rows[rowIndex];
+
+        let hasBeenChanged = false;
+
+        columns.map(({id}) => {
+            if(rowInitValue[id] !== rowValues[id]) hasBeenChanged = true;
+        })
+
+        return hasBeenChanged;
+    }
+
     const renderRow = () => columns.map((column, colIndex) => {
         const { fieldType, customizeCellContent, onChangeAction, customCell: CustomCell, key } = column;
 
         const currentCellValue = row[column.id];
         const inputName = `rows[${rowIndex}].${column.id}`;
+        const rowChangeStatus = hasRowChanged();
 
         const customCellValue = customizeCellContent
             ? customizeCellContent(currentCellValue, row, formikProps, callbackProps)
@@ -75,7 +89,8 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
 
         const callbackProps = {
             rowIndex,
-            columnID: column.id
+            columnID: column.id,
+            hasRowChanged: rowChangeStatus
         }
 
         const handleOnBlur = e => {
@@ -84,6 +99,12 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
         };
 
         const handleInputKeyDown = e => onInputKeyDown(e, handleOnBlur);
+
+        const shouldBeEditable = typeof column.editable === 'function'
+            ? column.editable(row, formikProps)
+            : singleRowEditing && dirty
+                ? rowChangeStatus && column.editable
+                : column.editable;
 
         return <React.Fragment key={key || inputName}>
             <td
@@ -105,16 +126,20 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
                     : CustomCell
                         ? <CustomCell
                             value={customOrCurrentCellValue}
-                            editable={column.editable}
+                            editable={shouldBeEditable}
                             onSwitchToEditMode={e => onCellSwitchToEdit(rowIndex, colIndex, e)}
                             row={row}
                             rowIndex={rowIndex}
                             columnID={column.id}
                             formikProps={formikProps}
+                            hasRowChanged={rowChangeStatus}
+                            onBlur={handleOnBlur}
+                            onChange={e => onInputChange(e, handleChange)}
+                            onKeyDown={handleInputKeyDown}
                         />
                         : <Cell
                             value={customOrCurrentCellValue}
-                            editable={column.editable}
+                            editable={shouldBeEditable}
                             onSwitchToEditMode={e => onCellSwitchToEdit(rowIndex, colIndex, e)}
                             row={row}
                         />
