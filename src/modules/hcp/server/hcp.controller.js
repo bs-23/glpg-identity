@@ -321,6 +321,14 @@ async function editHcp(req, res) {
         delete HcpUser.dataValues.created_by;
         delete HcpUser.dataValues.updated_by;
 
+        await logService.log({
+            event_type: 'UPDATE',
+            object_id: HcpUser.id,
+            table_name: 'hcp_profiles',
+            actor: req.user.id,
+            description: 'Updated HCP profile'
+        });
+
         response.data = HcpUser;
         res.json(response);
     } catch (err) {
@@ -757,6 +765,14 @@ async function createHcpProfile(req, res) {
             response.data.retention_period = '1 hour';
         }
 
+        await logService.log({
+            event_type: 'CREATE',
+            object_id: hcpUser.id,
+            table_name: 'hcp_profiles',
+            actor: req.user.id,
+            description: 'HCP user created'
+        });
+
         res.json(response);
     } catch (err) {
         console.error(err);
@@ -874,7 +890,7 @@ async function approveHCPUser(req, res) {
             event_type: 'UPDATE',
             object_id: hcpUser.id,
             table_name: 'hcp_profiles',
-            created_by: req.user.id,
+            actor: req.user.id,
             description: req.body.comment
         });
 
@@ -911,7 +927,7 @@ async function rejectHCPUser(req, res) {
             event_type: 'CREATE',
             object_id: hcpUser.id,
             table_name: 'hcp_archives',
-            created_by: req.user.id,
+            actor: req.user.id,
             description: req.body.comment
         });
 
