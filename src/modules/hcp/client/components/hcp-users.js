@@ -20,10 +20,18 @@ import EditableTable from '../../../core/client/components/EditableTable/Editabl
 
 const SaveConfirmation = ({ show, onHideHandler, editableTableProps }) => {
     const [comment, setComment] = useState("");
+    const [touched, setTouched] = useState(false);
+
+    const { getUpdatedCells, row } = editableTableProps;
 
     const handleSubmit = () => {
-        editableTableProps.submitForm();
+        console.log('Submitting: ', row, comment);
+        console.log('Get Updated Cels: ', getUpdatedCells());
         onHideHandler();
+    }
+
+    const handleOnBlur = () => {
+        setTouched(true);
     }
 
     return <Modal
@@ -46,12 +54,12 @@ const SaveConfirmation = ({ show, onHideHandler, editableTableProps }) => {
                         <label className="font-weight-bold">Comment</label>
                     </div>{console.log('Editable Table Props: ', editableTableProps)}
                     <div>
-                        <textarea rows="4" cols="45" value={comment} onChange={(e) => setComment(e.target.value)} />
+                        <textarea rows="4" cols="45" value={comment} onBlur={handleOnBlur} onChange={(e) => setComment(e.target.value)} />
                     </div>
-                    <button disabled={!comment} onClick={handleSubmit}> Update </button>
-                    {!comment && <div className="invalid-feedback">
+                    {!comment && touched && <div className="invalid-feedback">
                         Must provide a comment.
                     </div>}
+                    <button disabled={!comment} onClick={handleSubmit}> Update </button>
                 </div>
             </div>
         </Modal.Body>
@@ -70,7 +78,6 @@ export default function hcpUsers() {
     const [sort, setSort] = useState({ type: 'ASC', value: null });
     const [showFilters, setShowFilters] = useState(true);
     const [editableTableProps, setEditableTableProps] = useState({});
-
 
     const hcps = useSelector(state => state.hcpReducer.hcps);
     const specialties = useSelector(state => state.hcpReducer.specialties);
@@ -265,17 +272,26 @@ export default function hcpUsers() {
             : <i className="icon icon-close-circle text-danger consent-not-given"> </i>
     }
 
-    const renderActions = ({ row, rowIndex, formikProps: { dirty, submitForm }, value, hasRowChanged, onChange }) => {
+    const renderActions = ({ row, rowIndex, formikProps, hasRowChanged, editableTableProps }) => {
+        const { getUpdatedCells } = editableTableProps;
+        const { dirty, submitForm, resetForm } = formikProps;
+
         return <span>
-            <Dropdown className="ml-auto dropdown-customize">
+            {!hasRowChanged && <Dropdown className="ml-auto dropdown-customize">
                 <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                     <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(hcps.users[rowIndex])}>Profile</Dropdown.Item></LinkContainer>
                     {row.status === 'not_verified' && <LinkContainer disabled={dirty} to="#"><Dropdown.Item onClick={() => onUpdateStatus(hcps.users[rowIndex])}>Manage Status</Dropdown.Item></LinkContainer>}
-                    <LinkContainer to="#"><Dropdown.Item disabled={!hasRowChanged} onClick={() => onTableRowSave(hcps.users[rowIndex], {submitForm, value, onChange, rowIndex})}>Save</Dropdown.Item></LinkContainer>
+                    <LinkContainer to="#"><Dropdown.Item disabled={!hasRowChanged} onClick={() => onTableRowSave(hcps.users[rowIndex], {submitForm, getUpdatedCells, row})}>Save</Dropdown.Item></LinkContainer>
                 </Dropdown.Menu>
-            </Dropdown>
+            </Dropdown>}
+            {hasRowChanged &&
+                <>
+                    <button classNames="btn cdp-btn-outline-secondary btn-sm text-white" onClick={resetForm}><i class="fas fa-times-circle mr-1"></i> Reset</button>
+                    <button classNames="btn cdp-btn-secondary ml-2 btn-sm text-white" onClick={submitForm} disabled={!dirty}><i class="fas fa-check-circle mr-1"></i>Save Changes</button>
+                </>
+            }
         </span>
     }
 

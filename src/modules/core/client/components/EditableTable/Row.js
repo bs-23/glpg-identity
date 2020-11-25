@@ -31,7 +31,7 @@ const BackendErrorMessage = ({ name }) => (
     </Field>
 )
 
-const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCell, formikProps, singleRowEditing, onInputChange, onInputKeyDown }) => {
+const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCell, formikProps, singleRowEditing, onInputChange, onInputKeyDown, editableTableProps }) => {
     const { handleBlur, handleChange, initialValues, values, dirty } = formikProps;
 
     const isCellInvalid = (name) => {
@@ -72,12 +72,13 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
         return hasBeenChanged;
     }
 
+    const rowChangeStatus = hasRowChanged();
+
     const renderRow = () => columns.map((column, colIndex) => {
         const { fieldType, customizeCellContent, onChangeAction, customCell: CustomCell, key } = column;
 
         const currentCellValue = row[column.id];
         const inputName = `rows[${rowIndex}].${column.id}`;
-        const rowChangeStatus = hasRowChanged();
 
         const customCellValue = customizeCellContent
             ? customizeCellContent(currentCellValue, row, formikProps, callbackProps)
@@ -133,9 +134,7 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
                             columnID={column.id}
                             formikProps={formikProps}
                             hasRowChanged={rowChangeStatus}
-                            onBlur={handleOnBlur}
-                            onChange={e => onInputChange(e, handleChange)}
-                            onKeyDown={handleInputKeyDown}
+                            editableTableProps={editableTableProps}
                         />
                         : <Cell
                             value={customOrCurrentCellValue}
@@ -154,7 +153,7 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
         </React.Fragment>
     })
 
-    return columns && row && <tr>
+    return columns && row && <tr className={singleRowEditing && rowChangeStatus ? 'edited' : ''}>
         {renderRow()}
     </tr>;
 }

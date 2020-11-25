@@ -237,6 +237,7 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
                                     onInputChange={handleInputChange}
                                     onCellSwitchToEdit={handleCellSwitchToEdit}
                                     onInputKeyDown={handleInputKeyDown}
+                                    editableTableProps={{ getUpdatedRows, getUpdatedCells }}
                                 />
                             )}
                         </tbody>
