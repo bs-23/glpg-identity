@@ -54,7 +54,7 @@ const UserManagement = () => {
                                             <i className="icon icon-role icon-3x icon-3x cdp-list-group__icon"></i>
                                             <span>
                                                 <strong className="mb-2 h4 d-block cdp-list-group__link-title">Manage Permission Sets</strong>
-                                                <span className="d-block cdp-list-group__link-description">Manage permission sets and permissions</span>
+                                                <span className="d-block cdp-list-group__link-description">Assign rights to Permission Set</span>
                                                 <span className="d-block cdp-list-group__link-activity">5 - 7 minutes</span>
                                             </span>
                                         </NavLink>

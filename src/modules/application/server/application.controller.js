@@ -165,7 +165,7 @@ async function saveData(req, res) {
 async function getData(req, res) {
     const response = new Response({}, []);
     try{
-        doc = await Data.findOne({
+        const doc = await Data.findOne({
             where: { id: req.params.id },
             include: {
                 model: Application,

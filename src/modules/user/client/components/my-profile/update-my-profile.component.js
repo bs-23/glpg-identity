@@ -131,7 +131,7 @@ const UpdateMyProfile = () => {
             const matchedCountry = countries[selectedCountryCode];
             let countryCodeForPhoneNumber = '';
             if(matchedCountry) countryCodeForPhoneNumber = CountryCodesObject[matchedCountry.country_iso2];
-            const phone = values.phone ? countryCodeForPhoneNumber + values.phone : '';
+            const phone = values.phone ? countryCodeForPhoneNumber + values.phone : null;
 
             delete values.isCountryFlagActive;
 

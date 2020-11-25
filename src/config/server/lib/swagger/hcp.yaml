@@ -240,7 +240,7 @@ paths:
                 - name: id
                   in: path
                   required: true
-                  description: the user identifier, as id
+                  description: the user identifier
                   schema:
                     type: string
             responses:
@@ -271,7 +271,7 @@ paths:
                 - name: id
                   in: path
                   required: true
-                  description: the user identifier, as id
+                  description: the user identifier
                   schema:
                     type: string
             requestBody:
@@ -307,6 +307,55 @@ paths:
                         applicaiton/json:
                             schema:
                                 $ref: "#/components/schemas/errorResponse"
+
+    /api/hcp-profiles/{id}/consents:
+            put:
+                tags:
+                    - hcp-profiles
+                summary: Update consents of an HCP user.
+                parameters:
+                    - name: id
+                      in: path
+                      required: true
+                      description: the user identifier
+                      schema:
+                        type: string
+                requestBody:
+                    required: true
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    consents:
+                                        type: array
+                                        items:
+                                            type: object
+                                            description: Key value pair of consent id and answer
+                                            example: { consent_id: true/false }
+                responses:
+                    200:
+                        description: The request has succeeded.
+                        content:
+                            application/json:
+                                schema:
+                                    type: object
+                                    properties:
+                                        id:
+                                            type: string
+                                        consents:
+                                            type: array
+                                            items:
+                                                type: object
+                                                description: Key value pair of consent id and answer
+                                                example: { consent_id: true/false }
+
+                    400:
+                        description: Bad request
+                        content:
+                            applicaiton/json:
+                                schema:
+                                    $ref: "#/components/schemas/errorResponse"
 
     /api/hcp-profiles/specialties:
         get:

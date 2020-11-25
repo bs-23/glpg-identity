@@ -16,9 +16,6 @@ module.exports = app => {
     app.route('/api/get-all-process-activities')
         .get(CDPAuthStrategy, controller.getAllProcessActivities);
 
-    app.route('/api/get-all-opt-types')
-        .get(CDPAuthStrategy, controller.getAllOptTypes);
-
     app.route('/api/consents/:id')
         .get(CDPAuthStrategy, controller.getUserConsents);
 

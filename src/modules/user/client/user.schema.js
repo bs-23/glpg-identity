@@ -43,7 +43,7 @@ export const loginSchema = object().shape({
         .email('This field should be a valid email address')
         .required('This field must not be empty'),
     password: string().required('This field must not be empty'),
-    // recaptchaToken: string().nullable().required('Captcha verification required')
+    recaptchaToken: string().nullable().required('Captcha verification required')
 });
 
 export const registerSchema = object().shape({
@@ -192,7 +192,7 @@ export const updateMyProfileSchema = object().shape({
         otherwise: string().matches(/^[+0-9]*$/, 'This field only contains digits or plus')
             .min(7, 'This field must be at least 7 characters long')
             .test('is-length-valid', `This field must be at most ${PHONE_MAX_LENGTH} characters long`, phone => {
-                return phone.length <= PHONE_MAX_LENGTH;
+                return !phone || phone.length <= PHONE_MAX_LENGTH;
             })
     })
 });

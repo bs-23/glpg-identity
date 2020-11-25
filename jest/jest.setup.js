@@ -27,6 +27,7 @@ module.exports = async function() {
     require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
     require(path.join(process.cwd(), 'src/modules/core/server/password/password-history.model'));
     require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-archives.model.js'));
+    require(path.join(process.cwd(), 'src/modules/application/server/data.model.js'));
 
     const PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permission-set.model.js"));
     const ServiceCategory = require(path.join(process.cwd(), "src/modules/user/server/permission/service-category.model.js"));
