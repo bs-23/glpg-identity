@@ -35,6 +35,7 @@
         border-bottom: 1px solid rgba(0, 0, 0, 0.125) !important;
         position: relative;
         overflow: hidden;
+        z-index: 2;
 
         &-header {
             font-weight: 600;
@@ -64,6 +65,42 @@
                 transform: rotate(180deg)
             }
         }
+    }
+}
+.faq {
+    .fa-compress {
+        display: none;
+    }
+
+    &-expand {
+        position: absolute;
+        left: 15px;
+        width: calc(100% - 30px);
+        height: calc(100% - 32px) !important;
+
+        .fa-compress {
+            display: inline-block;
+        }
+
+        .fa-expand {
+            display: none !important;
+        }
+    }
+
+    &-body {
+        position: relative;
+    }
+
+    &:after {
+        content: "";
+        display: block;
+        width: 131px;
+        height: 215px;
+        background: url(/assets/images/question.svg) no-repeat;
+        right: 50px;
+        position: absolute;
+        bottom: 50px;
+        z-index: 1;
     }
 }
 

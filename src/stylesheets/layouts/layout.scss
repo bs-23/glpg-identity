@@ -17,4 +17,10 @@
     flex: 1;
     display: flex;
     position: relative;
+
+    &-panel {
+        &-right {
+            position: inherit;
+        }
+    }
 }

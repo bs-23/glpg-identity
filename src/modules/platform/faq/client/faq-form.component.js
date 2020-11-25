@@ -16,13 +16,13 @@ const FaqForm = (props) => {
         props.changeShow(false);
     };
 
-    const FormFieldFluid = ({ label, name, type, children, required = true, ...rest }) => <div className="col-12">
+    const FormFieldFluid = ({ label, name, type, children, required = true, ...rest }) => 
         <div className="form-group">
             <label className="font-weight-bold" htmlFor="last_name">{label}{required && <span className="text-danger">*</span>}</label>
             {children || <Field className="form-control" type={type} name={name} {...rest} />}
             <div className="invalid-feedback"><ErrorMessage name={name} /></div>
         </div>
-    </div>
+    
 
     const ToggleList = ({ name, options, labelExtractor, idExtractor, allOptionID }) => {
         const isChecked = (id, arrayHelpers) => arrayHelpers.form.values[name].includes(id);
@@ -86,7 +86,7 @@ const FaqForm = (props) => {
     };
 
     return (
-        <Modal centered show={props.show} onHide={handleClose}>
+        <Modal size="lg" centered show={props.show} onHide={handleClose}>
             <Modal.Header closeButton>
                 <Modal.Title className="modal-title_small">{props.editable ? 'Edit FAQ' : 'Add New FAQ'}</Modal.Title>
             </Modal.Header>
@@ -123,7 +123,7 @@ const FaqForm = (props) => {
                                                 <Field className="form-control preference" type='text' name='question' id='question' />
                                                 <div className="invalid-feedback"><ErrorMessage name="question" /></div>
                                             </div>
-                                            <FormFieldFluid label="Select Service Categories" name="service_categories" required={false} >
+                                            <FormFieldFluid label="Categories" name="service_categories" required={false} >
                                                 <ToggleList
                                                     name="service_categories"
                                                     options={props.serviceCategory}
