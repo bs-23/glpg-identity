@@ -13,7 +13,7 @@ const SearchHcp = () => {
                     <div className="col-12 px-0 px-sm-3">
                         <div className="shadow-sm bg-light pb-3">
                             <h2 className="d-flex align-items-center p-3 px-sm-3 py-sm-3 page-title light">
-                                <span className="page-title__text font-weight-bold">OKLA Serach</span>
+                                <span className="page-title__text font-weight-bold">OKLA Search</span>
                             </h2>
                             <div className="add-user mx-3 mt-0 p-3 bg-white rounded border">
                             <Formik
@@ -133,6 +133,48 @@ const SearchHcp = () => {
                                     </Form>
                                 )}
                             </Formik>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col-12">
+                        <div className="my-3">
+                            <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
+                                <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Search Result</h4>
+                                <div className="d-flex justify-content-between align-items-center">
+                                    <span className="mr-2"><i className="fas fa-check cdp-text-primary"></i> Valid</span>
+                                    <span><i className="fas fa-times cdp-text-secondary"></i> Invalid</span>
+                                </div>
+                            </div>
+                            <div className="table-responsive shadow-sm bg-white">
+                                <table className="table table-hover table-sm mb-0 cdp-table">
+                                    <thead className="cdp-bg-primary text-white cdp-table__header">
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Speciality</th>
+                                            <th>Workplace</th>
+                                            <th>Onekey ID</th>
+                                            <th>Individual - Identifier</th>
+                                            <th>Conuntry</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="cdp-table__body bg-white">
+                                        <tr>
+                                            <td>David Alian</td>
+                                            <td>
+                                                <div className="currentWorkplace"><i className="fas fa-check mr-1 cdp-text-primary"></i> IBN sina, Dhaka</div>
+                                                <div className="previousWorkplace"><i className="fas fa-times mr-1 cdp-text-secondary"></i> Popular, Dhaka</div>
+                                            </td>
+                                            <td>Dentist</td>
+                                            <td>551255</td>
+                                            <td>564564565</td>
+                                            <td>Belgium</td>
+                                            <td>Detail</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
