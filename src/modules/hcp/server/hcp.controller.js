@@ -775,18 +775,19 @@ async function getHcpProfile(req, res) {
 
         response.data = getHcpViewModel(doc.dataValues);;
 
-        const userConsents = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id', 'consent_confirmed', 'opt_type', 'updated_at'] });
-
-        if (!userConsents) {
-            response.data = { ...response.data, consents: [] };
-            return res.json(response);
-        }
-
-        const userConsentDetails = await ConsentLocale.findAll({
+        const userConsents = await HcpConsents.findAll({
+            where: { user_id: doc.id },
             include: {
                 model: Consent,
                 as: 'consent'
-            }, where: {
+            },
+            attributes: ['consent_id', 'consent_confirmed', 'opt_type', 'updated_at']
+        });
+
+        if (!userConsents) return res.json([]);
+
+        const userConsentDetails = await ConsentLocale.findAll({
+            where: {
                 consent_id: userConsents.map(consent => consent.consent_id),
                 locale: {
                     [Op.iLike]: `%${doc.locale}`
@@ -794,21 +795,22 @@ async function getHcpProfile(req, res) {
             }, attributes: ['consent_id', 'rich_text']
         });
 
-
-        const consentResponse = userConsentDetails.map(({
-            consent_id: id,
-            rich_text,
-            consent: { preference }
-        }) => ({ id, preference, rich_text: validator.unescape(rich_text) }));
-
         response.data = {
             ...response.data,
-            consents: consentResponse.map(conRes => {
-                const matchedConsent = userConsents.find(consent => consent.consent_id === conRes.id);
-                conRes.consent_given_time = matchedConsent ? matchedConsent.updated_at : null;
-                conRes.opt_type = matchedConsent ? matchedConsent.opt_type : null;
-                conRes.consent_given = matchedConsent ? matchedConsent.consent_confirmed ? true : false : null;
-                return conRes;
+            consents: userConsents.map(userConsent => {
+                const localization = userConsentDetails && userConsentDetails.length
+                    ? userConsentDetails.find(ucd => ucd.consent_id === userConsent.consent_id)
+                    : { rich_text: 'Localized text not found for this consent.' };
+
+                const consentData = {
+                    consent_given: userConsent.consent_confirmed,
+                    consent_given_time: userConsent.updated_at,
+                    id: userConsent.consent_id,
+                    opt_type: userConsent.opt_type,
+                    preference: userConsent.consent.preference,
+                    rich_text: validator.unescape(localization.rich_text)
+                }
+                return consentData;
             })
         };
 
@@ -854,27 +856,20 @@ async function getHCPUserConsents(req, res) {
             }, attributes: ['consent_id', 'rich_text']
         });
 
-
-        const consentResponse = userConsents.map(({
-            consent_id: id,
-            consent: { preference }
-        }) => {
+        response.data = userConsents.map(userConsent => {
             const localization = userConsentDetails && userConsentDetails.length
-                ? userConsentDetails.find(ucd => ucd.consent_id === id)
+                ? userConsentDetails.find(ucd => ucd.consent_id === userConsent.consent_id)
                 : { rich_text: 'Localized text not found for this consent.' };
-            return {
-                id,
-                preference,
-                rich_text: validator.unescape(localization.rich_text)
-            };
-        });
 
-        response.data = consentResponse.map(conRes => {
-            const matchedConsent = userConsents.find(consent => consent.consent_id === conRes.id);
-            conRes.consent_given_time = matchedConsent ? matchedConsent.updated_at : null;
-            conRes.opt_type = matchedConsent ? matchedConsent.opt_type : null;
-            conRes.consent_given = matchedConsent ? matchedConsent.consent_confirmed ? true : false : null;
-            return conRes;
+            const consentData = {
+                consent_given: userConsent.consent_confirmed,
+                consent_given_time: userConsent.updated_at,
+                id: userConsent.consent_id,
+                opt_type: userConsent.opt_type,
+                preference: userConsent.consent.preference,
+                rich_text: validator.unescape(localization.rich_text)
+            }
+            return consentData;
         });
 
         res.json(response);
