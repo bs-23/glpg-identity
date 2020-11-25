@@ -21,7 +21,11 @@ export default function reducer(state = initialState, action) {
 
     switch (action.type) {
         case Types.POST_FAQ_ITEM_FULFILLED: {
-            return { ...state, faq_item: action.payload.data };
+            return {
+                ...state,
+                faq_item: action.payload.data,
+                faq_items: [...state.faq_items, action.payload.data]
+            };
         }
     }
 

@@ -4,15 +4,17 @@ import FaqForm from './faq-form.component';
 import axios from "axios";
 import { getFaqItems } from './faq.actions';
 import { useSelector, useDispatch } from 'react-redux';
+import parse from 'html-react-parser';
+import Dropdown from 'react-bootstrap/Dropdown';
 
 export default function ManageFaq() {
     const [show, setShow] = useState(false);
     const faqData = useSelector(state => state.faqReducer.faq_items);
     const [serviceCategory, setServiceCategory] = useState(false);
-
+    const dispatch = useDispatch();
 
     useEffect(() => {
-
+        dispatch(getFaqItems());
         async function getServiceCategory() {
             const response = (await axios.get('/api/serviceCategories')).data;
             setServiceCategory(response);
@@ -45,6 +47,44 @@ export default function ManageFaq() {
                                 <FaqForm serviceCategory={serviceCategory} changeShow={(val) => setShow(val)} show={show} />
                             </div>
                         </div>
+
+                        {faqData && faqData.length > 0 && serviceCategory && serviceCategory.length > 0 &&
+                            <div className="table-responsive shadow-sm bg-white">
+                                <table className="table table-hover table-sm mb-0 cdp-table">
+                                    <thead className="cdp-bg-primary text-white cdp-table__header">
+                                        <tr>
+                                            <th>Questions</th>
+                                            <th>Answers</th>
+                                            <th>Category</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="cdp-table__body bg-white">
+                                        {faqData.map((row, index) => (
+                                            <tr key={index}>
+                                                <td>{row.question}</td>
+                                                <td>{parse(row.answer)}</td>
+                                                <td>{row.service_categories && row.service_categories.map((item, key) => (
+                                                    (serviceCategory.find(x => x.id === item).title) + (key < row.service_categories.length - 1 ? ',' : '')
+
+                                                ))
+                                                }</td>
+                                                <td><Dropdown className="ml-auto dropdown-customize">
+                                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
+                                                    </Dropdown.Toggle>
+                                                    <Dropdown.Menu>
+                                                        <Dropdown.Item>
+                                                            Edit
+                                                        </Dropdown.Item>
+                                                        <Dropdown.Item>Delete</Dropdown.Item>
+                                                    </Dropdown.Menu>
+                                                </Dropdown></td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>

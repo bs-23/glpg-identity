@@ -12,6 +12,7 @@ export function fetchFaqItem(id) {
 }
 
 export function getFaqItems() {
+    console.log("hi");
     return {
         type: Types.GET_FAQ_ITEMS,
         payload: axios({
