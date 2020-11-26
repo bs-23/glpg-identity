@@ -61,7 +61,22 @@ async function updateFaqItem(req, res) {
     }
 }
 
-async function deleteFaqItem(req, res) { }
+async function deleteFaqItem(req, res) {
+    try {
+        const id = req.params.id;
+
+        if (!id) {
+            return res.status(400).send('Invalid request.');
+        }
+
+        await Faq.destroy({ where: { id } });
+        res.sendStatus(200);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
 
 exports.getFaqItem = getFaqItem;
 exports.getFaqItems = getFaqItems;

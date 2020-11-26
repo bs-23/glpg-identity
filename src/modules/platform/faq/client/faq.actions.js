@@ -12,7 +12,6 @@ export function fetchFaqItem(id) {
 }
 
 export function getFaqItems() {
-    console.log("hi");
     return {
         type: Types.GET_FAQ_ITEMS,
         payload: axios({
@@ -40,6 +39,16 @@ export function editFaqItem(data, id) {
             method: 'patch',
             url: `/api/faq/${id}`,
             data
+        })
+    };
+}
+
+export function deleteFaqItem(id) {
+    return {
+        type: Types.DELETE_FAQ_ITEM,
+        payload: axios({
+            method: 'delete',
+            url: `/api/faq/${id}`
         })
     };
 }

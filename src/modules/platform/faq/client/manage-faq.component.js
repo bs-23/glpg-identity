@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import FaqForm from './faq-form.component';
 import axios from "axios";
-import { getFaqItems } from './faq.actions';
+import { getFaqItems, deleteFaqItem } from './faq.actions';
 import { useSelector, useDispatch } from 'react-redux';
 import parse from 'html-react-parser';
 import Dropdown from 'react-bootstrap/Dropdown';
+import Modal from 'react-bootstrap/Modal';
+import { useToasts } from 'react-toast-notifications';
 
 export default function ManageFaq() {
     const [show, setShow] = useState(false);
@@ -13,7 +15,26 @@ export default function ManageFaq() {
     const [serviceCategory, setServiceCategory] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [editData, setEditData] = useState(null);
+    const [showDelete, setShowDelete] = useState(false);
+    const [deleteId, setDeleteId] = useState(false);
+    const { addToast } = useToasts();
     const dispatch = useDispatch();
+
+    const deleteFaq = () => {
+        dispatch(deleteFaqItem(deleteId)).then(() => {
+            addToast('FAQ deleted successfully', {
+                appearance: 'success',
+                autoDismiss: true
+            });
+            setShowDelete(false);
+        }).catch(error => {
+            addToast(error.response.data, {
+                appearance: 'error',
+                autoDismiss: true
+            });
+        });
+
+    }
 
     useEffect(() => {
         dispatch(getFaqItems());
@@ -77,7 +98,7 @@ export default function ManageFaq() {
                                                         <Dropdown.Item onClick={() => { setShow(true); setEditMode(true); setEditData(row); }}>
                                                             Edit
                                                         </Dropdown.Item>
-                                                        <Dropdown.Item>Delete</Dropdown.Item>
+                                                        <Dropdown.Item onClick={() => { setShowDelete(true); setDeleteId(row.id); }}>Delete</Dropdown.Item>
                                                     </Dropdown.Menu>
                                                 </Dropdown></td>
                                             </tr>
@@ -87,6 +108,20 @@ export default function ManageFaq() {
                             </div>
                         }
                         <FaqForm editMode={editMode} editData={editData} serviceCategory={serviceCategory} changeShow={(val) => setShow(val)} show={show} />
+                        <Modal centered show={showDelete} onHide={() => setShowDelete(false)}>
+                            <Modal.Header closeButton>
+                                <Modal.Title className="modal-title_small">Remove FAQ</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <div>
+                                    Are you sure you want to remove this FAQ?
+                                    </div>
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <button className="btn cdp-btn-outline-primary" onClick={() => setShowDelete(false)}>Cancel</button>
+                                <button className="ml-2 btn cdp-btn-secondary text-white" onClick={() => deleteFaq()}>Confirm</button>
+                            </Modal.Footer>
+                        </Modal>
                     </div>
                 </div>
             </div>

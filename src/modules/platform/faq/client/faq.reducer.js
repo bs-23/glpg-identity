@@ -10,16 +10,12 @@ export default function reducer(state = initialState, action) {
         case Types.GET_FAQ_ITEM_FULFILLED: {
             return { ...state, faq_item: action.payload.data };
         }
-    }
 
-    switch (action.type) {
         case Types.GET_FAQ_ITEMS_FULFILLED: {
             console.log(action.payload.data);
             return { ...state, faq_items: action.payload.data };
         }
-    }
 
-    switch (action.type) {
         case Types.POST_FAQ_ITEM_FULFILLED: {
             return {
                 ...state,
@@ -27,9 +23,7 @@ export default function reducer(state = initialState, action) {
                 faq_items: [...state.faq_items, action.payload.data]
             };
         }
-    }
 
-    switch (action.type) {
         case Types.PUT_FAQ_ITEM_FULFILLED: {
             return {
                 ...state,
@@ -41,10 +35,16 @@ export default function reducer(state = initialState, action) {
                     return item
                 })
             }
+        }
 
+        case Types.DELETE_FAQ_ITEM_FULFILLED: {
+            const id = action.payload.config.url.split("/api/faq/")[1];
+            return {
+                ...state,
+                faq_items: state.faq_items.filter(x => x.id !== id)
+            }
         }
     }
-
 
     return state;
 }
