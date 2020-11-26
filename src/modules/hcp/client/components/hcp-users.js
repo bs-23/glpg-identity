@@ -317,7 +317,7 @@ export default function hcpUsers() {
             unique: true,
             onSort: generateSortHandler('email'),
             fieldType: { name: 'email', maxLength: '100' },
-            width: "14%"
+            width: "12%"
         },
         {
             id: 'created_at',
@@ -326,7 +326,7 @@ export default function hcpUsers() {
             onSort: generateSortHandler('created_at'),
             customizeCellContent: formatDate,
             fieldType: { name: 'date' },
-            width: "10%"
+            width: "8%"
         },
         {
             id: 'first_name',
@@ -356,13 +356,13 @@ export default function hcpUsers() {
             unique: true,
             onSort: generateSortHandler('uuid'),
             fieldType: { name: 'email', maxLength: '20' },
-            width: "8%"
+            width: "9%"
         },
         {
             id: 'country_iso2',
             name: 'Country',
             customizeCellContent: getCountryName,
-            width: "10%",
+            width: "9%",
             fieldType: {
                 name: 'select',
                 options: countries && countries.map(c => ({ value: c.country_iso2.toLowerCase(), label: c.codbase_desc }))
@@ -381,16 +381,15 @@ export default function hcpUsers() {
             editable: true,
             // customCell: renderOptInTypes,
             fieldType: { name: 'country_phone', maxLength: '100' },
-            class: "consent-col",
-            width: "15%"
+            width: "8%"
         },
         {
             id: 'opt_types',
             name: 'Opt-In-Types',
             editable: false,
             customCell: renderOptInTypes,
-            class: "consent-col",
-            width: "8%"
+            //class: "consent-col",
+            width: "10%"
         },
         // {
         //     id: 'opt_types',
@@ -406,6 +405,7 @@ export default function hcpUsers() {
             name: 'Action',
             editable: false,
             customCell: renderActions,
+            class: "posi-relative",
             width: "6%"
         }
     ];
