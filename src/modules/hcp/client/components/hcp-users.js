@@ -279,14 +279,10 @@ export default function hcpUsers() {
     // }
 
     const renderOptInTypes = ({ value }) => {
-        const opt_in_types = [];
-        if(value.includes('single-opt-in')) {
-            opt_in_types.push('Single');
-        }
-        if(value.includes('double-opt-in')) {
-            opt_in_types.push('Double');
-        }
-        return opt_in_types.join(', ');
+        return <div>
+            {value.includes('single-opt-in') && <div>Single</div>}
+            {value.includes('double-opt-in') && <div>Double</div>}
+        </div>
     }
 
     const renderActions = ({ row, rowIndex, formikProps, hasRowChanged, editableTableProps }) => {
