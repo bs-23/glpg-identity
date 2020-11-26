@@ -535,6 +535,8 @@ async function createHcpProfile(req, res) {
 
         const hcpUser = await Hcp.create(model);
 
+        const countries = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;', { type: QueryTypes.SELECT });
+
         let hasDoubleOptIn = false;
         const consentArr = [];
 
@@ -549,10 +551,14 @@ async function createHcpProfile(req, res) {
 
                 if (!consentDetails) return;
 
+                const currentCountry = countries.find(c => c.country_iso2.toLowerCase() === model.country_iso2.toLowerCase());
+
+                const baseCountry = countries.find(c => c.countryname === currentCountry.codbase_desc);
+
                 const consentCountry = await ConsentCountry.findOne({
                     where: {
                         country_iso2: {
-                            [Op.iLike]:model.country_iso2
+                            [Op.iLike]:baseCountry.country_iso2
                         },
                         consent_id: consentDetails.id
                     }
