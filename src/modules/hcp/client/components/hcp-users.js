@@ -48,23 +48,23 @@ const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
     >
         <Modal.Header closeButton>
             <Modal.Title id="example-custom-modal-styling-title">
-                Save confirmation
+                Save Confirmation
             </Modal.Title>
         </Modal.Header>
         <Modal.Body>
             <div className="p-3">
-                <h4 className="font-weight-bold">Do you want to proceed?</h4>
+                <p className="">Please comment and continue to save these changes to the HCP profile</p>
                 <div>
                     <div>
-                        <label className="font-weight-bold">Comment</label>
+                        <label className="font-weight-bold">Comment <span class="text-danger">*</span></label>
                     </div>{console.log('Editable Table Props: ', editableTableProps)}
                     <div>
-                        <textarea rows="4" cols="45" value={comment} onBlur={handleOnBlur} onChange={(e) => setComment(e.target.value)} />
+                        <textarea className="form-control" rows="4" cols="45" value={comment} onBlur={handleOnBlur} onChange={(e) => setComment(e.target.value)} />
                     </div>
                     {!comment && touched && <div className="invalid-feedback">
                         Must provide a comment.
                     </div>}
-                    <button disabled={!comment} onClick={handleSubmit}> Update </button>
+                    <button className="btn btn-block mt-3 cdp-btn-primary text-white" disabled={!comment} onClick={handleSubmit}> Update </button>
                 </div>
             </div>
         </Modal.Body>
