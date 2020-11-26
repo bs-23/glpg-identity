@@ -708,15 +708,6 @@ async function createHcpProfile(req, res) {
 
                 if (!consentDetails) return;
 
-                const consentLocale = await ConsentLocale.findOne({
-                    where: {
-                        locale: {
-                            [Op.iLike]: `%${model.locale}`
-                        },
-                        consent_id: consentDetails.id
-                    }
-                });
-
                 const consentCountry = await ConsentCountry.findOne({
                     where: {
                         country_iso2: {
@@ -726,7 +717,7 @@ async function createHcpProfile(req, res) {
                     }
                 });
 
-                if (!consentLocale || !consentCountry) return;
+                if (!consentCountry) return;
 
                 if (consentCountry.opt_type === 'double-opt-in') {
                     hasDoubleOptIn = true;
@@ -735,7 +726,6 @@ async function createHcpProfile(req, res) {
                 consentArr.push({
                     user_id: hcpUser.id,
                     consent_id: consentDetails.id,
-                    title: consentLocale.rich_text,
                     consent_confirmed: consentCountry.opt_type === 'double-opt-in' ? false : true,
                     opt_type: consentCountry.opt_type,
                     created_by: req.user.id,
@@ -849,19 +839,7 @@ async function approveHCPUser(req, res) {
         let hasDoubleOptIn = false;
 
         if (userConsents && userConsents.length) {
-            const consentIds = userConsents.map(consent => consent.consent_id)
-            const allConsentDetails = await ConsentLocale.findAll({
-                where: {
-                    consent_id: consentIds,
-                    locale: {
-                        [Op.iLike] : hcpUser.locale
-                    }
-                }
-            });
-
-            if (allConsentDetails && allConsentDetails.length) {
-                hasDoubleOptIn = true;
-            }
+            hasDoubleOptIn = true;
         }
 
         hcpUser.status = hasDoubleOptIn ? 'consent_pending' : 'manually_verified';
@@ -956,18 +934,19 @@ async function getHcpProfile(req, res) {
 
         response.data = getHcpViewModel(doc.dataValues);;
 
-        const userConsents = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id', 'consent_confirmed', 'opt_type', 'updated_at'] });
-
-        if (!userConsents) {
-            response.data = { ...response.data, consents: [] };
-            return res.json(response);
-        }
-
-        const userConsentDetails = await ConsentLocale.findAll({
+        const userConsents = await HcpConsents.findAll({
+            where: { user_id: doc.id },
             include: {
                 model: Consent,
                 as: 'consent'
-            }, where: {
+            },
+            attributes: ['consent_id', 'consent_confirmed', 'opt_type', 'updated_at']
+        });
+
+        if (!userConsents) return res.json([]);
+
+        const userConsentDetails = await ConsentLocale.findAll({
+            where: {
                 consent_id: userConsents.map(consent => consent.consent_id),
                 locale: {
                     [Op.iLike]: `%${doc.locale}`
@@ -975,21 +954,22 @@ async function getHcpProfile(req, res) {
             }, attributes: ['consent_id', 'rich_text']
         });
 
-
-        const consentResponse = userConsentDetails.map(({
-            consent_id: id,
-            rich_text,
-            consent: { preference }
-        }) => ({ id, preference, rich_text: validator.unescape(rich_text) }));
-
         response.data = {
             ...response.data,
-            consents: consentResponse.map(conRes => {
-                const matchedConsent = userConsents.find(consent => consent.consent_id === conRes.id);
-                conRes.consent_given_time = matchedConsent ? matchedConsent.updated_at : null;
-                conRes.opt_type = matchedConsent ? matchedConsent.opt_type : null;
-                conRes.consent_given = matchedConsent ? matchedConsent.consent_confirmed ? true : false : null;
-                return conRes;
+            consents: userConsents.map(userConsent => {
+                const localization = userConsentDetails && userConsentDetails.length
+                    ? userConsentDetails.find(ucd => ucd.consent_id === userConsent.consent_id)
+                    : { rich_text: 'Localized text not found for this consent.' };
+
+                const consentData = {
+                    consent_given: userConsent.consent_confirmed,
+                    consent_given_time: userConsent.updated_at,
+                    id: userConsent.consent_id,
+                    opt_type: userConsent.opt_type,
+                    preference: userConsent.consent.preference,
+                    rich_text: validator.unescape(localization.rich_text)
+                }
+                return consentData;
             })
         };
 
@@ -1015,15 +995,19 @@ async function getHCPUserConsents(req, res) {
             return res.status(404).send(response);
         }
 
-        const userConsents = await HcpConsents.findAll({ where: { user_id: doc.id }, attributes: ['consent_id', 'consent_confirmed', 'opt_type', 'updated_at'] });
+        const userConsents = await HcpConsents.findAll({
+            where: { user_id: doc.id },
+            include: {
+                model: Consent,
+                as: 'consent'
+            },
+            attributes: ['consent_id', 'consent_confirmed', 'opt_type', 'updated_at']
+        });
 
         if (!userConsents) return res.json([]);
 
         const userConsentDetails = await ConsentLocale.findAll({
-            include: {
-                model: Consent,
-                as: 'consent'
-            }, where: {
+            where: {
                 consent_id: userConsents.map(consent => consent.consent_id),
                 locale: {
                     [Op.iLike]: `%${locale ? locale : doc.locale}`
@@ -1031,19 +1015,20 @@ async function getHCPUserConsents(req, res) {
             }, attributes: ['consent_id', 'rich_text']
         });
 
+        response.data = userConsents.map(userConsent => {
+            const localization = userConsentDetails && userConsentDetails.length
+                ? userConsentDetails.find(ucd => ucd.consent_id === userConsent.consent_id)
+                : { rich_text: 'Localized text not found for this consent.' };
 
-        const consentResponse = userConsentDetails.map(({
-            consent_id: id,
-            rich_text,
-            consent: { preference }
-        }) => ({ id, preference, rich_text: validator.unescape(rich_text) }));
-
-        response.data = consentResponse.map(conRes => {
-            const matchedConsent = userConsents.find(consent => consent.consent_id === conRes.id);
-            conRes.consent_given_time = matchedConsent ? matchedConsent.updated_at : null;
-            conRes.opt_type = matchedConsent ? matchedConsent.opt_type : null;
-            conRes.consent_given = matchedConsent ? matchedConsent.consent_confirmed ? true : false : null;
-            return conRes;
+            const consentData = {
+                consent_given: userConsent.consent_confirmed,
+                consent_given_time: userConsent.updated_at,
+                id: userConsent.consent_id,
+                opt_type: userConsent.opt_type,
+                preference: userConsent.consent.preference,
+                rich_text: validator.unescape(localization.rich_text)
+            }
+            return consentData;
         });
 
         res.json(response);
