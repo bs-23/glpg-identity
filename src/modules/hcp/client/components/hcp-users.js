@@ -378,6 +378,7 @@ export default function hcpUsers() {
                                                         .catch(err => onUpdateStatusFailure(err))
                                                 }
                                                 if (values.selectedStatus === 'reject') {
+                                                    if(values.comment === 'other') values.comment = values.other_comment;
                                                     axios.put(`/api/hcp-profiles/${currentUser.id}/reject`, values)
                                                         .then(() => onUpdateStatusSuccess())
                                                         .catch(err => onUpdateStatusFailure(err))
@@ -401,7 +402,35 @@ export default function hcpUsers() {
                                                         <div className="col-12 col-sm-12">
                                                             <div className="form-group mb-0">
                                                                 <label className="font-weight-bold" htmlFor="comment">Comment <span className="text-danger">*</span></label>
-                                                                <Field className="form-control" data-testid='comment' component="textarea" rows="4" name="comment" />
+                                                                <div>
+                                                                    <label>
+                                                                        <Field className="form-control" data-testid='comment' type="radio" name="comment" value="HCP User did a mistake in typing UUID manually" />
+                                                                        HCP User did a mistake in typing UUID manually
+                                                                    </label>
+                                                                </div>
+                                                                <div>
+                                                                    <label>
+                                                                        <Field className="form-control" data-testid='comment' type="radio" name="comment" value="HCP User has exclusivity with other Pharma Companies" />
+                                                                        HCP User has exclusivity with other Pharma Companies
+                                                                    </label>
+                                                                </div>
+                                                                <div>
+                                                                    <label>
+                                                                        <Field className="form-control" data-testid='comment' type="radio" name="comment" value="HCP User is not in the customers IQVia OneKey population" />
+                                                                        HCP User is not in the customers IQVia OneKey population
+                                                                    </label>
+                                                                </div>
+                                                                <div>
+                                                                    <label>
+                                                                        <Field className="form-control" data-testid='comment' type="radio" rows="4" name="comment" value="other" />
+                                                                        Other:
+                                                                    </label>
+                                                                </div>
+                                                                <div>
+                                                                    {formikProps.values.comment === 'other' &&
+                                                                        <Field className="form-control" data-testid='comment' component="textarea" rows="4" name="other_comment" />
+                                                                    }
+                                                                </div>
                                                                 <div className="invalid-feedback"><ErrorMessage name="comment" /></div>
                                                             </div>
                                                         </div>
