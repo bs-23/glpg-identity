@@ -292,8 +292,8 @@ export default function hcpUsers() {
             </Dropdown>}
             {hasRowChanged &&
                 <>
-                    <button classNames="btn cdp-btn-outline-secondary btn-sm text-white" onClick={resetForm}><i class="fas fa-times-circle mr-1"></i> Reset</button>
-                    <button classNames="btn cdp-btn-secondary ml-2 btn-sm text-white" onClick={() => onTableRowSave(hcps.users[rowIndex], { rowIndex, editableTableProps, formikProps })} disabled={!dirty}><i class="fas fa-check-circle mr-1"></i>Save Changes</button>
+                    <button className="btn cdp-btn-outline-secondary btn-sm" onClick={resetForm}><i class="fas fa-times-circle mr-1"></i> Reset</button>
+                    <button className="btn cdp-btn-primary ml-2 btn-sm text-white" onClick={() => onTableRowSave(hcps.users[rowIndex], { rowIndex, editableTableProps, formikProps })} disabled={!dirty}><i class="fas fa-check-circle mr-1"></i>Save Changes</button>
                 </>
             }
         </span>

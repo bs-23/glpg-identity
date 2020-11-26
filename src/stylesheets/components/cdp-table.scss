@@ -116,8 +116,11 @@
         }
     }
 
-    &.table-hover tbody tr:hover {
-        background-color: rgba(20,77,67,0.07);
+    &.table-hover tbody tr {
+        &:hover,
+        &.edited{
+            background-color: rgba(20,77,67,0.07);
+        } 
     }
 
     &__col {
