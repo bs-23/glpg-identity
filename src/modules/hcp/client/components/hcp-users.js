@@ -328,6 +328,7 @@ export default function hcpUsers() {
                                 dialogClassName="modal-customize"
                                 aria-labelledby="example-custom-modal-styling-title"
                                 centered
+                                size="lg"
                             >
                                 <Modal.Header closeButton>
                                     <Modal.Title id="example-custom-modal-styling-title">
@@ -395,29 +396,21 @@ export default function hcpUsers() {
                                                         <div className="col-12 col-sm-12">
                                                             <div className="form-group mb-0">
                                                                 <label className="font-weight-bold" htmlFor="comment">Comment <span className="text-danger">*</span></label>
-                                                                <div>
-                                                                    <label>
-                                                                        <Field className="form-control" data-testid='comment' type="radio" name="comment" value="HCP User did a mistake in typing UUID manually" />
-                                                                        HCP User did a mistake in typing UUID manually
-                                                                    </label>
+                                                                <div className="custom-control custom-radio pb-2">
+                                                                    <Field className="custom-control-input" id="UUIDmanually" data-testid='comment' type="radio" name="comment" value="HCP User did a mistake in typing UUID manually" />
+                                                                    <label className="custom-control-label font-weight-bold" for="UUIDmanually"> HCP User did a mistake in typing UUID manually</label>
                                                                 </div>
-                                                                <div>
-                                                                    <label>
-                                                                        <Field className="form-control" data-testid='comment' type="radio" name="comment" value="HCP User has exclusivity with other Pharma Companies" />
-                                                                        HCP User has exclusivity with other Pharma Companies
-                                                                    </label>
+                                                                <div className="custom-control custom-radio pb-2">
+                                                                    <Field className="custom-control-input" data-testid='comment' type="radio" id="PharmaCompanies" name="comment" value="HCP User has exclusivity with other Pharma Companies" />
+                                                                    <label className="custom-control-label font-weight-bold" for="PharmaCompanies">HCP User has exclusivity with other Pharma Companies</label>
                                                                 </div>
-                                                                <div>
-                                                                    <label>
-                                                                        <Field className="form-control" data-testid='comment' type="radio" name="comment" value="HCP User is not in the customers IQVia OneKey population" />
-                                                                        HCP User is not in the customers IQVia OneKey population
-                                                                    </label>
+                                                                <div className="custom-control custom-radio pb-2">
+                                                                    <Field className="custom-control-input" data-testid='comment' id="OneKeypopulation" type="radio" name="comment" value="HCP User is not in the customers IQVia OneKey population" />
+                                                                    <label className="custom-control-label font-weight-bold" for="OneKeypopulation">HCP User is not in the customers IQVia OneKey population</label>
                                                                 </div>
-                                                                <div>
-                                                                    <label>
-                                                                        <Field className="form-control" data-testid='comment' type="radio" rows="4" name="comment" value="other" />
-                                                                        Other:
-                                                                    </label>
+                                                                <div className="custom-control custom-radio pb-2">
+                                                                    <Field className="custom-control-input" data-testid='comment' id="Other" type="radio" rows="4" name="comment" value="other" />
+                                                                    <label className="custom-control-label font-weight-bold" for="Other">Other:</label>
                                                                 </div>
                                                                 <div>
                                                                     {formikProps.values.comment === 'other' &&
