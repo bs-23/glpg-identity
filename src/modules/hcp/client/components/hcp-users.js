@@ -292,8 +292,8 @@ export default function hcpUsers() {
     const renderActions = ({ row, rowIndex, formikProps, hasRowChanged, editableTableProps }) => {
         const { dirty, resetForm } = formikProps;
 
-        return <span>
-            {!hasRowChanged && <Dropdown className="ml-auto dropdown-customize">
+        return <div className="position-relative">
+            {!hasRowChanged && <Dropdown className="dropdown-customize">
                 <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
@@ -303,11 +303,13 @@ export default function hcpUsers() {
             </Dropdown>}
             {hasRowChanged &&
                 <>
-                    <button className="btn cdp-btn-outline-secondary btn-sm" onClick={resetForm}><i class="fas fa-times-circle mr-1"></i> Reset</button>
-                    <button className="btn cdp-btn-primary ml-2 btn-sm text-white" onClick={() => onTableRowSave(hcps.users[rowIndex], { rowIndex, editableTableProps, formikProps })} disabled={!dirty}><i class="fas fa-check-circle mr-1"></i>Save Changes</button>
+                <div className="d-flex position-absolute inline-editing__btn-wrap">
+                    <button className="btn cdp-btn-outline-secondary btn-sm text-nowrap" onClick={resetForm}><i class="fas fa-times-circle mr-1"></i> Reset</button>
+                    <button className="btn cdp-btn-primary ml-2 btn-sm text-white text-nowrap" onClick={() => onTableRowSave(hcps.users[rowIndex], { rowIndex, editableTableProps, formikProps })} disabled={!dirty}><i class="fas fa-check-circle mr-1"></i>Save Changes</button>
+                </div>
                 </>
-            }
-        </span>
+             }
+        </div>
     }
 
     const columns = [

@@ -47,7 +47,13 @@
             &__edit-icon {
                 visibility: hidden;
             }
+
+            &__btn-wrap {
+                right: 0px;
+            }
         }
+
+
 
         &__save-btn {
             position: sticky;
@@ -118,9 +124,9 @@
 
     &.table-hover tbody tr {
         &:hover,
-        &.edited{
+        &.edited {
             background-color: rgba(20,77,67,0.07);
-        } 
+        }
     }
 
     &__col {
