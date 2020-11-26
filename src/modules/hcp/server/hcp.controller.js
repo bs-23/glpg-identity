@@ -365,7 +365,7 @@ async function updateHcps(req, res) {
         }
 
         await Promise.all(Hcps.map(async hcp => {
-            const { id, email, first_name, last_name, uuid, specialty_onekey, country_iso2, _rowIndex } = trimRequestBody(hcp);
+            const { id, email, first_name, last_name, uuid, specialty_onekey, country_iso2, telephone, comment, _rowIndex } = trimRequestBody(hcp);
 
             if(!id) {
                 response.errors.push(new Error(_rowIndex, 'id', 'ID is missing.'));
@@ -434,10 +434,10 @@ async function updateHcps(req, res) {
                     response.errors.push(new Error(_rowIndex, 'uuid', 'UUID already exists.'));
                 }
 
-                if(uuidsToUpdate.has(uuid)) {
-                    uuidsToUpdate.get(uuid).push(_rowIndex);
+                if(uuidsToUpdate.has(uuid_from_master_data || uuid)) {
+                    uuidsToUpdate.get(uuid_from_master_data || uuid).push(_rowIndex);
                 }else{
-                    uuidsToUpdate.set(uuid, [_rowIndex]);
+                    uuidsToUpdate.set(uuid_from_master_data || uuid, [_rowIndex]);
                 }
             }
 
@@ -447,7 +447,9 @@ async function updateHcps(req, res) {
                 first_name,
                 last_name,
                 specialty_onekey,
-                country_iso2
+                country_iso2,
+                telephone,
+                comment
             });
 
             HcpUser.dataValues._rowIndex = _rowIndex;
@@ -472,6 +474,16 @@ async function updateHcps(req, res) {
 
         await Promise.all(hcpModelInstances.map(async (hcp, index) => {
             await hcp.update(hcpsToUpdate[index]);
+        }));
+
+        await Promise.all(hcpModelInstances.map(async (hcp, index) => {
+            logService.log({
+                event_type: 'UPDATE',
+                object_id: hcp.id,
+                table_name: 'hcp_profiles',
+                actor: req.user.id,
+                description: hcpsToUpdate[index].comment
+            });
         }));
 
         hcpModelInstances.map((hcpModelIns, idx) => {
