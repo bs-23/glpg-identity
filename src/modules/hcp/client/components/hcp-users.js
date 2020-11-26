@@ -16,7 +16,6 @@ import { getHcpProfiles } from '../hcp.actions';
 import { ApprovalRejectSchema } from '../hcp.schema';
 import uuidAuthorities from '../uuid-authorities.json';
 import { getAllCountries } from '../../../core/client/country/country.actions';
-import SearchHcp from './search-hcp.component';
 
 
 export default function hcpUsers() {
@@ -25,10 +24,11 @@ export default function hcpUsers() {
     const history = useHistory();
     const params = new URLSearchParams(window.location.search);
 
-    const [show, setShow] = useState({ profileManage: false, updateStatus: false, search: false });
+    const [show, setShow] = useState({ profileManage: false, updateStatus: false });
     const [currentUser, setCurrentUser] = useState({});
     const { addToast } = useToasts();
     const [sort, setSort] = useState({ type: 'ASC', value: null });
+    const [selectedRow, setSelectedRow] = useState({ type: 'ASC', value: null });
 
     const hcps = useSelector(state => state.hcpReducer.hcps);
     const countries = useSelector(state => state.countryReducer.countries);
@@ -131,6 +131,13 @@ export default function hcpUsers() {
         window.open(link, 'name','width=600,height=400');
     }
 
+    const openDiscoverHcpsWindow = (rowId) => {
+        const width = (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth) * 0.8;
+        const height = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) * 0.9;
+        window.open('/hcps/discover', 'name', `width=${width || 600},height=${height || 400}`);
+        setSelectedRow(rowId);
+    }
+
     useEffect(() => {
         dispatch(getAllCountries());
     }, []);
@@ -195,7 +202,6 @@ export default function hcpUsers() {
                                     </div>
                                 </div>
                                 <div className="d-flex pt-3 pt-sm-0">
-                                    <button className="btn btn-block text-white cdp-btn-secondary mr-2" onClick={() => setShow({ ...show, search: true })}>Search</button>
                                     {countries && hcps['countries'] &&
                                         <React.Fragment>
                                             <Dropdown className="ml-auto dropdown-customize mr-2">
@@ -409,20 +415,6 @@ export default function hcpUsers() {
 
                             </Modal>
 
-                            <Modal
-                                size="lg"
-                                show={show.search}
-                                onHide={() => { setShow({ ...show, search: false }) }}
-                                dialogClassName="modal-customize"
-                                aria-labelledby="example-custom-modal-styling-title"
-                                centered>
-                                <Modal.Header closeButton>
-                                </Modal.Header>
-                                <Modal.Body>
-                                    <SearchHcp />
-                                </Modal.Body>
-                            </Modal>
-
                             {hcps['users'] && hcps['users'].length > 0 &&
                                 <React.Fragment>
                                     <div className="shadow-sm bg-white table-responsive">
@@ -444,7 +436,7 @@ export default function hcpUsers() {
                                             </thead>
                                             <tbody className="cdp-table__body bg-white">
                                                 {hcps['users'].map((row, index) => (
-                                                    <tr key={index}>
+                                                    <tr key={index} className={row.id === selectedRow ? 'selected' : ''}>
                                                         <td className="text-break">{row.email}</td>
                                                         <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                         <td className="text-break">{row.first_name}</td>
@@ -453,7 +445,7 @@ export default function hcpUsers() {
                                                             {row.status === 'self_verified' ? <span><i className="fa fa-xs fa-circle text-success pr-2 hcp-status-icon"></i>Self Verified</span> :
                                                                 row.status === 'manually_verified' ? <span><i className="fa fa-xs fa-circle text-success pr-2 hcp-status-icon"></i>Manually Verified</span> :
                                                                     row.status === 'consent_pending' ? <span><i className="fa fa-xs fa-circle text-warning pr-2 hcp-status-icon"></i>Consent Pending</span> :
-                                                                        row.status === 'not_verified' ? <span><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Not Verified <i type="button" className="fas fa-search ml-1 cdp-text-primary"></i></span> :
+                                                                        row.status === 'not_verified' ? <span><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Not Verified <i type="button" className="fas fa-search ml-1 cdp-text-primary" onClick={() => openDiscoverHcpsWindow(row.id)}></i></span> :
                                                                             row.status === 'rejected' ? <span><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Rejected</span> : <span></span>
                                                             }
                                                         </td>
