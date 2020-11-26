@@ -32,3 +32,14 @@ export function createFaqItem(data) {
         })
     };
 }
+
+export function editFaqItem(data, id) {
+    return {
+        type: Types.PUT_FAQ_ITEM,
+        payload: axios({
+            method: 'patch',
+            url: `/api/faq/${id}`,
+            data
+        })
+    };
+}

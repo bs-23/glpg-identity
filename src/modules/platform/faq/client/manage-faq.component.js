@@ -11,6 +11,8 @@ export default function ManageFaq() {
     const [show, setShow] = useState(false);
     const faqData = useSelector(state => state.faqReducer.faq_items);
     const [serviceCategory, setServiceCategory] = useState(false);
+    const [editMode, setEditMode] = useState(false);
+    const [editData, setEditData] = useState(null);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -41,10 +43,9 @@ export default function ManageFaq() {
                     <div className="col-12">
                         <div className="d-sm-flex justify-content-end align-items-center mb-3 mt-4">
                             <div class="d-flex justify-content-between align-items-center">
-                                <button onClick={() => setShow(true)} className="btn cdp-btn-secondary text-white ml-2">
+                                <button onClick={() => { setShow(true); setEditMode(false); setEditData(null); }} className="btn cdp-btn-secondary text-white ml-2">
                                     <i className="icon icon-plus pr-1"></i> Add New FAQ
                                 </button>
-                                <FaqForm serviceCategory={serviceCategory} changeShow={(val) => setShow(val)} show={show} />
                             </div>
                         </div>
 
@@ -73,7 +74,7 @@ export default function ManageFaq() {
                                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu>
-                                                        <Dropdown.Item>
+                                                        <Dropdown.Item onClick={() => { setShow(true); setEditMode(true); setEditData(row); }}>
                                                             Edit
                                                         </Dropdown.Item>
                                                         <Dropdown.Item>Delete</Dropdown.Item>
@@ -85,6 +86,7 @@ export default function ManageFaq() {
                                 </table>
                             </div>
                         }
+                        <FaqForm editMode={editMode} editData={editData} serviceCategory={serviceCategory} changeShow={(val) => setShow(val)} show={show} />
                     </div>
                 </div>
             </div>

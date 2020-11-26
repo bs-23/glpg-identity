@@ -4,7 +4,7 @@ import { Form, Formik, Field, ErrorMessage, FieldArray } from "formik";
 import { useToasts } from 'react-toast-notifications';
 import { faqSchema } from './faq.schema';
 import DraftEditor from '../../../core/client/components/draft-editor';
-import { createFaqItem } from './faq.actions';
+import { createFaqItem, editFaqItem } from './faq.actions';
 import { useDispatch } from 'react-redux';
 
 const FaqForm = (props) => {
@@ -16,13 +16,13 @@ const FaqForm = (props) => {
         props.changeShow(false);
     };
 
-    const FormFieldFluid = ({ label, name, type, children, required = true, ...rest }) => 
+    const FormFieldFluid = ({ label, name, type, children, required = true, ...rest }) =>
         <div className="form-group">
             <label className="font-weight-bold" htmlFor="last_name">{label}{required && <span className="text-danger">*</span>}</label>
             {children || <Field className="form-control" type={type} name={name} {...rest} />}
             <div className="invalid-feedback"><ErrorMessage name={name} /></div>
         </div>
-    
+
 
     const ToggleList = ({ name, options, labelExtractor, idExtractor, allOptionID }) => {
         const isChecked = (id, arrayHelpers) => arrayHelpers.form.values[name].includes(id);
@@ -95,22 +95,37 @@ const FaqForm = (props) => {
                 <div className="consent-manage">
                     <Formik
                         initialValues={{
-                            question: '',
-                            service_categories: '',
-                            answer: ''
+                            question: props.editMode ? props.editData.question : '',
+                            service_categories: props.editMode ? props.editData.service_categories : [],
+                            answer: props.editMode ? props.editData.answer : '',
                         }}
                         validationSchema={faqSchema}
                         displayName="FaqForm"
                         onSubmit={(values, actions) => {
-                            dispatch(createFaqItem(values)).then(() => {
-                                actions.resetForm();
-                                showToast('FAQ created successfully', 'success');
-                                handleClose();
-                            }).catch(error => {
-                                showToast(error.response.data, 'error');
-                            }).finally(function () {
-                                actions.setSubmitting(false);
-                            });
+                            if (props.editMode) {
+                                dispatch(editFaqItem(values, props.editData.id)).then(() => {
+                                    actions.resetForm();
+                                    showToast('FAQ updated successfully', 'success');
+                                    handleClose();
+                                }).catch(error => {
+                                    showToast(error.response.data, 'error');
+                                }).finally(function () {
+                                    actions.setSubmitting(false);
+                                });
+
+                            } else {
+                                dispatch(createFaqItem(values)).then(() => {
+                                    actions.resetForm();
+                                    showToast('FAQ created successfully', 'success');
+                                    handleClose();
+                                }).catch(error => {
+                                    showToast(error.response.data, 'error');
+                                }).finally(function () {
+                                    actions.setSubmitting(false);
+                                });
+
+                            }
+
                         }}
                     >
                         {formikProps => (
@@ -136,7 +151,7 @@ const FaqForm = (props) => {
                                                 <div className="border rounded draft-editor">
                                                     <DraftEditor htmlContent={formikProps.initialValues.answer} onChangeHTML={(html) => {
                                                         formikProps.setFieldValue('answer', html);
-                                                    }}/>
+                                                    }} />
                                                 </div>
                                             </div>
                                         </div>

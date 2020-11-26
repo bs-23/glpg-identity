@@ -116,11 +116,11 @@ async function getHcps(req, res) {
         async function getCountryIso2() {
             const user_codbase_list_for_iso2 = (await sequelize.datasyncConnector.query(
                 `SELECT * FROM ciam.vwcountry where ciam.vwcountry.country_iso2 = ANY($countries);`, {
-                    bind: {
-                        countries: userPermittedCountries
-                    },
-                    type: QueryTypes.SELECT
-                }
+                bind: {
+                    countries: userPermittedCountries
+                },
+                type: QueryTypes.SELECT
+            }
             )).map(i => i.codbase);
 
             const user_country_iso2_list = (await sequelize.datasyncConnector.query(
@@ -553,7 +553,7 @@ async function createHcpProfile(req, res) {
                 const consentCountry = await ConsentCountry.findOne({
                     where: {
                         country_iso2: {
-                            [Op.iLike]:model.country_iso2
+                            [Op.iLike]: model.country_iso2
                         },
                         consent_id: consentDetails.id
                     }
@@ -679,7 +679,7 @@ async function approveHCPUser(req, res) {
                 where: {
                     consent_id: consentIds,
                     locale: {
-                        [Op.iLike] : hcpUser.locale
+                        [Op.iLike]: hcpUser.locale
                     }
                 }
             });
@@ -698,7 +698,7 @@ async function approveHCPUser(req, res) {
 
         try {
             await notifyHcpUserApproval(hcpUser);
-        } catch(e) {
+        } catch (e) {
             await hcpUser.update({
                 status: 'not_verified',
                 reset_password_token: null,
