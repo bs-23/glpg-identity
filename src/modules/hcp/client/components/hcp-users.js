@@ -18,21 +18,26 @@ import { ApprovalRejectSchema, HcpInlineEditSchema } from '../hcp.schema';
 import uuidAuthorities from '../uuid-authorities.json';
 import EditableTable from '../../../core/client/components/EditableTable/EditableTable';
 
-const SaveConfirmation = ({ show, onHideHandler, editableTableProps }) => {
+const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
     const [comment, setComment] = useState("");
     const [touched, setTouched] = useState(false);
 
-    const { getUpdatedCells, row } = editableTableProps;
+    const { rowIndex, editableTableProps, formikProps } = tableProps;
+    const { values, submitForm } = formikProps || {};
 
     const handleSubmit = () => {
-        console.log('Submitting: ', row, comment);
-        console.log('Get Updated Cels: ', getUpdatedCells());
-        onHideHandler();
+        values.rows[rowIndex].comment = comment;
+        submitForm();
     }
 
     const handleOnBlur = () => {
         setTouched(true);
     }
+
+    useEffect(() => {
+        setComment('');
+        setTouched(false);
+    }, [show]);
 
     return <Modal
         show={show}
@@ -234,6 +239,7 @@ export default function hcpUsers() {
                     autoDismiss: true
                 });
                 done(data.data);
+                setShow({ ...show, saveConfirmation: false });
             })
             .catch(err => {
                 addToast('Could not save changes. Please correct the following errors.', {
@@ -273,8 +279,7 @@ export default function hcpUsers() {
     }
 
     const renderActions = ({ row, rowIndex, formikProps, hasRowChanged, editableTableProps }) => {
-        const { getUpdatedCells } = editableTableProps;
-        const { dirty, submitForm, resetForm } = formikProps;
+        const { dirty, resetForm } = formikProps;
 
         return <span>
             {!hasRowChanged && <Dropdown className="ml-auto dropdown-customize">
@@ -283,13 +288,12 @@ export default function hcpUsers() {
                 <Dropdown.Menu>
                     <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(hcps.users[rowIndex])}>Profile</Dropdown.Item></LinkContainer>
                     {row.status === 'not_verified' && <LinkContainer disabled={dirty} to="#"><Dropdown.Item onClick={() => onUpdateStatus(hcps.users[rowIndex])}>Manage Status</Dropdown.Item></LinkContainer>}
-                    <LinkContainer to="#"><Dropdown.Item disabled={!hasRowChanged} onClick={() => onTableRowSave(hcps.users[rowIndex], {submitForm, getUpdatedCells, row})}>Save</Dropdown.Item></LinkContainer>
                 </Dropdown.Menu>
             </Dropdown>}
             {hasRowChanged &&
                 <>
                     <button classNames="btn cdp-btn-outline-secondary btn-sm text-white" onClick={resetForm}><i class="fas fa-times-circle mr-1"></i> Reset</button>
-                    <button classNames="btn cdp-btn-secondary ml-2 btn-sm text-white" onClick={submitForm} disabled={!dirty}><i class="fas fa-check-circle mr-1"></i>Save Changes</button>
+                    <button classNames="btn cdp-btn-secondary ml-2 btn-sm text-white" onClick={() => onTableRowSave(hcps.users[rowIndex], { rowIndex, editableTableProps, formikProps })} disabled={!dirty}><i class="fas fa-check-circle mr-1"></i>Save Changes</button>
                 </>
             }
         </span>
@@ -671,7 +675,7 @@ export default function hcpUsers() {
                             <SaveConfirmation
                                 show={show.saveConfirmation}
                                 onHideHandler={() => { setShow({ ...show, saveConfirmation: false }) }}
-                                editableTableProps={editableTableProps}
+                                tableProps={editableTableProps}
                             />
 
                             {/* {hcps['users'] && hcps['users'].length > 0 &&

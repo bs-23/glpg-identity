@@ -179,7 +179,7 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
             const updatedCells = {};
             let hasRowChanged = false;
 
-            Object.keys(initRow).forEach(key => {
+            Object.keys(currRow).forEach(key => {
                 if (initRow[key] !== currRow[key]) {
                     updatedCells[key] = currRow[key];
                     hasRowChanged = true;
