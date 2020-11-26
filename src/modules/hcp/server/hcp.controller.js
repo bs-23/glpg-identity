@@ -1256,19 +1256,23 @@ async function updateHCPUserConsents(req, res) {
 
 async function searchOkla(req, res) {
     //      codbase
-    // in my contract
+    //      in my contract
     //      method (phonetic, fuzzy)
-    // duplicates
+    //      duplicates
     //      first name
     //      last name
-    // specialty
+    //      specialty
     //      address
     //      city
     //      post code
     //      onekey id
     //      individual identifier
+    //      page
     try {
-        const { duplicates, isInContract, phonetic } = req.body;
+        let { duplicates, isInContract, phonetic } = req.body;
+
+        const page = req.query.page ? +req.query.page - 1 : 0;
+        const limit = 15;
 
         if ((duplicates && typeof duplicates !== 'boolean')
             || (phonetic && typeof phonetic !== 'boolean')
@@ -1289,6 +1293,7 @@ async function searchOkla(req, res) {
             postCode: 'address.longPostalCode',
             onekeyId: 'activity.activityEid',
             individualEid: 'individual.individualEid',
+            specialty: 'individual.speciality1'
         }
 
         const fields = Object.keys(fieldMap).map(key => {
@@ -1306,12 +1311,48 @@ async function searchOkla(req, res) {
             entityType: 'activity',
             isInContract,
             duplicates,
-            resultSize: 50,
+            startIndex: page,
+            resultSize: limit,
             codBases: codbases,
             fields
         };
         const { response: searchResult } = await OklaService.search(queryObj);
         res.json(searchResult);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function getSpecialtiesForCdp(req, res) {
+    try {
+        const { codbases } = req.query;
+
+        const specialties = await sequelize.datasyncConnector.query(`
+            SELECT codbase, cod_id_onekey, cod_locale, cod_description
+            FROM ciam.vwspecialtymaster as Specialty
+            WHERE LOWER(cod_locale) = 'en'
+            ${codbases
+                ? 'AND LOWER(codbase) = ' + (Array.isArray(codbases)
+                    ? 'ANY($codbases)'
+                    : '$codbases')
+                : ''}
+            ORDER BY cod_description ASC;
+            `, {
+            bind: {
+                codbases: codbases && Array.isArray(codbases)
+                    ? codbases.map(c => c.toLowerCase())
+                    : (codbases || '').toLowerCase()
+            },
+            type: QueryTypes.SELECT
+        });
+
+        const viewModels = (specialties || []).map(({ codbase, cod_id_onekey, cod_description }) => ({
+            codbase,
+            codIdOnekey: cod_id_onekey,
+            codDescription: cod_description
+        }));
+        res.json(viewModels);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -1334,3 +1375,4 @@ exports.rejectHCPUser = rejectHCPUser;
 exports.getHCPUserConsents = getHCPUserConsents;
 exports.updateHCPUserConsents = updateHCPUserConsents;
 exports.searchOkla = searchOkla;
+exports.getSpecialtiesForCdp = getSpecialtiesForCdp;
