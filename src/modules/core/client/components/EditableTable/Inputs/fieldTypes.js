@@ -2,5 +2,6 @@ export default {
     TEXT: 'text',
     SELECT: 'select',
     DATE: 'date',
-    EMAIL: 'email'
+    EMAIL: 'email',
+    COUNTRY_PHONE: 'country_phone'
 }

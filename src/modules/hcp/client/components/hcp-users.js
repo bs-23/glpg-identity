@@ -266,16 +266,27 @@ export default function hcpUsers() {
                         : <span></span>
     }
 
-    const renderSingleOptInSymbol = ({ value }) => {
-        return value && value.includes('single-opt-in')
-            ? <i className="fas fa-check-circle cdp-text-primary font-size-15px"></i>
-            : <i className="icon icon-close-circle text-danger consent-not-given"> </i>
-    }
+    // const renderSingleOptInSymbol = ({ value }) => {
+    //     return value && value.includes('single-opt-in')
+    //         ? <i className="fas fa-check-circle cdp-text-primary font-size-15px"></i>
+    //         : <i className="icon icon-close-circle text-danger consent-not-given"> </i>
+    // }
 
-    const renderDoubleOptInSymbol = ({ value }) => {
-        return value && value.includes('double-opt-in')
-            ? <i className="fas fa-check-circle cdp-text-primary font-size-15px"></i>
-            : <i className="icon icon-close-circle text-danger consent-not-given"> </i>
+    // const renderDoubleOptInSymbol = ({ value }) => {
+    //     return value && value.includes('double-opt-in')
+    //         ? <i className="fas fa-check-circle cdp-text-primary font-size-15px"></i>
+    //         : <i className="icon icon-close-circle text-danger consent-not-given"> </i>
+    // }
+
+    const renderOptInTypes = ({ value }) => {
+        const opt_in_types = [];
+        if(value.includes('single-opt-in')) {
+            opt_in_types.push('Single');
+        }
+        if(value.includes('double-opt-in')) {
+            opt_in_types.push('Double');
+        }
+        return opt_in_types.join(', ');
     }
 
     const renderActions = ({ row, rowIndex, formikProps, hasRowChanged, editableTableProps }) => {
@@ -365,23 +376,31 @@ export default function hcpUsers() {
             fieldType: { name: 'select', options: getSpecialtyOptions }
         },
         {
-            id: 'opt_types',
-            key: "single",
-            name: 'Single Opt-In',
-            editable: false,
-            customCell: renderSingleOptInSymbol,
+            id: 'telephone',
+            name: 'Phone',
+            editable: true,
+            // customCell: renderOptInTypes,
+            fieldType: { name: 'country_phone', maxLength: '100' },
             class: "consent-col",
-            width: "8%"
+            width: "15%"
         },
         {
             id: 'opt_types',
-            key: "double",
-            name: 'Double Opt-In',
+            name: 'Opt-In-Types',
             editable: false,
-            customCell: renderDoubleOptInSymbol,
+            customCell: renderOptInTypes,
             class: "consent-col",
             width: "8%"
         },
+        // {
+        //     id: 'opt_types',
+        //     key: "double",
+        //     name: 'Double Opt-In',
+        //     editable: false,
+        //     customCell: renderDoubleOptInSymbol,
+        //     class: "consent-col",
+        //     width: "8%"
+        // },
         {
             id: 'action',
             name: 'Action',
