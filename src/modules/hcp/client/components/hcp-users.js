@@ -280,8 +280,8 @@ export default function hcpUsers() {
 
     const renderOptInTypes = ({ value }) => {
         return <div>
-            {value.includes('single-opt-in') && <i title="Single Opt-In" className="fas fa-check cdp-text-primary mr-2"></i>}
-            {value.includes('double-opt-in') && <i title="Double Opt-In" className="fas fa-check-double cdp-text-primary mr-2"></i>}
+            {value.includes('single-opt-in') ? <i title="Single Opt-In" className="fas fa-check cdp-text-primary mr-3"></i> : <i title="Single Opt-In" className="fas fa-check text-danger mr-3"></i>}
+            {value.includes('double-opt-in') ? <i title="Double Opt-In" className="fas fa-check-double cdp-text-primary"></i> : <i title="Double Opt-In" className="fas fa-check-double text-danger"></i>}
         </div>
     }
 
