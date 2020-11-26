@@ -37,7 +37,7 @@ async function createRole(req, res) {
         if(!permissionSets.length) return res.status(400).send('Must provide permission sets.');
 
         const [role, created] = await Role.findOrCreate({
-            where: { title },
+            where: { title: { [Op.iLike]: title } },
             defaults: {
                 title: title.trim(),
                 slug: title.trim().replace(/ +/g, '_').toLowerCase(),
@@ -81,7 +81,10 @@ async function editRole(req, res) {
 
         if(!foundRole) return res.status(400).send('Role not found.');
 
-        const roleWithSameName = await Role.findOne({ where: { title, id: { [Op.ne]: id } }});
+        const roleWithSameName = await Role.findOne({ where: {
+            title: { [Op.iLike]: title },
+            id: { [Op.ne]: id } }
+        });
 
         if(roleWithSameName) return res.status(400).send('Role with the same title already exists.');
 
