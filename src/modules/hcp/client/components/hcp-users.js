@@ -386,10 +386,36 @@ export default function hcpUsers() {
                                                 <Form onSubmit={formikProps.handleSubmit}>
                                                     <div className="row">
                                                         <div className="col-6">
-                                                            <a onClick={() => formikProps.setFieldValue('selectedStatus', 'approve')} className={`btn btn-block cdp-btn-outline-primary mt-4 p-2 font-weight-bold ${formikProps.values.selectedStatus === 'approve' ? 'selected' : ''}`} >Approve User</a>
+                                                            <a
+                                                                className={`btn btn-block cdp-btn-outline-primary mt-4 p-2 font-weight-bold ${formikProps.values.selectedStatus === 'approve' ? 'selected' : ''}`}
+                                                                onClick={() => {
+                                                                    if(formikProps.values.selectedStatus !== 'approve') {
+                                                                        formikProps.setFieldValue('selectedStatus', 'approve');
+                                                                        formikProps.setFieldValue('comment', '');
+                                                                        formikProps.setFieldValue('other_comment', '');
+                                                                        formikProps.setFieldTouched('comment', false);
+                                                                        formikProps.setFieldTouched('other_comment', false);
+                                                                    }
+                                                                }}
+                                                            >
+                                                                Approve User
+                                                            </a>
                                                         </div>
                                                         <div className="col-6">
-                                                            <a onClick={() => formikProps.setFieldValue('selectedStatus', 'reject')} className={`btn btn-block cdp-btn-outline-danger mt-4 p-2 font-weight-bold  ${formikProps.values.selectedStatus === 'reject' ? 'selected' : ''}`} >Reject User</a>
+                                                            <a
+                                                                onClick={() => {
+                                                                    if(formikProps.values.selectedStatus !== 'reject') {
+                                                                        formikProps.setFieldValue('selectedStatus', 'reject');
+                                                                        formikProps.setFieldValue('comment', '');
+                                                                        formikProps.setFieldValue('other_comment', '');
+                                                                        formikProps.setFieldTouched('comment', false);
+                                                                        formikProps.setFieldTouched('other_comment', false);
+                                                                    }
+                                                                }}
+                                                                className={`btn btn-block cdp-btn-outline-danger mt-4 p-2 font-weight-bold  ${formikProps.values.selectedStatus === 'reject' ? 'selected' : ''}`}
+                                                            >
+                                                                Reject User
+                                                            </a>
                                                         </div>
                                                     </div>
                                                     {formikProps.values.selectedStatus === 'approve' && <div className="row mt-4">
