@@ -146,7 +146,7 @@ const FaqForm = (props) => {
                                                     labelExtractor={item => item.title}
                                                 />
                                             </FormFieldFluid>
-                                            <div className="form-group">
+                                            <div className="form-group pt-3">
                                                 <label className="font-weight-bold" htmlFor='answer'>Answer <span className="text-danger">*</span></label>
                                                 <div className="border rounded draft-editor">
                                                     <DraftEditor htmlContent={formikProps.initialValues.answer} onChangeHTML={(html) => {
@@ -156,10 +156,10 @@ const FaqForm = (props) => {
                                             </div>
                                         </div>
                                     </div>
-                                </Modal.Body>
-                                <Modal.Footer>
-                                    <button type="submit" className="btn cdp-btn-primary mr-2 text-white shadow-sm">Save Changes</button>
-                                    <button type="button" className="btn cdp-btn-secondary text-white shadow-sm" onClick={handleClose}>Close</button>
+                            </Modal.Body>
+                            <Modal.Footer className="border-0  pt-0 px-3">
+                                    {/*<button type="button" className="btn cdp-btn-secondary text-white shadow-sm" onClick={handleClose}>Close</button>*/}
+                                    <button type="submit" className="btn btn-block cdp-btn-secondary mt-3 text-white ">Submit</button>
                                 </Modal.Footer>
                             </Form>
                         )}
