@@ -1,10 +1,32 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
+import Select, { components } from 'react-select';
+import Popover from 'react-bootstrap/Popover';
 
 const SearchHcp = () => {
     const countries = useSelector(state => state.countryReducer.countries);
+    const [selectedOption, setSelectedOption] = useState({})
 
+    const handleChange = selectedOption => {
+        console.log(`Option selected:`, selectedOption);
+        setSelectedOption(selectedOption)
+    };
+
+    const options = [
+        { value: 'chocolate', label: 'Chocolate' },
+        { value: 'strawberry', label: 'Strawberry' },
+        { value: 'vanilla', label: 'Vanilla' },
+    ];
+
+    const Option = props => {
+        return (
+            <div style={{ display: 'flex' }}>
+                <components.Option {...props} />
+                <span><input type="checkbox"/></span>
+            </div>
+        );
+      };
 
     return (
         <main className="app__content cdp-light-bg h-100">
@@ -15,6 +37,17 @@ const SearchHcp = () => {
                             <h2 className="d-flex align-items-center p-3 px-sm-3 py-sm-3 page-title light">
                                 <span className="page-title__text font-weight-bold">OKLA Search</span>
                             </h2>
+                            <Select
+                                defaultValue={[]}
+                                isMulti={true}
+                                name="countries"
+                                options={options}
+                                components={ { Option } }
+                                className="basic-multi-select"
+                                classNamePrefix="select"
+                                // onChange={handleChange}
+                                // value={selectedOption}
+                            />
                             <div className="add-user mx-3 mt-0 p-3 bg-white rounded border">
                             <Formik
                                 initialValues={{
@@ -27,7 +60,17 @@ const SearchHcp = () => {
                                             <div className="col-12">
                                                 <div className="form-group">
                                                     <label for="exampleInputEmail1">Countries</label>
-                                                    <Field className="form-control" component="select" name="names" multiple={true}
+                                                    <Select
+                                                        defaultValue={[]}
+                                                        isMulti={true}
+                                                        name="countries"
+                                                        options={options}
+                                                        className="basic-multi-select"
+                                                        classNamePrefix="select"
+                                                        // onChange={handleChange}
+                                                        // value={selectedOption}
+                                                    />
+                                                    {/* <Field className="form-control" component="select" name="names" multiple={true}
                                                         // // You need to set the new field value
                                                         // onChange={evt =>
                                                         //     setFieldValue(
@@ -44,7 +87,7 @@ const SearchHcp = () => {
                                                             })
                                                         }
 
-                                                    </Field>
+                                                    </Field> */}
                                                     <small id="exampleFormControlSelect1" className="form-text text-muted">You may select multiple counties </small>
                                                 </div>
                                             </div>
