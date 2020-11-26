@@ -331,10 +331,11 @@ async function getDatasyncConsentsReport(req, res) {
             if (orderBy === 'date') sortBy = 'ciam.vw_veeva_consent_master.capture_datetime';
         }
 
-        const consent_filter = opt_type ? `ciam.vw_veeva_consent_master.country_code = ANY($countries) and
+        const consent_filter = opt_type ? opt.type === 'Opt_In_vod' ? `ciam.vw_veeva_consent_master.country_code = ANY($countries) and
         ciam.vw_veeva_consent_master.opt_type = '${opt.type}' and
-        ciam.vw_veeva_consent_master.double_opt_in = ${opt.double_opt_in}` : `ciam.vw_veeva_consent_master.country_code = ANY($countries)`;
-
+        ciam.vw_veeva_consent_master.double_opt_in = ${opt.double_opt_in}` :
+        `ciam.vw_veeva_consent_master.country_code = ANY($countries) and
+        ciam.vw_veeva_consent_master.opt_type = '${opt.type}'` : `ciam.vw_veeva_consent_master.country_code = ANY($countries)`;
 
         const hcp_consents = await sequelize.datasyncConnector.query(
             `SELECT
