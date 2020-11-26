@@ -359,18 +359,19 @@ export default function hcpUsers() {
                                         <Formik
                                             initialValues={{
                                                 comment: '',
-                                                selectedStatus: ''
+                                                selectedStatus: '',
+                                                other_comment: ''
                                             }}
                                             displayName="ApproveRejectForm"
                                             validationSchema={ApprovalRejectSchema}
                                             onSubmit={(values, actions) => {
                                                 if (values.selectedStatus === 'approve') {
-                                                    axios.put(`/api/hcp-profiles/${currentUser.id}/approve`, { comment: '' })
+                                                    if(values.comment === 'other') values.comment = values.other_comment;
+                                                    axios.put(`/api/hcp-profiles/${currentUser.id}/approve`, { comment: values.comment })
                                                         .then(() => onUpdateStatusSuccess())
                                                         .catch(err => onUpdateStatusFailure(err))
                                                 }
                                                 if (values.selectedStatus === 'reject') {
-                                                    if(values.comment === 'other') values.comment = values.other_comment;
                                                     axios.put(`/api/hcp-profiles/${currentUser.id}/reject`, values)
                                                         .then(() => onUpdateStatusSuccess())
                                                         .catch(err => onUpdateStatusFailure(err))
@@ -390,7 +391,7 @@ export default function hcpUsers() {
                                                             <a onClick={() => formikProps.setFieldValue('selectedStatus', 'reject')} className={`btn btn-block cdp-btn-outline-danger mt-4 p-2 font-weight-bold  ${formikProps.values.selectedStatus === 'reject' ? 'selected' : ''}`} >Reject User</a>
                                                         </div>
                                                     </div>
-                                                    {formikProps.values.selectedStatus === 'reject' && <div className="row mt-4">
+                                                    {formikProps.values.selectedStatus === 'approve' && <div className="row mt-4">
                                                         <div className="col-12 col-sm-12">
                                                             <div className="form-group mb-0">
                                                                 <label className="font-weight-bold" htmlFor="comment">Comment <span className="text-danger">*</span></label>
@@ -420,8 +421,22 @@ export default function hcpUsers() {
                                                                 </div>
                                                                 <div>
                                                                     {formikProps.values.comment === 'other' &&
-                                                                        <Field className="form-control" data-testid='comment' component="textarea" rows="4" name="other_comment" />
+                                                                        <>
+                                                                            <Field className="form-control" data-testid='comment' component="textarea" rows="4" name="other_comment" />
+                                                                            <div className="invalid-feedback"><ErrorMessage name="other_comment" /></div>
+                                                                        </>
                                                                     }
+                                                                </div>
+                                                                <div className="invalid-feedback"><ErrorMessage name="comment" /></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>}
+                                                    {formikProps.values.selectedStatus === 'reject' && <div className="row mt-4">
+                                                        <div className="col-12 col-sm-12">
+                                                            <div className="form-group mb-0">
+                                                                <label className="font-weight-bold" htmlFor="comment">Comment <span className="text-danger">*</span></label>
+                                                                <div>
+                                                                    <Field className="form-control" data-testid='comment' component="textarea" rows="4" name="comment" />
                                                                 </div>
                                                                 <div className="invalid-feedback"><ErrorMessage name="comment" /></div>
                                                             </div>
