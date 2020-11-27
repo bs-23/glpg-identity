@@ -5,7 +5,6 @@ import SelectInput from './SelectInput';
 import DateInput from './DateInput';
 import EmailInput from './EmailInput';
 import SelectContainer from './Container/SelectContainer';
-import CountryPhoneInput from './CountryPhoneInput';
 
 const InputField = ({ type, ...props }) => {
     const { name: inputFieldType, options, maxLength } = type || {};
@@ -14,7 +13,6 @@ const InputField = ({ type, ...props }) => {
     if(inputFieldType === fieldTypes.SELECT) return <SelectContainer {...props} options={options}>{(selectOptions) => <SelectInput options={selectOptions} {...props} />}</SelectContainer>
     if(inputFieldType === fieldTypes.DATE) return <DateInput {...props} />
     if(inputFieldType === fieldTypes.EMAIL) return <EmailInput maxLength={maxLength} {...props} />
-    if(inputFieldType === fieldTypes.COUNTRY_PHONE) return <CountryPhoneInput maxLength={maxLength} {...props} />
 
     return <TextInput {...props} />
 }

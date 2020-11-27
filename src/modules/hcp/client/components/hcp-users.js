@@ -266,18 +266,6 @@ export default function hcpUsers() {
                         : <span></span>
     }
 
-    // const renderSingleOptInSymbol = ({ value }) => {
-    //     return value && value.includes('single-opt-in')
-    //         ? <i className="fas fa-check-circle cdp-text-primary font-size-15px"></i>
-    //         : <i className="icon icon-close-circle text-danger consent-not-given"> </i>
-    // }
-
-    // const renderDoubleOptInSymbol = ({ value }) => {
-    //     return value && value.includes('double-opt-in')
-    //         ? <i className="fas fa-check-circle cdp-text-primary font-size-15px"></i>
-    //         : <i className="icon icon-close-circle text-danger consent-not-given"> </i>
-    // }
-
     const renderOptInTypes = ({ value }) => {
         return <div>
             {value.includes('single-opt-in') ? <i title="Single Opt-In" className="fas fa-check cdp-text-primary mr-3"></i> : <i title="Single Opt-In" className="fas fa-check text-danger mr-3"></i>}
@@ -306,6 +294,10 @@ export default function hcpUsers() {
                 </>
              }
         </div>
+    }
+
+    const CustomOptInHeader = () => {
+        return <div>Opt Type</div>
     }
 
     const columns = [
@@ -377,8 +369,6 @@ export default function hcpUsers() {
             id: 'telephone',
             name: 'Phone',
             editable: true,
-            // customCell: renderOptInTypes,
-            fieldType: { name: 'country_phone', maxLength: '100' },
             width: "8%"
         },
         {
@@ -386,18 +376,10 @@ export default function hcpUsers() {
             name: 'Opt-In-Types',
             editable: false,
             customCell: renderOptInTypes,
+            CustomHeader: CustomOptInHeader,
             //class: "consent-col",
             width: "10%"
         },
-        // {
-        //     id: 'opt_types',
-        //     key: "double",
-        //     name: 'Double Opt-In',
-        //     editable: false,
-        //     customCell: renderDoubleOptInSymbol,
-        //     class: "consent-col",
-        //     width: "8%"
-        // },
         {
             id: 'action',
             name: 'Action',
