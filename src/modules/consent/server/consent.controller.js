@@ -271,12 +271,12 @@ async function getDatasyncConsentsReport(req, res) {
         const opt_type = req.query.opt_type === undefined ? '' : req.query.opt_type;
         const offset = page * limit;
 
-        const setOpt = () => {
-            if(opt_type === 'opt-out') return { type: 'Opt_Out_vod', double_opt_in: false }
-            if(opt_type === 'single-opt-in') return { type: 'Opt_In_vod', double_opt_in: false };
-            return { type: 'Opt_In_vod', double_opt_in: true };
-        }
-        const opt = setOpt();
+        // const setOpt = () => {
+        //     if(opt_type === 'opt-out') return { type: 'Opt_Out_vod', double_opt_in: false }
+        //     if(opt_type === 'single-opt-in') return { type: 'Opt_In_vod', double_opt_in: false };
+        //     return { type: 'Opt_In_vod', double_opt_in: true };
+        // }
+        // const opt = setOpt();
 
         const [, userPermittedCountries] = await getUserPermissions(req.user.id);
 
@@ -331,11 +331,18 @@ async function getDatasyncConsentsReport(req, res) {
             if (orderBy === 'date') sortBy = 'ciam.vw_veeva_consent_master.capture_datetime';
         }
 
-        const consent_filter = opt_type ? opt.type === 'Opt_In_vod' ? `ciam.vw_veeva_consent_master.country_code = ANY($countries) and
-        ciam.vw_veeva_consent_master.opt_type = '${opt.type}' and
-        ciam.vw_veeva_consent_master.double_opt_in = ${opt.double_opt_in}` :
-        `ciam.vw_veeva_consent_master.country_code = ANY($countries) and
-        ciam.vw_veeva_consent_master.opt_type = '${opt.type}'` : `ciam.vw_veeva_consent_master.country_code = ANY($countries)`;
+        const getConsentFilter = () => {
+            if(opt_type === 'single-opt-in') return `ciam.vw_veeva_consent_master.country_code = ANY($countries) and
+                ciam.vw_veeva_consent_master.opt_type = 'Opt_In_vod' and
+                (ciam.vw_veeva_consent_master.double_opt_in = false or ciam.vw_veeva_consent_master.double_opt_in IS NULL)`;
+            if(opt_type === 'double-opt-in') return `ciam.vw_veeva_consent_master.country_code = ANY($countries) and
+                ciam.vw_veeva_consent_master.opt_type = 'Opt_In_vod' and
+                ciam.vw_veeva_consent_master.double_opt_in = true`;
+            if(opt_type === 'opt-out') return `ciam.vw_veeva_consent_master.country_code = ANY($countries) and
+                ciam.vw_veeva_consent_master.opt_type = 'Opt_Out_vod'`
+            return `ciam.vw_veeva_consent_master.country_code = ANY($countries)`;
+        }
+        const consent_filter = getConsentFilter();
 
         const hcp_consents = await sequelize.datasyncConnector.query(
             `SELECT
