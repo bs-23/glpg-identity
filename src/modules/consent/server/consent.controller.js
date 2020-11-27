@@ -272,7 +272,7 @@ async function getDatasyncConsentsReport(req, res) {
         const offset = page * limit;
 
         const [, userPermittedCountries] = await getUserPermissions(req.user.id);
-        const countries = (await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwcountry'))[0];
+        const countries = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry;", { type: QueryTypes.SELECT });
 
         async function getCountryIso2() {
             const user_codbase_list_for_iso2 = countries.filter(i => userPermittedCountries.includes(i.country_iso2)).map(i => i.codbase);
