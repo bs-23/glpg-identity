@@ -300,6 +300,10 @@ export default function hcpUsers() {
         return <div>Opt Type</div>
     }
 
+    const RegistrationHeader = () => {
+        return <span>Date of <br /> Registration</span>
+    }
+
     const columns = [
         {
             id: 'email',
@@ -316,6 +320,7 @@ export default function hcpUsers() {
             onSort: generateSortHandler('created_at'),
             customizeCellContent: formatDate,
             fieldType: { name: 'date' },
+            CustomHeader: RegistrationHeader,
             width: "8%"
         },
         {
