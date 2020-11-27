@@ -289,8 +289,8 @@ export default function hcpUsers() {
             {hasRowChanged &&
                 <>
                 <div className="d-flex position-absolute inline-editing__btn-wrap">
-                    <button className="btn cdp-btn-outline-secondary btn-sm text-nowrap" onClick={resetForm}><i class="fas fa-times-circle mr-1"></i> Reset</button>
-                    <button className="btn cdp-btn-primary ml-2 btn-sm text-white text-nowrap" onClick={() => onTableRowSave(hcps.users[rowIndex], { rowIndex, editableTableProps, formikProps })} disabled={!dirty}><i class="fas fa-check-circle mr-1"></i>Save Changes</button>
+                    <i onClick={resetForm} class="fas fa-times-circle mr-1 text-danger fa-2x mr-2" title="Cancel Changes" type="button"></i>
+                    <i onClick={() => onTableRowSave(hcps.users[rowIndex], { rowIndex, editableTableProps, formikProps })} disabled={!dirty} class="fas fa-check-circle mr-1 cdp-text-primary fa-2x" title="Save Changes" type="button"></i>
                 </div>
                 </>
              }
