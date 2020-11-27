@@ -1272,7 +1272,7 @@ async function searchOkla(req, res) {
         let { duplicates, isInContract, phonetic } = req.body;
 
         const page = req.query.page ? +req.query.page - 1 : 0;
-        const limit = 15;
+        const limit = 1000;
 
         if ((duplicates && typeof duplicates !== 'boolean')
             || (phonetic && typeof phonetic !== 'boolean')
@@ -1311,13 +1311,45 @@ async function searchOkla(req, res) {
             entityType: 'activity',
             isInContract,
             duplicates,
-            startIndex: page,
+            // startIndex: page,
             resultSize: limit,
             codBases: codbases,
             fields
         };
-        const { response: searchResult } = await OklaService.search(queryObj);
-        res.json(searchResult);
+
+        const { response: searchResponse } = await OklaService.search(queryObj);
+
+        const groupedByIndividuals = _.groupBy(searchResponse.results, 'individual.individualEid');
+
+        const results = [];
+        Object.keys(groupedByIndividuals).forEach((individualEid, index) => {
+
+            const group = groupedByIndividuals[individualEid];
+            // console.log('================================', group);
+            const individual = group[0].individual;
+            const workplaces = group.map(g => g.workplace);
+
+            const res = {
+                firstName: individual.firstName,
+                lastName: individual.lastName,
+                specialty: individual.qualifications ? individual.qualifications['SP,1'].corporateLabel : ''
+            };
+            console.log(index + '================================', res);
+        });
+
+        // const data = {
+        //     users: hcp_users,
+        //     page: page + 1,
+        //     limit,
+        //     total: totalUser,
+        //     start: limit * page + 1,
+        //     end: offset + limit > totalUser ? totalUser : offset + limit,
+        //     status: status ? status : null,
+        //     codbase: codbase ? codbase : null,
+        //     countries: userPermittedCountries
+        // };
+
+        res.json(searchResponse);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
