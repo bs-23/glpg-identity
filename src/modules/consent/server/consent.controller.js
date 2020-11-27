@@ -277,42 +277,16 @@ async function getDatasyncConsentsReport(req, res) {
             return { type: 'Opt_In_vod', double_opt_in: true };
         }
         const opt = setOpt();
-
         const [, userPermittedCountries] = await getUserPermissions(req.user.id);
+        const countries = (await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwcountry'))[0];
 
         async function getCountryIso2() {
-            const user_codbase_list_for_iso2 = (await sequelize.datasyncConnector.query(
-                `SELECT * FROM ciam.vwcountry where ciam.vwcountry.country_iso2 = ANY($countries);`,
-                {
-                    bind: {
-                        countries: userPermittedCountries
-                    },
-                    type: QueryTypes.SELECT
-                }
-            )).map(i => i.codbase);
-
-            const user_country_iso2_list = (await sequelize.datasyncConnector.query(
-                `SELECT * FROM ciam.vwcountry where ciam.vwcountry.codbase = ANY($codbases);`,
-                {
-                    bind: {
-                        codbases: user_codbase_list_for_iso2
-                    },
-                    type: QueryTypes.SELECT
-                }
-            )).map(i => i.country_iso2);
-
+            const user_codbase_list_for_iso2 = countries.filter(i => userPermittedCountries.includes(i.country_iso2)).map(i => i.codbase);
+            const user_country_iso2_list = countries.filter(i => user_codbase_list_for_iso2.includes(i.codbase)).map(i => i.country_iso2);
             return user_country_iso2_list;
         }
 
-        const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(
-            `SELECT * FROM ciam.vwcountry WHERE ciam.vwcountry.codbase = $codbase;`,
-            {
-                type: QueryTypes.SELECT,
-                bind: { codbase: codbase }
-            }
-        )).map(i => i.country_iso2);
-
-
+        const country_iso2_list_for_codbase = countries.filter(i => i.codbase === codbase).map(i => i.country_iso2);
         const country_iso2_list = await getCountryIso2();
 
         const orderBy = req.query.orderBy ? req.query.orderBy : '';
