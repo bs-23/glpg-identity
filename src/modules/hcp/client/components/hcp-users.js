@@ -336,6 +336,7 @@ export default function hcpUsers() {
                                 dialogClassName="modal-customize"
                                 aria-labelledby="example-custom-modal-styling-title"
                                 centered
+                                size="lg"
                             >
                                 <Modal.Header closeButton>
                                     <Modal.Title id="example-custom-modal-styling-title">
@@ -367,18 +368,19 @@ export default function hcpUsers() {
                                         <Formik
                                             initialValues={{
                                                 comment: '',
-                                                selectedStatus: ''
+                                                selectedStatus: '',
+                                                other_comment: ''
                                             }}
                                             displayName="ApproveRejectForm"
                                             validationSchema={ApprovalRejectSchema}
                                             onSubmit={(values, actions) => {
                                                 if (values.selectedStatus === 'approve') {
-                                                    axios.put(`/api/hcp-profiles/${currentUser.id}/approve`, { comment: '' })
+                                                    if(values.comment === 'other') values.comment = values.other_comment;
+                                                    axios.put(`/api/hcp-profiles/${currentUser.id}/approve`, { comment: values.comment })
                                                         .then(() => onUpdateStatusSuccess())
                                                         .catch(err => onUpdateStatusFailure(err))
                                                 }
                                                 if (values.selectedStatus === 'reject') {
-                                                    if(values.comment === 'other') values.comment = values.other_comment;
                                                     axios.put(`/api/hcp-profiles/${currentUser.id}/reject`, values)
                                                         .then(() => onUpdateStatusSuccess())
                                                         .catch(err => onUpdateStatusFailure(err))
@@ -392,44 +394,76 @@ export default function hcpUsers() {
                                                 <Form onSubmit={formikProps.handleSubmit}>
                                                     <div className="row">
                                                         <div className="col-6">
-                                                            <a onClick={() => formikProps.setFieldValue('selectedStatus', 'approve')} className={`btn btn-block cdp-btn-outline-primary mt-4 p-2 font-weight-bold ${formikProps.values.selectedStatus === 'approve' ? 'selected' : ''}`} >Approve User</a>
+                                                            <a
+                                                                className={`btn btn-block cdp-btn-outline-primary mt-4 p-2 font-weight-bold ${formikProps.values.selectedStatus === 'approve' ? 'selected' : ''}`}
+                                                                onClick={() => {
+                                                                    if(formikProps.values.selectedStatus !== 'approve') {
+                                                                        formikProps.setFieldValue('selectedStatus', 'approve');
+                                                                        formikProps.setFieldValue('comment', '');
+                                                                        formikProps.setFieldValue('other_comment', '');
+                                                                        formikProps.setFieldTouched('comment', false);
+                                                                        formikProps.setFieldTouched('other_comment', false);
+                                                                    }
+                                                                }}
+                                                            >
+                                                                Approve User
+                                                            </a>
                                                         </div>
                                                         <div className="col-6">
-                                                            <a onClick={() => formikProps.setFieldValue('selectedStatus', 'reject')} className={`btn btn-block cdp-btn-outline-danger mt-4 p-2 font-weight-bold  ${formikProps.values.selectedStatus === 'reject' ? 'selected' : ''}`} >Reject User</a>
+                                                            <a
+                                                                onClick={() => {
+                                                                    if(formikProps.values.selectedStatus !== 'reject') {
+                                                                        formikProps.setFieldValue('selectedStatus', 'reject');
+                                                                        formikProps.setFieldValue('comment', '');
+                                                                        formikProps.setFieldValue('other_comment', '');
+                                                                        formikProps.setFieldTouched('comment', false);
+                                                                        formikProps.setFieldTouched('other_comment', false);
+                                                                    }
+                                                                }}
+                                                                className={`btn btn-block cdp-btn-outline-danger mt-4 p-2 font-weight-bold  ${formikProps.values.selectedStatus === 'reject' ? 'selected' : ''}`}
+                                                            >
+                                                                Reject User
+                                                            </a>
                                                         </div>
                                                     </div>
+                                                    {formikProps.values.selectedStatus === 'approve' && <div className="row mt-4">
+                                                        <div className="col-12 col-sm-12">
+                                                            <div className="form-group mb-0">
+                                                                <label className="font-weight-bold" htmlFor="comment">Comment <span className="text-danger">*</span></label>
+                                                                <div className="custom-control custom-radio pb-2">
+                                                                    <Field className="custom-control-input" id="UUIDmanually" data-testid='comment' type="radio" name="comment" value="HCP User did a mistake in typing UUID manually" />
+                                                                    <label className="custom-control-label font-weight-bold" for="UUIDmanually"> HCP User did a mistake in typing UUID manually</label>
+                                                                </div>
+                                                                <div className="custom-control custom-radio pb-2">
+                                                                    <Field className="custom-control-input" data-testid='comment' type="radio" id="PharmaCompanies" name="comment" value="HCP User has exclusivity with other Pharma Companies" />
+                                                                    <label className="custom-control-label font-weight-bold" for="PharmaCompanies">HCP User has exclusivity with other Pharma Companies</label>
+                                                                </div>
+                                                                <div className="custom-control custom-radio pb-2">
+                                                                    <Field className="custom-control-input" data-testid='comment' id="OneKeypopulation" type="radio" name="comment" value="HCP User is not in the customers IQVia OneKey population" />
+                                                                    <label className="custom-control-label font-weight-bold" for="OneKeypopulation">HCP User is not in the customers IQVia OneKey population</label>
+                                                                </div>
+                                                                <div className="custom-control custom-radio pb-2">
+                                                                    <Field className="custom-control-input" data-testid='comment' id="Other" type="radio" rows="4" name="comment" value="other" />
+                                                                    <label className="custom-control-label font-weight-bold" for="Other">Other:</label>
+                                                                </div>
+                                                                <div>
+                                                                    {formikProps.values.comment === 'other' &&
+                                                                        <>
+                                                                            <Field className="form-control" data-testid='comment' component="textarea" rows="4" name="other_comment" />
+                                                                            <div className="invalid-feedback"><ErrorMessage name="other_comment" /></div>
+                                                                        </>
+                                                                    }
+                                                                </div>
+                                                                <div className="invalid-feedback"><ErrorMessage name="comment" /></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>}
                                                     {formikProps.values.selectedStatus === 'reject' && <div className="row mt-4">
                                                         <div className="col-12 col-sm-12">
                                                             <div className="form-group mb-0">
                                                                 <label className="font-weight-bold" htmlFor="comment">Comment <span className="text-danger">*</span></label>
                                                                 <div>
-                                                                    <label>
-                                                                        <Field className="form-control" data-testid='comment' type="radio" name="comment" value="HCP User did a mistake in typing UUID manually" />
-                                                                        HCP User did a mistake in typing UUID manually
-                                                                    </label>
-                                                                </div>
-                                                                <div>
-                                                                    <label>
-                                                                        <Field className="form-control" data-testid='comment' type="radio" name="comment" value="HCP User has exclusivity with other Pharma Companies" />
-                                                                        HCP User has exclusivity with other Pharma Companies
-                                                                    </label>
-                                                                </div>
-                                                                <div>
-                                                                    <label>
-                                                                        <Field className="form-control" data-testid='comment' type="radio" name="comment" value="HCP User is not in the customers IQVia OneKey population" />
-                                                                        HCP User is not in the customers IQVia OneKey population
-                                                                    </label>
-                                                                </div>
-                                                                <div>
-                                                                    <label>
-                                                                        <Field className="form-control" data-testid='comment' type="radio" rows="4" name="comment" value="other" />
-                                                                        Other:
-                                                                    </label>
-                                                                </div>
-                                                                <div>
-                                                                    {formikProps.values.comment === 'other' &&
-                                                                        <Field className="form-control" data-testid='comment' component="textarea" rows="4" name="other_comment" />
-                                                                    }
+                                                                    <Field className="form-control" data-testid='comment' component="textarea" rows="4" name="comment" />
                                                                 </div>
                                                                 <div className="invalid-feedback"><ErrorMessage name="comment" /></div>
                                                             </div>
