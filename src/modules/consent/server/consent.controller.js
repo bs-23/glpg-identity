@@ -271,13 +271,6 @@ async function getDatasyncConsentsReport(req, res) {
         const opt_type = req.query.opt_type === undefined ? '' : req.query.opt_type;
         const offset = page * limit;
 
-        // const setOpt = () => {
-        //     if(opt_type === 'opt-out') return { type: 'Opt_Out_vod', double_opt_in: false }
-        //     if(opt_type === 'single-opt-in') return { type: 'Opt_In_vod', double_opt_in: false };
-        //     return { type: 'Opt_In_vod', double_opt_in: true };
-        // }
-        // const opt = setOpt();
-
         const [, userPermittedCountries] = await getUserPermissions(req.user.id);
         const countries = (await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwcountry'))[0];
 
