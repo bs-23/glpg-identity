@@ -1,4 +1,6 @@
 const Faq = require('./faq.model');
+const ServiceCategory = require('../../../user/server/permission/service-category.model');
+const { QueryTypes, Op, where, col, fn, literal } = require('sequelize');
 
 async function getFaqItem(req, res) {
     try {
@@ -15,9 +17,66 @@ async function getFaqItem(req, res) {
 
 async function getFaqItems(req, res) {
     try {
-        const response = await Faq.findAll({});
+        const page = req.query.page ? req.query.page - 1 : 0;
+        if (page < 0) return res.status(404).send("page must be greater or equal 1");
 
-        res.json(response);
+        const limit = 2;
+        const offset = page * limit;
+
+        const category = req.query.category === 'null' || req.query.category === undefined ? null : req.query.category;
+
+        const orderBy = req.query.orderBy === 'null'
+            ? null
+            : req.query.orderBy;
+        const orderType = req.query.orderType === 'asc' || req.query.orderType === 'desc'
+            ? req.query.orderType
+            : 'asc';
+
+        const order = [
+            ['created_at', 'DESC'],
+            ['id', 'DESC']
+        ];
+
+        const sortableColumns = ['question', 'answer'];
+
+        if (orderBy && sortableColumns.includes(orderBy)) {
+            order.splice(0, 0, [orderBy, orderType]);
+        }
+
+        const serviceCategories = await ServiceCategory.findAll({ raw: true });
+        const categorySlug = category ? serviceCategories.find(x => x.title === category).slug : null;
+        const categoryList = [];
+        serviceCategories.forEach(element => {
+            categoryList.push(element.slug);
+        });
+
+        console.log(categorySlug);
+
+
+        const response = await Faq.findAndCountAll({
+            where: {
+                categories: {
+                    [Op.overlap]: category ? [categorySlug] : categoryList
+
+                }
+            },
+            offset,
+            limit,
+            order: order,
+            //  raw: true
+        });
+
+        const responseData = {
+            faq: response.rows,
+            page: page + 1,
+            limit,
+            total: response.count,
+            start: limit * page + 1,
+            end: offset + limit > response.count ? response.count : offset + limit,
+            category: categorySlug
+        }
+
+        res.json(responseData);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -26,12 +85,12 @@ async function getFaqItems(req, res) {
 
 async function createFaqItem(req, res) {
     try {
-        const { question, answer, service_categories } = req.body;
+        const { question, answer, categories } = req.body;
 
         const response = await Faq.create({
             question,
             answer,
-            service_categories,
+            categories,
             created_by: req.user.id,
             updated_by: req.user.id
         });
@@ -45,13 +104,13 @@ async function createFaqItem(req, res) {
 
 async function updateFaqItem(req, res) {
     try {
-        const { question, answer, service_categories } = req.body;
+        const { question, answer, categories } = req.body;
 
         let faq = await Faq.findOne({ where: { id: req.params.id } });
 
         if (!faq) return res.status(404).send("FAQ is not found or may be removed");
 
-        await faq.update({ question, answer, service_categories });
+        await faq.update({ question, answer, categories });
 
         res.json(faq);
 

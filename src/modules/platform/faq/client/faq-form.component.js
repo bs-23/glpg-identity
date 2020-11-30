@@ -9,6 +9,7 @@ import { useDispatch } from 'react-redux';
 
 const FaqForm = (props) => {
     const [, setShow] = useState(false);
+    const [editCategories, setEditCategories] = useState([]);
     const { addToast } = useToasts();
     const dispatch = useDispatch();
     const handleClose = () => {
@@ -56,6 +57,8 @@ const FaqForm = (props) => {
             options.unshift(allOptionsObject);
         }
 
+
+
         return <FieldArray
             name={name}
             render={arrayHelpers => (
@@ -85,6 +88,15 @@ const FaqForm = (props) => {
         });
     };
 
+    const convertSlugToId = (arr) => {
+        const convertArray = [];
+        arr.forEach(element => {
+            convertArray.push(props.serviceCategory.find(x => x.slug === element).id);
+        });
+        return convertArray;
+
+    }
+
     return (
         <Modal size="lg" centered show={props.show} onHide={handleClose}>
             <Modal.Header closeButton>
@@ -96,12 +108,21 @@ const FaqForm = (props) => {
                     <Formik
                         initialValues={{
                             question: props.editMode ? props.editData.question : '',
-                            service_categories: props.editMode ? props.editData.service_categories : [],
+                            categories: props.editMode ? convertSlugToId(props.editData.categories) : [],
                             answer: props.editMode ? props.editData.answer : '',
                         }}
                         validationSchema={faqSchema}
                         displayName="FaqForm"
                         onSubmit={(values, actions) => {
+
+                            const catgory_list = [];
+                            values.categories.forEach(element => {
+                                catgory_list.push(props.serviceCategory.find(x => x.id === element).slug);
+                            });
+
+                            values.categories = catgory_list;
+                            console.log(values);
+
                             if (props.editMode) {
                                 dispatch(editFaqItem(values, props.editData.id)).then(() => {
                                     actions.resetForm();
@@ -138,9 +159,9 @@ const FaqForm = (props) => {
                                                 <Field className="form-control preference" type='text' name='question' id='question' />
                                                 <div className="invalid-feedback"><ErrorMessage name="question" /></div>
                                             </div>
-                                            <FormFieldFluid label="Categories" name="service_categories" required={false} >
+                                            <FormFieldFluid label="Categories" name="categories" required={false} >
                                                 <ToggleList
-                                                    name="service_categories"
+                                                    name="categories"
                                                     options={props.serviceCategory}
                                                     idExtractor={item => item.id}
                                                     labelExtractor={item => item.title}

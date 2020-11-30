@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import FaqForm from './faq-form.component';
 import axios from "axios";
 import { getFaqItems, deleteFaqItem } from './faq.actions';
@@ -12,13 +12,18 @@ import { useToasts } from 'react-toast-notifications';
 export default function ManageFaq() {
     const [show, setShow] = useState(false);
     const faqData = useSelector(state => state.faqReducer.faq_items);
-    const [serviceCategory, setServiceCategory] = useState(false);
+    const [serviceCategories, setServiceCategories] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [editData, setEditData] = useState(null);
+    const [category, setCategory] = useState(null);
+    const [sort, setSort] = useState({ type: 'asc', value: null });
     const [showDelete, setShowDelete] = useState(false);
     const [deleteId, setDeleteId] = useState(false);
     const { addToast } = useToasts();
     const dispatch = useDispatch();
+    const location = useLocation();
+    const history = useHistory();
+    const params = new URLSearchParams(window.location.search);
 
     const deleteFaq = () => {
         dispatch(deleteFaqItem(deleteId)).then(() => {
@@ -36,11 +41,57 @@ export default function ManageFaq() {
 
     }
 
+    const urlChange = (pageNo, faqCategory, orderColumn, pageChange = false) => {
+        let orderType = params.get('orderType');
+        const orderBy = params.get('orderBy');
+        const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
+        const category = faqCategory ? encodeURIComponent(faqCategory) : encodeURIComponent(params.get('category'));
+
+        if (!pageChange) {
+            if (orderBy && !orderType) {
+                orderType = 'asc'
+            }
+
+            (orderBy === orderColumn)
+                ? (orderType === 'asc'
+                    ? orderType = 'desc'
+                    : orderType = 'asc')
+                : orderType = 'asc';
+        }
+
+        const url = `?page=${page}`
+            + (category && category !== 'null' ? `&category=${category}` : '')
+            + (orderColumn && orderColumn !== 'null' ? `&orderBy=${orderColumn}` : '')
+            + (orderColumn && orderType && orderType !== 'null' ? `&orderType=${orderType}` : '');
+
+        history.push(location.pathname + url);
+
+    }
+
     useEffect(() => {
-        dispatch(getFaqItems());
+        setCategory(params.get('category') ? params.get('category') : null);
+        const searchObj = {};
+        const searchParams = location.search.slice(1).split("&");
+        searchParams.forEach(element => {
+            searchObj[element.split("=")[0]] = element.split("=")[1];
+        });
+        console.log(params.get('category'));
+        dispatch(getFaqItems(searchObj.page, searchObj.category, searchObj.orderBy, searchObj.orderType));
+        setSort({ type: params.get('orderType') || 'asc', value: params.get('orderBy') });
+    }, [location]);
+
+    const pageLeft = () => {
+        if (faqData.page > 1) urlChange(faqData.page - 1, faqData.category, params.get('orderBy'), true);
+    };
+
+    const pageRight = () => {
+        if (faqData.end !== faqData.total) urlChange(faqData.page + 1, faqData.category, params.get('orderBy'), true);
+    };
+
+    useEffect(() => {
         async function getServiceCategory() {
             const response = (await axios.get('/api/serviceCategories')).data;
-            setServiceCategory(response);
+            setServiceCategories(response);
         }
         getServiceCategory();
     }, []);
@@ -64,13 +115,29 @@ export default function ManageFaq() {
                     <div className="col-12">
                         <div className="d-sm-flex justify-content-end align-items-center mb-3 mt-4">
                             <div class="d-flex justify-content-between align-items-center">
+                                <Dropdown className="ml-auto dropdown-customize">
+                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center">
+                                        <i className="icon icon-filter mr-2 mb-n1"></i> {!faqData.category ? 'Filter by Category' : serviceCategories.find(x => x.slug === faqData.category).title}
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu>
+                                        {
+                                            faqData.category && <Dropdown.Item onClick={() => urlChange(1, 'null', params.get('orderBy'))}>All</Dropdown.Item>
+                                        }
+                                        {
+                                            serviceCategories.length > 0 && serviceCategories.map((item, index) => (
+                                                item.title !== faqData.category && <Dropdown.Item key={index} onClick={() => urlChange(1, item.title, params.get('orderBy'))}>{item.title}</Dropdown.Item>
+                                            ))
+                                        }
+                                    </Dropdown.Menu>
+                                </Dropdown>
+
                                 <button onClick={() => { setShow(true); setEditMode(false); setEditData(null); }} className="btn cdp-btn-secondary text-white ml-2">
                                     <i className="icon icon-plus pr-1"></i> Add New FAQ
                                 </button>
                             </div>
                         </div>
 
-                        {faqData && faqData.length > 0 && serviceCategory && serviceCategory.length > 0 &&
+                        {faqData.faq && faqData.faq.length > 0 && serviceCategories && serviceCategories.length > 0 &&
                             <div className="table-responsive shadow-sm bg-white">
                                 <table className="table table-hover table-sm mb-0 cdp-table">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
@@ -82,12 +149,12 @@ export default function ManageFaq() {
                                         </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
-                                        {faqData.map((row, index) => (
+                                        {faqData.faq.map((row, index) => (
                                             <tr key={index}>
                                                 <td>{row.question}</td>
                                                 <td>{parse(row.answer)}</td>
-                                                <td>{row.service_categories && row.service_categories.map((item, key) => (
-                                                    (serviceCategory.find(x => x.id === item).title) + (key < row.service_categories.length - 1 ? ',' : '')
+                                                <td>{row.categories && row.categories.map((item, key) => (
+                                                    (serviceCategories.find(x => x.slug === item).title) + (key < row.categories.length - 1 ? ',' : '')
 
                                                 ))
                                                 }</td>
@@ -105,9 +172,19 @@ export default function ManageFaq() {
                                         ))}
                                     </tbody>
                                 </table>
+                                {((faqData.page === 1 &&
+                                    faqData.total > faqData.limit) ||
+                                    (faqData.page > 1))
+                                    && faqData['faq'] &&
+                                    <div className="pagination justify-content-end align-items-center border-top p-3">
+                                        <span className="cdp-text-primary font-weight-bold">{faqData.start + ' - ' + faqData.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + faqData.total}</span>
+                                        <span className="pagination-btn" data-testid='Prev' onClick={() => pageLeft()} disabled={faqData.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
+                                        <span className="pagination-btn" data-testid='Next' onClick={() => pageRight()} disabled={faqData.end === faqData.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
+                                    </div>
+                                }
                             </div>
                         }
-                        <FaqForm editMode={editMode} editData={editData} serviceCategory={serviceCategory} changeShow={(val) => setShow(val)} show={show} />
+                        <FaqForm editMode={editMode} editData={editData} serviceCategory={serviceCategories} changeShow={(val) => setShow(val)} show={show} />
                         <Modal centered show={showDelete} onHide={() => setShowDelete(false)}>
                             <Modal.Header closeButton>
                                 <Modal.Title className="modal-title_small">Remove FAQ</Modal.Title>

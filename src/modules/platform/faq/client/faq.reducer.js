@@ -2,7 +2,7 @@ import Types from './faq.types';
 
 const initialState = {
     faq_item: null,
-    faq_items: []
+    faq_items: {}
 };
 
 export default function reducer(state = initialState, action) {
@@ -12,7 +12,6 @@ export default function reducer(state = initialState, action) {
         }
 
         case Types.GET_FAQ_ITEMS_FULFILLED: {
-            console.log(action.payload.data);
             return { ...state, faq_items: action.payload.data };
         }
 
@@ -20,7 +19,7 @@ export default function reducer(state = initialState, action) {
             return {
                 ...state,
                 faq_item: action.payload.data,
-                faq_items: [...state.faq_items, action.payload.data]
+                faq_items: { ...state.faq_items, faq: [...state.faq_items.faq, action.payload.data] }
             };
         }
 
@@ -28,12 +27,15 @@ export default function reducer(state = initialState, action) {
             return {
                 ...state,
                 faq_item: action.payload.data,
-                faq_items: (state.faq_items).map(item => {
-                    if (item.id === action.payload.data.id) {
-                        return action.payload.data
-                    }
-                    return item
-                })
+                faq_items: {
+                    ...state.faq_items,
+                    faq: (state.faq_items.faq).map(item => {
+                        if (item.id === action.payload.data.id) {
+                            return action.payload.data
+                        }
+                        return item
+                    })
+                }
             }
         }
 
@@ -41,7 +43,10 @@ export default function reducer(state = initialState, action) {
             const id = action.payload.config.url.split("/api/faq/")[1];
             return {
                 ...state,
-                faq_items: state.faq_items.filter(x => x.id !== id)
+                faq_items: {
+                    ...state.faq_items,
+                    faq: state.faq_items.faq.filter(x => x.id !== id)
+                }
             }
         }
     }
