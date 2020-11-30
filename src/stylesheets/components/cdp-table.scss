@@ -49,7 +49,9 @@
             }
 
             &__btn-wrap {
-                right: 0px;
+                left: 0px;
+                top: 50%;
+                transform: translateY(-40%);
             }
         }
 
@@ -123,9 +125,17 @@
     }
 
     &.table-hover tbody tr {
-        &:hover,
-        &.edited {
+        &:hover {
             background-color: rgba(20,77,67,0.07);
+        }
+
+        &.edited {
+            background-color: rgba(20,77,67,0.1);
+            border: 2px solid rgba(20,77,67,0.2);
+
+            .fa-1_5x {
+                font-size: 1.5em;
+            }
         }
     }
 
