@@ -347,6 +347,7 @@ export default function hcpUsers() {
             name: 'First Name',
             fieldType: { name: 'text', maxLength: '50' },
             onSort: generateSortHandler('first_name'),
+            class: "text-break",
             width: "10%"
         },
         {
@@ -354,6 +355,7 @@ export default function hcpUsers() {
             name: 'Last Name',
             fieldType: { name: 'text', maxLength: '50' },
             onSort: generateSortHandler('onSort'),
+            class: "text-break",
             width: "10%"
         },
         {
