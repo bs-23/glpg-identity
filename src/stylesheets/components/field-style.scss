@@ -106,6 +106,9 @@ input:checked + .slider:before {
 .custom-checkbox .custom-control-input:focus ~ .custom-control-label::before {
     box-shadow: none !important;
 }
+.custom-control-input:focus ~ .custom-control-label::before {
+    box-shadow: 0 0 0 0.2rem rgba(20, 77, 67, .25) !important;
+}
 
 .custom-control-label::before {
     border: #adb5bd solid 1px !important;
