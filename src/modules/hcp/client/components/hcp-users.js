@@ -353,7 +353,7 @@ export default function hcpUsers() {
             id: 'last_name',
             name: 'Last Name',
             fieldType: { name: 'text', maxLength: '50' },
-            onSort: generateSortHandler('onSort'),
+            onSort: generateSortHandler('last_name'),
             width: "10%"
         },
         {
