@@ -385,7 +385,8 @@ export default function hcpUsers() {
             id: 'telephone',
             name: 'Phone',
             editable: true,
-            width: "8%"
+            width: "8%",
+            fieldType: { name: 'text', maxLength: '25' },
         },
         {
             id: 'opt_types',
