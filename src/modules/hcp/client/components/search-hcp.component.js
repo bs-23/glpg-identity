@@ -67,7 +67,7 @@ const SearchHcp = () => {
                                                         name="countries"
                                                         components={{Option: CustomOption}}
                                                         hideSelectedOptions={false}
-                                                        controlShouldRenderValue = { false }
+                                                        // controlShouldRenderValue = { false }
                                                         options={getCountries()}
                                                         onChange={handleChange}
                                                     />
