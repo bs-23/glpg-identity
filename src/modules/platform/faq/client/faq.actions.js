@@ -11,11 +11,12 @@ export function fetchFaqItem(id) {
     };
 }
 
-export function getFaqItems(page = 1, category, orderBy, orderType) {
+export function getFaqItems(page = 1, category, orderBy, orderType, limit = 30) {
     const url = `/api/faq?page=${page}`
         + (category ? `&category=${category}` : '')
         + (orderBy && orderBy !== 'null' ? `&orderBy=${orderBy}` : '')
-        + (orderType && orderType !== 'null' ? `&orderType=${orderType}` : '');
+        + (orderType && orderType !== 'null' ? `&orderType=${orderType}` : '')
+        + (limit && limit !== 'null' ? `&limit=${limit}` : '');
     return {
         type: Types.GET_FAQ_ITEMS,
         payload: axios({

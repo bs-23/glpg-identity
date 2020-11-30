@@ -126,7 +126,7 @@ export default function ManageFaq() {
                                         }
                                         {
                                             serviceCategories.length > 0 && serviceCategories.map((item, index) => (
-                                                item.title !== faqData.category && <Dropdown.Item key={index} onClick={() => urlChange(1, item.title, params.get('orderBy'))}>{item.title}</Dropdown.Item>
+                                                item.title !== faqData.category && <Dropdown.Item key={index} onClick={() => urlChange(1, item.slug, params.get('orderBy'))}>{item.title}</Dropdown.Item>
                                             ))
                                         }
                                     </Dropdown.Menu>

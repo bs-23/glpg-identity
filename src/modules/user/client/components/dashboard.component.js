@@ -1,8 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import Faq from '../../../shared/client/components/faq.component';
+import Faq from '../../../platform/faq/client/faq.component';
+import { useSelector, useDispatch } from 'react-redux';
+import { getFaqItems } from '../../../platform/faq/client/faq.actions';
 
 export default function Dashboard() {
+    const faqData = useSelector(state => state.faqReducer.faq_items);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(getFaqItems(1, 'information', null, null, 5));
+    }, []);
+
     return (
         <main className="app__content cdp-light-bg">
             <div className="container-fluid">
@@ -55,7 +64,7 @@ export default function Dashboard() {
                         </div>
                     </div>
                     <div className="col-12 col-lg-4 col-xl-3 py-3 app__content-panel-right">
-                        <Faq/>
+                        <Faq category={faqData.faq} />
                     </div>
                 </div>
             </div>

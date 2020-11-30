@@ -20,7 +20,7 @@ async function getFaqItems(req, res) {
         const page = req.query.page ? req.query.page - 1 : 0;
         if (page < 0) return res.status(404).send("page must be greater or equal 1");
 
-        const limit = 2;
+        const limit = req.query.limit ? req.query.limit : 30;
         const offset = page * limit;
 
         const category = req.query.category === 'null' || req.query.category === undefined ? null : req.query.category;
@@ -44,19 +44,16 @@ async function getFaqItems(req, res) {
         }
 
         const serviceCategories = await ServiceCategory.findAll({ raw: true });
-        const categorySlug = category ? serviceCategories.find(x => x.title === category).slug : null;
         const categoryList = [];
         serviceCategories.forEach(element => {
             categoryList.push(element.slug);
         });
 
-        console.log(categorySlug);
-
 
         const response = await Faq.findAndCountAll({
             where: {
                 categories: {
-                    [Op.overlap]: category ? [categorySlug] : categoryList
+                    [Op.overlap]: category ? [category] : categoryList
 
                 }
             },
@@ -73,7 +70,7 @@ async function getFaqItems(req, res) {
             total: response.count,
             start: limit * page + 1,
             end: offset + limit > response.count ? response.count : offset + limit,
-            category: categorySlug
+            category: category
         }
 
         res.json(responseData);
