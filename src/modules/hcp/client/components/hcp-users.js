@@ -82,7 +82,7 @@ export default function hcpUsers() {
     const [currentUser, setCurrentUser] = useState({});
     const { addToast } = useToasts();
     const [sort, setSort] = useState({ type: 'ASC', value: null });
-    const [showFilters, setShowFilters] = useState(true);
+    const [tableDirty, setTableDirty] = useState(false);
     const [editableTableProps, setEditableTableProps] = useState({});
 
     const hcps = useSelector(state => state.hcpReducer.hcps);
@@ -317,7 +317,10 @@ export default function hcpUsers() {
     }
 
     const RegistrationHeader = () => {
-        return <span>Date of <br /> Registration</span>
+        return <span className={sort.value === 'created_at' ? `cdp-table__col-sorting sorted ${sort.type && sort.type.toLowerCase()}` : 'cdp-table__col-sorting'} >
+            Date of <br /> Registration
+            {!tableDirty && <i onClick={generateSortHandler('created_at')} className="icon icon-sort cdp-table__icon-sorting"></i>}
+        </span>
     }
 
     const columns = [
@@ -412,7 +415,7 @@ export default function hcpUsers() {
     ];
 
     const handleTableDirtyStatusChange = (dirty) => {
-        setShowFilters(!dirty);
+        setTableDirty(dirty);
     }
 
     useEffect(() => {
@@ -478,7 +481,7 @@ export default function hcpUsers() {
                                         </div>
                                     </div>
                                 </div>
-                                {showFilters && <div className="d-flex pt-3 pt-sm-0">
+                                {!tableDirty && <div className="d-flex pt-3 pt-sm-0">
                                     {countries && hcps['countries'] &&
                                         <React.Fragment>
                                             <Dropdown className="ml-auto dropdown-customize mr-2">
@@ -781,7 +784,7 @@ export default function hcpUsers() {
                                         onDirtyChange={handleTableDirtyStatusChange}
                                         enableReinitialize
                                     >
-                                    {
+                                    {/* {
                                         (editableTableProps) => {
                                             const { dirty, values, touched, status, errors, error, resetForm, initialValues, submitForm } = editableTableProps;
                                             console.log('current value: ', values.rows[0] && values.rows[0].first_name)
@@ -792,7 +795,7 @@ export default function hcpUsers() {
                                                 </div>
                                             </div>
                                         }
-                                    }
+                                    } */}
                                     </EditableTable>
                                     {((hcps.page === 1 &&
                                         hcps.total > hcps.limit) ||
