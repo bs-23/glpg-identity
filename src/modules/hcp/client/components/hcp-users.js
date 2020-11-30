@@ -82,7 +82,7 @@ export default function hcpUsers() {
     const [currentUser, setCurrentUser] = useState({});
     const { addToast } = useToasts();
     const [sort, setSort] = useState({ type: 'ASC', value: null });
-    const [showFilters, setShowFilters] = useState(true);
+    const [tableDirty, setTableDirty] = useState(false);
     const [editableTableProps, setEditableTableProps] = useState({});
 
     const hcps = useSelector(state => state.hcpReducer.hcps);
@@ -275,15 +275,15 @@ export default function hcpUsers() {
     }
 
     const renderActions = ({ row, rowIndex, formikProps, hasRowChanged, editableTableProps }) => {
-        const { dirty, resetForm } = formikProps;
+        const { dirty, resetForm, initialValues } = formikProps;
 
         return <div className="position-relative d-inline-block">
             {!hasRowChanged && <Dropdown className="dropdown-customize">
                 <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
-                    <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(hcps.users[rowIndex])}>Profile</Dropdown.Item></LinkContainer>
-                    {row.status === 'not_verified' && <LinkContainer disabled={dirty} to="#"><Dropdown.Item onClick={() => onUpdateStatus(hcps.users[rowIndex])}>Manage Status</Dropdown.Item></LinkContainer>}
+                    <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(initialValues.rows[rowIndex])}>Profile</Dropdown.Item></LinkContainer>
+                    {row.status === 'not_verified' && <LinkContainer disabled={dirty} to="#"><Dropdown.Item onClick={() => onUpdateStatus(initialValues.rows[rowIndex])}>Manage Status</Dropdown.Item></LinkContainer>}
                 </Dropdown.Menu>
             </Dropdown>}
             {hasRowChanged &&
@@ -317,7 +317,10 @@ export default function hcpUsers() {
     }
 
     const RegistrationHeader = () => {
-        return <span>Date of <br /> Registration</span>
+        return <span className={sort.value === 'created_at' ? `cdp-table__col-sorting sorted ${sort.type && sort.type.toLowerCase()}` : 'cdp-table__col-sorting'} >
+            Date of <br /> Registration
+            {!tableDirty && <i onClick={generateSortHandler('created_at')} className="icon icon-sort cdp-table__icon-sorting"></i>}
+        </span>
     }
 
     const columns = [
@@ -367,24 +370,16 @@ export default function hcpUsers() {
             unique: true,
             onSort: generateSortHandler('uuid'),
             fieldType: { name: 'email', maxLength: '20' },
-            width: "9%"
-        },
-        {
-            id: 'country_iso2',
-            name: 'Country',
-            customizeCellContent: getCountryName,
             width: "9%",
-            fieldType: {
-                name: 'select',
-                options: countries && countries.map(c => ({ value: c.country_iso2.toLowerCase(), label: c.codbase_desc }))
-            }
+            editable: (row) => row.status === 'manually_verified'
         },
         {
             id: 'specialty_onekey',
             name: 'Specialty',
             width: "10%",
             customizeCellContent: getSpecialtyDescription,
-            fieldType: { name: 'select', options: getSpecialtyOptions }
+            fieldType: { name: 'select', options: getSpecialtyOptions },
+            editable: (row) => row.status === 'manually_verified'
         },
         {
             id: 'telephone',
@@ -412,7 +407,7 @@ export default function hcpUsers() {
     ];
 
     const handleTableDirtyStatusChange = (dirty) => {
-        setShowFilters(!dirty);
+        setTableDirty(dirty);
     }
 
     useEffect(() => {
@@ -478,7 +473,7 @@ export default function hcpUsers() {
                                         </div>
                                     </div>
                                 </div>
-                                {showFilters && <div className="d-flex pt-3 pt-sm-0">
+                                {!tableDirty && <div className="d-flex pt-3 pt-sm-0">
                                     {countries && hcps['countries'] &&
                                         <React.Fragment>
                                             <Dropdown className="ml-auto dropdown-customize mr-2">
@@ -698,76 +693,6 @@ export default function hcpUsers() {
                                 tableProps={editableTableProps}
                             />
 
-                            {/* {hcps['users'] && hcps['users'].length > 0 &&
-                                <React.Fragment>
-                                    <div className="shadow-sm bg-white table-responsive">
-                                        <table className="table table-hover table-sm mb-0 cdp-table cdp-table-sm">
-                                            <thead className="cdp-bg-primary text-white cdp-table__header">
-                                                <tr>
-                                                    <th><span className={sort.value === 'email' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, hcps.codBase, hcps.status, 'email')}>Email<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                    <th><span className={sort.value === 'created_at' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, hcps.codBase, hcps.status, 'created_at')}>Date of Registration<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                    <th><span className={sort.value === 'first_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, hcps.codBase, hcps.status, 'first_name')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                    <th><span className={sort.value === 'last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, hcps.codBase, hcps.status, 'last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                    <th><span className={sort.value === 'status' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, hcps.codBase, hcps.status, 'status')}>Status<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                    <th><span className={sort.value === 'uuid' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, hcps.codBase, hcps.status, 'uuid')}>UUID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                    <th><span >Country</span></th>
-                                                    <th><span>Specialty</span></th>
-                                                    <th className="consent-col">Single<br /> Opt-In</th>
-                                                    <th className="consent-col">Double<br /> Opt-In</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="cdp-table__body bg-white">
-                                                {hcps['users'].map((row, index) => (
-                                                    <tr key={index}>
-                                                        <td className="text-break">{row.email}</td>
-                                                        <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
-                                                        <td className="text-break">{row.first_name}</td>
-                                                        <td className="text-break">{row.last_name}</td>
-                                                        <td className="text-nowrap">
-                                                            {row.status === 'self_verified' ? <span><i className="fa fa-xs fa-circle text-success pr-2 hcp-status-icon"></i>Self Verified</span> :
-                                                                row.status === 'manually_verified' ? <span><i className="fa fa-xs fa-circle text-success pr-2 hcp-status-icon"></i>Manually Verified</span> :
-                                                                    row.status === 'consent_pending' ? <span><i className="fa fa-xs fa-circle text-warning pr-2 hcp-status-icon"></i>Consent Pending</span> :
-                                                                        row.status === 'not_verified' ? <span><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Not Verified</span> :
-                                                                            row.status === 'rejected' ? <span><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Rejected</span> : <span></span>
-                                                            }
-                                                        </td>
-                                                        <td>{row.uuid}</td>
-                                                        <td><span>{getCountryName(row.country_iso2)}</span></td>
-                                                        <td>{row.specialty_description}</td>
-                                                        <td>{row.opt_types.includes('single-opt-in') ? <i className="fas fa-check-circle cdp-text-primary font-size-15px"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
-                                                        <td>{row.opt_types.includes('double-opt-in') ? <i className="fas fa-check-circle cdp-text-primary font-size-15px"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
-                                                        <td>
-                                                            <span>
-                                                                <Dropdown className="ml-auto dropdown-customize">
-                                                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
-                                                                    </Dropdown.Toggle>
-                                                                    <Dropdown.Menu>
-                                                                        <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(row)}>Profile</Dropdown.Item></LinkContainer>
-                                                                        {row.status === 'not_verified' && <LinkContainer to="#"><Dropdown.Item onClick={() => onUpdateStatus(row)}>Manage Status</Dropdown.Item></LinkContainer>}
-                                                                    </Dropdown.Menu>
-                                                                </Dropdown>
-                                                            </span>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                        {((hcps.page === 1 &&
-                                            hcps.total > hcps.limit) ||
-                                            (hcps.page > 1))
-                                            && hcps['users'] &&
-                                            <div className="pagination justify-content-end align-items-center border-top p-3">
-                                                <span className="cdp-text-primary font-weight-bold">{hcps.start + ' - ' + hcps.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + hcps.total}</span>
-                                                <span className="pagination-btn" data-testid='Prev' onClick={() => pageLeft()} disabled={hcps.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
-                                                <span className="pagination-btn" data-testid='Next' onClick={() => pageRight()} disabled={hcps.end === hcps.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
-                                            </div>
-                                        }
-                                    </div>
-
-                                </React.Fragment>
-                            } */}
-
                             {hcps['users'] && hcps['users'].length > 0 &&
                                 <React.Fragment>
                                     <EditableTable
@@ -781,7 +706,7 @@ export default function hcpUsers() {
                                         onDirtyChange={handleTableDirtyStatusChange}
                                         enableReinitialize
                                     >
-                                    {
+                                    {/* {
                                         (editableTableProps) => {
                                             const { dirty, values, touched, status, errors, error, resetForm, initialValues, submitForm } = editableTableProps;
                                             console.log('current value: ', values.rows[0] && values.rows[0].first_name)
@@ -792,7 +717,7 @@ export default function hcpUsers() {
                                                 </div>
                                             </div>
                                         }
-                                    }
+                                    } */}
                                     </EditableTable>
                                     {((hcps.page === 1 &&
                                         hcps.total > hcps.limit) ||
