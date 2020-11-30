@@ -3,6 +3,7 @@ const { Op } = require('sequelize');
 const Role = require('./role.model');
 const RolePermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/role-permissionSet.model"));
 const PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permission-set.model"));
+const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 
 async function getRoles(req, res) {
     try {
@@ -36,7 +37,7 @@ async function createRole(req, res) {
         if(!permissionSets.length) return res.status(400).send('Must provide permission sets.');
 
         const [role, created] = await Role.findOrCreate({
-            where: { title },
+            where: { title: { [Op.iLike]: title } },
             defaults: {
                 title: title.trim(),
                 slug: title.trim().replace(/ +/g, '_').toLowerCase(),
@@ -51,6 +52,14 @@ async function createRole(req, res) {
         const permission_sets = permissionSets.map(id => ({ roleId: role.id, permissionSetId: id }));
 
         await RolePermissionSet.bulkCreate(permission_sets);
+
+        await logService.log({
+            event_type: 'CREATE',
+            object_id: role.id,
+            table_name: 'roles',
+            actor: req.user.id,
+            description: `"${role.title}" role created`
+        });
 
         res.json(role);
     } catch (error) {
@@ -72,7 +81,10 @@ async function editRole(req, res) {
 
         if(!foundRole) return res.status(400).send('Role not found.');
 
-        const roleWithSameName = await Role.findOne({ where: { title, id: { [Op.ne]: id } }});
+        const roleWithSameName = await Role.findOne({ where: {
+            title: { [Op.iLike]: title },
+            id: { [Op.ne]: id } }
+        });
 
         if(roleWithSameName) return res.status(400).send('Role with the same title already exists.');
 
@@ -84,6 +96,14 @@ async function editRole(req, res) {
         });
 
         await foundRole.setPermission_sets(permissionSets);
+
+        await logService.log({
+            event_type: 'UPDATE',
+            object_id: foundRole.id,
+            table_name: 'roles',
+            actor: req.user.id,
+            description: `Role updated`
+        });
 
         res.json(foundRole);
     } catch (error) {

@@ -7,6 +7,10 @@ const PermissionSet_Application = require('./permissionSet-application.model');
 const ServiceCategory = require('../permission/service-category.model');
 const Application = require('../../../application/server/application.model');
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
+const UserProfile_PermissionSet = require(path.join(process.cwd(), 'src/modules/user/server/permission-set/userProfile-permissionSet.model.js'));
+const UserProfile = require(path.join(process.cwd(), 'src/modules/user/server/user-profile.model.js'));
+const UserRole_PermissionSet = require(path.join(process.cwd(), 'src/modules/user/server/permission-set/role-permissionSet.model.js'));
+const Role = require(path.join(process.cwd(), 'src/modules/user/server/role/role.model.js'));
 
 async function getPermissionSets(req, res) {
     try {
@@ -57,7 +61,8 @@ async function getPermissionSet(req, res) {
 
         const permissionSet = await PermissionSet.findOne({
             where: { id },
-            include: [{
+            include: [
+                {
                     model: PermissionSet_ServiceCategory,
                     as: 'ps_sc',
                     attributes: [ 'id'],
@@ -77,6 +82,22 @@ async function getPermissionSet(req, res) {
                         as: 'application',
                         attributes: [ 'id', 'name', 'slug' ]
 
+                    }]
+                },
+                {
+                    model: UserProfile_PermissionSet,
+                    as: 'ps_up_ps',
+                    include: [{
+                        model: UserProfile,
+                        as: 'profile'
+                    }]
+                },
+                {
+                    model: UserRole_PermissionSet,
+                    as: 'ps_role_ps',
+                    include: [{
+                        model: Role,
+                        as: 'role'
                     }]
                 }
             ],
@@ -105,7 +126,7 @@ async function createPermissionSet(req, res) {
         if(!title.trim()) return res.status(400).send('Permission set title can not be empty.');
 
         const [doc, created] = await PermissionSet.findOrCreate({
-            where: { title },
+            where: { title: { [Op.iLike]: title } },
             defaults: {
                 title: title,
                 slug: title.replace(/ +/g, '_').toLowerCase(),
@@ -136,9 +157,9 @@ async function createPermissionSet(req, res) {
         await logService.log({
             event_type: 'CREATE',
             object_id: doc.id,
-            table_name: 'permissionSet',
-            created_by: req.user.id,
-            description: `${doc.name} permission set created`
+            table_name: 'permission_sets',
+            actor: req.user.id,
+            description: `"${doc.title}" Permission-Set created`
         });
 
         res.json(doc);
@@ -166,7 +187,7 @@ async function editPermissionSet(req, res) {
             return res.sendStatus(400);
         }
 
-        const permSetWithSameTitle = await PermissionSet.findAll({ where: { id: { [Op.ne]: doc.id }, title }});
+        const permSetWithSameTitle = await PermissionSet.findAll({ where: { id: { [Op.ne]: doc.id }, title: { [Op.iLike]: title } }});
 
         if(permSetWithSameTitle.length) return res.status(400).send('Permission set with the same title already exists.');
 
@@ -181,6 +202,14 @@ async function editPermissionSet(req, res) {
         await doc.setService_categories(serviceCategories);
 
         await doc.setApplications(applications);
+
+        await logService.log({
+            event_type: 'UPDATE',
+            object_id: doc.id,
+            table_name: 'permission_sets',
+            actor: req.user.id,
+            description: `Permission-Set updated`
+        });
 
         res.json(doc);
     } catch (error) {

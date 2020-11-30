@@ -14,6 +14,7 @@ const HCPS = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-profil
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-consents.model'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/user/server/permission/permissions.js'));
+const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 
 function getTranslationViewmodels(translations) {
     return translations.map(t => ({
@@ -270,48 +271,16 @@ async function getDatasyncConsentsReport(req, res) {
         const opt_type = req.query.opt_type === undefined ? '' : req.query.opt_type;
         const offset = page * limit;
 
-        const setOpt = () => {
-            if(opt_type === 'opt-out') return { type: 'Opt_Out_vod', double_opt_in: false }
-            if(opt_type === 'single-opt-in') return { type: 'Opt_In_vod', double_opt_in: false };
-            return { type: 'Opt_In_vod', double_opt_in: true };
-        }
-        const opt = setOpt();
-
         const [, userPermittedCountries] = await getUserPermissions(req.user.id);
+        const countries = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry;", { type: QueryTypes.SELECT });
 
         async function getCountryIso2() {
-            const user_codbase_list_for_iso2 = (await sequelize.datasyncConnector.query(
-                `SELECT * FROM ciam.vwcountry where ciam.vwcountry.country_iso2 = ANY($countries);`,
-                {
-                    bind: {
-                        countries: userPermittedCountries
-                    },
-                    type: QueryTypes.SELECT
-                }
-            )).map(i => i.codbase);
-
-            const user_country_iso2_list = (await sequelize.datasyncConnector.query(
-                `SELECT * FROM ciam.vwcountry where ciam.vwcountry.codbase = ANY($codbases);`,
-                {
-                    bind: {
-                        codbases: user_codbase_list_for_iso2
-                    },
-                    type: QueryTypes.SELECT
-                }
-            )).map(i => i.country_iso2);
-
+            const user_codbase_list_for_iso2 = countries.filter(i => userPermittedCountries.includes(i.country_iso2)).map(i => i.codbase);
+            const user_country_iso2_list = countries.filter(i => user_codbase_list_for_iso2.includes(i.codbase)).map(i => i.country_iso2);
             return user_country_iso2_list;
         }
 
-        const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(
-            `SELECT * FROM ciam.vwcountry WHERE ciam.vwcountry.codbase = $codbase;`,
-            {
-                type: QueryTypes.SELECT,
-                bind: { codbase: codbase }
-            }
-        )).map(i => i.country_iso2);
-
-
+        const country_iso2_list_for_codbase = countries.filter(i => i.codbase === codbase).map(i => i.country_iso2);
         const country_iso2_list = await getCountryIso2();
 
         const orderBy = req.query.orderBy ? req.query.orderBy : '';
@@ -330,10 +299,18 @@ async function getDatasyncConsentsReport(req, res) {
             if (orderBy === 'date') sortBy = 'ciam.vw_veeva_consent_master.capture_datetime';
         }
 
-        const consent_filter = opt_type ? `ciam.vw_veeva_consent_master.country_code = ANY($countries) and
-        ciam.vw_veeva_consent_master.opt_type = '${opt.type}' and
-        ciam.vw_veeva_consent_master.double_opt_in = ${opt.double_opt_in}` : `ciam.vw_veeva_consent_master.country_code = ANY($countries)`;
-
+        const getConsentFilter = () => {
+            if(opt_type === 'single-opt-in') return `ciam.vw_veeva_consent_master.country_code = ANY($countries) and
+                ciam.vw_veeva_consent_master.opt_type = 'Opt_In_vod' and
+                (ciam.vw_veeva_consent_master.double_opt_in = false or ciam.vw_veeva_consent_master.double_opt_in IS NULL)`;
+            if(opt_type === 'double-opt-in') return `ciam.vw_veeva_consent_master.country_code = ANY($countries) and
+                ciam.vw_veeva_consent_master.opt_type = 'Opt_In_vod' and
+                ciam.vw_veeva_consent_master.double_opt_in = true`;
+            if(opt_type === 'opt-out') return `ciam.vw_veeva_consent_master.country_code = ANY($countries) and
+                ciam.vw_veeva_consent_master.opt_type = 'Opt_Out_vod'`
+            return `ciam.vw_veeva_consent_master.country_code = ANY($countries)`;
+        }
+        const consent_filter = getConsentFilter();
 
         const hcp_consents = await sequelize.datasyncConnector.query(
             `SELECT
@@ -666,6 +643,14 @@ async function createConsent(req, res) {
             );
         }
 
+        await logService.log({
+            event_type: 'CREATE',
+            object_id: data.id,
+            table_name: 'consents',
+            actor: req.user.id,
+            description: `"${data.preference}" consent created`
+        });
+
         res.json(data);
     } catch (err) {
         console.error(err);
@@ -676,8 +661,6 @@ async function createConsent(req, res) {
 async function updateCdpConsent(req, res) {
     try {
         const { preference, category_id, legal_basis, is_active, translations } = req.body;
-
-
 
         const id = req.params.id;
         if (!id || !preference || !category_id || !legal_basis) {
@@ -741,6 +724,14 @@ async function updateCdpConsent(req, res) {
                 })
             );
         }
+
+        await logService.log({
+            event_type: 'UPDATE',
+            object_id: consent.id,
+            table_name: 'consents',
+            actor: req.user.id,
+            description: `Consent updated`
+        });
 
         res.sendStatus(200);
     } catch (err) {
@@ -817,6 +808,14 @@ async function assignConsentToCountry(req, res) {
 
         createdCountryConsent.dataValues.consent = consent;
 
+        await logService.log({
+            event_type: 'CREATE',
+            object_id: createdCountryConsent.id,
+            table_name: 'consent_countries',
+            actor: req.user.id,
+            description: `Consent assigned to country`
+        });
+
         res.json(createdCountryConsent);
     } catch (err) {
         console.error(err);
@@ -833,14 +832,21 @@ async function updateCountryConsent(req, res) {
 
         const consentCountry = await ConsentCountry.findOne({ where: { id } });
 
-        if (!consentCountry) return res.status(404).send('Country-Consent association does noit exist.');
+        if (!consentCountry) return res.status(404).send('Country-Consent association does not exist.');
 
         await consentCountry.update({
             opt_type: optType
         });
 
-        res.json(consentCountry);
+        await logService.log({
+            event_type: 'UPDATE',
+            object_id: consentCountry.id,
+            table_name: 'consent_countries',
+            actor: req.user.id,
+            description: `Country-Consent Opt Type updated`
+        });
 
+        res.json(consentCountry);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -851,11 +857,22 @@ async function deleteCountryConsent(req, res) {
     try {
         const id = req.params.id;
 
-        if (!id) {
-            return res.status(400).send('Invalid request.');
-        }
+        if (!id) return res.status(400).send('Invalid request.');
 
-        await ConsentCountry.destroy({ where: { id } });
+        const consentCountry = await ConsentCountry.findOne({ where: { id } });
+        if (!consentCountry) return res.status(404).send('Country-Consent association does not exist.');
+
+        const deleted = await ConsentCountry.destroy({ where: { id } });
+
+        if (!deleted) return res.status(400).send('Delete failed.');
+
+        await logService.log({
+            event_type: 'DELETE',
+            object_id: id,
+            table_name: 'consent_countries',
+            actor: req.user.id,
+            description: `Country-Consent deleted`
+        });
 
         res.sendStatus(200);
     } catch (err) {
@@ -919,11 +936,17 @@ async function createConsentCategory(req, res) {
             }
         });
 
-        if (!created && data) {
-            return res.status(400).send('The consent category already exists.');
-        }
+        if (!created && data) return res.status(400).send('The consent category already exists.');
 
         data.dataValues.createdBy = `${req.user.first_name} ${req.user.last_name}`;
+
+        await logService.log({
+            event_type: 'CREATE',
+            object_id: data.id,
+            table_name: 'consent_categories',
+            actor: req.user.id,
+            description: `"${data.title}" consent category created`
+        });
 
         res.json(data);
     } catch (err) {
@@ -935,6 +958,10 @@ async function createConsentCategory(req, res) {
 async function updateConsentCategory(req, res) {
     try {
         const { title } = req.body;
+
+        const consentCategory = await ConsentCategory.findOne({ where: { id: req.params.id } });
+        if (!consentCategory) return res.status(404).send('The consent category does not exist');
+
         const isTitleExists = await ConsentCategory.findOne({
             where: {
                 id: { [Op.not]: req.params.id },
@@ -944,13 +971,17 @@ async function updateConsentCategory(req, res) {
             }
         });
 
-        if (isTitleExists) {
-            return res.status(400).send('The consent category already exists.');
-        }
-
-        const consentCategory = await ConsentCategory.findOne({ where: { id: req.params.id } });
+        if (isTitleExists) return res.status(400).send('The consent category already exists.');
 
         const data = await consentCategory.update({ title, slug: title, updated_by: req.user.id });
+
+        await logService.log({
+            event_type: 'UPDATE',
+            object_id: consentCategory.id,
+            table_name: 'consent_categories',
+            actor: req.user.id,
+            description: `Consent category updated`
+        });
 
         res.json(data);
     } catch (err) {
