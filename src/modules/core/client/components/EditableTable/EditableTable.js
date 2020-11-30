@@ -39,11 +39,11 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
         setRawRows(rows);
     }, [rows]);
 
-    const rowSchemaWithOptionalValidation = addValidationToSchema(rowSchema, rawColumns);
+    const rowSchemaWithOptionalValidation = rowSchema ? addValidationToSchema(rowSchema, rawColumns) : null;
 
-    const tableSchema = yup.object().shape({
+    const tableSchema = rowSchema ? yup.object().shape({
         rows: yup.array().of(rowSchemaWithOptionalValidation)
-    });
+    }) : null;
 
     const handleCellSwitchToEdit = (rowIndex, columnIndex) => {
         setEditingCell({ rowIndex, columnIndex })
