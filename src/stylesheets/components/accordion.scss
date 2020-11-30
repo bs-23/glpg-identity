@@ -27,6 +27,10 @@
         &-help {
             font-size: 32px;
         }
+
+        &-toggle {
+            font-size: 25px;
+        }
     }
 
     .card {
@@ -67,8 +71,9 @@
         }
     }
 }
+
 .faq {
-    .fa-compress {
+    .faq-icon-minimize {
         display: none;
     }
 
@@ -78,17 +83,32 @@
         width: calc(100% - 30px);
         height: calc(100% - 32px) !important;
 
-        .fa-compress {
+        .faq-icon-minimize {
             display: inline-block;
         }
 
-        .fa-expand {
+        .faq-icon-expand {
             display: none !important;
         }
     }
 
-    &-body {
+    &__body {
         position: relative;
+
+        .card {
+            &:last-child {
+                border-bottom: none !important;
+            }
+
+            a {
+                color: $secondary-color;
+
+                &:hover {
+                    color: $secondary-color !important;
+                    text-decoration: underline !important;
+                }
+            }
+        }
     }
 
     &:after {

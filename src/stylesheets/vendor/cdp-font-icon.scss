@@ -258,6 +258,14 @@
     content: "\33";
 }
 
+.icon-minimize:before {
+    content: "\38";
+}
+
+.icon-expand:before {
+    content: "\39";
+}
+
 //custome css
 $class-slug: icon- !default;
 

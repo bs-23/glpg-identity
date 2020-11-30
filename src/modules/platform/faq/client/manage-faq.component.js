@@ -113,7 +113,8 @@ export default function ManageFaq() {
 
                 <div className="row">
                     <div className="col-12">
-                        <div className="d-sm-flex justify-content-end align-items-center mb-3 mt-4">
+                        <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
+                            <h4 class="cdp-text-primary font-weight-bold mb-3 mb-sm-0">FAQ List</h4>
                             <div class="d-flex justify-content-between align-items-center">
                                 <Dropdown className="ml-auto dropdown-customize">
                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center">
@@ -142,18 +143,18 @@ export default function ManageFaq() {
                                 <table className="table table-hover table-sm mb-0 cdp-table">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
-                                            <th>Questions</th>
-                                            <th>Answers</th>
-                                            <th>Category</th>
-                                            <th>Action</th>
+                                            <th width="25%">Questions</th>
+                                            <th width="45%">Answers</th>
+                                            <th width="25%">Category</th>
+                                            <th width="5%">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
                                         {faqData.faq.map((row, index) => (
                                             <tr key={index}>
-                                                <td>{row.question}</td>
-                                                <td>{parse(row.answer)}</td>
-                                                <td>{row.categories && row.categories.map((item, key) => (
+                                                <td className="text-break">{row.question}</td>
+                                                <td className="text-break">{parse(row.answer)}</td>
+                                                <td className="text-break">{row.categories && row.categories.map((item, key) => (
                                                     (serviceCategories.find(x => x.slug === item).title) + (key < row.categories.length - 1 ? ',' : '')
 
                                                 ))
@@ -165,7 +166,7 @@ export default function ManageFaq() {
                                                         <Dropdown.Item onClick={() => { setShow(true); setEditMode(true); setEditData(row); }}>
                                                             Edit
                                                         </Dropdown.Item>
-                                                        <Dropdown.Item onClick={() => { setShowDelete(true); setDeleteId(row.id); }}>Delete</Dropdown.Item>
+                                                        <Dropdown.Item className="text-danger" onClick={() => { setShowDelete(true); setDeleteId(row.id); }}>Delete</Dropdown.Item>
                                                     </Dropdown.Menu>
                                                 </Dropdown></td>
                                             </tr>
