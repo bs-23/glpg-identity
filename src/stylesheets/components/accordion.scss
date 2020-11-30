@@ -67,6 +67,7 @@
         }
     }
 }
+
 .faq {
     .fa-compress {
         display: none;
@@ -87,8 +88,23 @@
         }
     }
 
-    &-body {
+    &__body {
         position: relative;
+
+        .card {
+            &:last-child {
+                border-bottom: none !important;
+            }
+
+            a {
+                color: $secondary-color;
+
+                &:hover {
+                    color: $secondary-color !important;
+                    text-decoration: underline !important;
+                }
+            }
+        }
     }
 
     &:after {

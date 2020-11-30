@@ -59,20 +59,22 @@ const FaqForm = (props) => {
         return <FieldArray
             name={name}
             render={arrayHelpers => (
-                options.map(item => <label key={idExtractor(item)} className="d-flex  align-items-center">
-                    <span className="switch">
-                        <input name={name}
-                            className="custom-control-input"
-                            type="checkbox"
-                            value={idExtractor(item)}
-                            id={idExtractor(item)}
-                            checked={isChecked(idExtractor(item), arrayHelpers)}
-                            onChange={(e) => handleChange(e, arrayHelpers)}
-                            disabled={item.hasOwnProperty('disabled') ? item.disabled : false}
-                        />
-                        <span className="slider round"></span>
+                options.map(item => <label key={idExtractor(item)} className="row align-items-center">
+                    <span className="switch-label text-left col-9 col-sm-6">{labelExtractor(item)}</span>
+                    <span className="col-3 col-sm-6">
+                        <span className="switch">
+                            <input name={name}
+                                className="custom-control-input"
+                                type="checkbox"
+                                value={idExtractor(item)}
+                                id={idExtractor(item)}
+                                checked={isChecked(idExtractor(item), arrayHelpers)}
+                                onChange={(e) => handleChange(e, arrayHelpers)}
+                                disabled={item.hasOwnProperty('disabled') ? item.disabled : false}
+                            />
+                            <span className="slider round"></span>
+                        </span>
                     </span>
-                    <span className="switch-label text-left pl-2">{labelExtractor(item)}</span>
                 </label>)
             )}
         />
