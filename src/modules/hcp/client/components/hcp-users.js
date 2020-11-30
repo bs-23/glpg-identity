@@ -277,7 +277,7 @@ export default function hcpUsers() {
     const renderActions = ({ row, rowIndex, formikProps, hasRowChanged, editableTableProps }) => {
         const { dirty, resetForm, initialValues } = formikProps;
 
-        return <div className="position-relative">
+        return <div className="position-relative d-inline-block">
             {!hasRowChanged && <Dropdown className="dropdown-customize">
                 <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
                 </Dropdown.Toggle>
@@ -289,8 +289,8 @@ export default function hcpUsers() {
             {hasRowChanged &&
                 <>
                 <div className="d-flex position-absolute inline-editing__btn-wrap">
-                    <i onClick={resetForm} class="fas fa-times-circle mr-1 text-danger fa-2x mr-2" title="Cancel Changes" type="button"></i>
-                    <i onClick={() => onTableRowSave(hcps.users[rowIndex], { rowIndex, editableTableProps, formikProps })} disabled={!dirty} class="fas fa-check-circle mr-1 cdp-text-primary fa-2x" title="Save Changes" type="button"></i>
+                    <i onClick={() => onTableRowSave(hcps.users[rowIndex], { rowIndex, editableTableProps, formikProps })} disabled={!dirty} class="fas fa-check mr-3 cdp-text-primary fa-1_5x" title="Save Changes" type="button"></i>
+                    <i onClick={resetForm} class="fas fa-times text-danger fa-1_5x" title="Cancel Changes" type="button"></i>
                 </div>
                 </>
              }
@@ -347,6 +347,7 @@ export default function hcpUsers() {
             name: 'First Name',
             fieldType: { name: 'text', maxLength: '50' },
             onSort: generateSortHandler('first_name'),
+            class: "text-break",
             width: "10%"
         },
         {
@@ -354,6 +355,7 @@ export default function hcpUsers() {
             name: 'Last Name',
             fieldType: { name: 'text', maxLength: '50' },
             onSort: generateSortHandler('last_name'),
+            class: "text-break",
             width: "10%"
         },
         {

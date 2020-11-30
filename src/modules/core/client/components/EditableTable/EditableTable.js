@@ -221,7 +221,7 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
                 }, 0);
 
                 return <>
-                    <table className="table table-hover table-sm mb-0 cdp-table cdp-table-sm mt-3 cdp-table-inline-editing">
+                    <table className="table table-hover table-sm mb-0 cdp-table cdp-table-sm cdp-table-inline-editing">
                         <Header columns={rawColumns} dirty={dirty} sortOn={sortOn} sortType={sortType} />
                         <tbody className="cdp-table__body bg-white">
                             {formikProps.values.rows.map((row, index) =>
