@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
@@ -11,6 +12,15 @@ const SearchHcp = () => {
         console.log(`Option selected:`, selectedOption);
         setSelectedOption(selectedOption)
     };
+
+    useEffect(() => {
+        const getSpecialties = async () =>{
+            const response = await axios.get('http://localhost:5050/api/hcps/specialties?codbases=wnl&codbases=WBE')
+            console.log(response);
+        }
+
+        getSpecialties();
+    }, []);
 
     // const options = [
     //     { value: 'chocolate', label: 'Chocolate' },
