@@ -127,28 +127,28 @@ describe('Hcp user component', () => {
         expect(first_td.textContent).toEqual('a');
     });
 
-    it('should update status of a hcp user', async () => {
-        const { debug, getByTestId, getByText, container } = render(wrapperComponent());
-        const tbody = await waitFor(() => container.querySelector('tbody'));
-        const rows = tbody.childNodes;
-        const first_row = rows[0];
-        const actionBtn = first_row.lastChild.childNodes[0].childNodes[0].childNodes[0];
+    // it('should update status of a hcp user', async () => {
+    //     const { debug, getByTestId, getByText, container } = render(wrapperComponent());
+    //     const tbody = await waitFor(() => container.querySelector('tbody'));
+    //     const rows = tbody.childNodes;
+    //     const first_row = rows[0];
+    //     const actionBtn = first_row.lastChild.childNodes[0].childNodes[0].childNodes[0];
 
-        fireEvent.click(actionBtn);
+    //     fireEvent.click(actionBtn);
 
-        const updateBtn = await waitFor(() => getByText('Manage Status'));
+    //     const updateBtn = await waitFor(() => getByText('Manage Status'));
 
-        fireEvent.click(updateBtn);
+    //     fireEvent.click(updateBtn);
 
-        const approveBtn = await waitFor(() => getByText('Approve User'));
+    //     const approveBtn = await waitFor(() => getByText('Approve User'));
 
-        const submitBtn = await waitFor(() => getByTestId('submit'));
+    //     const submitBtn = await waitFor(() => getByTestId('submit'));
 
-        await waitFor(() => fireEvent.click(approveBtn));
+    //     await waitFor(() => fireEvent.click(approveBtn));
 
-        await waitFor(() => fireEvent.click(submitBtn));
+    //     await waitFor(() => fireEvent.click(submitBtn));
 
-    });
+    // });
 
     it('should show HCP user details modal', async () => {
         const { debug, getByTestId, getByText, container } = render(wrapperComponent());
@@ -170,108 +170,4 @@ describe('Hcp user component', () => {
 
         expect(nameField.textContent).toEqual('a a');
     });
-
-    // it('should sort table data by first name', async () => {
-    //     const { container, getByText } = render(wrapperComponent());
-    //     const tbody = container.querySelector('tbody');
-    //     const first_name = getByText('Firstname');
-    //     const span = first_name.querySelector('span');
-    //     const buttons = span.childNodes;
-    //     const dsc_button = buttons[1];
-
-
-    //     await waitFor(() => {
-    //         fireEvent.click(dsc_button);
-    //     });
-
-
-    //     const rows = tbody.childNodes;
-    //     const first_row = rows[0];
-    //     const tds = first_row.childNodes;
-    //     const first_td = tds[0];
-
-    //     expect(first_td.textContent).toEqual('b');
-    // })
-
-    // it('should not update firstname of hcp user', async () => {
-    //     const { container } = render(wrapperComponent());
-    //     const tbody = container.querySelector('tbody');
-    //     const first_row = tbody.childNodes[0];
-    //     const action_td = first_row.childNodes[6];
-    //     const span = action_td.querySelector('span');
-    //     const edit_btn = span.childNodes[0];
-
-    //     const first_name = first_row.childNodes[0];
-
-    //     await waitFor(() => {
-    //         fireEvent.click(edit_btn);
-    //     });
-
-    //     const new_tbody = container.querySelector('tbody');
-    //     const new_first_row = new_tbody.childNodes[0];
-    //     const new_action_td = new_first_row.childNodes[6];
-    //     const cancel_btn = new_action_td.childNodes[1];
-
-    //     await waitFor(() => {
-    //         fireEvent.click(cancel_btn);
-    //     });
-
-    //     const new_first_name = new_first_row.childNodes[0];
-
-
-    //     expect(first_name.textContent).toEqual(new_first_name.textContent);
-    // })
-
-    // it('should update firstname, lastname and phone of hcp user', async () => {
-    //     const { container } = render(wrapperComponent());
-    //     const tbody = container.querySelector('tbody');
-    //     const first_row = tbody.childNodes[0];
-    //     const action_td = first_row.childNodes[6];
-    //     const span = action_td.querySelector('span');
-    //     const edit_btn = span.childNodes[0];
-
-    //     await waitFor(() => {
-    //         fireEvent.click(edit_btn);
-    //     });
-
-    //     const new_tbody = container.querySelector('tbody');
-    //     const new_first_row = new_tbody.childNodes[0];
-    //     const first_name_td = new_first_row.childNodes[0];
-    //     const last_name_td = new_first_row.childNodes[2];
-    //     const phone_td = new_first_row.childNodes[3];
-    //     const new_action_td = new_first_row.childNodes[6];
-    //     const update_btn = new_action_td.childNodes[0];
-
-    //     const first_name_input = first_name_td.childNodes[0];
-    //     const last_name_input = last_name_td.childNodes[0];
-    //     const phone_input = phone_td.childNodes[0];
-
-    //     await waitFor(() => {
-    //         fireEvent.change(first_name_input, { target: { value: 'z' } });
-    //         fireEvent.change(last_name_input, { target: { value: 'z' } });
-    //         fireEvent.change(phone_input, { target: { value: '0' } });
-    //     })
-
-    //     expect(first_name_input.value).toEqual('z');
-    //     expect(last_name_input.value).toEqual('z');
-    //     expect(phone_input.value).toEqual('0');
-
-
-    //     const updated_hcp_user = { id: "1", uuid: "1", first_name: "z", last_name: "z", email: "a", telephone: "0" };
-    //     fakeAxios.onPut(`/api/hcps/${'1'}`).reply(200, updated_hcp_user);
-
-    //     await waitFor(() => {
-    //         fireEvent.click(update_btn);
-    //     });
-
-    //     const updated_tbody = container.querySelector('tbody');
-    //     const updated_first_row = updated_tbody.childNodes[0];
-    //     const updated_first_name = updated_first_row.childNodes[0];
-    //     const updated_last_name = updated_first_row.childNodes[2];
-    //     const updated_phone = updated_first_row.childNodes[3];
-
-    //     expect(updated_first_name.textContent).toEqual('z');
-    //     expect(updated_last_name.textContent).toEqual('z');
-    //     expect(updated_phone.textContent).toEqual('0');
-    // })
 });

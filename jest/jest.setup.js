@@ -12,6 +12,17 @@ module.exports = async function() {
 
     await sequelize.cdpConnector.query('CREATE SCHEMA IF NOT EXISTS cdp');
 
+    await sequelize.cdpConnector.query(`
+        DO $$ BEGIN
+        CREATE AGGREGATE array_concat_agg(anyarray) (
+            SFUNC = array_cat,
+            STYPE = anyarray
+        );
+        EXCEPTION
+            WHEN duplicate_function THEN NULL;
+        END $$;
+    `);
+
     const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
     const Hcp_profile = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-profile.model'));
     const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
