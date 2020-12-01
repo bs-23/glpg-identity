@@ -130,10 +130,10 @@ async function init() {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
 
             const faqCategories = [
-                { title: "General", slug: "general", created_by: admin.id, updated_by: admin.id },
-                { title: "Information Management", slug: "information", created_by: admin.id, updated_by: admin.id },
-                { title: "Management of Customer Data Platform", slug: "cdp", created_by: admin.id, updated_by: admin.id },
-                { title: "Data Privacy & Consent Management", slug: "privacy", created_by: admin.id, updated_by: admin.id }
+                { title: "General", slug: "", created_by: admin.id, updated_by: admin.id },
+                { title: "Information Management", slug: "", created_by: admin.id, updated_by: admin.id },
+                { title: "Management of Customer Data Platform", slug: "", created_by: admin.id, updated_by: admin.id },
+                { title: "Data Privacy & Consent Management", slug: "", created_by: admin.id, updated_by: admin.id }
             ];
 
             FaqCategory.destroy({ truncate: { cascade: true } }).then(() => {

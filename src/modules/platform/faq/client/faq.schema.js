@@ -20,3 +20,9 @@ export const faqSchema = object().shape({
             //.min(1, 'Must select at least one category')
             .required('Must select at least one category')
 });
+
+export const FaqCategorySchema = object().shape({
+    title: string()
+        .max(60, 'This field must be at most 50 characters long.')
+        .required('This field must not be empty.'),
+});

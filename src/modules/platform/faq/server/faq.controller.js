@@ -144,6 +144,21 @@ async function getFaqCategories(req, res) {
     }
 }
 
+async function createFaqCategory(req, res) {
+    try {
+        const { title } = req.body;
+
+        const response = await FaqCategories.create({
+            title,
+            slug: title
+        });
+
+        res.json(response);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
 
 exports.getFaqItem = getFaqItem;
 exports.getFaqItems = getFaqItems;
@@ -151,3 +166,4 @@ exports.createFaqItem = createFaqItem;
 exports.updateFaqItem = updateFaqItem;
 exports.deleteFaqItem = deleteFaqItem;
 exports.getFaqCategories = getFaqCategories;
+exports.createFaqCategory = createFaqCategory;

@@ -16,4 +16,5 @@ module.exports = app => {
 
     app.route('/api/faqCategories')
         .get(CDPAuthStrategy, controller.getFaqCategories)
+        .post(CDPAuthStrategy, controller.createFaqCategory)
 };

@@ -9,7 +9,6 @@ import { useDispatch } from 'react-redux';
 
 const FaqForm = (props) => {
     const [, setShow] = useState(false);
-    const [editCategories, setEditCategories] = useState([]);
     const { addToast } = useToasts();
     const dispatch = useDispatch();
     const handleClose = () => {
