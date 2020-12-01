@@ -95,17 +95,22 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
         }
 
         const handleOnBlur = e => {
-            onChangeAction && onChangeAction(currentCellValue, row, formikProps, callbackProps);
-            onCellBlur(e, handleBlur);
+            if(onChangeAction) {
+                Promise.resolve(onChangeAction(e.target.value, currentCellValue, row, formikProps, callbackProps))
+                    .then(onCellBlur(e, handleBlur));
+            }
+            else onCellBlur(e, handleBlur);
         };
 
         const handleInputKeyDown = e => onInputKeyDown(e, handleOnBlur);
 
-        const shouldBeEditable = typeof column.editable === 'function'
+        const isAllowedToEdit = typeof column.editable === 'function'
             ? column.editable(row, formikProps)
-            : singleRowEditing && dirty
-                ? rowChangeStatus && column.editable
-                : column.editable;
+            : column.editable;
+
+        const shouldBeEditable = singleRowEditing && dirty
+            ? rowChangeStatus && isAllowedToEdit
+            : isAllowedToEdit;
 
         return <React.Fragment key={key || inputName}>
             <td

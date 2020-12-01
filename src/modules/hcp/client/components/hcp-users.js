@@ -227,6 +227,11 @@ export default function hcpUsers() {
         return row.specialty_description;
     }
 
+    const handleSpecialtyChange = async (updatedValue, oldValue, row, formikProps, { rowIndex }) => {
+        const sp_desc = getSpecialtyDescription(updatedValue, row);
+        formikProps.values.rows[rowIndex].specialty_description = sp_desc;
+    }
+
     const formatDate = (date) => {
         return (new Date(date)).toLocaleDateString('en-GB').replace(/\//g, '.')
     }
@@ -379,7 +384,8 @@ export default function hcpUsers() {
             id: 'specialty_onekey',
             name: 'Specialty',
             width: "10%",
-            customizeCellContent: getSpecialtyDescription,
+            onChangeAction: handleSpecialtyChange,
+            customizeCellContent: (value, row) => row.specialty_description,
             fieldType: { name: 'select', options: getSpecialtyOptions },
             editable: (row) => row.status === 'manually_verified'
         },
