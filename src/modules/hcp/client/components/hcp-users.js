@@ -417,10 +417,24 @@ export default function hcpUsers() {
 
     const handleTableDirtyStatusChange = (dirty) => {
         setTableDirty(dirty);
+        window.tableDirty = dirty;
+    }
+
+    const alertUserBeforeClosingWindow = (e) => {
+        if(window.tableDirty) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
     }
 
     useEffect(() => {
         dispatch(getAllCountries());
+        window.addEventListener('beforeunload', alertUserBeforeClosingWindow);
+        window.tableDirty = false;
+        return () => {
+            window.removeEventListener('beforeunload', alertUserBeforeClosingWindow);
+            delete window.tableDirty;
+        }
     }, []);
 
     useEffect(() => {
