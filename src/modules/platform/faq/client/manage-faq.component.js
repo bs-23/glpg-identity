@@ -75,7 +75,6 @@ export default function ManageFaq() {
         searchParams.forEach(element => {
             searchObj[element.split("=")[0]] = element.split("=")[1];
         });
-        console.log(params.get('category'));
         dispatch(getFaqItems(searchObj.page, searchObj.category, searchObj.orderBy, searchObj.orderType));
         setSort({ type: params.get('orderType') || 'asc', value: params.get('orderBy') });
     }, [location]);
@@ -90,7 +89,7 @@ export default function ManageFaq() {
 
     useEffect(() => {
         async function getServiceCategory() {
-            const response = (await axios.get('/api/serviceCategories')).data;
+            const response = (await axios.get('/api/faqCategories')).data;
             setServiceCategories(response);
         }
         getServiceCategory();
@@ -115,36 +114,39 @@ export default function ManageFaq() {
                     <div className="col-12">
                         <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
                             <h4 class="cdp-text-primary font-weight-bold mb-3 mb-sm-0">FAQ List</h4>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <Dropdown className="ml-auto dropdown-customize">
-                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center">
-                                        <i className="icon icon-filter mr-2 mb-n1"></i> {!faqData.category ? 'Filter by Category' : serviceCategories.find(x => x.slug === faqData.category).title}
-                                    </Dropdown.Toggle>
-                                    <Dropdown.Menu>
-                                        {
-                                            faqData.category && <Dropdown.Item onClick={() => urlChange(1, 'null', params.get('orderBy'))}>All</Dropdown.Item>
-                                        }
-                                        {
-                                            serviceCategories.length > 0 && serviceCategories.map((item, index) => (
-                                                item.title !== faqData.category && <Dropdown.Item key={index} onClick={() => urlChange(1, item.slug, params.get('orderBy'))}>{item.title}</Dropdown.Item>
-                                            ))
-                                        }
-                                    </Dropdown.Menu>
-                                </Dropdown>
+                            {serviceCategories.length > 0 &&
+                                < div class="d-flex justify-content-between align-items-center">
+                                    <Dropdown className="ml-auto dropdown-customize">
+                                        <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center">
+                                            <i className="icon icon-filter mr-2 mb-n1"></i> {!faqData.category ? 'Filter by Category' : serviceCategories.find(x => x.slug === faqData.category).title}
+                                        </Dropdown.Toggle>
+                                        <Dropdown.Menu>
+                                            {
+                                                faqData.category && <Dropdown.Item onClick={() => urlChange(1, 'null', params.get('orderBy'))}>All</Dropdown.Item>
+                                            }
+                                            {
+                                                serviceCategories.length > 0 && serviceCategories.map((item, index) => (
+                                                    item.title !== faqData.category && <Dropdown.Item key={index} onClick={() => urlChange(1, item.slug, params.get('orderBy'))}>{item.title}</Dropdown.Item>
+                                                ))
+                                            }
+                                        </Dropdown.Menu>
+                                    </Dropdown>
 
-                                <button onClick={() => { setShow(true); setEditMode(false); setEditData(null); }} className="btn cdp-btn-secondary text-white ml-2">
-                                    <i className="icon icon-plus pr-1"></i> Add New FAQ
+                                    <button onClick={() => { setShow(true); setEditMode(false); setEditData(null); }} className="btn cdp-btn-secondary text-white ml-2">
+                                        <i className="icon icon-plus pr-1"></i> Add New FAQ
                                 </button>
-                            </div>
+                                </div>
+                            }
                         </div>
 
                         {faqData.faq && faqData.faq.length > 0 && serviceCategories && serviceCategories.length > 0 &&
                             <div className="table-responsive shadow-sm bg-white">
                                 <table className="table table-hover table-sm mb-0 cdp-table">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
+
                                         <tr>
-                                            <th width="25%">Questions</th>
-                                            <th width="45%">Answers</th>
+                                            <th width="25%"><span className={sort.value === 'question' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.category, 'question')}>Questions<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                            <th width="45%"><span className={sort.value === 'answer' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.category, 'answer')}>Answers<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                             <th width="25%">Category</th>
                                             <th width="5%">Action</th>
                                         </tr>
@@ -203,7 +205,7 @@ export default function ManageFaq() {
                     </div>
                 </div>
             </div>
-        </main>
+        </main >
 
     );
 }

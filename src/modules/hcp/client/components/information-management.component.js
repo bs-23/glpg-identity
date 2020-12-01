@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import Faq from '../../../shared/client/components/faq.component';
+import Faq from '../../../platform/faq/client/faq.component';
 
 const InformationManagement = () => {
     return (
@@ -88,7 +88,7 @@ const InformationManagement = () => {
                         </div>
                     </div>
                     <div className="col-12 col-lg-4 col-xl-3 py-3 app__content-panel-right">
-                        <Faq />
+                        <Faq category="information" />
                     </div>
                 </div>
             </div>

@@ -13,4 +13,7 @@ module.exports = app => {
         .get(CDPAuthStrategy, controller.getFaqItem)
         .patch(CDPAuthStrategy, controller.updateFaqItem)
         .delete(CDPAuthStrategy, controller.deleteFaqItem);
+
+    app.route('/api/faqCategories')
+        .get(CDPAuthStrategy, controller.getFaqCategories)
 };

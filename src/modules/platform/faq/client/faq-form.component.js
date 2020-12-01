@@ -19,7 +19,7 @@ const FaqForm = (props) => {
 
     const FormFieldFluid = ({ label, name, type, children, required = true, ...rest }) =>
         <div className="form-group">
-            <label className="font-weight-bold" htmlFor="last_name">{label}{required && <span className="text-danger">*</span>}</label>
+            <label className="font-weight-bold" htmlFor="last_name">{label}{required && <span className="text-danger"> *</span>}</label>
             {children || <Field className="form-control" type={type} name={name} {...rest} />}
             <div className="invalid-feedback"><ErrorMessage name={name} /></div>
         </div>
@@ -123,7 +123,6 @@ const FaqForm = (props) => {
                             });
 
                             values.categories = catgory_list;
-                            console.log(values);
 
                             if (props.editMode) {
                                 dispatch(editFaqItem(values, props.editData.id)).then(() => {
@@ -161,26 +160,29 @@ const FaqForm = (props) => {
                                                 <Field className="form-control preference" type='text' name='question' id='question' />
                                                 <div className="invalid-feedback"><ErrorMessage name="question" /></div>
                                             </div>
-                                            <FormFieldFluid label="Categories" name="categories" required={false} >
+                                            <FormFieldFluid label="Select Categories" name="categories" required={true} >
                                                 <ToggleList
                                                     name="categories"
                                                     options={props.serviceCategory}
                                                     idExtractor={item => item.id}
                                                     labelExtractor={item => item.title}
                                                 />
+
                                             </FormFieldFluid>
                                             <div className="form-group pt-3">
                                                 <label className="font-weight-bold" htmlFor='answer'>Answer <span className="text-danger">*</span></label>
                                                 <div className="border rounded draft-editor">
                                                     <DraftEditor htmlContent={formikProps.initialValues.answer} onChangeHTML={(html) => {
                                                         formikProps.setFieldValue('answer', html);
+
                                                     }} />
                                                 </div>
+                                                <div className="invalid-feedback"><ErrorMessage name="answer" /></div>
                                             </div>
                                         </div>
                                     </div>
-                            </Modal.Body>
-                            <Modal.Footer className="border-0  pt-0 px-3">
+                                </Modal.Body>
+                                <Modal.Footer className="border-0  pt-0 px-3">
                                     {/*<button type="button" className="btn cdp-btn-secondary text-white shadow-sm" onClick={handleClose}>Close</button>*/}
                                     <button type="submit" className="btn btn-block cdp-btn-secondary mt-3 text-white ">Submit</button>
                                 </Modal.Footer>

@@ -1,36 +1,37 @@
-import React, { useEffect, useState } from 'react';
-import { NavLink, useLocation, useHistory } from 'react-router-dom';
-import FaqForm from './faq-form.component';
-import axios from "axios";
-import { getFaqItems, deleteFaqItem } from './faq.actions';
-import { useSelector, useDispatch } from 'react-redux';
-import parse from 'html-react-parser';
-import Dropdown from 'react-bootstrap/Dropdown';
-import Modal from 'react-bootstrap/Modal';
-import { useToasts } from 'react-toast-notifications';
+import React, { useEffect } from 'react';
+import { NavLink } from 'react-router-dom';
 import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
+import parse from 'html-react-parser';
+import { useSelector, useDispatch } from 'react-redux';
+import { getFaqItems } from '../../../platform/faq/client/faq.actions';
 
 export default function Faq(props) {
     const [show, setShow] = React.useState();
+
+    const faqData = useSelector(state => state.faqReducer.faq_items);
+    const dispatch = useDispatch();
+
     useEffect(() => {
+        dispatch(getFaqItems(1, props.category, null, null, 5));
     }, []);
+
 
     return (
         <React.Fragment>
             <div className={`faq h-100 shadow-sm bg-white ${show ? "faq-expand" : ""}`}>
                 <h4 className="faq__header p-3 font-weight-bold mb-0 d-flex justify-content-between">
                     FAQ Hints
-                    <i onClick={() => setShow(true)} type="button" class="icon icon-expand faq-icon-expand faq__icon-toggle  d-none d-lg-block"></i>
+                    <i onClick={() => setShow(true)} type="button" class="icon icon-expand faq-icon-expand faq__icon-toggle  d-none"></i>
                     <i class="icon icon-minimize faq-icon-minimize  faq__icon-toggle" type="button" onClick={() => setShow(false)}></i>
-                    <i className="icon icon-help faq__icon-help d-block d-lg-none"></i>
+                    <i className="icon icon-help faq__icon-help d-block"></i>
                 </h4>
                 <Accordion defaultActiveKey="0" className="faq__body">
 
-                    {props.category && props.category.map((faq, index) => (
+                    {faqData.faq && faqData.faq.map((faq, index) => (
                         <Card>
                             <Accordion.Collapse eventKey={index + ""}>
-                                <Card.Body>{faq.answer}</Card.Body>
+                                <Card.Body>{parse(faq.answer)}</Card.Body>
                             </Accordion.Collapse>
                             <Accordion.Toggle as={Card.Header} eventKey={index + ""} className="p-3 d-flex align-items-baseline justify-content-between" role="button">
                                 {faq.question}

@@ -1,5 +1,5 @@
 const Faq = require('./faq.model');
-const ServiceCategory = require('../../../user/server/permission/service-category.model');
+const FaqCategories = require('../../faq/server/faq_categories.model');
 const { QueryTypes, Op, where, col, fn, literal } = require('sequelize');
 
 async function getFaqItem(req, res) {
@@ -43,9 +43,9 @@ async function getFaqItems(req, res) {
             order.splice(0, 0, [orderBy, orderType]);
         }
 
-        const serviceCategories = await ServiceCategory.findAll({ raw: true });
+        const faqCategories = await FaqCategories.findAll({ raw: true });
         const categoryList = [];
-        serviceCategories.forEach(element => {
+        faqCategories.forEach(element => {
             categoryList.push(element.slug);
         });
 
@@ -59,8 +59,7 @@ async function getFaqItems(req, res) {
             },
             offset,
             limit,
-            order: order,
-            //  raw: true
+            order: order
         });
 
         const responseData = {
@@ -69,7 +68,7 @@ async function getFaqItems(req, res) {
             limit,
             total: response.count,
             start: limit * page + 1,
-            end: offset + limit > response.count ? response.count : offset + limit,
+            end: offset + limit > response.count ? parseInt(response.count) : parseInt(offset + limit),
             category: category
         }
 
@@ -134,8 +133,21 @@ async function deleteFaqItem(req, res) {
     }
 }
 
+async function getFaqCategories(req, res) {
+    try {
+        const faqCategories = await FaqCategories.findAll();
+
+        res.json(faqCategories);
+    } catch (err) {
+        console.error(error);
+        res.status(500).send('Internal server error');
+    }
+}
+
+
 exports.getFaqItem = getFaqItem;
 exports.getFaqItems = getFaqItems;
 exports.createFaqItem = createFaqItem;
 exports.updateFaqItem = updateFaqItem;
 exports.deleteFaqItem = deleteFaqItem;
+exports.getFaqCategories = getFaqCategories;
