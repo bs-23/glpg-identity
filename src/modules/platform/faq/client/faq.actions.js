@@ -26,34 +26,12 @@ export function getFaqItems(page = 1, category, orderBy, orderType, limit = 30) 
     };
 }
 
-export function getFaqCategories() {
-    const url = `/api/faqCategories`;
-    return {
-        type: Types.GET_FAQ_CATEGORIES,
-        payload: axios({
-            method: 'get',
-            url: url
-        })
-    };
-}
-
 export function createFaqItem(data) {
     return {
         type: Types.POST_FAQ_ITEM,
         payload: axios({
             method: 'post',
             url: `/api/faq`,
-            data
-        })
-    };
-}
-
-export function createFaqCategory(data) {
-    return {
-        type: Types.POST_FAQ_CATEGORY,
-        payload: axios({
-            method: 'post',
-            url: `/api/faqCategories`,
             data
         })
     };

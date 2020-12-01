@@ -38,7 +38,6 @@ async function init() {
     const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/userProfile-permissionSet.model"));
     const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
     const UserRole = require(path.join(process.cwd(), "src/modules/user/server/role/user-role.model"));
-    const FaqCategory = require(path.join(process.cwd(), "src/modules/platform/faq/server/faq_categories.model.js"));
     const { Modules } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
     require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model'));
     require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-profile.model'));
@@ -117,27 +116,6 @@ async function init() {
 
             ServiceCategory.destroy({ truncate: { cascade: true } }).then(() => {
                 ServiceCategory.bulkCreate(serviceCategories, {
-                    returning: true,
-                    ignoreDuplicates: false
-                }).then(function () {
-                    callback();
-                });
-            });
-        });
-    }
-
-    function faqCategorySeeder(callback) {
-        User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
-
-            const faqCategories = [
-                { title: "General", slug: "", created_by: admin.id, updated_by: admin.id },
-                { title: "Information Management", slug: "", created_by: admin.id, updated_by: admin.id },
-                { title: "Management of Customer Data Platform", slug: "", created_by: admin.id, updated_by: admin.id },
-                { title: "Data Privacy & Consent Management", slug: "", created_by: admin.id, updated_by: admin.id }
-            ];
-
-            FaqCategory.destroy({ truncate: { cascade: true } }).then(() => {
-                FaqCategory.bulkCreate(faqCategories, {
                     returning: true,
                     ignoreDuplicates: false
                 }).then(function () {
@@ -472,7 +450,7 @@ async function init() {
         });
     }
 
-    async.waterfall([userSeeder, userProfileSeeder, userUpdateSeeder, serviceCategorySeeder, faqCategorySeeder, permissionSetSeeder, permissionSetServiceCategorySeeder, userProfilePermissionSetSeeder, applicationSeeder, permissionSetApplicationsSeeder, consentSeeder], function (err) {
+    async.waterfall([userSeeder, userProfileSeeder, userUpdateSeeder, serviceCategorySeeder, permissionSetSeeder, permissionSetServiceCategorySeeder, userProfilePermissionSetSeeder, applicationSeeder, permissionSetApplicationsSeeder, consentSeeder], function (err) {
         if (err) console.error(err);
         else console.info('DB seed completed!');
         process.exit();

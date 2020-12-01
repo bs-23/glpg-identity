@@ -1,5 +1,4 @@
 const Faq = require('./faq.model');
-const FaqCategories = require('../../faq/server/faq_categories.model');
 const { QueryTypes, Op, where, col, fn, literal } = require('sequelize');
 
 async function getFaqItem(req, res) {
@@ -43,20 +42,14 @@ async function getFaqItems(req, res) {
             order.splice(0, 0, [orderBy, orderType]);
         }
 
-        const faqCategories = await FaqCategories.findAll({ raw: true });
-        const categoryList = [];
-        faqCategories.forEach(element => {
-            categoryList.push(element.slug);
-        });
-
+        const filter = {
+            categories: {
+                [Op.overlap]: [category]
+            }
+        };
 
         const response = await Faq.findAndCountAll({
-            where: {
-                categories: {
-                    [Op.overlap]: category ? [category] : categoryList
-
-                }
-            },
+            where: category ? filter : {},
             offset,
             limit,
             order: order
@@ -64,12 +57,14 @@ async function getFaqItems(req, res) {
 
         const responseData = {
             faq: response.rows,
-            page: page + 1,
-            limit,
-            total: response.count,
-            start: limit * page + 1,
-            end: offset + limit > response.count ? parseInt(response.count) : parseInt(offset + limit),
-            category: category
+            metadata: {
+                page: page + 1,
+                limit,
+                total: response.count,
+                start: limit * page + 1,
+                end: offset + limit > response.count ? parseInt(response.count) : parseInt(offset + limit),
+                category: category,
+            }
         }
 
         res.json(responseData);
@@ -133,37 +128,9 @@ async function deleteFaqItem(req, res) {
     }
 }
 
-async function getFaqCategories(req, res) {
-    try {
-        const faqCategories = await FaqCategories.findAll();
-
-        res.json(faqCategories);
-    } catch (err) {
-        console.error(error);
-        res.status(500).send('Internal server error');
-    }
-}
-
-async function createFaqCategory(req, res) {
-    try {
-        const { title } = req.body;
-
-        const response = await FaqCategories.create({
-            title,
-            slug: title
-        });
-
-        res.json(response);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Internal server error');
-    }
-}
 
 exports.getFaqItem = getFaqItem;
 exports.getFaqItems = getFaqItems;
 exports.createFaqItem = createFaqItem;
 exports.updateFaqItem = updateFaqItem;
 exports.deleteFaqItem = deleteFaqItem;
-exports.getFaqCategories = getFaqCategories;
-exports.createFaqCategory = createFaqCategory;

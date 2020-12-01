@@ -3,7 +3,12 @@ import Types from './faq.types';
 const initialState = {
     faq_item: null,
     faq_items: {},
-    faq_categories: []
+    faq_categories: [
+        { id: "0", title: "General", slug: "general" },
+        { id: "1", title: "Information Management", slug: "information" },
+        { id: "2", title: "Management of Customer Data Platform", slug: "cdp" },
+        { id: "3", title: "Data Privacy & Consent Management", slug: "privacy" }
+    ]
 };
 
 export default function reducer(state = initialState, action) {
@@ -51,6 +56,19 @@ export default function reducer(state = initialState, action) {
                     })
                 }
             }
+        }
+
+        case Types.PUT_FAQ_CATEGORY_FULFILLED: {
+            return {
+                ...state,
+                faq_categories: (state.faq_categories).map(item => {
+                    if (item.id === action.payload.data.id) {
+                        return action.payload.data
+                    }
+                    return item
+                })
+            }
+
         }
 
         case Types.DELETE_FAQ_ITEM_FULFILLED: {

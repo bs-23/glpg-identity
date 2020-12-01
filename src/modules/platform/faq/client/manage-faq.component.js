@@ -12,7 +12,7 @@ import { useToasts } from 'react-toast-notifications';
 export default function ManageFaq() {
     const [show, setShow] = useState(false);
     const faqData = useSelector(state => state.faqReducer.faq_items);
-    const [serviceCategories, setServiceCategories] = useState(false);
+    const serviceCategories = useSelector(state => state.faqReducer.faq_categories);
     const [editMode, setEditMode] = useState(false);
     const [editData, setEditData] = useState(null);
     const [category, setCategory] = useState(null);
@@ -80,20 +80,13 @@ export default function ManageFaq() {
     }, [location]);
 
     const pageLeft = () => {
-        if (faqData.page > 1) urlChange(faqData.page - 1, faqData.category, params.get('orderBy'), true);
+        if (faqData.metadata.page > 1) urlChange(faqData.metadata.page - 1, faqData.metadata.category, params.get('orderBy'), true);
     };
 
     const pageRight = () => {
-        if (faqData.end !== faqData.total) urlChange(faqData.page + 1, faqData.category, params.get('orderBy'), true);
+        if (faqData.metadata.end !== faqData.metadata.total) urlChange(faqData.metadata.page + 1, faqData.metadata.category, params.get('orderBy'), true);
     };
 
-    useEffect(() => {
-        async function getServiceCategory() {
-            const response = (await axios.get('/api/faqCategories')).data;
-            setServiceCategories(response);
-        }
-        getServiceCategory();
-    }, []);
 
     return (
         <main className="app__content cdp-light-bg h-100">
@@ -114,19 +107,19 @@ export default function ManageFaq() {
                     <div className="col-12">
                         <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
                             <h4 class="cdp-text-primary font-weight-bold mb-3 mb-sm-0">FAQ List</h4>
-                            {serviceCategories.length > 0 &&
+                            {serviceCategories.length > 0 && faqData.metadata &&
                                 < div class="d-flex justify-content-between align-items-center">
                                     <Dropdown className="ml-auto dropdown-customize">
                                         <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center">
-                                            <i className="icon icon-filter mr-2 mb-n1"></i> {!faqData.category ? 'Filter by Category' : serviceCategories.find(x => x.slug === faqData.category).title}
+                                            <i className="icon icon-filter mr-2 mb-n1"></i> {!faqData.metadata.category ? 'Filter by Category' : serviceCategories.find(x => x.slug === faqData.metadata.category).title}
                                         </Dropdown.Toggle>
                                         <Dropdown.Menu>
                                             {
-                                                faqData.category && <Dropdown.Item onClick={() => urlChange(1, 'null', params.get('orderBy'))}>All</Dropdown.Item>
+                                                faqData.metadata.category && <Dropdown.Item onClick={() => urlChange(1, 'null', params.get('orderBy'))}>All</Dropdown.Item>
                                             }
                                             {
                                                 serviceCategories.length > 0 && serviceCategories.map((item, index) => (
-                                                    item.title !== faqData.category && <Dropdown.Item key={index} onClick={() => urlChange(1, item.slug, params.get('orderBy'))}>{item.title}</Dropdown.Item>
+                                                    item.title !== faqData.metadata.category && <Dropdown.Item key={index} onClick={() => urlChange(1, item.slug, params.get('orderBy'))}>{item.title}</Dropdown.Item>
                                                 ))
                                             }
                                         </Dropdown.Menu>
@@ -145,8 +138,8 @@ export default function ManageFaq() {
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
 
                                         <tr>
-                                            <th width="25%"><span className={sort.value === 'question' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.category, 'question')}>Questions<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                            <th width="45%"><span className={sort.value === 'answer' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.category, 'answer')}>Answers<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                            <th width="25%"><span className={sort.value === 'question' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'question')}>Questions<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                            <th width="45%"><span className={sort.value === 'answer' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'answer')}>Answers<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                             <th width="25%">Category</th>
                                             <th width="5%">Action</th>
                                         </tr>
@@ -175,14 +168,14 @@ export default function ManageFaq() {
                                         ))}
                                     </tbody>
                                 </table>
-                                {((faqData.page === 1 &&
-                                    faqData.total > faqData.limit) ||
-                                    (faqData.page > 1))
+                                {((faqData.metadata.page === 1 &&
+                                    faqData.metadata.total > faqData.metadata.limit) ||
+                                    (faqData.metadata.page > 1))
                                     && faqData['faq'] &&
-                                    <div className="pagination justify-content-end align-items-center border-top p-3">
-                                        <span className="cdp-text-primary font-weight-bold">{faqData.start + ' - ' + faqData.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + faqData.total}</span>
-                                        <span className="pagination-btn" data-testid='Prev' onClick={() => pageLeft()} disabled={faqData.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
-                                        <span className="pagination-btn" data-testid='Next' onClick={() => pageRight()} disabled={faqData.end === faqData.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
+                                    <div className="pagination justify-content-end align-items-center border-top p-3">.
+                                        <span className="cdp-text-primary font-weight-bold">{faqData.metadata.start + ' - ' + faqData.metadata.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + faqData.metadata.total}</span>
+                                        <span className="pagination-btn" data-testid='Prev' onClick={() => pageLeft()} disabled={faqData.metadata.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
+                                        <span className="pagination-btn" data-testid='Next' onClick={() => pageRight()} disabled={faqData.metadata.end === faqData.metadata.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
                                     </div>
                                 }
                             </div>
