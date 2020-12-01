@@ -180,6 +180,19 @@ export default function ManageFaq() {
                                 }
                             </div>
                         }
+
+                        {faqData.faq && faqData.faq.length === 0 &&
+                            <div className="row justify-content-center mt-5 pt-5 mb-3">
+                                <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">
+                                    <i class="icon icon-team icon-6x cdp-text-secondary"></i>
+                                    <h3 className="font-weight-bold cdp-text-primary pt-4">No FAQ Found!</h3>
+                                    <h4 className="cdp-text-primary pt-3 pb-5">Click on the button below to create new one</h4>
+                                    <button onClick={() => { setShow(true); setEditMode(false); setEditData(null); }} className="btn cdp-btn-secondary text-white px-5 py-2 font-weight-bold">
+                                        <i className="icon icon-plus pr-1"></i> Add New FAQ
+                                            </button>
+                                </div>
+                            </div>
+                        }
                         <FaqForm editMode={editMode} editData={editData} serviceCategory={serviceCategories} changeShow={(val) => setShow(val)} show={show} />
                         <Modal centered show={showDelete} onHide={() => setShowDelete(false)}>
                             <Modal.Header closeButton>
