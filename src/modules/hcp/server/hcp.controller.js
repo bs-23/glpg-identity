@@ -1255,24 +1255,11 @@ async function updateHCPUserConsents(req, res) {
 }
 
 async function searchOkla(req, res) {
-    //      codbase
-    //      in my contract
-    //      method (phonetic, fuzzy)
-    //      duplicates
-    //      first name
-    //      last name
-    //      specialty
-    //      address
-    //      city
-    //      post code
-    //      onekey id
-    //      individual identifier
-    //      page
     try {
         let { duplicates, isInContract, phonetic } = req.body;
 
-        const page = req.query.page ? +req.query.page - 1 : 0;
-        const limit = 1000;
+        const page = req.query.page ? +req.query.page : 0;
+        const limit = 15;
 
         if ((duplicates && typeof duplicates !== 'boolean')
             || (phonetic && typeof phonetic !== 'boolean')
@@ -1311,7 +1298,7 @@ async function searchOkla(req, res) {
             entityType: 'activity',
             isInContract,
             duplicates,
-            // startIndex: page,
+            startIndex: page * limit,
             resultSize: limit,
             codBases: codbases,
             fields
@@ -1323,33 +1310,45 @@ async function searchOkla(req, res) {
 
         const results = [];
         Object.keys(groupedByIndividuals).forEach((individualEid, index) => {
+            const activitiesOfIndividual = groupedByIndividuals[individualEid];
+            const onekeyEidList = activitiesOfIndividual.map(i => i.onekeyEid);
+            const individual = activitiesOfIndividual[0].individual;
 
-            const group = groupedByIndividuals[individualEid];
-            // console.log('================================', group);
-            const individual = group[0].individual;
-            const workplaces = group.map(g => g.workplace);
+            const workplaces = activitiesOfIndividual.map(g => {
+                const workplace = g.workplace;
+                const name = [workplace.managerWorkplaceUsualName, workplace.usualName].filter(i => i).join(' - ');
+                return {
+                    isMainActivity: g.activity.isMainActivity,
+                    isValid: workplace.statusLabel === 'Valid',
+                    name,
+                    addresss: workplace.workplaceAddresses['P,1'].address.addressLongLabel,
+                    city: workplace.workplaceAddresses['P,1'].address.postalTownReference.villageLabel
+                };
+            });
 
             const res = {
                 firstName: individual.firstName,
                 lastName: individual.lastName,
-                specialty: individual.qualifications ? individual.qualifications['SP,1'].corporateLabel : ''
+                specialty: individual.qualifications ? individual.qualifications['SP,1'].corporateLabel : '',
+                individualEid: individual.individualEid,
+                countryIso2: activitiesOfIndividual[0].country,
+                codbase: activitiesOfIndividual[0].codBase,
+                workplaces,
+                onekeyEidList
             };
-            console.log(index + '================================', res);
+
+            // console.log(index + '-' + res.firstName + '-' + res.lastName + '-' + res.specialty + '-' + res.individualEid + '-' + res.countryIso2 + '-' + res.codbase);
+
+            results.push(res);
         });
 
-        // const data = {
-        //     users: hcp_users,
-        //     page: page + 1,
-        //     limit,
-        //     total: totalUser,
-        //     start: limit * page + 1,
-        //     end: offset + limit > totalUser ? totalUser : offset + limit,
-        //     status: status ? status : null,
-        //     codbase: codbase ? codbase : null,
-        //     countries: userPermittedCountries
-        // };
-
-        res.json(searchResponse);
+        const data = {
+            totalNumberOfResults: searchResponse.totalNumberOfResults,
+            numberOfIndividuals: searchResponse.numberOfIndividuals,
+            resultSize: searchResponse.resultSize,
+            results
+        }
+        res.json(data);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
