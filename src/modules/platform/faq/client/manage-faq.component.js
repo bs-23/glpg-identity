@@ -157,7 +157,7 @@ export default function ManageFaq() {
                                                 <td className="text-break">{row.question}</td>
                                                 <td className="text-break">{parse(row.answer)}</td>
                                                 <td className="text-break">{row.categories && row.categories.map((item, key) => (
-                                                    (serviceCategories.find(x => x.slug === item).title) + (key < row.categories.length - 1 ? ',' : '')
+                                                    (serviceCategories.find(x => x.slug === item).title) + (key < row.categories.length - 1 ? ', ' : '')
 
                                                 ))
                                                 }</td>

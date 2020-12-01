@@ -1,6 +1,6 @@
 import React from 'react';
 import { Switch } from 'react-router-dom';
-import { FaqClientRoutes } from './faq';
+import { FaqClientRoutes, faqReducer } from './faq';
 import PrivateRoute from '../core/client/PrivateRoute';
 import UserManagement from '../user/client/components/user-management.component';
 
@@ -14,3 +14,5 @@ export function PlatformRoutes() {
         </Switch>
     );
 }
+
+export { faqReducer };
