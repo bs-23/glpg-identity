@@ -58,7 +58,7 @@ async function createRole(req, res) {
             object_id: role.id,
             table_name: 'roles',
             actor: req.user.id,
-            description: `"${role.title}" role created`
+            remarks: `"${role.title}" role created`
         });
 
         res.json(role);
@@ -102,7 +102,7 @@ async function editRole(req, res) {
             object_id: foundRole.id,
             table_name: 'roles',
             actor: req.user.id,
-            description: `Role updated`
+            remarks: `Role updated`
         });
 
         res.json(foundRole);

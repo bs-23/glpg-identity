@@ -318,7 +318,7 @@ async function editHcp(req, res) {
             object_id: HcpUser.id,
             table_name: 'hcp_profiles',
             actor: req.user.id,
-            description: 'Updated HCP profile'
+            remarks: 'Updated HCP profile'
         });
 
         response.data = HcpUser;
@@ -607,7 +607,7 @@ async function createHcpProfile(req, res) {
             object_id: hcpUser.id,
             table_name: 'hcp_profiles',
             actor: req.user.id,
-            description: 'HCP user created'
+            remarks: 'HCP user created'
         });
 
         res.json(response);
@@ -716,7 +716,7 @@ async function approveHCPUser(req, res) {
             object_id: hcpUser.id,
             table_name: 'hcp_profiles',
             actor: req.user.id,
-            description: req.body.comment
+            remarks: req.body.comment
         });
 
         res.json(response);
@@ -753,7 +753,7 @@ async function rejectHCPUser(req, res) {
             object_id: hcpUser.id,
             table_name: 'hcp_archives',
             actor: req.user.id,
-            description: req.body.comment
+            remarks: req.body.comment
         });
 
         await hcpUser.destroy();

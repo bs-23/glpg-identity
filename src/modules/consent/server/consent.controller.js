@@ -649,7 +649,7 @@ async function createConsent(req, res) {
             object_id: data.id,
             table_name: 'consents',
             actor: req.user.id,
-            description: `"${data.preference}" consent created`
+            remarks: `"${data.preference}" consent created`
         });
 
         res.json(data);
@@ -731,7 +731,7 @@ async function updateCdpConsent(req, res) {
             object_id: consent.id,
             table_name: 'consents',
             actor: req.user.id,
-            description: `Consent updated`
+            remarks: `Consent updated`
         });
 
         res.sendStatus(200);
@@ -814,7 +814,7 @@ async function assignConsentToCountry(req, res) {
             object_id: createdCountryConsent.id,
             table_name: 'consent_countries',
             actor: req.user.id,
-            description: `Consent assigned to country`
+            remarks: `Consent assigned to country`
         });
 
         res.json(createdCountryConsent);
@@ -844,7 +844,7 @@ async function updateCountryConsent(req, res) {
             object_id: consentCountry.id,
             table_name: 'consent_countries',
             actor: req.user.id,
-            description: `Country-Consent Opt Type updated`
+            remarks: `Country-Consent Opt Type updated`
         });
 
         res.json(consentCountry);
@@ -872,7 +872,7 @@ async function deleteCountryConsent(req, res) {
             object_id: id,
             table_name: 'consent_countries',
             actor: req.user.id,
-            description: `Country-Consent deleted`
+            remarks: `Country-Consent deleted`
         });
 
         res.sendStatus(200);
@@ -946,7 +946,7 @@ async function createConsentCategory(req, res) {
             object_id: data.id,
             table_name: 'consent_categories',
             actor: req.user.id,
-            description: `"${data.title}" consent category created`
+            remarks: `"${data.title}" consent category created`
         });
 
         res.json(data);
@@ -981,7 +981,7 @@ async function updateConsentCategory(req, res) {
             object_id: consentCategory.id,
             table_name: 'consent_categories',
             actor: req.user.id,
-            description: `Consent category updated`
+            remarks: `Consent category updated`
         });
 
         res.json(data);
