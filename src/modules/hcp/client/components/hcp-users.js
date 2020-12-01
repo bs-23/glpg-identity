@@ -49,7 +49,7 @@ const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
     >
         <Modal.Header closeButton>
             <Modal.Title id="example-custom-modal-styling-title">
-                Save Confirmation
+                Change Confirmation
             </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -65,7 +65,7 @@ const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
                     {!comment && touched && <div className="invalid-feedback">
                         Must provide a comment.
                     </div>}
-                    <button className="btn btn-block mt-3 cdp-btn-primary text-white" disabled={!comment} onClick={handleSubmit}> Update </button>
+                    <button className="btn btn-block mt-3 cdp-btn-primary text-white" disabled={!comment} onClick={handleSubmit}> Save Changes </button>
                 </div>
             </div>
         </Modal.Body>
@@ -301,6 +301,7 @@ export default function hcpUsers() {
              }
         </div>
     }
+
     const popoverTop = (
         <Popover id="popover-basic" className="popup-customize">
             <Popover.Title as="h3" className=" px-3">Opt-In type hint:</Popover.Title>
@@ -358,6 +359,7 @@ export default function hcpUsers() {
         {
             id: 'last_name',
             name: 'Last Name',
+            editable: false,
             fieldType: { name: 'text', maxLength: '50' },
             onSort: generateSortHandler('last_name'),
             class: "text-break",
