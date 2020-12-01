@@ -34,6 +34,9 @@ const Audit = sequelize.cdpConnector.define('audits', {
     },
     description: {
         type: DataTypes.STRING
+    },
+    changes: {
+        type: DataTypes.STRING(5000)
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,

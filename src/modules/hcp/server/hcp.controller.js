@@ -339,6 +339,7 @@ async function updateHcps(req, res) {
     const hcpModelInstances = [];
     const emailsToUpdate = new Map();
     const uuidsToUpdate = new Map();
+    const allUpdateRecordsForLogging = [];
 
     function Data(rowIndex, property, value) {
         this.rowIndex = rowIndex;
@@ -442,8 +443,7 @@ async function updateHcps(req, res) {
                 last_name,
                 specialty_onekey,
                 country_iso2,
-                telephone,
-                comment
+                telephone
             });
 
             HcpUser.dataValues._rowIndex = _rowIndex;
@@ -467,7 +467,21 @@ async function updateHcps(req, res) {
         }
 
         await Promise.all(hcpModelInstances.map(async (hcp, index) => {
+            const updatedPropertiesLog = [];
+
+            Object.keys(hcpsToUpdate[index]).map(key => {
+                if(hcpsToUpdate[index][key]) {
+                    const updatedPropertyLogObject = {
+                        field: key,
+                        old_value: hcp.dataValues[key],
+                        new_value: hcpsToUpdate[index][key]
+                    };
+                    updatedPropertiesLog.push(updatedPropertyLogObject);
+                }
+            });
+
             await hcp.update(hcpsToUpdate[index]);
+            allUpdateRecordsForLogging.push(updatedPropertiesLog);
         }));
 
         await Promise.all(hcpModelInstances.map(async (hcp, index) => {
@@ -476,7 +490,8 @@ async function updateHcps(req, res) {
                 object_id: hcp.id,
                 table_name: 'hcp_profiles',
                 actor: req.user.id,
-                description: hcpsToUpdate[index].comment
+                description: Hcps[index].comment,
+                changes: JSON.stringify(allUpdateRecordsForLogging[index])
             });
         }));
 
