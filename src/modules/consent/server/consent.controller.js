@@ -164,14 +164,15 @@ async function getConsentsReport(req, res) {
         const country_iso2_list_for_user_countries_codbase = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => codbase_list_mapped_with_user_country_iso2_list.includes(i.codbase)).map(i => i.country_iso2) : [];
         const countries_ignorecase_for_user_countries_codbase = [].concat.apply([], country_iso2_list_for_user_countries_codbase.map(i => ignoreCaseArray(i)));
 
-        const opt_types = [...new Set((await ConsentCountry.findAll()).map(i => i.opt_type))];
+        const opt_types = ['single-opt-in', 'double-opt-in', 'soft-opt-in', 'opt-out'];
 
         const consent_filter = {
-            consent_confirmed: true,
+            // consent_confirmed: true,
+            'opt_type': opt_type ? { [Op.eq]: opt_type } : { [Op.or]: opt_types },
             '$hcp_profile.application_id$': req.user.type === 'admin' ? { [Op.or]: application_list } : userPermittedApplications,
             '$hcp_profile.country_iso2$': codbase ? { [Op.any]: [countries_ignorecase_for_codbase] } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : countries_ignorecase_for_user_countries_codbase,
             '$consent.consent_country.country_iso2$': { [Op.or]: [ Sequelize.fn('LOWER', Sequelize.col('hcp_profile.country_iso2')), Sequelize.fn('UPPER', Sequelize.col('hcp_profile.country_iso2')) ] },
-            '$consent.consent_country.opt_type$': opt_type ? { [Op.eq]: opt_type } : { [Op.or]: opt_types }
+            // '$consent.consent_country.opt_type$': opt_type ? { [Op.eq]: opt_type } : { [Op.or]: opt_types }
         };
 
         const hcp_consents = await HcpConsents.findAll({
@@ -648,7 +649,7 @@ async function createConsent(req, res) {
             object_id: data.id,
             table_name: 'consents',
             actor: req.user.id,
-            description: `"${data.preference}" consent created`
+            remarks: `"${data.preference}" consent created`
         });
 
         res.json(data);
@@ -730,7 +731,7 @@ async function updateCdpConsent(req, res) {
             object_id: consent.id,
             table_name: 'consents',
             actor: req.user.id,
-            description: `Consent updated`
+            remarks: `Consent updated`
         });
 
         res.sendStatus(200);
@@ -813,7 +814,7 @@ async function assignConsentToCountry(req, res) {
             object_id: createdCountryConsent.id,
             table_name: 'consent_countries',
             actor: req.user.id,
-            description: `Consent assigned to country`
+            remarks: `Consent assigned to country`
         });
 
         res.json(createdCountryConsent);
@@ -843,7 +844,7 @@ async function updateCountryConsent(req, res) {
             object_id: consentCountry.id,
             table_name: 'consent_countries',
             actor: req.user.id,
-            description: `Country-Consent Opt Type updated`
+            remarks: `Country-Consent Opt Type updated`
         });
 
         res.json(consentCountry);
@@ -871,7 +872,7 @@ async function deleteCountryConsent(req, res) {
             object_id: id,
             table_name: 'consent_countries',
             actor: req.user.id,
-            description: `Country-Consent deleted`
+            remarks: `Country-Consent deleted`
         });
 
         res.sendStatus(200);
@@ -945,7 +946,7 @@ async function createConsentCategory(req, res) {
             object_id: data.id,
             table_name: 'consent_categories',
             actor: req.user.id,
-            description: `"${data.title}" consent category created`
+            remarks: `"${data.title}" consent category created`
         });
 
         res.json(data);
@@ -980,7 +981,7 @@ async function updateConsentCategory(req, res) {
             object_id: consentCategory.id,
             table_name: 'consent_categories',
             actor: req.user.id,
-            description: `Consent category updated`
+            remarks: `Consent category updated`
         });
 
         res.json(data);

@@ -3,12 +3,15 @@ import XRegExp from 'xregexp';
 
 export const ApprovalRejectSchema = object().shape({
     comment: string()
-        .required('Must select one option.'),
+        .required('Must select one option.')
+        .max(500, 'This field must be at most 500 characters long.'),
     other_comment: string().when('selectedStatus', {
         is: 'approve',
         then: string().when('comment', {
             is: 'other',
-            then: string().required('This field must not be empty.'),
+            then: string()
+                .required('This field must not be empty.')
+                .max(500, 'This field must be at most 500 characters long.'),
             otherwise: string()
         }),
         otherwise: string()

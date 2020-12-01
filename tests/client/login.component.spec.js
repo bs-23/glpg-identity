@@ -93,10 +93,10 @@ describe('Login component', () => {
         });
 
         // Turn this back on when recaptcha is enabled in login component
-        // act(() => {
-        //     const mockedField = getByTestId("captcha");
-        //     mockedField[Object.keys(mockedField)[1]].testprops.setFieldValue("recaptchaToken", 'token')
-        // })
+        act(() => {
+            const mockedField = getByTestId("captcha");
+            mockedField[Object.keys(mockedField)[1]].testprops.setFieldValue("recaptchaToken", 'token')
+        })
 
         fireEvent.click(submit);
 
