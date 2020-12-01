@@ -22,9 +22,9 @@ export default function Faq(props) {
             <div className={`faq h-100 shadow-sm bg-white ${show ? "faq-expand" : ""}`}>
                 <h4 className="faq__header p-3 font-weight-bold mb-0 d-flex justify-content-between">
                     FAQ Hints
-                    <i onClick={() => setShow(true)} type="button" class="icon icon-expand faq-icon-expand faq__icon-toggle  d-none"></i>
+                    <i onClick={() => setShow(true)} type="button" class="icon icon-expand faq-icon-expand faq__icon-toggle d-none d-lg-block"></i>
                     <i class="icon icon-minimize faq-icon-minimize  faq__icon-toggle" type="button" onClick={() => setShow(false)}></i>
-                    <i className="icon icon-help faq__icon-help d-block"></i>
+                    <i className="icon icon-help faq__icon-help d-block d-lg-none"></i>
                 </h4>
                 <Accordion defaultActiveKey="0" className="faq__body">
 
