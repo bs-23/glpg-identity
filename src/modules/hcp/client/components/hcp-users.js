@@ -54,7 +54,7 @@ const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
         </Modal.Header>
         <Modal.Body>
             <div className="p-3">
-                <p className="">Please comment and continue to save these changes to the HCP profile</p>
+                <p className="">Please comment and continue to save the changes to the HCP profile</p>
                 <div>
                     <div>
                         <label className="font-weight-bold">Comment <span class="text-danger">*</span></label>
