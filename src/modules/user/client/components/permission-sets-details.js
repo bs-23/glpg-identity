@@ -89,7 +89,7 @@ const PermissionSetDetails = ({ permissionSetId }) => {
             </div>
         </div>
         <div className="pb-0 pb-sm-2 d-block d-sm-flex">
-            
+
             <div className="profile-detail__col pb-3">
                 <span className="mr-2 d-block profile-detail__label">Used in Profiles</span>
                 <span className="profile-detail__value">{
@@ -128,7 +128,7 @@ export const PermissionSetDetailsModal = ({ permissionSetId, show, onHide, ...re
     >
         <Modal.Header closeButton>
             <Modal.Title id="example-custom-modal-styling-title">
-                Permission Set Details
+                Rights of this Permission Set
             </Modal.Title>
         </Modal.Header>
         <Modal.Body>
