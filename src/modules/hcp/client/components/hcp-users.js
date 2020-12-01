@@ -280,7 +280,7 @@ export default function hcpUsers() {
     }
 
     const renderActions = ({ row, rowIndex, formikProps, hasRowChanged, editableTableProps }) => {
-        const { dirty, resetForm, initialValues } = formikProps;
+        const { dirty, resetForm, initialValues, isValid } = formikProps;
 
         return <div className="position-relative d-inline-block">
             {!hasRowChanged && <Dropdown className="dropdown-customize">
@@ -294,7 +294,7 @@ export default function hcpUsers() {
             {hasRowChanged &&
                 <>
                 <div className="d-flex position-absolute inline-editing__btn-wrap">
-                    <i onClick={() => onTableRowSave(hcps.users[rowIndex], { rowIndex, editableTableProps, formikProps })} disabled={!dirty} class="fas fa-check mr-3 cdp-text-primary fa-1_5x" title="Save Changes" type="button"></i>
+                    <i style={isValid ? {} :  { pointerEvents: 'none' }} onClick={() => onTableRowSave(hcps.users[rowIndex], { rowIndex, editableTableProps, formikProps })} disabled={!dirty} class="fas fa-check mr-3 cdp-text-primary fa-1_5x" title="Save Changes" type="button"></i>
                     <i onClick={resetForm} class="fas fa-times text-danger fa-1_5x" title="Cancel Changes" type="button"></i>
                 </div>
                 </>
