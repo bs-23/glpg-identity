@@ -48,10 +48,17 @@
                 visibility: hidden;
             }
 
-            &__btn-wrap {
-                left: 0px;
-                top: 50%;
-                transform: translateY(-40%);
+            &__btn {
+                &-wrap {
+                    left: 0px;
+                    top: 50%;
+                    transform: translateY(-40%);
+                }
+
+                &-disable {
+                    cursor: default;
+                    opacity: .3;
+                }
             }
         }
 

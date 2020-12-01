@@ -57,7 +57,7 @@ const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
                 <p className="">Please comment and continue to save the changes to the HCP profile</p>
                 <div>
                     <div>
-                        <label className="font-weight-bold">Comment <span class="text-danger">*</span></label>
+                        <label className="font-weight-bold">Comment <span className="text-danger">*</span></label>
                     </div>{console.log('Editable Table Props: ', editableTableProps)}
                     <div>
                         <textarea className="form-control" rows="4" cols="45" value={comment} onBlur={handleOnBlur} onChange={(e) => setComment(e.target.value)} />
@@ -294,8 +294,8 @@ export default function hcpUsers() {
             {hasRowChanged &&
                 <>
                 <div className="d-flex position-absolute inline-editing__btn-wrap">
-                    <i style={isValid ? {} :  { pointerEvents: 'none' }} onClick={() => onTableRowSave(hcps.users[rowIndex], { rowIndex, editableTableProps, formikProps })} disabled={!dirty} class="fas fa-check mr-3 cdp-text-primary fa-1_5x" title="Save Changes" type="button"></i>
-                    <i onClick={resetForm} class="fas fa-times text-danger fa-1_5x" title="Cancel Changes" type="button"></i>
+                    <i style={isValid ? {} : { pointerEvents: 'none' }} onClick={() => onTableRowSave(hcps.users[rowIndex], { rowIndex, editableTableProps, formikProps })} disabled={!dirty} className={isValid ? 'fas fa-check mr-3 cdp-text-primary fa-1_5x' : 'fas fa-check mr-3 cdp-text-primary fa-1_5x inline-editing__btn-disable'} title="Save Changes" type="button"></i>
+                    <i onClick={resetForm} className="fas fa-times text-danger fa-1_5x" title="Cancel Changes" type="button"></i>
                 </div>
                 </>
              }
@@ -318,7 +318,7 @@ export default function hcpUsers() {
 
     const CustomOptInHeader = () => {
         return <div>Opt Type <OverlayTrigger trigger="click" rootClose placement="top" overlay={popoverTop}>
-            <i class="fas fa-info-circle ml-1 text-white" role="button"></i>
+            <i className="fas fa-info-circle ml-1 text-white" role="button"></i>
         </OverlayTrigger></div>
     }
 
@@ -615,7 +615,7 @@ export default function hcpUsers() {
                                                             </Card.Body>
                                                         </Accordion.Collapse>
                                                         <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
-                                                            <span className="d-flex align-items-center"><i class={`icon ${consent.consent_given ? 'icon-check-filled' : 'icon-close-circle text-danger'} cdp-text-primary mr-4 consent-check`}></i> <span className="consent-summary">{consent.preference}</span></span>
+                                                        <span className="d-flex align-items-center"><i className={`icon ${consent.consent_given ? 'icon-check-filled' : 'icon-close-circle text-danger'} cdp-text-primary mr-4 consent-check`}></i> <span className="consent-summary">{consent.preference}</span></span>
                                                             <i className="icon icon-arrow-down ml-2 accordion-consent__icon-down"></i>
                                                         </Accordion.Toggle>
                                                     </Card> : null}
@@ -800,7 +800,7 @@ export default function hcpUsers() {
                                             console.log('current value: ', values.rows[0] && values.rows[0].first_name)
                                             return dirty && <div className="cdp-bg-primary text-center p-2 cdp-table-inline-editing__save-btn">
                                                 <div>
-                                                    <button className="btn cdp-btn-outline-secondary btn-sm text-white" onClick={resetForm}><i class="fas fa-times-circle mr-1"></i> Reset</button>
+                                                    <button className="btn cdp-btn-outline-secondary btn-sm text-white" onClick={resetForm}><i className="fas fa-times-circle mr-1"></i> Reset</button>
                                                     <button className="btn cdp-btn-secondary ml-2 btn-sm text-white" onClick={submitForm} disabled={!dirty}><i class="fas fa-check-circle mr-1"></i>Save Changes</button>
                                                 </div>
                                             </div>
@@ -824,7 +824,7 @@ export default function hcpUsers() {
                                 <>
                                     <div className="row justify-content-center mt-sm-5 pt-5 mb-3">
                                         <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">
-                                            <i class="icon icon-team icon-6x cdp-text-secondary"></i>
+                                        <i className="icon icon-team icon-6x cdp-text-secondary"></i>
                                             <h3 className="font-weight-bold cdp-text-primary pt-4">No Profile Found!</h3>
                                         </div>
                                     </div>
