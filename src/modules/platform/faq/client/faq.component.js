@@ -26,9 +26,9 @@ export default function Faq(props) {
                     <i class="icon icon-minimize faq-icon-minimize  faq__icon-toggle" type="button" onClick={() => setShow(false)}></i>
                     <i className="icon icon-help faq__icon-help d-block d-lg-none"></i>
                 </h4>
-                <Accordion defaultActiveKey="0" className="faq__body">
 
-                    {faqData.faq && faqData.faq.map((faq, index) => (
+                {faqData.faq && faqData.faq.map((faq, index) => (
+                    <Accordion defaultActiveKey="0" className="faq__body">
                         <Card>
                             <Accordion.Collapse eventKey={index + ""}>
                                 <Card.Body>{parse(faq.answer)}</Card.Body>
@@ -39,14 +39,25 @@ export default function Faq(props) {
                             </Accordion.Toggle>
 
                         </Card>
+                        <Card className="border-0">
+                            <NavLink to="platform-management/manage-faq" className="p-3 pb-0 mb-0 w-100 d-flex align-items-center bg-white cdp-text-secondary">
+                                More FAQ's
+                            </NavLink>
+                        </Card>
+                    </Accordion>
+                ))}
 
-                    ))}
-                    <Card className="border-0">
-                        <NavLink to="platform-management/manage-faq" className="p-3 pb-0 mb-0 w-100 d-flex align-items-center bg-white cdp-text-secondary">
-                            More FAQ's
-                        </NavLink>
-                    </Card>
-                </Accordion>
+                {faqData.faq && faqData.faq.length === 0 &&
+                    <div className="bg-white text-center py-3 px-2 border-top">
+                        <i className="icon icon-help icon-3x cdp-text-secondary"></i>
+                        <h5 className="font-weight-bold cdp-text-primary pt-4">No FAQ Found!</h5>
+                        <p className="py-3">Click on the button below to create new one</p>
+                        <button className="btn cdp-btn-secondary text-white px-5 py-2 font-weight-bold">
+                            <i className="icon icon-plus pr-1"></i> Add New FAQ
+                            </button>
+                    </div>
+                }
+
             </div>
         </React.Fragment>
 
