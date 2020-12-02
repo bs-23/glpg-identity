@@ -26,10 +26,10 @@ export default function Faq(props) {
                     <i class="icon icon-minimize faq-icon-minimize  faq__icon-toggle" type="button" onClick={() => setShow(false)}></i>
                     <i className="icon icon-help faq__icon-help d-block d-lg-none"></i>
                 </h4>
+                <Accordion defaultActiveKey="0" className="faq__body">
+                    {faqData.faq && faqData.faq.map((faq, index) => (
 
-                {faqData.faq && faqData.faq.map((faq, index) => (
-                    <Accordion key={index} defaultActiveKey="0" className="faq__body">
-                        <Card>
+                        <Card key={index}>
                             <Accordion.Collapse eventKey={index + ""}>
                                 <Card.Body>{parse(faq.answer)}</Card.Body>
                             </Accordion.Collapse>
@@ -39,15 +39,16 @@ export default function Faq(props) {
                             </Accordion.Toggle>
 
                         </Card>
+                    ))}
+                    {faqData.faq && faqData.faq.length > 0 &&
+                        <Card className="border-0">
+                            <NavLink to="platform-management/manage-faq" className="p-3 pb-0 mb-0 w-100 d-flex align-items-center bg-white cdp-text-secondary">
+                                More FAQ's
+                        </NavLink>
+                        </Card>
+                    }
+                </Accordion>
 
-                    </Accordion>
-                ))}
-
-                <Card className="border-0">
-                    <NavLink to="platform-management/manage-faq" className="p-3 pb-0 mb-0 w-100 d-flex align-items-center bg-white cdp-text-secondary">
-                        More FAQ's
-                    </NavLink>
-                </Card>
 
                 {faqData.faq && faqData.faq.length === 0 &&
                     <div className="bg-white text-center py-3 px-2 border-top">
