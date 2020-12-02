@@ -386,6 +386,13 @@ export default function hcpUsers() {
             editable: (row) => row.status === 'manually_verified'
         },
         {
+            id: 'country_iso2',
+            name: 'Country',
+            editable: false,
+            width: "12%",
+            customizeCellContent: getCountryName
+        },
+        {
             id: 'specialty_onekey',
             name: 'Specialty',
             width: "10%",
