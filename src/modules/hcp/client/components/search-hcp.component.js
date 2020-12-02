@@ -14,11 +14,20 @@ const SearchHcp = () => {
     //     setSelectedOption(selectedOption)
     // };
 
+    const resetSearch = (props) => {
+        /**
+         * To-DO
+         * - reset country selection
+         * - clear results
+         */
+        props.resetForm();
+    };
+
     useEffect(() => {
-        const getSpecialties = async () =>{
+        const getSpecialties = async () => {
             const codbases = selectedOption.map(item => `codbases=${item.value}`);
             const parameters = codbases.join('&');
-            if(parameters){
+            if (parameters) {
                 const response = await axios.get(`/api/hcps/specialties?${parameters}`);
                 console.log(response);
                 setSpecialties(response.data);
@@ -39,7 +48,7 @@ const SearchHcp = () => {
                     <input type="checkbox" className="custom-control-input" checked={props.isSelected} onChange={() => null} />
                     <label className="custom-control-label" for="customCheck1">{children}</label>
                 </div>
-          </components.Option>
+            </components.Option>
         );
     };
 
@@ -66,7 +75,7 @@ const SearchHcp = () => {
                                     postal_code: '',
                                     one_key_id: '',
                                     individual: '',
-                                    specialties: [],
+                                    specialties: []
                                 }}
                                 displayName="SearchForm"
                                 onSubmit={(values, actions) => {
@@ -93,7 +102,7 @@ const SearchHcp = () => {
                                                         classNamePrefix="multiselect"
                                                         onChange = { selectedOption => {
                                                             formikProps.values.countries = selectedOption;
-                                                            setSelectedOption(selectedOption)
+                                                            setSelectedOption(selectedOption || [])
                                                         }}
                                                     />
                                                 </div>
@@ -185,10 +194,14 @@ const SearchHcp = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="row">
-                                            <div className="col-6"><button type="reset" className="btn btn-block btn-secondary mt-4 p-2">CLOSE</button></div>
-                                            <div className="col-6"><button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2">SEARCH</button></div>
-                                        </div>
+                                            <div className="row">
+                                                <div className="col-6">
+                                                    <button type="reset" className="btn btn-block btn-secondary mt-4 p-2" onClick={() => resetSearch(formikProps)}>RESET</button>
+                                                </div>
+                                                <div className="col-6">
+                                                    <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!formikProps.values.countries || !formikProps.values.countries.length || !(formikProps.values.firstname  || formikProps.values.lastname || formikProps.values.address_label || formikProps.values.city || formikProps.values.postal_code || formikProps.values.one_key_id || formikProps.values.individual || (formikProps.values.specialties && formikProps.values.specialties.length))}>SEARCH</button>
+                                                </div>
+                                            </div>
                                     </Form>
                                 )}
                             </Formik>
@@ -222,11 +235,11 @@ const SearchHcp = () => {
                                     <tbody className="cdp-table__body bg-white">
                                         <tr>
                                             <td>David Alian</td>
+                                            <td>Dentist</td>
                                             <td>
                                                 <div className="currentWorkplace"><i className="fas fa-check mr-1 cdp-text-primary"></i> IBN sina, Dhaka</div>
                                                 <div className="previousWorkplace"><i className="fas fa-times mr-1 cdp-text-secondary"></i> Popular, Dhaka</div>
                                             </td>
-                                            <td>Dentist</td>
                                             <td>551255</td>
                                             <td>564564565</td>
                                             <td>Belgium</td>
