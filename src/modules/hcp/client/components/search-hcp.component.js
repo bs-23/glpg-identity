@@ -9,18 +9,19 @@ const SearchHcp = () => {
     const [selectedOption, setSelectedOption] = useState([]);
     const [specialties, setSpecialties] = useState([]);
 
-    const handleChange = selectedOption => {
-        console.log(`Option selected:`, selectedOption);
-        setSelectedOption(selectedOption)
-    };
+    // const handleChange = selectedOption => {
+    //     console.log(`Option selected:`, selectedOption);
+    //     setSelectedOption(selectedOption)
+    // };
 
     useEffect(() => {
         const getSpecialties = async () =>{
             const codbases = selectedOption.map(item => `codbases=${item.value}`);
             const parameters = codbases.join('&');
             if(parameters){
-                const response = await axios.get(`http://localhost:5050/api/hcps/specialties?${parameters}`)
-                setSpecialties(response.data)
+                const response = await axios.get(`/api/hcps/specialties?${parameters}`);
+                console.log(response);
+                setSpecialties(response.data);
             }
             else setSpecialties([]);
         }
@@ -29,7 +30,7 @@ const SearchHcp = () => {
     }, [selectedOption]);
 
     const getCountries = () => countries.map(country => ({ value: country.codbase, label: country.codbase_desc }));
-    const getSpecialties = () => specialties.map( i => ({ value: i.codbase, label: i.codDescription }));
+    const getSpecialties = () => specialties.map( i => ({ value: i.codDescription, label: i.codDescription }));
 
     const CustomOption = ({ children, ...props }) => {
         return (
@@ -54,11 +55,27 @@ const SearchHcp = () => {
                             <div className="add-user mx-3 mt-0 p-3 bg-white rounded border">
                             <Formik
                                 initialValues={{
-                                    names: []
+                                    countries: [],
+                                    in_my_contract: false,
+                                    phonetic: false,
+                                    duplicates: false,
+                                    firstname: '',
+                                    lastname: '',
+                                    address_label: '',
+                                    city: '',
+                                    postal_code: '',
+                                    one_key_id: '',
+                                    individual: '',
+                                    specialties: [],
+                                }}
+                                displayName="SearchForm"
+                                onSubmit={(values, actions) => {
+                                    console.log("testing", values)
+                                    actions.setSubmitting(false);
                                 }}
                             >
                                 { formikProps => (
-                                    <Form>
+                                    <Form onSubmit={formikProps.handleSubmit}>
                                         <div className="row">
                                             <div className="col-12">
                                                 <div className="form-group">
@@ -71,23 +88,28 @@ const SearchHcp = () => {
                                                         hideSelectedOptions={false}
                                                         // controlShouldRenderValue = { false }
                                                         options={getCountries()}
-                                                        onChange={handleChange}
+                                                        // onChange={handleChange}
                                                         className="multiselect"
                                                         classNamePrefix="multiselect"
+                                                        onChange = { selectedOption => {
+                                                            formikProps.values.countries = selectedOption;
+                                                            setSelectedOption(selectedOption)
+                                                        }}
                                                     />
                                                 </div>
                                             </div>
+
                                             <div className="col-12">
                                                 <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-2">
-                                                    <input type="checkbox" className="custom-control-input" id="customControlInline" />
+                                                    <input type="checkbox" className="custom-control-input" name="in_my_contract" id="customControlInline" onChange={(e) => formikProps.values.in_my_contract = e.target.checked}/>
                                                     <label className="custom-control-label" for="customControlInline">In My Contract</label>
                                                 </div>
                                                 <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-2">
-                                                    <input type="checkbox" className="custom-control-input" id="customControlInline2" />
+                                                    <input type="checkbox" className="custom-control-input" name="phonetic" id="customControlInline2" onChange={(e) => formikProps.values.phonetic = e.target.checked} />
                                                     <label className="custom-control-label" for="customControlInline2">Phonetic</label>
                                                 </div>
                                                 <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-2">
-                                                    <input type="checkbox" className="custom-control-input" id="customControlInline3" />
+                                                    <input type="checkbox" className="custom-control-input" name="duplicates" id="customControlInline3" onChange={(e) => formikProps.values.duplicates = e.target.checked} />
                                                     <label className="custom-control-label" for="customControlInline3">Duplicates</label>
                                                 </div>
                                             </div>
@@ -97,13 +119,13 @@ const SearchHcp = () => {
                                             <div className="col-12 col-sm-4">
                                                 <div className="form-group">
                                                     <label for="exampleFormControlInput1">First Name</label>
-                                                    <input type="text" className="form-control" id="firstName" placeholder="" />
+                                                    <Field className="form-control firstname" type='text' name='firstname' id='firstname' />
                                                 </div>
                                             </div>
                                             <div className="col-12 col-sm-4">
                                                 <div className="form-group">
                                                     <label for="exampleFormControlInput1">Last Name</label>
-                                                    <input type="text" className="form-control" id="lastName" placeholder="" />
+                                                    <Field className="form-control lastname" type='text' name='lastname' id='lastname' />
                                                 </div>
                                             </div>
                                             <div className="col-12 col-sm-4">
@@ -117,9 +139,12 @@ const SearchHcp = () => {
                                                         hideSelectedOptions={false}
                                                         // controlShouldRenderValue = { false }
                                                         options={getSpecialties()}
-
                                                         className="multiselect"
                                                         classNamePrefix="multiselect"
+                                                        onChange = { selectedOption => {
+                                                            console.log(`Option selected:`, selectedOption);
+                                                            formikProps.values.specialties = selectedOption;
+                                                        }}
                                                     />
                                                 </div>
                                             </div>
@@ -129,19 +154,19 @@ const SearchHcp = () => {
                                             <div className="col-12 col-sm-4">
                                                 <div className="form-group">
                                                     <label for="AddressLabel">Address Label</label>
-                                                    <input type="text" className="form-control" id="AddressLabel" placeholder="" />
+                                                    <Field className="form-control address_label" type='text' name='address_label' id='address_label' />
                                                 </div>
                                             </div>
                                             <div className="col-12 col-sm-4">
                                                 <div className="form-group">
                                                     <label for="City">City</label>
-                                                    <input type="text" className="form-control" id="City" placeholder="" />
+                                                    <Field className="form-control city" type='text' name='city' id='city' />
                                                 </div>
                                             </div>
                                             <div className="col-12 col-sm-4">
                                                 <div className="form-group">
                                                     <label for="PostalCode">Postal Code</label>
-                                                    <input type="text" className="form-control" id="PostalCode" placeholder="" />
+                                                    <Field className="form-control postal_code" type='text' name='postal_code' id='postal_code' />
                                                 </div>
                                             </div>
                                         </div>
@@ -150,13 +175,13 @@ const SearchHcp = () => {
                                             <div className="col-12 col-sm-4">
                                                 <div className="form-group">
                                                     <label for="OnekeyID">Onekey ID</label>
-                                                    <input type="text" className="form-control" id="OnekeyID" placeholder="" />
+                                                    <Field className="form-control one_key_id" type='text' name='one_key_id' id='one_key_id' />
                                                 </div>
                                             </div>
                                             <div className="col-12 col-sm-4">
                                                 <div className="form-group">
                                                     <label for="Individual ">Individual - Identifier</label>
-                                                    <input type="text" className="form-control" id="Individual " placeholder="" />
+                                                    <Field className="form-control individual" type='text' name='individual' id='individual' />
                                                 </div>
                                             </div>
                                         </div>
