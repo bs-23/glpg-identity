@@ -282,7 +282,7 @@ export default function hcpUsers() {
     const renderActions = ({ row, rowIndex, formikProps, hasRowChanged, editableTableProps }) => {
         const { dirty, resetForm, initialValues, isValid } = formikProps;
 
-        return <div className="position-relative d-inline-block">
+        return <div className="position-relative">
             {!hasRowChanged && <Dropdown className="dropdown-customize">
                 <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
                 </Dropdown.Toggle>
