@@ -98,6 +98,23 @@ const FaqForm = (props) => {
 
     }
 
+    const sortArrayWithTitle = (array) => {
+        const catgory_title_list = [];
+        array.forEach(element => {
+            catgory_title_list.push(props.serviceCategory.find(x => x.id === element).title);
+        });
+
+        catgory_title_list.sort();
+
+        const catgory_slug_list = [];
+
+        catgory_title_list.forEach(element => {
+            catgory_slug_list.push(props.serviceCategory.find(x => x.title === element).slug);
+        });
+
+        return catgory_slug_list;
+    }
+
     return (
         <Modal size="lg" centered show={props.show} onHide={handleClose}>
             <Modal.Header closeButton>
@@ -115,13 +132,7 @@ const FaqForm = (props) => {
                         validationSchema={faqSchema}
                         displayName="FaqForm"
                         onSubmit={(values, actions) => {
-
-                            const catgory_list = [];
-                            values.categories.forEach(element => {
-                                catgory_list.push(props.serviceCategory.find(x => x.id === element).slug);
-                            });
-
-                            values.categories = catgory_list;
+                            values.categories = sortArrayWithTitle(values.categories);
 
                             if (props.editMode) {
                                 dispatch(editFaqItem(values, props.editData.id)).then(() => {

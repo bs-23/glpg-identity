@@ -140,7 +140,7 @@ export default function ManageFaq() {
                                         <tr>
                                             <th width="25%"><span className={sort.value === 'question' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'question')}>Questions<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                             <th width="45%"><span className={sort.value === 'answer' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'answer')}>Answers<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                            <th width="25%">Category</th>
+                                            <th width="25%"><span className={sort.value === 'categories' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'categories')}>Category<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                             <th width="5%">Action</th>
                                         </tr>
                                     </thead>
@@ -184,7 +184,7 @@ export default function ManageFaq() {
                         {faqData.faq && faqData.faq.length === 0 &&
                             <div className="row justify-content-center mt-5 pt-5 mb-3">
                                 <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">
-                                <i class="icon icon-help icon-6x cdp-text-secondary"></i>
+                                    <i class="icon icon-help icon-6x cdp-text-secondary"></i>
                                     <h3 className="font-weight-bold cdp-text-primary pt-4">No FAQ Found!</h3>
                                     <h4 className="cdp-text-primary pt-3 pb-5">Click on the button below to create new one</h4>
                                     <button onClick={() => { setShow(true); setEditMode(false); setEditData(null); }} className="btn cdp-btn-secondary text-white px-5 py-2 font-weight-bold">
