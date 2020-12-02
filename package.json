@@ -1,6 +1,7 @@
 {
   "name": "glpg-cdp",
   "version": "0.3.1",
+  "license": "MIT",
   "author": "Brain Station 23 Limited",
   "scripts": {
     "start": "run-p webpack:development pm2:development",
@@ -93,7 +94,7 @@
     "sequelize": "6.3.5",
     "sonarqube-scanner": "^2.8.0",
     "supertest": "^6.0.1",
-    "swagger-jsdoc": "^6.0.0-rc.3",
+    "swagger-jsdoc": "^5.0.1",
     "swagger-ui-express": "^4.1.5",
     "terser-webpack-plugin": "^5.0.3",
     "unique-slug": "^2.0.2",
