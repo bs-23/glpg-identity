@@ -274,15 +274,15 @@ export default function hcpUsers() {
 
     const renderOptInTypes = ({ value }) => {
         return <div>
-            {value.includes('single-opt-in') ? <i title="Single Opt-In" className="fas fa-check cdp-text-primary mr-3"></i> : <i title="Single Opt-In" className="fas fa-check text-danger mr-3"></i>}
-            {value.includes('double-opt-in') ? <i title="Double Opt-In" className="fas fa-check-double cdp-text-primary"></i> : <i title="Double Opt-In" className="fas fa-check-double text-danger"></i>}
+            {value.includes('single-opt-in') ? <i title="Single Opt-In" className="fas fa-check cdp-text-primary mr-3"></i> : ''}
+            {value.includes('double-opt-in') ? <i title="Double Opt-In" className="fas fa-check-double cdp-text-primary"></i> : ''}
         </div>
     }
 
     const renderActions = ({ row, rowIndex, formikProps, hasRowChanged, editableTableProps }) => {
         const { dirty, resetForm, initialValues, isValid } = formikProps;
 
-        return <div className="position-relative d-inline-block">
+        return <div className="position-relative">
             {!hasRowChanged && <Dropdown className="dropdown-customize">
                 <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
                 </Dropdown.Toggle>
@@ -302,22 +302,21 @@ export default function hcpUsers() {
         </div>
     }
 
-    const popoverTop = (
-        <Popover id="popover-basic" className="popup-customize">
-            <Popover.Title as="h3" className=" px-3">Opt-In type hint:</Popover.Title>
-            <Popover.Content className=" px-3">
-                <ul className="list-unstyled">
-                    <li className="pl-0"><i className="fa fa-xs fa-circle cdp-text-primary position-static mr-1"></i> Consent provided </li>
-                    <li className="pl-0"><i className="fa fa-xs fa-circle text-danger mr-1 position-static"></i> Consent not provided</li>
-                    <li className="pl-0"><i className="fas fa-check mr-1"></i> Single Opt-In</li>
-                    <li className="pl-0"><i className="fas fa-check-double mr-1"></i> Double Opt-In</li>
+    const hintpopup = (
+        <Popover id="popover-basic" className="shadow-lg">
+            <Popover.Title as="h3" className=" px-3 bg-light">Opt type sign hint:</Popover.Title>
+            <Popover.Content className="px-3">
+                <ul className="list-unstyled mb-0">
+                    <li className="pl-0 pb-2"><i className="fas fa-check mr-1"></i> Single Opt-In</li>
+                    <li className="pl-0 pb-2"><i className="fas fa-check-double mr-1"></i> Double Opt-In</li>
+                    <li className="pl-0 pb-2"><i className="far fa-window-close text-danger mr-1"></i> Opt Out</li>
                 </ul>
             </Popover.Content>
         </Popover>
     );
 
     const CustomOptInHeader = () => {
-        return <div>Opt Type <OverlayTrigger trigger="click" rootClose placement="top" overlay={popoverTop}>
+        return <div>Opt Type <OverlayTrigger trigger="click" rootClose placement="left" overlay={hintpopup}>
             <i className="fas fa-info-circle ml-1 text-white" role="button"></i>
         </OverlayTrigger></div>
     }
