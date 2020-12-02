@@ -1326,10 +1326,16 @@ async function searchOkla(req, res) {
                 };
             });
 
+            const specialties = individual.qualifications
+                ? Object.keys(individual.qualifications).map(key => {
+                    return individual.qualifications[key].corporateLabel
+                })
+                : undefined;
+
             const res = {
                 firstName: individual.firstName,
                 lastName: individual.lastName,
-                specialty: individual.qualifications ? individual.qualifications['SP,1'].corporateLabel : '',
+                specialties,
                 individualEid: individual.individualEid,
                 countryIso2: activitiesOfIndividual[0].country,
                 codbase: activitiesOfIndividual[0].codBase,
@@ -1383,19 +1389,36 @@ async function getOklaHcpDetails(req, res) {
         const workplaces = activitiesOfIndividual.map(g => {
             const workplace = g.workplace;
             const name = [workplace.managerWorkplaceUsualName, workplace.usualName].filter(i => i).join(' - ');
+            const telephoneNumbers = Object.keys(workplace.telephones).map(key => {
+                return {
+                    number: workplace.telephones[key].callNumberForSearch,
+                    type: workplace.telephones[key].typeCorporateLabel
+                };
+            });
             return {
                 isMainActivity: g.activity.isMainActivity,
                 isValid: workplace.statusLabel === 'Valid',
                 name,
                 addresss: workplace.workplaceAddresses['P,1'].address.addressLongLabel,
-                city: workplace.workplaceAddresses['P,1'].address.postalTownReference.villageLabel
+                location: {
+                    latitude: workplace.workplaceAddresses['P,1'].address.geocodingAddresses.W.latitude,
+                    longitude: workplace.workplaceAddresses['P,1'].address.geocodingAddresses.W.longitude
+                },
+                city: workplace.workplaceAddresses['P,1'].address.postalTownReference.villageLabel,
+                telephoneNumbers
             };
         });
+
+        const specialties = individual.qualifications
+            ? Object.keys(individual.qualifications).map(key => {
+                return individual.qualifications[key].corporateLabel
+            })
+            : undefined;
 
         const data = {
             firstName: individual.firstName,
             lastName: individual.lastName,
-            specialty: individual.qualifications ? individual.qualifications['SP,1'].corporateLabel : '',
+            specialties,
             individualEid: individual.individualEid,
             countryIso2: activitiesOfIndividual[0].country,
             codbase: activitiesOfIndividual[0].codBase,
