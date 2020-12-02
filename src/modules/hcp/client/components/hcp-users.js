@@ -163,7 +163,7 @@ export default function hcpUsers() {
     const getCountryName = (country_iso2) => {
         if (!allCountries || !country_iso2) return null;
         const country = allCountries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
-        return country && country.codbase_desc;
+        return country && country.countryname;
     }
 
     const getUuidAuthorities = (codbase) => {
