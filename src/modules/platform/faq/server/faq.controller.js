@@ -2,6 +2,8 @@ const Faq = require('./faq.model');
 const path = require('path');
 const { Op } = require('sequelize');
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
+const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model.js'));
+const Sequelize = require('sequelize');
 
 async function getFaqItem(req, res) {
     try {
@@ -33,15 +35,19 @@ async function getFaqItems(req, res) {
             ? req.query.orderType
             : 'asc';
 
-        const order = [
+        let order = [
             ['created_at', 'DESC'],
             ['id', 'DESC']
         ];
 
-        const sortableColumns = ['question', 'answer', 'categories'];
+        const sortableColumns = ['question', 'answer', 'categories', 'updated_at'];
 
         if (orderBy && sortableColumns.includes(orderBy)) {
             order.splice(0, 0, [orderBy, orderType]);
+        }
+
+        if (orderBy === 'created_by') {
+            order = [[Sequelize.literal('"createdByUser.first_name"'), orderType]];
         }
 
         const filter = {
@@ -50,15 +56,42 @@ async function getFaqItems(req, res) {
             }
         };
 
+        const inclusions = [
+            {
+                model: User,
+                as: 'createdByUser',
+                attributes: ['first_name', 'last_name'],
+
+            },
+            {
+                model: User,
+                as: 'updatedByUser',
+                attributes: ['first_name', 'last_name']
+            }
+        ];
+
         const response = await Faq.findAndCountAll({
+            include: inclusions,
             where: category ? filter : {},
             offset,
             limit,
-            order: order
+            order: order,
+        });
+
+        const data = response.rows.map(c => {
+            const createdBy = `${c.createdByUser.first_name} ${c.createdByUser.last_name}`;
+            const updatedBy = `${c.updatedByUser.first_name} ${c.updatedByUser.last_name}`;
+            delete c.dataValues.createdByUser;
+            delete c.dataValues.updatedByUser;
+            return {
+                ...c.dataValues,
+                createdBy,
+                updatedBy
+            }
         });
 
         const responseData = {
-            faq: response.rows,
+            faq: data,
             metadata: {
                 page: page + 1,
                 limit,
