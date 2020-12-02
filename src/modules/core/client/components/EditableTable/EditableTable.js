@@ -197,7 +197,7 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
 
         return updatedCellsOfRows;
     }
-    if(formikBag) console.log(formikBag.values.rows[0])
+
     return <div className="shadow-sm bg-white table-responsive">
         <Formik
             initialValues={{ rows: rawRows }}

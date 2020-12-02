@@ -58,7 +58,7 @@ const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
                 <div>
                     <div>
                         <label className="font-weight-bold">Comment <span className="text-danger">*</span></label>
-                    </div>{console.log('Editable Table Props: ', editableTableProps)}
+                    </div>
                     <div>
                         <textarea className="form-control" rows="4" cols="45" value={comment} onBlur={handleOnBlur} onChange={(e) => setComment(e.target.value)} />
                     </div>
