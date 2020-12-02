@@ -50,11 +50,11 @@ export default function Faq(props) {
                 {faqData.faq && faqData.faq.length === 0 &&
                     <div className="bg-white text-center py-3 px-2 border-top">
                         <i className="icon icon-help icon-3x cdp-text-secondary"></i>
-                        <h5 className="font-weight-bold cdp-text-primary pt-4">No FAQ Found!</h5>
-                        <p className="py-3">Click on the button below to create new one</p>
-                        <button className="btn cdp-btn-secondary text-white px-5 py-2 font-weight-bold">
-                            <i className="icon icon-plus pr-1"></i> Add New FAQ
-                            </button>
+                        <h5 className="cdp-text-primary pt-4">No FAQ found related this category</h5>
+                        <p className="py-2 mb-4">Click on the button below to add related this category from FAQ list</p>
+                        <NavLink to="platform-management/manage-faq" className="btn cdp-btn-secondary text-white px-5 py-2 font-weight-bold">
+                            <i className="fas fa-list-ul pr-1"></i> FAQ List
+                        </NavLink>
                     </div>
                 }
 
