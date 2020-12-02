@@ -39,13 +39,15 @@ export default function Faq(props) {
                             </Accordion.Toggle>
 
                         </Card>
-                        <Card className="border-0">
-                            <NavLink to="platform-management/manage-faq" className="p-3 pb-0 mb-0 w-100 d-flex align-items-center bg-white cdp-text-secondary">
-                                More FAQ's
-                            </NavLink>
-                        </Card>
+
                     </Accordion>
                 ))}
+
+                <Card className="border-0">
+                    <NavLink to="platform-management/manage-faq" className="p-3 pb-0 mb-0 w-100 d-flex align-items-center bg-white cdp-text-secondary">
+                        More FAQ's
+                    </NavLink>
+                </Card>
 
                 {faqData.faq && faqData.faq.length === 0 &&
                     <div className="bg-white text-center py-3 px-2 border-top">
