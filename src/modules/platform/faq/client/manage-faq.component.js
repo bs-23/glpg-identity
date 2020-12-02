@@ -140,9 +140,9 @@ export default function ManageFaq() {
                                         <tr>
                                             <th width="25%"><span className={sort.value === 'question' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'question')}>Question<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                             <th width="35%"><span className={sort.value === 'answer' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'answer')}>Answer<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                            <th width="25%"><span className={sort.value === 'categories' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'categories')}>Category<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                            <th width="22%"><span className={sort.value === 'categories' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'categories')}>Category<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                             <th width="10%"><span className={sort.value === 'created_by' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'created_by')}>Created By<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                            <th width="5%">Action</th>
+                                            <th width="8%">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
