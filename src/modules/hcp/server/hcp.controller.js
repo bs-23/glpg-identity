@@ -122,11 +122,11 @@ async function getHcps(req, res) {
         async function getCountryIso2() {
             const user_codbase_list_for_iso2 = (await sequelize.datasyncConnector.query(
                 `SELECT * FROM ciam.vwcountry where ciam.vwcountry.country_iso2 = ANY($countries);`, {
-                    bind: {
-                        countries: userPermittedCountries
-                    },
-                    type: QueryTypes.SELECT
-                }
+                bind: {
+                    countries: userPermittedCountries
+                },
+                type: QueryTypes.SELECT
+            }
             )).map(i => i.codbase);
 
             const user_country_iso2_list = (await sequelize.datasyncConnector.query(
@@ -738,7 +738,7 @@ async function createHcpProfile(req, res) {
                 const consentCountry = await ConsentCountry.findOne({
                     where: {
                         country_iso2: {
-                            [Op.iLike]:baseCountry.country_iso2
+                            [Op.iLike]: baseCountry.country_iso2
                         },
                         consent_id: consentDetails.id
                     }
@@ -878,7 +878,7 @@ async function approveHCPUser(req, res) {
 
         try {
             await notifyHcpUserApproval(hcpUser);
-        } catch(e) {
+        } catch (e) {
             await hcpUser.update({
                 status: 'not_verified',
                 reset_password_token: null,
@@ -1448,20 +1448,20 @@ async function updateHCPUserConsents(req, res) {
             response.errors.push(new CustomError('Invalid HCP User.', 400));
         }
 
-        if(!req.body.consents) response.errors.push(new CustomError('consents are missing.', 400, 'consents'));
+        if (!req.body.consents) response.errors.push(new CustomError('consents are missing.', 400, 'consents'));
 
         if (response.errors.length) {
             return res.status(400).send(response);
         }
 
-        if(req.body.consents && req.body.consents.length) {
+        if (req.body.consents && req.body.consents.length) {
             await Promise.all(req.body.consents.map(async x => {
                 const consentId = Object.keys(x)[0];
                 const consentResponse = Object.values(x)[0];
 
                 const hcpConsent = await HcpConsents.findOne({ where: { user_id: hcpUser.id, consent_id: consentId } });
 
-                if(!hcpConsent || consentResponse) return;
+                if (!hcpConsent || consentResponse) return;
 
                 if (hcpConsent && consentResponse === false) {
                     hcpConsent.opt_type = 'opt-out';

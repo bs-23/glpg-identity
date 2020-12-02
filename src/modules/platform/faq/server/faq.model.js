@@ -2,29 +2,25 @@ const path = require('path');
 const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
+const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model.js'));
 
-const ApplicationDomain = sequelize.cdpConnector.define('application_domains', {
+const Faq = sequelize.cdpConnector.define('faq', {
     id: {
         allowNull: false,
         primaryKey: true,
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4
     },
-    application_id: {
+    question: {
         allowNull: false,
-        type: DataTypes.UUID
+        type: DataTypes.STRING(60)
     },
-    domain: {
+    answer: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING(1500)
     },
-    country_iso2: {
-        allowNull: false,
-        type: DataTypes.STRING
-    },
-    is_active: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true
+    categories: {
+        type: DataTypes.ARRAY(DataTypes.STRING)
     },
     created_by: {
         type: DataTypes.UUID
@@ -34,10 +30,13 @@ const ApplicationDomain = sequelize.cdpConnector.define('application_domains', {
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
-    tableName: 'application_domains',
+    tableName: 'faq',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
 
-module.exports = ApplicationDomain;
+Faq.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by' });
+Faq.belongsTo(User, { as: 'updatedByUser', foreignKey: 'updated_by' });
+
+module.exports = Faq;

@@ -601,6 +601,12 @@ export default function hcpUsers() {
                                                 <div className="">{currentUser.birthdate ? currentUser.birthdate : '--'}</div>
                                             </div>
                                         </div>
+                                        <div className="row mt-3">
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Locale</div>
+                                                <div className="text-capitalize">{currentUser.locale ? currentUser.locale : '--'}</div>
+                                            </div>
+                                        </div>
                                         <div className="row mt-4">
                                             <div className="col accordion-consent rounded shadow-sm p-0">
                                                 <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Consents</h4>

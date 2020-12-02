@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = {
     verbose: true,
     collectCoverage: true,
@@ -7,5 +9,8 @@ module.exports = {
     transform: {
         "^.+\\.jsx?$": "babel-jest",
         ".+\\.(css|styl|less|sass|scss|png|jpg|ttf|woff|woff2)$": "jest-transform-stub"
+    },
+    moduleNameMapper: {
+        "\\.(css)$": path.join(process.cwd(), '/tests/client/_mocks_/stub.js')
     }
 }

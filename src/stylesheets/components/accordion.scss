@@ -27,6 +27,10 @@
         &-help {
             font-size: 32px;
         }
+
+        &-toggle {
+            font-size: 25px;
+        }
     }
 
     .card {
@@ -35,6 +39,7 @@
         border-bottom: 1px solid rgba(0, 0, 0, 0.125) !important;
         position: relative;
         overflow: hidden;
+        z-index: 2;
 
         &-header {
             font-weight: 600;
@@ -64,6 +69,58 @@
                 transform: rotate(180deg)
             }
         }
+    }
+}
+
+.faq {
+    .faq-icon-minimize {
+        display: none;
+    }
+
+    &-expand {
+        position: absolute;
+        left: 15px;
+        width: calc(100% - 30px);
+        height: calc(100% - 32px) !important;
+
+        .faq-icon-minimize {
+            display: inline-block;
+        }
+
+        .faq-icon-expand {
+            display: none !important;
+        }
+    }
+
+    &__body {
+        position: relative;
+
+        .card {
+            &:last-child {
+                border-bottom: none !important;
+            }
+
+            a {
+                color: $secondary-color;
+
+                &:hover {
+                    color: $secondary-color !important;
+                    text-decoration: underline !important;
+                }
+            }
+        }
+    }
+
+    &:after {
+        content: "";
+        display: block;
+        width: 131px;
+        height: 215px;
+        background: url(../../../../wwwroot/assets/images/question.svg) no-repeat;
+        right: 50px;
+        position: absolute;
+        bottom: 50px;
+        z-index: 1;
     }
 }
 
