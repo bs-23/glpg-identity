@@ -28,7 +28,7 @@ export default function Faq(props) {
                 </h4>
 
                 {faqData.faq && faqData.faq.map((faq, index) => (
-                    <Accordion defaultActiveKey="0" className="faq__body">
+                    <Accordion key={index} defaultActiveKey="0" className="faq__body">
                         <Card>
                             <Accordion.Collapse eventKey={index + ""}>
                                 <Card.Body>{parse(faq.answer)}</Card.Body>
