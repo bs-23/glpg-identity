@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
@@ -5,14 +6,30 @@ import Select, { components } from 'react-select';
 
 const SearchHcp = () => {
     const countries = useSelector(state => state.countryReducer.countries);
-    const [selectedOption, setSelectedOption] = useState({})
+    const [selectedOption, setSelectedOption] = useState([]);
+    const [specialties, setSpecialties] = useState([]);
 
     const handleChange = selectedOption => {
         console.log(`Option selected:`, selectedOption);
         setSelectedOption(selectedOption)
     };
 
-    const getCountries = () => countries.map(country => ({ value: country.codbase, label: country.codbase_desc }))
+    useEffect(() => {
+        const getSpecialties = async () =>{
+            const codbases = selectedOption.map(item => `codbases=${item.value}`);
+            const parameters = codbases.join('&');
+            if(parameters){
+                const response = await axios.get(`http://localhost:5050/api/hcps/specialties?${parameters}`)
+                setSpecialties(response.data)
+            }
+            else setSpecialties([]);
+        }
+
+        getSpecialties();
+    }, [selectedOption]);
+
+    const getCountries = () => countries.map(country => ({ value: country.codbase, label: country.codbase_desc }));
+    const getSpecialties = () => specialties.map( i => ({ value: i.codbase, label: i.codDescription }));
 
     const CustomOption = ({ children, ...props }) => {
         return (
@@ -92,13 +109,18 @@ const SearchHcp = () => {
                                             <div className="col-12 col-sm-4">
                                                 <div className="form-group">
                                                     <label for="Speciality">Speciality</label>
-                                                    <select className="form-control" id="Speciality">
-                                                        <option>1</option>
-                                                        <option>2</option>
-                                                        <option>3</option>
-                                                        <option>4</option>
-                                                        <option>5</option>
-                                                    </select>
+                                                    <Select
+                                                        defaultValue={[]}
+                                                        isMulti={true}
+                                                        name="specialties"
+                                                        components={{Option: CustomOption}}
+                                                        hideSelectedOptions={false}
+                                                        // controlShouldRenderValue = { false }
+                                                        options={getSpecialties()}
+
+                                                        className="multiselect"
+                                                        classNamePrefix="multiselect"
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
