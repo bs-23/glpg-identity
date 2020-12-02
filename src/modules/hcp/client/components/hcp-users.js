@@ -163,7 +163,7 @@ export default function hcpUsers() {
     const getCountryName = (country_iso2) => {
         if (!allCountries || !country_iso2) return null;
         const country = allCountries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
-        return country && country.codbase_desc;
+        return country && country.countryname;
     }
 
     const getUuidAuthorities = (codbase) => {
@@ -614,7 +614,7 @@ export default function hcpUsers() {
                                         <div className="row mt-3">
                                             <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">Locale</div>
-                                                <div className="text-capitalize">{currentUser.locale ? currentUser.locale : '--'}</div>
+                                                <div>{currentUser.locale ? currentUser.locale : '--'}</div>
                                             </div>
                                         </div>
                                         <div className="row mt-4">
