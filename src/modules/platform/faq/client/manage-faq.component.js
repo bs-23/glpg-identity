@@ -139,10 +139,9 @@ export default function ManageFaq() {
 
                                         <tr>
                                             <th width="25%"><span className={sort.value === 'question' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'question')}>Question<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                            <th width="30%"><span className={sort.value === 'answer' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'answer')}>Answer<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                            <th width="20%"><span className={sort.value === 'categories' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'categories')}>Category<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                            <th width="35%"><span className={sort.value === 'answer' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'answer')}>Answer<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                            <th width="25%"><span className={sort.value === 'categories' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'categories')}>Category<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                             <th width="10%"><span className={sort.value === 'created_by' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'created_by')}>Created By<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                            <th width="10%"><span className={sort.value === 'updated_at' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'updated_at')}>Modified Date<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                             <th width="5%">Action</th>
                                         </tr>
                                     </thead>
@@ -157,7 +156,6 @@ export default function ManageFaq() {
                                                 ))
                                                 }</td>
                                                 <td className="text-break">{row.createdBy}</td>
-                                                <td>{(new Date(row.updated_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                 <td><Dropdown className="ml-auto dropdown-customize">
                                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
                                                     </Dropdown.Toggle>
