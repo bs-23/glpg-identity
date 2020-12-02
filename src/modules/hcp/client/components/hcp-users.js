@@ -313,6 +313,7 @@ export default function hcpUsers() {
                     <li className="pl-0 pb-2"><i className="fas fa-check mr-1"></i> Single Opt-In</li>
                     <li className="pl-0 pb-2"><i className="fas fa-check-double mr-1"></i> Double Opt-In</li>
                     <li className="pl-0 pb-2"><i className="far fa-window-close text-danger mr-1"></i> Opt Out</li>
+                    <li className="pl-0 pb-2"><i className="far fa-square text-secondary mr-1"></i> Consent not provided</li>
                 </ul>
             </Popover.Content>
         </Popover>
