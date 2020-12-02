@@ -1,7 +1,6 @@
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const { DataTypes } = require('sequelize');
-const ApplicationDomain = require('./application-domain.model');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
@@ -72,10 +71,5 @@ const Application = sequelize.cdpConnector.define('applications', {
 Application.prototype.validPassword = function (password) {
     return bcrypt.compareSync(password, this.password);
 };
-
-Application.hasMany(ApplicationDomain, {
-    as: 'applicationDomains',
-    foreignKey: 'application_id'
-});
 
 module.exports = Application;

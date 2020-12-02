@@ -24,7 +24,6 @@ async function init() {
     `);
 
     const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
-    const ApplicationDomain = require(path.join(process.cwd(), 'src/modules/application/server/application-domain.model'));
     const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
     const ConsentCategory = require(path.join(process.cwd(), 'src/modules/consent/server/consent-category.model'));
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
@@ -252,23 +251,12 @@ async function init() {
                 }
             ];
 
-            const applicationDomains = [
-                { application_id: '3252888b-530a-441b-8358-3e423dbce08a', country_iso2: 'nl', domain: 'http://172.16.229.25:4503' },
-                { application_id: 'a7959308-7ec5-4090-94ff-2367113a454d', country_iso2: 'nl', domain: 'https://www-dev.jyseleca.nl' },
-                { application_id: 'a7959308-7ec5-4090-94ff-2367113a454d', country_iso2: 'be', domain: 'https://products-dev.glpg.com' }
-            ];
-
             Application.destroy({ truncate: { cascade: true } }).then(() => {
                 Application.bulkCreate(applications, {
                     returning: true,
                     ignoreDuplicates: false
                 }).then(function () {
-                    ApplicationDomain.bulkCreate(applicationDomains, {
-                        returning: true,
-                        ignoreDuplicates: false
-                    }).then(function () {
-                        callback();
-                    });
+                    callback();
                 });
             });
         });
