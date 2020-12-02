@@ -274,8 +274,8 @@ export default function hcpUsers() {
 
     const renderOptInTypes = ({ value }) => {
         return <div>
-            {value.includes('single-opt-in') ? <i title="Single Opt-In" className="fas fa-check cdp-text-primary mr-3"></i> : <i title="Single Opt-In" className="fas fa-check text-danger mr-3"></i>}
-            {value.includes('double-opt-in') ? <i title="Double Opt-In" className="fas fa-check-double cdp-text-primary"></i> : <i title="Double Opt-In" className="fas fa-check-double text-danger"></i>}
+            {value.includes('single-opt-in') ? <i title="Single Opt-In" className="fas fa-check cdp-text-primary mr-3"></i> : ''}
+            {value.includes('double-opt-in') ? <i title="Double Opt-In" className="fas fa-check-double cdp-text-primary"></i> : ''}
         </div>
     }
 
@@ -303,7 +303,7 @@ export default function hcpUsers() {
     }
 
     const hintpopup = (
-        <Popover id="popover-basic" className="">
+        <Popover id="popover-basic" className="shadow-lg">
             <Popover.Title as="h3" className=" px-3 bg-light">Opt type sign hint:</Popover.Title>
             <Popover.Content className="px-3">
                 <ul className="list-unstyled mb-0">
