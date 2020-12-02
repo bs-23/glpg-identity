@@ -302,22 +302,21 @@ export default function hcpUsers() {
         </div>
     }
 
-    const popoverTop = (
-        <Popover id="popover-basic" className="popup-customize">
-            <Popover.Title as="h3" className=" px-3">Opt-In type hint:</Popover.Title>
-            <Popover.Content className=" px-3">
-                <ul className="list-unstyled">
-                    <li className="pl-0"><i className="fa fa-xs fa-circle cdp-text-primary position-static mr-1"></i> Consent provided </li>
-                    <li className="pl-0"><i className="fa fa-xs fa-circle text-danger mr-1 position-static"></i> Consent not provided</li>
-                    <li className="pl-0"><i className="fas fa-check mr-1"></i> Single Opt-In</li>
-                    <li className="pl-0"><i className="fas fa-check-double mr-1"></i> Double Opt-In</li>
+    const hintpopup = (
+        <Popover id="popover-basic" className="">
+            <Popover.Title as="h3" className=" px-3 bg-light">Opt type sign hint:</Popover.Title>
+            <Popover.Content className="px-3">
+                <ul className="list-unstyled mb-0">
+                    <li className="pl-0 pb-2"><i className="fas fa-check mr-1"></i> Single Opt-In</li>
+                    <li className="pl-0 pb-2"><i className="fas fa-check-double mr-1"></i> Double Opt-In</li>
+                    <li className="pl-0 pb-2"><i className="far fa-window-close text-danger mr-1"></i> Opt Out</li>
                 </ul>
             </Popover.Content>
         </Popover>
     );
 
     const CustomOptInHeader = () => {
-        return <div>Opt Type <OverlayTrigger trigger="click" rootClose placement="top" overlay={popoverTop}>
+        return <div>Opt Type <OverlayTrigger trigger="click" rootClose placement="left" overlay={hintpopup}>
             <i className="fas fa-info-circle ml-1 text-white" role="button"></i>
         </OverlayTrigger></div>
     }
