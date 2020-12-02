@@ -614,7 +614,7 @@ export default function hcpUsers() {
                                         <div className="row mt-3">
                                             <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">Locale</div>
-                                                <div className="text-capitalize">{currentUser.locale ? currentUser.locale : '--'}</div>
+                                                <div>{currentUser.locale ? currentUser.locale : '--'}</div>
                                             </div>
                                         </div>
                                         <div className="row mt-4">
