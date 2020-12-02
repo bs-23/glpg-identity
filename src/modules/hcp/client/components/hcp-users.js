@@ -307,7 +307,6 @@ export default function hcpUsers() {
 
     const hintpopup = (
         <Popover id="popover-basic" className="shadow-lg">
-            <Popover.Title as="h3" className=" px-3 bg-light">Opt type sign hint:</Popover.Title>
             <Popover.Content className="px-3">
                 <ul className="list-unstyled mb-0">
                     <li className="pl-0 pb-2"><i className="fas fa-check mr-1"></i> Single Opt-In</li>
