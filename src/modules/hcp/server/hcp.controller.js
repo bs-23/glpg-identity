@@ -1281,7 +1281,7 @@ async function searchOkla(req, res) {
             onekeyId: 'activity.activityEid',
             individualEid: 'individual.individualEid',
             specialty: 'individual.speciality1'
-        }
+        };
 
         const fields = Object.keys(fieldMap).map(key => {
             const value = req.body[key];
@@ -1326,10 +1326,16 @@ async function searchOkla(req, res) {
                 };
             });
 
+            const specialties = individual.qualifications
+                ? Object.keys(individual.qualifications).map(key => {
+                    return individual.qualifications[key].corporateLabel
+                })
+                : undefined;
+
             const res = {
                 firstName: individual.firstName,
                 lastName: individual.lastName,
-                specialty: individual.qualifications ? individual.qualifications['SP,1'].corporateLabel : '',
+                specialties,
                 individualEid: individual.individualEid,
                 countryIso2: activitiesOfIndividual[0].country,
                 codbase: activitiesOfIndividual[0].codBase,
@@ -1348,6 +1354,78 @@ async function searchOkla(req, res) {
             resultSize: searchResponse.resultSize,
             results
         }
+        res.json(data);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function getOklaHcpDetails(req, res) {
+    const { codbase, id } = req.params;
+    if (!id || !codbase) return res.status(400).send('Invalid request.');
+
+    try {
+        const queryObj = {
+            entityType: 'activity',
+            codBases: [codbase],
+            fields: [
+                {
+                    "name": "individual.individualEid",
+                    "method": "EXACT",
+                    "values": [id]
+                }
+            ]
+        };
+
+        const { response: searchResponse } = await OklaService.search(queryObj);
+
+        const activitiesOfIndividual = searchResponse.results.filter(r => r.individual.individualEid === id);
+
+        const  onekeyEidList = activitiesOfIndividual.map(i => i.onekeyEid);
+        const individual = activitiesOfIndividual[0].individual;
+
+
+        const workplaces = activitiesOfIndividual.map(g => {
+            const workplace = g.workplace;
+            const name = [workplace.managerWorkplaceUsualName, workplace.usualName].filter(i => i).join(' - ');
+            const telephoneNumbers = Object.keys(workplace.telephones).map(key => {
+                return {
+                    number: workplace.telephones[key].callNumberForSearch,
+                    type: workplace.telephones[key].typeCorporateLabel
+                };
+            });
+            return {
+                isMainActivity: g.activity.isMainActivity,
+                isValid: workplace.statusLabel === 'Valid',
+                name,
+                addresss: workplace.workplaceAddresses['P,1'].address.addressLongLabel,
+                location: {
+                    latitude: workplace.workplaceAddresses['P,1'].address.geocodingAddresses.W.latitude,
+                    longitude: workplace.workplaceAddresses['P,1'].address.geocodingAddresses.W.longitude
+                },
+                city: workplace.workplaceAddresses['P,1'].address.postalTownReference.villageLabel,
+                telephoneNumbers
+            };
+        });
+
+        const specialties = individual.qualifications
+            ? Object.keys(individual.qualifications).map(key => {
+                return individual.qualifications[key].corporateLabel
+            })
+            : undefined;
+
+        const data = {
+            firstName: individual.firstName,
+            lastName: individual.lastName,
+            specialties,
+            individualEid: individual.individualEid,
+            countryIso2: activitiesOfIndividual[0].country,
+            codbase: activitiesOfIndividual[0].codBase,
+            workplaces,
+            onekeyEidList
+        };
+
         res.json(data);
     } catch (err) {
         console.error(err);
@@ -1407,3 +1485,4 @@ exports.getHCPUserConsents = getHCPUserConsents;
 exports.updateHCPUserConsents = updateHCPUserConsents;
 exports.searchOkla = searchOkla;
 exports.getSpecialtiesForCdp = getSpecialtiesForCdp;
+exports.getOklaHcpDetails = getOklaHcpDetails;
