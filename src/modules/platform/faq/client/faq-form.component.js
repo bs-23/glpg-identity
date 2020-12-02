@@ -118,7 +118,7 @@ const FaqForm = (props) => {
     return (
         <Modal size="lg" centered show={props.show} onHide={handleClose}>
             <Modal.Header closeButton>
-                <Modal.Title className="modal-title_small">{props.editable ? 'Edit FAQ' : 'Add New FAQ'}</Modal.Title>
+                <Modal.Title className="modal-title_small">{props.editMode ? 'Edit FAQ' : 'Add New FAQ'}</Modal.Title>
             </Modal.Header>
 
             {props.serviceCategory.length > 0 && props.serviceCategory.length > 0 &&

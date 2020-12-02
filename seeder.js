@@ -38,6 +38,7 @@ async function init() {
     const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
     const UserRole = require(path.join(process.cwd(), "src/modules/user/server/role/user-role.model"));
     const { Modules } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
+    const Faq = require(path.join(process.cwd(), 'src/modules/platform/faq/server/faq.model.js'));
     require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model'));
     require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-profile.model'));
     require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-consents.model'));
@@ -45,7 +46,7 @@ async function init() {
     require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
     require(path.join(process.cwd(), 'src/modules/core/server/password/password-history.model.js'));
     require(path.join(process.cwd(), 'src/modules/application/server/data.model.js'));
-    require(path.join(process.cwd(), 'src/modules/platform/faq/server/faq.model.js'));
+
 
     await sequelize.cdpConnector.sync();
 
@@ -115,6 +116,27 @@ async function init() {
 
             ServiceCategory.destroy({ truncate: { cascade: true } }).then(() => {
                 ServiceCategory.bulkCreate(serviceCategories, {
+                    returning: true,
+                    ignoreDuplicates: false
+                }).then(function () {
+                    callback();
+                });
+            });
+        });
+    }
+
+    function faqSeeder(callback) {
+        User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
+
+            const faqCategories = [
+                { question: "Key Benefits of a CDP", answer: "<p>CDPs improve your organization, better your customer relationships, and complement your current software and marketing efforts. Here are a handful of key benefits of having a CDP.</p>", categories: ["general"], created_by: admin.id, updated_by: admin.id },
+                { question: "What is customer data?", answer: "<p>CDPs exist because customer data has become crucial to both business and marketing operations. So, what is customer data exactly? Customer data is information consumers leave behind as they use the internet and interact with companies online and offline: through websites, blogs, e-commerce portals, and in-store interactions. (We dive into some examples below.) It’s highly valuable to businesses, although recent legal dialogue (such as the GDPR) has changed how organizations collect and manage this data.</p>", categories: ["general"], created_by: admin.id, updated_by: admin.id },
+                { question: "What is a Customer Data Platform?", answer: "<p>A Customer Data Platform (CDP) is a software that aggregates and organizes customer data across a variety of touchpoints and is used by other software, systems, and marketing efforts. CDPs collect and structure real-time data into individual, centralized customer profiles.</p>", categories: ["general"], created_by: admin.id, updated_by: admin.id },
+                { question: "Data Collection", answer: "<p>The main advantage of a CDP is its ability to collect data from a variety of sources (both online and offline, with a variety of formats and structures) and convert that disparate data into a standardized form.</p>", categories: ["general"], created_by: admin.id, updated_by: admin.id }
+            ];
+
+            Faq.destroy({ truncate: { cascade: true } }).then(() => {
+                Faq.bulkCreate(faqCategories, {
                     returning: true,
                     ignoreDuplicates: false
                 }).then(function () {
@@ -438,7 +460,7 @@ async function init() {
         });
     }
 
-    async.waterfall([userSeeder, userProfileSeeder, userUpdateSeeder, serviceCategorySeeder, permissionSetSeeder, permissionSetServiceCategorySeeder, userProfilePermissionSetSeeder, applicationSeeder, permissionSetApplicationsSeeder, consentSeeder], function (err) {
+    async.waterfall([userSeeder, userProfileSeeder, faqSeeder, userUpdateSeeder, serviceCategorySeeder, permissionSetSeeder, permissionSetServiceCategorySeeder, userProfilePermissionSetSeeder, applicationSeeder, permissionSetApplicationsSeeder, consentSeeder], function (err) {
         if (err) console.error(err);
         else console.info('DB seed completed!');
         process.exit();
