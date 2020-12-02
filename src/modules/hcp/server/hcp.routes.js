@@ -36,6 +36,12 @@ module.exports = app => {
     app.route('/api/hcp-profiles/specialties')
         .get(passport.authenticate('application-jwt', { session: false }), controller.getSpecialties);
 
+    app.route('/api/hcp-profiles/specialties-eng')
+        .get(CDPAuthStrategy, controller.getSpecialtiesWithEnglishTranslation);
+
+    app.route('/api/hcp-profiles/update-hcps')
+        .put(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.updateHcps);
+
     app.route('/api/hcp-profiles/:id/approve')
         .put(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.approveHCPUser);
 

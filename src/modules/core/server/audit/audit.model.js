@@ -32,6 +32,9 @@ const Audit = sequelize.cdpConnector.define('audits', {
         allowNull: false,
         type: DataTypes.UUID
     },
+    changes: {
+        type: DataTypes.STRING(5000)
+    },
     remarks: {
         type: DataTypes.STRING(500)
     }
