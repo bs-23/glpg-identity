@@ -1,5 +1,7 @@
 const Faq = require('./faq.model');
-const { QueryTypes, Op, where, col, fn, literal } = require('sequelize');
+const path = require('path');
+const { Op } = require('sequelize');
+const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 
 async function getFaqItem(req, res) {
     try {
@@ -36,7 +38,7 @@ async function getFaqItems(req, res) {
             ['id', 'DESC']
         ];
 
-        const sortableColumns = ['question', 'answer'];
+        const sortableColumns = ['question', 'answer', 'categories'];
 
         if (orderBy && sortableColumns.includes(orderBy)) {
             order.splice(0, 0, [orderBy, orderType]);
@@ -86,6 +88,14 @@ async function createFaqItem(req, res) {
             updated_by: req.user.id
         });
 
+        await logService.log({
+            event_type: 'CREATE',
+            object_id: response.id,
+            table_name: 'faq',
+            actor: req.user.id,
+            remarks: `"${response.question}" FAQ created`
+        });
+
         res.json(response);
     } catch (err) {
         console.error(err);
@@ -103,6 +113,14 @@ async function updateFaqItem(req, res) {
 
         await faq.update({ question, answer, categories });
 
+        await logService.log({
+            event_type: 'UPDATE',
+            object_id: faq.id,
+            table_name: 'faq',
+            actor: req.user.id,
+            remarks: `"${faq.question}" FAQ updated`
+        });
+
         res.json(faq);
 
     } catch (err) {
@@ -119,7 +137,21 @@ async function deleteFaqItem(req, res) {
             return res.status(400).send('Invalid request.');
         }
 
+        let faq = await Faq.findOne({ where: { id: req.params.id } });
+
+        if (!faq) return res.status(404).send("FAQ is not found or may be removed");
+
         await Faq.destroy({ where: { id } });
+
+        await logService.log({
+            event_type: 'DELETE',
+            object_id: faq.id,
+            table_name: 'faq',
+            actor: req.user.id,
+            remarks: `"${faq.question}" FAQ deleted`
+        });
+
+
         res.sendStatus(200);
 
     } catch (err) {
