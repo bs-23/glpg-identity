@@ -1,5 +1,5 @@
 import React from "react";
-import { Switch, useRouteMatch, Route } from "react-router-dom";
+import { Switch, useRouteMatch } from "react-router-dom";
 import Users from "./components/users.component";
 import UserForm from "./components/user-form.component";
 import UserManagement from "./components/user-management.component";
@@ -11,7 +11,7 @@ import ManagePermissionSets from "./components/permission-sets.component";
 import MyProfile from "./components/my-profile/my-profile.component";
 
 export default function UserRoutes() {
-    let { path } = useRouteMatch();
+    const { path } = useRouteMatch();
 
     return (
         <Switch>

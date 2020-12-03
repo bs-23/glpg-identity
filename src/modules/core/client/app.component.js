@@ -25,6 +25,7 @@ import SwaggerLogin from '../../../config/server/lib/swagger/swagger-login.compo
 import store from './store';
 import { getCountries } from '../../core/client/country/country.actions';
 import { PlatformRoutes } from '../../platform';
+import HelpComponent from '../../core/client/components/help.component';
 
 let refCount = 0;
 
@@ -81,32 +82,29 @@ export default function App() {
     return (
         <ToastProvider placement="top-center" autoDismissTimeout={2500} >
             <Switch>
+                <PublicRoute path="/swagger" component={SwaggerLogin}/>
 
-                <PublicRoute path="/swagger" component={SwaggerLogin} />
+                <PublicRoute path="/login" component={Login}/>
 
-                <PublicRoute path="/login" component={Login} />
+                <PrivateRoute exact path="/" component={Dashboard}/>
 
-                <PrivateRoute exact path="/" component={Dashboard} />
+                <Route path="/users" component={UserRoutes}/>
 
-                <Route path="/users" component={UserRoutes} />
+                <Route path="/hcps" component={HcpRoutes}/>
 
+                <Route path='/consent' component={ConsentRoutes}/>
 
-                <Route path="/hcps" component={HcpRoutes} />
+                <Route path="/reset-password" component={ResetPasswordForm}/>
 
-                <Route path='/consent' component={ConsentRoutes} />
+                <Route path="/forgot-password" component={ForgotPassword}/>
 
-                <Route path="/reset-password" component={ResetPasswordForm} />
+                <Route path="/forbidden" component={Forbidden}/>
 
-                <Route path="/forgot-password" component={ForgotPassword} />
+                <Route path="/platform" component={PlatformRoutes}/>
 
-                <Route path="/forbidden" component={Forbidden} />
-
-
-                <PlatformRoutes />
-
+                <PrivateRoute path="/help" component={HelpComponent}/>
 
                 <Route component={NoMatch} />
-
             </Switch>
         </ToastProvider>
     );
