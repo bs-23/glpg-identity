@@ -34,7 +34,7 @@ export default function Faq(props) {
                                 <Card.Body>{parse(faq.answer)}</Card.Body>
                             </Accordion.Collapse>
                             <Accordion.Toggle as={Card.Header} eventKey={index + ""} className="p-3 d-flex align-items-baseline justify-content-between" role="button">
-                                {faq.question}
+                                <span className="faq__question">{faq.question}</span>
                                 <i className="icon icon-arrow-down ml-2 faq__icon-down"></i>
                             </Accordion.Toggle>
 
