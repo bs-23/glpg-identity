@@ -38,8 +38,8 @@ const OklaHcpdetails = ({ individual, setSelectedIndividual }) => {
 
                     <div>Workplaces:</div>
                     {
-                        hcpDetails.workplaces.map(workplace => (
-                            <div>
+                        hcpDetails.workplaces.map((workplace, index) => (
+                            <div key={'workplace-' + index}>
                                 <span>{workplace.isMainActivity
                                     ? '★'
                                     : workplace.isValid
@@ -49,6 +49,7 @@ const OklaHcpdetails = ({ individual, setSelectedIndividual }) => {
                                 <span>{workplace.name}</span>
                                 <span>{workplace.address}</span>
                                 <span>{workplace.city}</span>
+                                {workplace.contactNumbers.map((c,i) => (<div key={'tel-'+i}>{c.type}: {c.number}</div>))}
                             </div>
                         ))
                     }

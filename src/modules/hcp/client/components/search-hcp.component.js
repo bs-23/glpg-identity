@@ -235,7 +235,7 @@ const SearchHcp = () => {
                                             <td>551255</td>
                                             <td>564564565</td>
                                             <td>Belgium</td>
-                                            <td><a type="button" className="link-with-underline" onClick={() => setSelectedIndividual({id: 'WBEB00000163', codbase: 'WBE'})}>Details</a></td>
+                                            <td><a type="button" className="link-with-underline" onClick={() => setSelectedIndividual({id: 'WBEB03049045', codbase: 'WBE'})}>Details</a></td>
                                         </tr>
                                     </tbody>
                                 </table>

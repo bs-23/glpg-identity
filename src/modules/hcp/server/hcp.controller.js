@@ -1644,7 +1644,7 @@ async function getOklaHcpDetails(req, res) {
         const workplaces = activitiesOfIndividual.map(g => {
             const workplace = g.workplace;
             const name = [workplace.managerWorkplaceUsualName, workplace.usualName].filter(i => i).join(' - ');
-            const telephoneNumbers = Object.keys(workplace.telephones).map(key => {
+            const contactNumbers = Object.keys(workplace.telephones).map(key => {
                 return {
                     number: workplace.telephones[key].callNumberForSearch,
                     type: workplace.telephones[key].typeCorporateLabel
@@ -1660,7 +1660,7 @@ async function getOklaHcpDetails(req, res) {
                     longitude: workplace.workplaceAddresses['P,1'].address.geocodingAddresses.W.longitude
                 },
                 city: workplace.workplaceAddresses['P,1'].address.postalTownReference.villageLabel,
-                telephoneNumbers
+                contactNumbers
             };
         });
 
