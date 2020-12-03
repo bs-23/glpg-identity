@@ -1010,7 +1010,6 @@ async function getHcpProfile(req, res) {
 
 async function getHCPUserConsents(req, res) {
     const response = new Response({}, []);
-    const { locale } = req.query;
 
     try {
         const doc = await Hcp.findOne({
@@ -1033,14 +1032,37 @@ async function getHCPUserConsents(req, res) {
 
         if (!userConsents) return res.json([]);
 
-        const userConsentDetails = await ConsentLocale.findAll({
+        let userConsentDetails = await ConsentLocale.findAll({
             where: {
                 consent_id: userConsents.map(consent => consent.consent_id),
                 locale: {
-                    [Op.iLike]: `%${locale ? locale : doc.locale}`
+                    [Op.iLike]: `%${doc.locale}`
                 }
             }, attributes: ['consent_id', 'rich_text']
         });
+
+        if(userConsentDetails) {
+            const codbaseCountry = await sequelize.datasyncConnector.query(`
+                SELECT * FROM ciam.vwcountry
+                WHERE countryname = (SELECT codbase_desc FROM ciam.vwcountry
+                WHERE LOWER(ciam.vwcountry.country_iso2) = $country_iso2);`, {
+                bind: {
+                    country_iso2: doc.country_iso2.toLowerCase()
+                },
+                type: QueryTypes.SELECT
+            });
+
+            const localeUsingParentCountryISO = `${doc.language_code}_${codbaseCountry[0].country_iso2}`;
+
+            userConsentDetails = await ConsentLocale.findAll({
+                where: {
+                    consent_id: userConsents.map(consent => consent.consent_id),
+                    locale: {
+                        [Op.iLike]: `%${localeUsingParentCountryISO}`
+                    }
+                }, attributes: ['consent_id', 'rich_text']
+            });
+        }
 
         response.data = userConsents.map(userConsent => {
             const localization = userConsentDetails && userConsentDetails.length

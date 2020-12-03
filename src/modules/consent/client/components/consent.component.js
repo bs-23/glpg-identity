@@ -70,7 +70,7 @@ const ConsentComponent = ({ consentId, setConsentId }) => {
                             <div>{consent.updatedBy || '--'}</div>
                         </div>
                         <div className="col-12 col-sm-6 pb-3 px-0">
-                            <label className="mt-1 font-weight-bold">Last Updatd On</label>
+                            <label className="mt-1 font-weight-bold">Last Updated On</label>
                             <div>{(new Date(consent.updated_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
                         </div>
                         <div className="col-12 pb-3 px-0">
