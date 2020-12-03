@@ -8,15 +8,69 @@ import Accordion from 'react-bootstrap/Accordion';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Modal from 'react-bootstrap/Modal';
 import Card from 'react-bootstrap/Card';
-import parse from 'html-react-parser';
 import axios from 'axios';
 import _ from 'lodash';
+import parse from 'html-react-parser';
+import { OverlayTrigger, Popover } from 'react-bootstrap';
 
-import { getHcpProfiles } from '../hcp.actions';
-import { ApprovalRejectSchema } from '../hcp.schema';
-import uuidAuthorities from '../uuid-authorities.json';
 import { getAllCountries } from '../../../core/client/country/country.actions';
+import { getHcpProfiles, getHCPSpecialities } from '../hcp.actions';
+import { ApprovalRejectSchema, HcpInlineEditSchema } from '../hcp.schema';
+import uuidAuthorities from '../uuid-authorities.json';
+import EditableTable from '../../../core/client/components/EditableTable/EditableTable';
 
+const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
+    const [comment, setComment] = useState("");
+    const [touched, setTouched] = useState(false);
+
+    const { rowIndex, editableTableProps, formikProps } = tableProps;
+    const { values, submitForm } = formikProps || {};
+
+    const handleSubmit = () => {
+        values.rows[rowIndex].comment = comment;
+        submitForm();
+    }
+
+    const handleOnBlur = () => {
+        setTouched(true);
+    }
+
+    useEffect(() => {
+        setComment('');
+        setTouched(false);
+    }, [show]);
+
+    return <Modal
+        show={show}
+        onHide={onHideHandler}
+        dialogClassName="modal-customize"
+        aria-labelledby="example-custom-modal-styling-title"
+        centered
+    >
+        <Modal.Header closeButton>
+            <Modal.Title id="example-custom-modal-styling-title">
+                Change Confirmation
+            </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+            <div className="p-3">
+                <p className="">Please comment and continue to save the changes to the HCP profile</p>
+                <div>
+                    <div>
+                        <label className="font-weight-bold">Comment <span className="text-danger">*</span></label>
+                    </div>
+                    <div>
+                        <textarea className="form-control" rows="4" cols="45" value={comment} onBlur={handleOnBlur} onChange={(e) => setComment(e.target.value)} />
+                    </div>
+                    {!comment && touched && <div className="invalid-feedback">
+                        Must provide a comment.
+                    </div>}
+                    <button className="btn btn-block mt-3 cdp-btn-primary text-white" disabled={!comment} onClick={handleSubmit}> Save Changes </button>
+                </div>
+            </div>
+        </Modal.Body>
+    </Modal>
+}
 
 export default function hcpUsers() {
     const dispatch = useDispatch();
@@ -24,13 +78,16 @@ export default function hcpUsers() {
     const history = useHistory();
     const params = new URLSearchParams(window.location.search);
 
-    const [show, setShow] = useState({ profileManage: false, updateStatus: false });
+    const [show, setShow] = useState({ profileManage: false, updateStatus: false, saveConfirmation: false });
     const [currentUser, setCurrentUser] = useState({});
     const { addToast } = useToasts();
     const [sort, setSort] = useState({ type: 'ASC', value: null });
-    const [selectedRow, setSelectedRow] = useState({ type: 'ASC', value: null });
+    const [tableDirty, setTableDirty] = useState(false);
+    const [editableTableProps, setEditableTableProps] = useState({});
+    const [selectedRow, setSelectedRow] = useState(null);
 
     const hcps = useSelector(state => state.hcpReducer.hcps);
+    const specialties = useSelector(state => state.hcpReducer.specialties);
     const countries = useSelector(state => state.countryReducer.countries);
     const allCountries = useSelector(state => state.countryReducer.allCountries);
 
@@ -98,10 +155,16 @@ export default function hcpUsers() {
         setCurrentUser(user);
     }
 
+    const onTableRowSave = (user, tableProps) => {
+        setShow({ ...show, saveConfirmation: true });
+        setCurrentUser(user);
+        setEditableTableProps({ ...editableTableProps, ...tableProps });
+    }
+
     const getCountryName = (country_iso2) => {
         if (!allCountries || !country_iso2) return null;
         const country = allCountries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
-        return country && country.codbase_desc;
+        return country && country.countryname;
     }
 
     const getUuidAuthorities = (codbase) => {
@@ -138,8 +201,258 @@ export default function hcpUsers() {
         setSelectedRow(rowId);
     }
 
+    const getSpecialtyOptions = async (value, row) => {
+        const { country_iso2, locale } = row;
+        const response = await dispatch(getHCPSpecialities(country_iso2, locale));
+        const { value: { data: specialty_by_country_locale } } = response;
+
+        if(!specialty_by_country_locale) return [];
+
+        const options = specialty_by_country_locale.map(sp => ({
+            key: `${sp.cod_id_onekey}_${sp.cod_description}`,
+            value: sp.cod_id_onekey,
+            label: sp.cod_description
+        }));
+
+        return options;
+    }
+
+    const getSpecialtyDescription = (specialty_onekey, row) => {
+        const { locale, country_iso2 } = row;
+        const country_locale_key = `${country_iso2.toLowerCase()}_${locale.toLowerCase()}`;
+        const specialty_by_country_locale = specialties[country_locale_key];
+
+        if(specialty_by_country_locale) {
+            const specialties_by_onekey = specialty_by_country_locale.filter(sp => sp.cod_id_onekey === specialty_onekey);
+
+            const speciality_en = specialties_by_onekey.find(sp => sp.cod_locale.toLowerCase() === 'en');
+            if(speciality_en) return speciality_en.cod_description;
+
+            const speciality_locale = specialties_by_onekey.find(sp => sp.cod_locale.toLowerCase() === locale.toLowerCase());
+            return speciality_locale ? speciality_locale.cod_description : '';
+        }
+
+        return row.specialty_description;
+    }
+
+    const handleSpecialtyChange = async (updatedValue, oldValue, row, formikProps, { rowIndex }) => {
+        const sp_desc = getSpecialtyDescription(updatedValue, row);
+        formikProps.values.rows[rowIndex].specialty_description = sp_desc;
+    }
+
+    const formatDate = (date) => {
+        return (new Date(date)).toLocaleDateString('en-GB').replace(/\//g, '.')
+    }
+
+    const submitHandler = ({ getUpdatedCells }, done) => {
+        const updatedCells = getUpdatedCells(["id", "comment"]);
+        axios.put('/api/hcp-profiles/update-hcps', updatedCells)
+            .then(({data}) => {
+                addToast('Successfully saved changes.', {
+                    appearance: 'success',
+                    autoDismiss: true
+                });
+                done(data.data);
+                setShow({ ...show, saveConfirmation: false });
+            })
+            .catch(err => {
+                addToast('Could not save changes. Please correct the following errors.', {
+                    appearance: 'error',
+                    autoDismiss: true
+                });
+                done(null, err.response.data.errors);
+            });
+    }
+
+    const generateSortHandler = (columnName) => () => urlChange(1, hcps.codBase, hcps.status, columnName);
+
+    const renderStatus = ({ value: status, row }) => {
+        return status === 'self_verified'
+        ? <span><i className="fa fa-xs fa-circle text-success pr-2 hcp-status-icon"></i>Self Verified</span>
+        : status === 'manually_verified'
+            ? <span><i className="fa fa-xs fa-circle text-success pr-2 hcp-status-icon"></i>Manually Verified</span>
+            : status === 'consent_pending'
+                ? <span><i className="fa fa-xs fa-circle text-warning pr-2 hcp-status-icon"></i>Consent Pending</span>
+                : status === 'not_verified'
+                    ? <span><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Not Verified <i type="button" className="fas fa-search search-in-okla ml-1 cdp-text-primary" onClick={() => openDiscoverHcpsWindow(row.id)}></i></span>
+                    : status === 'rejected'
+                        ? <span><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Rejected</span>
+                        : <span></span>
+    }
+
+    const renderOptInTypes = ({ value }) => {
+        const allOptTypes = ['single-opt-in', 'double-opt-in', 'opt-out'];
+        return <div className="text-center ml-n2">
+            {value.includes('single-opt-in') ? <i title="Single Opt-In" className="fas fa-check cdp-text-primary mr-3"></i> : ''}
+            {value.includes('double-opt-in') ? <i title="Double Opt-In" className="fas fa-check-double cdp-text-primary"></i> : ''}
+            {value.includes('opt-out') ? <i title="Opt-out" className="far fa-window-close text-danger mr-1"></i> : ''}
+            {value.filter(val => allOptTypes.some(ot => ot === val)).length ? '' : <div>N/A</div>}
+        </div>
+    }
+
+    const renderActions = ({ row, rowIndex, formikProps, hasRowChanged, editableTableProps }) => {
+        const { dirty, resetForm, initialValues, isValid } = formikProps;
+
+        return <div className="position-relative">
+            {!hasRowChanged && <Dropdown className="dropdown-customize">
+                <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                    <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(initialValues.rows[rowIndex])}>Profile</Dropdown.Item></LinkContainer>
+                    {row.status === 'not_verified' && <LinkContainer disabled={dirty} to="#"><Dropdown.Item onClick={() => onUpdateStatus(initialValues.rows[rowIndex])}>Manage Status</Dropdown.Item></LinkContainer>}
+                </Dropdown.Menu>
+            </Dropdown>}
+            {hasRowChanged &&
+                <>
+                <div className="d-flex position-absolute inline-editing__btn-wrap">
+                    <i style={isValid ? {} : { pointerEvents: 'none' }} onClick={() => onTableRowSave(hcps.users[rowIndex], { rowIndex, editableTableProps, formikProps })} disabled={!dirty} className={isValid ? 'fas fa-check mr-3 cdp-text-primary fa-1_5x' : 'fas fa-check mr-3 cdp-text-primary fa-1_5x inline-editing__btn-disable'} title="Save Changes" type="button"></i>
+                    <i onClick={resetForm} className="fas fa-times text-danger fa-1_5x" title="Cancel Changes" type="button"></i>
+                </div>
+                </>
+             }
+        </div>
+    }
+
+    const hintpopup = (
+        <Popover id="popover-basic" className="shadow-lg">
+            <Popover.Content className="px-3">
+                <ul className="list-unstyled mb-0">
+                    <li className="pl-0 pb-2"><i className="fas fa-check mr-1"></i> Single Opt-In</li>
+                    <li className="pl-0 pb-2"><i className="fas fa-check-double mr-1"></i> Double Opt-In</li>
+                    <li className="pl-0 pb-2"><i className="far fa-window-close text-danger mr-1"></i> Opt Out</li>
+                </ul>
+            </Popover.Content>
+        </Popover>
+    );
+
+    const CustomOptInHeader = () => {
+        return <div>Opt Type <OverlayTrigger trigger="click" rootClose placement="left" overlay={hintpopup}>
+            <i className="fas fa-info-circle ml-1 text-white" role="button"></i>
+        </OverlayTrigger></div>
+    }
+
+    const RegistrationHeader = () => {
+        return <span className={sort.value === 'created_at' ? `cdp-table__col-sorting sorted ${sort.type && sort.type.toLowerCase()}` : 'cdp-table__col-sorting'} >
+            Date of <br /> Registration
+            {!tableDirty && <i onClick={generateSortHandler('created_at')} className="icon icon-sort cdp-table__icon-sorting"></i>}
+        </span>
+    }
+
+    const columns = [
+        {
+            id: 'email',
+            name: 'Email',
+            unique: true,
+            onSort: generateSortHandler('email'),
+            fieldType: { name: 'email', maxLength: '100' },
+            width: "12%"
+        },
+        {
+            id: 'created_at',
+            name: 'Date of Registration',
+            editable: false,
+            onSort: generateSortHandler('created_at'),
+            customizeCellContent: formatDate,
+            fieldType: { name: 'date' },
+            CustomHeader: RegistrationHeader,
+            width: "8%"
+        },
+        {
+            id: 'first_name',
+            name: 'First Name',
+            fieldType: { name: 'text', maxLength: '50' },
+            onSort: generateSortHandler('first_name'),
+            class: "text-break",
+            width: "10%"
+        },
+        {
+            id: 'last_name',
+            name: 'Last Name',
+            editable: false,
+            fieldType: { name: 'text', maxLength: '50' },
+            onSort: generateSortHandler('last_name'),
+            class: "text-break",
+            width: "10%"
+        },
+        {
+            id: 'status',
+            name: 'Status',
+            editable: false,
+            customCell: renderStatus,
+            onSort: generateSortHandler('status'),
+            width: "8%"
+        },
+        {
+            id: 'uuid',
+            name: 'UUID',
+            unique: true,
+            onSort: generateSortHandler('uuid'),
+            fieldType: { name: 'email', maxLength: '20' },
+            width: "9%",
+            editable: (row) => row.status === 'manually_verified'
+        },
+        {
+            id: 'country_iso2',
+            name: 'Country',
+            editable: false,
+            width: "12%",
+            customizeCellContent: getCountryName
+        },
+        {
+            id: 'specialty_onekey',
+            name: 'Specialty',
+            width: "10%",
+            onChangeAction: handleSpecialtyChange,
+            customizeCellContent: (value, row) => row.specialty_description,
+            fieldType: { name: 'select', options: getSpecialtyOptions },
+            editable: (row) => row.status === 'manually_verified'
+        },
+        {
+            id: 'telephone',
+            name: 'Phone',
+            editable: true,
+            width: "8%",
+            fieldType: { name: 'text', maxLength: '25' },
+        },
+        {
+            id: 'opt_types',
+            name: 'Opt-In-Types',
+            editable: false,
+            customCell: renderOptInTypes,
+            CustomHeader: CustomOptInHeader,
+            class: "text-center",
+            width: "8%"
+        },
+        {
+            id: 'action',
+            name: 'Action',
+            editable: false,
+            customCell: renderActions,
+            class: "posi-relative",
+            width: "8%"
+        }
+    ];
+
+    const handleTableDirtyStatusChange = (dirty) => {
+        setTableDirty(dirty);
+        window.tableDirty = dirty;
+    }
+
+    const alertUserBeforeClosingWindow = (e) => {
+        if(window.tableDirty) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    }
+
     useEffect(() => {
         dispatch(getAllCountries());
+        window.addEventListener('beforeunload', alertUserBeforeClosingWindow);
+        window.tableDirty = false;
+        return () => {
+            window.removeEventListener('beforeunload', alertUserBeforeClosingWindow);
+            delete window.tableDirty;
+        }
     }, []);
 
     useEffect(() => {
@@ -201,7 +514,7 @@ export default function hcpUsers() {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="d-flex pt-3 pt-sm-0">
+                                {!tableDirty && <div className="d-flex pt-3 pt-sm-0">
                                     {countries && hcps['countries'] &&
                                         <React.Fragment>
                                             <Dropdown className="ml-auto dropdown-customize mr-2">
@@ -240,7 +553,7 @@ export default function hcpUsers() {
                                             </Dropdown>
                                         </React.Fragment>
                                     }
-                                </div>
+                                </div>}
 
                             </div>
                             <Modal
@@ -305,11 +618,17 @@ export default function hcpUsers() {
                                                 <div className="">{currentUser.birthdate ? currentUser.birthdate : '--'}</div>
                                             </div>
                                         </div>
+                                        <div className="row mt-3">
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Locale</div>
+                                                <div>{currentUser.locale ? currentUser.locale : '--'}</div>
+                                            </div>
+                                        </div>
                                         <div className="row mt-4">
                                             <div className="col accordion-consent rounded shadow-sm p-0">
                                                 <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Consents</h4>
                                                 {currentUser.consents && currentUser.consents.length ? <Accordion>{currentUser.consents.map(consent =>
-                                                    {return consent.consent_given === true ? <Card key={consent.id}>
+                                                    <Card key={consent.id}>
                                                         <Accordion.Collapse eventKey={consent.id}>
                                                             <Card.Body>
                                                                 <div>{parse(consent.rich_text)}</div>
@@ -318,10 +637,10 @@ export default function hcpUsers() {
                                                             </Card.Body>
                                                         </Accordion.Collapse>
                                                         <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
-                                                            <span className="d-flex align-items-center"><i class={`icon ${consent.consent_given ? 'icon-check-filled' : 'icon-close-circle text-danger'} cdp-text-primary mr-4 consent-check`}></i> <span className="consent-summary">{consent.preference}</span></span>
+                                                        <span className="d-flex align-items-center"><i className={`icon ${consent.consent_given ? 'icon-check-filled' : 'icon-close-circle text-danger'} cdp-text-primary mr-4 consent-check`}></i> <span className="consent-summary">{consent.preference}</span></span>
                                                             <i className="icon icon-arrow-down ml-2 accordion-consent__icon-down"></i>
                                                         </Accordion.Toggle>
-                                                    </Card> : null}
+                                                    </Card>
                                                 )}</Accordion> : <div className="m-3 alert alert-warning">The HCP has not given any consent.</div>}
                                             </div>
                                         </div>
@@ -478,74 +797,49 @@ export default function hcpUsers() {
 
                             </Modal>
 
+                            <SaveConfirmation
+                                show={show.saveConfirmation}
+                                onHideHandler={() => { setShow({ ...show, saveConfirmation: false }) }}
+                                tableProps={editableTableProps}
+                            />
+
                             {hcps['users'] && hcps['users'].length > 0 &&
                                 <React.Fragment>
-                                    <div className="shadow-sm bg-white table-responsive">
-                                        <table className="table table-hover table-sm mb-0 cdp-table cdp-table-sm">
-                                            <thead className="cdp-bg-primary text-white cdp-table__header">
-                                                <tr>
-                                                    <th><span className={sort.value === 'email' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, hcps.codBase, hcps.status, 'email')}>Email<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                    <th><span className={sort.value === 'created_at' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, hcps.codBase, hcps.status, 'created_at')}>Date of Registration<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                    <th><span className={sort.value === 'first_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, hcps.codBase, hcps.status, 'first_name')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                    <th><span className={sort.value === 'last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, hcps.codBase, hcps.status, 'last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                    <th><span className={sort.value === 'status' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, hcps.codBase, hcps.status, 'status')}>Status<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                    <th><span className={sort.value === 'uuid' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, hcps.codBase, hcps.status, 'uuid')}>UUID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                                    <th><span >Country</span></th>
-                                                    <th><span>Specialty</span></th>
-                                                    <th className="consent-col">Single<br /> Opt-In</th>
-                                                    <th className="consent-col">Double<br /> Opt-In</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="cdp-table__body bg-white">
-                                                {hcps['users'].map((row, index) => (
-                                                    <tr key={index} className={row.id === selectedRow ? 'selected' : ''}>
-                                                        <td className="text-break">{row.email}</td>
-                                                        <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
-                                                        <td className="text-break">{row.first_name}</td>
-                                                        <td className="text-break">{row.last_name}</td>
-                                                        <td className="text-nowrap">
-                                                            {row.status === 'self_verified' ? <span><i className="fa fa-xs fa-circle text-success pr-2 hcp-status-icon"></i>Self Verified</span> :
-                                                                row.status === 'manually_verified' ? <span><i className="fa fa-xs fa-circle text-success pr-2 hcp-status-icon"></i>Manually Verified</span> :
-                                                                    row.status === 'consent_pending' ? <span><i className="fa fa-xs fa-circle text-warning pr-2 hcp-status-icon"></i>Consent Pending</span> :
-                                                                        row.status === 'not_verified' ? <span><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Not Verified <i type="button" className="fas fa-search ml-1 cdp-text-primary" onClick={() => openDiscoverHcpsWindow(row.id)}></i></span> :
-                                                                            row.status === 'rejected' ? <span><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Rejected</span> : <span></span>
-                                                            }
-                                                        </td>
-                                                        <td>{row.uuid}</td>
-                                                        <td><span>{getCountryName(row.country_iso2)}</span></td>
-                                                        <td>{row.specialty_description}</td>
-                                                        <td>{row.opt_types.includes('single-opt-in') ? <i className="fas fa-check-circle cdp-text-primary font-size-15px"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
-                                                        <td>{row.opt_types.includes('double-opt-in') ? <i className="fas fa-check-circle cdp-text-primary font-size-15px"></i> : <i className="icon icon-close-circle text-danger consent-not-given"> </i>}</td>
-                                                        <td>
-                                                            <span>
-                                                                <Dropdown className="ml-auto dropdown-customize">
-                                                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
-                                                                    </Dropdown.Toggle>
-                                                                    <Dropdown.Menu>
-                                                                        <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(row)}>Profile</Dropdown.Item></LinkContainer>
-                                                                        {/* <LinkContainer to="#"><Dropdown.Item>Edit Profile</Dropdown.Item></LinkContainer> */}
-                                                                        {row.status === 'not_verified' && <LinkContainer to="#"><Dropdown.Item onClick={() => onUpdateStatus(row)}>Manage Status</Dropdown.Item></LinkContainer>}
-                                                                    </Dropdown.Menu>
-                                                                </Dropdown>
-                                                            </span>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                        {((hcps.page === 1 &&
-                                            hcps.total > hcps.limit) ||
-                                            (hcps.page > 1))
-                                            && hcps['users'] &&
-                                            <div className="pagination justify-content-end align-items-center border-top p-3">
-                                                <span className="cdp-text-primary font-weight-bold">{hcps.start + ' - ' + hcps.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + hcps.total}</span>
-                                                <span className="pagination-btn" data-testid='Prev' onClick={() => pageLeft()} disabled={hcps.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
-                                                <span className="pagination-btn" data-testid='Next' onClick={() => pageRight()} disabled={hcps.end === hcps.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
+                                    <EditableTable
+                                        rows={hcps.users}
+                                        columns={columns}
+                                        sortOn={sort.value}
+                                        sortType={sort.type}
+                                        onSubmit={submitHandler}
+                                        schema={HcpInlineEditSchema}
+                                        singleRowEditing={true}
+                                        selectedRow={selectedRow}
+                                        onDirtyChange={handleTableDirtyStatusChange}
+                                        enableReinitialize
+                                    >
+                                    {/* {
+                                        (editableTableProps) => {
+                                            const { dirty, values, touched, status, errors, error, resetForm, initialValues, submitForm } = editableTableProps;
+                                            console.log('current value: ', values.rows[0] && values.rows[0].first_name)
+                                            return dirty && <div className="cdp-bg-primary text-center p-2 cdp-table-inline-editing__save-btn">
+                                                <div>
+                                                    <button className="btn cdp-btn-outline-secondary btn-sm text-white" onClick={resetForm}><i className="fas fa-times-circle mr-1"></i> Reset</button>
+                                                    <button className="btn cdp-btn-secondary ml-2 btn-sm text-white" onClick={submitForm} disabled={!dirty}><i class="fas fa-check-circle mr-1"></i>Save Changes</button>
+                                                </div>
                                             </div>
                                         }
-                                    </div>
-
+                                    } */}
+                                    </EditableTable>
+                                    {((hcps.page === 1 &&
+                                        hcps.total > hcps.limit) ||
+                                        (hcps.page > 1))
+                                        && hcps['users'] &&
+                                        <div className="pagination justify-content-end align-items-center border-top p-3">
+                                            <span className="cdp-text-primary font-weight-bold">{hcps.start + ' - ' + hcps.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + hcps.total}</span>
+                                            <span className="pagination-btn" data-testid='Prev' onClick={() => pageLeft()} disabled={hcps.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
+                                            <span className="pagination-btn" data-testid='Next' onClick={() => pageRight()} disabled={hcps.end === hcps.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
+                                        </div>
+                                    }
                                 </React.Fragment>
                             }
 
@@ -553,7 +847,7 @@ export default function hcpUsers() {
                                 <>
                                     <div className="row justify-content-center mt-sm-5 pt-5 mb-3">
                                         <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">
-                                            <i class="icon icon-team icon-6x cdp-text-secondary"></i>
+                                        <i className="icon icon-team icon-6x cdp-text-secondary"></i>
                                             <h3 className="font-weight-bold cdp-text-primary pt-4">No Profile Found!</h3>
                                         </div>
                                     </div>

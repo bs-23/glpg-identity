@@ -71,7 +71,6 @@ export default function reducer(state = initialState, action) {
         }
 
         case Types.CREATE_COUNTRY_CONSENT_FULFILLED: {
-            console.log([...state.country_consents, action.payload.data]);
             return {
                 ...state,
                 country_consents: [...state.country_consents, action.payload.data]

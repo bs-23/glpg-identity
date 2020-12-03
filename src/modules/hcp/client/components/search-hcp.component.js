@@ -54,19 +54,21 @@ const SearchHcp = () => {
                                     isInContract: false,
                                     phonetic: false,
                                     duplicates: false,
-                                    firstname: '',
-                                    lastname: '',
-                                    address_label: '',
+                                    firstName: '',
+                                    lastName: '',
+                                    address: '',
                                     city: '',
-                                    postal_code: '',
-                                    one_key_id: '',
-                                    individual: '',
+                                    postCode: '',
+                                    onekeyId: '',
+                                    individualEid: '',
                                     specialties: [],
                                 }}
                                 displayName="SearchForm"
                                 onSubmit={async (values, actions) => {
+                                    values.specialties = values.specialties.map(i => i.value);
                                     values.codbases = values.countries.map(i => i.value);
                                     delete values.countries;
+
 
                                     console.log("testing", values)
                                     const response = await axios.post('/api/okla/hcps/search', values);
@@ -120,13 +122,13 @@ const SearchHcp = () => {
                                             <div className="col-12 col-sm-4">
                                                 <div className="form-group">
                                                     <label for="exampleFormControlInput1">First Name</label>
-                                                    <Field className="form-control firstname" type='text' name='firstname' id='firstname' />
+                                                    <Field className="form-control firstName" type='text' name='firstName' id='firstName' />
                                                 </div>
                                             </div>
                                             <div className="col-12 col-sm-4">
                                                 <div className="form-group">
                                                     <label for="exampleFormControlInput1">Last Name</label>
-                                                    <Field className="form-control lastname" type='text' name='lastname' id='lastname' />
+                                                    <Field className="form-control lastName" type='text' name='lastName' id='lastName' />
                                                 </div>
                                             </div>
                                             <div className="col-12 col-sm-4">
@@ -155,7 +157,7 @@ const SearchHcp = () => {
                                             <div className="col-12 col-sm-4">
                                                 <div className="form-group">
                                                     <label for="AddressLabel">Address Label</label>
-                                                    <Field className="form-control address_label" type='text' name='address_label' id='address_label' />
+                                                    <Field className="form-control address" type='text' name='address' id='address' />
                                                 </div>
                                             </div>
                                             <div className="col-12 col-sm-4">
@@ -167,7 +169,7 @@ const SearchHcp = () => {
                                             <div className="col-12 col-sm-4">
                                                 <div className="form-group">
                                                     <label for="PostalCode">Postal Code</label>
-                                                    <Field className="form-control postal_code" type='text' name='postal_code' id='postal_code' />
+                                                    <Field className="form-control postCode" type='text' name='postCode' id='postCode' />
                                                 </div>
                                             </div>
                                         </div>
@@ -176,13 +178,13 @@ const SearchHcp = () => {
                                             <div className="col-12 col-sm-4">
                                                 <div className="form-group">
                                                     <label for="OnekeyID">Onekey ID</label>
-                                                    <Field className="form-control one_key_id" type='text' name='one_key_id' id='one_key_id' />
+                                                    <Field className="form-control onekeyId" type='text' name='onekeyId' id='onekeyId' />
                                                 </div>
                                             </div>
                                             <div className="col-12 col-sm-4">
                                                 <div className="form-group">
                                                     <label for="Individual ">Individual - Identifier</label>
-                                                    <Field className="form-control individual" type='text' name='individual' id='individual' />
+                                                    <Field className="form-control individual" type='text' name='individualEid' id='individual' />
                                                 </div>
                                             </div>
                                         </div>

@@ -10,7 +10,7 @@ export function getConsentReport(page, codbase, opt_type, orderBy, orderType) {
     orderBy && search_params.append('orderBy', orderBy);
     orderType && search_params.append('orderType', orderType);
 
-    const url = `/api/consent-performance-report${search_params.toString() !== '' ? '?' + search_params.toString() : ''}`;
+    const url = `/api/cdp-consent-performance-report${search_params.toString() !== '' ? '?' + search_params.toString() : ''}`;
 
     return {
         type: Types.GET_CONSENTS_REPORT,
@@ -30,7 +30,7 @@ export function getVeevaConsentReport(page, codbase, opt_type, orderBy, orderTyp
     orderBy && search_params.append('orderBy', orderBy);
     orderType && search_params.append('orderType', orderType);
 
-    const url = `/api/datasync-consent-performance-report${search_params.toString() !== '' ? '?' + search_params.toString() : ''}`;
+    const url = `/api/veeva-consent-performance-report${search_params.toString() !== '' ? '?' + search_params.toString() : ''}`;
 
     return {
         type: Types.GET_VEEVA_CONSENTS_REPORT,
