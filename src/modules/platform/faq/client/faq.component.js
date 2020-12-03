@@ -42,7 +42,7 @@ export default function Faq(props) {
                     ))}
                     {faqData.faq && faqData.faq.length > 0 &&
                         <Card className="border-0">
-                            <NavLink to="platform-management/manage-faq" className="p-3 pb-0 mb-0 w-100 d-flex align-items-center bg-white cdp-text-secondary">
+                            <NavLink to={`platform-management/manage-faq?page=1&category=${props.category}`} className="p-3 pb-0 mb-0 w-100 d-flex align-items-center bg-white cdp-text-secondary">
                                 More FAQ's
                         </NavLink>
                         </Card>
