@@ -35,10 +35,11 @@ export default function reducer(state = initialState, action) {
         }
 
         case Types.POST_FAQ_ITEM_FULFILLED: {
+            state.faq_items.faq.unshift(action.payload.data);
             return {
                 ...state,
                 faq_item: action.payload.data,
-                faq_items: { ...state.faq_items, faq: [...state.faq_items.faq, action.payload.data] }
+                faq_items: { ...state.faq_items, faq: state.faq_items.faq }
             };
         }
 

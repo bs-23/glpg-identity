@@ -119,6 +119,21 @@ async function createFaqItem(req, res) {
         const faq = await Faq.findOne({ where: { question: { [Op.iLike]: question } } });
 
         if (faq) return res.status(404).send("This question already exists");
+        const inclusions = [
+            {
+                model: User,
+                as: 'createdByUser',
+                attributes: ['first_name', 'last_name'],
+
+            },
+            {
+                model: User,
+                as: 'updatedByUser',
+                attributes: ['first_name', 'last_name']
+            }
+        ];
+
+
 
         const response = await Faq.create({
             question,
@@ -127,6 +142,11 @@ async function createFaqItem(req, res) {
             created_by: req.user.id,
             updated_by: req.user.id
         });
+
+        const user = await User.findOne({ where: { id: req.user.id } });
+
+        response.dataValues.createdBy = `${user.dataValues.first_name} ${user.dataValues.last_name}`;
+        response.dataValues.updatedBy = `${user.dataValues.first_name} ${user.dataValues.last_name}`;
 
         await logService.log({
             event_type: 'CREATE',
@@ -176,7 +196,7 @@ async function updateFaqItem(req, res) {
 
 
         faq.dataValues.createdBy = `${faq.dataValues.createdByUser.dataValues.first_name} ${faq.dataValues.createdByUser.dataValues.last_name}`;
-        faq.dataValues.updatedByUser = `${faq.dataValues.updatedByUser.dataValues.first_name} ${faq.dataValues.updatedByUser.dataValues.last_name}`;
+        faq.dataValues.updatedBy = `${faq.dataValues.updatedByUser.dataValues.first_name} ${faq.dataValues.updatedByUser.dataValues.last_name}`;
 
         delete faq.dataValues.createdByUser;
         delete faq.dataValues.updatedByUser;
