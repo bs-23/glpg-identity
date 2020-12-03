@@ -85,8 +85,8 @@ const SearchHcp = () => {
                             >
                                 { formikProps => (
                                     <Form onSubmit={formikProps.handleSubmit}>
-                                        <div className="row">
-                                            <div className="col-12">
+                                        <div className="row align-items-center">
+                                            <div className="col-12 col-sm-6 col-lg-8">
                                                 <div className="form-group">
                                                     <label for="exampleInputEmail1">Countries</label>
                                                     <Select
@@ -108,7 +108,7 @@ const SearchHcp = () => {
                                                 </div>
                                             </div>
 
-                                            <div className="col-12">
+                                            <div className="col-12 col-sm-6 col-lg-4 mt-0 mt-sm-3">
                                                 <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-2">
                                                     <input type="checkbox" className="custom-control-input" name="in_my_contract" id="customControlInline" onChange={(e) => formikProps.values.in_my_contract = e.target.checked}/>
                                                     <label className="custom-control-label" for="customControlInline">In My Contract</label>
