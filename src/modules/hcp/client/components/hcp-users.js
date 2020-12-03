@@ -274,7 +274,7 @@ export default function hcpUsers() {
             : status === 'consent_pending'
                 ? <span><i className="fa fa-xs fa-circle text-warning pr-2 hcp-status-icon"></i>Consent Pending</span>
                 : status === 'not_verified'
-                    ? <span><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Not Verified <i type="button" className="fas fa-search search-in-okla ml-1 cdp-text-primary" onClick={() => openDiscoverHcpsWindow(row.id)}></i></span>
+                    ? <span class="text-nowrap"><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Not Verified <i type="button" className="fas fa-search search-in-okla ml-1 cdp-text-primary" onClick={() => openDiscoverHcpsWindow(row.id)}></i></span>
                     : status === 'rejected'
                         ? <span><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Rejected</span>
                         : <span></span>
