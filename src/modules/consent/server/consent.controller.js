@@ -118,7 +118,7 @@ function ignoreCaseArray(str) {
     return [str.toLowerCase(), str.toUpperCase(), str.charAt(0).toLowerCase() + str.charAt(1).toUpperCase(), str.charAt(0).toUpperCase() + str.charAt(1).toLowerCase()];
 }
 
-async function getConsentsReport(req, res) {
+async function getCdpConsentsReport(req, res) {
     const response = new Response({}, []);
 
     try {
@@ -261,7 +261,7 @@ async function getConsentsReport(req, res) {
     }
 }
 
-async function getDatasyncConsentsReport(req, res) {
+async function getVeevaConsentsReport(req, res) {
     const response = new Response({}, []);
 
     try {
@@ -991,8 +991,8 @@ async function updateConsentCategory(req, res) {
 }
 
 exports.getConsents = getConsents;
-exports.getConsentsReport = getConsentsReport;
-exports.getDatasyncConsentsReport = getDatasyncConsentsReport;
+exports.getCdpConsentsReport = getCdpConsentsReport;
+exports.getVeevaConsentsReport = getVeevaConsentsReport;
 exports.getAllProcessActivities = getAllProcessActivities;
 exports.getUserConsents = getUserConsents;
 exports.getCdpConsents = getCdpConsents;
