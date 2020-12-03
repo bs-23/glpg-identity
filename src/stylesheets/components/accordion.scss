@@ -111,6 +111,10 @@
         }
     }
 
+    &__question {
+        flex: 0 0 90%;
+    }
+
     &:after {
         content: "";
         display: block;
