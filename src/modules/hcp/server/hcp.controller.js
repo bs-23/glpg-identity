@@ -41,7 +41,7 @@ const hcpValidation = () => {
             .max(20, 'This field must be at most 20 characters long.')
             .required('This field must not be empty.'),
         telephone: string()
-            .matches(/^[+]?[0-9]*$/, 'This field only contains digits or plus')
+            .matches(/^[+]?[\/0-9]*$/, 'This field only contains digits or plus')
             .min(7, 'This field must be at least 7 characters long')
             .max(25,'This field must be at most 25 characters long')
             .nullable()
