@@ -6,7 +6,7 @@ const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/user/s
 
 module.exports = app => {
     app.route('/api/faq')
-        .get(CDPAuthStrategy, ModuleGuard(Modules.PLATFORM.value), controller.getFaqItems)
+        .get(CDPAuthStrategy, controller.getFaqItems)
         .post(CDPAuthStrategy, ModuleGuard(Modules.PLATFORM.value), controller.createFaqItem);
 
     app.route('/api/faq/:id')
