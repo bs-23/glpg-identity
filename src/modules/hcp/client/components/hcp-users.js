@@ -620,7 +620,7 @@ export default function hcpUsers() {
                                             <div className="col accordion-consent rounded shadow-sm p-0">
                                                 <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Consents</h4>
                                                 {currentUser.consents && currentUser.consents.length ? <Accordion>{currentUser.consents.map(consent =>
-                                                    {return consent.consent_given === true ? <Card key={consent.id}>
+                                                    <Card key={consent.id}>
                                                         <Accordion.Collapse eventKey={consent.id}>
                                                             <Card.Body>
                                                                 <div>{parse(consent.rich_text)}</div>
@@ -632,7 +632,7 @@ export default function hcpUsers() {
                                                         <span className="d-flex align-items-center"><i className={`icon ${consent.consent_given ? 'icon-check-filled' : 'icon-close-circle text-danger'} cdp-text-primary mr-4 consent-check`}></i> <span className="consent-summary">{consent.preference}</span></span>
                                                             <i className="icon icon-arrow-down ml-2 accordion-consent__icon-down"></i>
                                                         </Accordion.Toggle>
-                                                    </Card> : null}
+                                                    </Card>
                                                 )}</Accordion> : <div className="m-3 alert alert-warning">The HCP has not given any consent.</div>}
                                             </div>
                                         </div>
