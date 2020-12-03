@@ -274,7 +274,7 @@ export default function hcpUsers() {
 
     const renderOptInTypes = ({ value }) => {
         const allOptTypes = ['single-opt-in', 'double-opt-in', 'opt-out'];
-        return <div>
+        return <div className="text-center ml-n2">
             {value.includes('single-opt-in') ? <i title="Single Opt-In" className="fas fa-check cdp-text-primary mr-3"></i> : ''}
             {value.includes('double-opt-in') ? <i title="Double Opt-In" className="fas fa-check-double cdp-text-primary"></i> : ''}
             {value.includes('opt-out') ? <i title="Opt-out" className="far fa-window-close text-danger mr-1"></i> : ''}
@@ -412,8 +412,8 @@ export default function hcpUsers() {
             editable: false,
             customCell: renderOptInTypes,
             CustomHeader: CustomOptInHeader,
-            //class: "consent-col",
-            width: "10%"
+            class: "text-center",
+            width: "8%"
         },
         {
             id: 'action',
@@ -421,7 +421,7 @@ export default function hcpUsers() {
             editable: false,
             customCell: renderActions,
             class: "posi-relative",
-            width: "6%"
+            width: "8%"
         }
     ];
 
