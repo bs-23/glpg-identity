@@ -98,9 +98,20 @@
 
         &.selected {
             background: rgba(20,77,67,0.1);
+
             border: {
                 top: 2px solid rgba(20,77,67,0.2);
                 bottom: 2px solid rgba(20,77,67,0.2);
+            }
+
+            .search-in-okla {
+                visibility: visible;
+            }
+        }
+
+        &:hover {
+            .search-in-okla {
+                visibility: visible;
             }
         }
     }
@@ -204,4 +215,8 @@
     .table-responsive {
         overflow: visible;
     }
+}
+
+.search-in-okla {
+    visibility: hidden;
 }
