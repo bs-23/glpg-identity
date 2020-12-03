@@ -40,6 +40,7 @@ export const faqSchema = object().shape({
     categories:
         array()
             .of(string())
+            .min(1, 'Must select at least one category')
             .required('Must select at least one category')
 });
 
