@@ -67,9 +67,10 @@ const SearchHcp = () => {
                                 }}
                                 displayName="SearchForm"
                                 onSubmit={async (values, actions) => {
+                                    console.log(values);
                                     values.specialties = values.specialties.map(i => i.value);
                                     values.codbases = values.countries.map(i => i.value);
-                                    delete values.countries;
+                                    // delete values.countries;
 
 
                                     console.log("testing", values)
