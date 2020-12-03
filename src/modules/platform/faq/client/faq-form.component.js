@@ -138,10 +138,10 @@ const FaqForm = (props) => {
                                 dispatch(editFaqItem(values, props.editData.id)).then(() => {
                                     actions.resetForm();
                                     showToast('FAQ updated successfully', 'success');
-                                    handleClose();
                                 }).catch(error => {
                                     showToast(error.response.data, 'error');
                                 }).finally(function () {
+                                    handleClose();
                                     actions.setSubmitting(false);
                                 });
 
@@ -149,10 +149,10 @@ const FaqForm = (props) => {
                                 dispatch(createFaqItem(values)).then(() => {
                                     actions.resetForm();
                                     showToast('FAQ created successfully', 'success');
-                                    handleClose();
                                 }).catch(error => {
                                     showToast(error.response.data, 'error');
                                 }).finally(function () {
+                                    handleClose();
                                     actions.setSubmitting(false);
                                 });
 

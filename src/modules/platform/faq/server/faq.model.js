@@ -12,6 +12,7 @@ const Faq = sequelize.cdpConnector.define('faq', {
         defaultValue: DataTypes.UUIDV4
     },
     question: {
+        unique: true,
         allowNull: false,
         type: DataTypes.STRING(60)
     },
