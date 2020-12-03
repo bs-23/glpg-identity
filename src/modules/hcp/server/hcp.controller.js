@@ -1537,7 +1537,7 @@ async function searchOkla(req, res) {
             postCode: 'address.longPostalCode',
             onekeyId: 'activity.activityEid',
             individualEid: 'individual.individualEid',
-            specialty: 'individual.speciality1'
+            specialties: 'individual.speciality1'
         };
 
         const fields = Object.keys(fieldMap).map(key => {
@@ -1546,7 +1546,7 @@ async function searchOkla(req, res) {
                 return {
                     name: fieldMap[key],
                     method: phonetic === true ? 'PHONETIC' : "FUZZY",
-                    values: [value]
+                    values: Array.isArray(value) ? value : [value]
                 }
             }
         }).filter(field => field);
