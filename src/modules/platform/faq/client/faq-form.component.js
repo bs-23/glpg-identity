@@ -134,29 +134,31 @@ const FaqForm = (props) => {
                         onSubmit={(values, actions) => {
                             values.categories = sortArrayWithTitle(values.categories);
 
-                            if (props.editMode) {
-                                dispatch(editFaqItem(values, props.editData.id)).then(() => {
-                                    actions.resetForm();
-                                    showToast('FAQ updated successfully', 'success');
-                                }).catch(error => {
-                                    showToast(error.response.data, 'error');
-                                }).finally(function () {
-                                    handleClose();
-                                    actions.setSubmitting(false);
-                                });
+                            console.log(values);
 
-                            } else {
-                                dispatch(createFaqItem(values)).then(() => {
-                                    actions.resetForm();
-                                    showToast('FAQ created successfully', 'success');
-                                }).catch(error => {
-                                    showToast(error.response.data, 'error');
-                                }).finally(function () {
-                                    handleClose();
-                                    actions.setSubmitting(false);
-                                });
+                            // if (props.editMode) {
+                            //     dispatch(editFaqItem(values, props.editData.id)).then(() => {
+                            //         actions.resetForm();
+                            //         showToast('FAQ updated successfully', 'success');
+                            //     }).catch(error => {
+                            //         showToast(error.response.data, 'error');
+                            //     }).finally(function () {
+                            //         handleClose();
+                            //         actions.setSubmitting(false);
+                            //     });
 
-                            }
+                            // } else {
+                            //     dispatch(createFaqItem(values)).then(() => {
+                            //         actions.resetForm();
+                            //         showToast('FAQ created successfully', 'success');
+                            //     }).catch(error => {
+                            //         showToast(error.response.data, 'error');
+                            //     }).finally(function () {
+                            //         handleClose();
+                            //         actions.setSubmitting(false);
+                            //     });
+
+                            // }
 
                         }}
                     >
