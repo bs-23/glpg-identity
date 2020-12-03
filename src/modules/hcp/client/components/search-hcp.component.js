@@ -65,16 +65,16 @@ const SearchHcp = () => {
                             <Formik
                                 initialValues={{
                                     countries: [],
-                                    in_my_contract: false,
+                                    inMyContract: false,
                                     phonetic: false,
                                     duplicates: false,
-                                    firstname: '',
-                                    lastname: '',
-                                    address_label: '',
+                                    firstName: '',
+                                    lastName: '',
+                                    address: '',
                                     city: '',
-                                    postal_code: '',
-                                    one_key_id: '',
-                                    individual: '',
+                                    postCode: '',
+                                    onekeyId: '',
+                                    individualEid: '',
                                     specialties: []
                                 }}
                                 displayName="SearchForm"
@@ -110,7 +110,7 @@ const SearchHcp = () => {
 
                                             <div className="col-12 col-sm-6 col-lg-4 mt-0 mt-sm-3">
                                                 <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-2">
-                                                    <input type="checkbox" className="custom-control-input" name="in_my_contract" id="customControlInline" onChange={(e) => formikProps.values.in_my_contract = e.target.checked}/>
+                                                    <input type="checkbox" className="custom-control-input" name="inMyContract" id="customControlInline" onChange={(e) => formikProps.values.inMyContract = e.target.checked}/>
                                                     <label className="custom-control-label" for="customControlInline">In My Contract</label>
                                                 </div>
                                                 <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-2">
@@ -128,13 +128,13 @@ const SearchHcp = () => {
                                             <div className="col-12 col-sm-4">
                                                 <div className="form-group">
                                                     <label for="exampleFormControlInput1">First Name</label>
-                                                    <Field className="form-control firstname" type='text' name='firstname' id='firstname' />
+                                                    <Field className="form-control firstname" type='text' name='firstName' id='firstName' />
                                                 </div>
                                             </div>
                                             <div className="col-12 col-sm-4">
                                                 <div className="form-group">
                                                     <label for="exampleFormControlInput1">Last Name</label>
-                                                    <Field className="form-control lastname" type='text' name='lastname' id='lastname' />
+                                                    <Field className="form-control lastname" type='text' name='lastName' id='lastName' />
                                                 </div>
                                             </div>
                                             <div className="col-12 col-sm-4">
@@ -163,7 +163,7 @@ const SearchHcp = () => {
                                             <div className="col-12 col-sm-4">
                                                 <div className="form-group">
                                                     <label for="AddressLabel">Address Label</label>
-                                                    <Field className="form-control address_label" type='text' name='address_label' id='address_label' />
+                                                    <Field className="form-control address_label" type='text' name='address' id='address' />
                                                 </div>
                                             </div>
                                             <div className="col-12 col-sm-4">
@@ -175,7 +175,7 @@ const SearchHcp = () => {
                                             <div className="col-12 col-sm-4">
                                                 <div className="form-group">
                                                     <label for="PostalCode">Postal Code</label>
-                                                    <Field className="form-control postal_code" type='text' name='postal_code' id='postal_code' />
+                                                    <Field className="form-control postal_code" type='text' name='postCode' id='postCode' />
                                                 </div>
                                             </div>
                                         </div>
@@ -184,13 +184,13 @@ const SearchHcp = () => {
                                             <div className="col-12 col-sm-4">
                                                 <div className="form-group">
                                                     <label for="OnekeyID">Onekey ID</label>
-                                                    <Field className="form-control one_key_id" type='text' name='one_key_id' id='one_key_id' />
+                                                    <Field className="form-control one_key_id" type='text' name='onekeyId' id='onekeyId' />
                                                 </div>
                                             </div>
                                             <div className="col-12 col-sm-4">
                                                 <div className="form-group">
                                                     <label for="Individual ">Individual - Identifier</label>
-                                                    <Field className="form-control individual" type='text' name='individual' id='individual' />
+                                                    <Field className="form-control individual" type='text' name='individualEid' id='individualEid' />
                                                 </div>
                                             </div>
                                         </div>
@@ -199,7 +199,7 @@ const SearchHcp = () => {
                                                     <button type="reset" className="btn btn-block btn-secondary mt-4 p-2" onClick={() => resetSearch(formikProps)}>RESET</button>
                                                 </div>
                                                 <div className="col-6">
-                                                    <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!formikProps.values.countries || !formikProps.values.countries.length || !(formikProps.values.firstname  || formikProps.values.lastname || formikProps.values.address_label || formikProps.values.city || formikProps.values.postal_code || formikProps.values.one_key_id || formikProps.values.individual || (formikProps.values.specialties && formikProps.values.specialties.length))}>SEARCH</button>
+                                                    <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!formikProps.values.countries || !formikProps.values.countries.length || !(formikProps.values.firstName  || formikProps.values.lastName || formikProps.values.address || formikProps.values.city || formikProps.values.postCode || formikProps.values.onekeyId || formikProps.values.individualEid || (formikProps.values.specialties && formikProps.values.specialties.length))}>SEARCH</button>
                                                 </div>
                                             </div>
                                     </Form>
