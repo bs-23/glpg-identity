@@ -9,11 +9,6 @@ const SearchHcp = () => {
     const [selectedOption, setSelectedOption] = useState([]);
     const [specialties, setSpecialties] = useState([]);
 
-    // const handleChange = selectedOption => {
-    //     console.log(`Option selected:`, selectedOption);
-    //     setSelectedOption(selectedOption)
-    // };
-
     useEffect(() => {
         const getSpecialties = async () =>{
             const codbases = selectedOption.map(item => `codbases=${item.value}`);
@@ -56,7 +51,7 @@ const SearchHcp = () => {
                             <Formik
                                 initialValues={{
                                     countries: [],
-                                    in_my_contract: false,
+                                    isInContract: false,
                                     phonetic: false,
                                     duplicates: false,
                                     firstname: '',
@@ -69,8 +64,14 @@ const SearchHcp = () => {
                                     specialties: [],
                                 }}
                                 displayName="SearchForm"
-                                onSubmit={(values, actions) => {
+                                onSubmit={async (values, actions) => {
+                                    values.codbases = values.countries.map(i => i.value);
+                                    delete values.countries;
+
                                     console.log("testing", values)
+                                    const response = await axios.post('/api/okla/hcps/search', values);
+                                    console.log(response);
+
                                     actions.setSubmitting(false);
                                 }}
                             >
@@ -101,7 +102,7 @@ const SearchHcp = () => {
 
                                             <div className="col-12">
                                                 <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-2">
-                                                    <input type="checkbox" className="custom-control-input" name="in_my_contract" id="customControlInline" onChange={(e) => formikProps.values.in_my_contract = e.target.checked}/>
+                                                    <input type="checkbox" className="custom-control-input" name="isInContract" id="customControlInline" onChange={(e) => formikProps.values.isInContract = e.target.checked}/>
                                                     <label className="custom-control-label" for="customControlInline">In My Contract</label>
                                                 </div>
                                                 <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-2">
