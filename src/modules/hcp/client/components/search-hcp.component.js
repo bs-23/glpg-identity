@@ -16,10 +16,10 @@ const SearchHcp = () => {
 
     const resetSearch = (props) => {
         /**
-         * To-DO
-         * - reset country selection
+         * To-Do
          * - clear results
          */
+        setSelectedOption([]);
         props.resetForm();
     };
 
@@ -100,9 +100,12 @@ const SearchHcp = () => {
                                                         // onChange={handleChange}
                                                         className="multiselect"
                                                         classNamePrefix="multiselect"
+                                                        value={selectedOption}
                                                         onChange = { selectedOption => {
                                                             formikProps.values.countries = selectedOption;
-                                                            setSelectedOption(selectedOption || [])
+                                                            setSelectedOption(selectedOption || []);
+                                                            // to-do
+                                                            // - clear results
                                                         }}
                                                     />
                                                 </div>
