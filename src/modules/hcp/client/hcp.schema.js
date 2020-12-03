@@ -26,12 +26,12 @@ export const ApprovalRejectSchema = object().shape({
 
 export const HcpInlineEditSchema = object().shape({
     first_name: string()
-        .matches(XRegExp('^[\\pL]+(?:\\s[\\pL]+)*$'), 'This field only contains letters')
+        .matches(XRegExp('^[\\pL.]+(?:\\s[\\pL.]+)*$'), 'This field only contains letters')
         .min(2, 'This field must be at least 2 characters long.')
         .max(50, 'This field must be at most 50 characters long.')
         .required('This field must not be empty.'),
     last_name: string()
-        .matches(XRegExp('^[\\pL]+(?:\\s[\\pL]+)*$'), 'This field only contains letters')
+        .matches(XRegExp('^[\\pL.]+(?:\\s[\\pL.]+)*$'), 'This field only contains letters')
         .min(2, 'This field must be at least 2 characters long.')
         .max(50, 'This field must be at most 50 characters long.')
         .required('This field must not be empty.'),
