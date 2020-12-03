@@ -171,7 +171,6 @@ async function getCdpConsentsReport(req, res) {
             'opt_type': opt_type ? { [Op.eq]: opt_type } : { [Op.or]: opt_types },
             '$hcp_profile.application_id$': req.user.type === 'admin' ? { [Op.or]: application_list } : userPermittedApplications,
             '$hcp_profile.country_iso2$': codbase ? { [Op.any]: [countries_with_ignorecase] } : { [Op.any]: [country_iso2_list_with_ignorecase] },
-            '$consent.consent_country.country_iso2$': { [Op.or]: [ Sequelize.fn('LOWER', Sequelize.col('hcp_profile.country_iso2')), Sequelize.fn('UPPER', Sequelize.col('hcp_profile.country_iso2')) ] },
         };
 
         const hcp_consents = await HcpConsents.findAll({
@@ -188,11 +187,6 @@ async function getCdpConsentsReport(req, res) {
                         {
                             model: ConsentCategory,
                             attributes: ['title', 'slug']
-                        },
-                        {
-                            model: ConsentCountry,
-                            as: 'consent_country',
-                            attributes: ['country_iso2', 'opt_type']
                         }
                     ]
                 }
@@ -212,7 +206,6 @@ async function getCdpConsentsReport(req, res) {
             hcp_consent.dataValues.preference = hcp_consent.consent.preference;
             hcp_consent.dataValues.category = hcp_consent.consent.consent_category.title;
             hcp_consent.dataValues.type = hcp_consent.consent.consent_category.slug;
-            hcp_consent.dataValues.country_iso2 = hcp_consent.consent.consent_country[0].country_iso2;
 
             delete hcp_consent.dataValues['consent'];
         });
@@ -228,10 +221,6 @@ async function getCdpConsentsReport(req, res) {
                     include: [
                         {
                             model: ConsentCategory
-                        },
-                        {
-                            model: ConsentCountry,
-                            as: 'consent_country'
                         }
                     ]
                 }
