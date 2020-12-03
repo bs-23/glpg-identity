@@ -12,10 +12,20 @@ module.exports = async function() {
 
     await sequelize.cdpConnector.query('CREATE SCHEMA IF NOT EXISTS cdp');
 
+    await sequelize.cdpConnector.query(`
+        DO $$ BEGIN
+        CREATE AGGREGATE array_concat_agg(anyarray) (
+            SFUNC = array_cat,
+            STYPE = anyarray
+        );
+        EXCEPTION
+            WHEN duplicate_function THEN NULL;
+        END $$;
+    `);
+
     const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
     const Hcp_profile = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-profile.model'));
     const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
-    const ApplicationDomain = require(path.join(process.cwd(), 'src/modules/application/server/application-domain.model.js'));
     const ConsentCategory = require(path.join(process.cwd(), 'src/modules/consent/server/consent-category.model'));
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
     const ConsentLocale = require(path.join(process.cwd(), 'src/modules/consent/server/consent-locale.model'));
@@ -43,7 +53,6 @@ module.exports = async function() {
     await PermissionSetServiceCategories.bulkCreate(specHelper.permissionSet_serviceCategories, { returning: true, ignoreDuplicates: false });
     await UserProfilePermissionSet.bulkCreate(specHelper.userProfile_permissionSet, { returning: true, ignoreDuplicates: false });
     await Application.create(specHelper.defaultApplication);
-    await ApplicationDomain.bulkCreate(specHelper.defaultApplicationDomain, { returning: true, ignoreDuplicates: false });
     await User.create(specHelper.users.defaultAdmin);
     await User.create(specHelper.users.defaultUser);
     await Hcp_profile.create(specHelper.hcp.defaultUser);

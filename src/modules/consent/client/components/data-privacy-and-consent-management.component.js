@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import Faq from '../../../shared/client/components/faq.component';
+import Faq from '../../../platform/faq/client/faq.component';
 
 const ConsentManagement = () => {
     return (
@@ -103,8 +103,8 @@ const ConsentManagement = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="col-12 col-lg-4 col-xl-3 py-3">
-                        <Faq />
+                    <div className="col-12 col-lg-4 col-xl-3 py-3 app__content-panel-right">
+                        <Faq category="privacy" />
                     </div>
                 </div>
             </div>
