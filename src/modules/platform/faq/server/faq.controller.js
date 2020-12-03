@@ -31,7 +31,7 @@ async function getFaqItems(req, res) {
         const orderBy = req.query.orderBy === 'null'
             ? null
             : req.query.orderBy;
-        const orderType = req.query.orderType === 'asc' || req.query.orderType === 'desc'
+        let orderType = req.query.orderType === 'asc' || req.query.orderType === 'desc'
             ? req.query.orderType
             : 'asc';
 
@@ -42,11 +42,14 @@ async function getFaqItems(req, res) {
 
         const sortableColumns = ['question', 'answer', 'categories', 'updated_at'];
 
+        if (orderBy === 'categories') orderType === 'asc' ? orderType = 'desc' : orderType = 'asc';
+
         if (orderBy && sortableColumns.includes(orderBy)) {
             order.splice(0, 0, [orderBy, orderType]);
         }
 
         if (orderBy === 'created_by') {
+
             order = [[Sequelize.literal('"createdByUser.first_name"'), orderType]];
         }
 
@@ -113,6 +116,25 @@ async function createFaqItem(req, res) {
     try {
         const { question, answer, categories } = req.body;
 
+        const faq = await Faq.findOne({ where: { question: { [Op.iLike]: question } } });
+
+        if (faq) return res.status(404).send("This question already exists");
+        const inclusions = [
+            {
+                model: User,
+                as: 'createdByUser',
+                attributes: ['first_name', 'last_name'],
+
+            },
+            {
+                model: User,
+                as: 'updatedByUser',
+                attributes: ['first_name', 'last_name']
+            }
+        ];
+
+
+
         const response = await Faq.create({
             question,
             answer,
@@ -120,6 +142,11 @@ async function createFaqItem(req, res) {
             created_by: req.user.id,
             updated_by: req.user.id
         });
+
+        const user = await User.findOne({ where: { id: req.user.id } });
+
+        response.dataValues.createdBy = `${user.dataValues.first_name} ${user.dataValues.last_name}`;
+        response.dataValues.updatedBy = `${user.dataValues.first_name} ${user.dataValues.last_name}`;
 
         await logService.log({
             event_type: 'CREATE',
@@ -138,11 +165,41 @@ async function createFaqItem(req, res) {
 
 async function updateFaqItem(req, res) {
     try {
+
         const { question, answer, categories } = req.body;
 
-        let faq = await Faq.findOne({ where: { id: req.params.id } });
+        const inclusions = [
+            {
+                model: User,
+                as: 'createdByUser',
+                attributes: ['first_name', 'last_name'],
+
+            },
+            {
+                model: User,
+                as: 'updatedByUser',
+                attributes: ['first_name', 'last_name']
+            }
+        ];
+
+        const faq = await Faq.findOne({ include: inclusions, where: { id: req.params.id } });
 
         if (!faq) return res.status(404).send("FAQ is not found or may be removed");
+
+        const faqSameQuestion = await Faq.findOne({
+            where: {
+                question: { [Op.iLike]: question }
+            }
+        });
+
+        if (faqSameQuestion && faqSameQuestion.dataValues.id !== faq.dataValues.id) return res.status(404).send("This question already exists in other FAQ");
+
+
+        faq.dataValues.createdBy = `${faq.dataValues.createdByUser.dataValues.first_name} ${faq.dataValues.createdByUser.dataValues.last_name}`;
+        faq.dataValues.updatedBy = `${faq.dataValues.updatedByUser.dataValues.first_name} ${faq.dataValues.updatedByUser.dataValues.last_name}`;
+
+        delete faq.dataValues.createdByUser;
+        delete faq.dataValues.updatedByUser;
 
         await faq.update({ question, answer, categories });
 
