@@ -8,14 +8,16 @@ import { getFaqItems } from '../../../platform/faq/client/faq.actions';
 
 export default function Faq(props) {
     const [show, setShow] = React.useState();
-
+    const { serviceCategories } = useSelector(state => state.userReducer.loggedInUser);
     const faqData = useSelector(state => state.faqReducer.faq_items);
     const dispatch = useDispatch();
 
-    useEffect(() => {
-        dispatch(getFaqItems(1, props.category, null, null, 5));
-    }, []);
+    const hasPlatformPermission = (serviceCategories || []).filter(sc => sc.slug === 'platform').length > 0;
+    const faqsPerpage = hasPlatformPermission ? 5 : null;
 
+    useEffect(() => {
+        dispatch(getFaqItems(1, props.category, null, null, faqsPerpage));
+    }, []);
 
     return (
         <React.Fragment>
@@ -40,11 +42,11 @@ export default function Faq(props) {
 
                         </Card>
                     ))}
-                    {faqData.faq && faqData.faq.length > 0 &&
+                    {hasPlatformPermission && faqData.faq && faqData.faq.length > 0 &&
                         <Card className="border-0">
                             <NavLink to={`platform-management/manage-faq?page=1&category=${props.category}`} className="p-3 pb-0 mb-0 w-100 d-flex align-items-center bg-white cdp-text-secondary">
                                 More FAQ's
-                        </NavLink>
+                            </NavLink>
                         </Card>
                     }
                 </Accordion>

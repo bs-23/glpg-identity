@@ -23,8 +23,8 @@ async function getFaqItems(req, res) {
         const page = req.query.page ? req.query.page - 1 : 0;
         if (page < 0) return res.status(404).send("page must be greater or equal 1");
 
-        const limit = req.query.limit ? req.query.limit : 30;
-        const offset = page * limit;
+        const limit = req.query.limit ? req.query.limit : null;
+        const offset = limit ? page * limit : null;
 
         const category = req.query.category === 'null' || req.query.category === undefined ? null : req.query.category;
 

@@ -25,6 +25,8 @@ export default function ManageFaq() {
     const history = useHistory();
     const params = new URLSearchParams(window.location.search);
 
+    const faqsPerPage = 30;
+
     const deleteFaq = () => {
         dispatch(deleteFaqItem(deleteId)).then(() => {
             addToast('FAQ deleted successfully', {
@@ -75,7 +77,7 @@ export default function ManageFaq() {
         searchParams.forEach(element => {
             searchObj[element.split("=")[0]] = element.split("=")[1];
         });
-        dispatch(getFaqItems(searchObj.page, searchObj.category, searchObj.orderBy, searchObj.orderType));
+        dispatch(getFaqItems(searchObj.page, searchObj.category, searchObj.orderBy, searchObj.orderType, faqsPerPage));
         setSort({ type: params.get('orderType') || 'asc', value: params.get('orderBy') });
     }, [location]);
 
