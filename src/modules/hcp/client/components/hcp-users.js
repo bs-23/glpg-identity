@@ -198,7 +198,7 @@ export default function hcpUsers() {
         const width = (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth) * 0.8;
         const height = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) * 0.9;
         window.open('/hcps/discover', 'name', `width=${width || 600},height=${height || 400}`);
-        // setSelectedRow(rowId);
+        setSelectedRow(rowId);
     }
 
     const getSpecialtyOptions = async (value, row) => {
@@ -266,7 +266,7 @@ export default function hcpUsers() {
 
     const generateSortHandler = (columnName) => () => urlChange(1, hcps.codBase, hcps.status, columnName);
 
-    const renderStatus = ({ value: status }) => {
+    const renderStatus = ({ value: status, row }) => {
         return status === 'self_verified'
         ? <span><i className="fa fa-xs fa-circle text-success pr-2 hcp-status-icon"></i>Self Verified</span>
         : status === 'manually_verified'
@@ -274,7 +274,7 @@ export default function hcpUsers() {
             : status === 'consent_pending'
                 ? <span><i className="fa fa-xs fa-circle text-warning pr-2 hcp-status-icon"></i>Consent Pending</span>
                 : status === 'not_verified'
-                    ? <span><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Not Verified <i type="button" className="fas fa-search ml-1 cdp-text-primary" onClick={() => openDiscoverHcpsWindow()}></i></span>
+                    ? <span><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Not Verified <i type="button" className="fas fa-search ml-1 cdp-text-primary" onClick={() => openDiscoverHcpsWindow(row.id)}></i></span>
                     : status === 'rejected'
                         ? <span><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Rejected</span>
                         : <span></span>
@@ -813,6 +813,7 @@ export default function hcpUsers() {
                                         onSubmit={submitHandler}
                                         schema={HcpInlineEditSchema}
                                         singleRowEditing={true}
+                                        selectedRow={selectedRow}
                                         onDirtyChange={handleTableDirtyStatusChange}
                                         enableReinitialize
                                     >

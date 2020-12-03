@@ -29,7 +29,7 @@ const addValidationToSchema = (schema, columns) => {
     return modifiedSchema;
 }
 
-const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children, onSubmit, onDirtyChange, sortOn, sortType, singleRowEditing, ...props }) => {
+const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children, onSubmit, onDirtyChange, sortOn, sortType, singleRowEditing, selectedRow, ...props }) => {
     const [editingCell, setEditingCell] = useState(null);
     const [rawRows, setRawRows] = useState([]);
     const formikRef = useRef();
@@ -238,6 +238,7 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
                                     onCellSwitchToEdit={handleCellSwitchToEdit}
                                     onInputKeyDown={handleInputKeyDown}
                                     editableTableProps={{ getUpdatedRows, getUpdatedCells }}
+                                    selectedRow={selectedRow}
                                 />
                             )}
                         </tbody>
