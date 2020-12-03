@@ -1575,6 +1575,7 @@ async function searchOkla(req, res) {
                 const workplace = g.workplace;
                 const name = [workplace.managerWorkplaceUsualName, workplace.usualName].filter(i => i).join(' - ');
                 return {
+                    id: workplace.workplaceEid,
                     isMainActivity: g.activity.isMainActivity,
                     isValid: workplace.statusLabel === 'Valid',
                     name,
@@ -1651,6 +1652,7 @@ async function getOklaHcpDetails(req, res) {
                 };
             });
             return {
+                id: workplace.workplaceEid,
                 isMainActivity: g.activity.isMainActivity,
                 isValid: workplace.statusLabel === 'Valid',
                 name,

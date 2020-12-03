@@ -38,8 +38,8 @@ const OklaHcpdetails = ({ individual, setSelectedIndividual }) => {
 
                     <div>Workplaces:</div>
                     {
-                        hcpDetails.workplaces.map((workplace, index) => (
-                            <div key={'workplace-' + index}>
+                        hcpDetails.workplaces.map(workplace => (
+                            <div key={workplace.id} className="p-2">
                                 <span>{workplace.isMainActivity
                                     ? '★'
                                     : workplace.isValid
