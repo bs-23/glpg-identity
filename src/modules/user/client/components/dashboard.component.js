@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import Faq from '../../../shared/client/components/faq.component';
+import Faq from '../../../platform/faq/client/faq.component';
 
 export default function Dashboard() {
+
+
     return (
         <main className="app__content cdp-light-bg">
             <div className="container-fluid">
@@ -54,8 +56,8 @@ export default function Dashboard() {
                             </div>
                         </div>
                     </div>
-                    <div className="col-12 col-lg-4 col-xl-3 py-3">
-                        <Faq/>
+                    <div className="col-12 col-lg-4 col-xl-3 py-3 app__content-panel-right">
+                        <Faq category="general" />
                     </div>
                 </div>
             </div>

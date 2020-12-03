@@ -56,18 +56,6 @@ module.exports = {
             email: 'hcp-portal@glpg.com',
         }, process.env.APPLICATION_TOKEN_SECRET, { expiresIn: '30d', issuer: defaultApplicationId }),
     },
-    defaultApplicationDomain : [
-        {
-            application_id: defaultApplicationId,
-            domain: 'https://wwww.example.com/',
-            country_iso2: 'be'
-        },
-        {
-            application_id: defaultApplicationId,
-            domain: 'https://wwww.example.com/',
-            country_iso2: 'nl'
-        }
-    ],
     users: {
         defaultAdmin: {
             id: defaultAdminId,

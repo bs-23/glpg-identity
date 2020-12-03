@@ -7,11 +7,11 @@ module.exports = app => {
     app.route('/api/consents')
         .get(passport.authenticate('application-jwt', { session: false }), controller.getConsents);
 
-    app.route('/api/consent-performance-report')
-        .get(CDPAuthStrategy, controller.getConsentsReport);
+    app.route('/api/cdp-consent-performance-report')
+        .get(CDPAuthStrategy, controller.getCdpConsentsReport);
 
-    app.route('/api/datasync-consent-performance-report')
-        .get(CDPAuthStrategy, controller.getDatasyncConsentsReport);
+    app.route('/api/veeva-consent-performance-report')
+        .get(CDPAuthStrategy, controller.getVeevaConsentsReport);
 
     app.route('/api/get-all-process-activities')
         .get(CDPAuthStrategy, controller.getAllProcessActivities);

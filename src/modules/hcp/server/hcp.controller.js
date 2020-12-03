@@ -95,6 +95,14 @@ async function addPasswordResetTokenToUser(user) {
     await user.save();
 }
 
+var trimRequestBody = function(reqBody){
+    Object.keys(reqBody).forEach(key => {
+        if(typeof reqBody[key] === 'string')
+            reqBody[key] = reqBody[key].trim();
+    });
+    return reqBody;
+}
+
 function ignoreCaseArray(str) {
     return [str.toLowerCase(), str.toUpperCase(), str.charAt(0).toLowerCase() + str.charAt(1).toUpperCase(), str.charAt(0).toUpperCase() + str.charAt(1).toLowerCase()];
 }
@@ -110,18 +118,16 @@ async function getHcps(req, res) {
         const codbase = req.query.codbase === 'undefined' ? null : req.query.codbase;
         const offset = page * limit;
 
-        // const application_list = (await Hcp.findAll()).map(i => i.get("application_id"));
-
         const [userPermittedApplications, userPermittedCountries] = await getUserPermissions(req.user.id);
 
         async function getCountryIso2() {
             const user_codbase_list_for_iso2 = (await sequelize.datasyncConnector.query(
                 `SELECT * FROM ciam.vwcountry where ciam.vwcountry.country_iso2 = ANY($countries);`, {
-                    bind: {
-                        countries: userPermittedCountries
-                    },
-                    type: QueryTypes.SELECT
-                }
+                bind: {
+                    countries: userPermittedCountries
+                },
+                type: QueryTypes.SELECT
+            }
             )).map(i => i.codbase);
 
             const user_country_iso2_list = (await sequelize.datasyncConnector.query(
@@ -139,10 +145,6 @@ async function getHcps(req, res) {
 
         const country_iso2_list = await getCountryIso2();
         const ignorecase_of_country_iso2_list = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
-
-        // const codbase_list_mapped_with_user_country_iso2_list = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => userPermittedCountries.includes(i.country_iso2)).map(i => i.codbase) : [];
-        // const country_iso2_list_for_user_countries_codbase = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => codbase_list_mapped_with_user_country_iso2_list.includes(i.codbase)).map(i => i.country_iso2) : [];
-        // const countries_ignorecase_for_user_countries_codbase = [].concat.apply([], country_iso2_list_for_user_countries_codbase.map(i => ignoreCaseArray(i)));
 
         const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(
             `SELECT * FROM ciam.vwcountry WHERE ciam.vwcountry.codbase = $codbase;`, {
@@ -319,10 +321,188 @@ async function editHcp(req, res) {
             object_id: HcpUser.id,
             table_name: 'hcp_profiles',
             actor: req.user.id,
-            description: 'Updated HCP profile'
+            remarks: 'Updated HCP profile'
         });
 
         response.data = HcpUser;
+        res.json(response);
+    } catch (err) {
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
+    }
+}
+
+async function updateHcps(req, res) {
+    const Hcps = req.body;
+    const response = new Response([], []);
+    const hcpsToUpdate = [];
+    const hcpModelInstances = [];
+    const emailsToUpdate = new Map();
+    const uuidsToUpdate = new Map();
+    const allUpdateRecordsForLogging = [];
+
+    function Data(rowIndex, property, value) {
+        this.rowIndex = rowIndex;
+        this.property = property;
+        this.value = value;
+    }
+
+    function Error(rowIndex, property, message) {
+        this.rowIndex = rowIndex;
+        this.property = property;
+        this.message = message;
+    }
+
+    try {
+        if(!Array.isArray(Hcps)) {
+            response.error.push(new CustomError('Must be an array', 400));
+            return res.status(400).send(response);
+        }
+
+        await Promise.all(Hcps.map(async hcp => {
+            const { id, email, first_name, last_name, uuid, specialty_onekey, country_iso2, telephone, comment, _rowIndex } = trimRequestBody(hcp);
+
+            if(!id) {
+                response.errors.push(new Error(_rowIndex, 'id', 'ID is missing.'));
+            }
+
+            const HcpUser = await Hcp.findOne({ where: { id: id } });
+
+            if (!HcpUser) {
+                response.errors.push(new Error(_rowIndex, 'id', 'User not found.'));
+            }
+
+            if(email) {
+                if(!validator.isEmail(email)) {
+                    response.errors.push(new Error(_rowIndex, 'email', 'Invalid email'));
+                }else{
+                    const doesEmailExist = await Hcp.findOne({
+                        where: {
+                            id: { [Op.ne]: id },
+                            email: { [Op.iLike]: `${email}` } }
+                        }
+                    );
+
+                    if(doesEmailExist) {
+                        response.errors.push(new Error(_rowIndex, 'email', 'Email already exists'));
+                    }
+
+                    if(emailsToUpdate.has(email)) {
+                        emailsToUpdate.get(email).push(_rowIndex);
+                    }else{
+                        emailsToUpdate.set(email, [_rowIndex]);
+                    }
+                }
+            }
+
+            let uuid_from_master_data;
+
+            if(uuid) {
+                let master_data = {};
+
+                const uuidWithoutSpecialCharacter = uuid.replace(/[-]/gi, '');
+
+                master_data = await sequelize.datasyncConnector.query(`select * from ciam.vwhcpmaster
+                        where regexp_replace(uuid_1, '[-]', '', 'gi') = $uuid
+                        OR regexp_replace(uuid_2, '[-]', '', 'gi') = $uuid`, {
+                    bind: { uuid: uuidWithoutSpecialCharacter },
+                    type: QueryTypes.SELECT
+                });
+                master_data = master_data && master_data.length ? master_data[0] : {};
+
+                const uuid_1_from_master_data = (master_data.uuid_1 || '');
+                const uuid_2_from_master_data = (master_data.uuid_2 || '');
+
+                uuid_from_master_data = [uuid_1_from_master_data, uuid_2_from_master_data]
+                    .find(id => id.replace(/[-]/gi, '') === uuidWithoutSpecialCharacter);
+
+                const doesUUIDExist = await Hcp.findOne({
+                    where: {
+                        id: {
+                            [Op.ne]: id
+                        },
+                        uuid: uuid_from_master_data || uuid
+                    }
+                });
+
+                if (doesUUIDExist) {
+                    response.errors.push(new Error(_rowIndex, 'uuid', 'UUID already exists.'));
+                }
+
+                if(uuidsToUpdate.has(uuid_from_master_data || uuid)) {
+                    uuidsToUpdate.get(uuid_from_master_data || uuid).push(_rowIndex);
+                }else{
+                    uuidsToUpdate.set(uuid_from_master_data || uuid, [_rowIndex]);
+                }
+            }
+
+            hcpsToUpdate.push({
+                uuid: uuid_from_master_data || uuid,
+                email,
+                first_name,
+                last_name,
+                specialty_onekey,
+                country_iso2,
+                telephone
+            });
+
+            HcpUser.dataValues._rowIndex = _rowIndex;
+            hcpModelInstances.push(HcpUser);
+        }));
+
+        emailsToUpdate.forEach((listOfIndex) => {
+            if(listOfIndex.length > 1) {
+                listOfIndex.map(ind => response.errors.push(new Error(ind, 'email', 'Email matches with another row.')))
+            }
+        })
+
+        uuidsToUpdate.forEach((listOfIndex) => {
+            if(listOfIndex.length > 1) {
+                listOfIndex.map(ind => response.errors.push(new Error(ind, 'uuid', 'UUID matches with another row.')))
+            }
+        })
+
+        if(response.errors && response.errors.length) {
+            return res.status(400).send(response);
+        }
+
+        await Promise.all(hcpModelInstances.map(async (hcp, index) => {
+            const updatedPropertiesLog = [];
+
+            Object.keys(hcpsToUpdate[index]).map(key => {
+                if(hcpsToUpdate[index][key]) {
+                    const updatedPropertyLogObject = {
+                        field: key,
+                        old_value: hcp.dataValues[key],
+                        new_value: hcpsToUpdate[index][key]
+                    };
+                    updatedPropertiesLog.push(updatedPropertyLogObject);
+                }
+            });
+
+            await hcp.update(hcpsToUpdate[index]);
+            allUpdateRecordsForLogging.push(updatedPropertiesLog);
+        }));
+
+        await Promise.all(hcpModelInstances.map(async (hcp, index) => {
+            logService.log({
+                event_type: 'UPDATE',
+                object_id: hcp.id,
+                table_name: 'hcp_profiles',
+                actor: req.user.id,
+                description: Hcps[index].comment,
+                changes: JSON.stringify(allUpdateRecordsForLogging[index])
+            });
+        }));
+
+        hcpModelInstances.map((hcpModelIns, idx) => {
+            const { _rowIndex } = hcpModelIns.dataValues;
+            Object.keys(hcpsToUpdate[idx]).map(key => {
+                if(hcpsToUpdate[idx][key]) response.data.push(new Data(_rowIndex, key, hcpModelIns.dataValues[key]));
+            })
+        });
+
         res.json(response);
     } catch (err) {
         console.error(err);
@@ -559,7 +739,7 @@ async function createHcpProfile(req, res) {
                 const consentCountry = await ConsentCountry.findOne({
                     where: {
                         country_iso2: {
-                            [Op.iLike]:baseCountry.country_iso2
+                            [Op.iLike]: baseCountry.country_iso2
                         },
                         consent_id: consentDetails.id
                     }
@@ -608,7 +788,7 @@ async function createHcpProfile(req, res) {
             object_id: hcpUser.id,
             table_name: 'hcp_profiles',
             actor: req.user.id,
-            description: 'HCP user created'
+            remarks: 'HCP user created'
         });
 
         res.json(response);
@@ -699,7 +879,7 @@ async function approveHCPUser(req, res) {
 
         try {
             await notifyHcpUserApproval(hcpUser);
-        } catch(e) {
+        } catch (e) {
             await hcpUser.update({
                 status: 'not_verified',
                 reset_password_token: null,
@@ -717,7 +897,7 @@ async function approveHCPUser(req, res) {
             object_id: hcpUser.id,
             table_name: 'hcp_profiles',
             actor: req.user.id,
-            description: req.body.comment
+            remarks: req.body.comment
         });
 
         res.json(response);
@@ -754,7 +934,7 @@ async function rejectHCPUser(req, res) {
             object_id: hcpUser.id,
             table_name: 'hcp_archives',
             actor: req.user.id,
-            description: req.body.comment
+            remarks: req.body.comment
         });
 
         await hcpUser.destroy();
@@ -831,7 +1011,6 @@ async function getHcpProfile(req, res) {
 
 async function getHCPUserConsents(req, res) {
     const response = new Response({}, []);
-    const { locale } = req.query;
 
     try {
         const doc = await Hcp.findOne({
@@ -854,14 +1033,37 @@ async function getHCPUserConsents(req, res) {
 
         if (!userConsents) return res.json([]);
 
-        const userConsentDetails = await ConsentLocale.findAll({
+        let userConsentDetails = await ConsentLocale.findAll({
             where: {
                 consent_id: userConsents.map(consent => consent.consent_id),
                 locale: {
-                    [Op.iLike]: `%${locale ? locale : doc.locale}`
+                    [Op.iLike]: `%${doc.locale}`
                 }
             }, attributes: ['consent_id', 'rich_text']
         });
+
+        if(userConsentDetails) {
+            const codbaseCountry = await sequelize.datasyncConnector.query(`
+                SELECT * FROM ciam.vwcountry
+                WHERE countryname = (SELECT codbase_desc FROM ciam.vwcountry
+                WHERE LOWER(ciam.vwcountry.country_iso2) = $country_iso2);`, {
+                bind: {
+                    country_iso2: doc.country_iso2.toLowerCase()
+                },
+                type: QueryTypes.SELECT
+            });
+
+            const localeUsingParentCountryISO = `${doc.language_code}_${codbaseCountry[0].country_iso2}`;
+
+            userConsentDetails = await ConsentLocale.findAll({
+                where: {
+                    consent_id: userConsents.map(consent => consent.consent_id),
+                    locale: {
+                        [Op.iLike]: `%${localeUsingParentCountryISO}`
+                    }
+                }, attributes: ['consent_id', 'rich_text']
+            });
+        }
 
         response.data = userConsents.map(userConsent => {
             const localization = userConsentDetails && userConsentDetails.length
@@ -1141,6 +1343,61 @@ async function getSpecialties(req, res) {
     }
 }
 
+async function getSpecialtiesWithEnglishTranslation(req, res) {
+    const response = new Response([], []);
+    try {
+        const { country_iso2, locale } = req.query;
+
+        if (!country_iso2) response.errors.push(new CustomError(`Missing required query parameter`, 4300, 'country_iso2'));
+
+        if (!locale) response.errors.push(new CustomError(`Missing required query parameter`, 4300, 'locale'));
+
+        if (response.errors && response.errors.length) return res.status(400).send(response);
+
+        const countries = await sequelize.datasyncConnector.query(`
+            SELECT * FROM ciam.vwcountry
+            WHERE LOWER(ciam.vwcountry.country_iso2) = $country_iso2;`, {
+            bind: {
+                country_iso2: country_iso2.toLowerCase()
+            },
+            type: QueryTypes.SELECT
+        });
+
+        if (!countries || !countries.length) {
+            response.data = [];
+            return res.status(204).send(response);
+        }
+
+        let masterDataSpecialties = await sequelize.datasyncConnector.query(`
+            SELECT cod_id_onekey, codbase, cod_description, cod_locale
+            FROM ciam.vwspecialtymaster as Specialty
+            WHERE cod_id_onekey in
+                    (SELECT cod_id_onekey
+                    FROM ciam.vwspecialtymaster as Specialty
+                    WHERE LOWER(cod_locale) = $locale AND LOWER(codbase) = $codbase)
+                AND (LOWER(cod_locale) = 'en' OR LOWER(cod_locale) = $locale)
+            `, {
+            bind: {
+                locale: locale.toLowerCase(),
+                codbase: countries[0].codbase.toLowerCase()
+            },
+            type: QueryTypes.SELECT
+        });
+
+        if (!masterDataSpecialties || masterDataSpecialties.length === 0) {
+            response.data = [];
+            return res.status(204).send(response);
+        }
+
+        response.data = masterDataSpecialties;
+        res.json(response);
+    } catch (err) {
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
+    }
+}
+
 async function getAccessToken(req, res) {
     const response = new Response({}, []);
 
@@ -1214,20 +1471,20 @@ async function updateHCPUserConsents(req, res) {
             response.errors.push(new CustomError('Invalid HCP User.', 400));
         }
 
-        if(!req.body.consents) response.errors.push(new CustomError('consents are missing.', 400, 'consents'));
+        if (!req.body.consents) response.errors.push(new CustomError('consents are missing.', 400, 'consents'));
 
         if (response.errors.length) {
             return res.status(400).send(response);
         }
 
-        if(req.body.consents && req.body.consents.length) {
+        if (req.body.consents && req.body.consents.length) {
             await Promise.all(req.body.consents.map(async x => {
                 const consentId = Object.keys(x)[0];
                 const consentResponse = Object.values(x)[0];
 
                 const hcpConsent = await HcpConsents.findOne({ where: { user_id: hcpUser.id, consent_id: consentId } });
 
-                if(!hcpConsent || consentResponse) return;
+                if (!hcpConsent || consentResponse) return;
 
                 if (hcpConsent && consentResponse === false) {
                     hcpConsent.opt_type = 'opt-out';
@@ -1482,6 +1739,8 @@ exports.confirmConsents = confirmConsents;
 exports.approveHCPUser = approveHCPUser;
 exports.rejectHCPUser = rejectHCPUser;
 exports.getHCPUserConsents = getHCPUserConsents;
+exports.updateHcps = updateHcps;
+exports.getSpecialtiesWithEnglishTranslation = getSpecialtiesWithEnglishTranslation;
 exports.updateHCPUserConsents = updateHCPUserConsents;
 exports.searchOkla = searchOkla;
 exports.getSpecialtiesForCdp = getSpecialtiesForCdp;

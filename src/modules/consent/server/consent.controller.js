@@ -118,7 +118,7 @@ function ignoreCaseArray(str) {
     return [str.toLowerCase(), str.toUpperCase(), str.charAt(0).toLowerCase() + str.charAt(1).toUpperCase(), str.charAt(0).toUpperCase() + str.charAt(1).toLowerCase()];
 }
 
-async function getConsentsReport(req, res) {
+async function getCdpConsentsReport(req, res) {
     const response = new Response({}, []);
 
     try {
@@ -148,30 +148,29 @@ async function getConsentsReport(req, res) {
         order.push([HCPS, 'created_at', 'DESC']);
         order.push([HCPS, 'id', 'DESC']);
 
+        const countries = await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT });
+
         const userCountriesApplication = await getUserPermissions(req.user.id);
-        const userPermittedCountries = userCountriesApplication[1];
+        const userPermittedCodbases = countries.filter(i => userCountriesApplication[1].includes(i.country_iso2)).map(i => i.codbase);
+        const userPermittedCountries = countries.filter(i => userPermittedCodbases.includes(i.codbase)).map(i => i.country_iso2);
         const userPermittedApplications = userCountriesApplication[0].map(app => app.id);
 
         const application_list = (await HCPS.findAll()).map(i => i.get("application_id"));
 
-        const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => i.codbase === codbase).map(i => i.country_iso2);
-        const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
 
-        const country_iso2_list = req.user.type === 'admin' ? (await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry", { type: QueryTypes.SELECT })).map(i => i.country_iso2) : (await HCPS.findAll()).map(i => i.get("country_iso2"));
-        const countries_ignorecase = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
+        const country_iso2_list_for_codbase = countries.filter(i => i.codbase === codbase).map(i => i.country_iso2);
+        const countries_with_ignorecase = [].concat.apply([], country_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
 
-        const codbase_list_mapped_with_user_country_iso2_list = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => userPermittedCountries.includes(i.country_iso2)).map(i => i.codbase) : [];
-        const country_iso2_list_for_user_countries_codbase = req.user.type !== 'admin' ? (await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT })).filter(i => codbase_list_mapped_with_user_country_iso2_list.includes(i.codbase)).map(i => i.country_iso2) : [];
-        const countries_ignorecase_for_user_countries_codbase = [].concat.apply([], country_iso2_list_for_user_countries_codbase.map(i => ignoreCaseArray(i)));
+        const codbase_list = countries.filter(i => userPermittedCountries.includes(i.country_iso2)).map(i => i.codbase);
+        const country_iso2_list = countries.filter(i => codbase_list.includes(i.codbase)).map(i => i.country_iso2);
+        const country_iso2_list_with_ignorecase = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
 
-        const opt_types = [...new Set((await ConsentCountry.findAll()).map(i => i.opt_type))];
+        const opt_types = ['single-opt-in', 'double-opt-in', 'soft-opt-in', 'opt-out'];
 
         const consent_filter = {
-            consent_confirmed: true,
+            'opt_type': opt_type ? { [Op.eq]: opt_type } : { [Op.or]: opt_types },
             '$hcp_profile.application_id$': req.user.type === 'admin' ? { [Op.or]: application_list } : userPermittedApplications,
-            '$hcp_profile.country_iso2$': codbase ? { [Op.any]: [countries_ignorecase_for_codbase] } : req.user.type === 'admin' ? { [Op.any]: [countries_ignorecase] } : countries_ignorecase_for_user_countries_codbase,
-            '$consent.consent_country.country_iso2$': { [Op.or]: [ Sequelize.fn('LOWER', Sequelize.col('hcp_profile.country_iso2')), Sequelize.fn('UPPER', Sequelize.col('hcp_profile.country_iso2')) ] },
-            '$consent.consent_country.opt_type$': opt_type ? { [Op.eq]: opt_type } : { [Op.or]: opt_types }
+            '$hcp_profile.country_iso2$': codbase ? { [Op.any]: [countries_with_ignorecase] } : { [Op.any]: [country_iso2_list_with_ignorecase] },
         };
 
         const hcp_consents = await HcpConsents.findAll({
@@ -188,11 +187,6 @@ async function getConsentsReport(req, res) {
                         {
                             model: ConsentCategory,
                             attributes: ['title', 'slug']
-                        },
-                        {
-                            model: ConsentCountry,
-                            as: 'consent_country',
-                            attributes: ['country_iso2', 'opt_type']
                         }
                     ]
                 }
@@ -212,7 +206,6 @@ async function getConsentsReport(req, res) {
             hcp_consent.dataValues.preference = hcp_consent.consent.preference;
             hcp_consent.dataValues.category = hcp_consent.consent.consent_category.title;
             hcp_consent.dataValues.type = hcp_consent.consent.consent_category.slug;
-            hcp_consent.dataValues.country_iso2 = hcp_consent.consent.consent_country[0].country_iso2;
 
             delete hcp_consent.dataValues['consent'];
         });
@@ -228,10 +221,6 @@ async function getConsentsReport(req, res) {
                     include: [
                         {
                             model: ConsentCategory
-                        },
-                        {
-                            model: ConsentCountry,
-                            as: 'consent_country'
                         }
                     ]
                 }
@@ -247,7 +236,7 @@ async function getConsentsReport(req, res) {
             end: offset + limit > total_consents ? total_consents : offset + limit,
             codbase: codbase ? codbase : '',
             opt_type: opt_type ? opt_type : '',
-            countries: req.user.type === 'admin' ? [...new Set(country_iso2_list)] : userPermittedCountries,
+            countries: userCountriesApplication[1],
             orderBy: orderBy,
             orderType: orderType
         };
@@ -261,7 +250,7 @@ async function getConsentsReport(req, res) {
     }
 }
 
-async function getDatasyncConsentsReport(req, res) {
+async function getVeevaConsentsReport(req, res) {
     const response = new Response({}, []);
 
     try {
@@ -648,7 +637,7 @@ async function createConsent(req, res) {
             object_id: data.id,
             table_name: 'consents',
             actor: req.user.id,
-            description: `"${data.preference}" consent created`
+            remarks: `"${data.preference}" consent created`
         });
 
         res.json(data);
@@ -730,7 +719,7 @@ async function updateCdpConsent(req, res) {
             object_id: consent.id,
             table_name: 'consents',
             actor: req.user.id,
-            description: `Consent updated`
+            remarks: `Consent updated`
         });
 
         res.sendStatus(200);
@@ -813,7 +802,7 @@ async function assignConsentToCountry(req, res) {
             object_id: createdCountryConsent.id,
             table_name: 'consent_countries',
             actor: req.user.id,
-            description: `Consent assigned to country`
+            remarks: `Consent assigned to country`
         });
 
         res.json(createdCountryConsent);
@@ -843,7 +832,7 @@ async function updateCountryConsent(req, res) {
             object_id: consentCountry.id,
             table_name: 'consent_countries',
             actor: req.user.id,
-            description: `Country-Consent Opt Type updated`
+            remarks: `Country-Consent Opt Type updated`
         });
 
         res.json(consentCountry);
@@ -871,7 +860,7 @@ async function deleteCountryConsent(req, res) {
             object_id: id,
             table_name: 'consent_countries',
             actor: req.user.id,
-            description: `Country-Consent deleted`
+            remarks: `Country-Consent deleted`
         });
 
         res.sendStatus(200);
@@ -945,7 +934,7 @@ async function createConsentCategory(req, res) {
             object_id: data.id,
             table_name: 'consent_categories',
             actor: req.user.id,
-            description: `"${data.title}" consent category created`
+            remarks: `"${data.title}" consent category created`
         });
 
         res.json(data);
@@ -980,7 +969,7 @@ async function updateConsentCategory(req, res) {
             object_id: consentCategory.id,
             table_name: 'consent_categories',
             actor: req.user.id,
-            description: `Consent category updated`
+            remarks: `Consent category updated`
         });
 
         res.json(data);
@@ -991,8 +980,8 @@ async function updateConsentCategory(req, res) {
 }
 
 exports.getConsents = getConsents;
-exports.getConsentsReport = getConsentsReport;
-exports.getDatasyncConsentsReport = getDatasyncConsentsReport;
+exports.getCdpConsentsReport = getCdpConsentsReport;
+exports.getVeevaConsentsReport = getVeevaConsentsReport;
 exports.getAllProcessActivities = getAllProcessActivities;
 exports.getUserConsents = getUserConsents;
 exports.getCdpConsents = getCdpConsents;

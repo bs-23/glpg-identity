@@ -352,11 +352,11 @@ async function login(req, res) {
                 return res.status(401).send('Password has been expired. Please reset the password.');
             }
 
-            const isSiteVerified = await verifySite(recaptchaToken);
+            // const isSiteVerified = await verifySite(recaptchaToken);
 
-            if (!isSiteVerified) {
-                return res.status(400).send('Failed captcha verification.');
-            }
+            // if (!isSiteVerified) {
+            //     return res.status(400).send('Failed captcha verification.');
+            // }
 
             await user.update({ refresh_token: generateRefreshToken(user) });
         }
@@ -374,7 +374,7 @@ async function login(req, res) {
             object_id: user.id,
             table_name: 'users',
             actor: user.id,
-            description: 'CDP user logged in'
+            remarks: 'CDP user logged in'
         });
 
         res.json(await formatProfile(user));
@@ -390,7 +390,7 @@ async function logout(req, res) {
         object_id: req.user.id,
         table_name: 'users',
         actor: req.user.id,
-        description: 'CDP user logged out'
+        remarks: 'CDP user logged out'
     });
 
     res.clearCookie('access_token');
@@ -442,7 +442,7 @@ async function createUser(req, res) {
             object_id: user.id,
             table_name: 'users',
             actor: req.user.id,
-            description: 'Created new CDP user'
+            remarks: 'Created new CDP user'
         };
         await logService.log(logData);
 
@@ -837,7 +837,7 @@ async function updateSignedInUserProfile(req, res) {
             object_id: signedInUser.id,
             table_name: 'users',
             actor: req.user.id,
-            description: 'Updated Signed-in user'
+            remarks: 'Updated Signed-in user'
         });
 
         const hasEmailChanged = currentEmail.toLowerCase() !== email.toLowerCase();
@@ -901,7 +901,7 @@ async function updateUserDetails(req, res) {
             object_id: user.id,
             table_name: 'users',
             actor: req.user.id,
-            description: 'Updated CDP user'
+            remarks: 'Updated CDP user'
         });
 
         res.json(formatProfile(user));

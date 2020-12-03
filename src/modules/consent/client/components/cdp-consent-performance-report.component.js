@@ -15,7 +15,7 @@ import { getConsentReport } from '../consent.actions';
 
 const CdpConsentPerformanceReport = () => {
     const dispatch = useDispatch();
-    const [allOptTypes, setAllOptTypes] = useState(["single-opt-in", "double-opt-in"]);
+    const [allOptTypes, setAllOptTypes] = useState(["single-opt-in", "double-opt-in", "opt-out"]);
     const [show, setShow] = useState({ profileManage: false, updateStatus: false });
     const [currentAction, setCurrentAction] = useState({ userId: null, action: null });
     const [currentUser, setCurrentUser] = useState({});
