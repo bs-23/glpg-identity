@@ -163,7 +163,7 @@ export default function ManageFaq() {
                                                         <Dropdown.Item onClick={() => { setShow(true); setEditMode(true); setEditData(row); }}>
                                                             Edit
                                                         </Dropdown.Item>
-                                                        <Dropdown.Item className="text-danger" onClick={() => { setShowDelete(true); setDeleteId(row.id); }}>Delete</Dropdown.Item>
+                                                        <Dropdown.Item className="text-danger bg-white" onClick={() => { setShowDelete(true); setDeleteId(row.id); }}>Delete</Dropdown.Item>
                                                     </Dropdown.Menu>
                                                 </Dropdown></td>
                                             </tr>
