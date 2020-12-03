@@ -18,6 +18,51 @@ const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const PasswordPolicies = require(path.join(process.cwd(), 'src/modules/core/server/password/password-policies.js'));
 const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/user/server/permission/permissions.js'));
+const XRegExp = require('xregexp');
+const { string }  = require('yup');
+
+const hcpValidation = () => {
+    const schema = {
+        first_name: string()
+            .matches(XRegExp('^[\\pL.]+(?:\\s[\\pL.]+)*$'), 'This field only contains letters')
+            .min(2, 'This field must be at least 2 characters long.')
+            .max(50, 'This field must be at most 50 characters long.')
+            .required('This field must not be empty.'),
+        last_name: string()
+            .matches(XRegExp('^[\\pL.]+(?:\\s[\\pL.]+)*$'), 'This field only contains letters')
+            .min(2, 'This field must be at least 2 characters long.')
+            .max(50, 'This field must be at most 50 characters long.')
+            .required('This field must not be empty.'),
+        email: string()
+            .email('This field should be a valid email address.')
+            .max(100, 'This field must be at most 100 characters long.')
+            .required('This field must not be empty.'),
+        uuid: string()
+            .max(20, 'This field must be at most 20 characters long.')
+            .required('This field must not be empty.'),
+        telephone: string()
+            .matches(/^[+]?[0-9]*$/, 'This field only contains digits or plus')
+            .min(7, 'This field must be at least 7 characters long')
+            .max(25,'This field must be at most 25 characters long')
+            .nullable()
+    }
+
+    return {
+        validate: async (value, schemaName) => {
+            try{
+                await schema[schemaName].validate(value);
+                return {
+                    valid: true
+                };
+            }catch(err){
+                return {
+                    valid: false,
+                    errors: err.errors
+                }
+            }
+        }
+    }
+}
 
 function generateAccessToken(doc) {
     return jwt.sign({
@@ -584,6 +629,11 @@ async function registrationLookup(req, res) {
 async function createHcpProfile(req, res) {
     const response = new Response({}, []);
     const { email, uuid, salutation, first_name, last_name, country_iso2, language_code, specialty_onekey, telephone, birthdate, origin_url } = req.body;
+    const hcpValidator = hcpValidation().validate;
+
+    const firstNameValidationStatus = await hcpValidator(first_name, 'first_name');
+    const lastNameValidationStatus = await hcpValidator(last_name, 'last_name');
+    const telephoneValidationStatus = await hcpValidator(telephone, 'telephone');
 
     if (!email || !validator.isEmail(email)) {
         response.errors.push(new CustomError('Email address is missing or invalid.', 400, 'email'));
@@ -607,12 +657,16 @@ async function createHcpProfile(req, res) {
         response.errors.push(new CustomError('First name is missing.', 400, 'first_name'));
     } else if (first_name.length > 50) {
         response.errors.push(new CustomError('First name should be at most 50 characters', 400, 'first_name'));
+    } else if(!firstNameValidationStatus.valid) {
+        response.errors.push(new CustomError(firstNameValidationStatus.errors[0], 400, 'first_name'));
     }
 
     if (!last_name) {
         response.errors.push(new CustomError('Last name is missing.', 400, 'last_name'));
     } else if (last_name.length > 50) {
         response.errors.push(new CustomError('Last name should be at most 50 characters', 400, 'last_name'));
+    } else if(!lastNameValidationStatus.valid) {
+        response.errors.push(new CustomError(lastNameValidationStatus.errors[0], 400, 'last_name'));
     }
 
     if (!country_iso2) {
@@ -637,6 +691,8 @@ async function createHcpProfile(req, res) {
 
     if (telephone && telephone.length > 25) {
         response.errors.push(new CustomError('Telephone number should be at most 25 digits including country code', 400, 'telephone'));
+    } else if(!telephoneValidationStatus.valid) {
+        response.errors.push(new CustomError(telephoneValidationStatus.errors[0], 400, 'telephone'));
     }
 
     if (specialty_onekey.length > 20) {
