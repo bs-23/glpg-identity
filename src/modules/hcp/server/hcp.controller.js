@@ -1600,8 +1600,6 @@ async function searchOkla(req, res) {
                 onekeyEidList
             };
 
-            // console.log(index + '-' + res.firstName + '-' + res.lastName + '-' + res.specialty + '-' + res.individualEid + '-' + res.countryIso2 + '-' + res.codbase);
-
             results.push(res);
         });
 
@@ -1656,7 +1654,7 @@ async function getOklaHcpDetails(req, res) {
                 isMainActivity: g.activity.isMainActivity,
                 isValid: workplace.statusLabel === 'Valid',
                 name,
-                addresss: workplace.workplaceAddresses['P,1'].address.addressLongLabel,
+                address: workplace.workplaceAddresses['P,1'].address.addressLongLabel,
                 location: {
                     latitude: workplace.workplaceAddresses['P,1'].address.geocodingAddresses.W.latitude,
                     longitude: workplace.workplaceAddresses['P,1'].address.geocodingAddresses.W.longitude

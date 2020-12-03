@@ -3,11 +3,13 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import Select, { components } from 'react-select';
+import OklaHcpdetails from './okla-hcp-details.component';
 
 const SearchHcp = () => {
     const countries = useSelector(state => state.countryReducer.countries);
     const [selectedOption, setSelectedOption] = useState([]);
     const [specialties, setSpecialties] = useState([]);
+    const [selectedIndividual, setSelectedIndividual] = useState(null);
 
     useEffect(() => {
         const getSpecialties = async () =>{
@@ -233,7 +235,7 @@ const SearchHcp = () => {
                                             <td>551255</td>
                                             <td>564564565</td>
                                             <td>Belgium</td>
-                                            <td>Detail</td>
+                                            <td><a type="button" className="link-with-underline" onClick={() => setSelectedIndividual({id: 'WBEB00000163', codbase: 'WBE'})}>Details</a></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -242,6 +244,8 @@ const SearchHcp = () => {
                     </div>
                 </div>
             </div>
+
+            {selectedIndividual && <OklaHcpdetails individual={selectedIndividual} setSelectedIndividual={setSelectedIndividual} />}
         </main>
     );
 }

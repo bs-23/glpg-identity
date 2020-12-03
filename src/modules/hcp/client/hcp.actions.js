@@ -86,3 +86,20 @@ export function getHCPSpecialities(country_iso2, locale) {
         })
     };
 }
+
+export function getOklaHcpDetails(codbase, individualEid) {
+    return {
+        type: Types.GET_OKLA_HCP_DETAILS,
+        payload: axios({
+            method: 'get',
+            url: `/api/okla/hcps/${codbase}/${individualEid}`
+        })
+    };
+}
+
+export function setOklaHcpDetails(hcpDetails) {
+    return {
+        type: Types.SET_OKLA_HCP_DETAILS,
+        payload: hcpDetails
+    };
+}
