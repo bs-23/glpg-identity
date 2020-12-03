@@ -149,7 +149,7 @@ export default function ManageFaq() {
                                         {faqData.faq.map((row, index) => (
                                             <tr key={index}>
                                                 <td className="text-break">{row.question}</td>
-                                                <td className="text-break">{parse(row.answer)}</td>
+                                                <td className="text-break cdp-link-secondary">{parse(row.answer)}</td>
                                                 <td className="text-break">{row.categories && row.categories.map((item, key) => (
                                                     (serviceCategories.find(x => x.slug === item).title) + (key < row.categories.length - 1 ? ', ' : '')
 

@@ -189,6 +189,18 @@
             border: 1px solid $secondary-color;
         }
     }
+
+    &-link {
+        &-secondary {
+            a {
+                color: $secondary-color;
+
+                &:hover {
+                    color: $secondary-color;
+                }
+            }
+        }
+    }
 }
 
 .text-dark {
