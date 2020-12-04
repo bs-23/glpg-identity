@@ -48,8 +48,8 @@ export default function Faq(props) {
 
                 { faqData.faq && faqData.faq.length === 0 &&
                     <div className="bg-white text-center py-3 px-2">
-                        <i className="icon icon-help icon-3x cdp-text-secondary"></i>
-                        <h5 className="cdp-text-primary pt-4">No data found!</h5>
+                        <i className="icon icon-help faq__no-data-found-lg-icon cdp-text-secondary"></i>
+                        <h4 className="cdp-text-primary">No data found!</h4>
                     </div>
                 }
             </div>

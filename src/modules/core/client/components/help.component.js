@@ -54,8 +54,9 @@ export default function Help() {
                                                 ))}
                                                 {faqData.faq.filter(f => f.categories.includes('general')).length === 0 &&
                                                     <Card>
-                                                        <Card.Body>
-                                                            No FAQs found
+                                                        <Card.Body className="text-center">
+                                                            <i className="icon icon-help cdp-text-secondary icon-3x"></i>
+                                                            <p className="pt-3 font-weight-bold"> No FAQs found related this category</p>
                                                         </Card.Body>
                                                     </Card>
                                                 }
@@ -79,8 +80,9 @@ export default function Help() {
                                                 ))}
                                                 {faqData.faq.filter(f => f.categories.includes('information')).length === 0 &&
                                                     <Card>
-                                                        <Card.Body>
-                                                            No FAQs found
+                                                        <Card.Body className="text-center">
+                                                        <i className="icon icon-help cdp-text-secondary icon-3x"></i>
+                                                        <p className="pt-3 font-weight-bold"> No FAQs found related this category</p>
                                                         </Card.Body>
                                                     </Card>
                                                 }
@@ -104,8 +106,9 @@ export default function Help() {
                                                 ))}
                                                 {faqData.faq.filter(f => f.categories.includes('cdp')).length === 0 &&
                                                     <Card>
-                                                        <Card.Body>
-                                                            No FAQs found
+                                                        <Card.Body className="text-center">
+                                                            <i className="icon icon-help cdp-text-secondary icon-3x"></i>
+                                                            <p className="pt-3 font-weight-bold"> No FAQs found related this category</p>
                                                         </Card.Body>
                                                     </Card>
                                                 }
@@ -129,8 +132,9 @@ export default function Help() {
                                                 ))}
                                                 {faqData.faq.filter(f => f.categories.includes('privacy')).length === 0 &&
                                                     <Card>
-                                                        <Card.Body>
-                                                            No FAQs found
+                                                        <Card.Body className="text-center">
+                                                            <i className="icon icon-help cdp-text-secondary icon-3x"></i>
+                                                            <p className="pt-3 font-weight-bold"> No FAQs found related this category</p>
                                                         </Card.Body>
                                                     </Card>
                                                 }
@@ -140,10 +144,14 @@ export default function Help() {
                                 </div>}
 
                                 {faqData.faq && faqData.faq.length === 0 &&
-                                    <div className="bg-white text-center py-3 px-2 border rounded shadow-sm">
-                                        <i className="icon icon-help icon-3x cdp-text-secondary"></i>
-                                        <h5 className="cdp-text-primary pt-4">No data found!</h5>
-                                    </div>
+                                    <div className="row justify-content-center">
+                                        <div className="col-12 col-md-6">
+                                            <div className="bg-white text-center py-3 px-2 border rounded shadow-sm">
+                                                <i className="icon icon-help icon-3x cdp-text-secondary faq__no-data-found-lg-icon"></i>
+                                                <h3 className="cdp-text-primary">No data found!</h3>
+                                            </div>
+                                        </div>
+                                    </div> 
                                 }
                             </div>
                         </div>
