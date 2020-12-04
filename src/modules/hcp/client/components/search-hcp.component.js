@@ -240,18 +240,29 @@ const SearchHcp = () => {
                                         </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
-                                        {console.log('================>', users)}
                                         {
                                             users.results && users.results.length && users.results.map( (user, idx) => (
                                                 <tr key={idx}>
                                                     <td>{`${user.firstName} ${user.lastName}`}</td>
-                                                    <td>
-                                                        <div className="currentWorkplace"><i className="fas fa-check mr-1 cdp-text-primary"></i> IBN sina, Dhaka</div>
-                                                        <div className="previousWorkplace"><i className="fas fa-times mr-1 cdp-text-secondary"></i> Popular, Dhaka</div>
-                                                    </td>
                                                     <td>Dentist</td>
-                                                    <td>551255</td>
-                                                    <td>564564565</td>
+                                                    <td>
+                                                        {
+                                                            user.workplaces.map((item, idxOfWorkPlace) => (
+                                                                <div key={idxOfWorkPlace} className="currentWorkplace">
+                                                                    {
+                                                                        item.isValid ? <i className="fas fa-check mr-1 cdp-text-primary"></i> : <i className="fas fa-times mr-1 cdp-text-secondary"></i>
+                                                                    }
+                                                                    {`${item.name || ''}, ${item.address || ''}, ${item.city || ''}`}
+                                                                </div>
+                                                            ))
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        {
+                                                            user.onekeyEidList.map((item, idxOfEid) => (<p key={idxOfEid}>{item}</p>))
+                                                        }
+                                                    </td>
+                                                    <td>{user.individualEid}</td>
                                                     <td>{getCountryName(user.countryIso2)}</td>
                                                     <td><a type="button" className="link-with-underline" onClick={() => setSelectedIndividual({id: 'WBEB03049045', codbase: 'WBE'})}>Details</a></td>
                                                 </tr>
