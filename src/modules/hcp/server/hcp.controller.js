@@ -534,7 +534,7 @@ async function updateHcps(req, res) {
                 object_id: hcp.id,
                 table_name: 'hcp_profiles',
                 actor: req.user.id,
-                description: Hcps[index].comment,
+                remarks: Hcps[index].comment,
                 changes: JSON.stringify(allUpdateRecordsForLogging[index])
             });
         }));
