@@ -40,7 +40,7 @@ const SearchHcp = () => {
     }, [selectedOption]);
 
     const getCountries = () => countries.map(country => ({ value: country.codbase, label: country.codbase_desc }));
-    const getSpecialties = () => specialties.map( i => ({ value: i.codDescription, label: i.codDescription }));
+    const getSpecialties = () => specialties.map( i => ({ value: i.codIdOnekey.split('.')[2], label: i.codDescription }));
 
     const CustomOption = ({ children, ...props }) => {
         return (
@@ -268,18 +268,6 @@ const SearchHcp = () => {
                                                 </tr>
                                             ))
                                         }
-                                        {/* <tr>
-                                            <td>David Alian</td>
-                                            <td>
-                                                <div className="currentWorkplace"><i className="fas fa-check mr-1 cdp-text-primary"></i> IBN sina, Dhaka</div>
-                                                <div className="previousWorkplace"><i className="fas fa-times mr-1 cdp-text-secondary"></i> Popular, Dhaka</div>
-                                            </td>
-                                            <td>Dentist</td>
-                                            <td>551255</td>
-                                            <td>564564565</td>
-                                            <td>Belgium</td>
-                                            <td><a type="button" className="link-with-underline" onClick={() => setSelectedIndividual({id: 'WBEB03049045', codbase: 'WBE'})}>Details</a></td>
-                                        </tr> */}
                                     </tbody>
                                 </table>
                             </div>
