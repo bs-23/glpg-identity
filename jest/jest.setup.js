@@ -2,7 +2,7 @@ const path = require('path');
 
 const config = require(path.join(process.cwd(), 'src/config/server/config'));
 
-module.exports = async function() {
+module.exports = async function () {
     await config.initEnvironmentVariables();
 
     process.env.POSTGRES_CDP_DATABASE = 'cdp_test';
@@ -30,6 +30,7 @@ module.exports = async function() {
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
     const ConsentLocale = require(path.join(process.cwd(), 'src/modules/consent/server/consent-locale.model'));
     const ConsentCountry = require(path.join(process.cwd(), 'src/modules/consent/server/consent-country.model'));
+    const Faq = require(path.join(process.cwd(), 'src/modules/platform/faq/server/faq.model.js'));
 
     require(path.join(process.cwd(), 'src/modules/consent/server/consent-country.model'));
     require(path.join(process.cwd(), 'src/modules/consent/server/consent-locale.model'));
@@ -60,4 +61,5 @@ module.exports = async function() {
     await Consent.create(specHelper.consent.demoConsent);
     await ConsentLocale.bulkCreate(specHelper.consent.demoConsentLocales, { returning: true, ignoreDuplicates: false });
     await ConsentCountry.bulkCreate(specHelper.consent.demoConsentCountry, { returning: true, ignoreDuplicates: false });
+    await Faq.create(specHelper.faq.demoFaq);
 };
