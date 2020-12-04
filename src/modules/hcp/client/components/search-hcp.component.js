@@ -216,6 +216,7 @@ const SearchHcp = () => {
                         </div>
                     </div>
                 </div>
+                { users.results && users.results.length &&
                 <div className="row">
                     <div className="col-12">
                         <div className="my-3">
@@ -226,6 +227,8 @@ const SearchHcp = () => {
                                     <span><i className="fas fa-times cdp-text-secondary"></i> Invalid</span>
                                 </div>
                             </div>
+
+
                             <div className="table-responsive shadow-sm bg-white">
                                 <table className="table table-hover table-sm mb-0 cdp-table">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
@@ -241,7 +244,7 @@ const SearchHcp = () => {
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
                                         {
-                                            users.results && users.results.length && users.results.map( (user, idx) => (
+                                            users.results.map( (user, idx) => (
                                                 <tr key={idx}>
                                                     <td>{`${user.firstName} ${user.lastName}`}</td>
                                                     <td>Dentist</td>
@@ -274,6 +277,7 @@ const SearchHcp = () => {
                         </div>
                     </div>
                 </div>
+                }
             </div>
 
             {selectedIndividual && <OklaHcpdetails individual={selectedIndividual} setSelectedIndividual={setSelectedIndividual} />}
