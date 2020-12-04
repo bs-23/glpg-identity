@@ -153,6 +153,17 @@
     }
 }
 
+.help-center {
+    &__card {
+
+        &.faq {
+            &:after {
+               display: none;
+            }
+        }
+    }
+}
+
 .accordion-consent {
     &__header {
         color: inherit;
