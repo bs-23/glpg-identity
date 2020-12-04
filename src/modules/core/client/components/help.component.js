@@ -52,6 +52,12 @@ export default function Help() {
                                         ))}
                                     </Accordion>
                                 </div>
+                                {faqData.faq && faqData.faq.length === 0 &&
+                                    <div className="bg-white text-center py-3 px-2 border rounded shadow-sm">
+                                        <i className="icon icon-help icon-3x cdp-text-secondary"></i>
+                                        <h5 className="cdp-text-primary pt-4">No data found!</h5>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>
@@ -62,12 +68,7 @@ export default function Help() {
 
                 
 
-                {faqData.faq && faqData.faq.length === 0 &&
-                    <div className="bg-white text-center py-3 px-2 border-top">
-                        <i className="icon icon-help icon-3x cdp-text-secondary"></i>
-                        <h5 className="cdp-text-primary pt-4">No data found!</h5>
-                    </div>
-                }
+                
         </React.Fragment>
     );
 }
