@@ -95,7 +95,6 @@
         }
     }*/
     /*Auto scroll end*/
-
     .faq-icon-minimize {
         display: none;
     }
@@ -136,6 +135,11 @@
 
     &__question {
         flex: 0 0 90%;
+    }
+
+    &__no-data-found-lg-icon {
+        font-size: 175px;
+        opacity: .1;
     }
 
     @media (min-width: $screen-desktop) {
