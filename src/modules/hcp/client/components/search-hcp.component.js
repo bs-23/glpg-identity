@@ -16,13 +16,6 @@ const SearchHcp = () => {
     const [selectedIndividual, setSelectedIndividual] = useState(null);
     const [users, setUsers] = useState({});
 
-
-    const getCountryName = (country_iso2) => {
-        if (!allCountries || !country_iso2) return null;
-        const country = allCountries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
-        return country && country.countryname;
-    }
-
     useEffect(() => {
         const getSpecialties = async () =>{
             const codbases = selectedOption.map(item => `codbases=${item.value}`);
@@ -41,6 +34,18 @@ const SearchHcp = () => {
 
     const getCountries = () => countries.map(country => ({ value: country.codbase, label: country.codbase_desc }));
     const getSpecialties = () => specialties.map( i => ({ value: i.codIdOnekey.split('.')[2], label: i.codDescription }));
+
+    const getCountryName = (country_iso2) => {
+        if (!allCountries || !country_iso2) return null;
+        const country = allCountries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+        return country && country.countryname;
+    }
+
+    const getCodbase = (country_iso2) => {
+        if (!allCountries || !country_iso2) return null;
+        const country = allCountries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+        return country && country.codbase;
+    }
 
     const CustomOption = ({ children, ...props }) => {
         return (
@@ -238,7 +243,7 @@ const SearchHcp = () => {
                                             <th>Workplace</th>
                                             <th>Onekey ID</th>
                                             <th>Individual - Identifier</th>
-                                            <th>Conuntry</th>
+                                            <th>Country</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -267,7 +272,7 @@ const SearchHcp = () => {
                                                     </td>
                                                     <td>{user.individualEid}</td>
                                                     <td>{getCountryName(user.countryIso2)}</td>
-                                                    <td><a type="button" className="link-with-underline" onClick={() => setSelectedIndividual({id: 'WBEB03049045', codbase: 'WBE'})}>Details</a></td>
+                                                    <td><a type="button" className="link-with-underline" onClick={() => setSelectedIndividual({id: user.individualEid, codbase: getCodbase(user.countryIso2)})}>Details</a></td>
                                                 </tr>
                                             ))
                                         }
