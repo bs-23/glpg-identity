@@ -23,8 +23,8 @@ async function getFaqItems(req, res) {
         const page = req.query.page ? req.query.page - 1 : 0;
         if (page < 0) return res.status(404).send("page must be greater or equal 1");
 
-        const limit = req.query.limit ? req.query.limit : null;
-        const offset = limit ? page * limit : null;
+        const limit = req.query.limit ? req.query.limit : 30;
+        const offset = page * limit;
 
         const category = req.query.category === 'null' || req.query.category === undefined ? null : req.query.category;
 
@@ -49,7 +49,6 @@ async function getFaqItems(req, res) {
         }
 
         if (orderBy === 'created_by') {
-
             order = [[Sequelize.literal('"createdByUser.first_name"'), orderType]];
         }
 
@@ -78,7 +77,7 @@ async function getFaqItems(req, res) {
             where: category ? filter : {},
             offset,
             limit,
-            order: order,
+            order: order
         });
 
         const data = response.rows.map(c => {
@@ -249,7 +248,6 @@ async function deleteFaqItem(req, res) {
         res.status(500).send('Internal server error');
     }
 }
-
 
 exports.getFaqItem = getFaqItem;
 exports.getFaqItems = getFaqItems;

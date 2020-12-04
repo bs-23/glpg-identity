@@ -284,8 +284,8 @@ export default function hcpUsers() {
         const allOptTypes = ['single-opt-in', 'double-opt-in', 'opt-out'];
         return <div className="text-center ml-n2">
             {value.includes('single-opt-in') ? <i title="Single Opt-In" className="fas fa-check cdp-text-primary mr-3"></i> : ''}
-            {value.includes('double-opt-in') ? <i title="Double Opt-In" className="fas fa-check-double cdp-text-primary"></i> : ''}
-            {value.includes('opt-out') ? <i title="Opt-out" className="far fa-window-close text-danger mr-1"></i> : ''}
+            {value.includes('double-opt-in') ? <i title="Double Opt-In" className="fas fa-check-double cdp-text-primary mr-3"></i> : ''}
+            {value.includes('opt-out') ? <i title="Opt-out" className="far fa-window-close text-danger"></i> : ''}
             {value.filter(val => allOptTypes.some(ot => ot === val)).length ? '' : <div>N/A</div>}
         </div>
     }
@@ -579,9 +579,20 @@ export default function hcpUsers() {
                                             </div>
                                         </div>
                                         <div className="row mt-3">
+
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Email</div>
+                                                <div className="">{currentUser.email || '--'}</div>
+                                            </div>
                                             <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">UUID</div>
                                                 <div className="">{currentUser.uuid || '--'}</div>
+                                            </div>
+                                        </div>
+                                        <div className="row mt-3">
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Phone Number</div>
+                                                <div className="">{currentUser.telephone || '--'}</div>
                                             </div>
                                             <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">OneKeyID</div>
@@ -590,12 +601,12 @@ export default function hcpUsers() {
                                         </div>
                                         <div className="row mt-3">
                                             <div className="col-6">
-                                                <div className="mt-1 font-weight-bold">Email</div>
-                                                <div className="">{currentUser.email || '--'}</div>
+                                                <div className="mt-1 font-weight-bold">Date of Birth</div>
+                                                <div className="">{currentUser.birthdate ? currentUser.birthdate : '--'}</div>
                                             </div>
                                             <div className="col-6">
-                                                <div className="mt-1 font-weight-bold">Phone Number</div>
-                                                <div className="">{currentUser.telephone || '--'}</div>
+                                                <div className="mt-1 font-weight-bold">Status</div>
+                                                <div className="text-capitalize">{currentUser.status ? _.startCase(_.toLower(currentUser.status.replace(/_/g, ' '))) : '--'}</div>
                                             </div>
                                         </div>
                                         <div className="row mt-3">
@@ -606,16 +617,6 @@ export default function hcpUsers() {
                                             <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">Date of Registration</div>
                                                 <div className="">{currentUser.created_at ? (new Date(currentUser.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.') : '--'}</div>
-                                            </div>
-                                        </div>
-                                        <div className="row mt-3">
-                                            <div className="col-6">
-                                                <div className="mt-1 font-weight-bold">Status</div>
-                                                <div className="text-capitalize">{currentUser.status ? _.startCase(_.toLower(currentUser.status.replace(/_/g, ' '))) : '--'}</div>
-                                            </div>
-                                            <div className="col-6">
-                                                <div className="mt-1 font-weight-bold">Date of Birth</div>
-                                                <div className="">{currentUser.birthdate ? currentUser.birthdate : '--'}</div>
                                             </div>
                                         </div>
                                         <div className="row mt-3">
@@ -632,8 +633,8 @@ export default function hcpUsers() {
                                                         <Accordion.Collapse eventKey={consent.id}>
                                                             <Card.Body>
                                                                 <div>{parse(consent.rich_text)}</div>
-                                                                <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Consent Opt-Type:</span> <span className="text-capitalize">{consent.opt_type}</span></div>
-                                                                {consent.consent_given && <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Consent given date:</span>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>}
+                                                                <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Opt-Type:</span> <span className="text-capitalize">{consent.opt_type}</span></div>
+                                                                <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Updated on:</span>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
                                                             </Card.Body>
                                                         </Accordion.Collapse>
                                                         <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">

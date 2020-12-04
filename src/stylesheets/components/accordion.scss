@@ -74,7 +74,7 @@
 
 .faq {
     /*Auto scroll*/
-    display: table;
+    /*display: table;
     table-layout: fixed;
     width: 100%;
 
@@ -93,9 +93,8 @@
         &:empty {
             display: none;
         }
-    }
+    }*/
     /*Auto scroll end*/
-
     .faq-icon-minimize {
         display: none;
     }
@@ -138,8 +137,13 @@
         flex: 0 0 90%;
     }
 
+    &__no-data-found-lg-icon {
+        font-size: 175px;
+        opacity: .1;
+    }
+
     @media (min-width: $screen-desktop) {
-        &:after {
+        /*&:after {
             content: "";
             display: block;
             width: 131px;
@@ -149,6 +153,17 @@
             position: absolute;
             bottom: 50px;
             z-index: 1;
+        }*/
+    }
+}
+
+.help-center {
+    &__card {
+
+        &.faq {
+            &:after {
+               display: none;
+            }
         }
     }
 }

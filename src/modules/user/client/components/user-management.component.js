@@ -58,7 +58,7 @@ const UserManagement = () => {
                                                 <span className="d-block cdp-list-group__link-activity">5 - 7 minutes</span>
                                             </span>
                                         </NavLink>
-                                        <NavLink to="platform-management/manage-faq" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
+                                        <NavLink to="platform/manage-faq" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
                                             <i className="icon icon-help icon-3x cdp-list-group__icon"></i>
                                             <span>
                                                 <strong className="mb-2 h4 d-block cdp-list-group__link-title">Manage FAQs</strong>

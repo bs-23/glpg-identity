@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import FaqForm from './faq-form.component';
-import axios from "axios";
 import { getFaqItems, deleteFaqItem } from './faq.actions';
 import { useSelector, useDispatch } from 'react-redux';
 import parse from 'html-react-parser';
@@ -25,8 +24,6 @@ export default function ManageFaq() {
     const history = useHistory();
     const params = new URLSearchParams(window.location.search);
 
-    const faqsPerPage = 30;
-
     const deleteFaq = () => {
         dispatch(deleteFaqItem(deleteId)).then(() => {
             addToast('FAQ deleted successfully', {
@@ -40,7 +37,6 @@ export default function ManageFaq() {
                 autoDismiss: true
             });
         });
-
     }
 
     const urlChange = (pageNo, faqCategory, orderColumn, pageChange = false) => {
@@ -67,17 +63,11 @@ export default function ManageFaq() {
             + (orderColumn && orderType && orderType !== 'null' ? `&orderType=${orderType}` : '');
 
         history.push(location.pathname + url);
-
     }
 
     useEffect(() => {
         setCategory(params.get('category') ? params.get('category') : null);
-        const searchObj = {};
-        const searchParams = location.search.slice(1).split("&");
-        searchParams.forEach(element => {
-            searchObj[element.split("=")[0]] = element.split("=")[1];
-        });
-        dispatch(getFaqItems(searchObj.page, searchObj.category, searchObj.orderBy, searchObj.orderType, faqsPerPage));
+        dispatch(getFaqItems(location.search));
         setSort({ type: params.get('orderType') || 'asc', value: params.get('orderBy') });
     }, [location]);
 
@@ -88,7 +78,6 @@ export default function ManageFaq() {
     const pageRight = () => {
         if (faqData.metadata.end !== faqData.metadata.total) urlChange(faqData.metadata.page + 1, faqData.metadata.category, params.get('orderBy'), true);
     };
-
 
     return (
         <main className="app__content cdp-light-bg h-100">
@@ -110,7 +99,7 @@ export default function ManageFaq() {
                         <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
                             <h4 class="cdp-text-primary font-weight-bold mb-3 mb-sm-0">FAQ List</h4>
                             {serviceCategories.length > 0 && faqData.metadata &&
-                                < div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex justify-content-between align-items-center">
                                     <Dropdown className="ml-auto dropdown-customize">
                                         <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center">
                                             <i className="icon icon-filter mr-2 mb-n1"></i> {!faqData.metadata.category ? 'Filter by Category' : serviceCategories.find(x => x.slug === faqData.metadata.category).title}
@@ -129,7 +118,7 @@ export default function ManageFaq() {
 
                                     <button onClick={() => { setShow(true); setEditMode(false); setEditData(null); }} className="btn cdp-btn-secondary text-white ml-2">
                                         <i className="icon icon-plus pr-1"></i> Add New FAQ
-                                </button>
+                                    </button>
                                 </div>
                             }
                         </div>
@@ -138,7 +127,6 @@ export default function ManageFaq() {
                             <div className="table-responsive shadow-sm bg-white">
                                 <table className="table table-hover table-sm mb-0 cdp-table">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
-
                                         <tr>
                                             <th width="25%"><span className={sort.value === 'question' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'question')}>Question<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                             <th width="35%"><span className={sort.value === 'answer' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'answer')}>Answer<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
@@ -152,11 +140,9 @@ export default function ManageFaq() {
                                             <tr key={index}>
                                                 <td className="text-break">{row.question}</td>
                                                 <td className="text-break cdp-link-secondary">{parse(row.answer)}</td>
-                                                <td className="text-break">{row.categories && row.categories.map((item, key) => (
-                                                    (serviceCategories.find(x => x.slug === item).title) + (key < row.categories.length - 1 ? ', ' : '')
-
-                                                ))
-                                                }</td>
+                                                <td className="text-break">{ row.categories && row.categories.map((item, key) => (
+                                                    (serviceCategories.find(x => x.slug === item).title) + (key < row.categories.length - 1 ? ', ' : '')))}
+                                                </td>
                                                 <td className="text-break">{row.createdBy}</td>
                                                 <td><Dropdown className="ml-auto dropdown-customize">
                                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
@@ -197,15 +183,15 @@ export default function ManageFaq() {
                                 </div>
                             </div>
                         }
+
                         <FaqForm editMode={editMode} editData={editData} serviceCategory={serviceCategories} changeShow={(val) => setShow(val)} show={show} />
+
                         <Modal centered show={showDelete} onHide={() => setShowDelete(false)}>
                             <Modal.Header closeButton>
                                 <Modal.Title className="modal-title_small">Remove FAQ</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>
-                                <div>
-                                    Are you sure you want to remove this FAQ?
-                                    </div>
+                                <div>Are you sure you want to remove this?</div>
                             </Modal.Body>
                             <Modal.Footer>
                                 <button className="btn cdp-btn-outline-primary" onClick={() => setShowDelete(false)}>Cancel</button>
@@ -215,7 +201,6 @@ export default function ManageFaq() {
                     </div>
                 </div>
             </div>
-        </main >
-
+        </main>
     );
 }
