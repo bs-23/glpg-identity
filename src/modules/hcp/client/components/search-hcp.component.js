@@ -16,13 +16,23 @@ const SearchHcp = () => {
     const [selectedIndividual, setSelectedIndividual] = useState(null);
     const [users, setUsers] = useState({});
 
+    const resetSearch = (props) => {
+        /**
+         * To-DO
+         * - reset country selection
+         * - clear results
+         */
+        setSelectedOption([]);
+        setUsers([]);
+        props.resetForm();
+    };
+
     useEffect(() => {
         const getSpecialties = async () =>{
             const codbases = selectedOption.map(item => `codbases=${item.value}`);
             const parameters = codbases.join('&');
             if(parameters){
                 const response = await axios.get(`/api/hcps/specialties?${parameters}`);
-                console.log(response);
                 setSpecialties(response.data);
             }
             else setSpecialties([]);
@@ -116,9 +126,10 @@ const SearchHcp = () => {
                                                         // onChange={handleChange}
                                                         className="multiselect"
                                                         classNamePrefix="multiselect"
+                                                        value={selectedOption}
                                                         onChange = { selectedOption => {
                                                             formikProps.values.countries = selectedOption;
-                                                            setSelectedOption(selectedOption)
+                                                            setSelectedOption(selectedOption || []);
                                                         }}
                                                     />
                                                 </div>
@@ -210,9 +221,14 @@ const SearchHcp = () => {
                                                 </div>
                                             </div>
                                         </div>
+
                                         <div className="row">
-                                            <div className="col-6"><button type="reset" className="btn btn-block btn-secondary mt-4 p-2">CLOSE</button></div>
-                                            <div className="col-6"><button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2">SEARCH</button></div>
+                                            <div className="col-6">
+                                                <button type="reset" className="btn btn-block btn-secondary mt-4 p-2" onClick={() => resetSearch(formikProps)}>RESET</button>
+                                            </div>
+                                            <div className="col-6">
+                                                <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!formikProps.values.countries || !formikProps.values.countries.length || !(formikProps.values.firstName  || formikProps.values.lastName || formikProps.values.address || formikProps.values.city || formikProps.values.postalCode || formikProps.values.onekeyId || formikProps.values.individualEid || (formikProps.values.specialties && formikProps.values.specialties.length))}>SEARCH</button>
+                                            </div>
                                         </div>
                                     </Form>
                                 )}
