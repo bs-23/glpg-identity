@@ -73,6 +73,29 @@
 }
 
 .faq {
+    /*Auto scroll*/
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+
+    &__header {
+        height: 62px;
+    }
+
+    &__body {
+        position: relative;
+        overflow-y: auto;
+
+        @media (min-width: $screen-desktop) {
+            height: calc(100% - 62px);
+        }
+
+        &:empty {
+            display: none;
+        }
+    }
+    /*Auto scroll end*/
+
     .faq-icon-minimize {
         display: none;
     }
@@ -115,16 +138,18 @@
         flex: 0 0 90%;
     }
 
-    &:after {
-        content: "";
-        display: block;
-        width: 131px;
-        height: 215px;
-        background: url(../../../../wwwroot/assets/images/question.svg) no-repeat;
-        right: 50px;
-        position: absolute;
-        bottom: 50px;
-        z-index: 1;
+    @media (min-width: $screen-desktop) {
+        &:after {
+            content: "";
+            display: block;
+            width: 131px;
+            height: 215px;
+            background: url(../../../../wwwroot/assets/images/question.svg) no-repeat;
+            right: 50px;
+            position: absolute;
+            bottom: 50px;
+            z-index: 1;
+        }
     }
 }
 
