@@ -1626,6 +1626,7 @@ async function searchOkla(req, res) {
             const activitiesOfIndividual = groupedByIndividuals[individualEid];
             const onekeyEidList = activitiesOfIndividual.map(i => i.onekeyEid);
             const individual = activitiesOfIndividual[0].individual;
+            const isInContract = activitiesOfIndividual[0].isInContract;
 
             const workplaces = activitiesOfIndividual.map(g => {
                 const workplace = g.workplace;
@@ -1654,7 +1655,8 @@ async function searchOkla(req, res) {
                 countryIso2: activitiesOfIndividual[0].country,
                 codbase: activitiesOfIndividual[0].codBase,
                 workplaces,
-                onekeyEidList
+                onekeyEidList,
+                isInContract
             };
 
             results.push(res);
@@ -1696,7 +1698,7 @@ async function getOklaHcpDetails(req, res) {
 
         const  onekeyEidList = activitiesOfIndividual.map(i => i.onekeyEid);
         const individual = activitiesOfIndividual[0].individual;
-
+        const isInContract = activitiesOfIndividual[0].isInContract;
 
         const workplaces = activitiesOfIndividual.map(g => {
             const workplace = g.workplace;
@@ -1736,7 +1738,8 @@ async function getOklaHcpDetails(req, res) {
             countryIso2: activitiesOfIndividual[0].country,
             codbase: activitiesOfIndividual[0].codBase,
             workplaces,
-            onekeyEidList
+            onekeyEidList,
+            isInContract
         };
 
         res.json(data);
