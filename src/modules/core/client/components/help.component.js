@@ -39,7 +39,7 @@ export default function Help() {
                                 {faqData.faq && faqData.faq.length > 0 && <div className="row">
                                     <div className="col-12 col-md-6">
                                         <div className="help-center__card mb-3 shadow-sm bg-white faq">
-                                            <h6 className="cdp-bg-primary-lighter text-white mb-0 px-3 py-2">General</h6>
+                                            <h6 className="cdp-bg-primary-lighter text-white mb-0 px-3 py-2">General Questions</h6>
                                             <Accordion defaultActiveKey="0" className="faq__body">
                                                 {faqData.faq.filter(f => f.categories.includes('general')).map((faq, index) => (
                                                     <Card key={index}>
@@ -65,7 +65,7 @@ export default function Help() {
                                     </div>
                                     <div className="col-12 col-md-6">
                                         <div className="help-center__card mb-3 shadow-sm bg-white faq">
-                                            <h6 className="cdp-bg-primary-lighter text-white mb-0 px-3 py-2">Information</h6>
+                                            <h6 className="cdp-bg-primary-lighter text-white mb-0 px-3 py-2">Information Management</h6>
                                             <Accordion className="faq__body">
                                                 {faqData.faq.filter(f => f.categories.includes('information')).map((faq, index) => (
                                                     <Card key={index}>
@@ -91,7 +91,7 @@ export default function Help() {
                                     </div>
                                     <div className="col-12 col-md-6">
                                         <div className="help-center__card mb-3 shadow-sm bg-white faq">
-                                            <h6 className="cdp-bg-primary-lighter text-white mb-0 px-3 py-2">Platform</h6>
+                                            <h6 className="cdp-bg-primary-lighter text-white mb-0 px-3 py-2">Management of Customer Data Platform</h6>
                                             <Accordion className="faq__body">
                                                 {faqData.faq.filter(f => f.categories.includes('cdp')).map((faq, index) => (
                                                     <Card key={index}>
@@ -117,7 +117,7 @@ export default function Help() {
                                     </div>
                                     <div className="col-12 col-md-6">
                                         <div className="help-center__card mb-3 shadow-sm bg-white faq">
-                                            <h6 className="cdp-bg-primary-lighter text-white mb-0 px-3 py-2">Privacy</h6>
+                                            <h6 className="cdp-bg-primary-lighter text-white mb-0 px-3 py-2">Data Privacy & Consent Management</h6>
                                             <Accordion className="faq__body">
                                                 {faqData.faq.filter(f => f.categories.includes('privacy')).map((faq, index) => (
                                                     <Card key={index}>
