@@ -36,12 +36,12 @@ export default function Help() {
                                 </h4>
                             </div>
                             <div className="help-center">
-                                <div className="row">
+                                {faqData.faq && faqData.faq.length > 0 && <div className="row">
                                     <div className="col-12 col-md-6">
                                         <div className="help-center__card mb-3 shadow-sm bg-white faq">
                                             <h6 className="cdp-bg-primary-lighter text-white mb-0 px-3 py-2">General</h6>
                                             <Accordion defaultActiveKey="0" className="faq__body">
-                                                {faqData.faq && faqData.faq.filter(f => f.categories.includes('general')).map((faq, index) => (
+                                                {faqData.faq.filter(f => f.categories.includes('general')).map((faq, index) => (
                                                     <Card key={index}>
                                                         <Accordion.Collapse eventKey={index + ""}>
                                                             <Card.Body>{parse(faq.answer)}</Card.Body>
@@ -52,6 +52,13 @@ export default function Help() {
                                                         </Accordion.Toggle>
                                                     </Card>
                                                 ))}
+                                                {faqData.faq.filter(f => f.categories.includes('general')).length === 0 &&
+                                                    <Card>
+                                                        <Card.Body>
+                                                            No FAQs found
+                                                        </Card.Body>
+                                                    </Card>
+                                                }
                                             </Accordion>
                                         </div>
                                     </div>
@@ -59,7 +66,7 @@ export default function Help() {
                                         <div className="help-center__card mb-3 shadow-sm bg-white faq">
                                             <h6 className="cdp-bg-primary-lighter text-white mb-0 px-3 py-2">Information</h6>
                                             <Accordion className="faq__body">
-                                                {faqData.faq && faqData.faq.filter(f => f.categories.includes('information')).map((faq, index) => (
+                                                {faqData.faq.filter(f => f.categories.includes('information')).map((faq, index) => (
                                                     <Card key={index}>
                                                         <Accordion.Collapse eventKey={index + ""}>
                                                             <Card.Body>{parse(faq.answer)}</Card.Body>
@@ -70,6 +77,13 @@ export default function Help() {
                                                         </Accordion.Toggle>
                                                     </Card>
                                                 ))}
+                                                {faqData.faq.filter(f => f.categories.includes('information')).length === 0 &&
+                                                    <Card>
+                                                        <Card.Body>
+                                                            No FAQs found
+                                                        </Card.Body>
+                                                    </Card>
+                                                }
                                             </Accordion>
                                         </div>
                                     </div>
@@ -77,7 +91,7 @@ export default function Help() {
                                         <div className="help-center__card mb-3 shadow-sm bg-white faq">
                                             <h6 className="cdp-bg-primary-lighter text-white mb-0 px-3 py-2">Platform</h6>
                                             <Accordion className="faq__body">
-                                                {faqData.faq && faqData.faq.filter(f => f.categories.includes('cdp')).map((faq, index) => (
+                                                {faqData.faq.filter(f => f.categories.includes('cdp')).map((faq, index) => (
                                                     <Card key={index}>
                                                         <Accordion.Collapse eventKey={index + ""}>
                                                             <Card.Body>{parse(faq.answer)}</Card.Body>
@@ -88,6 +102,13 @@ export default function Help() {
                                                         </Accordion.Toggle>
                                                     </Card>
                                                 ))}
+                                                {faqData.faq.filter(f => f.categories.includes('cdp')).length === 0 &&
+                                                    <Card>
+                                                        <Card.Body>
+                                                            No FAQs found
+                                                        </Card.Body>
+                                                    </Card>
+                                                }
                                             </Accordion>
                                         </div>
                                     </div>
@@ -95,7 +116,7 @@ export default function Help() {
                                         <div className="help-center__card mb-3 shadow-sm bg-white faq">
                                             <h6 className="cdp-bg-primary-lighter text-white mb-0 px-3 py-2">Privacy</h6>
                                             <Accordion className="faq__body">
-                                                {faqData.faq && faqData.faq.filter(f => f.categories.includes('privacy')).map((faq, index) => (
+                                                {faqData.faq.filter(f => f.categories.includes('privacy')).map((faq, index) => (
                                                     <Card key={index}>
                                                         <Accordion.Collapse eventKey={index + ""}>
                                                             <Card.Body>{parse(faq.answer)}</Card.Body>
@@ -106,12 +127,18 @@ export default function Help() {
                                                         </Accordion.Toggle>
                                                     </Card>
                                                 ))}
+                                                {faqData.faq.filter(f => f.categories.includes('privacy')).length === 0 &&
+                                                    <Card>
+                                                        <Card.Body>
+                                                            No FAQs found
+                                                        </Card.Body>
+                                                    </Card>
+                                                }
                                             </Accordion>
                                         </div>
                                     </div>
-                                    
-                                </div>
-                                
+                                </div>}
+
                                 {faqData.faq && faqData.faq.length === 0 &&
                                     <div className="bg-white text-center py-3 px-2 border rounded shadow-sm">
                                         <i className="icon icon-help icon-3x cdp-text-secondary"></i>
@@ -121,14 +148,8 @@ export default function Help() {
                             </div>
                         </div>
                     </div>
-
                 </div>
             </main>
-
-
-
-
-                
         </React.Fragment>
     );
 }
