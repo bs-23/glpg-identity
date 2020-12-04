@@ -18,12 +18,12 @@ export default function Faq(props) {
     return (
         <React.Fragment>
             <div className={`faq h-100 shadow-sm bg-white ${show ? "faq-expand" : ""}`}>
-                <h4 className="faq__header p-3 font-weight-bold mb-0 d-flex justify-content-between">
+                <h5 className="faq__header p-3 font-weight-bold mb-0 d-flex justify-content-between">
                     Questions You May Have
                     <i onClick={() => setShow(true)} type="button" class="icon icon-expand faq-icon-expand faq__icon-toggle d-none d-lg-block"></i>
                     <i class="icon icon-minimize faq-icon-minimize  faq__icon-toggle" type="button" onClick={() => setShow(false)}></i>
                     <i className="icon icon-help faq__icon-help d-block d-lg-none"></i>
-                </h4>
+                </h5>
                 <Accordion defaultActiveKey="0" className="faq__body">
                     {faqData.faq && faqData.faq.map((faq, index) => (
                         <Card key={index}>
@@ -47,7 +47,7 @@ export default function Faq(props) {
                 </Accordion>
 
                 { faqData.faq && faqData.faq.length === 0 &&
-                    <div className="bg-white text-center py-3 px-2 border-top">
+                    <div className="bg-white text-center py-3 px-2">
                         <i className="icon icon-help icon-3x cdp-text-secondary"></i>
                         <h5 className="cdp-text-primary pt-4">No data found!</h5>
                     </div>
