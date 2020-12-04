@@ -47,9 +47,13 @@ export default function Faq(props) {
                 </Accordion>
 
                 { faqData.faq && faqData.faq.length === 0 &&
-                    <div className="bg-white text-center py-3 px-2">
-                        <i className="icon icon-help faq__no-data-found-lg-icon cdp-text-secondary"></i>
-                        <h4 className="cdp-text-primary">No data found!</h4>
+                    <div className="bg-white text-center py-3 px-2 border-top">
+                        <i className="icon icon-help icon-3x cdp-text-secondary"></i>
+                        <h5 className="cdp-text-primary pt-4">No data found related to this service category</h5>
+                        <p className="py-2 mb-4">Click the button below for more information</p>
+                        <NavLink to="help" className="btn cdp-btn-secondary text-white px-5 py-2 font-weight-bold">
+                            <i className="fas fa-list-ul pr-1"></i> CDP Help Center
+                        </NavLink>
                     </div>
                 }
             </div>

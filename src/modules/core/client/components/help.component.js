@@ -56,7 +56,7 @@ export default function Help() {
                                                     <Card>
                                                         <Card.Body className="text-center">
                                                             <i className="icon icon-help cdp-text-secondary icon-3x"></i>
-                                                            <p className="pt-3 font-weight-bold"> No FAQs found related this category</p>
+                                                            <p className="pt-3 font-weight-bold"> No data found related to this category.</p>
                                                         </Card.Body>
                                                     </Card>
                                                 }
@@ -82,7 +82,7 @@ export default function Help() {
                                                     <Card>
                                                         <Card.Body className="text-center">
                                                         <i className="icon icon-help cdp-text-secondary icon-3x"></i>
-                                                        <p className="pt-3 font-weight-bold"> No FAQs found related this category</p>
+                                                        <p className="pt-3 font-weight-bold"> No data found related to this category.</p>
                                                         </Card.Body>
                                                     </Card>
                                                 }
@@ -108,7 +108,7 @@ export default function Help() {
                                                     <Card>
                                                         <Card.Body className="text-center">
                                                             <i className="icon icon-help cdp-text-secondary icon-3x"></i>
-                                                            <p className="pt-3 font-weight-bold"> No FAQs found related this category</p>
+                                                            <p className="pt-3 font-weight-bold"> No data found related to this category.</p>
                                                         </Card.Body>
                                                     </Card>
                                                 }
@@ -134,7 +134,7 @@ export default function Help() {
                                                     <Card>
                                                         <Card.Body className="text-center">
                                                             <i className="icon icon-help cdp-text-secondary icon-3x"></i>
-                                                            <p className="pt-3 font-weight-bold"> No FAQs found related this category</p>
+                                                            <p className="pt-3 font-weight-bold"> No data found related to this category.</p>
                                                         </Card.Body>
                                                     </Card>
                                                 }
@@ -151,7 +151,7 @@ export default function Help() {
                                                 <h3 className="cdp-text-primary">No data found!</h3>
                                             </div>
                                         </div>
-                                    </div> 
+                                    </div>
                                 }
                             </div>
                         </div>
