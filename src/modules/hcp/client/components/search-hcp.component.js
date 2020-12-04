@@ -16,13 +16,6 @@ const SearchHcp = () => {
     const [selectedIndividual, setSelectedIndividual] = useState(null);
     const [users, setUsers] = useState({});
 
-
-    const getCountryName = (country_iso2) => {
-        if (!allCountries || !country_iso2) return null;
-        const country = allCountries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
-        return country && country.countryname;
-    }
-
     useEffect(() => {
         const getSpecialties = async () =>{
             const codbases = selectedOption.map(item => `codbases=${item.value}`);
@@ -40,7 +33,19 @@ const SearchHcp = () => {
     }, [selectedOption]);
 
     const getCountries = () => countries.map(country => ({ value: country.codbase, label: country.codbase_desc }));
-    const getSpecialties = () => specialties.map( i => ({ value: i.codDescription, label: i.codDescription }));
+    const getSpecialties = () => specialties.map( i => ({ value: i.codIdOnekey.split('.')[2], label: i.codDescription }));
+
+    const getCountryName = (country_iso2) => {
+        if (!allCountries || !country_iso2) return null;
+        const country = allCountries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+        return country && country.countryname;
+    }
+
+    const getCodbase = (country_iso2) => {
+        if (!allCountries || !country_iso2) return null;
+        const country = allCountries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+        return country && country.codbase;
+    }
 
     const CustomOption = ({ children, ...props }) => {
         return (
@@ -216,6 +221,7 @@ const SearchHcp = () => {
                         </div>
                     </div>
                 </div>
+                { users.results && users.results.length &&
                 <div className="row">
                     <div className="col-12">
                         <div className="my-3">
@@ -226,6 +232,8 @@ const SearchHcp = () => {
                                     <span><i className="fas fa-times cdp-text-secondary"></i> Invalid</span>
                                 </div>
                             </div>
+
+
                             <div className="table-responsive shadow-sm bg-white">
                                 <table className="table table-hover table-sm mb-0 cdp-table">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
@@ -235,13 +243,13 @@ const SearchHcp = () => {
                                             <th>Workplace</th>
                                             <th>Onekey ID</th>
                                             <th>Individual - Identifier</th>
-                                            <th>Conuntry</th>
+                                            <th>Country</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
                                         {
-                                            users.results && users.results.length && users.results.map( (user, idx) => (
+                                            users.results.map( (user, idx) => (
                                                 <tr key={idx}>
                                                     <td>{`${user.firstName} ${user.lastName}`}</td>
                                                     <td>Dentist</td>
@@ -264,28 +272,17 @@ const SearchHcp = () => {
                                                     </td>
                                                     <td>{user.individualEid}</td>
                                                     <td>{getCountryName(user.countryIso2)}</td>
-                                                    <td><a type="button" className="link-with-underline" onClick={() => setSelectedIndividual({id: 'WBEB03049045', codbase: 'WBE'})}>Details</a></td>
+                                                    <td><a type="button" className="link-with-underline" onClick={() => setSelectedIndividual({id: user.individualEid, codbase: getCodbase(user.countryIso2)})}>Details</a></td>
                                                 </tr>
                                             ))
                                         }
-                                        {/* <tr>
-                                            <td>David Alian</td>
-                                            <td>
-                                                <div className="currentWorkplace"><i className="fas fa-check mr-1 cdp-text-primary"></i> IBN sina, Dhaka</div>
-                                                <div className="previousWorkplace"><i className="fas fa-times mr-1 cdp-text-secondary"></i> Popular, Dhaka</div>
-                                            </td>
-                                            <td>Dentist</td>
-                                            <td>551255</td>
-                                            <td>564564565</td>
-                                            <td>Belgium</td>
-                                            <td><a type="button" className="link-with-underline" onClick={() => setSelectedIndividual({id: 'WBEB03049045', codbase: 'WBE'})}>Details</a></td>
-                                        </tr> */}
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
                 </div>
+                }
             </div>
 
             {selectedIndividual && <OklaHcpdetails individual={selectedIndividual} setSelectedIndividual={setSelectedIndividual} />}
