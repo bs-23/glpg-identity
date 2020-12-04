@@ -3,13 +3,25 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import Select, { components } from 'react-select';
+import { getAllCountries } from '../../../core/client/country/country.actions';
 import OklaHcpdetails from './okla-hcp-details.component';
 
 const SearchHcp = () => {
+    const dispatch = useDispatch();
+
     const countries = useSelector(state => state.countryReducer.countries);
+    const allCountries = useSelector(state => state.countryReducer.allCountries);
     const [selectedOption, setSelectedOption] = useState([]);
     const [specialties, setSpecialties] = useState([]);
     const [selectedIndividual, setSelectedIndividual] = useState(null);
+    const [users, setUsers] = useState({});
+
+
+    const getCountryName = (country_iso2) => {
+        if (!allCountries || !country_iso2) return null;
+        const country = allCountries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+        return country && country.countryname;
+    }
 
     useEffect(() => {
         const getSpecialties = async () =>{
@@ -24,6 +36,7 @@ const SearchHcp = () => {
         }
 
         getSpecialties();
+        dispatch(getAllCountries());
     }, [selectedOption]);
 
     const getCountries = () => countries.map(country => ({ value: country.codbase, label: country.codbase_desc }));
@@ -75,6 +88,7 @@ const SearchHcp = () => {
 
                                     console.log("testing", values)
                                     const response = await axios.post('/api/okla/hcps/search', values);
+                                    setUsers(response.data);
                                     console.log(response);
 
                                     actions.setSubmitting(false);
@@ -226,7 +240,24 @@ const SearchHcp = () => {
                                         </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
-                                        <tr>
+                                        {console.log('================>', users)}
+                                        {
+                                            users.results && users.results.length && users.results.map( (user, idx) => (
+                                                <tr key={idx}>
+                                                    <td>{`${user.firstName} ${user.lastName}`}</td>
+                                                    <td>
+                                                        <div className="currentWorkplace"><i className="fas fa-check mr-1 cdp-text-primary"></i> IBN sina, Dhaka</div>
+                                                        <div className="previousWorkplace"><i className="fas fa-times mr-1 cdp-text-secondary"></i> Popular, Dhaka</div>
+                                                    </td>
+                                                    <td>Dentist</td>
+                                                    <td>551255</td>
+                                                    <td>564564565</td>
+                                                    <td>{getCountryName(user.countryIso2)}</td>
+                                                    <td><a type="button" className="link-with-underline" onClick={() => setSelectedIndividual({id: 'WBEB03049045', codbase: 'WBE'})}>Details</a></td>
+                                                </tr>
+                                            ))
+                                        }
+                                        {/* <tr>
                                             <td>David Alian</td>
                                             <td>
                                                 <div className="currentWorkplace"><i className="fas fa-check mr-1 cdp-text-primary"></i> IBN sina, Dhaka</div>
@@ -237,7 +268,7 @@ const SearchHcp = () => {
                                             <td>564564565</td>
                                             <td>Belgium</td>
                                             <td><a type="button" className="link-with-underline" onClick={() => setSelectedIndividual({id: 'WBEB03049045', codbase: 'WBE'})}>Details</a></td>
-                                        </tr>
+                                        </tr> */}
                                     </tbody>
                                 </table>
                             </div>

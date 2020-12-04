@@ -1541,7 +1541,8 @@ async function searchOkla(req, res) {
         };
 
         const fields = Object.keys(fieldMap).map(key => {
-            const value = req.body[key];
+            let value = req.body[key];
+            if (Array.isArray(value) && value.length === 0) value = null;
             if (value) {
                 return {
                     name: fieldMap[key],
