@@ -26,12 +26,12 @@ export const ApprovalRejectSchema = object().shape({
 
 export const HcpInlineEditSchema = object().shape({
     first_name: string()
-        .matches(XRegExp('^[\\pL]+(?:\\s[\\pL]+)*$'), 'This field only contains letters')
+        .matches(XRegExp('^[\\pL.]+(?:\\s[\\pL.]+)*$'), 'This field only contains letters')
         .min(2, 'This field must be at least 2 characters long.')
         .max(50, 'This field must be at most 50 characters long.')
         .required('This field must not be empty.'),
     last_name: string()
-        .matches(XRegExp('^[\\pL]+(?:\\s[\\pL]+)*$'), 'This field only contains letters')
+        .matches(XRegExp('^[\\pL.]+(?:\\s[\\pL.]+)*$'), 'This field only contains letters')
         .min(2, 'This field must be at least 2 characters long.')
         .max(50, 'This field must be at most 50 characters long.')
         .required('This field must not be empty.'),
@@ -47,7 +47,7 @@ export const HcpInlineEditSchema = object().shape({
     specialty_onekey: string()
         .required('This field must not be empty.'),
     telephone: string()
-        .matches(/^[+]?[0-9]*$/, 'This field only contains digits or plus')
+        .matches(/^[+]?[\/0-9]*$/, 'This field only contains digits or plus')
         .min(7, 'This field must be at least 7 characters long')
         .max(25,'This field must be at most 25 characters long')
         .nullable()

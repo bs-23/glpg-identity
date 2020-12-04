@@ -22,7 +22,6 @@ export default function reducer(state = initialState, action) {
         }
 
         case Types.GET_FAQ_CATEGORIES_FULFILLED: {
-            console.log(action.payload.data);
             return { ...state, faq_categories: action.payload.data };
         }
 

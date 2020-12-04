@@ -25,6 +25,8 @@ export default function ManageFaq() {
     const history = useHistory();
     const params = new URLSearchParams(window.location.search);
 
+    const faqsPerPage = 30;
+
     const deleteFaq = () => {
         dispatch(deleteFaqItem(deleteId)).then(() => {
             addToast('FAQ deleted successfully', {
@@ -75,7 +77,7 @@ export default function ManageFaq() {
         searchParams.forEach(element => {
             searchObj[element.split("=")[0]] = element.split("=")[1];
         });
-        dispatch(getFaqItems(searchObj.page, searchObj.category, searchObj.orderBy, searchObj.orderType));
+        dispatch(getFaqItems(searchObj.page, searchObj.category, searchObj.orderBy, searchObj.orderType, faqsPerPage));
         setSort({ type: params.get('orderType') || 'asc', value: params.get('orderBy') });
     }, [location]);
 
@@ -174,7 +176,7 @@ export default function ManageFaq() {
                                     faqData.metadata.total > faqData.metadata.limit) ||
                                     (faqData.metadata.page > 1))
                                     && faqData['faq'] &&
-                                    <div className="pagination justify-content-end align-items-center border-top p-3">.
+                                    <div className="pagination justify-content-end align-items-center border-top p-3">
                                         <span className="cdp-text-primary font-weight-bold">{faqData.metadata.start + ' - ' + faqData.metadata.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + faqData.metadata.total}</span>
                                         <span className="pagination-btn" data-testid='Prev' onClick={() => pageLeft()} disabled={faqData.metadata.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
                                         <span className="pagination-btn" data-testid='Next' onClick={() => pageRight()} disabled={faqData.metadata.end === faqData.metadata.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
