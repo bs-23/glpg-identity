@@ -571,9 +571,20 @@ export default function hcpUsers() {
                                             </div>
                                         </div>
                                         <div className="row mt-3">
+
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Email</div>
+                                                <div className="">{currentUser.email || '--'}</div>
+                                            </div>
                                             <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">UUID</div>
                                                 <div className="">{currentUser.uuid || '--'}</div>
+                                            </div>
+                                        </div>
+                                        <div className="row mt-3">
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Phone Number</div>
+                                                <div className="">{currentUser.telephone || '--'}</div>
                                             </div>
                                             <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">OneKeyID</div>
@@ -582,12 +593,12 @@ export default function hcpUsers() {
                                         </div>
                                         <div className="row mt-3">
                                             <div className="col-6">
-                                                <div className="mt-1 font-weight-bold">Email</div>
-                                                <div className="">{currentUser.email || '--'}</div>
+                                                <div className="mt-1 font-weight-bold">Date of Birth</div>
+                                                <div className="">{currentUser.birthdate ? currentUser.birthdate : '--'}</div>
                                             </div>
                                             <div className="col-6">
-                                                <div className="mt-1 font-weight-bold">Phone Number</div>
-                                                <div className="">{currentUser.telephone || '--'}</div>
+                                                <div className="mt-1 font-weight-bold">Status</div>
+                                                <div className="text-capitalize">{currentUser.status ? _.startCase(_.toLower(currentUser.status.replace(/_/g, ' '))) : '--'}</div>
                                             </div>
                                         </div>
                                         <div className="row mt-3">
@@ -598,16 +609,6 @@ export default function hcpUsers() {
                                             <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">Date of Registration</div>
                                                 <div className="">{currentUser.created_at ? (new Date(currentUser.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.') : '--'}</div>
-                                            </div>
-                                        </div>
-                                        <div className="row mt-3">
-                                            <div className="col-6">
-                                                <div className="mt-1 font-weight-bold">Status</div>
-                                                <div className="text-capitalize">{currentUser.status ? _.startCase(_.toLower(currentUser.status.replace(/_/g, ' '))) : '--'}</div>
-                                            </div>
-                                            <div className="col-6">
-                                                <div className="mt-1 font-weight-bold">Date of Birth</div>
-                                                <div className="">{currentUser.birthdate ? currentUser.birthdate : '--'}</div>
                                             </div>
                                         </div>
                                         <div className="row mt-3">
