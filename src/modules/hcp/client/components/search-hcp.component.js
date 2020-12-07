@@ -266,7 +266,7 @@ const SearchHcp = () => {
                                                                     {
                                                                         item.isValid ? <i className="fas fa-check mr-1 cdp-text-primary"></i> : <i className="fas fa-times mr-1 cdp-text-secondary"></i>
                                                                     }
-                                                                    {`${item.name || ''}, ${item.address || ''}, ${item.city || ''}`}
+                                                                    {[item.name,item.address, item.city].filter(i => i).join(', ')}
                                                                 </div>
                                                             ))
                                                         }
