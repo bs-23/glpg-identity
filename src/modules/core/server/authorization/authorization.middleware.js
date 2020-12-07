@@ -1,17 +1,17 @@
 const path = require("path");
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
-const User = require(path.join(process.cwd(), "src/modules/user/server/user.model"));
-const UserProfile = require(path.join(process.cwd(), "src/modules/user/server/user-profile.model"));
-const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/userProfile-permissionSet.model"));
-const PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permission-set.model"));
-const PermissionSet_ServiceCateory = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-serviceCategory.model"));
-const ServiceCategory = require(path.join(process.cwd(), "src/modules/user/server/permission/service-category.model"));
-const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-application.model"));
+const User = require(path.join(process.cwd(), "src/modules/platform/user/server/user.model.js"));
+const UserProfile = require(path.join(process.cwd(), "src/modules/platform/profile/server/user-profile.model.js"));
+const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/userProfile-permissionSet.model.js"));
+const PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permission-set.model.js"));
+const PermissionSet_ServiceCateory = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-serviceCategory.model.js"));
+const ServiceCategory = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/service-category.model.js"));
+const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-application.model.js"));
 const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
-const User_Role = require(path.join(process.cwd(), "src/modules/user/server/role/user-role.model"));
-const Role_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/role-permissionSet.model"));
-const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
+const User_Role = require(path.join(process.cwd(), "src/modules/platform/role/server/user-role.model.js"));
+const Role_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/role-permissionSet.model.js"));
+const Role = require(path.join(process.cwd(), "src/modules/platform/role/server/role.model.js"));
 
 const AdminGuard = (req, res, next) => {
     if (!req.user) return res.status(401).send('unauthorized');

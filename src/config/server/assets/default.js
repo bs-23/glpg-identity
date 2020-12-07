@@ -8,6 +8,10 @@ module.exports = {
             "src/modules/!(core)/server/**/*.routes.js",
             "src/modules/core/server/country/country.routes.js",
             "src/modules/platform/faq/server/**/*.routes.js",
+            "src/modules/platform/user/server/**/*.routes.js",
+            "src/modules/platform/role/server/**/*.routes.js",
+            "src/modules/platform/profile/server/**/*.routes.js",
+            "src/modules/platform/permission-set/server/**/*.routes.js",
             "src/modules/core/server/**/*.routes.js",
             "src/config/server/lib/swagger/swagger.controller.js"
         ],

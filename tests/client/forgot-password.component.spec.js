@@ -7,7 +7,7 @@ import axios from 'axios'
 import MockAdapter from 'axios-mock-adapter'
 import { ToastProvider } from 'react-toast-notifications';
 import store from '../../src/modules/core/client/store.js';
-import ForgotPassword from '../../src/modules/user/client/components/forgot-password.component';
+import ForgotPassword from '../../src/modules/platform/user/client/components/forgot-password.component';
 
 configure({ adapter: new Adapter() });
 
@@ -36,7 +36,7 @@ describe('Forgot password component', () => {
 
         await waitFor(() => {
             expect(email.value).toEqual('');
-        }) 
+        })
     });
 
     it('Should fill out email, submit and get error response', async () => {

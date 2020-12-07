@@ -1,15 +1,29 @@
 import React from 'react';
-import { Switch, useRouteMatch } from 'react-router-dom';
+import { Route, useRouteMatch } from 'react-router-dom';
 import { FaqClientRoutes, faqReducer } from './faq';
+import { UserClientRoutes, userReducer } from './user';
+import { ProfileClientRoutes, profileReducer } from './profile';
+import { RoleClientRoutes, roleReducer } from './role';
+import { PermissionSetClientRoutes, permissionSetReducer } from './permission-set';
 
 export function PlatformRoutes() {
     const { path } = useRouteMatch();
 
     return (
-        <Switch>
+        <Route>
+            <UserClientRoutes path={path}/>
             <FaqClientRoutes path={path}/>
-        </Switch>
+            <ProfileClientRoutes path={path}/>
+            <RoleClientRoutes path={path}/>
+            <PermissionSetClientRoutes path={path}/>
+        </Route>
     );
 }
 
-export { faqReducer };
+export {
+    faqReducer,
+    userReducer,
+    profileReducer,
+    roleReducer,
+    permissionSetReducer
+};

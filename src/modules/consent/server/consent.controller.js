@@ -9,11 +9,11 @@ const ConsentCountry = require('./consent-country.model');
 const ConsentCategory = require('./consent-category.model');
 const ConsentLanguage = require('./consent-locale.model');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
-const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model.js'));
+const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
 const HCPS = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-profile.model'));
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-consents.model'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
-const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/user/server/permission/permissions.js'));
+const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/platform/user/server/permission/permissions.js'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 
 function getTranslationViewmodels(translations) {

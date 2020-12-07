@@ -8,8 +8,8 @@ import MockAdapter from 'axios-mock-adapter'
 import { Provider } from 'react-redux';
 import { ToastProvider } from 'react-toast-notifications';
 import store from '../../src/modules/core/client/store';
-import UserForm from '../../src/modules/user/client/components/user-form.component';
-import { login } from '../../src/modules/user/client/user.actions';
+import UserForm from '../../src/modules/platform/user/client/components/user-form.component';
+import { login } from '../../src/modules/platform/user/client/user.actions';
 
 configure({ adapter: new Adapter() });
 

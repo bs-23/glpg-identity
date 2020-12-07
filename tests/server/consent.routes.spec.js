@@ -44,7 +44,7 @@ describe('Consent Routes', () => {
 
     it('Should get consent performance report', async () => {
         const response = await request
-            .get(`/api/consent-performance-report`)
+            .get(`/api/cdp-consent-performance-report`)
             .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
 
         expect(response.statusCode).toBe(200);
