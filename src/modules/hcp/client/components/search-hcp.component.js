@@ -17,11 +17,6 @@ const SearchHcp = () => {
     const [users, setUsers] = useState({});
 
     const resetSearch = (props) => {
-        /**
-         * To-DO
-         * - reset country selection
-         * - clear results
-         */
         setSelectedOption([]);
         setUsers([]);
         props.resetForm();
@@ -64,7 +59,7 @@ const SearchHcp = () => {
                     <input type="checkbox" className="custom-control-input" checked={props.isSelected} onChange={() => null} />
                     <label className="custom-control-label" for="customCheck1">{children}</label>
                 </div>
-          </components.Option>
+            </components.Option>
         );
     };
 
@@ -99,13 +94,8 @@ const SearchHcp = () => {
                                     values.specialties = values.specialties.map(i => i.value);
                                     values.codbases = values.countries.map(i => i.value);
                                     // delete values.countries;
-
-
-                                    console.log("testing", values)
                                     const response = await axios.post('/api/okla/hcps/search', values);
                                     setUsers(response.data);
-                                    console.log(response);
-
                                     actions.setSubmitting(false);
                                 }}
                             >
@@ -268,7 +258,7 @@ const SearchHcp = () => {
                                             users.results.map( (user, idx) => (
                                                 <tr key={idx}>
                                                     <td>{`${user.firstName} ${user.lastName}`}</td>
-                                                    <td>Dentist</td>
+                                                    <td>{(user.specialties || ['--']).join(', ')}</td>
                                                     <td>
                                                         {
                                                             user.workplaces.map((item, idxOfWorkPlace) => (

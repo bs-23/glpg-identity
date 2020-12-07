@@ -1703,7 +1703,7 @@ async function getOklaHcpDetails(req, res) {
         const workplaces = activitiesOfIndividual.map(g => {
             const workplace = g.workplace;
             const name = [workplace.managerWorkplaceUsualName, workplace.usualName].filter(i => i).join(' - ');
-            const contactNumbers = Object.keys(workplace.telephones).map(key => {
+            const contactNumbers = Object.keys(workplace.telephones || []).map(key => {
                 return {
                     number: workplace.telephones[key].callNumberForSearch,
                     type: workplace.telephones[key].typeCorporateLabel
@@ -1728,7 +1728,7 @@ async function getOklaHcpDetails(req, res) {
             ? Object.keys(individual.qualifications).map(key => {
                 return individual.qualifications[key].corporateLabel
             })
-            : undefined;
+            : [];
 
         const data = {
             firstName: individual.firstName,

@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Modal from 'react-bootstrap/Modal';
 import { getOklaHcpDetails, setOklaHcpDetails } from '../hcp.actions';
+import MapView from './map-view';
 
 const OklaHcpdetails = ({ individual, setSelectedIndividual }) => {
     const dispatch = useDispatch();
+    const [selectedWorkplace, setSelectedWorkplace] = useState(null);
 
     const hcpDetails = useSelector(state => state.hcpReducer.oklaHcpDetails);
 
@@ -16,6 +18,10 @@ const OklaHcpdetails = ({ individual, setSelectedIndividual }) => {
     useEffect(() => {
         dispatch(getOklaHcpDetails(individual.codbase, individual.id));
     }, [individual]);
+
+    useEffect(() => {
+        hcpDetails && setSelectedWorkplace(hcpDetails.workplaces[0]);
+    }, [hcpDetails]);
 
     return <Modal
         size="lg"
@@ -36,10 +42,12 @@ const OklaHcpdetails = ({ individual, setSelectedIndividual }) => {
                     <div>Individual-Id: {hcpDetails.individualEid}</div>
                     <div>Specialties: {hcpDetails.specialties.join(', ')}</div>
 
+                    { selectedWorkplace && <MapView location={selectedWorkplace.location} />}
+
                     <div>Workplaces:</div>
                     {
-                        hcpDetails.workplaces.map(workplace => (
-                            <div key={workplace.id} className="p-2">
+                        hcpDetails.workplaces.map((workplace, idx) => (
+                            <div key={workplace.id} className={`p-2 border-bottom ${selectedWorkplace && workplace.id === selectedWorkplace.id ? 'selected' : ''}`} id={'wp-' + idx} onClick={() => { setSelectedWorkplace(workplace); }}>
                                 <span>{workplace.isMainActivity
                                     ? '★'
                                     : workplace.isValid
@@ -49,7 +57,7 @@ const OklaHcpdetails = ({ individual, setSelectedIndividual }) => {
                                 <span>{workplace.name}</span>
                                 <span>{workplace.address}</span>
                                 <span>{workplace.city}</span>
-                                {workplace.contactNumbers.map((c,i) => (<div key={'tel-'+i}>{c.type}: {c.number}</div>))}
+                                {workplace.contactNumbers.map((c, i) => (<div key={'tel-' + i}>{c.type}: {c.number}</div>))}
                             </div>
                         ))
                     }
