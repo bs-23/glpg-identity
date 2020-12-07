@@ -13,19 +13,15 @@ import Forbidden from './Forbidden';
 import NoMatch from "./NoMatch";
 import PublicRoute from "./PublicRoute";
 import PrivateRoute from "./PrivateRoute";
-import Login from "../../platform/user/client/components/login.component";
-import Dashboard from "../../platform//user/client/components/dashboard.component";
-import { getSignedInUserProfile } from "../../platform/user/client/user.actions";
+import { Dashboard, Login, ForgotPassword, ResetPassword, PlatformRoutes, userActions, MyProfile } from "../../platform";
 import HcpRoutes from "../../hcp/client/hcp.routes";
 import ConsentRoutes from "../../consent/client/consent.routes";
-import ForgotPassword from '../../platform/user/client/components/forgot-password.component';
-import ResetPasswordForm from '../../platform/user/client/components/reset-password.component';
-import MyProfile from '../../platform/user/client/components/my-profile/my-profile.component';
 import SwaggerLogin from '../../../config/server/lib/swagger/swagger-login.component';
 import store from './store';
 import { getCountries } from '../../core/client/country/country.actions';
-import { PlatformRoutes } from '../../platform';
 import HelpComponent from '../../core/client/components/help.component';
+
+const { getSignedInUserProfile } = userActions;
 
 let refCount = 0;
 
@@ -92,7 +88,7 @@ export default function App() {
 
                 <Route path='/consent' component={ConsentRoutes}/>
 
-                <Route path="/reset-password" component={ResetPasswordForm}/>
+                <Route path="/reset-password" component={ResetPassword}/>
 
                 <Route path="/forgot-password" component={ForgotPassword}/>
 

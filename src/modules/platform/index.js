@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, useRouteMatch } from 'react-router-dom';
 import { FaqClientRoutes, faqReducer } from './faq';
-import { UserClientRoutes, userReducer } from './user';
+import { UserClientRoutes, userReducer, userActions, Login, Dashboard, ForgotPassword, ResetPassword, MyProfile } from './user';
 import { ProfileClientRoutes, profileReducer } from './profile';
 import { RoleClientRoutes, roleReducer } from './role';
 import { PermissionSetClientRoutes, permissionSetReducer } from './permission-set';
@@ -25,5 +25,11 @@ export {
     userReducer,
     profileReducer,
     roleReducer,
-    permissionSetReducer
+    permissionSetReducer,
+    userActions,
+    Login,
+    Dashboard,
+    ForgotPassword,
+    ResetPassword,
+    MyProfile
 };
