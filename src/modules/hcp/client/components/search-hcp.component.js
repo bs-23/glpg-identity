@@ -101,8 +101,8 @@ const SearchHcp = () => {
                             >
                                 { formikProps => (
                                     <Form onSubmit={formikProps.handleSubmit}>
-                                        <div className="row">
-                                            <div className="col-12">
+                                        <div className="row align-items-center">
+                                            <div className="col-12 col-sm-6 col-lg-4">
                                                 <div className="form-group">
                                                     <label for="exampleInputEmail1">Countries</label>
                                                     <Select
@@ -125,7 +125,7 @@ const SearchHcp = () => {
                                                 </div>
                                             </div>
 
-                                            <div className="col-12">
+                                              <div className="col-12 col-sm-6 col-lg-8 pt-3">
                                                 <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-2">
                                                     <input type="checkbox" className="custom-control-input" name="isInContract" id="customControlInline" onChange={(e) => formikProps.values.isInContract = e.target.checked}/>
                                                     <label className="custom-control-label" for="customControlInline">In My Contract</label>
@@ -214,7 +214,7 @@ const SearchHcp = () => {
 
                                         <div className="row">
                                             <div className="col-6">
-                                                <button type="reset" className="btn btn-block btn-secondary mt-4 p-2" onClick={() => resetSearch(formikProps)}>RESET</button>
+                                                <button type="reset" className="btn btn-block btn-secondary mt-4 p-2" onClick={() => resetSearch(formikProps)}>CLEAR</button>
                                             </div>
                                             <div className="col-6">
                                                 <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!formikProps.values.countries || !formikProps.values.countries.length || !(formikProps.values.firstName  || formikProps.values.lastName || formikProps.values.address || formikProps.values.city || formikProps.values.postalCode || formikProps.values.onekeyId || formikProps.values.individualEid || (formikProps.values.specialties && formikProps.values.specialties.length))}>SEARCH</button>
