@@ -1,7 +1,8 @@
 import Types from "./hcp.types";
 
 const initialState = {
-    hcps: {}
+    hcps: {},
+    specialties: {}
 };
 
 function sortItems(itms, val, type) {
@@ -47,6 +48,19 @@ export default function reducer(state = initialState, action) {
                 hcps: (action.payload.type === 'ASC') ? { ...state.hcps, users: sortItems(state.hcps['users'], action.payload.val, 1) } :
                     { ...state.hcps, users: sortItems(state.hcps['users'], action.payload.val, -1) }
             }
+        }
+
+        case Types.GET_HCP_SPECIALTIES_FULFILLED: {
+            const newSpcialtyState = {
+                [action.payload.country_locale_key]: action.payload.data
+            }
+            return {
+                ...state,
+                specialties: {
+                    ...state.specialties,
+                    ...newSpcialtyState
+                }
+            };
         }
     }
 

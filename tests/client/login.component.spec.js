@@ -8,7 +8,7 @@ import { BrowserRouter } from 'react-router-dom';
 import MockAdapter from 'axios-mock-adapter'
 import { ToastProvider } from 'react-toast-notifications';
 import store from '../../src/modules/core/client/store.js';
-import Login from '../../src/modules/user/client/components/login.component';
+import Login from '../../src/modules/platform/user/client/components/login.component';
 import ReCAPTCHA from "react-google-recaptcha";
 import { act } from 'react-dom/test-utils';
 
@@ -93,10 +93,10 @@ describe('Login component', () => {
         });
 
         // Turn this back on when recaptcha is enabled in login component
-        // act(() => {
-        //     const mockedField = getByTestId("captcha");
-        //     mockedField[Object.keys(mockedField)[1]].testprops.setFieldValue("recaptchaToken", 'token')
-        // })
+        act(() => {
+            const mockedField = getByTestId("captcha");
+            mockedField[Object.keys(mockedField)[1]].testprops.setFieldValue("recaptchaToken", 'token')
+        })
 
         fireEvent.click(submit);
 

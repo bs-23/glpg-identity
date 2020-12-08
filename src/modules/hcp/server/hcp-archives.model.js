@@ -15,7 +15,6 @@ const HcpArchives = sequelize.cdpConnector.define('hcp_archives', {
         type: DataTypes.UUID
     },
     uuid: {
-        unique: true,
         type: DataTypes.STRING
     },
     salutation: {
@@ -31,7 +30,6 @@ const HcpArchives = sequelize.cdpConnector.define('hcp_archives', {
         type: DataTypes.STRING
     },
     email: {
-        unique: true,
         allowNull: false,
         type: DataTypes.STRING
     },

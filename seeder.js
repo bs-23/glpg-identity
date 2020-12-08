@@ -12,30 +12,42 @@ async function init() {
 
     await sequelize.cdpConnector.query(`CREATE SCHEMA IF NOT EXISTS ${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`);
 
+    await sequelize.cdpConnector.query(`
+        DO $$ BEGIN
+        CREATE AGGREGATE array_concat_agg(anyarray) (
+            SFUNC = array_cat,
+            STYPE = anyarray
+        );
+        EXCEPTION
+            WHEN duplicate_function THEN NULL;
+        END $$;
+    `);
+
     const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
-    const ApplicationDomain = require(path.join(process.cwd(), 'src/modules/application/server/application-domain.model'));
-    const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
+    const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
     const ConsentCategory = require(path.join(process.cwd(), 'src/modules/consent/server/consent-category.model'));
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
     const ConsentLocale = require(path.join(process.cwd(), 'src/modules/consent/server/consent-locale.model'));
     const ConsentCountry = require(path.join(process.cwd(), 'src/modules/consent/server/consent-country.model'));
-    const UserProfile = require(path.join(process.cwd(), "src/modules/user/server/user-profile.model"));
-    const ServiceCategory = require(path.join(process.cwd(), "src/modules/user/server/permission/service-category.model"));
-    const PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permission-set.model"));
-    const PermissionSet_ServiceCategory = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-serviceCategory.model"));
-    const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/user/server/permission-set/permissionSet-application.model"));
-    const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/user/server/permission-set/userProfile-permissionSet.model"));
-    const Role = require(path.join(process.cwd(), "src/modules/user/server/role/role.model"));
-    const UserRole = require(path.join(process.cwd(), "src/modules/user/server/role/user-role.model"));
+    const UserProfile = require(path.join(process.cwd(), "src/modules/platform/profile/server/user-profile.model.js"));
+    const ServiceCategory = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/service-category.model.js"));
+    const PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permission-set.model.js"));
+    const PermissionSet_ServiceCategory = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-serviceCategory.model.js"));
+    const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-application.model.js"));
+    const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/userProfile-permissionSet.model.js"));
+    const Role = require(path.join(process.cwd(), "src/modules/platform/role/server/role.model.js"));
+    const UserRole = require(path.join(process.cwd(), "src/modules/platform/role/server/user-role.model.js"));
     const { Modules } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
+    const Faq = require(path.join(process.cwd(), 'src/modules/platform/faq/server/faq.model.js'));
     require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model'));
     require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-profile.model'));
     require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-consents.model'));
     require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-archives.model'));
-    require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
+    require(path.join(process.cwd(), 'src/modules/platform/user/server/reset-password.model.js'));
     require(path.join(process.cwd(), 'src/modules/core/server/password/password-history.model.js'));
     require(path.join(process.cwd(), 'src/modules/core/server/filter/filter.model.js'));
     require(path.join(process.cwd(), 'src/modules/application/server/data.model.js'));
+
 
     await sequelize.cdpConnector.sync();
 
@@ -66,7 +78,7 @@ async function init() {
                 { title: "Site Admin", slug: "site_admin", type: 'standard', description: "This is the default profile for Site Admin", created_by: admin.id, updated_by: admin.id },
                 { title: "Global Data Steward", type: 'standard', slug: "global_data_steward", description: "This is the default profile for Global Data Steward", created_by: admin.id, updated_by: admin.id },
                 { title: "Local Data Steward", type: 'standard', slug: "local_data_steward", description: "This is the default profile for Local Data Steward", created_by: admin.id, updated_by: admin.id },
-                { title: "Data Privacy Officer", type: 'standard', slug: "data_privacy_officer", description: "This is the default profile for Data Privacy Officer",  created_by: admin.id, updated_by: admin.id }
+                { title: "Data Privacy Officer", type: 'standard', slug: "data_privacy_officer", description: "This is the default profile for Data Privacy Officer", created_by: admin.id, updated_by: admin.id }
             ];
 
             UserProfile.destroy({ truncate: { cascade: true } }).then(() => {
@@ -86,7 +98,7 @@ async function init() {
             where: { email: 'glpg@brainstation-23.com' }
         }).then(admin => {
             UserProfile.findOne({ where: { slug: 'system_admin' } }).then(sysAdminProfile => {
-                admin.update({profileId: sysAdminProfile.id});
+                admin.update({ profileId: sysAdminProfile.id });
             })
 
         }).then(function () {
@@ -114,14 +126,35 @@ async function init() {
         });
     }
 
+    function faqSeeder(callback) {
+        User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
+
+            const faqCategories = [
+                { question: "Key Benefits of a CDP", answer: "<p>CDPs improve your organization, better your customer relationships, and complement your current software and marketing efforts. Here are a handful of key benefits of having a CDP.</p>", categories: ["general"], created_by: admin.id, updated_by: admin.id },
+                { question: "What is customer data?", answer: "<p>CDPs exist because customer data has become crucial to both business and marketing operations. So, what is customer data exactly? Customer data is information consumers leave behind as they use the internet and interact with companies online and offline: through websites, blogs, e-commerce portals, and in-store interactions. (We dive into some examples below.) It’s highly valuable to businesses, although recent legal dialogue (such as the GDPR) has changed how organizations collect and manage this data.</p>", categories: ["general"], created_by: admin.id, updated_by: admin.id },
+                { question: "What is a Customer Data Platform?", answer: "<p>A Customer Data Platform (CDP) is a software that aggregates and organizes customer data across a variety of touchpoints and is used by other software, systems, and marketing efforts. CDPs collect and structure real-time data into individual, centralized customer profiles.</p>", categories: ["general"], created_by: admin.id, updated_by: admin.id },
+                { question: "Data Collection", answer: "<p>The main advantage of a CDP is its ability to collect data from a variety of sources (both online and offline, with a variety of formats and structures) and convert that disparate data into a standardized form.</p>", categories: ["general"], created_by: admin.id, updated_by: admin.id }
+            ];
+
+            Faq.destroy({ truncate: { cascade: true } }).then(() => {
+                Faq.bulkCreate(faqCategories, {
+                    returning: true,
+                    ignoreDuplicates: false
+                }).then(function () {
+                    callback();
+                });
+            });
+        });
+    }
+
     function permissionSetSeeder(callback) {
 
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
 
             const permissionSet = [
-                { title: "System Admin Permission Set", slug: "system_admin", type: 'standard', countries:["BE", "FR", "DE", "IT", "NL", "ES", "GB"], description: "This is the default permission set for System Admin", created_by: admin.id, updated_by: admin.id },
-                { title: "Site Admin Permission Set", slug: "site_admin", type: 'standard', description: "This is the default permission set for Site Admin", countries:["BE", "FR", "DE", "IT", "NL", "ES", "GB"], created_by: admin.id, updated_by: admin.id },
-                { title: "GDS Permission Set", slug: "gds", type: 'standard', countries:["BE", "FR", "DE", "IT", "NL", "ES", "GB"], description: "This is the default permission set for Global Data Steward", created_by: admin.id, updated_by: admin.id },
+                { title: "System Admin Permission Set", slug: "system_admin", type: 'standard', countries: ["BE", "FR", "DE", "IT", "NL", "ES", "GB"], description: "This is the default permission set for System Admin", created_by: admin.id, updated_by: admin.id },
+                { title: "Site Admin Permission Set", slug: "site_admin", type: 'standard', description: "This is the default permission set for Site Admin", countries: ["BE", "FR", "DE", "IT", "NL", "ES", "GB"], created_by: admin.id, updated_by: admin.id },
+                { title: "GDS Permission Set", slug: "gds", type: 'standard', countries: ["BE", "FR", "DE", "IT", "NL", "ES", "GB"], description: "This is the default permission set for Global Data Steward", created_by: admin.id, updated_by: admin.id },
                 { title: "LDS Permission Set", slug: "lds", type: 'standard', description: "This is the default permission set for Local Data Steward", created_by: admin.id, updated_by: admin.id },
                 { title: "DPO Permission Set", slug: "data_privacy_officer", type: 'standard', description: "This is the default permission set for Data Privacy Officer", created_by: admin.id, updated_by: admin.id },
             ];
@@ -159,7 +192,6 @@ async function init() {
                     { permissionSetId: values[1].id, serviceCategoryId: values[4].id },
 
                     { permissionSetId: values[5].id, serviceCategoryId: values[4].id },
-                    { permissionSetId: values[5].id, serviceCategoryId: values[2].id },
 
                     { permissionSetId: values[6].id, serviceCategoryId: values[2].id },
                     { permissionSetId: values[7].id, serviceCategoryId: values[2].id }
@@ -242,23 +274,12 @@ async function init() {
                 }
             ];
 
-            const applicationDomains = [
-                { application_id: '3252888b-530a-441b-8358-3e423dbce08a', country_iso2: 'nl', domain: 'http://172.16.229.25:4503' },
-                { application_id: 'a7959308-7ec5-4090-94ff-2367113a454d', country_iso2: 'nl', domain: 'https://www-dev.jyseleca.nl' },
-                { application_id: 'a7959308-7ec5-4090-94ff-2367113a454d', country_iso2: 'be', domain: 'https://products-dev.glpg.com' }
-            ];
-
             Application.destroy({ truncate: { cascade: true } }).then(() => {
                 Application.bulkCreate(applications, {
                     returning: true,
                     ignoreDuplicates: false
                 }).then(function () {
-                    ApplicationDomain.bulkCreate(applicationDomains, {
-                        returning: true,
-                        ignoreDuplicates: false
-                    }).then(function () {
-                        callback();
-                    });
+                    callback();
                 });
             });
         });
@@ -440,7 +461,7 @@ async function init() {
         });
     }
 
-    async.waterfall([userSeeder,userProfileSeeder,userUpdateSeeder,serviceCategorySeeder, permissionSetSeeder, permissionSetServiceCategorySeeder, userProfilePermissionSetSeeder, applicationSeeder, permissionSetApplicationsSeeder, consentSeeder], function (err) {
+    async.waterfall([userSeeder, userProfileSeeder, faqSeeder, userUpdateSeeder, serviceCategorySeeder, permissionSetSeeder, permissionSetServiceCategorySeeder, userProfilePermissionSetSeeder, applicationSeeder, permissionSetApplicationsSeeder, consentSeeder], function (err) {
         if (err) console.error(err);
         else console.info('DB seed completed!');
         process.exit();

@@ -11,6 +11,8 @@ const { defaultUser } = specHelper.users;
 
 let request;
 
+jest.setTimeout(20000);
+
 beforeAll(async () => {
     const config = require(path.join(process.cwd(), 'src/config/server/config'));
     await config.initEnvironmentVariables();
@@ -42,7 +44,7 @@ describe('Consent Routes', () => {
 
     it('Should get consent performance report', async () => {
         const response = await request
-            .get(`/api/consent-performance-report`)
+            .get(`/api/cdp-consent-performance-report`)
             .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
 
         expect(response.statusCode).toBe(200);
@@ -56,14 +58,5 @@ describe('Consent Routes', () => {
 
         expect(response.statusCode).toBe(200);
         expect(response.res.headers['content-type']).toMatch('text/html');
-    });
-
-    it('Should get all opt types', async () => {
-        const response = await request
-            .get(`/api/get-all-opt-types`)
-            .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
-
-        expect(response.statusCode).toBe(200);
-        expect(response.res.headers['content-type']).toMatch('application/json');
     });
 });

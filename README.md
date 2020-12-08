@@ -14,8 +14,6 @@
 ```bash
 PORT=<express_server_port>
 RECAPTCHA_SITE_KEY=<recaptcha_site_key>
-POSTGRES_CDP_URL=<postgresql_connection_string>
-POSTGRES_CDP_DATABASE=<database_name>
 AWS_ACCESS_KEY_ID=<aws_access_key_id>
 AWS_SECRET_ACCESS_KEY=<aws_secret_access_key>
 AWS_REGION=<aws_region>

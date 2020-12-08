@@ -3,7 +3,7 @@ const path = require('path');
 const controller = require('./hcp.controller');
 const { Modules } = require('../../core/server/authorization/authorization.constants');
 const { ModuleGuard } = require('../../core/server/authorization/authorization.middleware');
-const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/user/server/user-authentication.middleware.js'));
+const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/platform/user/server/user-authentication.middleware.js'));
 
 module.exports = app => {
     app.route('/api/hcps')
@@ -36,6 +36,12 @@ module.exports = app => {
     app.route('/api/hcp-profiles/specialties')
         .get(passport.authenticate('application-jwt', { session: false }), controller.getSpecialties);
 
+    app.route('/api/hcp-profiles/specialties-eng')
+        .get(CDPAuthStrategy, controller.getSpecialtiesWithEnglishTranslation);
+
+    app.route('/api/hcp-profiles/update-hcps')
+        .put(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.updateHcps);
+
     app.route('/api/hcp-profiles/:id/approve')
         .put(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.approveHCPUser);
 
@@ -43,7 +49,8 @@ module.exports = app => {
         .put(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.rejectHCPUser);
 
     app.route('/api/hcp-profiles/:id/consents')
-        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getHCPUserConsents);
+        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getHCPUserConsents)
+        .put(passport.authenticate('application-jwt', { session: false }), controller.updateHCPUserConsents);
 
     app.route('/api/hcp-profiles/:id')
         .get(passport.authenticate('application-jwt', { session: false }), controller.getHcpProfile)

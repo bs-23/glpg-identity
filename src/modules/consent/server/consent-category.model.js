@@ -2,7 +2,7 @@ const path = require('path');
 const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
-const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model.js'));
+const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
 
 const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
 

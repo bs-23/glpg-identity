@@ -6,7 +6,7 @@ import axios from 'axios'
 import MockAdapter from 'axios-mock-adapter'
 import { ToastProvider } from 'react-toast-notifications';
 import store from '../../src/modules/core/client/store.js';
-import ResetPassword from '../../src/modules/user/client/components/reset-password.component';
+import ResetPassword from '../../src/modules/platform/user/client/components/reset-password.component';
 
 
 describe('Reset password component', () => {

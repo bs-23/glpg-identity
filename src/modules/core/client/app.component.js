@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Switch, Route } from "react-router-dom";
 import { useCookies } from 'react-cookie';
-import { ToastProvider} from 'react-toast-notifications';
+import { ToastProvider } from 'react-toast-notifications';
 
 import "bootstrap/scss/bootstrap";
 import "@fortawesome/fontawesome-free/css/all.css";
@@ -13,17 +13,15 @@ import Forbidden from './Forbidden';
 import NoMatch from "./NoMatch";
 import PublicRoute from "./PublicRoute";
 import PrivateRoute from "./PrivateRoute";
-import Login from "../../user/client/components/login.component";
-import Dashboard from "../../user/client/components/dashboard.component";
-import { getSignedInUserProfile } from "../../user/client/user.actions";
-import UserRoutes from "../../user/client/user.routes";
+import { Dashboard, Login, ForgotPassword, ResetPassword, PlatformRoutes, userActions, MyProfile } from "../../platform";
 import HcpRoutes from "../../hcp/client/hcp.routes";
 import ConsentRoutes from "../../consent/client/consent.routes";
-import ForgotPassword from '../../user/client/components/forgot-password.component';
-import ResetPasswordForm from '../../user/client/components/reset-password.component';
 import SwaggerLogin from '../../../config/server/lib/swagger/swagger-login.component';
 import store from './store';
 import { getCountries } from '../../core/client/country/country.actions';
+import HelpComponent from '../../core/client/components/help.component';
+
+const { getSignedInUserProfile } = userActions;
 
 let refCount = 0;
 
@@ -33,7 +31,7 @@ function setLoading(isLoading) {
         document.getElementById('loader').style = 'display: block';
     } else if (refCount > 0) {
         refCount--;
-        if(refCount > 0) document.getElementById('loader').style = 'display: block';
+        if (refCount > 0) document.getElementById('loader').style = 'display: block';
         else document.getElementById('loader').style = 'display: none';
     }
 }
@@ -57,7 +55,7 @@ axios.interceptors.response.use(response => {
 axios.interceptors.response.use(
     response => response,
     error => {
-        const {loggedInUser} = store.getState().userReducer;
+        const { loggedInUser } = store.getState().userReducer;
 
         if (error.response && error.response.status === 401 && loggedInUser) window.location = "/login";
 
@@ -80,27 +78,29 @@ export default function App() {
     return (
         <ToastProvider placement="top-center" autoDismissTimeout={2500} >
             <Switch>
+                <PublicRoute path="/swagger" component={SwaggerLogin}/>
 
-                <PublicRoute path="/swagger" component={SwaggerLogin} />
+                <PublicRoute path="/login" component={Login}/>
 
-                <PublicRoute path="/login" component={Login} />
+                <PrivateRoute exact path="/" component={Dashboard}/>
 
-                <PrivateRoute exact path="/" component={Dashboard} />
+                <Route path="/hcps" component={HcpRoutes}/>
 
-                <Route path="/users" component={UserRoutes} />
+                <Route path='/consent' component={ConsentRoutes}/>
 
-                <Route path="/hcps" component={HcpRoutes} />
+                <Route path="/reset-password" component={ResetPassword}/>
 
-                <Route path='/consent' component={ConsentRoutes} />
+                <Route path="/forgot-password" component={ForgotPassword}/>
 
-                <Route path="/reset-password" component={ResetPasswordForm} />
+                <Route path="/forbidden" component={Forbidden}/>
 
-                <Route path="/forgot-password" component={ForgotPassword} />
+                <Route path="/platform" component={PlatformRoutes}/>
 
-                <Route path="/forbidden" component={Forbidden} />
+                <Route path="/my-profile" component={MyProfile}/>
+
+                <PrivateRoute path="/help" component={HelpComponent}/>
 
                 <Route component={NoMatch} />
-
             </Switch>
         </ToastProvider>
     );

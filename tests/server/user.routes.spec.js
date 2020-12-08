@@ -139,7 +139,7 @@ describe('User Routes', () => {
                 confirmPassword: '1c9QZu5YU%J$'
             });
 
-        const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
+        const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
         const user = await User.findOne({ where: { email: defaultUser.email }})
         user.update({ password: defaultUser.password })
 
@@ -198,8 +198,8 @@ describe('User Routes', () => {
 
         jest.spyOn(emailService, 'send').mockImplementation(() => Promise.resolve());
 
-        const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model'));
-        const ResetPassword = require(path.join(process.cwd(), 'src/modules/user/server/reset-password.model'));
+        const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
+        const ResetPassword = require(path.join(process.cwd(), 'src/modules/platform/user/server/reset-password.model.js'));
 
         const user = await User.findOne({ where: { email } });
         await user.update({ password_updated_at: new Date() - 2 * 24 * 60 * 60 * 1000 });
