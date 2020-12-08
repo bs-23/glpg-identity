@@ -169,6 +169,7 @@ async function getCdpConsentsReport(req, res) {
 
         const consent_filter = {
             'opt_type': opt_type ? { [Op.eq]: opt_type } : { [Op.or]: opt_types },
+            [Op.or]: [{ 'consent_confirmed': true }, { 'opt_type': 'opt-out' }],
             '$hcp_profile.application_id$': req.user.type === 'admin' ? { [Op.or]: application_list } : userPermittedApplications,
             '$hcp_profile.country_iso2$': codbase ? { [Op.any]: [countries_with_ignorecase] } : { [Op.any]: [country_iso2_list_with_ignorecase] },
         };

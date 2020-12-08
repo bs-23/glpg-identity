@@ -880,6 +880,8 @@ async function confirmConsents(req, res) {
             });
         }
 
+        await hcpUser.update({ is_email_verified: true });
+
         hcpUser.status = hcpUser.individual_id_onekey ? 'self_verified' : 'manually_verified';
         await addPasswordResetTokenToUser(hcpUser);
 
