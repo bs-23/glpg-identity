@@ -8,7 +8,7 @@ import { BrowserRouter } from 'react-router-dom';
 import MockAdapter from 'axios-mock-adapter'
 import { ToastProvider } from 'react-toast-notifications';
 import store from '../../src/modules/core/client/store.js';
-import Login from '../../src/modules/user/client/components/login.component';
+import Login from '../../src/modules/platform/user/client/components/login.component';
 import ReCAPTCHA from "react-google-recaptcha";
 import { act } from 'react-dom/test-utils';
 

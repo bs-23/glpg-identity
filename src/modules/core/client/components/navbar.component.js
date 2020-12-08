@@ -45,7 +45,7 @@ export default function Navbar() {
     }
 
     const myProfileClickHandler = () => {
-        history.push('/users/my-profile');
+        history.push('/my-profile');
     }
 
     return (

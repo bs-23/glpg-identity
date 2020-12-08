@@ -17,7 +17,7 @@ const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequel
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const PasswordPolicies = require(path.join(process.cwd(), 'src/modules/core/server/password/password-policies.js'));
-const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/user/server/permission/permissions.js'));
+const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/platform/user/server/permission/permissions.js'));
 const OklaService = require(path.join(process.cwd(), 'src/config/server/lib/okla.service'));
 const XRegExp = require('xregexp');
 const { string }  = require('yup');
@@ -535,7 +535,7 @@ async function updateHcps(req, res) {
                 object_id: hcp.id,
                 table_name: 'hcp_profiles',
                 actor: req.user.id,
-                description: Hcps[index].comment,
+                remarks: Hcps[index].comment,
                 changes: JSON.stringify(allUpdateRecordsForLogging[index])
             });
         }));

@@ -11,7 +11,7 @@ import store from '../../src/modules/core/client/store.js';
 import IdleTimeout from '../../src/modules/core/client/components/idle-timeout.component';
 import { act } from 'react-dom/test-utils';
 import { screen } from '@testing-library/dom'
-import { login } from '../../src/modules/user/client/user.actions';
+import { login } from '../../src/modules/platform/user/client/user.actions';
 
 configure({ adapter: new Adapter() });
 

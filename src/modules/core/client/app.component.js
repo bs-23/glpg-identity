@@ -13,19 +13,15 @@ import Forbidden from './Forbidden';
 import NoMatch from "./NoMatch";
 import PublicRoute from "./PublicRoute";
 import PrivateRoute from "./PrivateRoute";
-import Login from "../../user/client/components/login.component";
-import Dashboard from "../../user/client/components/dashboard.component";
-import { getSignedInUserProfile } from "../../user/client/user.actions";
-import UserRoutes from "../../user/client/user.routes";
+import { Dashboard, Login, ForgotPassword, ResetPassword, PlatformRoutes, userActions, MyProfile } from "../../platform";
 import HcpRoutes from "../../hcp/client/hcp.routes";
 import ConsentRoutes from "../../consent/client/consent.routes";
-import ForgotPassword from '../../user/client/components/forgot-password.component';
-import ResetPasswordForm from '../../user/client/components/reset-password.component';
 import SwaggerLogin from '../../../config/server/lib/swagger/swagger-login.component';
 import store from './store';
 import { getCountries } from '../../core/client/country/country.actions';
-import { PlatformRoutes } from '../../platform';
 import HelpComponent from '../../core/client/components/help.component';
+
+const { getSignedInUserProfile } = userActions;
 
 let refCount = 0;
 
@@ -88,19 +84,19 @@ export default function App() {
 
                 <PrivateRoute exact path="/" component={Dashboard}/>
 
-                <Route path="/users" component={UserRoutes}/>
-
                 <Route path="/hcps" component={HcpRoutes}/>
 
                 <Route path='/consent' component={ConsentRoutes}/>
 
-                <Route path="/reset-password" component={ResetPasswordForm}/>
+                <Route path="/reset-password" component={ResetPassword}/>
 
                 <Route path="/forgot-password" component={ForgotPassword}/>
 
                 <Route path="/forbidden" component={Forbidden}/>
 
                 <Route path="/platform" component={PlatformRoutes}/>
+
+                <Route path="/my-profile" component={MyProfile}/>
 
                 <PrivateRoute path="/help" component={HelpComponent}/>
 

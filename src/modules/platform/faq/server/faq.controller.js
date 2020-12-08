@@ -2,7 +2,7 @@ const Faq = require('./faq.model');
 const path = require('path');
 const { Op } = require('sequelize');
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
-const User = require(path.join(process.cwd(), 'src/modules/user/server/user.model.js'));
+const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
 const Sequelize = require('sequelize');
 
 async function getFaqItem(req, res) {

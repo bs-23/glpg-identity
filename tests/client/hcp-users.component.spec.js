@@ -9,7 +9,7 @@ import { ToastProvider } from 'react-toast-notifications';
 import { Provider } from 'react-redux';
 import store from '../../src/modules/core/client/store';
 import HcpUser from '../../src/modules/hcp/client/components/hcp-users';
-import { login } from '../../src/modules/user/client/user.actions';
+import { login } from '../../src/modules/platform/user/client/user.actions';
 import { getHcpProfiles } from '../../src/modules/hcp/client/hcp.actions'
 
 configure({ adapter: new Adapter() });

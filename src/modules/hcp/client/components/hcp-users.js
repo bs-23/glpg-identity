@@ -345,7 +345,8 @@ export default function hcpUsers() {
             unique: true,
             onSort: generateSortHandler('email'),
             fieldType: { name: 'email', maxLength: '100' },
-            width: "12%"
+            width: "12%",
+            editable: (row) => ['manually_verified', 'self_verified'].includes(row.status)
         },
         {
             id: 'created_at',
@@ -363,7 +364,8 @@ export default function hcpUsers() {
             fieldType: { name: 'text', maxLength: '50' },
             onSort: generateSortHandler('first_name'),
             class: "text-break",
-            width: "10%"
+            width: "10%",
+            editable: (row) => ['manually_verified', 'self_verified'].includes(row.status)
         },
         {
             id: 'last_name',
@@ -410,7 +412,7 @@ export default function hcpUsers() {
         {
             id: 'telephone',
             name: 'Phone',
-            editable: true,
+            editable: (row) => ['manually_verified', 'self_verified'].includes(row.status),
             width: "8%",
             fieldType: { name: 'text', maxLength: '25' },
         },
@@ -831,7 +833,7 @@ export default function hcpUsers() {
                                         }
                                     } */}
                                     </EditableTable>
-                                    {((hcps.page === 1 &&
+                                    {!tableDirty && ((hcps.page === 1 &&
                                         hcps.total > hcps.limit) ||
                                         (hcps.page > 1))
                                         && hcps['users'] &&
