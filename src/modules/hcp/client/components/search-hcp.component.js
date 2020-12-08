@@ -6,6 +6,17 @@ import Select, { components } from 'react-select';
 import { getAllCountries } from '../../../core/client/country/country.actions';
 import OklaHcpdetails from './okla-hcp-details.component';
 
+const safeGet = (object, property) => {
+    const propData = (object || {})[property];
+    return (prop) => prop ? safeGet(propData, prop) : propData;
+};
+
+const flatten = (array) => {
+    return Array.isArray(array) ? [].concat(...array.map(flatten)) : array;
+}
+
+const union = (a, b) => [...new Set([...a, ...b])];
+
 const SearchHcp = () => {
     const dispatch = useDispatch();
 
@@ -15,6 +26,7 @@ const SearchHcp = () => {
     const [specialties, setSpecialties] = useState([]);
     const [selectedIndividual, setSelectedIndividual] = useState(null);
     const [users, setUsers] = useState({});
+    const [userCountries, setUserCountries] = useState([]);
 
     const resetSearch = (props) => {
         setSelectedOption([]);
@@ -22,7 +34,36 @@ const SearchHcp = () => {
         props.resetForm();
     };
 
+    const extractLoggedInUserCountries = (data) => {
+        const profile_permission_sets = safeGet(data, 'profile')('permissionSets')();
+        const profile_countries = profile_permission_sets ? profile_permission_sets.map(pps => safeGet(pps, 'countries')() || []) : [];
+
+        const userRoles = safeGet(data, 'role')();
+        const roles_countries = userRoles ? userRoles.map(role => {
+            const role_permission_sets = safeGet(role, 'permissionSets')();
+            return role_permission_sets.map(rps => safeGet(rps, 'countries')() || []);
+        }) : [];
+
+        const userCountries = union(flatten(profile_countries), flatten(roles_countries)).filter(e => e);
+
+        return userCountries;
+    }
+
+    const fetchUserCountries = (args, allCountries) => {
+        const countryList = [];
+        args.forEach(element => {
+            countryList.push(allCountries.find(x => x.country_iso2 == element));
+        });
+        return countryList.filter(c => c);
+    }
+
     useEffect(() => {
+        async function getCountries() {
+            const userProfile = (await axios.get('/api/users/profile')).data;
+            const userCountries = extractLoggedInUserCountries(userProfile);
+            setUserCountries(fetchUserCountries(userCountries, countries));
+        }
+
         const getSpecialties = async () =>{
             const codbases = selectedOption.map(item => `codbases=${item.value}`);
             const parameters = codbases.join('&');
@@ -32,12 +73,12 @@ const SearchHcp = () => {
             }
             else setSpecialties([]);
         }
-
+        getCountries();
         getSpecialties();
         dispatch(getAllCountries());
-    }, [selectedOption]);
+    }, [selectedOption, countries]);
 
-    const getCountries = () => countries.map(country => ({ value: country.codbase, label: country.codbase_desc }));
+    const getCountries = () => userCountries.map(country => ({ value: country.codbase, label: country.codbase_desc }));
     const getSpecialties = () => specialties.map( i => ({ value: i.codIdOnekey.split('.')[2], label: i.codDescription }));
 
     const getCountryName = (country_iso2) => {
