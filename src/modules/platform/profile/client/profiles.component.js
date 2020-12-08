@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { Form, Formik, Field, ErrorMessage, FieldArray } from "formik";
 import { useToasts } from "react-toast-notifications";
 import Modal from 'react-bootstrap/Modal';
-import { profileCreateSchema } from "../profile.schema";
-import { PermissionSetDetailsModal } from "../../../permission-set";
+import { profileCreateSchema } from "./profile.schema";
+import { PermissionSetDetailsModal } from "../../../platform";
 
 const FormField = ({ label, name, type, children, required=true, ...rest }) => <div className="col-12">
     <div className="form-group">

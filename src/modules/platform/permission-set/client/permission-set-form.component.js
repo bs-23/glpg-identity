@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
 import { useSelector, useDispatch } from "react-redux";
 import { useToasts } from "react-toast-notifications";
-import { permissionSetCreateSchema } from "../permission-set.schema";
+import { permissionSetCreateSchema } from "./permission-set.schema";
 
 
 const FormField = ({ label, name, type, children, required=true, ...rest }) => <div className="col-12 col-sm-6">

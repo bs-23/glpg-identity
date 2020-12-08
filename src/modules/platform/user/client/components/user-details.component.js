@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { useToasts } from "react-toast-notifications";
 import { NavLink } from 'react-router-dom';
 import { Form, Formik, Field, ErrorMessage } from "formik";
-import { PermissionSetDetailsModal } from "../../../permission-set/client/components/permission-sets-details";
+import { PermissionSetDetailsModal } from "../../../../platform";
 
 const FormField = ({ label, name, type, children, required=true, ...rest }) => <div className="col-12">
     <div className="form-group">
