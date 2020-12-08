@@ -23,6 +23,8 @@ const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
     const [comment, setComment] = useState("");
     const [touched, setTouched] = useState(false);
 
+    const maxCommentLength = 500;
+
     const { rowIndex, editableTableProps, formikProps } = tableProps;
     const { values, submitForm } = formikProps || {};
 
@@ -65,7 +67,8 @@ const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
                     {!comment && touched && <div className="invalid-feedback">
                         Must provide a comment.
                     </div>}
-                    <button className="btn btn-block mt-3 cdp-btn-primary text-white" disabled={!comment} onClick={handleSubmit}> Save Changes </button>
+                    {comment.length > maxCommentLength && <div class="invalid-feedback">This field must be at most {maxCommentLength} characters long.</div>}
+                    <button className="btn btn-block mt-3 cdp-btn-primary text-white" disabled={!comment || comment.length > maxCommentLength} onClick={handleSubmit}> Save Changes </button>
                 </div>
             </div>
         </Modal.Body>
