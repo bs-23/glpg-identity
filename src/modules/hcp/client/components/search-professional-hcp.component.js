@@ -172,7 +172,7 @@ const SearchProfessionalHcp = () => {
                                     isInContract: false,
                                     phonetic: false,
                                     duplicates: false,
-                                    firstName: 'harold',
+                                    firstName: '',
                                     lastName: '',
                                     address: '',
                                     city: '',
@@ -351,7 +351,7 @@ const SearchProfessionalHcp = () => {
                                         {
                                             users.results.map( (user, idx) => (
                                                 <tr key={idx}>
-                                                    <td>{user.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary"></i>} {`${user.firstName} ${user.lastName}`}</td>
+                                                    <td>{user.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary" title="In my contract"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary" title="Not in my contract"></i>} {`${user.firstName} ${user.lastName}`}</td>
                                                     <td>{(user.specialties || ['--']).join(', ')}</td>
                                                     <td>
                                                         {
