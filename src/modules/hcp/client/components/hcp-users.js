@@ -463,6 +463,7 @@ export default function hcpUsers() {
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/hcps">Information Management</NavLink></li>
                                 <li className="breadcrumb-item active"><span>HCP Profile List</span></li>
+                                <li className="ml-auto mr-3"><div className="faq__floating"><i class="icon icon-help icon-2x cdp-text-secondary"></i></div></li>
                             </ol>
                         </nav>
                     </div>
