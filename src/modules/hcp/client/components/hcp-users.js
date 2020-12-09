@@ -12,6 +12,7 @@ import axios from 'axios';
 import _ from 'lodash';
 import parse from 'html-react-parser';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
+import Faq from '../../../platform/faq/client/faq.component';
 
 import { getAllCountries } from '../../../core/client/country/country.actions';
 import { getHcpProfiles, getHCPSpecialities } from '../hcp.actions';
@@ -467,22 +468,14 @@ export default function hcpUsers() {
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/hcps">Information Management</NavLink></li>
                                 <li className="breadcrumb-item active"><span>HCP Profile List</span></li>
-                                <li className="ml-auto mr-3"><div className="faq__floating"><i onClick={handleShowFaq} class="icon icon-help icon-2x cdp-text-secondary"></i></div></li>
+                                <li className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help icon-2x cdp-text-secondary"></i></li>
                             </ol>
 
-                            <Modal show={showFaq} onHide={handleCloseFaq}>
+                            <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
                                 <Modal.Header closeButton>
-                                    <Modal.Title>Modal heading</Modal.Title>
+                                    <Modal.Title>Questions You May Have</Modal.Title>
                                 </Modal.Header>
-                                <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
-                                <Modal.Footer>
-                                    <button variant="secondary" onClick={handleCloseFaq}>
-                                        Close
-                                    </button>
-                                    <button variant="primary" onClick={handleCloseFaq}>
-                                        Save Changes
-                                    </button>
-                                </Modal.Footer>
+                                <Modal.Body className="faq__in-modal"><Faq category="information" /></Modal.Body>
                             </Modal>
                         </nav>
                     </div>

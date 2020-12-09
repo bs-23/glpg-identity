@@ -171,6 +171,12 @@
             }
         }
     }
+
+    &__in-modal {
+        .faq__header {
+            display: none !important;
+        }
+    }
 }
 
 .help-center {
