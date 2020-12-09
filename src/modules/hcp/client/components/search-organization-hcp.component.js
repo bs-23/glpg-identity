@@ -157,7 +157,7 @@ const SearchOrganizationHcp = () => {
                                     values.specialties = values.specialties.map(i => i.value);
                                     values.codbases = values.countries.map(i => i.value);
                                     // delete values.countries;
-                                    const response = await axios.post('/api/okla/hcps/search', values);
+                                    const response = await axios.post('/api/okla/hcos/search', values);
                                     setUsers(response.data);
                                     actions.setSubmitting(false);
                                 }}
@@ -295,9 +295,8 @@ const SearchOrganizationHcp = () => {
                                         <tr>
                                             <th>Name</th>
                                             <th>Speciality</th>
-                                            <th>Workplace</th>
-                                            <th>Onekey ID</th>
-                                            <th>Individual - Identifier</th>
+                                            <th>Address</th>
+                                            <th>City</th>
                                             <th>Country</th>
                                             <th>Action</th>
                                         </tr>
@@ -306,26 +305,10 @@ const SearchOrganizationHcp = () => {
                                         {
                                             users.results.map( (user, idx) => (
                                                 <tr key={idx}>
-                                                    <td>{user.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary"></i>} {`${user.firstName} ${user.lastName}`}</td>
+                                                    <td>{user.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary"></i>} {`${user.name}`}</td>
                                                     <td>{(user.specialties || ['--']).join(', ')}</td>
-                                                    <td>
-                                                        {
-                                                            user.workplaces.map((item, idxOfWorkPlace) => (
-                                                                <div key={idxOfWorkPlace} className="currentWorkplace">
-                                                                    {
-                                                                        item.isValid ? <i className="fas fa-check mr-1 cdp-text-primary"></i> : <i className="fas fa-times mr-1 cdp-text-secondary"></i>
-                                                                    }
-                                                                    {[item.name,item.address, item.city].filter(i => i).join(', ')}
-                                                                </div>
-                                                            ))
-                                                        }
-                                                    </td>
-                                                    <td>
-                                                        {
-                                                            user.onekeyEidList.map((item, idxOfEid) => (<p key={idxOfEid}>{item}</p>))
-                                                        }
-                                                    </td>
-                                                    <td>{user.individualEid}</td>
+                                                    <td>{ user.address }</td>
+                                                    <td>{ user.city }</td>
                                                     <td>{getCountryName(user.countryIso2)}</td>
                                                     <td><a type="button" className="link-with-underline" onClick={() => setSelectedIndividual({id: user.workplaceEid, codbase: getCodbase(user.countryIso2)})}>Details</a></td>
                                                 </tr>
