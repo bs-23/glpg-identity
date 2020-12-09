@@ -559,7 +559,7 @@ async function createConsent(req, res) {
     try {
         let { preference, category_id, legal_basis, is_active, translations } = req.body;
 
-        if (!preference || !category_id || !legal_basis) {
+        if (!preference.trim() || !category_id || !legal_basis) {
             return res.status(400).send('Invalid request.');
         }
 
@@ -584,11 +584,11 @@ async function createConsent(req, res) {
 
         const [consent, created] = await Consent.findOrCreate({
             where: {
-                preference: { [Op.iLike]: preference }
+                preference: { [Op.iLike]: preference.trim() }
             },
             defaults: {
-                preference,
-                slug: preference,
+                preference: preference.trim(),
+                slug: preference.trim(),
                 category_id,
                 legal_basis,
                 is_active,
@@ -638,7 +638,7 @@ async function createConsent(req, res) {
             object_id: data.id,
             table_name: 'consents',
             actor: req.user.id,
-            remarks: `"${data.preference}" consent created`
+            remarks: `"${data.preference.trim()}" consent created`
         });
 
         res.json(data);
