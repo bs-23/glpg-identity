@@ -6,6 +6,7 @@ import { Form, Formik, Field, ErrorMessage } from 'formik';
 import Select, { components } from 'react-select';
 import { getAllCountries } from '../../../core/client/country/country.actions';
 import OklaHcpdetails from './okla-hcp-details.component';
+import { array } from 'yup';
 
 const safeGet = (object, property) => {
     const propData = (object || {})[property];
@@ -27,6 +28,7 @@ const SearchProfessionalHcp = () => {
 
     const [selectedOption, setSelectedOption] = useState([]);
     const [specialties, setSpecialties] = useState([]);
+    const [specialtiesFlag, setSpecialtiesFlag] = useState(false);
     const [selectedIndividual, setSelectedIndividual] = useState(null);
     const [users, setUsers] = useState({});
     const [formData, setFormData] = useState({});
@@ -44,7 +46,7 @@ const SearchProfessionalHcp = () => {
     const pageLeft = () => {
         if(currentPage === 1) return;
 
-        axios.post(`/api/okla/hcps/search?page?${currentPage-1}`, formData)
+        axios.post(`/api/okla/hcps/search?page=${currentPage-1}`, formData)
         .then(response => {
             setUsers(response.data);
             setCurrentPage(currentPage-1);
@@ -56,7 +58,7 @@ const SearchProfessionalHcp = () => {
 
     const pageRight = () => {
         if(currentPage === Math.ceil(users.totalNumberOfResults / users.resultSize)) return;
-        axios.post(`/api/okla/hcps/search?page?${currentPage+1}`, formData)
+        axios.post(`/api/okla/hcps/search?page=${currentPage+1}`, formData)
         .then(response => {
             setUsers(response.data);
             setCurrentPage(currentPage+1);
@@ -262,8 +264,8 @@ const SearchProfessionalHcp = () => {
                                                         className="multiselect"
                                                         classNamePrefix="multiselect"
                                                         onChange = { selectedOption => {
-                                                            console.log(`Option selected:`, selectedOption);
-                                                            formikProps.values.specialties = selectedOption;
+                                                            formikProps.values.specialties = Array.isArray(selectedOption) ? selectedOption : [];
+                                                            setSpecialtiesFlag(Array.isArray(selectedOption) && selectedOption.length);
                                                         }}
                                                     />
                                                 </div>
@@ -311,7 +313,7 @@ const SearchProfessionalHcp = () => {
                                                 <button type="reset" className="btn btn-block btn-secondary mt-4 p-2" onClick={() => resetSearch(formikProps)}>CLEAR</button>
                                             </div>
                                             <div className="col-6">
-                                                <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!formikProps.values.countries || !formikProps.values.countries.length || !(formikProps.values.firstName  || formikProps.values.lastName || formikProps.values.address || formikProps.values.city || formikProps.values.postalCode || formikProps.values.onekeyId || formikProps.values.individualEid || (formikProps.values.specialties && formikProps.values.specialties.length))}>SEARCH</button>
+                                                <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!formikProps.values.countries || !formikProps.values.countries.length || !(formikProps.values.firstName  || formikProps.values.lastName || formikProps.values.address || formikProps.values.city || formikProps.values.postalCode || formikProps.values.onekeyId || formikProps.values.individualEid || specialtiesFlag)}>SEARCH</button>
                                             </div>
                                         </div>
                                     </Form>

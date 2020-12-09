@@ -27,6 +27,7 @@ const SearchOrganizationHcp = () => {
 
     const [selectedOption, setSelectedOption] = useState([]);
     const [specialties, setSpecialties] = useState([]);
+    const [specialtiesFlag, setSpecialtiesFlag] = useState();
     const [selectedIndividual, setSelectedIndividual] = useState(null);
     const [users, setUsers] = useState({});
     const [formData, setFormData] = useState({});
@@ -44,7 +45,7 @@ const SearchOrganizationHcp = () => {
     const pageLeft = () => {
         if(currentPage === 1) return;
 
-        axios.post(`/api/okla/hcps/search?page?${currentPage-1}`, formData)
+        axios.post(`/api/okla/hcps/search?page=${currentPage-1}`, formData)
         .then(response => {
             setUsers(response.data);
             setCurrentPage(currentPage-1);
@@ -56,7 +57,7 @@ const SearchOrganizationHcp = () => {
 
     const pageRight = () => {
         if(currentPage === Math.ceil(users.totalNumberOfResults / users.resultSize)) return;
-        axios.post(`/api/okla/hcps/search?page?${currentPage+1}`, formData)
+        axios.post(`/api/okla/hcps/search?page=${currentPage+1}`, formData)
         .then(response => {
             setUsers(response.data);
             setCurrentPage(currentPage+1);
@@ -269,8 +270,8 @@ const SearchOrganizationHcp = () => {
                                                         className="multiselect"
                                                         classNamePrefix="multiselect"
                                                         onChange = { selectedOption => {
-                                                            console.log(`Option selected:`, selectedOption);
-                                                            formikProps.values.specialties = selectedOption;
+                                                            formikProps.values.specialties = Array.isArray(selectedOption) ? selectedOption : [];
+                                                            setSpecialtiesFlag(Array.isArray(selectedOption) && selectedOption.length);
                                                         }}
                                                     />
                                                 </div>
@@ -297,7 +298,7 @@ const SearchOrganizationHcp = () => {
                                                 <button type="reset" className="btn btn-block btn-secondary mt-4 p-2" onClick={() => resetSearch(formikProps)}>CLEAR</button>
                                             </div>
                                             <div className="col-6">
-                                                <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!formikProps.values.countries || !formikProps.values.countries.length || !(formikProps.values.address || formikProps.values.city || formikProps.values.postalCode || formikProps.values.onekeyId || formikProps.values.workplaceEid || (formikProps.values.specialties && formikProps.values.specialties.length))}>SEARCH</button>
+                                                <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!formikProps.values.countries || !formikProps.values.countries.length || !(formikProps.values.address || formikProps.values.city || formikProps.values.postalCode || formikProps.values.onekeyId || formikProps.values.workplaceEid || specialtiesFlag)}> SEARCH </button>
                                             </div>
                                         </div>
                                     </Form>
