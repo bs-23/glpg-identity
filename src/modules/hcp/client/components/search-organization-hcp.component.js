@@ -148,7 +148,7 @@ const SearchOrganizationHcp = () => {
                                     city: '',
                                     postCode: '',
                                     onekeyId: '',
-                                    individualEid: '',
+                                    workplaceEid: '',
                                     specialties: [],
                                 }}
                                 displayName="SearchForm"
@@ -256,7 +256,7 @@ const SearchOrganizationHcp = () => {
                                             <div className="col-12 col-sm-4">
                                                 <div className="form-group">
                                                     <label for="Individual ">Workplace - Identifier</label>
-                                                    <Field className="form-control individual" type='text' name='individualEid' id='individual' />
+                                                    <Field className="form-control individual" type='text' name='workplaceEid' id='individual' />
                                                 </div>
                                             </div>
                                         </div>
@@ -266,7 +266,7 @@ const SearchOrganizationHcp = () => {
                                                 <button type="reset" className="btn btn-block btn-secondary mt-4 p-2" onClick={() => resetSearch(formikProps)}>CLEAR</button>
                                             </div>
                                             <div className="col-6">
-                                                <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!formikProps.values.countries || !formikProps.values.countries.length || !(formikProps.values.address || formikProps.values.city || formikProps.values.postalCode || formikProps.values.onekeyId || formikProps.values.individualEid || (formikProps.values.specialties && formikProps.values.specialties.length))}>SEARCH</button>
+                                                <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!formikProps.values.countries || !formikProps.values.countries.length || !(formikProps.values.address || formikProps.values.city || formikProps.values.postalCode || formikProps.values.onekeyId || formikProps.values.workplaceEid || (formikProps.values.specialties && formikProps.values.specialties.length))}>SEARCH</button>
                                             </div>
                                         </div>
                                     </Form>
@@ -306,7 +306,7 @@ const SearchOrganizationHcp = () => {
                                         {
                                             users.results.map( (user, idx) => (
                                                 <tr key={idx}>
-                                                    <td>{`${user.firstName} ${user.lastName}`}</td>
+                                                    <td>{user.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary"></i>} {`${user.firstName} ${user.lastName}`}</td>
                                                     <td>{(user.specialties || ['--']).join(', ')}</td>
                                                     <td>
                                                         {
@@ -327,7 +327,7 @@ const SearchOrganizationHcp = () => {
                                                     </td>
                                                     <td>{user.individualEid}</td>
                                                     <td>{getCountryName(user.countryIso2)}</td>
-                                                    <td><a type="button" className="link-with-underline" onClick={() => setSelectedIndividual({id: user.individualEid, codbase: getCodbase(user.countryIso2)})}>Details</a></td>
+                                                    <td><a type="button" className="link-with-underline" onClick={() => setSelectedIndividual({id: user.workplaceEid, codbase: getCodbase(user.countryIso2)})}>Details</a></td>
                                                 </tr>
                                             ))
                                         }
