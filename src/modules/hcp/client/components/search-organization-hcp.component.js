@@ -1,16 +1,30 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import Select, { components } from 'react-select';
 import { getAllCountries } from '../../../core/client/country/country.actions';
 import OklaHcpdetails from './okla-hcp-details.component';
 
-const SearchHcp = () => {
+const safeGet = (object, property) => {
+    const propData = (object || {})[property];
+    return (prop) => prop ? safeGet(propData, prop) : propData;
+};
+
+const flatten = (array) => {
+    return Array.isArray(array) ? [].concat(...array.map(flatten)) : array;
+}
+
+const union = (a, b) => [...new Set([...a, ...b])];
+
+const SearchOrganizationHcp = () => {
     const dispatch = useDispatch();
 
     const countries = useSelector(state => state.countryReducer.countries);
     const allCountries = useSelector(state => state.countryReducer.allCountries);
+    const [userCountries, setUserCountries] = useState([]);
+
     const [selectedOption, setSelectedOption] = useState([]);
     const [specialties, setSpecialties] = useState([]);
     const [selectedIndividual, setSelectedIndividual] = useState(null);
@@ -22,7 +36,36 @@ const SearchHcp = () => {
         props.resetForm();
     };
 
+    const extractLoggedInUserCountries = (data) => {
+        const profile_permission_sets = safeGet(data, 'profile')('permissionSets')();
+        const profile_countries = profile_permission_sets ? profile_permission_sets.map(pps => safeGet(pps, 'countries')() || []) : [];
+
+        const userRoles = safeGet(data, 'role')();
+        const roles_countries = userRoles ? userRoles.map(role => {
+            const role_permission_sets = safeGet(role, 'permissionSets')();
+            return role_permission_sets.map(rps => safeGet(rps, 'countries')() || []);
+        }) : [];
+
+        const userCountries = union(flatten(profile_countries), flatten(roles_countries)).filter(e => e);
+
+        return userCountries;
+    }
+
+    const fetchUserCountries = (args, allCountries) => {
+        const countryList = [];
+        args.forEach(element => {
+            countryList.push(allCountries.find(x => x.country_iso2 == element));
+        });
+        return countryList.filter(c => c);
+    }
+
     useEffect(() => {
+        async function getCountries() {
+            const userProfile = (await axios.get('/api/users/profile')).data;
+            const userCountries = extractLoggedInUserCountries(userProfile);
+            setUserCountries(fetchUserCountries(userCountries, countries));
+        }
+
         const getSpecialties = async () =>{
             const codbases = selectedOption.map(item => `codbases=${item.value}`);
             const parameters = codbases.join('&');
@@ -32,12 +75,12 @@ const SearchHcp = () => {
             }
             else setSpecialties([]);
         }
-
+        getCountries();
         getSpecialties();
         dispatch(getAllCountries());
-    }, [selectedOption]);
+    }, [selectedOption, countries]);
 
-    const getCountries = () => countries.map(country => ({ value: country.codbase, label: country.codbase_desc }));
+    const getCountries = () => userCountries.map(country => ({ value: country.codbase, label: country.codbase_desc }));
     const getSpecialties = () => specialties.map( i => ({ value: i.codIdOnekey.split('.')[2], label: i.codDescription }));
 
     const getCountryName = (country_iso2) => {
@@ -67,11 +110,31 @@ const SearchHcp = () => {
         <main className="app__content cdp-light-bg h-100">
             <div className="container-fluid">
                 <div className="row">
+                    <div className="col-12 px-0">
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb rounded-0">
+                                <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
+                                <li className="breadcrumb-item"><NavLink to="/hcps">Information Management</NavLink></li>
+                                <li className="breadcrumb-item active"><span>Discover HCPs</span></li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+
+                <div className="row">
                     <div className="col-12 px-0 px-sm-3">
                         <div className="shadow-sm bg-light pb-3">
                             <h2 className="d-flex align-items-center p-3 px-sm-3 py-sm-3 page-title light">
                                 <span className="page-title__text font-weight-bold">OKLA Search</span>
                             </h2>
+
+                            <div className="d-flex align-items-center p-3 px-sm-3 py-sm-3 page-title light">
+                                <div>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/hcps/discover-professional">Health Care Professional</NavLink>
+                                    <NavLink className="custom-tab px-4 py-3 cdp-border-primary" to="/hcps/discover-organization">Health Care Organization</NavLink>
+                                </div>
+                            </div>
+
                             <div className="add-user mx-3 mt-0 p-3 bg-white rounded border">
                             <Formik
                                 initialValues={{
@@ -140,18 +203,25 @@ const SearchHcp = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <h5 className="border-bottom pt-5 pb-2 "><i className="far fa-user cdp-text-secondary mr-2"></i>Individual</h5>
+
+                                        <h5 className="border-bottom pt-4 pb-2 "><i className="far fa-building cdp-text-secondary mr-2"></i>Workplace</h5>
                                         <div className="row">
                                             <div className="col-12 col-sm-4">
                                                 <div className="form-group">
-                                                    <label for="exampleFormControlInput1">First Name</label>
-                                                    <Field className="form-control firstName" type='text' name='firstName' id='firstName' />
+                                                    <label for="AddressLabel">Address Label</label>
+                                                    <Field className="form-control address" type='text' name='address' id='address' />
                                                 </div>
                                             </div>
                                             <div className="col-12 col-sm-4">
                                                 <div className="form-group">
-                                                    <label for="exampleFormControlInput1">Last Name</label>
-                                                    <Field className="form-control lastName" type='text' name='lastName' id='lastName' />
+                                                    <label for="City">City</label>
+                                                    <Field className="form-control city" type='text' name='city' id='city' />
+                                                </div>
+                                            </div>
+                                            <div className="col-12 col-sm-4">
+                                                <div className="form-group">
+                                                    <label for="PostalCode">Postal Code</label>
+                                                    <Field className="form-control postCode" type='text' name='postCode' id='postCode' />
                                                 </div>
                                             </div>
                                             <div className="col-12 col-sm-4">
@@ -175,27 +245,6 @@ const SearchHcp = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <h5 className="border-bottom pt-4 pb-2 "><i className="far fa-building cdp-text-secondary mr-2"></i>Workplace</h5>
-                                        <div className="row">
-                                            <div className="col-12 col-sm-4">
-                                                <div className="form-group">
-                                                    <label for="AddressLabel">Address Label</label>
-                                                    <Field className="form-control address" type='text' name='address' id='address' />
-                                                </div>
-                                            </div>
-                                            <div className="col-12 col-sm-4">
-                                                <div className="form-group">
-                                                    <label for="City">City</label>
-                                                    <Field className="form-control city" type='text' name='city' id='city' />
-                                                </div>
-                                            </div>
-                                            <div className="col-12 col-sm-4">
-                                                <div className="form-group">
-                                                    <label for="PostalCode">Postal Code</label>
-                                                    <Field className="form-control postCode" type='text' name='postCode' id='postCode' />
-                                                </div>
-                                            </div>
-                                        </div>
                                         <h5 className="border-bottom pt-4 pb-2 "><i className="fas fa-key cdp-text-secondary mr-2"></i>Identifiers</h5>
                                         <div className="row">
                                             <div className="col-12 col-sm-4">
@@ -206,7 +255,7 @@ const SearchHcp = () => {
                                             </div>
                                             <div className="col-12 col-sm-4">
                                                 <div className="form-group">
-                                                    <label for="Individual ">Individual - Identifier</label>
+                                                    <label for="Individual ">Workplace - Identifier</label>
                                                     <Field className="form-control individual" type='text' name='individualEid' id='individual' />
                                                 </div>
                                             </div>
@@ -296,4 +345,4 @@ const SearchHcp = () => {
     );
 }
 
-export default SearchHcp;
+export default SearchOrganizationHcp;
