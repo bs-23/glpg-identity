@@ -197,7 +197,7 @@ export default function hcpUsers() {
     const openDiscoverHcpsWindow = (rowId) => {
         const width = (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth) * 0.8;
         const height = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) * 0.9;
-        window.open('/hcps/discover', 'name', `width=${width || 600},height=${height || 400}`);
+        window.open('/hcps/discover-professionals', 'name', `width=${width || 600},height=${height || 400}`);
         setSelectedRow(rowId);
     }
 

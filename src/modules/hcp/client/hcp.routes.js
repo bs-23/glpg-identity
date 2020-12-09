@@ -13,8 +13,8 @@ export default function HcpRoutes() {
         <Switch>
             <PrivateRoute exact path={path} component={InformationManagement} module={'information'} />
             <PrivateRoute path={`${path}/list`} component={HcpUsers} module={'information'} />
-            <PrivateRoute path={`${path}/discover-professional`} component={SearchProfessionalHcp} module={'information'} />
-            <PrivateRoute path={`${path}/discover-organization`} component={SearchOrganizationHcp} module={'information'} />
+            <PrivateRoute path={`${path}/discover-professionals`} component={SearchProfessionalHcp} module={'information'} />
+            <PrivateRoute path={`${path}/discover-organizations`} component={SearchOrganizationHcp} module={'information'} />
         </Switch>
     );
 }
