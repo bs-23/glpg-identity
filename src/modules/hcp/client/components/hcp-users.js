@@ -64,11 +64,11 @@ const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
                     <div>
                         <textarea className="form-control" rows="4" cols="45" value={comment} onBlur={handleOnBlur} onChange={(e) => setComment(e.target.value)} />
                     </div>
-                    {!comment && touched && <div className="invalid-feedback">
+                    {(!comment || !comment.trim()) && touched && <div className="invalid-feedback">
                         Must provide a comment.
                     </div>}
-                    {comment.length > maxCommentLength && <div class="invalid-feedback">This field must be at most {maxCommentLength} characters long.</div>}
-                    <button className="btn btn-block mt-3 cdp-btn-primary text-white" disabled={!comment || comment.length > maxCommentLength} onClick={handleSubmit}> Save Changes </button>
+                    {comment.trim().length > maxCommentLength && <div class="invalid-feedback">This field must be at most {maxCommentLength} characters long.</div>}
+                    <button className="btn btn-block mt-3 cdp-btn-primary text-white" disabled={!comment || !comment.trim() || comment.trim().length > maxCommentLength} onClick={handleSubmit}> Save Changes </button>
                 </div>
             </div>
         </Modal.Body>
