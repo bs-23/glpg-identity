@@ -1570,7 +1570,8 @@ async function searchOklaHcps(req, res) {
     try {
         let { duplicates, isInContract, phonetic } = req.body;
 
-        const page = req.query.page ? +req.query.page : 0;
+        let page = req.query.page ? +req.query.page - 1 : 0;
+        page = page < 0 ? 0 : page;
         const limit = 30;
 
         if ((duplicates && typeof duplicates !== 'boolean')
@@ -1584,7 +1585,7 @@ async function searchOklaHcps(req, res) {
 
         if (!codbases || !codbases.length) return res.status(400).send('Invalid Codbases.');
 
-        const fieldMap = {
+        const fieldNameMap = {
             firstName: 'individual.firstName',
             lastName: 'individual.lastName',
             address: 'address.dispatchLabel',
@@ -1595,13 +1596,20 @@ async function searchOklaHcps(req, res) {
             specialties: 'individual.speciality1'
         };
 
-        const fields = Object.keys(fieldMap).map(key => {
+        const exactFields = ['onekeyId', 'individualEid', 'specialties'];
+
+        const fields = Object.keys(fieldNameMap).map(key => {
             let value = req.body[key];
             if (Array.isArray(value) && value.length === 0) value = null;
+            const isExact = exactFields.includes(key);
             if (value) {
                 return {
-                    name: fieldMap[key],
-                    method: phonetic === true ? 'PHONETIC' : "FUZZY",
+                    name: fieldNameMap[key],
+                    method: isExact
+                        ? 'EXACT'
+                        : phonetic === true
+                            ? 'PHONETIC'
+                            : "FUZZY",
                     values: Array.isArray(value) ? value : [value]
                 }
             }
@@ -1651,12 +1659,14 @@ async function searchOklaHcps(req, res) {
                 firstName: individual.firstName,
                 lastName: individual.lastName,
                 specialties,
+                type: individual.typeCorporateLabel,
                 individualEid: individual.individualEid,
                 countryIso2: activitiesOfIndividual[0].country,
                 codbase: activitiesOfIndividual[0].codBase,
                 workplaces,
                 onekeyEidList,
-                isInContract
+                isInContract,
+                isValid: individual.statusCorporateLabel === 'Valid'
             };
 
             results.push(res);
@@ -1679,7 +1689,8 @@ async function searchOklaHcos(req, res) {
     try {
         let { duplicates, isInContract, phonetic } = req.body;
 
-        const page = req.query.page ? +req.query.page : 0;
+        let page = req.query.page ? +req.query.page - 1 : 0;
+        page = page < 0 ? 0 : page;
         const limit = 30;
 
         if ((duplicates && typeof duplicates !== 'boolean')
@@ -1693,7 +1704,7 @@ async function searchOklaHcos(req, res) {
 
         if (!codbases || !codbases.length) return res.status(400).send('Invalid Codbases.');
 
-        const fieldMap = {
+        const fieldNameMap = {
             address: 'address.dispatchLabel',
             city: 'address.villageLabel',
             postCode: 'address.longPostalCode',
@@ -1702,13 +1713,20 @@ async function searchOklaHcos(req, res) {
             specialties: 'workplace.speciality1'
         };
 
-        const fields = Object.keys(fieldMap).map(key => {
+        const exactFields = ['onekeyId', 'workplaceEid', 'specialties'];
+
+        const fields = Object.keys(fieldNameMap).map(key => {
             let value = req.body[key];
             if (Array.isArray(value) && value.length === 0) value = null;
+            const isExact = exactFields.includes(key);
             if (value) {
                 return {
-                    name: fieldMap[key],
-                    method: phonetic === true ? 'PHONETIC' : "FUZZY",
+                    name: fieldNameMap[key],
+                    method: isExact
+                        ? 'EXACT'
+                        : phonetic === true
+                            ? 'PHONETIC'
+                            : "FUZZY",
                     values: Array.isArray(value) ? value : [value]
                 }
             }
@@ -1799,12 +1817,14 @@ async function getOklaHcpDetails(req, res) {
                 isValid: workplace.statusCorporateLabel === 'Valid',
                 name,
                 address: workplace.workplaceAddresses['P,1'].address.addressLongLabel,
+                postCode: workplace.workplaceAddresses['P,1'].address.longPostalCode,
                 location: {
                     latitude: workplace.workplaceAddresses['P,1'].address.geocodingAddresses.W.latitude,
                     longitude: workplace.workplaceAddresses['P,1'].address.geocodingAddresses.W.longitude
                 },
                 city: workplace.workplaceAddresses['P,1'].address.postalTownReference.villageLabel,
-                contactNumbers
+                contactNumbers,
+                type: workplace.typeCorporateLabel,
             };
         });
 
@@ -1814,16 +1834,32 @@ async function getOklaHcpDetails(req, res) {
             })
             : [];
 
+        const externalIdentifiers = Object.keys(individual.externalKeys).map(key => {
+            const externalKey = individual.externalKeys[key];
+            return {
+                name: externalKey.typeLabel,
+                value: externalKey.value
+            };
+        });
+
         const data = {
             firstName: individual.firstName,
             lastName: individual.lastName,
+            salutation: individual.prefixNameCorporateLabel,
+            title: individual.titleCorporateLabel,
+            gender: individual.genderCorporateLabel,
             specialties,
+            type: individual.typeCorporateLabel,
             individualEid: individual.individualEid,
+            externalIdentifiers,
             countryIso2: activitiesOfIndividual[0].country,
             codbase: activitiesOfIndividual[0].codBase,
             workplaces,
             onekeyEidList,
-            isInContract
+            isInContract,
+            isValid: individual.statusCorporateLabel === 'Valid',
+            graduationYear: individual.thesisYear,
+            birthYear: individual.birthYear,
         };
 
         res.json(data);

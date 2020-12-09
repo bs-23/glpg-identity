@@ -30,17 +30,31 @@ const OklaHcpdetails = ({ individual, setSelectedIndividual }) => {
         onHide={() => hideHcpDetails()}>
         <Modal.Header closeButton>
             <Modal.Title>
-                HCP details
+                {hcpDetails?.lastName} {hcpDetails?.firstName}
             </Modal.Title>
         </Modal.Header>
         <Modal.Body>
             {hcpDetails ? (
                 <div>
-                    <div>First Name: {hcpDetails.firstName}</div>
-                    <div>Last Name: {hcpDetails.lastName}</div>
+                    <div>Salutation: {hcpDetails.salutation}</div>
+                    <div>Title: {hcpDetails.title}</div>
+                    <div>Gender: {hcpDetails.gender}</div>
+                    <div>Graduation Year: {hcpDetails.graduationYear}</div>
+                    <div>Birth Year: {hcpDetails.birthYear}</div>
                     <div>Country: {hcpDetails.countryIso2}</div>
-                    <div>Individual-Id: {hcpDetails.individualEid}</div>
                     <div>Specialties: {hcpDetails.specialties.join(', ')}</div>
+                    <div>
+                        Identifiers:
+                        <div className="ml-3">OneKey Individual ID: {hcpDetails.individualEid}</div>
+                        {
+                            hcpDetails.externalIdentifiers.map((identifier, identifierIdx) => (
+                                <div key={identifierIdx} className="ml-3">{identifier.name}: {identifier.value}</div>
+                            ))
+                        }
+                    </div>
+
+                    <div>Status: {hcpDetails.isValid ? 'Valid' : 'Invalid'}</div>
+
 
                     { selectedWorkplace && <MapView location={selectedWorkplace.location} />}
 
@@ -54,9 +68,10 @@ const OklaHcpdetails = ({ individual, setSelectedIndividual }) => {
                                         ? <i className="fas fa-check mr-1 cdp-text-primary"></i>
                                         : <i className="fas fa-times mr-1 cdp-text-secondary"></i>}
                                 </span>
-                                <span>{workplace.name}</span>
-                                <span>{workplace.address}</span>
-                                <span>{workplace.city}</span>
+                                <span className="ml-1">{workplace.name}</span>
+                                <span className="ml-1">| {workplace.type}</span>
+                                <span className="ml-1">| {workplace.address}</span>
+                                <span className="ml-1">| {workplace.city}, {workplace.postCode}</span>
                                 {workplace.contactNumbers.map((c, i) => (<div key={'tel-' + i}>{c.type}: {c.number}</div>))}
                             </div>
                         ))

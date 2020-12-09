@@ -142,7 +142,7 @@ const SearchProfessionalHcp = () => {
                                     isInContract: false,
                                     phonetic: false,
                                     duplicates: false,
-                                    firstName: '',
+                                    firstName: 'harold',
                                     lastName: '',
                                     address: '',
                                     city: '',
