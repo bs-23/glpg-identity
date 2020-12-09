@@ -5,7 +5,7 @@ const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodeca
 const searchUrl = nodecache.getValue('OKLA_SEARCH_URL');
 const auth = {
     username: nodecache.getValue('OKLA_USERNAME'),
-    password: nodecache.getValue('OLA_PASSWORD')
+    password: nodecache.getValue('OKLA_PASSWORD')
 };
 
 async function search(queryObj) {
