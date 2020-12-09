@@ -298,7 +298,7 @@ const SearchOrganizationHcp = () => {
                                                 <button type="reset" className="btn btn-block btn-secondary mt-4 p-2" onClick={() => resetSearch(formikProps)}>CLEAR</button>
                                             </div>
                                             <div className="col-6">
-                                                <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!formikProps.values.countries || !formikProps.values.countries.length || !(formikProps.values.address || formikProps.values.city || formikProps.values.postalCode || formikProps.values.onekeyId || formikProps.values.workplaceEid || specialtiesFlag)}> SEARCH </button>
+                                                <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!formikProps.values.countries || !formikProps.values.countries.length || !(formikProps.values.address || formikProps.values.city || formikProps.values.postCode || formikProps.values.onekeyId || formikProps.values.workplaceEid || specialtiesFlag)}> SEARCH </button>
                                             </div>
                                         </div>
                                     </Form>
@@ -337,7 +337,7 @@ const SearchOrganizationHcp = () => {
                                         {
                                             users.results.map( (user, idx) => (
                                                 <tr key={idx}>
-                                                    <td>{user.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary"></i>} {`${user.name}`}</td>
+                                                    <td>{user.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary" title="In my contract"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary" title="Not In my contract"></i>} {`${user.name}`}</td>
                                                     <td>{(user.specialties || ['--']).join(', ')}</td>
                                                     <td>{ user.address }</td>
                                                     <td>{ user.city }</td>
