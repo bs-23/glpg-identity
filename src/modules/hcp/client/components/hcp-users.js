@@ -78,6 +78,10 @@ export default function hcpUsers() {
     const history = useHistory();
     const params = new URLSearchParams(window.location.search);
 
+    const [showFaq, setShowFaq] = useState(false);
+    const handleCloseFaq = () => setShowFaq(false);
+    const handleShowFaq = () => setShowFaq(true);
+
     const [show, setShow] = useState({ profileManage: false, updateStatus: false, saveConfirmation: false });
     const [currentUser, setCurrentUser] = useState({});
     const { addToast } = useToasts();
@@ -176,7 +180,7 @@ export default function hcpUsers() {
     };
 
     const urlChange = (pageNo, codBase, status, orderColumn, pageChange = false) => {
-        if(Array.isArray(status)) status = 'self_verified,manually_verified';
+        if (Array.isArray(status)) status = 'self_verified,manually_verified';
         let orderType = params.get('orderType');
         const orderBy = params.get('orderBy');
         const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
@@ -189,8 +193,8 @@ export default function hcpUsers() {
     };
 
     const openAuthorityLink = (link) => {
-        if(!link) return;
-        window.open(link, 'name','width=600,height=400');
+        if (!link) return;
+        window.open(link, 'name', 'width=600,height=400');
     }
 
     const getSpecialtyOptions = async (value, row) => {
@@ -198,7 +202,7 @@ export default function hcpUsers() {
         const response = await dispatch(getHCPSpecialities(country_iso2, locale));
         const { value: { data: specialty_by_country_locale } } = response;
 
-        if(!specialty_by_country_locale) return [];
+        if (!specialty_by_country_locale) return [];
 
         const options = specialty_by_country_locale.map(sp => ({
             key: `${sp.cod_id_onekey}_${sp.cod_description}`,
@@ -214,11 +218,11 @@ export default function hcpUsers() {
         const country_locale_key = `${country_iso2.toLowerCase()}_${locale.toLowerCase()}`;
         const specialty_by_country_locale = specialties[country_locale_key];
 
-        if(specialty_by_country_locale) {
+        if (specialty_by_country_locale) {
             const specialties_by_onekey = specialty_by_country_locale.filter(sp => sp.cod_id_onekey === specialty_onekey);
 
             const speciality_en = specialties_by_onekey.find(sp => sp.cod_locale.toLowerCase() === 'en');
-            if(speciality_en) return speciality_en.cod_description;
+            if (speciality_en) return speciality_en.cod_description;
 
             const speciality_locale = specialties_by_onekey.find(sp => sp.cod_locale.toLowerCase() === locale.toLowerCase());
             return speciality_locale ? speciality_locale.cod_description : '';
@@ -239,7 +243,7 @@ export default function hcpUsers() {
     const submitHandler = ({ getUpdatedCells }, done) => {
         const updatedCells = getUpdatedCells(["id", "comment"]);
         axios.put('/api/hcp-profiles/update-hcps', updatedCells)
-            .then(({data}) => {
+            .then(({ data }) => {
                 addToast('Successfully saved changes.', {
                     appearance: 'success',
                     autoDismiss: true
@@ -260,16 +264,16 @@ export default function hcpUsers() {
 
     const renderStatus = ({ value: status }) => {
         return status === 'self_verified'
-        ? <span><i className="fa fa-xs fa-circle text-success pr-2 hcp-status-icon"></i>Self Verified</span>
-        : status === 'manually_verified'
-            ? <span><i className="fa fa-xs fa-circle text-success pr-2 hcp-status-icon"></i>Manually Verified</span>
-            : status === 'consent_pending'
-                ? <span><i className="fa fa-xs fa-circle text-warning pr-2 hcp-status-icon"></i>Consent Pending</span>
-                : status === 'not_verified'
-                    ? <span><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Not Verified</span>
-                    : status === 'rejected'
-                        ? <span><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Rejected</span>
-                        : <span></span>
+            ? <span><i className="fa fa-xs fa-circle text-success pr-2 hcp-status-icon"></i>Self Verified</span>
+            : status === 'manually_verified'
+                ? <span><i className="fa fa-xs fa-circle text-success pr-2 hcp-status-icon"></i>Manually Verified</span>
+                : status === 'consent_pending'
+                    ? <span><i className="fa fa-xs fa-circle text-warning pr-2 hcp-status-icon"></i>Consent Pending</span>
+                    : status === 'not_verified'
+                        ? <span><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Not Verified</span>
+                        : status === 'rejected'
+                            ? <span><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Rejected</span>
+                            : <span></span>
     }
 
     const renderOptInTypes = ({ value }) => {
@@ -296,12 +300,12 @@ export default function hcpUsers() {
             </Dropdown>}
             {hasRowChanged &&
                 <>
-                <div className="d-flex position-absolute inline-editing__btn-wrap">
-                    <i style={isValid ? {} : { pointerEvents: 'none' }} onClick={() => onTableRowSave(hcps.users[rowIndex], { rowIndex, editableTableProps, formikProps })} disabled={!dirty} className={isValid ? 'fas fa-check mr-3 cdp-text-primary fa-1_5x' : 'fas fa-check mr-3 cdp-text-primary fa-1_5x inline-editing__btn-disable'} title="Save Changes" type="button"></i>
-                    <i onClick={resetForm} className="fas fa-times text-danger fa-1_5x" title="Cancel Changes" type="button"></i>
-                </div>
+                    <div className="d-flex position-absolute inline-editing__btn-wrap">
+                        <i style={isValid ? {} : { pointerEvents: 'none' }} onClick={() => onTableRowSave(hcps.users[rowIndex], { rowIndex, editableTableProps, formikProps })} disabled={!dirty} className={isValid ? 'fas fa-check mr-3 cdp-text-primary fa-1_5x' : 'fas fa-check mr-3 cdp-text-primary fa-1_5x inline-editing__btn-disable'} title="Save Changes" type="button"></i>
+                        <i onClick={resetForm} className="fas fa-times text-danger fa-1_5x" title="Cancel Changes" type="button"></i>
+                    </div>
                 </>
-             }
+            }
         </div>
     }
 
@@ -433,7 +437,7 @@ export default function hcpUsers() {
     }
 
     const alertUserBeforeClosingWindow = (e) => {
-        if(window.tableDirty) {
+        if (window.tableDirty) {
             e.preventDefault();
             e.returnValue = '';
         }
@@ -463,8 +467,23 @@ export default function hcpUsers() {
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/hcps">Information Management</NavLink></li>
                                 <li className="breadcrumb-item active"><span>HCP Profile List</span></li>
-                                <li className="ml-auto mr-3"><div className="faq__floating"><i class="icon icon-help icon-2x cdp-text-secondary"></i></div></li>
+                                <li className="ml-auto mr-3"><div className="faq__floating"><i onClick={handleShowFaq} class="icon icon-help icon-2x cdp-text-secondary"></i></div></li>
                             </ol>
+
+                            <Modal show={showFaq} onHide={handleCloseFaq}>
+                                <Modal.Header closeButton>
+                                    <Modal.Title>Modal heading</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
+                                <Modal.Footer>
+                                    <button variant="secondary" onClick={handleCloseFaq}>
+                                        Close
+                                    </button>
+                                    <button variant="primary" onClick={handleCloseFaq}>
+                                        Save Changes
+                                    </button>
+                                </Modal.Footer>
+                            </Modal>
                         </nav>
                     </div>
                 </div>
@@ -497,7 +516,7 @@ export default function hcpUsers() {
                                                                         key={authority.link} className="border-bottom py-2 px-3"
                                                                         onClick={() => openAuthorityLink(authority.link)}
                                                                         role="button"
-                                                                        >
+                                                                    >
                                                                         <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height={authority.height} />
                                                                     </Dropdown.Item>
                                                                 )
@@ -532,11 +551,11 @@ export default function hcpUsers() {
                                                 </Dropdown.Menu>
                                             </Dropdown>
 
-                                        <Dropdown className="d-flex align-items-center show dropdown rounded pl-2 pr-1 dropdown cdp-bg-secondary text-white dropdown shadow-sm">
-                                            Status
+                                            <Dropdown className="d-flex align-items-center show dropdown rounded pl-2 pr-1 dropdown cdp-bg-secondary text-white dropdown shadow-sm">
+                                                Status
                                                 <Dropdown.Toggle variant="" className="ml-2 cdp-bg-secondary rounded-0 border-left text-white">
-                                                {getSelectedStatus()}
-                                            </Dropdown.Toggle>
+                                                    {getSelectedStatus()}
+                                                </Dropdown.Toggle>
                                                 <Dropdown.Menu>
                                                     <Dropdown.Item className={hcps.status === null ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, null, params.get('orderBy'), params.get('orderType'))}>All</Dropdown.Item>
                                                     <Dropdown.Item className={isAllVerifiedStatus() ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, 'self_verified,manually_verified', params.get('orderBy'), params.get('orderType'))}>All Verified</Dropdown.Item>
@@ -633,7 +652,7 @@ export default function hcpUsers() {
                                                             </Card.Body>
                                                         </Accordion.Collapse>
                                                         <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
-                                                        <span className="d-flex align-items-center"><i className={`icon ${consent.consent_given ? 'icon-check-filled' : 'icon-close-circle text-danger'} cdp-text-primary mr-4 consent-check`}></i> <span className="consent-summary">{consent.preference}</span></span>
+                                                            <span className="d-flex align-items-center"><i className={`icon ${consent.consent_given ? 'icon-check-filled' : 'icon-close-circle text-danger'} cdp-text-primary mr-4 consent-check`}></i> <span className="consent-summary">{consent.preference}</span></span>
                                                             <i className="icon icon-arrow-down ml-2 accordion-consent__icon-down"></i>
                                                         </Accordion.Toggle>
                                                     </Card>
@@ -672,9 +691,11 @@ export default function hcpUsers() {
                                             <div className="row pb-3">
                                                 <div className="col">
                                                     {currentUser.consents && currentUser.consents.length ?
-                                                        currentUser.consents.map(consent => {return consent.consent_given && <div className="pb-1" key={consent.id} >
-                                                            <i className={`icon ${consent.consent_given ? 'icon-check-filled' : 'icon-close-circle text-danger'} cdp-text-primary mr-2 small`}></i>{consent.preference}
-                                                        </div>})
+                                                        currentUser.consents.map(consent => {
+                                                            return consent.consent_given && <div className="pb-1" key={consent.id} >
+                                                                <i className={`icon ${consent.consent_given ? 'icon-check-filled' : 'icon-close-circle text-danger'} cdp-text-primary mr-2 small`}></i>{consent.preference}
+                                                            </div>
+                                                        })
                                                         : <div className="alert alert-warning">The HCP has not given any consent.</div>
                                                     }
                                                 </div>
@@ -690,7 +711,7 @@ export default function hcpUsers() {
                                             validationSchema={ApprovalRejectSchema}
                                             onSubmit={(values, actions) => {
                                                 if (values.selectedStatus === 'approve') {
-                                                    if(values.comment === 'other') values.comment = values.other_comment;
+                                                    if (values.comment === 'other') values.comment = values.other_comment;
                                                     axios.put(`/api/hcp-profiles/${currentUser.id}/approve`, { comment: values.comment })
                                                         .then(() => onUpdateStatusSuccess())
                                                         .catch(err => onUpdateStatusFailure(err))
@@ -712,7 +733,7 @@ export default function hcpUsers() {
                                                             <a
                                                                 className={`btn btn-block cdp-btn-outline-primary mt-4 p-2 font-weight-bold ${formikProps.values.selectedStatus === 'approve' ? 'selected' : ''}`}
                                                                 onClick={() => {
-                                                                    if(formikProps.values.selectedStatus !== 'approve') {
+                                                                    if (formikProps.values.selectedStatus !== 'approve') {
                                                                         formikProps.setFieldValue('selectedStatus', 'approve');
                                                                         formikProps.setFieldValue('comment', '');
                                                                         formikProps.setFieldValue('other_comment', '');
@@ -727,7 +748,7 @@ export default function hcpUsers() {
                                                         <div className="col-6">
                                                             <a
                                                                 onClick={() => {
-                                                                    if(formikProps.values.selectedStatus !== 'reject') {
+                                                                    if (formikProps.values.selectedStatus !== 'reject') {
                                                                         formikProps.setFieldValue('selectedStatus', 'reject');
                                                                         formikProps.setFieldValue('comment', '');
                                                                         formikProps.setFieldValue('other_comment', '');
@@ -812,7 +833,7 @@ export default function hcpUsers() {
                                         onDirtyChange={handleTableDirtyStatusChange}
                                         enableReinitialize
                                     >
-                                    {/* {
+                                        {/* {
                                         (editableTableProps) => {
                                             const { dirty, values, touched, status, errors, error, resetForm, initialValues, submitForm } = editableTableProps;
                                             console.log('current value: ', values.rows[0] && values.rows[0].first_name)
@@ -842,7 +863,7 @@ export default function hcpUsers() {
                                 <>
                                     <div className="row justify-content-center mt-sm-5 pt-5 mb-3">
                                         <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">
-                                        <i className="icon icon-team icon-6x cdp-text-secondary"></i>
+                                            <i className="icon icon-team icon-6x cdp-text-secondary"></i>
                                             <h3 className="font-weight-bold cdp-text-primary pt-4">No Profile Found!</h3>
                                         </div>
                                     </div>
