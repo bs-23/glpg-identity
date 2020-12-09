@@ -23,7 +23,7 @@ const SearchOrganizationHcp = () => {
 
     const countries = useSelector(state => state.countryReducer.countries);
     const allCountries = useSelector(state => state.countryReducer.allCountries);
-    const [userCountries, setUserCountries] = useState([]);
+    const userCountries = getUserCountries();
 
     const [selectedOption, setSelectedOption] = useState([]);
     const [specialties, setSpecialties] = useState([]);
@@ -67,7 +67,7 @@ const SearchOrganizationHcp = () => {
         })
     }
 
-    const extractLoggedInUserCountries = (data) => {
+    function extractLoggedInUserCountries(data) {
         const profile_permission_sets = safeGet(data, 'profile')('permissionSets')();
         const profile_countries = profile_permission_sets ? profile_permission_sets.map(pps => safeGet(pps, 'countries')() || []) : [];
 
@@ -82,7 +82,7 @@ const SearchOrganizationHcp = () => {
         return userCountries;
     }
 
-    const fetchUserCountries = (args, allCountries) => {
+    function fetchUserCountries(args, allCountries) {
         const countryList = [];
         args.forEach(element => {
             countryList.push(allCountries.find(x => x.country_iso2 == element));
@@ -90,13 +90,13 @@ const SearchOrganizationHcp = () => {
         return countryList.filter(c => c);
     }
 
-    useEffect(() => {
-        async function getCountries() {
-            const userProfile = (await axios.get('/api/users/profile')).data;
-            const userCountries = extractLoggedInUserCountries(userProfile);
-            setUserCountries(fetchUserCountries(userCountries, countries));
-        }
+    function getUserCountries() {
+        const userProfile = useSelector(state => state.userReducer.loggedInUser);
+        const userCountries = extractLoggedInUserCountries(userProfile);
+        return fetchUserCountries(userCountries, countries);
+    }
 
+    useEffect(() => {
         const getSpecialties = async () =>{
             const codbases = selectedOption.map(item => `codbases=${item.value}`);
             const parameters = codbases.join('&');
@@ -106,7 +106,6 @@ const SearchOrganizationHcp = () => {
             }
             else setSpecialties([]);
         }
-        getCountries();
         getSpecialties();
         dispatch(getAllCountries());
     }, [selectedOption, countries]);
