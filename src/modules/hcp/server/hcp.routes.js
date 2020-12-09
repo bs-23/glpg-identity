@@ -13,10 +13,13 @@ module.exports = app => {
         .put(CDPAuthStrategy, controller.editHcp);
 
     app.route('/api/okla/hcps/search')
-        .post(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.searchOkla);
+        .post(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.searchOklaHcps);
 
     app.route('/api/okla/hcps/:codbase/:id')
         .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getOklaHcpDetails);
+
+    app.route('/api/okla/hcos/search')
+        .post(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.searchOklaHcos);
 
     app.route('/api/hcps/specialties')
         .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getSpecialtiesForCdp);

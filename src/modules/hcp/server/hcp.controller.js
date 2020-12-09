@@ -1566,12 +1566,12 @@ async function updateHCPUserConsents(req, res) {
     }
 }
 
-async function searchOkla(req, res) {
+async function searchOklaHcps(req, res) {
     try {
         let { duplicates, isInContract, phonetic } = req.body;
 
         const page = req.query.page ? +req.query.page : 0;
-        const limit = 15;
+        const limit = 30;
 
         if ((duplicates && typeof duplicates !== 'boolean')
             || (phonetic && typeof phonetic !== 'boolean')
@@ -1634,7 +1634,7 @@ async function searchOkla(req, res) {
                 return {
                     id: workplace.workplaceEid,
                     isMainActivity: g.activity.isMainActivity,
-                    isValid: workplace.statusLabel === 'Valid',
+                    isValid: workplace.statusCorporateLabel === 'Valid',
                     name,
                     addresss: workplace.workplaceAddresses['P,1'].address.addressLongLabel,
                     city: workplace.workplaceAddresses['P,1'].address.postalTownReference.villageLabel
@@ -1668,6 +1668,90 @@ async function searchOkla(req, res) {
             resultSize: searchResponse.resultSize,
             results
         }
+        res.json(data);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function searchOklaHcos(req, res) {
+    try {
+        let { duplicates, isInContract, phonetic } = req.body;
+
+        const page = req.query.page ? +req.query.page : 0;
+        const limit = 30;
+
+        if ((duplicates && typeof duplicates !== 'boolean')
+            || (phonetic && typeof phonetic !== 'boolean')
+            || (isInContract && typeof isInContract !== 'boolean'))
+            return res.status(400).send('Invalid request');
+
+        const codbases = req.body.codbases && Array.isArray(req.body.codbases)
+            ? req.body.codbases.filter(cb => 'string' === typeof cb)
+            : null;
+
+        if (!codbases || !codbases.length) return res.status(400).send('Invalid Codbases.');
+
+        const fieldMap = {
+            address: 'address.dispatchLabel',
+            city: 'address.villageLabel',
+            postCode: 'address.longPostalCode',
+            onekeyId: 'activity.activityEid',
+            workplaceEid: 'workplace.workplaceEid',
+            specialties: 'workplace.speciality1'
+        };
+
+        const fields = Object.keys(fieldMap).map(key => {
+            let value = req.body[key];
+            if (Array.isArray(value) && value.length === 0) value = null;
+            if (value) {
+                return {
+                    name: fieldMap[key],
+                    method: phonetic === true ? 'PHONETIC' : "FUZZY",
+                    values: Array.isArray(value) ? value : [value]
+                }
+            }
+        }).filter(field => field);
+
+        const queryObj = {
+            entityType: 'workplace',
+            isInContract,
+            duplicates,
+            startIndex: page * limit,
+            resultSize: limit,
+            codBases: codbases,
+            fields
+        };
+
+        const { response: searchResponse } = await OklaService.search(queryObj);
+
+        const results = searchResponse.results.map(({ isInContract, country, codBase, workplace }) => {
+            const name = [workplace.managerWorkplaceUsualName, workplace.usualName].filter(i => i).join(' - ');
+            const specialties = workplace.qualifications
+                ? Object.keys(workplace.qualifications).map(key => {
+                    return workplace.qualifications[key].corporateLabel
+                })
+                : undefined;
+            return {
+                name,
+                isInContract,
+                isValid: workplace.statusCorporateLabel === 'Valid',
+                specialties,
+                countryIso2: country,
+                codbase: codBase,
+                address: workplace.workplaceAddresses['P,1'].address.addressLongLabel,
+                city: workplace.workplaceAddresses['P,1'].address.postalTownReference.villageLabel
+            }
+        });
+
+        const data = {
+            totalNumberOfResults: searchResponse.totalNumberOfResults,
+            numberOfWorkplaces: searchResponse.numberOfWorkplaces,
+            resultSize: searchResponse.resultSize,
+            results
+        };
+
         res.json(data);
     } catch (err) {
         console.error(err);
@@ -1712,7 +1796,7 @@ async function getOklaHcpDetails(req, res) {
             return {
                 id: workplace.workplaceEid,
                 isMainActivity: g.activity.isMainActivity,
-                isValid: workplace.statusLabel === 'Valid',
+                isValid: workplace.statusCorporateLabel === 'Valid',
                 name,
                 address: workplace.workplaceAddresses['P,1'].address.addressLongLabel,
                 location: {
@@ -1801,6 +1885,7 @@ exports.getHCPUserConsents = getHCPUserConsents;
 exports.updateHcps = updateHcps;
 exports.getSpecialtiesWithEnglishTranslation = getSpecialtiesWithEnglishTranslation;
 exports.updateHCPUserConsents = updateHCPUserConsents;
-exports.searchOkla = searchOkla;
+exports.searchOklaHcps = searchOklaHcps;
+exports.searchOklaHcos = searchOklaHcos;
 exports.getSpecialtiesForCdp = getSpecialtiesForCdp;
 exports.getOklaHcpDetails = getOklaHcpDetails;
