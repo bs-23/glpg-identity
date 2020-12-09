@@ -915,12 +915,12 @@ async function createConsentCategory(req, res) {
         const [data, created] = await ConsentCategory.findOrCreate({
             where: {
                 title: {
-                    [Op.iLike]: req.body.title
+                    [Op.iLike]: req.body.title.trim()
                 }
             },
             defaults: {
-                title: req.body.title,
-                slug: req.body.title,
+                title: req.body.title.trim(),
+                slug: req.body.title.trim(),
                 created_by: req.user.id,
                 updated_by: req.user.id
             }
@@ -935,7 +935,7 @@ async function createConsentCategory(req, res) {
             object_id: data.id,
             table_name: 'consent_categories',
             actor: req.user.id,
-            remarks: `"${data.title}" consent category created`
+            remarks: `"${data.title.trim()}" consent category created`
         });
 
         res.json(data);
