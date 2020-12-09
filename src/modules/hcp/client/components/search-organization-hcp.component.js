@@ -29,12 +29,42 @@ const SearchOrganizationHcp = () => {
     const [specialties, setSpecialties] = useState([]);
     const [selectedIndividual, setSelectedIndividual] = useState(null);
     const [users, setUsers] = useState({});
+    const [formData, setFormData] = useState({});
+    const [currentPage, setCurrentPage] = useState(1);
+
 
     const resetSearch = (props) => {
+        setFormData({});
+        currentPage(1);
         setSelectedOption([]);
         setUsers([]);
         props.resetForm();
     };
+
+    const pageLeft = () => {
+        if(currentPage === 1) return;
+
+        axios.post(`/api/okla/hcps/search?page?${currentPage-1}`, formData)
+        .then(response => {
+            setUsers(response.data);
+            setCurrentPage(currentPage-1);
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    }
+
+    const pageRight = () => {
+        if(currentPage === Math.ceil(users.totalNumberOfResults / users.resultSize)) return;
+        axios.post(`/api/okla/hcps/search?page?${currentPage+1}`, formData)
+        .then(response => {
+            setUsers(response.data);
+            setCurrentPage(currentPage+1);
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    }
 
     const extractLoggedInUserCountries = (data) => {
         const profile_permission_sets = safeGet(data, 'profile')('permissionSets')();
@@ -159,6 +189,7 @@ const SearchOrganizationHcp = () => {
                                     // delete values.countries;
                                     const response = await axios.post('/api/okla/hcos/search', values);
                                     setUsers(response.data);
+                                    setFormData(values);
                                     actions.setSubmitting(false);
                                 }}
                             >
@@ -316,6 +347,14 @@ const SearchOrganizationHcp = () => {
                                         }
                                     </tbody>
                                 </table>
+                                {
+                                (Math.floor(users.totalNumberOfResults / users.resultSize) >= 1 ) &&
+                                    <div className="pagination justify-content-end align-items-center border-top p-3">
+                                        <span className="cdp-text-primary font-weight-bold">{`Page ${currentPage} of ${Math.floor(users.totalNumberOfResults / users.resultSize)+1}`}</span>
+                                        <span className="pagination-btn" onClick={() => pageLeft()} disabled={currentPage === 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
+                                        <span className="pagination-btn" onClick={() => pageRight()} disabled={Math.ceil(users.totalNumberOfResults / users.resultSize) === currentPage}><i className="icon icon-arrow-down ml-2 next"></i></span>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>
