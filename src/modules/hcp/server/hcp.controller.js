@@ -1439,6 +1439,35 @@ async function getSpecialtiesWithEnglishTranslation(req, res) {
             type: QueryTypes.SELECT
         });
 
+        if (!masterDataSpecialties.length) {
+            const codbaseCountry = await sequelize.datasyncConnector.query(`
+                SELECT * FROM ciam.vwcountry
+                WHERE LOWER(countryname) = $codbase_desc;`, {
+                bind: {
+                    codbase_desc: countries[0].codbase_desc.toLowerCase()
+                },
+                type: QueryTypes.SELECT
+            });
+
+            const localeUsingParentCountryISO = `${locale.split('_')[0]}_${codbaseCountry[0].country_iso2}`;
+
+            masterDataSpecialties = await sequelize.datasyncConnector.query(`
+                SELECT cod_id_onekey, codbase, cod_description, cod_locale
+                FROM ciam.vwspecialtymaster as Specialty
+                WHERE cod_id_onekey in
+                        (SELECT cod_id_onekey
+                        FROM ciam.vwspecialtymaster as Specialty
+                        WHERE LOWER(cod_locale) = $locale AND LOWER(codbase) = $codbase)
+                    AND (LOWER(cod_locale) = 'en' OR LOWER(cod_locale) = $locale)
+                `, {
+                bind: {
+                    locale: localeUsingParentCountryISO.toLowerCase(),
+                    codbase: countries[0].codbase.toLowerCase()
+                },
+                type: QueryTypes.SELECT
+            });
+        }
+
         if (!masterDataSpecialties || masterDataSpecialties.length === 0) {
             response.data = [];
             return res.status(204).send(response);
