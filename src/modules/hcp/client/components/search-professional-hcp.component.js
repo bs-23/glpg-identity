@@ -130,8 +130,8 @@ const SearchProfessionalHcp = () => {
 
                             <div className="d-flex align-items-center p-3 px-sm-3 py-sm-3 page-title light">
                                 <div>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/hcps/discover-professional">Health Care Professional</NavLink>
-                                    <NavLink className="custom-tab px-4 py-3 cdp-border-primary" to="/hcps/discover-organization">Health Care Organization</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/hcps/discover-professionals">Health Care Professional</NavLink>
+                                    <NavLink className="custom-tab px-4 py-3 cdp-border-primary" to="/hcps/discover-organizations">Health Care Organization</NavLink>
                                 </div>
                             </div>
 
