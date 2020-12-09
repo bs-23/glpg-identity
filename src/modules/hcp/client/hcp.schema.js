@@ -48,7 +48,6 @@ export const HcpInlineEditSchema = object().shape({
         .required('This field must not be empty.'),
     telephone: string()
         .matches(/^(?:[+]?[0-9]*|[0-9]{2,3}[\/]?[0-9]*)$/, 'Must be a valid phone number')
-        .min(6, 'This field must be at least 6 characters long')
         .max(25,'This field must be at most 25 characters long')
         .nullable()
 });
