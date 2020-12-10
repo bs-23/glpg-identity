@@ -1827,6 +1827,8 @@ async function getOklaHcpDetails(req, res) {
 
         const { response: searchResponse } = await OklaService.search(queryObj);
 
+        if (!searchResponse.results || !searchResponse.results.length) return res.status(404).send('No HCO found with this ID.');
+
         const activitiesOfIndividual = searchResponse.results.filter(r => r.individual.individualEid === id);
 
         const  onekeyEidList = activitiesOfIndividual.map(i => i.onekeyEid);
@@ -1919,55 +1921,10 @@ async function getOklaHcoDetails(req, res) {
 
         const { response: searchResponse } = await OklaService.search(queryObj);
 
-        if (!searchResponse.results || !searchResponse.results.length) return res.status(404).send('No workplace found.');
+        if (!searchResponse.results || !searchResponse.results.length) return res.status(404).send('No workplace found with this ID.');
 
         const { workplace, country, codBase, isInContract } = searchResponse.results[0];
 
-        // const activitiesOfIndividual = searchResponse.results.filter(r => r.individual.individualEid === id);
-
-        // const  onekeyEidList = activitiesOfIndividual.map(i => i.onekeyEid);
-        // const individual = activitiesOfIndividual[0].individual;
-        // const isInContract = activitiesOfIndividual[0].isInContract;
-
-        // const workplaces = activitiesOfIndividual.map(g => {
-        //     const workplace = g.workplace;
-        //     const name = [workplace.managerWorkplaceUsualName, workplace.usualName].filter(i => i).join(' - ');
-        //     const contactNumbers = Object.keys(workplace.telephones || []).map(key => {
-        //         return {
-        //             number: workplace.telephones[key].callNumberForSearch,
-        //             type: workplace.telephones[key].typeCorporateLabel
-        //         };
-        //     });
-        //     return {
-        //         id: workplace.workplaceEid,
-        //         isMainActivity: g.activity.isMainActivity,
-        //         isValid: workplace.statusCorporateLabel === 'Valid',
-        //         name,
-        //         address: workplace.workplaceAddresses['P,1'].address.addressLongLabel,
-        //         postCode: workplace.workplaceAddresses['P,1'].address.longPostalCode,
-        //         location: {
-        //             latitude: workplace.workplaceAddresses['P,1'].address.geocodingAddresses.W.latitude,
-        //             longitude: workplace.workplaceAddresses['P,1'].address.geocodingAddresses.W.longitude
-        //         },
-        //         city: workplace.workplaceAddresses['P,1'].address.postalTownReference.villageLabel,
-        //         contactNumbers,
-        //         type: workplace.typeCorporateLabel,
-        //     };
-        // });
-
-        // const specialties = individual.qualifications
-        //     ? Object.keys(individual.qualifications).map(key => {
-        //         return individual.qualifications[key].corporateLabel
-        //     })
-        //     : [];
-
-        // const externalIdentifiers = Object.keys(individual.externalKeys).map(key => {
-        //     const externalKey = individual.externalKeys[key];
-        //     return {
-        //         name: externalKey.typeLabel,
-        //         value: externalKey.value
-        //     };
-        // });
         const name = [workplace.managerWorkplaceUsualName, workplace.usualName].filter(i => i).join(' - ');
         const specialties = workplace.qualifications
             ? Object.keys(workplace.qualifications).map(key => {
