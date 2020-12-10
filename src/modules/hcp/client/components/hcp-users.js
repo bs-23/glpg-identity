@@ -289,7 +289,7 @@ export default function hcpUsers() {
         const { dirty, resetForm, initialValues, isValid } = formikProps;
 
         return <div className="position-relative">
-            {!hasRowChanged && <Dropdown className="dropdown-customize">
+            {!hasRowChanged && <Dropdown style={dirty ? { pointerEvents: 'none' } : {}} className={`dropdown-customize ${dirty ? 'hcp-inline-disable' : ''}`}>
                 <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
@@ -511,10 +511,10 @@ export default function hcpUsers() {
                                         </div>
                                     </div>
                                 </div>
-                                {!tableDirty && <div className="d-flex pt-3 pt-sm-0">
+                                <div className="d-flex pt-3 pt-sm-0">
                                     {countries && hcps['countries'] &&
                                         <React.Fragment>
-                                            <Dropdown className="ml-auto dropdown-customize mr-2">
+                                            <Dropdown style={tableDirty ? { pointerEvents: 'none' } : {}} className={`ml-auto dropdown-customize mr-2 ${tableDirty ? 'hcp-inline-disable' : ''}`}>
                                                 <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center">
                                                     <i className="icon icon-filter mr-2 mb-n1"></i> {hcps.codbase && (countries.find(i => i.codbase === hcps.codbase)) ? (countries.find(i => i.codbase === hcps.codbase)).codbase_desc : 'Filter by Country'}
                                                 </Dropdown.Toggle>
@@ -534,7 +534,7 @@ export default function hcpUsers() {
                                                 </Dropdown.Menu>
                                             </Dropdown>
 
-                                        <Dropdown className="d-flex align-items-center show dropdown rounded pl-2 pr-1 dropdown cdp-bg-secondary text-white dropdown shadow-sm">
+                                        <Dropdown style={tableDirty ? { pointerEvents: 'none' } : {}} className={`d-flex align-items-center show dropdown rounded pl-2 pr-1 dropdown cdp-bg-secondary text-white dropdown shadow-sm ${tableDirty ? 'hcp-inline-disable' : ''}`}>
                                             Status
                                                 <Dropdown.Toggle variant="" className="ml-2 cdp-bg-secondary rounded-0 border-left text-white">
                                                 {getSelectedStatus()}
@@ -550,7 +550,7 @@ export default function hcpUsers() {
                                             </Dropdown>
                                         </React.Fragment>
                                     }
-                                </div>}
+                                </div>
 
                             </div>
                             <Modal
@@ -827,14 +827,14 @@ export default function hcpUsers() {
                                         }
                                     } */}
                                     </EditableTable>
-                                    {!tableDirty && ((hcps.page === 1 &&
+                                    {((hcps.page === 1 &&
                                         hcps.total > hcps.limit) ||
                                         (hcps.page > 1))
                                         && hcps['users'] &&
                                         <div className="pagination justify-content-end align-items-center border-top p-3">
                                             <span className="cdp-text-primary font-weight-bold">{hcps.start + ' - ' + hcps.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + hcps.total}</span>
-                                            <span className="pagination-btn" data-testid='Prev' onClick={() => pageLeft()} disabled={hcps.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
-                                            <span className="pagination-btn" data-testid='Next' onClick={() => pageRight()} disabled={hcps.end === hcps.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
+                                            <span style={tableDirty ? { pointerEvents: 'none' } : {}} className="pagination-btn" data-testid='Prev' onClick={() => pageLeft()} disabled={hcps.page <= 1 || tableDirty}><i className="icon icon-arrow-down ml-2 prev"></i></span>
+                                            <span style={tableDirty ? { pointerEvents: 'none' } : {}} className="pagination-btn" data-testid='Next' onClick={() => pageRight()} disabled={hcps.end === hcps.total || tableDirty}><i className="icon icon-arrow-down ml-2 next"></i></span>
                                         </div>
                                     }
                                 </React.Fragment>
