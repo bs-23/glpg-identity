@@ -5,9 +5,11 @@ export const ApprovalRejectSchema = object().shape({
     comment: string().when('selectedStatus', {
         is: 'approve',
         then: string()
+            .transform(value => value.trim())
             .required('Must select one option.')
             .max(500, 'This field must be at most 500 characters long.'),
         otherwise: string()
+            .transform(value => value.trim())
             .required('This field must not be empty.')
             .max(500, 'This field must be at most 500 characters long.'),
     }),
@@ -16,6 +18,7 @@ export const ApprovalRejectSchema = object().shape({
         then: string().when('comment', {
             is: 'other',
             then: string()
+                .test('has-only-spaces', 'This field must not be empty.', comment => comment && comment.trim())
                 .required('This field must not be empty.')
                 .max(500, 'This field must be at most 500 characters long.'),
             otherwise: string()

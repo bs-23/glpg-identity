@@ -952,7 +952,7 @@ async function approveHCPUser(req, res) {
             object_id: hcpUser.id,
             table_name: 'hcp_profiles',
             actor: req.user.id,
-            remarks: req.body.comment
+            remarks: req.body.comment.trim()
         });
 
         res.json(response);
@@ -989,7 +989,7 @@ async function rejectHCPUser(req, res) {
             object_id: hcpUser.id,
             table_name: 'hcp_archives',
             actor: req.user.id,
-            remarks: req.body.comment
+            remarks: req.body.comment.trim()
         });
 
         await hcpUser.destroy();
