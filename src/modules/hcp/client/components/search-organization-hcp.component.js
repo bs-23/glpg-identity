@@ -38,7 +38,7 @@ const SearchOrganizationHcp = () => {
         setFormData({});
         setCurrentPage(1);
         setSelectedOption([]);
-        setHcos([]);
+        setHcos({});
         props.resetForm();
     };
 
@@ -299,7 +299,7 @@ const SearchOrganizationHcp = () => {
                         </div>
                     </div>
                 </div>
-                {hcos.results && hcos.results.length &&
+                {hcos.results && hcos.results.length > 0 &&
                     <div className="row">
                         <div className="col-12">
                             <div className="my-3">
@@ -351,6 +351,10 @@ const SearchOrganizationHcp = () => {
                             </div>
                         </div>
                     </div>
+                }
+
+                {hcos.results && hcos.results.length <= 0 &&
+                    <div className="p-3 bg-white">No Health Care Organizations found</div>
                 }
             </div>
 

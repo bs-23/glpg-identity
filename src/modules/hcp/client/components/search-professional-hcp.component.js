@@ -36,15 +36,10 @@ const SearchProfessionalHcp = () => {
 
 
     const resetSearch = (props) => {
-        console.log('============>', props)
         setFormData({});
         setCurrentPage(1);
         setSelectedOption([]);
-        setUsers([]);
-        // props.values.specialties = [];
-        // props.values.isInContract = false;
-        // props.values.phonetic = false;
-        // props.values.duplicates = false;
+        setUsers({});
         props.resetForm();
     };
 
@@ -319,7 +314,7 @@ const SearchProfessionalHcp = () => {
                         </div>
                     </div>
                 </div>
-                {users.results && users.results.length &&
+                {users.results && users.results.length > 0 &&
                     <div className="row">
                         <div className="col-12">
                             <div className="my-3">
@@ -388,6 +383,10 @@ const SearchProfessionalHcp = () => {
                             </div>
                         </div>
                     </div>
+                }
+
+                {users.results && users.results.length <= 0 &&
+                    <div className="p-3 bg-white">No Health Care Professionals found</div>
                 }
             </div>
 
