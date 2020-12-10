@@ -37,7 +37,7 @@ const SearchProfessionalHcp = () => {
 
     const resetSearch = (props) => {
         setFormData({});
-        currentPage(1);
+        setCurrentPage(1);
         setSelectedOption([]);
         setUsers([]);
         props.resetForm();
