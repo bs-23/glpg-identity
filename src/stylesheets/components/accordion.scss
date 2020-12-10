@@ -177,6 +177,13 @@
             display: none !important;
         }
     }
+
+    &__list-group {
+        .list-group-item:hover {
+            @extend .cdp-light-bg;
+            cursor: pointer;
+        }
+    }
 }
 
 .help-center {

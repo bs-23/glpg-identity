@@ -23,13 +23,150 @@ export default function Help() {
                     <div className="row">
                         <div className="col-12 px-0">
                             <nav aria-label="breadcrumb">
-                                <ol className="breadcrumb rounded-0">
+                                <ol className="breadcrumb rounded-0 mb-0">
                                     <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                     <li className="breadcrumb-item active"><span>Help</span></li>
                                 </ol>
                             </nav>
                         </div>
                     </div>
+                    {faqData.faq && faqData.faq.length > 0 && <div className="container">
+                        <div className="row">
+                            <div className="col-12">
+                                <div className="faq border-bottom mb-3 shadow-sm p-3 mt-3 bg-white">
+                                    <h5 className="cdp-text-primary pb-2">General Questions</h5>
+                                    <Accordion defaultActiveKey="0" className="faq__body">
+                                        {faqData.faq.filter(f => f.categories.includes('general')).map((faq, index) => (
+                                            <Card key={index}>
+                                                <Accordion.Collapse eventKey={index + ""}>
+                                                    <Card.Body className="bg-white border">{parse(faq.answer)}</Card.Body>
+                                                </Accordion.Collapse>
+                                                <Accordion.Toggle as={Card.Header} eventKey={index + ""} className="px-3 bg-light py-2 d-flex align-items-baseline justify-content-between" role="button">
+                                                    <span className="faq__question">{faq.question}</span>
+                                                    <i className="icon icon-arrow-down ml-2 faq__icon-down"></i>
+                                                </Accordion.Toggle>
+                                            </Card>
+                                        ))}
+                                        {faqData.faq.filter(f => f.categories.includes('general')).length === 0 &&
+                                            <Card>
+                                                <Card.Body className="text-center">
+                                                    <i className="icon icon-help cdp-text-secondary icon-3x"></i>
+                                                    <p className="pt-3 font-weight-bold"> No data found related to this category.</p>
+                                                </Card.Body>
+                                            </Card>
+                                        }
+                                    </Accordion>
+                                </div>
+                            </div>
+                            <div className="col-12"><h4 className="cdp-text-primary pb-2">Categories</h4></div>
+                            <div className="col-12 col-sm-6 col-lg-6 mb-3">
+                                <ul className="list-group shadow-sm faq__list-group">
+                                    <li className="list-group-item d-flex justify-content-between align-items-center">
+                                        <div className="d-flex align-items-center">
+                                            <i className="icon icon-information-management icon-2x cdp-text-secondary"></i>
+                                            <span className="px-3">Information Management</span>
+                                            <span className="badge badge-light badge-pill cdp-text-primary">14</span>
+                                        </div>
+                                        <i className="fas fa-external-link-square-alt cdp-text-primary"></i>
+                                    </li>
+                                    <li className="list-group-item d-flex justify-content-between align-items-center">
+                                        <div className="d-flex align-items-center">
+                                            <span className="pr-3 pl-5">Manage HCP Master Data</span>
+                                            <span className="badge badge-light badge-pill cdp-text-primary">1</span>
+                                        </div>
+                                        <i className="fas fa-external-link-square-alt cdp-text-primary"></i>
+                                    </li>
+                                    <li className="list-group-item d-flex justify-content-between align-items-center">
+                                        <div className="d-flex align-items-center">
+                                            <span className="pr-3 pl-5">Discover Missing HCPs and HCOs</span>
+                                            <span className="badge badge-light badge-pill cdp-text-primary">1</span>
+                                        </div>
+                                        <i className="fas fa-external-link-square-alt cdp-text-primary"></i>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div className="col-12 col-sm-6 col-lg-6 mb-3">
+                                <ul className="list-group shadow-sm faq__list-group">
+                                    <li className="list-group-item d-flex justify-content-between align-items-center">
+                                        <div className="d-flex align-items-center">
+                                            <i className="icon icon-customer-data-platform icon-2x cdp-text-secondary"></i>
+                                            <span className="px-3">Management of Customer Data Platform</span>
+                                            <span className="badge badge-light badge-pill cdp-text-primary">14</span>
+                                        </div>
+                                        <i className="fas fa-external-link-square-alt cdp-text-primary"></i>
+                                    </li>
+                                    <li className="list-group-item d-flex justify-content-between align-items-center">
+                                        <div className="d-flex align-items-center">
+                                            <span className="pr-3 pl-5">User & Access Management</span>
+                                            <span className="badge badge-light badge-pill cdp-text-primary">1</span>
+                                        </div>
+                                        <i className="fas fa-external-link-square-alt cdp-text-primary"></i>
+                                    </li>
+                                    <li className="list-group-item d-flex justify-content-between align-items-center">
+                                        <div className="d-flex align-items-center">
+                                            <span className="pr-3 pl-5">Manage Profiles</span>
+                                            <span className="badge badge-light badge-pill cdp-text-primary">1</span>
+                                        </div>
+                                        <i className="fas fa-external-link-square-alt cdp-text-primary"></i>
+                                    </li>
+                                    <li className="list-group-item d-flex justify-content-between align-items-center">
+                                        <div className="d-flex align-items-center">
+                                            <span className="pr-3 pl-5">Manage Permission Sets</span>
+                                            <span className="badge badge-light badge-pill cdp-text-primary">1</span>
+                                        </div>
+                                        <i className="fas fa-external-link-square-alt cdp-text-primary"></i>
+                                    </li>
+                                    <li className="list-group-item d-flex justify-content-between align-items-center">
+                                        <div className="d-flex align-items-center">
+                                            <span className="pr-3 pl-5">Manage FAQs</span>
+                                            <span className="badge badge-light badge-pill cdp-text-primary">1</span>
+                                        </div>
+                                        <i className="fas fa-external-link-square-alt cdp-text-primary"></i>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div className="col-12 col-sm-6 col-lg-6 mb-3">
+                                <ul className="list-group shadow-sm faq__list-group">
+                                    <li className="list-group-item d-flex justify-content-between align-items-center">
+                                        <div className="d-flex align-items-center">
+                                            <i className="icon icon-data-consent-management icon-2x cdp-text-secondary"></i>
+                                            <span className="px-3">Data Privacy & Consent Management</span>
+                                            <span className="badge badge-light badge-pill cdp-text-primary">14</span>
+                                        </div>
+                                        <i className="fas fa-external-link-square-alt cdp-text-primary"></i>
+                                    </li>
+                                    <li className="list-group-item d-flex justify-content-between align-items-center">
+                                        <div className="d-flex align-items-center">
+                                            <span className="pr-3 pl-5">Manage New Consent</span>
+                                            <span className="badge badge-light badge-pill cdp-text-primary">1</span>
+                                        </div>
+                                        <i className="fas fa-external-link-square-alt cdp-text-primary"></i>
+                                    </li>
+                                    <li className="list-group-item d-flex justify-content-between align-items-center">
+                                        <div className="d-flex align-items-center">
+                                            <span className="pr-3 pl-5">Configure Consent Category</span>
+                                            <span className="badge badge-light badge-pill cdp-text-primary">1</span>
+                                        </div>
+                                        <i className="fas fa-external-link-square-alt cdp-text-primary"></i>
+                                    </li>
+                                    <li className="list-group-item d-flex justify-content-between align-items-center">
+                                        <div className="d-flex align-items-center">
+                                            <span className="pr-3 pl-5">Assign Consent to Country</span>
+                                            <span className="badge badge-light badge-pill cdp-text-primary">1</span>
+                                        </div>
+                                        <i className="fas fa-external-link-square-alt cdp-text-primary"></i>
+                                    </li>
+                                    <li className="list-group-item d-flex justify-content-between align-items-center">
+                                        <div className="d-flex align-items-center">
+                                            <span className="pr-3 pl-5">Generate Data Privacy Report & Consent Performance Management Report</span>
+                                            <span className="badge badge-light badge-pill cdp-text-primary">1</span>
+                                        </div>
+                                        <i className="fas fa-external-link-square-alt cdp-text-primary"></i>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>}
                     <div className="row">
                         <div className="col-12">
                             <div className="d-sm-flex justify-content-between align-items-center">
@@ -43,29 +180,7 @@ export default function Help() {
                                     <div className="col-12">
                                         <Tabs defaultActiveKey="General" className="faq__tabs">
                                             <Tab eventKey="General" title="General Questions">
-                                                <div className="faq p-3">
-                                                    <Accordion defaultActiveKey="0" className="faq__body">
-                                                        {faqData.faq.filter(f => f.categories.includes('general')).map((faq, index) => (
-                                                            <Card key={index}>
-                                                                <Accordion.Collapse eventKey={index + ""}>
-                                                                    <Card.Body>{parse(faq.answer)}</Card.Body>
-                                                                </Accordion.Collapse>
-                                                                <Accordion.Toggle as={Card.Header} eventKey={index + ""} className="px-3 py-2 d-flex align-items-baseline justify-content-between" role="button">
-                                                                    <span className="faq__question">{faq.question}</span>
-                                                                    <i className="icon icon-arrow-down ml-2 faq__icon-down"></i>
-                                                                </Accordion.Toggle>
-                                                            </Card>
-                                                        ))}
-                                                        {faqData.faq.filter(f => f.categories.includes('general')).length === 0 &&
-                                                            <Card>
-                                                                <Card.Body className="text-center">
-                                                                    <i className="icon icon-help cdp-text-secondary icon-3x"></i>
-                                                                    <p className="pt-3 font-weight-bold"> No data found related to this category.</p>
-                                                                </Card.Body>
-                                                            </Card>
-                                                        }
-                                                    </Accordion>
-                                                </div>
+                                                
                                             </Tab>
                                             <Tab eventKey="Information" title="Information Management">
                                                 <div className="faq p-3">
