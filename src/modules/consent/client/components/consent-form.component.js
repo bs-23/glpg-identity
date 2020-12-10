@@ -171,7 +171,7 @@ const ConsentForm = (props) => {
 
                                     />
                                 </div>
-                                {showError && item.rich_text === '<p><br></p>' && <div class="invalid-feedback">This field must not be empty.</div>}
+                                {showError && (item.rich_text === '<p><br></p>' || item.rich_text.replace(/&nbsp;/g, '') === '<p></p>') && <div class="invalid-feedback">This field must not be empty.</div>}
                                 {showError && item.rich_text.length > 976 && <div class="invalid-feedback">Maximum character limit has been exceeded.</div>}
                             </div>
                         </div>
@@ -224,7 +224,7 @@ const ConsentForm = (props) => {
                                             onSubmit={(values, actions) => {
                                                 values.is_active = isActive;
 
-                                                const validTranslations = translations.filter(item => item.country_iso2 && item.lang_code && item.rich_text && item.rich_text !== '<p><br></p>');
+                                                const validTranslations = translations.filter(item => item.country_iso2 && item.lang_code && item.rich_text && item.rich_text !== '<p><br></p>' && item.rich_text.replace(/&nbsp;/g, '') !== '<p></p>');
                                                 if (translations.length !== validTranslations.length) {
                                                     setShowError(true);
                                                     return;
