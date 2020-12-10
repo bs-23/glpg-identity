@@ -380,9 +380,9 @@ const SearchProfessionalHcp = () => {
                                     </tbody>
                                 </table>
                                 {
-                                (Math.floor(users.totalNumberOfResults / users.resultSize) >= 1 ) &&
+                                (Math.ceil(users.totalNumberOfResults / users.resultSize) >= 1 ) &&
                                     <div className="pagination justify-content-end align-items-center border-top p-3">
-                                        <span className="cdp-text-primary font-weight-bold">{`Page ${currentPage} of ${Math.floor(users.totalNumberOfResults / users.resultSize)+1}`}</span>
+                                        <span className="cdp-text-primary font-weight-bold">{`Page ${currentPage} of ${Math.ceil(users.totalNumberOfResults / users.resultSize)}`}</span>
                                         <span className="pagination-btn" onClick={() => pageLeft()} disabled={currentPage === 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
                                         <span className="pagination-btn" onClick={() => pageRight()} disabled={Math.ceil(users.totalNumberOfResults / users.resultSize) === currentPage}><i className="icon icon-arrow-down ml-2 next"></i></span>
                                     </div>
