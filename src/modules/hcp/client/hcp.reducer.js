@@ -3,7 +3,8 @@ import Types from "./hcp.types";
 const initialState = {
     hcps: {},
     specialties: {},
-    oklaHcpDetails: null
+    oklaHcpDetails: null,
+    oklaHcoDetails: null
 };
 
 function sortItems(itms, val, type) {
@@ -75,6 +76,20 @@ export default function reducer(state = initialState, action) {
             return {
                 ...state,
                 oklaHcpDetails: action.payload
+            }
+        }
+
+        case Types.GET_OKLA_HCO_DETAILS_FULFILLED: {
+            return {
+                ...state,
+                oklaHcoDetails: action.payload.data
+            };
+        }
+
+        case Types.SET_OKLA_HCO_DETAILS: {
+            return {
+                ...state,
+                oklaHcoDetails: action.payload
             }
         }
     }

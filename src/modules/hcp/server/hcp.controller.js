@@ -1753,6 +1753,7 @@ async function searchOklaHcos(req, res) {
                 : undefined;
             return {
                 name,
+                workplaceEid: workplace.workplaceEid,
                 isInContract,
                 isValid: workplace.statusCorporateLabel === 'Valid',
                 specialties,
@@ -1869,6 +1870,115 @@ async function getOklaHcpDetails(req, res) {
     }
 }
 
+async function getOklaHcoDetails(req, res) {
+    const { codbase, id } = req.params;
+    if (!id || !codbase) return res.status(400).send('Invalid request.');
+
+    try {
+        const queryObj = {
+            entityType: 'workplace',
+            codBases: [codbase],
+            fields: [
+                {
+                    "name": "workplace.workplaceEid",
+                    "method": "EXACT",
+                    "values": [id]
+                }
+            ]
+        };
+
+        const { response: searchResponse } = await OklaService.search(queryObj);
+
+        if (!searchResponse.results || !searchResponse.results.length) return res.status(404).send('No workplace found.');
+
+        const { workplace, country, codBase, isInContract } = searchResponse.results[0];
+
+        // const activitiesOfIndividual = searchResponse.results.filter(r => r.individual.individualEid === id);
+
+        // const  onekeyEidList = activitiesOfIndividual.map(i => i.onekeyEid);
+        // const individual = activitiesOfIndividual[0].individual;
+        // const isInContract = activitiesOfIndividual[0].isInContract;
+
+        // const workplaces = activitiesOfIndividual.map(g => {
+        //     const workplace = g.workplace;
+        //     const name = [workplace.managerWorkplaceUsualName, workplace.usualName].filter(i => i).join(' - ');
+        //     const contactNumbers = Object.keys(workplace.telephones || []).map(key => {
+        //         return {
+        //             number: workplace.telephones[key].callNumberForSearch,
+        //             type: workplace.telephones[key].typeCorporateLabel
+        //         };
+        //     });
+        //     return {
+        //         id: workplace.workplaceEid,
+        //         isMainActivity: g.activity.isMainActivity,
+        //         isValid: workplace.statusCorporateLabel === 'Valid',
+        //         name,
+        //         address: workplace.workplaceAddresses['P,1'].address.addressLongLabel,
+        //         postCode: workplace.workplaceAddresses['P,1'].address.longPostalCode,
+        //         location: {
+        //             latitude: workplace.workplaceAddresses['P,1'].address.geocodingAddresses.W.latitude,
+        //             longitude: workplace.workplaceAddresses['P,1'].address.geocodingAddresses.W.longitude
+        //         },
+        //         city: workplace.workplaceAddresses['P,1'].address.postalTownReference.villageLabel,
+        //         contactNumbers,
+        //         type: workplace.typeCorporateLabel,
+        //     };
+        // });
+
+        // const specialties = individual.qualifications
+        //     ? Object.keys(individual.qualifications).map(key => {
+        //         return individual.qualifications[key].corporateLabel
+        //     })
+        //     : [];
+
+        // const externalIdentifiers = Object.keys(individual.externalKeys).map(key => {
+        //     const externalKey = individual.externalKeys[key];
+        //     return {
+        //         name: externalKey.typeLabel,
+        //         value: externalKey.value
+        //     };
+        // });
+        const name = [workplace.managerWorkplaceUsualName, workplace.usualName].filter(i => i).join(' - ');
+        const specialties = workplace.qualifications
+            ? Object.keys(workplace.qualifications).map(key => {
+                return workplace.qualifications[key].corporateLabel
+            })
+            : undefined;
+        const addressData = workplace.workplaceAddresses['P,1'].address;
+        const contactNumbers = Object.keys(workplace.telephones || []).map(key => {
+            return {
+                number: workplace.telephones[key].callNumberForSearch,
+                type: workplace.telephones[key].typeCorporateLabel
+            };
+        });
+
+        const data = {
+            workplaceEid: workplace.workplaceEid,
+            name,
+            activity: workplace.activityLocationCorporateLabel,
+            isInContract,
+            countryIso2: country,
+            codbase: codBase,
+            specialties,
+            isValid: workplace.statusCorporateLabel === 'Valid',
+            type: workplace.typeCorporateLabel,
+            address: addressData.addressLongLabel,
+            postCode: addressData.longPostalCode,
+            location: {
+                latitude: addressData.geocodingAddresses.W.latitude,
+                longitude: addressData.geocodingAddresses.W.longitude
+            },
+            city: addressData.postalTownReference.villageLabel,
+            contactNumbers
+        };
+
+        res.json(data);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 async function getSpecialtiesForCdp(req, res) {
     try {
         const { codbases } = req.query;
@@ -1925,3 +2035,4 @@ exports.searchOklaHcps = searchOklaHcps;
 exports.searchOklaHcos = searchOklaHcos;
 exports.getSpecialtiesForCdp = getSpecialtiesForCdp;
 exports.getOklaHcpDetails = getOklaHcpDetails;
+exports.getOklaHcoDetails = getOklaHcoDetails;

@@ -4,15 +4,21 @@ import Modal from 'react-bootstrap/Modal';
 import { getOklaHcpDetails, setOklaHcpDetails } from '../hcp.actions';
 import MapView from './map-view';
 
-const OklaHcpdetails = ({ individual, setSelectedIndividual }) => {
+const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
     const dispatch = useDispatch();
     const [selectedWorkplace, setSelectedWorkplace] = useState(null);
 
     const hcpDetails = useSelector(state => state.hcpReducer.oklaHcpDetails);
+    const allCountries = useSelector(state => state.countryReducer.allCountries);
 
     const hideHcpDetails = () => {
         dispatch(setOklaHcpDetails(null));
         setSelectedIndividual(null);
+    };
+
+    const getCountryName = (countryIso2) => {
+        const country = allCountries.find(c => c.country_iso2.toLowerCase() === countryIso2.toLowerCase());
+        return country ? country.countryname : '--';
     };
 
     useEffect(() => {
@@ -41,7 +47,7 @@ const OklaHcpdetails = ({ individual, setSelectedIndividual }) => {
                     <div>Gender: {hcpDetails.gender}</div>
                     <div>Graduation Year: {hcpDetails.graduationYear}</div>
                     <div>Birth Year: {hcpDetails.birthYear}</div>
-                    <div>Country: {hcpDetails.countryIso2}</div>
+                    <div>Country: {getCountryName(hcpDetails.countryIso2)}</div>
                     <div>Specialties: {hcpDetails.specialties.join(', ')}</div>
                     <div>
                         Identifiers:
@@ -82,4 +88,4 @@ const OklaHcpdetails = ({ individual, setSelectedIndividual }) => {
     </Modal>
 };
 
-export default OklaHcpdetails;
+export default OklaHcpDetails;
