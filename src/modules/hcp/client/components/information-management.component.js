@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import Faq from '../../../platform/faq/client/faq.component';
+import { Faq } from '../../../platform';
 
 const InformationManagement = () => {
     return (
