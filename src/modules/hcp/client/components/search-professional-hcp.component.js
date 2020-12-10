@@ -36,10 +36,15 @@ const SearchProfessionalHcp = () => {
 
 
     const resetSearch = (props) => {
+        console.log('============>', props)
         setFormData({});
         setCurrentPage(1);
         setSelectedOption([]);
         setUsers([]);
+        // props.values.specialties = [];
+        // props.values.isInContract = false;
+        // props.values.phonetic = false;
+        // props.values.duplicates = false;
         props.resetForm();
     };
 
@@ -184,13 +189,15 @@ const SearchProfessionalHcp = () => {
                                 }}
                                 displayName="SearchForm"
                                 onSubmit={async (values, actions) => {
-                                    console.log(values);
-                                    values.specialties = values.specialties.map(i => i.value);
-                                    values.codbases = values.countries.map(i => i.value);
-                                    // delete values.countries;
-                                    const response = await axios.post('/api/okla/hcps/search', values);
+                                    const data = {...values};
+                                    data.specialties = data.specialties.map(i => i.value);
+                                    data.codbases = data.countries.map(i => i.value);
+                                    delete data.countries;
+
+                                    const response = await axios.post('/api/okla/hcps/search', data);
                                     setUsers(response.data);
-                                    setFormData(values);
+                                    setFormData(data);
+                                    setCurrentPage(1);
                                     actions.setSubmitting(false);
                                 }}
                             >
@@ -380,9 +387,9 @@ const SearchProfessionalHcp = () => {
                                     </tbody>
                                 </table>
                                 {
-                                (Math.floor(users.totalNumberOfResults / users.resultSize) >= 1 ) &&
+                                (Math.ceil(users.totalNumberOfResults / users.resultSize) >= 1 ) &&
                                     <div className="pagination justify-content-end align-items-center border-top p-3">
-                                        <span className="cdp-text-primary font-weight-bold">{`Page ${currentPage} of ${Math.floor(users.totalNumberOfResults / users.resultSize)+1}`}</span>
+                                        <span className="cdp-text-primary font-weight-bold">{`Page ${currentPage} of ${Math.ceil(users.totalNumberOfResults / users.resultSize)}`}</span>
                                         <span className="pagination-btn" onClick={() => pageLeft()} disabled={currentPage === 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
                                         <span className="pagination-btn" onClick={() => pageRight()} disabled={Math.ceil(users.totalNumberOfResults / users.resultSize) === currentPage}><i className="icon icon-arrow-down ml-2 next"></i></span>
                                     </div>
