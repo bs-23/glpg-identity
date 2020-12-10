@@ -30,7 +30,7 @@ export default function Help() {
                             </nav>
                         </div>
                     </div>
-                    {faqData.faq && faqData.faq.length > 0 && <div className="container">
+                    {faqData.faq && faqData.faq.length > 0 && <div className="container px-0 py-2">
                         <div className="row">
                             <div className="col-12">
                                 <div className="faq border-bottom mb-3 shadow-sm p-3 mt-3 bg-white">
