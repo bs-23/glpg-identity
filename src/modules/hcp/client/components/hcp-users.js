@@ -23,6 +23,8 @@ const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
     const [comment, setComment] = useState("");
     const [touched, setTouched] = useState(false);
 
+    const maxCommentLength = 500;
+
     const { rowIndex, editableTableProps, formikProps } = tableProps;
     const { values, submitForm } = formikProps || {};
 
@@ -62,10 +64,11 @@ const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
                     <div>
                         <textarea className="form-control" rows="4" cols="45" value={comment} onBlur={handleOnBlur} onChange={(e) => setComment(e.target.value)} />
                     </div>
-                    {!comment && touched && <div className="invalid-feedback">
+                    {(!comment || !comment.trim()) && touched && <div className="invalid-feedback">
                         Must provide a comment.
                     </div>}
-                    <button className="btn btn-block mt-3 cdp-btn-primary text-white" disabled={!comment} onClick={handleSubmit}> Save Changes </button>
+                    {comment.trim().length > maxCommentLength && <div class="invalid-feedback">This field must be at most {maxCommentLength} characters long.</div>}
+                    <button className="btn btn-block mt-3 cdp-btn-primary text-white" disabled={!comment || !comment.trim() || comment.trim().length > maxCommentLength} onClick={handleSubmit}> Save Changes </button>
                 </div>
             </div>
         </Modal.Body>
@@ -293,8 +296,8 @@ export default function hcpUsers() {
     const renderActions = ({ row, rowIndex, formikProps, hasRowChanged, editableTableProps }) => {
         const { dirty, resetForm, initialValues, isValid } = formikProps;
 
-        return <div className="position-relative">
-            {!hasRowChanged && <Dropdown className="dropdown-customize">
+        return <div className="position-relative" title={tableDirty ? "Save or reset changes to perform actions"  : null}>
+            {!hasRowChanged && <Dropdown className={`dropdown-customize ${dirty ? 'hcp-inline-disable' : ''}`}>
                 <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
@@ -516,46 +519,49 @@ export default function hcpUsers() {
                                         </div>
                                     </div>
                                 </div>
-                                {!tableDirty && <div className="d-flex pt-3 pt-sm-0">
+                                <div className="d-flex pt-3 pt-sm-0">
                                     {countries && hcps['countries'] &&
                                         <React.Fragment>
-                                            <Dropdown className="ml-auto dropdown-customize mr-2">
-                                                <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center">
-                                                    <i className="icon icon-filter mr-2 mb-n1"></i> {hcps.codbase && (countries.find(i => i.codbase === hcps.codbase)) ? (countries.find(i => i.codbase === hcps.codbase)).codbase_desc : 'Filter by Country'}
-                                                </Dropdown.Toggle>
-                                                <Dropdown.Menu>
-                                                    <Dropdown.Item className={hcps.codbase === null ? 'd-none' : ''} onClick={() => urlChange(1, 'null', hcps.status, params.get('orderBy'), params.get('orderType'))}>All</Dropdown.Item>
-                                                    {
-                                                        countries.map((item, index) => (
-                                                            hcps.countries.includes(item.country_iso2) &&
-                                                            <Dropdown.Item key={index} className={hcps.countries.includes(item.country_iso2) && hcps.codbase === item.codbase ? 'd-none' : ''} onClick={() => urlChange(1, item.codbase, hcps.status, params.get('orderBy'), params.get('orderType'))}>
-                                                                {
-                                                                    hcps.countries.includes(item.country_iso2) ? item.codbase_desc : null
-                                                                }
-                                                            </Dropdown.Item>
-                                                        ))
+                                            <div title={tableDirty ? "Save or reset changes to use filter options"  : null}>
+                                                <Dropdown className={`ml-auto dropdown-customize mr-2 ${tableDirty ? 'hcp-inline-disable' : ''}`}>
+                                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center">
+                                                        <i className="icon icon-filter mr-2 mb-n1"></i> {hcps.codbase && (countries.find(i => i.codbase === hcps.codbase)) ? (countries.find(i => i.codbase === hcps.codbase)).codbase_desc : 'Filter by Country'}
+                                                    </Dropdown.Toggle>
+                                                    <Dropdown.Menu>
+                                                        <Dropdown.Item className={hcps.codbase === null ? 'd-none' : ''} onClick={() => urlChange(1, 'null', hcps.status, params.get('orderBy'), params.get('orderType'))}>All</Dropdown.Item>
+                                                        {
+                                                            countries.map((item, index) => (
+                                                                hcps.countries.includes(item.country_iso2) &&
+                                                                <Dropdown.Item key={index} className={hcps.countries.includes(item.country_iso2) && hcps.codbase === item.codbase ? 'd-none' : ''} onClick={() => urlChange(1, item.codbase, hcps.status, params.get('orderBy'), params.get('orderType'))}>
+                                                                    {
+                                                                        hcps.countries.includes(item.country_iso2) ? item.codbase_desc : null
+                                                                    }
+                                                                </Dropdown.Item>
+                                                            ))
 
-                                                    }
-                                                </Dropdown.Menu>
-                                            </Dropdown>
-
-                                        <Dropdown className="d-flex align-items-center show dropdown rounded pl-2 pr-1 dropdown cdp-bg-secondary text-white dropdown shadow-sm">
-                                            Status
-                                                <Dropdown.Toggle variant="" className="ml-2 cdp-bg-secondary rounded-0 border-left text-white">
-                                                {getSelectedStatus()}
-                                            </Dropdown.Toggle>
-                                                <Dropdown.Menu>
-                                                    <Dropdown.Item className={hcps.status === null ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, null, params.get('orderBy'), params.get('orderType'))}>All</Dropdown.Item>
-                                                    <Dropdown.Item className={isAllVerifiedStatus() ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, 'self_verified,manually_verified', params.get('orderBy'), params.get('orderType'))}>All Verified</Dropdown.Item>
-                                                    <Dropdown.Item className={hcps.status === 'self_verified' ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, 'self_verified', params.get('orderBy'), params.get('orderType'))}>Self Verified</Dropdown.Item>
-                                                    <Dropdown.Item className={hcps.status === 'manually_verified' ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, 'manually_verified', params.get('orderBy'), params.get('orderType'))}>Manually Verified</Dropdown.Item>
-                                                    <Dropdown.Item className={hcps.status === 'consent_pending' ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, 'consent_pending', params.get('orderBy'), params.get('orderType'))}>Consent Pending</Dropdown.Item>
-                                                    <Dropdown.Item className={hcps.status === 'not_verified' ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, 'not_verified', params.get('orderBy'), params.get('orderType'))}>Not Verified</Dropdown.Item>
-                                                </Dropdown.Menu>
-                                            </Dropdown>
+                                                        }
+                                                    </Dropdown.Menu>
+                                                </Dropdown>
+                                            </div>
+                                            <div title={tableDirty ? "Save or reset changes to use filter options"  : null}>
+                                                <Dropdown className={`d-flex align-items-center show dropdown rounded pl-2 pr-1 dropdown cdp-bg-secondary text-white dropdown shadow-sm ${tableDirty ? 'hcp-inline-disable' : ''}`}>
+                                                    Status
+                                                    <Dropdown.Toggle variant="" className="ml-2 cdp-bg-secondary rounded-0 border-left text-white">
+                                                        {getSelectedStatus()}
+                                                    </Dropdown.Toggle>
+                                                    <Dropdown.Menu>
+                                                        <Dropdown.Item className={hcps.status === null ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, null, params.get('orderBy'), params.get('orderType'))}>All</Dropdown.Item>
+                                                        <Dropdown.Item className={isAllVerifiedStatus() ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, 'self_verified,manually_verified', params.get('orderBy'), params.get('orderType'))}>All Verified</Dropdown.Item>
+                                                        <Dropdown.Item className={hcps.status === 'self_verified' ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, 'self_verified', params.get('orderBy'), params.get('orderType'))}>Self Verified</Dropdown.Item>
+                                                        <Dropdown.Item className={hcps.status === 'manually_verified' ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, 'manually_verified', params.get('orderBy'), params.get('orderType'))}>Manually Verified</Dropdown.Item>
+                                                        <Dropdown.Item className={hcps.status === 'consent_pending' ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, 'consent_pending', params.get('orderBy'), params.get('orderType'))}>Consent Pending</Dropdown.Item>
+                                                        <Dropdown.Item className={hcps.status === 'not_verified' ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, 'not_verified', params.get('orderBy'), params.get('orderType'))}>Not Verified</Dropdown.Item>
+                                                    </Dropdown.Menu>
+                                                </Dropdown>
+                                            </div>
                                         </React.Fragment>
                                     }
-                                </div>}
+                                </div>
 
                             </div>
                             <Modal
@@ -833,14 +839,14 @@ export default function hcpUsers() {
                                         }
                                     } */}
                                     </EditableTable>
-                                    {!tableDirty && ((hcps.page === 1 &&
+                                    {((hcps.page === 1 &&
                                         hcps.total > hcps.limit) ||
                                         (hcps.page > 1))
                                         && hcps['users'] &&
-                                        <div className="pagination justify-content-end align-items-center border-top p-3">
+                                        <div className="pagination justify-content-end align-items-center border-top p-3" title={tableDirty ? "Save or reset changes to navigate between pages"  : null}>
                                             <span className="cdp-text-primary font-weight-bold">{hcps.start + ' - ' + hcps.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + hcps.total}</span>
-                                            <span className="pagination-btn" data-testid='Prev' onClick={() => pageLeft()} disabled={hcps.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
-                                            <span className="pagination-btn" data-testid='Next' onClick={() => pageRight()} disabled={hcps.end === hcps.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
+                                            <span style={tableDirty ? { pointerEvents: 'none' } : {}} className="pagination-btn" data-testid='Prev' onClick={() => pageLeft()} disabled={hcps.page <= 1 || tableDirty}><i className="icon icon-arrow-down ml-2 prev"></i></span>
+                                            <span style={tableDirty ? { pointerEvents: 'none' } : {}} className="pagination-btn" data-testid='Next' onClick={() => pageRight()} disabled={hcps.end === hcps.total || tableDirty}><i className="icon icon-arrow-down ml-2 next"></i></span>
                                         </div>
                                     }
                                 </React.Fragment>
