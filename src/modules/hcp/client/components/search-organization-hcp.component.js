@@ -45,7 +45,7 @@ const SearchOrganizationHcp = () => {
     const pageLeft = () => {
         if(currentPage === 1) return;
 
-        axios.post(`/api/okla/hcps/search?page=${currentPage-1}`, formData)
+        axios.post(`/api/okla/hcos/search?page=${currentPage-1}`, formData)
         .then(response => {
             setUsers(response.data);
             setCurrentPage(currentPage-1);
@@ -57,7 +57,7 @@ const SearchOrganizationHcp = () => {
 
     const pageRight = () => {
         if(currentPage === Math.ceil(users.totalNumberOfResults / users.resultSize)) return;
-        axios.post(`/api/okla/hcps/search?page=${currentPage+1}`, formData)
+        axios.post(`/api/okla/hcos/search?page=${currentPage+1}`, formData)
         .then(response => {
             setUsers(response.data);
             setCurrentPage(currentPage+1);
@@ -183,13 +183,15 @@ const SearchOrganizationHcp = () => {
                                 }}
                                 displayName="SearchForm"
                                 onSubmit={async (values, actions) => {
-                                    console.log(values);
-                                    values.specialties = values.specialties.map(i => i.value);
-                                    values.codbases = values.countries.map(i => i.value);
-                                    // delete values.countries;
-                                    const response = await axios.post('/api/okla/hcos/search', values);
+                                    const data = {...values};
+                                    data.specialties = data.specialties.map(i => i.value);
+                                    data.codbases = data.countries.map(i => i.value);
+                                    delete data.countries;
+
+                                    const response = await axios.post('/api/okla/hcos/search', data);
                                     setUsers(response.data);
-                                    setFormData(values);
+                                    setFormData(data);
+                                    setCurrentPage(1);
                                     actions.setSubmitting(false);
                                 }}
                             >

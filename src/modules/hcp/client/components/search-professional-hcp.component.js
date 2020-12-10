@@ -36,10 +36,15 @@ const SearchProfessionalHcp = () => {
 
 
     const resetSearch = (props) => {
+        console.log('============>', props)
         setFormData({});
         setCurrentPage(1);
         setSelectedOption([]);
         setUsers([]);
+        // props.values.specialties = [];
+        // props.values.isInContract = false;
+        // props.values.phonetic = false;
+        // props.values.duplicates = false;
         props.resetForm();
     };
 
@@ -184,13 +189,15 @@ const SearchProfessionalHcp = () => {
                                 }}
                                 displayName="SearchForm"
                                 onSubmit={async (values, actions) => {
-                                    console.log(values);
-                                    values.specialties = values.specialties.map(i => i.value);
-                                    values.codbases = values.countries.map(i => i.value);
-                                    // delete values.countries;
-                                    const response = await axios.post('/api/okla/hcps/search', values);
+                                    const data = {...values};
+                                    data.specialties = data.specialties.map(i => i.value);
+                                    data.codbases = data.countries.map(i => i.value);
+                                    delete data.countries;
+
+                                    const response = await axios.post('/api/okla/hcps/search', data);
                                     setUsers(response.data);
-                                    setFormData(values);
+                                    setFormData(data);
+                                    setCurrentPage(1);
                                     actions.setSubmitting(false);
                                 }}
                             >
