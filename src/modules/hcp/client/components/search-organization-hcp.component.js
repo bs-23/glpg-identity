@@ -249,7 +249,7 @@ const SearchOrganizationHcp = () => {
                                                 </div>
                                                 <div className="col-12 col-sm-4">
                                                     <div className="form-group">
-                                                        <label for="Speciality">Speciality</label>
+                                                        <label for="Specialty">Specialty</label>
                                                         <Select
                                                             defaultValue={[]}
                                                             isMulti={true}
@@ -317,7 +317,7 @@ const SearchOrganizationHcp = () => {
                                         <thead className="cdp-bg-primary text-white cdp-table__header">
                                             <tr>
                                                 <th>Name</th>
-                                                <th>Speciality</th>
+                                                <th>Specialty</th>
                                                 <th>Address</th>
                                                 <th>City</th>
                                                 <th>Country</th>

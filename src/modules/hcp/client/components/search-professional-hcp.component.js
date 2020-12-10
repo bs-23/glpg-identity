@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
@@ -21,6 +22,7 @@ const union = (a, b) => [...new Set([...a, ...b])];
 
 const SearchProfessionalHcp = () => {
     const dispatch = useDispatch();
+    const location = useLocation();
 
     const countries = useSelector(state => state.countryReducer.countries);
     const allCountries = useSelector(state => state.countryReducer.allCountries);
@@ -34,6 +36,21 @@ const SearchProfessionalHcp = () => {
     const [formData, setFormData] = useState({});
     const [currentPage, setCurrentPage] = useState(1);
 
+    const params = new URLSearchParams(window.location.search);
+    const initialFormValues = {
+        countries: [],
+        isInContract: false,
+        phonetic: false,
+        duplicates: false,
+        firstName: '',
+        lastName: '',
+        address: '',
+        city: '',
+        postCode: '',
+        onekeyId: '',
+        individualEid: '',
+        specialties: [],
+    };
 
     const resetSearch = (props) => {
         setFormData({});
@@ -107,6 +124,18 @@ const SearchProfessionalHcp = () => {
         dispatch(getAllCountries());
     }, [selectedOption]);
 
+    useEffect(() => {
+        if (params.get('firstName')) initialFormValues.firstName = params.get('firstName');
+        if (params.get('lastName')) initialFormValues.lastName = params.get('lastName');
+        if (params.get('countryIso2')) {
+            const countryIso2 = initialFormValues.firstName = params.get('countryIso2');
+        }
+        if (params.get('specialtyOnekey')) {
+            const specialtyOnekey = initialFormValues.firstName = params.get('specialtyOnekey');
+        }
+        if (params.get('firstName')) initialFormValues.firstName = params.get('firstName');
+    }, [location]);
+
     const getCountries = () => userCountries.map(country => ({ value: country.codbase, label: country.codbase_desc }));
     const getSpecialties = () => specialties.map(i => ({ value: i.codIdOnekey.split('.')[2], label: i.codDescription }));
 
@@ -158,20 +187,7 @@ const SearchProfessionalHcp = () => {
 
                             <div className="add-user mx-3 mt-0 p-3 bg-white rounded border">
                                 <Formik
-                                    initialValues={{
-                                        countries: [],
-                                        isInContract: false,
-                                        phonetic: false,
-                                        duplicates: false,
-                                        firstName: '',
-                                        lastName: '',
-                                        address: '',
-                                        city: '',
-                                        postCode: '',
-                                        onekeyId: '',
-                                        individualEid: '',
-                                        specialties: [],
-                                    }}
+                                    initialValues={initialFormValues}
                                     displayName="SearchForm"
                                     onSubmit={async (values, actions) => {
                                         const data = { ...values };
@@ -243,7 +259,7 @@ const SearchProfessionalHcp = () => {
                                                 </div>
                                                 <div className="col-12 col-sm-4">
                                                     <div className="form-group">
-                                                        <label for="Speciality">Speciality</label>
+                                                        <label for="Specialty">Specialty</label>
                                                         <Select
                                                             defaultValue={[]}
                                                             isMulti={true}
@@ -332,7 +348,7 @@ const SearchProfessionalHcp = () => {
                                         <thead className="cdp-bg-primary text-white cdp-table__header">
                                             <tr>
                                                 <th>Name</th>
-                                                <th>Speciality</th>
+                                                <th>Specialty</th>
                                                 <th>Workplace</th>
                                                 <th>Onekey ID</th>
                                                 <th>Individual - Identifier</th>
