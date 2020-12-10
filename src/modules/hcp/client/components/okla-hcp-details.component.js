@@ -26,7 +26,7 @@ const OklaHcpdetails = ({ individual, setSelectedIndividual }) => {
     return <Modal
         size="lg"
         centered
-        show={!!individual}
+        show={!!hcpDetails}
         onHide={() => hideHcpDetails()}>
         <Modal.Header closeButton>
             <Modal.Title>
