@@ -36,7 +36,7 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
         onHide={() => hideHcpDetails()}>
         <Modal.Header closeButton>
             <Modal.Title>
-                {hcpDetails?.lastName} {hcpDetails?.firstName}
+            {hcpDetails?.firstName} {hcpDetails?.lastName}
             </Modal.Title>
         </Modal.Header>
         <Modal.Body>
