@@ -276,7 +276,9 @@ async function getHcps(req, res) {
             const opt_types = new Set();
 
             hcp['hcpConsents'].map(hcpConsent => {
-                opt_types.add(hcpConsent.opt_type);
+                if(hcpConsent.consent_confirmed || hcpConsent.opt_type === 'opt-out') {
+                    opt_types.add(hcpConsent.opt_type);
+                }
             });
 
             hcp.dataValues.opt_types = [...opt_types];

@@ -382,7 +382,7 @@ const CdpConsentPerformanceReport = () => {
                                                         <td>{row.hcp_profile.first_name}</td>
                                                         <td>{row.hcp_profile.last_name}</td>
                                                         <td>
-                                                            <i className={`icon icon-check-filled icon-position-bit-down mr-2 ` + (row.hcp_profile.is_email_verified ? `cdp-text-primary` : `cdp-text-secondary`)}></i>
+                                                            <i className={`fas mr-2 ` + (row.hcp_profile.is_email_verified ? `fa-check-circle cdp-text-primary` : `fa-circle cdp-text-secondary`)}></i>
                                                             {row.hcp_profile.email}</td>
                                                         <td>{row.category}</td>
                                                         <td>{titleCase(row.opt_type)}</td>
