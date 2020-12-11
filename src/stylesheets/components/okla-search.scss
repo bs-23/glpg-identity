@@ -1,0 +1,28 @@
+.okla-search {
+
+    &__details {
+        min-height: 350px;
+        display: flex;
+    }
+
+    &__tabs {
+        margin-right: 30px;
+        flex-direction: column;
+        width: 200px;
+
+        .nav-link {
+            background: #F2F2F2;
+            margin-bottom: 5px;
+            border: none;
+            padding: 20px;
+            font-size: 26px;
+            font-weight: 600;
+            color: #222020;
+            border-left: 9px solid #F2F2F2;
+
+            &.active {
+                border-left: 9px solid #F69223;
+            }
+        }
+    }
+}
