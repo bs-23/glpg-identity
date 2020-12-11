@@ -99,18 +99,14 @@ const SearchProfessionalHcp = () => {
     }, [location]);
 
     useEffect(() => {
-        if (hcpProfile) {
-            initialFormValues.firstName = hcpProfile.first_name;
-            initialFormValues.lastName = hcpProfile.last_name;
-        }
-        if (userCountries && userCountries.length && !selectedCountries || !selectedCountries.length) {
-            setSelectedCountries([{ value:'BE', label: 'Belgium'}]);
-            console.log('-------------------');
+        if (userCountries && userCountries.length && hcpProfile && !selectedCountries || !selectedCountries.length) {
+            const country = (getCountries()).find(c => c.countryIso2.toLowerCase() === hcpProfile.country_iso2.toLowerCase());
+            if (country) setSelectedCountries([country]);
         }
 
     }, [userCountries, hcpProfile]);
 
-    const getCountries = () => userCountries.map(country => ({ value: country.codbase, label: country.codbase_desc }));
+    const getCountries = () => userCountries.map(country => ({ value: country.codbase, label: country.codbase_desc, countryIso2: country.country_iso2 }));
     const getSpecialties = () => specialties.map(i => ({ value: i.codIdOnekey.split('.')[2], label: i.codDescription }));
 
     const getCountryName = (country_iso2) => {
