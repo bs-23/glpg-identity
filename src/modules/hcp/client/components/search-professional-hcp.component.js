@@ -99,7 +99,7 @@ const SearchProfessionalHcp = () => {
     }, [location]);
 
     useEffect(() => {
-        if (userCountries && userCountries.length && hcpProfile && !selectedCountries || !selectedCountries.length) {
+        if (userCountries && userCountries.length && hcpProfile && (!selectedCountries || !selectedCountries.length)) {
             const country = (getCountries()).find(c => c.countryIso2.toLowerCase() === hcpProfile.country_iso2.toLowerCase());
             if (country) setSelectedCountries([country]);
         }
