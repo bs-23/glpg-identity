@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import Modal from 'react-bootstrap/Modal';
 import { getOklaHcoDetails, setOklaHcoDetails } from '../hcp.actions';
 import MapView from './map-view';
+import { Tabs, Tab } from 'react-bootstrap';
 
 const OklaHcoDetails = ({ hco, setSelectedHco }) => {
     const dispatch = useDispatch();
@@ -36,20 +37,31 @@ const OklaHcoDetails = ({ hco, setSelectedHco }) => {
         </Modal.Header>
         <Modal.Body>
             {hcoDetails ? (
-                <div>
-                    <div>OneKey Workplace ID: {hcoDetails.workplaceEid}</div>
-                    <div>Specialties: {hcoDetails.specialties.join(', ')}</div>
-                    <div>Status: {hcoDetails.isValid ? 'Valid' : 'Invalid'}</div>
-                    <div>Contract status: {hcoDetails.isInContract ? 'In my contract' : 'Not in my contract'}</div>
-                    <div>Type: {hcoDetails.type}</div>
-                    <div>Activity: {hcoDetails.activity}</div>
-                    {hcoDetails.contactNumbers.map((c, i) => (<div key={'tel-' + i}>{c.type}: {c.number}</div>))}
+                <div className="okla-search__details">
+                    <Tabs defaultActiveKey="Identifiers" className="okla-search__tabs">
+                        <Tab eventKey="Identifiers" title="Identifiers">
+                            <div>
+                                <div>OneKey Workplace ID: {hcoDetails.workplaceEid}</div>
+                                <div>Specialties: {hcoDetails.specialties.join(', ')}</div>
+                                <div>Status: {hcoDetails.isValid ? 'Valid' : 'Invalid'}</div>
+                                <div>Contract status: {hcoDetails.isInContract ? 'In my contract' : 'Not in my contract'}</div>
+                                <div>Type: {hcoDetails.type}</div>
+                                <div>Activity: {hcoDetails.activity}</div>
+                            </div>
+                        </Tab>
+                        <Tab eventKey="Workplace" title="Workplace">
+                            <div>
+                                {hcoDetails.contactNumbers.map((c, i) => (<div key={'tel-' + i}>{c.type}: {c.number}</div>))}
 
-                    <div>Address: {hcoDetails.address}</div>
-                    <div>City: {hcoDetails.city}</div>
-                    <div>Post Code: {hcoDetails.postCode}</div>
-                    <div>Country: {getCountryName(hcoDetails.countryIso2)}</div>
-                    <MapView location={hcoDetails.location} />
+                                <div>Address: {hcoDetails.address}</div>
+                                <div>City: {hcoDetails.city}</div>
+                                <div>Post Code: {hcoDetails.postCode}</div>
+                                <div>Country: {getCountryName(hcoDetails.countryIso2)}</div>
+                                <MapView location={hcoDetails.location} />
+                            </div>
+                        </Tab>
+                        
+                    </Tabs>
                 </div>
             ) : (<div></div>)}
         </Modal.Body>
