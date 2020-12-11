@@ -3,11 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { Form, Formik, Field, ErrorMessage } from 'formik';
+import { Form, Formik, Field } from 'formik';
 import Select, { components } from 'react-select';
 import { getAllCountries } from '../../../core/client/country/country.actions';
 import OklaHcpDetails from './okla-hcp-details.component';
-import { array } from 'yup';
 
 const safeGet = (object, property) => {
     const propData = (object || {})[property];
@@ -28,13 +27,14 @@ const SearchProfessionalHcp = () => {
     const allCountries = useSelector(state => state.countryReducer.allCountries);
     const userCountries = getUserCountries();
 
-    const [selectedOption, setSelectedOption] = useState([]);
+    const [selectedCountries, setSelectedCountries] = useState([]);
     const [specialties, setSpecialties] = useState([]);
     const [specialtiesFlag, setSpecialtiesFlag] = useState(false);
     const [selectedIndividual, setSelectedIndividual] = useState(null);
     const [users, setUsers] = useState({});
     const [formData, setFormData] = useState({});
     const [currentPage, setCurrentPage] = useState(1);
+    const [hcpProfile, setHcpProfile] = useState(null);
 
     const params = new URLSearchParams(window.location.search);
     const initialFormValues = {
@@ -55,7 +55,7 @@ const SearchProfessionalHcp = () => {
     const resetSearch = (props) => {
         setFormData({});
         setCurrentPage(1);
-        setSelectedOption([]);
+        setSelectedCountries([]);
         setUsers({});
         props.resetForm();
     };
@@ -68,7 +68,7 @@ const SearchProfessionalHcp = () => {
             })
             .catch(err => {
                 console.log(err);
-            })
+            });
     };
 
     const pageLeft = () => {
@@ -112,7 +112,7 @@ const SearchProfessionalHcp = () => {
 
     useEffect(() => {
         const getSpecialties = async () => {
-            const codbases = selectedOption.map(item => `codbases=${item.value}`);
+            const codbases = selectedCountries.map(item => `codbases=${item.value}`);
             const parameters = codbases.join('&');
             if (parameters) {
                 const response = await axios.get(`/api/hcps/specialties?${parameters}`);
@@ -122,19 +122,32 @@ const SearchProfessionalHcp = () => {
         }
         getSpecialties();
         dispatch(getAllCountries());
-    }, [selectedOption]);
+    }, [selectedCountries]);
 
     useEffect(() => {
-        if (params.get('firstName')) initialFormValues.firstName = params.get('firstName');
-        if (params.get('lastName')) initialFormValues.lastName = params.get('lastName');
-        if (params.get('countryIso2')) {
-            const countryIso2 = initialFormValues.firstName = params.get('countryIso2');
+        const getHcpProfile = async (id) => {
+            const { data: hcpProfile } = await axios.get(`/api/hcp-profiles/${id}`);
+            setHcpProfile(hcpProfile.data);
         }
-        if (params.get('specialtyOnekey')) {
-            const specialtyOnekey = initialFormValues.firstName = params.get('specialtyOnekey');
+
+        if (params.get('id')) {
+            const id = params.get('id');
+            getHcpProfile(id);
         }
-        if (params.get('firstName')) initialFormValues.firstName = params.get('firstName');
+
     }, [location]);
+
+    useEffect(() => {
+        if (hcpProfile) {
+            initialFormValues.firstName = hcpProfile.first_name;
+            initialFormValues.lastName = hcpProfile.last_name;
+        }
+        if (userCountries && userCountries.length && !selectedCountries || !selectedCountries.length) {
+            setSelectedCountries([{ value:'BE', label: 'Belgium'}]);
+            console.log('-------------------');
+        }
+
+    }, [userCountries, hcpProfile]);
 
     const getCountries = () => userCountries.map(country => ({ value: country.codbase, label: country.codbase_desc }));
     const getSpecialties = () => specialties.map(i => ({ value: i.codIdOnekey.split('.')[2], label: i.codDescription }));
@@ -219,10 +232,10 @@ const SearchProfessionalHcp = () => {
                                                             // onChange={handleChange}
                                                             className="multiselect"
                                                             classNamePrefix="multiselect"
-                                                            value={selectedOption}
+                                                            value={selectedCountries}
                                                             onChange={selectedOption => {
                                                                 formikProps.values.countries = selectedOption;
-                                                                setSelectedOption(selectedOption || []);
+                                                                setSelectedCountries(selectedOption || []);
                                                             }}
                                                         />
                                                     </div>

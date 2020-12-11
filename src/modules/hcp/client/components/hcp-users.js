@@ -200,7 +200,7 @@ export default function hcpUsers() {
     const openDiscoverHcpsWindow = (hcp) => {
         const width = (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth) * 0.8;
         const height = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) * 0.9;
-        window.open(`/hcps/discover-professionals?firstName=${hcp.first_name}&lastName=${hcp.last_name}&countryIso2=${hcp.country_iso2}&specialtyOnekey=${hcp.specialty_onekey}`, 'name', `width=${width || 600},height=${height || 400}`);
+        window.open(`/hcps/discover-professionals?id=${hcp.id}`, 'name', `width=${width || 600},height=${height || 400}`);
         setSelectedRow(hcp.id);
     }
 
