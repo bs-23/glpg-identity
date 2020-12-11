@@ -103,3 +103,20 @@ export function setOklaHcpDetails(hcpDetails) {
         payload: hcpDetails
     };
 }
+
+export function getOklaHcoDetails(codbase, workplaceEid) {
+    return {
+        type: Types.GET_OKLA_HCO_DETAILS,
+        payload: axios({
+            method: 'get',
+            url: `/api/okla/hcos/${codbase}/${workplaceEid}`
+        })
+    };
+}
+
+export function setOklaHcoDetails(hcoDetails) {
+    return {
+        type: Types.SET_OKLA_HCO_DETAILS,
+        payload: hcoDetails
+    };
+}

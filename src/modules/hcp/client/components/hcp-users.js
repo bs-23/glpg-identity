@@ -197,11 +197,11 @@ export default function hcpUsers() {
         window.open(link, 'name','width=600,height=400');
     }
 
-    const openDiscoverHcpsWindow = (rowId) => {
+    const openDiscoverHcpsWindow = (hcp) => {
         const width = (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth) * 0.8;
         const height = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) * 0.9;
-        window.open('/hcps/discover-professionals', 'name', `width=${width || 600},height=${height || 400}`);
-        setSelectedRow(rowId);
+        window.open(`/hcps/discover-professionals?firstName=${hcp.first_name}&lastName=${hcp.last_name}&countryIso2=${hcp.country_iso2}&specialtyOnekey=${hcp.specialty_onekey}`, 'name', `width=${width || 600},height=${height || 400}`);
+        setSelectedRow(hcp.id);
     }
 
     const getSpecialtyOptions = async (value, row) => {
@@ -277,7 +277,7 @@ export default function hcpUsers() {
             : status === 'consent_pending'
                 ? <span><i className="fa fa-xs fa-circle text-warning pr-2 hcp-status-icon"></i>Consent Pending</span>
                 : status === 'not_verified'
-                    ? <span class="text-nowrap"><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Not Verified <i type="button" className="fas fa-search search-in-okla ml-1 cdp-text-primary" onClick={() => openDiscoverHcpsWindow(row.id)}></i></span>
+                    ? <span class="text-nowrap"><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Not Verified <i type="button" className="fas fa-search search-in-okla ml-1 cdp-text-primary" onClick={() => openDiscoverHcpsWindow(row)}></i></span>
                     : status === 'rejected'
                         ? <span><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Rejected</span>
                         : <span></span>
