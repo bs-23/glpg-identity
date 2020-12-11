@@ -1,9 +1,9 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { Form, Formik, Field } from 'formik';
+import { useFormikContext, Form, Formik, Field } from 'formik';
 import Select, { components } from 'react-select';
 import { getAllCountries } from '../../../core/client/country/country.actions';
 import OklaHcpDetails from './okla-hcp-details.component';
@@ -11,6 +11,7 @@ import getUserPermittedCountries from '../../../core/client/util/user-country';
 
 const SearchProfessionalHcp = () => {
     const dispatch = useDispatch();
+    const formikRef = useRef();
     const location = useLocation();
 
     const countries = useSelector(state => state.countryReducer.countries);
@@ -25,6 +26,7 @@ const SearchProfessionalHcp = () => {
     const [formData, setFormData] = useState({});
     const [currentPage, setCurrentPage] = useState(1);
     const [hcpProfile, setHcpProfile] = useState(null);
+    const [isAssigned, setIsAssigned] = useState(false);
 
     const params = new URLSearchParams(window.location.search);
     const initialFormValues = {
@@ -99,11 +101,17 @@ const SearchProfessionalHcp = () => {
     }, [location]);
 
     useEffect(() => {
-        if (userCountries && userCountries.length && hcpProfile && (!selectedCountries || !selectedCountries.length)) {
-            const country = (getCountries()).find(c => c.countryIso2.toLowerCase() === hcpProfile.country_iso2.toLowerCase());
-            if (country) setSelectedCountries([country]);
+        if(hcpProfile){
+            formikRef.current.values.firstName = hcpProfile.first_name;
+            formikRef.current.values.lastName = hcpProfile.last_name;
+            formikRef.current.values.onekeyId = hcpProfile.individual_id_onekey;
         }
 
+        if (!isAssigned && userCountries && userCountries.length && hcpProfile && (!selectedCountries || !selectedCountries.length)) {
+            const country = (getCountries()).find(c => c.countryIso2.toLowerCase() === hcpProfile.country_iso2.toLowerCase());
+            if (country) setSelectedCountries([country]);
+            setIsAssigned(true);
+        }
     }, [userCountries, hcpProfile]);
 
     const getCountries = () => userCountries.map(country => ({ value: country.codbase, label: country.codbase_desc, countryIso2: country.country_iso2 }));
@@ -157,6 +165,7 @@ const SearchProfessionalHcp = () => {
 
                             <div className="add-user mx-3 mt-0 p-3 bg-white rounded border">
                                 <Formik
+                                    innerRef={formikRef}
                                     initialValues={initialFormValues}
                                     displayName="SearchForm"
                                     onSubmit={async (values, actions) => {
@@ -290,7 +299,7 @@ const SearchProfessionalHcp = () => {
                                                     <button type="reset" className="btn btn-block btn-secondary mt-4 p-2" onClick={() => resetSearch(formikProps)}>CLEAR</button>
                                                 </div>
                                                 <div className="col-6">
-                                                    <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!formikProps.values.countries || !formikProps.values.countries.length || !(formikProps.values.firstName || formikProps.values.lastName || formikProps.values.address || formikProps.values.city || formikProps.values.postCode || formikProps.values.onekeyId || formikProps.values.individualEid || specialtiesFlag)}>SEARCH</button>
+                                                    <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!selectedCountries || !selectedCountries.length || !(formikProps.values.firstName || formikProps.values.lastName || formikProps.values.address || formikProps.values.city || formikProps.values.postCode || formikProps.values.onekeyId || formikProps.values.individualEid || specialtiesFlag)}>SEARCH</button>
                                                 </div>
                                             </div>
                                         </Form>
