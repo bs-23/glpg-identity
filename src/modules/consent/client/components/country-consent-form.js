@@ -4,12 +4,13 @@ import { Form, Formik, Field, ErrorMessage } from "formik";
 import { useToasts } from 'react-toast-notifications';
 import optTypes from '../opt-types.json';
 import { updateCountryConsent, createCountryConsent } from '../consent.actions';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { countryConsentSchema } from '../consent.schema';
 
 const CountryConsentForm = (props) => {
     const [, setShow] = useState(false);
     const [country, setCountry] = useState(false);
+    const countries = useSelector(state => state.countryReducer.countries);
     const { addToast } = useToasts();
     const dispatch = useDispatch();
     const handleClose = () => {
@@ -24,8 +25,8 @@ const CountryConsentForm = (props) => {
     };
 
     useEffect(() => {
-        if (props.countries && props.editable) {
-            setCountry(props.countries.find(x => x.country_iso2.toLowerCase() === props.options.country_iso2.toLowerCase()));
+        if (props.editable) {
+            setCountry(countries.find(x => x.country_iso2.toLowerCase() === props.options.country_iso2.toLowerCase()));
         }
     });
 
@@ -35,7 +36,7 @@ const CountryConsentForm = (props) => {
                 <Modal.Title className="modal-title_small">{props.editable ? 'Manage opt type' : 'Assign consent to country'}</Modal.Title>
             </Modal.Header>
 
-            {props.consents.length > 0 && props.countries.length > 0 &&
+            {props.consents.length > 0 &&
                 <div className="consent-manage">
                     <Formik
                         initialValues={{
@@ -79,6 +80,7 @@ const CountryConsentForm = (props) => {
                                                 <label className="font-weight-bold" htmlFor="country_iso2">Select Country <span className="text-danger">*</span></label>
                                                 <Field disabled={props.editable ? true : false} data-testid="country_iso2" as="select" name="country_iso2" className="form-control">
                                                     <option key="select-country" value="" disabled>--Select Country--</option>
+                                                    {props.editable && props.countries.length === 0 && <option value={country.country_iso2}>{country.codbase_desc}</option>}
                                                     {props.countries.map(item => <option key={item.countryid} value={item.country_iso2}>{props.editable ? country.codbase_desc : item.codbase_desc}</option>)}
                                                 </Field>
                                                 <div className="invalid-feedback"><ErrorMessage name="country_iso2" /></div>
