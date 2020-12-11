@@ -6,25 +6,15 @@ import { Form, Formik, Field, ErrorMessage } from 'formik';
 import Select, { components } from 'react-select';
 import { getAllCountries } from '../../../core/client/country/country.actions';
 import OklaHcoDetails from './okla-hco-details.component';
-
-const safeGet = (object, property) => {
-    const propData = (object || {})[property];
-    return (prop) => prop ? safeGet(propData, prop) : propData;
-};
-
-const flatten = (array) => {
-    return Array.isArray(array) ? [].concat(...array.map(flatten)) : array;
-}
-
-const union = (a, b) => [...new Set([...a, ...b])];
+import getUserPermittedCountries from '../../../core/client/util/user-country';
 
 const SearchOrganizationHcp = () => {
     const dispatch = useDispatch();
 
     const countries = useSelector(state => state.countryReducer.countries);
     const allCountries = useSelector(state => state.countryReducer.allCountries);
-    const userCountries = getUserCountries();
-
+    const userProfile = useSelector(state => state.userReducer.loggedInUser);
+    const userCountries = getUserPermittedCountries(userProfile, countries);
     const [selectedOption, setSelectedOption] = useState([]);
     const [specialties, setSpecialties] = useState([]);
     const [specialtiesFlag, setSpecialtiesFlag] = useState();
@@ -32,7 +22,6 @@ const SearchOrganizationHcp = () => {
     const [hcos, setHcos] = useState({});
     const [formData, setFormData] = useState({});
     const [currentPage, setCurrentPage] = useState(1);
-
 
     const resetSearch = (props) => {
         setFormData({});
@@ -61,35 +50,6 @@ const SearchOrganizationHcp = () => {
     const pageRight = () => {
         if (currentPage === Math.ceil(hcos.totalNumberOfResults / hcos.resultSize)) return;
         searchHcos(currentPage + 1);
-    }
-
-    function extractLoggedInUserCountries(data) {
-        const profile_permission_sets = safeGet(data, 'profile')('permissionSets')();
-        const profile_countries = profile_permission_sets ? profile_permission_sets.map(pps => safeGet(pps, 'countries')() || []) : [];
-
-        const userRoles = safeGet(data, 'role')();
-        const roles_countries = userRoles ? userRoles.map(role => {
-            const role_permission_sets = safeGet(role, 'permissionSets')();
-            return role_permission_sets.map(rps => safeGet(rps, 'countries')() || []);
-        }) : [];
-
-        const userCountries = union(flatten(profile_countries), flatten(roles_countries)).filter(e => e);
-
-        return userCountries;
-    }
-
-    function fetchUserCountries(args, allCountries) {
-        const countryList = [];
-        args.forEach(element => {
-            countryList.push(allCountries.find(x => x.country_iso2 == element));
-        });
-        return countryList.filter(c => c);
-    }
-
-    function getUserCountries() {
-        const userProfile = useSelector(state => state.userReducer.loggedInUser);
-        const userCountries = extractLoggedInUserCountries(userProfile);
-        return fetchUserCountries(userCountries, countries);
     }
 
     useEffect(() => {
