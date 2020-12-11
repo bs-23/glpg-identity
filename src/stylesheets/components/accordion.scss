@@ -179,9 +179,18 @@
     }
 
     &__list-group {
+
+        &--modal-open {
+            display: none;
+        }
+
         .list-group-item:hover {
             @extend .cdp-light-bg;
             cursor: pointer;
+
+            .faq__list-group--modal-open {
+                display: block;
+            }
         }
     }
 }
