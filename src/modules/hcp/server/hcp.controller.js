@@ -277,7 +277,9 @@ async function getHcps(req, res) {
             const opt_types = new Set();
 
             hcp['hcpConsents'].map(hcpConsent => {
-                opt_types.add(hcpConsent.opt_type);
+                if(hcpConsent.consent_confirmed || hcpConsent.opt_type === 'opt-out') {
+                    opt_types.add(hcpConsent.opt_type);
+                }
             });
 
             hcp.dataValues.opt_types = [...opt_types];
@@ -953,7 +955,7 @@ async function approveHCPUser(req, res) {
             object_id: hcpUser.id,
             table_name: 'hcp_profiles',
             actor: req.user.id,
-            remarks: req.body.comment.trim()
+            remarks: (req.body.comment || '').trim()
         });
 
         res.json(response);
@@ -990,7 +992,7 @@ async function rejectHCPUser(req, res) {
             object_id: hcpUser.id,
             table_name: 'hcp_archives',
             actor: req.user.id,
-            remarks: req.body.comment.trim()
+            remarks: (req.body.comment || '').trim()
         });
 
         await hcpUser.destroy();

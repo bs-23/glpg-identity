@@ -16,9 +16,9 @@ const SearchOrganizationHcp = () => {
     const allCountries = useSelector(state => state.countryReducer.allCountries);
     const userProfile = useSelector(state => state.userReducer.loggedInUser);
     const userCountries = getUserPermittedCountries(userProfile, countries);
-    const [selectedOption, setSelectedOption] = useState([]);
+    const [selectedCountries, setSelectedCountries] = useState([]);
     const [specialties, setSpecialties] = useState([]);
-    const [specialtiesFlag, setSpecialtiesFlag] = useState();
+    const [selectedSpecialties, setSelectedSpecialties] = useState([]);
     const [selectedHco, setSelectedHco] = useState(null);
     const [hcos, setHcos] = useState({});
     const [formData, setFormData] = useState({});
@@ -27,9 +27,15 @@ const SearchOrganizationHcp = () => {
     const resetSearch = (props) => {
         setFormData({});
         setCurrentPage(1);
-        setSelectedOption([]);
+        setSelectedCountries([]);
+        setSelectedSpecialties([]);
         setHcos({});
         props.resetForm();
+    };
+
+    const scrollToResult = (isEmpty) => {
+        const searchResult = document.getElementById(isEmpty ? 'empty-search-result' : 'search-result');
+        searchResult.scrollIntoView({ behavior: 'smooth' });
     };
 
     const searchHcos = (newPage) => {
@@ -37,6 +43,7 @@ const SearchOrganizationHcp = () => {
             .then(response => {
                 setHcos(response.data);
                 setCurrentPage(newPage);
+                scrollToResult(response.data.results.length === 0);
             })
             .catch(err => {
                 console.log(err);
@@ -55,7 +62,7 @@ const SearchOrganizationHcp = () => {
 
     useEffect(() => {
         const getSpecialties = async () => {
-            const codbases = selectedOption.map(item => `codbases=${item.value}`);
+            const codbases = selectedCountries.map(item => `codbases=${item.value}`);
             const parameters = codbases.join('&');
             if (parameters) {
                 const response = await axios.get(`/api/hcps/specialties?${parameters}`);
@@ -65,7 +72,7 @@ const SearchOrganizationHcp = () => {
         }
         getSpecialties();
         dispatch(getAllCountries());
-    }, [selectedOption, countries]);
+    }, [selectedCountries, countries]);
 
     const getCountries = () => userCountries.map(country => ({ value: country.codbase, label: country.codbase_desc }));
     const getSpecialties = () => specialties.map(i => ({ value: i.codIdOnekey.split('.')[2], label: i.codDescription }));
@@ -144,6 +151,7 @@ const SearchOrganizationHcp = () => {
                                         setFormData(data);
                                         setCurrentPage(1);
                                         actions.setSubmitting(false);
+                                        scrollToResult(response.data.results.length === 0);
                                     }}
                                 >
                                     {formikProps => (
@@ -163,10 +171,10 @@ const SearchOrganizationHcp = () => {
                                                             // onChange={handleChange}
                                                             className="multiselect"
                                                             classNamePrefix="multiselect"
-                                                            value={selectedOption}
+                                                            value={selectedCountries}
                                                             onChange={selectedOption => {
-                                                                formikProps.values.countries = selectedOption;
-                                                                setSelectedOption(selectedOption || []);
+                                                                formikProps.setFieldValue('countries', selectedOption || []);
+                                                                setSelectedCountries(selectedOption || []);
                                                             }}
                                                         />
                                                     </div>
@@ -221,9 +229,10 @@ const SearchOrganizationHcp = () => {
                                                             options={getSpecialties()}
                                                             className="multiselect"
                                                             classNamePrefix="multiselect"
+                                                            value={selectedSpecialties}
                                                             onChange={selectedOption => {
-                                                                formikProps.values.specialties = Array.isArray(selectedOption) ? selectedOption : [];
-                                                                setSpecialtiesFlag(Array.isArray(selectedOption) && selectedOption.length);
+                                                                formikProps.setFieldValue('specialties', Array.isArray(selectedOption) ? selectedOption : []);
+                                                                setSelectedSpecialties(selectedOption || []);
                                                             }}
                                                         />
                                                     </div>
@@ -250,7 +259,7 @@ const SearchOrganizationHcp = () => {
                                                     <button type="reset" className="btn btn-block btn-secondary mt-4 p-2" onClick={() => resetSearch(formikProps)}>CLEAR</button>
                                                 </div>
                                                 <div className="col-6">
-                                                    <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!formikProps.values.countries || !formikProps.values.countries.length || !(formikProps.values.address || formikProps.values.city || formikProps.values.postCode || formikProps.values.onekeyId || formikProps.values.workplaceEid || specialtiesFlag)}> SEARCH </button>
+                                                    <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!formikProps.values.countries || !formikProps.values.countries.length || !(formikProps.values.address || formikProps.values.city || formikProps.values.postCode || formikProps.values.onekeyId || formikProps.values.workplaceEid || (selectedSpecialties && selectedSpecialties.length))}> SEARCH </button>
                                                 </div>
                                             </div>
                                         </Form>
@@ -261,7 +270,7 @@ const SearchOrganizationHcp = () => {
                     </div>
                 </div>
                 {hcos.results && hcos.results.length > 0 &&
-                    <div className="row">
+                    <div className="row" id="search-result">
                         <div className="col-12">
                             <div className="my-3">
                                 <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
@@ -323,7 +332,7 @@ const SearchOrganizationHcp = () => {
                 }
 
                 {hcos.results && hcos.results.length <= 0 &&
-                    <div className="p-3 bg-white">No Health Care Organizations found</div>
+                    <div className="p-3 bg-white" id="empty-search-result">No Health Care Organizations found</div>
                 }
             </div>
 

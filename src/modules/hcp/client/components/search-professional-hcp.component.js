@@ -21,7 +21,7 @@ const SearchProfessionalHcp = () => {
     const userCountries = getUserPermittedCountries(userProfile, countries);
     const [selectedCountries, setSelectedCountries] = useState([]);
     const [specialties, setSpecialties] = useState([]);
-    const [specialtiesFlag, setSpecialtiesFlag] = useState(false);
+    const [selectedSpecialties, setSelectedSpecialties] = useState([]);
     const [selectedIndividual, setSelectedIndividual] = useState(null);
     const [users, setUsers] = useState({});
     const [formData, setFormData] = useState({});
@@ -49,8 +49,14 @@ const SearchProfessionalHcp = () => {
         setFormData({});
         setCurrentPage(1);
         setSelectedCountries([]);
+        setSelectedSpecialties([]);
         setUsers({});
         props.resetForm();
+    };
+
+    const scrollToResult = (isEmpty) => {
+        const searchResult = document.getElementById(isEmpty ? 'empty-search-result' : 'search-result');
+        searchResult.scrollIntoView({ behavior: 'smooth' });
     };
 
     const searchHcps = (newPage) => {
@@ -58,6 +64,7 @@ const SearchProfessionalHcp = () => {
             .then(response => {
                 setUsers(response.data);
                 setCurrentPage(newPage);
+                scrollToResult(response.data.results.length === 0);
             })
             .catch(err => {
                 console.log(err);
@@ -102,10 +109,10 @@ const SearchProfessionalHcp = () => {
     }, [location]);
 
     useEffect(() => {
-        if(hcpProfile){
-            formikRef.current.values.firstName = hcpProfile.first_name;
-            formikRef.current.values.lastName = hcpProfile.last_name;
-            formikRef.current.values.onekeyId = hcpProfile.individual_id_onekey;
+        if (hcpProfile) {
+            formikRef.current.setFieldValue('firstName', hcpProfile.first_name || '');
+            formikRef.current.setFieldValue('lastName', hcpProfile.last_name || '');
+            formikRef.current.setFieldValue('onekeyId', hcpProfile.individual_id_onekey || '');
         }
 
         if (!isAssigned && userCountries && userCountries.length && hcpProfile && (!selectedCountries || !selectedCountries.length)) {
@@ -180,6 +187,7 @@ const SearchProfessionalHcp = () => {
                                         setFormData(data);
                                         setCurrentPage(1);
                                         actions.setSubmitting(false);
+                                        scrollToResult(response.data.results.length === 0);
                                     }}
                                 >
                                     {formikProps => (
@@ -250,9 +258,10 @@ const SearchProfessionalHcp = () => {
                                                             options={getSpecialties()}
                                                             className="multiselect"
                                                             classNamePrefix="multiselect"
+                                                            value={selectedSpecialties}
                                                             onChange={selectedOption => {
-                                                                formikProps.values.specialties = Array.isArray(selectedOption) ? selectedOption : [];
-                                                                setSpecialtiesFlag(Array.isArray(selectedOption) && selectedOption.length);
+                                                                formikProps.setFieldValue('specialties', Array.isArray(selectedOption) ? selectedOption : []);
+                                                                setSelectedSpecialties(selectedOption || []);
                                                             }}
                                                         />
                                                     </div>
@@ -300,7 +309,7 @@ const SearchProfessionalHcp = () => {
                                                     <button type="reset" className="btn btn-block btn-secondary mt-4 p-2" onClick={() => resetSearch(formikProps)}>CLEAR</button>
                                                 </div>
                                                 <div className="col-6">
-                                                    <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!selectedCountries || !selectedCountries.length || !(formikProps.values.firstName || formikProps.values.lastName || formikProps.values.address || formikProps.values.city || formikProps.values.postCode || formikProps.values.onekeyId || formikProps.values.individualEid || specialtiesFlag)}>SEARCH</button>
+                                                    <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!selectedCountries || !selectedCountries.length || !(formikProps.values.firstName || formikProps.values.lastName || formikProps.values.address || formikProps.values.city || formikProps.values.postCode || formikProps.values.onekeyId || formikProps.values.individualEid || (selectedSpecialties && selectedSpecialties.length))}>SEARCH</button>
                                                 </div>
                                             </div>
                                         </Form>
@@ -311,7 +320,7 @@ const SearchProfessionalHcp = () => {
                     </div>
                 </div>
                 {users.results && users.results.length > 0 &&
-                    <div className="row">
+                    <div className="row" id="search-result">
                         <div className="col-12">
                             <div className="my-3">
                                 <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
@@ -390,7 +399,7 @@ const SearchProfessionalHcp = () => {
                 }
 
                 {users.results && users.results.length <= 0 &&
-                    <div className="p-3 bg-white">No Health Care Professionals found</div>
+                    <div className="p-3 bg-white" id="empty-search-result">No Health Care Professionals found</div>
                 }
             </div>
 
