@@ -76,7 +76,8 @@ export default function DraftEditor({ onChangeHTML, htmlContent }) {
     useEffect(() => {
         if (onChangeHTML) {
             const editorContentInHTML = convertContentToHtml();
-            onChangeHTML(editorContentInHTML);
+            const plainText = editorState.getCurrentContent().getPlainText();
+            onChangeHTML(editorContentInHTML, plainText);
         }
     }, [editorState]);
 
