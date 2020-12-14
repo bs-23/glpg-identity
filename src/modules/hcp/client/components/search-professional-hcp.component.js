@@ -210,6 +210,7 @@ const SearchProfessionalHcp = () => {
                                                             onChange={selectedOption => {
                                                                 formikProps.values.countries = selectedOption;
                                                                 setSelectedCountries(selectedOption || []);
+                                                                setSelectedSpecialties([]);
                                                             }}
                                                         />
                                                     </div>
