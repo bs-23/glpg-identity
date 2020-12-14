@@ -334,12 +334,29 @@ async function login(req, res) {
 
             if (!user || !user.password || !user.validPassword(password)) {
                 if (user && user.password) {
+                    await logService.log({
+                        event_type: 'LOGIN',
+                        object_id: user.id,
+                        table_name: 'users',
+                        actor: user.id,
+                        remarks: user.failed_auth_attempt >= 4 ? 'Login failed. Account locked.' : 'Login failed. Wrong password.'
+                    });
                     await user.update({ failed_auth_attempt: user.dataValues.failed_auth_attempt + 1 });
                 }
 
                 const errorMessage = user && user.dataValues.failed_auth_attempt >= 5
                     ? userLockedMessage
                     : 'Invalid username or password.';
+
+                // if(user && user.failed_auth_attempt >= 5) {
+                //     await logService.log({
+                //         event_type: 'LOGIN',
+                //         object_id: user.id,
+                //         table_name: 'users',
+                //         actor: user.id,
+                //         remarks:
+                //     });
+                // }
 
                 return res.status(401).send(errorMessage);
             }
@@ -374,7 +391,7 @@ async function login(req, res) {
             object_id: user.id,
             table_name: 'users',
             actor: user.id,
-            remarks: 'CDP user logged in'
+            remarks: 'CDP login success'
         });
 
         res.json(await formatProfile(user));
@@ -892,16 +909,24 @@ async function updateUserDetails(req, res) {
 
         if(doesEmailExist) return res.status(400).send('Email already exists.');
 
+        const previousStatus = user.status;
+
         await user.update(partialUserData);
 
         await user.setRoles(userRoles);
+
+        let logMessage = status !== previousStatus
+            ? status === 'active'
+                ? 'User account activated'
+                : 'User account deactivated'
+            : 'Updated CDP User'
 
         await logService.log({
             event_type: 'UPDATE',
             object_id: user.id,
             table_name: 'users',
             actor: req.user.id,
-            remarks: 'Updated CDP user'
+            remarks: logMessage
         });
 
         res.json(formatProfile(user));
@@ -1015,6 +1040,14 @@ async function changePassword(req, res) {
 
         await emailService.send(options);
 
+        await logService.log({
+            event_type: 'UPDATE',
+            object_id: user.id,
+            table_name: 'users',
+            actor: user.id,
+            remarks: 'Change of password'
+        });
+
         res.json(await formatProfile(user));
     } catch (err) {
         console.error(err);
@@ -1023,6 +1056,16 @@ async function changePassword(req, res) {
 }
 
 async function resetPassword(req, res) {
+    async function log(object_id, req_user_id, message, event='BAD_REQUEST') {
+        await logService.log({
+            event_type: event,
+            object_id,
+            table_name: 'users',
+            actor: req_user_id,
+            remarks: message
+        });
+    }
+
     try {
         const { token } = req.query;
 
@@ -1040,22 +1083,39 @@ async function resetPassword(req, res) {
         const user = await User.findOne({ where: { id: resetRequest.user_id } });
 
         if (user.status === 'inactive') {
+            await log(user.id, user.id, 'Password reset failed. Reason: User inactive.');
             return res.status(403).send('User inactive.');
         }
 
         if (await PasswordPolicies.minimumPasswordAge(user.password_updated_at)) {
+            await log(user.id, user.id, 'Password reset failed. Reason: Tried to change password before 1 day.');
             return res.status(400).send(`You cannot change password before 1 day`);
         }
 
-        if (await PasswordPolicies.isOldPassword(req.body.newPassword, user)) return res.status(400).send('New password can not be your previously used password.');
+        if (await PasswordPolicies.isOldPassword(req.body.newPassword, user)) {
+            await log(user.id, user.id, 'Password reset failed. Reason: Provided previously given password.');
+            return res.status(400).send('New password can not be your previously used password.');
+        }
 
-        if (!PasswordPolicies.validatePassword(req.body.newPassword)) return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.');
+        if (!PasswordPolicies.validatePassword(req.body.newPassword)) {
+            await log(user.id, user.id, 'Password reset failed. Reason: Password does not satisfy requirements.');
+            return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.')
+        };
 
-        if (!PasswordPolicies.hasValidCharacters(req.body.newPassword)) return res.status(400).send('Password has one or more invalid character.');
+        if (!PasswordPolicies.hasValidCharacters(req.body.newPassword)) {
+            await log(user.id, user.id, 'Password reset failed. Reason: Password contains invalid characters.');
+            return res.status(400).send('Password has one or more invalid character.');
+        }
 
-        if (PasswordPolicies.isCommonPassword(req.body.newPassword, user)) return res.status(400).send('Password can not be commonly used passwords or personal info. Try a different one.');
+        if (PasswordPolicies.isCommonPassword(req.body.newPassword, user)) {
+            await log(user.id, user.id, 'Password reset failed. Reason: Common Password.');
+            return res.status(400).send('Password can not be commonly used passwords or personal info. Try a different one.');
+        }
 
-        if (req.body.newPassword !== req.body.confirmPassword) return res.status(400).send("Password and confirm password doesn't match.");
+        if (req.body.newPassword !== req.body.confirmPassword) {
+            await log(user.id, user.id, 'Password reset failed. Reason: Password and confirm password does not match.');
+            return res.status(400).send("Password and confirm password doesn't match.");
+        }
 
         if (user.password) await PasswordPolicies.saveOldPassword(user);
 
@@ -1063,6 +1123,8 @@ async function resetPassword(req, res) {
         const expiryDate = req.body.newPassword.length >= 15
             ? new Date(currentDate.setFullYear(currentDate.getFullYear() + 1))
             : new Date(currentDate.setDate(currentDate.getDate() + 90));
+
+        const wasAccountLocked = user.failed_auth_attempt >= 5;
 
         await user.update({
             password: req.body.newPassword,
@@ -1092,6 +1154,9 @@ async function resetPassword(req, res) {
         emailService.send(options);
 
         await resetRequest.destroy();
+
+        if(wasAccountLocked) await log(user.id, user.id, 'Password reset successful. Account unlocked.', 'UPDATE');
+        else await log(user.id, user.id, 'Password reset successful', 'UPDATE');
 
         res.sendStatus(200);
 
