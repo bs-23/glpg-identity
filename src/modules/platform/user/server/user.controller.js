@@ -23,7 +23,7 @@ const PasswordPolicies = require(path.join(process.cwd(), "src/modules/core/serv
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const { QueryTypes, Op, where, col, fn, literal } = require('sequelize');
 const Filter = require(path.join(process.cwd(), "src/modules/core/server/filter/filter.model.js"));
-const filterService = require(path.join(process.cwd(), 'src/modules/user/server/filter.js'));
+const filterService = require(path.join(process.cwd(), 'src/modules/platform/user/server/filter.js'));
 const { getRequestingUserPermissions, getPermissionsFromPermissionSet } = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/permissions.js"));
 
 function generateAccessToken(doc) {
