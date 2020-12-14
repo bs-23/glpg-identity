@@ -7,6 +7,7 @@ import { Tabs, Tab } from 'react-bootstrap';
 
 const OklaHcoDetails = ({ hco, setSelectedHco }) => {
     const dispatch = useDispatch();
+    const [selectedTab, setSelectedTab] = useState('Identifiers');
 
     const hcoDetails = useSelector(state => state.hcpReducer.oklaHcoDetails);
     const allCountries = useSelector(state => state.countryReducer.allCountries);
@@ -38,7 +39,7 @@ const OklaHcoDetails = ({ hco, setSelectedHco }) => {
         <Modal.Body>
             {hcoDetails ? (
                 <div className="okla-search__details">
-                    <Tabs defaultActiveKey="Identifiers" className="okla-search__tabs">
+                    <Tabs defaultActiveKey={selectedTab} className="okla-search__tabs" onSelect={(activeKey,e) => setSelectedTab(activeKey)}>
                         <Tab eventKey="Identifiers" title="Identifiers">
                             <div>
                                 <div>OneKey Workplace ID: {hcoDetails.workplaceEid}</div>
@@ -57,10 +58,10 @@ const OklaHcoDetails = ({ hco, setSelectedHco }) => {
                                 <div>City: {hcoDetails.city}</div>
                                 <div>Post Code: {hcoDetails.postCode}</div>
                                 <div>Country: {getCountryName(hcoDetails.countryIso2)}</div>
-                                <MapView location={hcoDetails.location} />
+                                {selectedTab === 'Workplace' && <MapView location={hcoDetails.location} />}
                             </div>
                         </Tab>
-                        
+
                     </Tabs>
                 </div>
             ) : (<div></div>)}

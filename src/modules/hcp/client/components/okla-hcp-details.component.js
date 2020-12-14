@@ -8,6 +8,7 @@ import { Tabs, Tab } from 'react-bootstrap';
 const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
     const dispatch = useDispatch();
     const [selectedWorkplace, setSelectedWorkplace] = useState(null);
+    const [selectedTab, setSelectedTab] = useState('Individual');
 
     const hcpDetails = useSelector(state => state.hcpReducer.oklaHcpDetails);
     const allCountries = useSelector(state => state.countryReducer.allCountries);
@@ -27,8 +28,8 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
     }, [individual]);
 
     useEffect(() => {
-        hcpDetails && setSelectedWorkplace(hcpDetails.workplaces[0]);
-    }, [hcpDetails]);
+        if (hcpDetails && selectedTab === 'Workplace') setSelectedWorkplace(hcpDetails.workplaces[0]);
+    }, [hcpDetails, selectedTab]);
 
     return <Modal
         size="lg"
@@ -43,7 +44,7 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
         <Modal.Body>
             {hcpDetails ? (
                 <div className="okla-search__details">
-                    <Tabs defaultActiveKey="Individual" className="okla-search__tabs">
+                    <Tabs defaultActiveKey={selectedTab} className="okla-search__tabs" onSelect={(activeKey,e) => setSelectedTab(activeKey)}>
                         <Tab eventKey="Individual" title="Individual">
                             <div>
                                 <div>Salutation: {hcpDetails.salutation}</div>
