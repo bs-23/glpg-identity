@@ -5,14 +5,41 @@
         display: flex;
 
         .tab-content {
-            flex: 0 0 calc(100% - 220px);
+            flex: 0 0 calc(100% - 270px);
+        }
+
+        &-items {
+            list-style: none;
+            padding: 0px;
+            margin: 0px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        &-item {
+            padding: 0px 10px 20px 0px;
+            flex: 0 0 33%;
+            white-space: nowrap;
+        }
+
+        &-title {
+            display: block;
+            color: #202020;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        &-value {
+            color: #636A70;
+            font-size: 18px;
+            font-weight: 600;
         }
     }
 
     &__tabs {
         margin-right: 30px;
         flex-direction: column;
-        width: 220px;
+        width: 270px;
 
         .nav-link {
             background: #F2F2F2;

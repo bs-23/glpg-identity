@@ -46,15 +46,36 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
                 <div className="okla-search__details">
                     <Tabs defaultActiveKey={selectedTab} className="okla-search__tabs" onSelect={(activeKey,e) => setSelectedTab(activeKey)}>
                         <Tab eventKey="Individual" title="Individual">
-                            <div>
-                                <div>Salutation: {hcpDetails.salutation}</div>
-                                <div>Title: {hcpDetails.title}</div>
-                                <div>Gender: {hcpDetails.gender}</div>
-                                <div>Graduation Year: {hcpDetails.graduationYear}</div>
-                                <div>Birth Year: {hcpDetails.birthYear}</div>
-                                <div>Country: {getCountryName(hcpDetails.countryIso2)}</div>
-                                <div>Specialties: {hcpDetails.specialties.join(', ')}</div>
-                            </div>
+                            <ul className="okla-search__details-items">
+                                <li className="okla-search__details-item">
+                                    <strong className="okla-search__details-title">Salutation</strong>
+                                    <span className="okla-search__details-value">{hcpDetails.salutation}</span>
+                                </li>
+                                <li className="okla-search__details-item">
+                                    <strong className="okla-search__details-title">Title</strong>
+                                    <span className="okla-search__details-value">{hcpDetails.title}</span>
+                                </li>
+                                <li className="okla-search__details-item">
+                                    <strong className="okla-search__details-title">Gender</strong>
+                                    <span className="okla-search__details-value">{hcpDetails.gender}</span>
+                                </li>
+                                <li className="okla-search__details-item">
+                                    <strong className="okla-search__details-title">Graduation Year</strong>
+                                    <span className="okla-search__details-value">{hcpDetails.graduationYear}</span>
+                                </li>
+                                <li className="okla-search__details-item">
+                                    <strong className="okla-search__details-title">Birth Year</strong>
+                                    <span className="okla-search__details-value">{hcpDetails.birthYear}</span>
+                                </li>
+                                <li className="okla-search__details-item">
+                                    <strong className="okla-search__details-title">Country</strong>
+                                    <span className="okla-search__details-value">{hcpDetails.countryIso2}</span>
+                                </li>
+                                <li className="okla-search__details-item">
+                                    <strong className="okla-search__details-title">Country</strong>
+                                    <span className="okla-search__details-value">{hcpDetails.specialties.join(', ')}</span>
+                                </li>
+                            </ul>
                         </Tab>
                         <Tab eventKey="Identifiers" title="Identifiers">
                             <div>

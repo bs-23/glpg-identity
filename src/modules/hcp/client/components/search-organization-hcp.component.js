@@ -8,6 +8,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import { getAllCountries } from '../../../core/client/country/country.actions';
 import OklaHcoDetails from './okla-hco-details.component';
 import getUserPermittedCountries from '../../../core/client/util/user-country';
+import { OverlayTrigger, Popover } from 'react-bootstrap';
 
 const SearchOrganizationHcp = () => {
     const dispatch = useDispatch();
@@ -38,6 +39,17 @@ const SearchOrganizationHcp = () => {
         searchResult.scrollIntoView({ behavior: 'smooth' });
     };
 
+    const namehintpopup = (
+        <Popover id="popover-basic" className="shadow-lg">
+            <Popover.Content className="px-3">
+                <ul className="list-unstyled mb-0">
+                    <li className="pl-0 pb-2"><i className="fas fa-circle mr-1 cdp-text-primary"></i> In my contract</li>
+                    <li className="pl-0 pb-2"><i className="fas fa-circle mr-1 cdp-text-secondary"></i> Not In my contract</li>
+                </ul>
+            </Popover.Content>
+        </Popover>
+    );
+
     const searchHcos = (newPage) => {
         axios.post(`/api/okla/hcos/search?page=${newPage}`, formData)
             .then(response => {
@@ -54,7 +66,7 @@ const SearchOrganizationHcp = () => {
         if (currentPage === 1) return;
         searchHcos(currentPage - 1);
     };
-
+    
     const pageRight = () => {
         if (currentPage === Math.ceil(hcos.totalNumberOfResults / hcos.resultSize)) return;
         searchHcos(currentPage + 1);
@@ -277,8 +289,6 @@ const SearchOrganizationHcp = () => {
                                 <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
                                     <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Search Result</h4>
                                     <div className="d-flex justify-content-between align-items-center">
-                                        <span className="mr-2"><i className="fas fa-check cdp-text-primary"></i> Valid</span>
-                                        <span><i className="fas fa-times cdp-text-secondary"></i> Invalid</span>
                                     </div>
                                 </div>
 
@@ -287,7 +297,9 @@ const SearchOrganizationHcp = () => {
                                     <table className="table table-hover table-sm mb-0 cdp-table">
                                         <thead className="cdp-bg-primary text-white cdp-table__header">
                                             <tr>
-                                                <th>Name</th>
+                                            <th>Name <OverlayTrigger trigger="click" rootClose placement="right" overlay={namehintpopup}>
+                                                <i className="fas fa-info-circle ml-1 text-white" role="button"></i>
+                                            </OverlayTrigger></th>
                                                 <th>Specialty</th>
                                                 <th>Address</th>
                                                 <th>City</th>

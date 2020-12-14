@@ -9,6 +9,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import { getAllCountries } from '../../../core/client/country/country.actions';
 import OklaHcpDetails from './okla-hcp-details.component';
 import getUserPermittedCountries from '../../../core/client/util/user-country';
+import { OverlayTrigger, Popover } from 'react-bootstrap';
 
 const SearchProfessionalHcp = () => {
     const dispatch = useDispatch();
@@ -58,6 +59,28 @@ const SearchProfessionalHcp = () => {
         const searchResult = document.getElementById(isEmpty ? 'empty-search-result' : 'search-result');
         searchResult.scrollIntoView({ behavior: 'smooth' });
     };
+
+    const namehintpopup = (
+        <Popover id="popover-basic" className="shadow-lg">
+            <Popover.Content className="px-3">
+                <ul className="list-unstyled mb-0">
+                    <li className="pl-0 pb-2"><i className="fas fa-circle mr-1 cdp-text-primary"></i> In my contract</li>
+                    <li className="pl-0 pb-2"><i className="fas fa-circle mr-1 cdp-text-secondary"></i> Not In my contract</li>
+                </ul>
+            </Popover.Content>
+        </Popover>
+    );
+
+    const workplacehintpopup = (
+        <Popover id="popover-basic" className="shadow-lg">
+            <Popover.Content className="px-3">
+                <ul className="list-unstyled mb-0">
+                    <li className="pl-0 pb-2"><i className="fas fa-check mr-1 cdp-text-primary"></i> Valid</li>
+                    <li className="pl-0 pb-2"><i className="fas fa-times mr-1 cdp-text-secondary"></i> Invalid </li>
+                </ul>
+            </Popover.Content>
+        </Popover>
+    );
 
     const searchHcps = (newPage) => {
         axios.post(`/api/okla/hcps/search?page=${newPage}`, formData)
@@ -330,8 +353,7 @@ const SearchProfessionalHcp = () => {
                                 <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
                                     <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Search Result</h4>
                                     <div className="d-flex justify-content-between align-items-center">
-                                        <span className="mr-2"><i className="fas fa-check cdp-text-primary"></i> Valid</span>
-                                        <span><i className="fas fa-times cdp-text-secondary"></i> Invalid</span>
+                                       
                                     </div>
                                 </div>
 
@@ -340,9 +362,13 @@ const SearchProfessionalHcp = () => {
                                     <table className="table table-hover table-sm mb-0 cdp-table">
                                         <thead className="cdp-bg-primary text-white cdp-table__header">
                                             <tr>
-                                                <th>Name</th>
+                                            <th>Name <OverlayTrigger trigger="click" rootClose placement="right" overlay={namehintpopup}>
+                                                <i className="fas fa-info-circle ml-1 text-white" role="button"></i>
+                                            </OverlayTrigger></th>
                                                 <th>Specialty</th>
-                                                <th>Workplace</th>
+                                            <th>Workplace <OverlayTrigger trigger="click" rootClose placement="right" overlay={workplacehintpopup}>
+                                                <i className="fas fa-info-circle ml-1 text-white" role="button"></i>
+                                            </OverlayTrigger></th>
                                                 <th>Onekey ID</th>
                                                 <th>Individual - Identifier</th>
                                                 <th>Country</th>
@@ -369,7 +395,7 @@ const SearchProfessionalHcp = () => {
                                                         </td>
                                                         <td>
                                                             {
-                                                                user.onekeyEidList.map((item, idxOfEid) => (<p key={idxOfEid}>{item}</p>))
+                                                                user.onekeyEidList.map((item, idxOfEid) => (<div key={idxOfEid}>{item}</div>))
                                                             }
                                                         </td>
                                                         <td>{user.individualEid}</td>
