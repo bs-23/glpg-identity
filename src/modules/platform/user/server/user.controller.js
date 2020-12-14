@@ -352,11 +352,11 @@ async function login(req, res) {
                 return res.status(401).send('Password has been expired. Please reset the password.');
             }
 
-            const isSiteVerified = await verifySite(recaptchaToken);
+            // const isSiteVerified = await verifySite(recaptchaToken);
 
-            if (!isSiteVerified) {
-                return res.status(400).send('Failed captcha verification.');
-            }
+            // if (!isSiteVerified) {
+            //     return res.status(400).send('Failed captcha verification.');
+            // }
 
             await user.update({ refresh_token: generateRefreshToken(user) });
         }
