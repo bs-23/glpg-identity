@@ -117,7 +117,10 @@ const SearchProfessionalHcp = () => {
 
         if (!isAssigned && userCountries && userCountries.length && hcpProfile && (!selectedCountries || !selectedCountries.length)) {
             const country = (getCountries()).find(c => c.countryIso2.toLowerCase() === hcpProfile.country_iso2.toLowerCase());
-            if (country) setSelectedCountries([country]);
+            if (country) {
+                setSelectedCountries([country]);
+                formikRef.current.setFieldValue('countries', [country]);
+            }
             setIsAssigned(true);
         }
     }, [userCountries, hcpProfile]);
