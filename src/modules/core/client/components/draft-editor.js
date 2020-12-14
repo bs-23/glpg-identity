@@ -38,6 +38,19 @@ let draftJsToHTMLOptions = {
                 style: inlineStyles
             }
         }
+    },
+    entityStyleFn: (entity) => {
+        const entityType = entity.get('type').toLowerCase();
+        if (entityType === 'link') {
+            const data = entity.getData();
+            return {
+                element: 'a',
+                attributes: {
+                    href: data.url,
+                    target: '_blank'
+                }
+            };
+        }
     }
 }
 
@@ -63,7 +76,8 @@ export default function DraftEditor({ onChangeHTML, htmlContent }) {
     useEffect(() => {
         if (onChangeHTML) {
             const editorContentInHTML = convertContentToHtml();
-            onChangeHTML(editorContentInHTML);
+            const plainText = editorState.getCurrentContent().getPlainText();
+            onChangeHTML(editorContentInHTML, plainText);
         }
     }, [editorState]);
 

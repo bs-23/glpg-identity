@@ -104,26 +104,8 @@ const CdpConsentPerformanceReport = () => {
         loadConsentsReport();
     }, []);
 
-    const checkVerifiedUser = () => {
-        consents_init_report['hcp_consents'].map(x => x.user_verified = false);
-
-        let report = consents_init_report['hcp_consents'].map(x => {
-            if (x.opt_type === "double-opt-in") {
-                consents_init_report['hcp_consents'].filter(y => y.hcp_profile.id === x.hcp_profile.id)
-                    .map(y => y.user_verified = true);
-            }
-            return x;
-        });
-
-        report = Object.assign({}, consents_init_report, { hcp_consents: report });
-        modify_consents_report(report);
-
-    }
     useEffect(() => {
         modify_consents_report(consents_init_report);
-        if (consents_init_report && consents_init_report['hcp_consents']) {
-            checkVerifiedUser();
-        }
     }, [consents_init_report]);
 
     return (
@@ -400,7 +382,7 @@ const CdpConsentPerformanceReport = () => {
                                                         <td>{row.hcp_profile.first_name}</td>
                                                         <td>{row.hcp_profile.last_name}</td>
                                                         <td>
-                                                            <i className={`icon icon-check-filled icon-position-bit-down mr-2 ` + (row.user_verified ? `cdp-text-primary` : `cdp-text-secondary`)}></i>
+                                                            <i className={`fas mr-2 ` + (row.hcp_profile.is_email_verified ? `fa-check-circle cdp-text-primary` : `fa-circle cdp-text-secondary`)}></i>
                                                             {row.hcp_profile.email}</td>
                                                         <td>{row.category}</td>
                                                         <td>{titleCase(row.opt_type)}</td>

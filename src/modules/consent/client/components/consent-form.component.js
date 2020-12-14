@@ -82,9 +82,6 @@ const ConsentForm = (props) => {
             const response = await axios.get('/api/privacy/consent-categories');
             setCategories(response.data);
         }
-        async function getCountries() {
-            setUserCountries(fetchUserCountries(loggedInUser.countries, countries));
-        }
         function getLanguages() {
             const mapped_languages = {};
 
@@ -107,9 +104,15 @@ const ConsentForm = (props) => {
 
         if (id) getConsent();
         getConsentCatogories();
-        getCountries();
         getLanguages();
     }, [props]);
+
+    useEffect(() => {
+        async function getCountries() {
+            setUserCountries(fetchUserCountries(loggedInUser.countries, countries));
+        }
+        getCountries();
+    }, [loggedInUser, countries])
 
     const getTranslations = (formikProps) => {
         return translations.map((item, idx) => {
@@ -171,7 +174,7 @@ const ConsentForm = (props) => {
 
                                     />
                                 </div>
-                                {showError && item.rich_text === '<p><br></p>' && <div class="invalid-feedback">This field must not be empty.</div>}
+                                {showError && (item.rich_text === '<p><br></p>' || item.rich_text.replace(/&nbsp;/g, '') === '<p></p>') && <div class="invalid-feedback">This field must not be empty.</div>}
                                 {showError && item.rich_text.length > 976 && <div class="invalid-feedback">Maximum character limit has been exceeded.</div>}
                             </div>
                         </div>
@@ -201,7 +204,7 @@ const ConsentForm = (props) => {
                     </div>
                 </div>
                 <div className="container">
-                    {categories && userCountries && countryLanguages && categories.length > 0 && userCountries.length > 0 && countryLanguages.length > 0 && ((consentId && Object.keys(consent).length) || (!consentId)) &&
+                    {categories && countryLanguages && categories.length > 0 && countryLanguages.length > 0 && ((consentId && Object.keys(consent).length) || (!consentId)) &&
                         <div className="row">
                             <div className="col-12">
                                 <div className="shadow-sm bg-white mb-3">
@@ -224,7 +227,7 @@ const ConsentForm = (props) => {
                                             onSubmit={(values, actions) => {
                                                 values.is_active = isActive;
 
-                                                const validTranslations = translations.filter(item => item.country_iso2 && item.lang_code && item.rich_text && item.rich_text !== '<p><br></p>');
+                                                const validTranslations = translations.filter(item => item.country_iso2 && item.lang_code && item.rich_text && item.rich_text !== '<p><br></p>' && item.rich_text.replace(/&nbsp;/g, '') !== '<p></p>');
                                                 if (translations.length !== validTranslations.length) {
                                                     setShowError(true);
                                                     return;

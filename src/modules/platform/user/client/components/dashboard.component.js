@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { NavLink } from 'react-router-dom';
-import Faq from '../../../../platform/faq/client/faq.component';
+import { Faq } from '../../../../platform';
 
 export default function Dashboard() {
 

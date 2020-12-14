@@ -126,11 +126,11 @@ async function createPermissionSet(req, res) {
         if(!title.trim()) return res.status(400).send('Permission set title can not be empty.');
 
         const [doc, created] = await PermissionSet.findOrCreate({
-            where: { title: { [Op.iLike]: title } },
+            where: { title: { [Op.iLike]: title.trim() } },
             defaults: {
-                title: title,
+                title: title.trim(),
                 slug: title.replace(/ +/g, '_').toLowerCase(),
-                description,
+                description: (description || '').trim(),
                 countries: countries ? countries : [],
                 created_by: req.user.id,
                 updated_by: req.user.id
@@ -187,7 +187,7 @@ async function editPermissionSet(req, res) {
             return res.sendStatus(400);
         }
 
-        const permSetWithSameTitle = await PermissionSet.findAll({ where: { id: { [Op.ne]: doc.id }, title: { [Op.iLike]: title } }});
+        const permSetWithSameTitle = await PermissionSet.findAll({ where: { id: { [Op.ne]: doc.id }, title: { [Op.iLike]: title.trim() } }});
 
         if(permSetWithSameTitle.length) return res.status(400).send('Permission set with the same title already exists.');
 
@@ -195,7 +195,7 @@ async function editPermissionSet(req, res) {
             title: title.trim(),
             slug: title.trim().replace(/ /g, '_').toLowerCase(),
             countries: countries ? countries : [],
-            description,
+            description: (description || '').trim(),
             updated_by: req.user.id
         });
 

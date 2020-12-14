@@ -43,7 +43,7 @@ async function createProfile(req, res) {
             defaults: {
                 title: title.trim(),
                 slug: title.trim().replace(/ +/g, '_').toLowerCase(),
-                description,
+                description: (description || '').trim(),
                 created_by: req.user.id,
                 updated_by: req.user.id
             }
@@ -82,7 +82,7 @@ async function editProfile(req, res) {
         await foundProfile.update({
             title: title.trim(),
             slug: title.trim().replace(/ /g, '_').toLowerCase(),
-            description,
+            description: (description || '').trim(),
             updated_by: req.user.id
         });
 

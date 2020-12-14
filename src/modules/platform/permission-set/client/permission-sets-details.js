@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Axios from 'axios';
 import { Modal } from "react-bootstrap";
-import { useSelector, useDispatch } from "react-redux";
-// import { getCountries } from '../../../user/client/user.actions'
+import { useSelector } from "react-redux";
 
 const WarningMessage = ({ message }) => <div className="alert alert-warning">
     {message}

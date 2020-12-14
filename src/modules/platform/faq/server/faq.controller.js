@@ -4,6 +4,14 @@ const { Op } = require('sequelize');
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
 const Sequelize = require('sequelize');
+const { IgnorePlugin } = require('webpack');
+
+const faqCategories = [
+    { id: "0", title: "General", slug: "general" },
+    { id: "1", title: "Information Management", slug: "information" },
+    { id: "2", title: "Management of Customer Data Platform", slug: "cdp" },
+    { id: "3", title: "Data Privacy & Consent Management", slug: "privacy" }
+];
 
 async function getFaqItem(req, res) {
     try {
@@ -17,6 +25,32 @@ async function getFaqItem(req, res) {
         res.status(500).send('Internal server error');
     }
 }
+
+function sort_category(items, orderType, limit, offset) {
+
+    let rows = items.rows.map(c => {
+        const categoryTitleList = [];
+        c.categories.forEach(element => {
+            categoryTitleList.push(faqCategories.find(x => x.slug === element).title);
+        });
+
+        const category = categoryTitleList[0];
+        const createdBy = `${c.createdByUser.first_name} ${c.createdByUser.last_name}`;
+        const updatedBy = `${c.updatedByUser.first_name} ${c.updatedByUser.last_name}`;
+        delete c.dataValues.createdByUser;
+        delete c.dataValues.updatedByUser;
+        return { ...c.dataValues, category, createdBy, updatedBy }
+    });
+
+    rows.sort((a, b) => (a.category > b.category) ?
+        (orderType === 'asc' ? -1 : 1) : ((b.category > a.category) ? (orderType === 'asc' ? 1 : -1) : 0));
+
+    rows = rows.slice(offset, offset + limit);
+
+    const data = { ...items, rows: rows };
+    return data;
+};
+
 
 async function getFaqItems(req, res) {
     try {
@@ -72,25 +106,35 @@ async function getFaqItems(req, res) {
             }
         ];
 
+
         const response = await Faq.findAndCountAll({
             include: inclusions,
             where: category ? filter : {},
-            offset,
-            limit,
-            order: order
+            offset: orderBy === 'categories' ? null : offset,
+            limit: orderBy === 'categories' ? null : limit,
+            order: orderBy === 'categories' ? [] : order,
+
         });
 
-        const data = response.rows.map(c => {
-            const createdBy = `${c.createdByUser.first_name} ${c.createdByUser.last_name}`;
-            const updatedBy = `${c.updatedByUser.first_name} ${c.updatedByUser.last_name}`;
-            delete c.dataValues.createdByUser;
-            delete c.dataValues.updatedByUser;
-            return {
-                ...c.dataValues,
-                createdBy,
-                updatedBy
-            }
-        });
+
+        let data = [];
+        if (orderBy === 'categories') {
+            data = sort_category(response, orderType, limit, offset).rows;
+
+        } else {
+            data = response.rows.map(c => {
+                const createdBy = `${c.createdByUser.first_name} ${c.createdByUser.last_name}`;
+                const updatedBy = `${c.updatedByUser.first_name} ${c.updatedByUser.last_name}`;
+                delete c.dataValues.createdByUser;
+                delete c.dataValues.updatedByUser;
+                return {
+                    ...c.dataValues,
+                    createdBy,
+                    updatedBy
+                }
+            });
+        }
+
 
         const responseData = {
             faq: data,
@@ -115,7 +159,7 @@ async function createFaqItem(req, res) {
     try {
         const { question, answer, categories } = req.body;
 
-        const faq = await Faq.findOne({ where: { question: { [Op.iLike]: question } } });
+        const faq = await Faq.findOne({ where: { question: { [Op.iLike]: question.trim() } } });
 
         if (faq) return res.status(404).send("This question already exists");
         const inclusions = [
@@ -135,7 +179,7 @@ async function createFaqItem(req, res) {
 
 
         const response = await Faq.create({
-            question,
+            question: question.trim(),
             answer,
             categories,
             created_by: req.user.id,
