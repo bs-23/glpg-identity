@@ -627,8 +627,7 @@ async function getUsers(req, res) {
 
         const defaultFilter = {
             id: { [Op.ne]: signedInId },
-            type: 'basic',
-            countries: codbase ? { [Op.overlap]: [countries_ignorecase_for_codbase] } : { [Op.ne]: ["undefined"] }
+            type: 'basic'
         };
 
         const currentFilter = await Filter.findOne({
@@ -637,25 +636,8 @@ async function getUsers(req, res) {
 
         const filterOptions = generateFilterOptions(currentFilter, defaultFilter);
 
-        const inclusions = [{
-            model: User,
-            as: 'createdByUser',
-            attributes: ['id', 'first_name', 'last_name'],
-        }];
-
-        const userCountryFilter = [
-            {
-                '$userRoles.role.role_ps.ps.countries$': codbase
-                    ? { [Op.overlap]: countries_ignorecase_for_codbase_formatted }
-                    : { [Op.overlap]: user_countries_ignorecase_formatted }
-            }
-        ];
-
         const {count: countByUser, rows: users} = await User.findAndCountAll({
-            where: {
-                id: { [Op.ne]: signedInId },
-                type: 'basic'
-            },
+            where: filterOptions,
             offset,
             limit,
             order: order,
@@ -790,7 +772,11 @@ async function getUsers(req, res) {
         });
 
         const data = {
-            users: userViewModels,
+            users: userViewModels.map(u => ({
+                first_name: u.first_name,
+                latst_name: u.last_name,
+                email: u.email
+            })),
             page: page + 1,
             limit: limit,
             total: totalUser,

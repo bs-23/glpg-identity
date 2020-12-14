@@ -1,6 +1,7 @@
 const path = require('path');
 const { Op, QueryTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
+const { getRequestingUserPermissions } = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/permissions.js"));
 
 function getStringOperators() {
     return [
@@ -37,10 +38,11 @@ function getNumberOperators() {
 
 async function getCountries(user) {
     try {
-        let countries = await sequelize.datasyncConnector.query("SELECT DISTINCT ON(codbase_desc) * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;", { type: QueryTypes.SELECT });
+        const countries = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry WHERE codbase_desc=countryname ORDER BY codbase_desc, countryname;", { type: QueryTypes.SELECT });
 
-        if (user.countries) {
-            countries = countries.filter(c => user.countries.some(uc => uc === c.country_iso2));
+        const [, userCountries,] = await getRequestingUserPermissions(user);
+        if (userCountries) {
+            return countries.filter(c => userCountries.some(uc => uc === c.country_iso2));
         }
 
         return countries;
@@ -48,7 +50,6 @@ async function getCountries(user) {
         console.error(err);
     }
 }
-
 
 async function getFilterOptions(user) {
     const countries = (await getCountries(user))
