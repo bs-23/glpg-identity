@@ -175,6 +175,7 @@ const SearchOrganizationHcp = () => {
                                                             onChange={selectedOption => {
                                                                 formikProps.setFieldValue('countries', selectedOption || []);
                                                                 setSelectedCountries(selectedOption || []);
+                                                                setSelectedSpecialties([]);
                                                             }}
                                                         />
                                                     </div>
