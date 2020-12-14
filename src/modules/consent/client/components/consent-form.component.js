@@ -82,9 +82,6 @@ const ConsentForm = (props) => {
             const response = await axios.get('/api/privacy/consent-categories');
             setCategories(response.data);
         }
-        async function getCountries() {
-            setUserCountries(fetchUserCountries(loggedInUser.countries, countries));
-        }
         function getLanguages() {
             const mapped_languages = {};
 
@@ -107,9 +104,15 @@ const ConsentForm = (props) => {
 
         if (id) getConsent();
         getConsentCatogories();
-        getCountries();
         getLanguages();
     }, [props]);
+
+    useEffect(() => {
+        async function getCountries() {
+            setUserCountries(fetchUserCountries(loggedInUser.countries, countries));
+        }
+        getCountries();
+    }, [loggedInUser, countries])
 
     const getTranslations = (formikProps) => {
         return translations.map((item, idx) => {
@@ -201,7 +204,7 @@ const ConsentForm = (props) => {
                     </div>
                 </div>
                 <div className="container">
-                    {categories && userCountries && countryLanguages && categories.length > 0 && userCountries.length > 0 && countryLanguages.length > 0 && ((consentId && Object.keys(consent).length) || (!consentId)) &&
+                    {categories && countryLanguages && categories.length > 0 && countryLanguages.length > 0 && ((consentId && Object.keys(consent).length) || (!consentId)) &&
                         <div className="row">
                             <div className="col-12">
                                 <div className="shadow-sm bg-white mb-3">
