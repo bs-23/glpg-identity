@@ -3,6 +3,7 @@ import { string, object, ref, array, boolean } from 'yup';
 
 export const consentSchema = object().shape({
     preference: string()
+        .transform(value => value.trim())
         .max(60, 'This field must be at most 60 characters long.')
         .required('This field must not be empty.'),
     category_id: string()

@@ -341,3 +341,9 @@ a {
         opacity: .8;
     }
 }
+
+.hcp-inline-disable {
+    opacity: .3;
+    cursor: not-allowed;
+    pointer-events: none;
+}

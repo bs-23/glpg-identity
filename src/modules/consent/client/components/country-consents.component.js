@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import { NavLink } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
 import { useSelector, useDispatch } from 'react-redux';
-import Modal from 'react-bootstrap/Modal'
-import axios from "axios";
+import Modal from 'react-bootstrap/Modal';
 import CountryConsentForm from './country-consent-form';
 import optTypes from '../opt-types.json';
 import ConsentComponent from './consent.component';
@@ -27,6 +26,7 @@ const CountryConsents = () => {
     const countries = useSelector(state => state.countryReducer.countries);
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
     const country_consents = useSelector(state => state.consentReducer.country_consents);
+    const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
 
     const getGroupedCountryConsents = () => {
         if (!countries || !countries.length) return [];
@@ -95,6 +95,17 @@ const CountryConsents = () => {
         });
     }
 
+    const getLoggedInUserCountries = () => {
+        const countriesDetails = [];
+        (loggedInUser.countries || []).forEach(c_iso2 => {
+            const countryDetails = countries.find(c => c.country_iso2.toLowerCase() === c_iso2.toLowerCase());
+            if(countryDetails){
+                countriesDetails.push(countryDetails);
+            }
+        });
+        return countriesDetails;
+    }
+
     useEffect(() => {
         dispatch(getCdpConsents(null, null));
         dispatch(getCountryConsents());
@@ -121,7 +132,16 @@ const CountryConsents = () => {
                                 <button onClick={() => { setShow(true); setEditable(false); setEditOption(null); }} className="btn cdp-btn-secondary text-white ml-2">
                                     <i className="icon icon-plus pr-1"></i> Assign consent to country
                                 </button>
-                                {cdp_consents && <CountryConsentForm editable={editable} options={editOption} changeShow={(val) => setShow(val)} countries={countries} consents={cdp_consents} show={show} />}
+                                {cdp_consents &&
+                                    <CountryConsentForm
+                                        editable={editable}
+                                        options={editOption}
+                                        changeShow={(val) => setShow(val)}
+                                        countries={getLoggedInUserCountries()}
+                                        consents={cdp_consents}
+                                        show={show}
+                                    />
+                                }
                             </div>
                         </div>
 
