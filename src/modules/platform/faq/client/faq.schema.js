@@ -27,6 +27,7 @@ function hasSpace(str) {
 
 export const faqSchema = object().shape({
     question: string()
+        .transform(value => value.trim())
         .max(60, 'This field must be at most 60 characters long.')
         .required('This field must not be empty.')
         .test('has-emoji', 'Emoji is not allowed',
