@@ -3,12 +3,16 @@
     &__details {
         min-height: 350px;
         display: flex;
+
+        .tab-content {
+            flex: 0 0 calc(100% - 220px);
+        }
     }
 
     &__tabs {
         margin-right: 30px;
         flex-direction: column;
-        width: 200px;
+        width: 220px;
 
         .nav-link {
             background: #F2F2F2;
