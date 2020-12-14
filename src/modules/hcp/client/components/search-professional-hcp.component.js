@@ -5,6 +5,7 @@ import { NavLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { useFormikContext, Form, Formik, Field } from 'formik';
 import Select, { components } from 'react-select';
+import Dropdown from 'react-bootstrap/Dropdown';
 import { getAllCountries } from '../../../core/client/country/country.actions';
 import OklaHcpDetails from './okla-hcp-details.component';
 import getUserPermittedCountries from '../../../core/client/util/user-country';
@@ -360,7 +361,15 @@ const SearchProfessionalHcp = () => {
                                                         </td>
                                                         <td>{user.individualEid}</td>
                                                         <td>{getCountryName(user.countryIso2)}</td>
-                                                        <td><a type="button" className="link-with-underline" onClick={() => setSelectedIndividual({ id: user.individualEid, codbase: user.codbase })}>Details</a></td>
+                                                        <td>
+                                                            <Dropdown>
+                                                                <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle btn">
+                                                                 </Dropdown.Toggle>
+                                                                <Dropdown.Menu>
+                                                                    <Dropdown.Item onClick={() => setSelectedIndividual({ id: user.individualEid, codbase: user.codbase })}>Details</Dropdown.Item>
+                                                                </Dropdown.Menu>
+                                                            </Dropdown>
+                                                        </td>
                                                     </tr>
                                                 ))
                                             }
