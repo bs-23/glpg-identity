@@ -38,7 +38,7 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
         onHide={() => hideHcpDetails()}>
         <Modal.Header closeButton>
             <Modal.Title>
-            {hcpDetails?.firstName} {hcpDetails?.lastName}
+            HCP Details
             </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -50,6 +50,10 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
                                 <li className="okla-search__details-item">
                                     <strong className="okla-search__details-title">Salutation</strong>
                                     <span className="okla-search__details-value">{hcpDetails.salutation}</span>
+                                </li>
+                                <li className="okla-search__details-item">
+                                    <strong className="okla-search__details-title">Name</strong>
+                                    <span className="okla-search__details-value">{hcpDetails?.firstName} {hcpDetails?.lastName}</span>
                                 </li>
                                 <li className="okla-search__details-item">
                                     <strong className="okla-search__details-title">Title</strong>
