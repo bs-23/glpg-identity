@@ -78,12 +78,12 @@ export default function DraftEditor({ onChangeHTML, htmlContent }) {
 
         while(true) {
             cleanedupHtml = html
-                .replace(/<p[^>]*>[\s &nbsp;]*<\/p>/g, '')
-                .replace(/<u[^>]*>[\s &nbsp;]*<\/u>/g, '')
-                .replace(/<strong[^>]*>[\s &nbsp;]*<\/strong>/g, '')
-                .replace(/<em[^>]*>[\s &nbsp;]*<\/em>/g, '')
-                .replace(/(?<=<p>)&nbsp;/g, '')
-                .replace(/&nbsp;(?=<\/p>)/g, '')
+                .replace(/<p[^>]*>(\s|&nbsp;)*<\/p>/g, '')
+                .replace(/<u[^>]*>(\s|&nbsp;)*<\/u>/g, '')
+                .replace(/<strong[^>]*>(\s|&nbsp;)*<\/strong>/g, '')
+                .replace(/<em[^>]*>(\s|&nbsp;)*<\/em>/g, '')
+                .replace(/(?<=<p>)(&nbsp;)*/g, '')
+                .replace(/(&nbsp;)*(?=<\/p>)/g, '')
                 .replace(/(?<=<p>(<strong>|<u>|<em>))&nbsp;/g, '')
                 .replace(/&nbsp;/g, '');
 

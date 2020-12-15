@@ -1223,22 +1223,12 @@ async function changePassword(req, res) {
 async function resetPassword(req, res) {
     const response = new Response({}, []);
 
-    async function logSuccess(object_id, actor, message) {
+    async function log(object_id, actor, message, event_type="BAD_REQUEST") {
         await logService.log({
-            event_type: "UPDATE",
+            event_type,
             object_id,
             table_name: 'hcp_profiles',
             actor,
-            remarks: message
-        });
-    }
-
-    async function logFailure(object_id, actor, message) {
-        await logService.log({
-            event_type: "BAD_REQUEST",
-            object_id,
-            actor,
-            table_name: 'hcp_profiles',
             remarks: message
         });
     }
@@ -1252,49 +1242,49 @@ async function resetPassword(req, res) {
         }
 
         if (await PasswordPolicies.minimumPasswordAge(doc.password_updated_at)) {
-            await logFailure(doc.id, req.user.id, 'HCP Password reset failed');
+            await log(doc.id, req.user.id, 'HCP Password reset failed');
             response.errors.push(new CustomError(`You cannot change password before 1 day`, 4202));
             return res.status(400).send(response);
         }
 
         if (doc.reset_password_expires < Date.now()) {
-            await logFailure(doc.id, req.user.id, 'HCP Password reset failed');
+            await log(doc.id, req.user.id, 'HCP Password reset failed');
             response.errors.push(new CustomError('Password reset token has been expired. Please request again.', 4400));
             return res.status(400).send(response);
         }
 
         if (req.body.new_password !== req.body.confirm_password) {
-            await logFailure(doc.id, req.user.id, 'HCP Password reset failed');
+            await log(doc.id, req.user.id, 'HCP Password reset failed');
             response.errors.push(new CustomError(`Password and confirm password doesn't match.`, 4201));
             return res.status(400).send(response);
         }
 
         if (await PasswordPolicies.isOldPassword(req.body.new_password, doc)) {
-            await logFailure(doc.id, req.user.id, 'HCP Password reset failed');
+            await log(doc.id, req.user.id, 'HCP Password reset failed');
             response.errors.push(new CustomError(`New password can not be your previously used password.`, 4203));
             return res.status(400).send(response);
         }
 
         if (!PasswordPolicies.validatePassword(req.body.new_password)) {
-            await logFailure(doc.id, req.user.id, 'HCP Password reset failed');
+            await log(doc.id, req.user.id, 'HCP Password reset failed');
             response.errors.push(new CustomError(`Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.`, 4200));
             return res.status(400).send(response);
         }
 
         if (!PasswordPolicies.hasValidCharacters(req.body.new_password)) {
-            await logFailure(doc.id, req.user.id, 'HCP Password reset failed');
+            await log(doc.id, req.user.id, 'HCP Password reset failed');
             response.errors.push(new CustomError(`Password has one or more invalid character.`, 4200));
             return res.status(400).send(response);
         }
 
         if (PasswordPolicies.isCommonPassword(req.body.new_password, doc)) {
-            await logFailure(doc.id, req.user.id, 'HCP Password reset failed');
+            await log(doc.id, req.user.id, 'HCP Password reset failed');
             response.errors.push(new CustomError(`Password can not be commonly used passwords or personal info. Try a different one.`, 400));
             return res.status(400).send(response);
         }
 
         if (req.body.new_password !== req.body.confirm_password) {
-            await logFailure(doc.id, req.user.id, 'HCP Password reset failed');
+            await log(doc.id, req.user.id, 'HCP Password reset failed');
             response.errors.push(new CustomError(`Password and confirm password doesn't match.`, 4201));
             return res.status(400).send(response);
         }
@@ -1317,8 +1307,8 @@ async function resetPassword(req, res) {
             is_firsttime_setup
         };
 
-        if(wasAccountLocked) await logSuccess(doc.id, req.user.id, 'HCP Password reset success. Account unlocked');
-        else await logSuccess(doc.id, req.user.id, 'HCP Password reset success');
+        if(wasAccountLocked) await log(doc.id, req.user.id, 'HCP Password reset success. Account unlocked', 'UPDATE');
+        else await log(doc.id, req.user.id, 'HCP Password reset success', 'UPDATE');
 
         res.json(response);
     } catch (err) {
