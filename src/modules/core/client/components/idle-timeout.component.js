@@ -9,7 +9,7 @@ import React, { useEffect, useState } from 'react';
 export default function IdleTimeOutModalComponent(props) {
     const location = useLocation();
     const [show, setShow] = useState(props.show);
-    const [cookies, setCookie, removeCookie] = useCookies();
+    const [, setCookie, removeCookie] = useCookies();
 
     const handleShow = () => (location.pathname !== '/login' && location.pathname !== '/swagger/login' && location.pathname != '/api-docs/') ? setShow(true) : setShow(false);
     const handleClose = () => setShow(false);
