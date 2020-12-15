@@ -124,7 +124,7 @@ const SearchProfessionalHcp = () => {
         if (hcpProfile) {
             formikRef.current.setFieldValue('firstName', hcpProfile.first_name || '');
             formikRef.current.setFieldValue('lastName', hcpProfile.last_name || '');
-            formikRef.current.setFieldValue('onekeyId', hcpProfile.individual_id_onekey || '');
+            formikRef.current.setFieldValue('individualEid', hcpProfile.individual_id_onekey || '');
             setHcpSpecialty(hcpProfile.specialty_onekey);
         }
 
