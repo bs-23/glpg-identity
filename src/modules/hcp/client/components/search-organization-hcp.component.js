@@ -343,7 +343,13 @@ const SearchOrganizationHcp = () => {
                 }
 
                 {hcos.results && hcos.results.length <= 0 &&
-                    <div className="p-3 bg-white" id="empty-search-result">No Health Care Organizations found</div>
+                    <div className="row justify-content-center my-5 py-5 mb-3">
+                        <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">
+                            <i className="far fa-building fa-4x cdp-text-secondary"></i>
+                            <h3 className="font-weight-bold cdp-text-primary pt-4">No Health Care Organizations found</h3>
+                            <h4 className="cdp-text-primary pt-3 pb-5">you might need to change some settings and search again</h4>
+                        </div>
+                    </div>
                 }
             </div>
 
