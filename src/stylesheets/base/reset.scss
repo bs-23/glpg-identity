@@ -319,6 +319,29 @@ a {
         background: $primary-color !important;
         color: $white-color;
     }
+
+    &__secondary {
+        font-weight: normal;
+        color: $gray-333;
+
+        &:hover {
+            color: $gray-555;
+        }
+
+        &.active {
+            background: $secondary-color !important;
+            border: 1px solid $secondary-color !important;
+
+            &:hover {
+                color: $white-color;
+            }
+        }
+
+        i.far {
+            font-size: 24px;
+            font-weight: normal;
+        }
+    }
 }
 
 .react-toast-notifications__container {

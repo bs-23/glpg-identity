@@ -124,17 +124,15 @@ const SearchOrganizationHcp = () => {
                 <div className="row">
                     <div className="col-12 px-0 px-sm-3">
                         <div className="shadow-sm bg-light pb-3">
-                            <h2 className="d-flex align-items-center p-3 px-sm-3 py-sm-3 page-title light">
-                                <span className="page-title__text font-weight-bold">OKLA Search</span>
-                            </h2>
-
-                            <div className="d-flex align-items-center p-3 px-sm-3 py-sm-3 page-title light">
-                                <div>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/hcps/discover-professionals">Health Care Professional</NavLink>
-                                    <NavLink className="custom-tab px-4 py-3 cdp-border-primary" to="/hcps/discover-organizations">Health Care Organization</NavLink>
+                            <div className="d-sm-flex justify-content-between align-items-center p-3">
+                                <h4 className="cdp-text-primary font-weight-bold mb-0 mr-sm-4 mr-1">OKLA Search</h4>
+                                <div className="d-flex align-items-center pl-3">
+                                    <div>
+                                        <NavLink className="custom-tab custom-tab__secondary px-3 py-3 border" to="/hcps/discover-professionals"><i className="far fa-user mr-2"></i>Health Care Professional</NavLink>
+                                        <NavLink className="custom-tab custom-tab__secondary px-4 py-3 border" to="/hcps/discover-organizations"><i className="far fa-building mr-2"></i>Health Care Organization</NavLink>
+                                    </div>
                                 </div>
                             </div>
-
                             <div className="add-user mx-3 mt-0 p-3 bg-white rounded border">
                                 <Formik
                                     initialValues={{
