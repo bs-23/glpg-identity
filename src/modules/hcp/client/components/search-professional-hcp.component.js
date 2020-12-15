@@ -29,6 +29,7 @@ const SearchProfessionalHcp = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [hcpProfile, setHcpProfile] = useState(null);
     const [isAssigned, setIsAssigned] = useState(false);
+    const [hcpSpecialty, setHcpSpecialty] = useState();
 
     const params = new URLSearchParams(window.location.search);
     const initialFormValues = {
@@ -88,13 +89,19 @@ const SearchProfessionalHcp = () => {
             const parameters = codbases.join('&');
             if (parameters) {
                 const response = await axios.get(`/api/hcps/specialties?${parameters}`);
+                // console.log('testing ==============>', hcpSpecialty);
+                const filtered = hcpSpecialty ? response.data.filter(i => i.codIdOnekey === hcpSpecialty): [];
+                // console.log('==============> selected Sepcialty for hcp ', filtered)
+                // filtered && filtered.length ? formikRef.current.setFieldValue('specialties', [{label: filtered[0].codDescription, value: filtered[0].codIdOnekey.split('.')[2]}]) : '';
+                // console.log('Formik condition ============> ', formikRef)
+                setSelectedSpecialties([{label: filtered[0].codDescription, value: filtered[0].codIdOnekey.split('.')[2]}])
                 setSpecialties(response.data);
             }
             else setSpecialties([]);
         }
         getSpecialties();
         dispatch(getAllCountries());
-    }, [selectedCountries]);
+    }, [selectedCountries, hcpSpecialty]);
 
     useEffect(() => {
         const getHcpProfile = async (id) => {
@@ -114,6 +121,8 @@ const SearchProfessionalHcp = () => {
             formikRef.current.setFieldValue('firstName', hcpProfile.first_name || '');
             formikRef.current.setFieldValue('lastName', hcpProfile.last_name || '');
             formikRef.current.setFieldValue('onekeyId', hcpProfile.individual_id_onekey || '');
+            console.log('===========> hosse ki ', hcpProfile.specialty_onekey)
+            setHcpSpecialty(hcpProfile.specialty_onekey);
         }
 
         if (!isAssigned && userCountries && userCountries.length && hcpProfile && (!selectedCountries || !selectedCountries.length) && allCountries && allCountries.length) {
