@@ -25,7 +25,7 @@ const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
 
     const maxCommentLength = 500;
 
-    const { rowIndex, editableTableProps, formikProps } = tableProps;
+    const { rowIndex, formikProps } = tableProps;
     const { values, submitForm } = formikProps || {};
 
     const handleSubmit = () => {
@@ -293,7 +293,7 @@ export default function hcpUsers() {
         </div>
     }
 
-    const renderActions = ({ row, rowIndex, formikProps, hasRowChanged, editableTableProps }) => {
+    const renderActions = ({ row, rowIndex, formikProps, hasRowChanged, editableTableProps: editProps }) => {
         const { dirty, resetForm, initialValues, isValid } = formikProps;
 
         return <div className="position-relative" title={tableDirty ? "Save or reset changes to perform actions"  : null}>
@@ -308,7 +308,7 @@ export default function hcpUsers() {
             {hasRowChanged &&
                 <>
                 <div className="d-flex position-absolute inline-editing__btn-wrap">
-                    <i style={isValid ? {} : { pointerEvents: 'none' }} onClick={() => onTableRowSave(hcps.users[rowIndex], { rowIndex, editableTableProps, formikProps })} disabled={!dirty} className={isValid ? 'fas fa-check mr-3 cdp-text-primary fa-1_5x' : 'fas fa-check mr-3 cdp-text-primary fa-1_5x inline-editing__btn-disable'} title="Save Changes" type="button"></i>
+                    <i style={isValid ? {} : { pointerEvents: 'none' }} onClick={() => onTableRowSave(hcps.users[rowIndex], { rowIndex, editableTableProps: editProps, formikProps })} disabled={!dirty} className={isValid ? 'fas fa-check mr-3 cdp-text-primary fa-1_5x' : 'fas fa-check mr-3 cdp-text-primary fa-1_5x inline-editing__btn-disable'} title="Save Changes" type="button"></i>
                     <i onClick={resetForm} className="fas fa-times text-danger fa-1_5x" title="Cancel Changes" type="button"></i>
                 </div>
                 </>
@@ -825,20 +825,7 @@ export default function hcpUsers() {
                                         selectedRow={selectedRow}
                                         onDirtyChange={handleTableDirtyStatusChange}
                                         enableReinitialize
-                                    >
-                                    {/* {
-                                        (editableTableProps) => {
-                                            const { dirty, values, touched, status, errors, error, resetForm, initialValues, submitForm } = editableTableProps;
-                                            console.log('current value: ', values.rows[0] && values.rows[0].first_name)
-                                            return dirty && <div className="cdp-bg-primary text-center p-2 cdp-table-inline-editing__save-btn">
-                                                <div>
-                                                    <button className="btn cdp-btn-outline-secondary btn-sm text-white" onClick={resetForm}><i className="fas fa-times-circle mr-1"></i> Reset</button>
-                                                    <button className="btn cdp-btn-secondary ml-2 btn-sm text-white" onClick={submitForm} disabled={!dirty}><i class="fas fa-check-circle mr-1"></i>Save Changes</button>
-                                                </div>
-                                            </div>
-                                        }
-                                    } */}
-                                    </EditableTable>
+                                    />
                                     {((hcps.page === 1 &&
                                         hcps.total > hcps.limit) ||
                                         (hcps.page > 1))

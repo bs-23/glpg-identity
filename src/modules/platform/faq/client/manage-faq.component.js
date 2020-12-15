@@ -14,7 +14,7 @@ export default function ManageFaq() {
     const serviceCategories = useSelector(state => state.faqReducer.faq_categories);
     const [editMode, setEditMode] = useState(false);
     const [editData, setEditData] = useState(null);
-    const [category, setCategory] = useState(null);
+    const [, setCategory] = useState(null);
     const [sort, setSort] = useState({ type: 'asc', value: null });
     const [showDelete, setShowDelete] = useState(false);
     const [deleteId, setDeleteId] = useState(false);

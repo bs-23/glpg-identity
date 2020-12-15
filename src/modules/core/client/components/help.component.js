@@ -4,7 +4,7 @@ import Card from 'react-bootstrap/Card';
 import parse from 'html-react-parser';
 import { useSelector, useDispatch } from 'react-redux';
 import { getFaqItems } from '../../../platform/faq/client/faq.actions';
-import { NavLink, useLocation, useHistory } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 export default function Help() {
     const faqData = useSelector(state => state.faqReducer.faq_items);

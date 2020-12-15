@@ -1100,7 +1100,7 @@ async function resetPassword(req, res) {
         if (!PasswordPolicies.validatePassword(req.body.newPassword)) {
             await log(user.id, user.id, 'Password reset failed. Reason: Password does not satisfy requirements.');
             return res.status(400).send('Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.')
-        };
+        }
 
         if (!PasswordPolicies.hasValidCharacters(req.body.newPassword)) {
             await log(user.id, user.id, 'Password reset failed. Reason: Password contains invalid characters.');

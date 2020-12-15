@@ -1,5 +1,4 @@
 import { string, object, array } from 'yup';
-import XRegExp from 'xregexp';
 
 
 function isNotEmpty(answer) {
