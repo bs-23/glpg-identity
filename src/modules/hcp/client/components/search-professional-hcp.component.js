@@ -10,11 +10,13 @@ import { getAllCountries } from '../../../core/client/country/country.actions';
 import OklaHcpDetails from './okla-hcp-details.component';
 import getUserPermittedCountries from '../../../core/client/util/user-country';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
+import { useToasts } from 'react-toast-notifications';
 
 const SearchProfessionalHcp = () => {
     const dispatch = useDispatch();
     const formikRef = useRef();
     const location = useLocation();
+    const { addToast } = useToasts();
 
     const countries = useSelector(state => state.countryReducer.countries);
     const allCountries = useSelector(state => state.countryReducer.allCountries);
@@ -69,7 +71,10 @@ const SearchProfessionalHcp = () => {
                 scrollToResult(response.data.results.length === 0);
             })
             .catch(err => {
-                console.log(err);
+                addToast('Sorry! Search failed. Please, try again.', {
+                    appearance: 'error',
+                    autoDismiss: true
+                });
             });
     };
 
@@ -89,12 +94,11 @@ const SearchProfessionalHcp = () => {
             const parameters = codbases.join('&');
             if (parameters) {
                 const response = await axios.get(`/api/hcps/specialties?${parameters}`);
-                // console.log('testing ==============>', hcpSpecialty);
                 const filtered = hcpSpecialty ? response.data.filter(i => i.codIdOnekey === hcpSpecialty): [];
-                // console.log('==============> selected Sepcialty for hcp ', filtered)
-                // filtered && filtered.length ? formikRef.current.setFieldValue('specialties', [{label: filtered[0].codDescription, value: filtered[0].codIdOnekey.split('.')[2]}]) : '';
-                // console.log('Formik condition ============> ', formikRef)
-                setSelectedSpecialties([{label: filtered[0].codDescription, value: filtered[0].codIdOnekey.split('.')[2]}])
+                if(filtered && filtered.length) {
+                    setSelectedSpecialties([{label: filtered[0].codDescription, value: filtered[0].codIdOnekey.split('.')[2]}]);
+                    formikRef.current.setFieldValue('specialties', [{label: filtered[0].codDescription, value: filtered[0].codIdOnekey.split('.')[2]}]);
+                }
                 setSpecialties(response.data);
             }
             else setSpecialties([]);
@@ -121,7 +125,6 @@ const SearchProfessionalHcp = () => {
             formikRef.current.setFieldValue('firstName', hcpProfile.first_name || '');
             formikRef.current.setFieldValue('lastName', hcpProfile.last_name || '');
             formikRef.current.setFieldValue('onekeyId', hcpProfile.individual_id_onekey || '');
-            console.log('===========> hosse ki ', hcpProfile.specialty_onekey)
             setHcpSpecialty(hcpProfile.specialty_onekey);
         }
 
@@ -216,12 +219,28 @@ const SearchProfessionalHcp = () => {
                                         data.codbases = data.countries.map(i => i.value);
                                         delete data.countries;
 
-                                        const response = await axios.post('/api/okla/hcps/search', data);
-                                        setUsers(response.data);
-                                        setFormData(data);
-                                        setCurrentPage(1);
-                                        actions.setSubmitting(false);
-                                        scrollToResult(response.data.results.length === 0);
+
+                                        axios.post('/api/okla/hcps/search', data)
+                                            .then(response => {
+                                                setUsers(response.data);
+                                                setFormData(data);
+                                                setCurrentPage(1);
+                                                actions.setSubmitting(false);
+                                                scrollToResult(response.data.results.length === 0);
+                                            })
+                                            .catch(err => {
+                                                addToast('Sorry! Search failed. Please, try again.', {
+                                                    appearance: 'error',
+                                                    autoDismiss: true
+                                                });
+                                            });
+
+                                        // const response = await axios.post('/api/okla/hcps/search', data);
+                                        // setUsers(response.data);
+                                        // setFormData(data);
+                                        // setCurrentPage(1);
+                                        // actions.setSubmitting(false);
+                                        // scrollToResult(response.data.results.length === 0);
                                     }}
                                 >
                                     {formikProps => (
