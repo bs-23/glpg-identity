@@ -81,10 +81,10 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
                                 </li>
                                 <li className="okla-search__details-item">
                                     <strong className="okla-search__details-title">Country</strong>
-                                    <span className="okla-search__details-value">{hcpDetails.countryIso2}</span>
+                                    <span className="okla-search__details-value">{getCountryName(hcpDetails.countryIso2)}</span>
                                 </li>
                                 <li className="okla-search__details-item">
-                                    <strong className="okla-search__details-title">Country</strong>
+                                    <strong className="okla-search__details-title">Specailty</strong>
                                     <span className="okla-search__details-value">{hcpDetails.specialties.join(', ')}</span>
                                 </li>
                             </ul>
@@ -97,7 +97,7 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
                                 </li>
                                 {
                                     hcpDetails.externalIdentifiers.map((identifier, identifierIdx) => (
-                                    <li className="okla-search__details-item">
+                                    <li className="okla-search__details-item" key={'id-'+identifierIdx}>
                                             <strong className="okla-search__details-title">{identifier.name}</strong>
                                             <span className="okla-search__details-value">{identifier.value}</span>
                                     </li>
