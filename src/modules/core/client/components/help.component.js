@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { getFaqItems } from '../../../platform/faq/client/faq.actions';
 import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import { Tabs, Tab } from 'react-bootstrap';
+import Axios from 'axios';
 
 export default function Help() {
     const faqData = useSelector(state => state.faqReducer.faq_items);
@@ -14,6 +15,11 @@ export default function Help() {
 
     useEffect(() => {
         dispatch(getFaqItems());
+        Axios.get('/api/faq/category').then(res => {
+            console.log(res.data);
+        }).catch(error => {
+        });
+
     }, []);
 
     return (
@@ -178,7 +184,7 @@ export default function Help() {
                                     <div className="col-12">
                                         <Tabs defaultActiveKey="General" className="faq__tabs">
                                             <Tab eventKey="General" title="General Questions">
-                                                
+
                                             </Tab>
                                             <Tab eventKey="Information" title="Information Management">
                                                 <div className="faq p-3">

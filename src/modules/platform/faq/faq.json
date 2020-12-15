@@ -1,0 +1,74 @@
+{
+    "topics": [
+        {
+            "category": "general",
+            "title": "General Information",
+            "slug": "general-information"
+        },
+        {
+            "category": "information",
+            "title": "Information Management",
+            "slug": "information-management"
+        },
+        {
+            "category": "information",
+            "title": "Manage HCP Master Data",
+            "slug": "manage-hcp"
+        },
+        {
+            "category": "information",
+            "title": "Discover Missing HCPs and HCOs",
+            "slug": "discover-hcp"
+        },
+        {
+            "category": "cdp",
+            "title": "Management of Customer Data Platform",
+            "slug": "cdp-management"
+        },
+        {
+            "category": "cdp",
+            "title": "User & Access Management",
+            "slug": "manage-access"
+        },
+        {
+            "category": "cdp",
+            "title": "Manage Profiles",
+            "slug": "manage-profile"
+        },
+        {
+            "category": "cdp",
+            "title": "Manage Permission Sets",
+            "slug": "manage-permission-set"
+        },
+        {
+            "category": "cdp",
+            "title": "Manage FAQs",
+            "slug": "manage-faqs"
+        },
+        {
+            "category": "privacy",
+            "title": "Data Privacy & Consent Management",
+            "slug": "data-privacy"
+        },
+        {
+            "category": "privacy",
+            "title": "Manage New Consent",
+            "slug": "manage-consent"
+        },
+        {
+            "category": "privacy",
+            "title": "Configure Consent Category",
+            "slug": "configure-consent-category"
+        },
+        {
+            "category": "privacy",
+            "title": "Assign Consent to Country",
+            "slug": "configure-consent-country"
+        },
+        {
+            "category": "privacy",
+            "title": "Generate Data Privacy & Consent Performance Management Report",
+            "slug": "consent-performance-report"
+        }
+    ]
+}

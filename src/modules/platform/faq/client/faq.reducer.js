@@ -1,14 +1,9 @@
 import Types from './faq.types';
-
+import Categories from '../faq.json';
 const initialState = {
     faq_item: null,
     faq_items: {},
-    faq_categories: [
-        { id: "0", title: "General", slug: "general" },
-        { id: "1", title: "Information Management", slug: "information" },
-        { id: "2", title: "Management of Customer Data Platform", slug: "cdp" },
-        { id: "3", title: "Data Privacy & Consent Management", slug: "privacy" }
-    ]
+    faq_categories: Categories
 };
 
 export default function reducer(state = initialState, action) {

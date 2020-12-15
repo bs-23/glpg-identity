@@ -11,7 +11,7 @@ import { useToasts } from 'react-toast-notifications';
 export default function ManageFaq() {
     const [show, setShow] = useState(false);
     const faqData = useSelector(state => state.faqReducer.faq_items);
-    const serviceCategories = useSelector(state => state.faqReducer.faq_categories);
+    const serviceCategories = useSelector(state => state.faqReducer.faq_categories.topics);
     const [editMode, setEditMode] = useState(false);
     const [editData, setEditData] = useState(null);
     const [category, setCategory] = useState(null);
@@ -70,6 +70,10 @@ export default function ManageFaq() {
         dispatch(getFaqItems(location.search));
         setSort({ type: params.get('orderType') || 'asc', value: params.get('orderBy') });
     }, [location]);
+
+    useEffect(() => {
+        console.log(serviceCategories);
+    }, [serviceCategories]);
 
     const pageLeft = () => {
         if (faqData.metadata.page > 1) urlChange(faqData.metadata.page - 1, faqData.metadata.category, params.get('orderBy'), true);
@@ -140,8 +144,10 @@ export default function ManageFaq() {
                                             <tr key={index}>
                                                 <td className="text-break">{row.question}</td>
                                                 <td className="text-break cdp-link-secondary">{parse(row.answer)}</td>
-                                                <td className="text-break">{ row.categories && row.categories.map((item, key) => (
-                                                    (serviceCategories.find(x => x.slug === item).title) + (key < row.categories.length - 1 ? ', ' : '')))}
+                                                <td className="text-break">
+                                                    {/* {row.categories && row.categories.map((item, key) => (
+                                                           (serviceCategories.find(x => x.slug === item).title) + (key < row.categories.length - 1 ? ', ' : '')))}
+                                                */}
                                                 </td>
                                                 <td className="text-break">{row.createdBy}</td>
                                                 <td><Dropdown className="ml-auto dropdown-customize">

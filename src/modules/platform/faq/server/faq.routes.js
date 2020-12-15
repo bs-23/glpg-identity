@@ -9,6 +9,10 @@ module.exports = app => {
         .get(CDPAuthStrategy, controller.getFaqItems)
         .post(CDPAuthStrategy, ModuleGuard(Modules.PLATFORM.value), controller.createFaqItem);
 
+
+    app.route('/api/faq/category')
+        .get(CDPAuthStrategy, controller.getFaqWithCategory);
+
     app.route('/api/faq/:id')
         .get(CDPAuthStrategy, controller.getFaqItem)
         .patch(CDPAuthStrategy, controller.updateFaqItem)

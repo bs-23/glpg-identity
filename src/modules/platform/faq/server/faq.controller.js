@@ -5,13 +5,8 @@ const logService = require(path.join(process.cwd(), 'src/modules/core/server/aud
 const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
 const Sequelize = require('sequelize');
 const { IgnorePlugin } = require('webpack');
+const faqCategories = require('../faq.json');
 
-const faqCategories = [
-    { id: "0", title: "General", slug: "general" },
-    { id: "1", title: "Information Management", slug: "information" },
-    { id: "2", title: "Management of Customer Data Platform", slug: "cdp" },
-    { id: "3", title: "Data Privacy & Consent Management", slug: "privacy" }
-];
 
 async function getFaqItem(req, res) {
     try {
@@ -31,7 +26,7 @@ function sort_category(items, orderType, limit, offset) {
     let rows = items.rows.map(c => {
         const categoryTitleList = [];
         c.categories.forEach(element => {
-            categoryTitleList.push(faqCategories.find(x => x.slug === element).title);
+            categoryTitleList.push(faqCategories.topics.find(x => x.slug === element).title);
         });
 
         const category = categoryTitleList[0];
@@ -149,6 +144,42 @@ async function getFaqItems(req, res) {
         }
 
         res.json(responseData);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function getFaqWithCategory(req, res) {
+    try {
+
+
+
+        const faq = await Faq.findAll({
+            raw: true
+        });
+
+        const response = [];
+
+        const parentCategories = [...new Set(Object.values(faqCategories.topics).map((item) => item.category))];
+
+        parentCategories.forEach(element => {
+            const subcategories = faqCategories.topics.filter(x => x.category === element);
+            subcategories.forEach(element => {
+                delete element.category;
+                //faq.map();
+            });
+            response.push({
+                category: element,
+                subcategories: subcategories
+            });
+        });
+
+        console.log(faq);
+
+
+
+        res.json(response);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -295,6 +326,7 @@ async function deleteFaqItem(req, res) {
 
 exports.getFaqItem = getFaqItem;
 exports.getFaqItems = getFaqItems;
+exports.getFaqWithCategory = getFaqWithCategory;
 exports.createFaqItem = createFaqItem;
 exports.updateFaqItem = updateFaqItem;
 exports.deleteFaqItem = deleteFaqItem;
