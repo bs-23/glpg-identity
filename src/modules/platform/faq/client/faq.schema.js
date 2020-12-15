@@ -27,6 +27,7 @@ function hasSpace(str) {
 
 export const faqSchema = object().shape({
     question: string()
+        .transform(value => value.trim())
         .max(60, 'This field must be at most 60 characters long.')
         .required('This field must not be empty.')
         .test('has-emoji', 'Emoji is not allowed',
@@ -34,10 +35,10 @@ export const faqSchema = object().shape({
         .test('has-special-charecters', 'Only space is not allowed',
             question => hasSpace(question)),
     answer: string()
-        .required('This field must not be empty.')
-        .max(1500, 'Maximum character limit has been exceeded.')
-        .test('is-empty', 'This field must not be empty.',
-            answer => isNotEmpty(answer)),
+        .max(1500, 'Maximum character limit has been exceeded.'),
+    answer_plaintext: string()
+        .transform(value => value.trim())
+        .required('This field must not be empty.'),
     categories:
         array()
             .of(string())

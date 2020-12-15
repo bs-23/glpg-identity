@@ -1152,6 +1152,16 @@ async function changePassword(req, res) {
 
     const response = new Response({}, []);
 
+    async function log(object_id, actor, message) {
+        await logService.log({
+            event_type: 'UPDATE',
+            object_id,
+            table_name: 'hcp_profiles',
+            actor,
+            remarks: message
+        });
+    }
+
     if (!email || !current_password || !new_password || !confirm_password) {
         response.errors.push(new CustomError('Missing required parameters.', 400));
         return res.status(400).send(response);
@@ -1200,6 +1210,9 @@ async function changePassword(req, res) {
         doc.update({ password: new_password, password_updated_at: new Date(Date.now()) });
 
         response.data = 'Password changed successfully.';
+
+        await log(doc.id, req.user.id, 'Password change success');
+
         res.send(response);
     } catch (err) {
         console.error(err);
@@ -1211,6 +1224,16 @@ async function changePassword(req, res) {
 async function resetPassword(req, res) {
     const response = new Response({}, []);
 
+    async function log(object_id, actor, message, event_type="BAD_REQUEST") {
+        await logService.log({
+            event_type,
+            object_id,
+            table_name: 'hcp_profiles',
+            actor,
+            remarks: message
+        });
+    }
+
     try {
         const doc = await Hcp.findOne({ where: { reset_password_token: req.query.token } });
 
@@ -1220,41 +1243,49 @@ async function resetPassword(req, res) {
         }
 
         if (await PasswordPolicies.minimumPasswordAge(doc.password_updated_at)) {
+            await log(doc.id, req.user.id, 'HCP Password reset failed');
             response.errors.push(new CustomError(`You cannot change password before 1 day`, 4202));
             return res.status(400).send(response);
         }
 
         if (doc.reset_password_expires < Date.now()) {
+            await log(doc.id, req.user.id, 'HCP Password reset failed');
             response.errors.push(new CustomError('Password reset token has been expired. Please request again.', 4400));
             return res.status(400).send(response);
         }
 
         if (req.body.new_password !== req.body.confirm_password) {
+            await log(doc.id, req.user.id, 'HCP Password reset failed');
             response.errors.push(new CustomError(`Password and confirm password doesn't match.`, 4201));
             return res.status(400).send(response);
         }
 
         if (await PasswordPolicies.isOldPassword(req.body.new_password, doc)) {
+            await log(doc.id, req.user.id, 'HCP Password reset failed');
             response.errors.push(new CustomError(`New password can not be your previously used password.`, 4203));
             return res.status(400).send(response);
         }
 
         if (!PasswordPolicies.validatePassword(req.body.new_password)) {
+            await log(doc.id, req.user.id, 'HCP Password reset failed');
             response.errors.push(new CustomError(`Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.`, 4200));
             return res.status(400).send(response);
         }
 
         if (!PasswordPolicies.hasValidCharacters(req.body.new_password)) {
+            await log(doc.id, req.user.id, 'HCP Password reset failed');
             response.errors.push(new CustomError(`Password has one or more invalid character.`, 4200));
             return res.status(400).send(response);
         }
 
         if (PasswordPolicies.isCommonPassword(req.body.new_password, doc)) {
+            await log(doc.id, req.user.id, 'HCP Password reset failed');
             response.errors.push(new CustomError(`Password can not be commonly used passwords or personal info. Try a different one.`, 400));
             return res.status(400).send(response);
         }
 
         if (req.body.new_password !== req.body.confirm_password) {
+            await log(doc.id, req.user.id, 'HCP Password reset failed');
             response.errors.push(new CustomError(`Password and confirm password doesn't match.`, 4201));
             return res.status(400).send(response);
         }
@@ -1262,6 +1293,8 @@ async function resetPassword(req, res) {
         if (doc.password) await PasswordPolicies.saveOldPassword(doc);
 
         const is_firsttime_setup = !doc.password;
+
+        const wasAccountLocked = doc.failed_auth_attempt >= 5;
 
         await doc.update({ password: req.body.new_password, password_updated_at: new Date(Date.now()), reset_password_token: null, reset_password_expires: null });
 
@@ -1274,6 +1307,9 @@ async function resetPassword(req, res) {
             message: 'Password reset successfully.',
             is_firsttime_setup
         };
+
+        if(wasAccountLocked) await log(doc.id, req.user.id, 'HCP Password reset success. Account unlocked', 'UPDATE');
+        else await log(doc.id, req.user.id, 'HCP Password reset success', 'UPDATE');
 
         res.json(response);
     } catch (err) {
@@ -1526,6 +1562,24 @@ async function getAccessToken(req, res) {
                 ? userLockedError
                 : new CustomError('Invalid email or password.', 401);
 
+            if (doc && doc.failed_auth_attempt >= 5) {
+                await logService.log({
+                    event_type: 'LOGIN',
+                    object_id: doc.id,
+                    table_name: 'hcp_profiles',
+                    actor: req.user.id,
+                    remarks: 'HCP Login failed. Account locked'
+                });
+            } else if(doc && doc.password && !doc.validPassword(password)) {
+                await logService.log({
+                    event_type: 'LOGIN',
+                    object_id: doc.id,
+                    table_name: 'hcp_profiles',
+                    actor: req.user.id,
+                    remarks: 'HCP login failed. Wrong password'
+                });
+            }
+
             response.errors.push(error);
             return res.status(401).json(response);
         }
@@ -1539,6 +1593,14 @@ async function getAccessToken(req, res) {
         await doc.update(
             { failed_auth_attempt: 0 },
             { where: { email: email } });
+
+        await logService.log({
+            event_type: 'LOGIN',
+            object_id: doc.id,
+            table_name: 'hcp_profiles',
+            actor: req.user.id,
+            remarks: 'HCP Login success'
+        });
 
         res.json(response);
     } catch (err) {

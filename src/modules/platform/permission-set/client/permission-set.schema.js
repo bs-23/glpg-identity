@@ -2,9 +2,11 @@ import { string, object, array } from 'yup';
 
 export const permissionSetCreateSchema = object().shape({
     title: string()
-        .required('This field must not be empty.')
-        .max(50, 'This field must be at most 50 characters long'),
+        .transform(value => value.trim())
+        .max(50, 'This field must be at most 50 characters long')
+        .required('This field must not be empty.'),
     description: string()
+        .transform(value => value.trim())
         .max(500, 'This field must be at most 500 characters long'),
     applications: array().of(string()),
     countries: array().of(string()),

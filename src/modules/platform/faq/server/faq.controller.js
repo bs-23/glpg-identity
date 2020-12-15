@@ -159,7 +159,7 @@ async function createFaqItem(req, res) {
     try {
         const { question, answer, categories } = req.body;
 
-        const faq = await Faq.findOne({ where: { question: { [Op.iLike]: question } } });
+        const faq = await Faq.findOne({ where: { question: { [Op.iLike]: question.trim() } } });
 
         if (faq) return res.status(404).send("This question already exists");
         const inclusions = [
@@ -179,7 +179,7 @@ async function createFaqItem(req, res) {
 
 
         const response = await Faq.create({
-            question,
+            question: question.trim(),
             answer,
             categories,
             created_by: req.user.id,
