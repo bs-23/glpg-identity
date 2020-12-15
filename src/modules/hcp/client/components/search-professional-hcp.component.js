@@ -60,28 +60,6 @@ const SearchProfessionalHcp = () => {
         searchResult.scrollIntoView({ behavior: 'smooth' });
     };
 
-    const namehintpopup = (
-        <Popover id="popover-basic" className="shadow-lg">
-            <Popover.Content className="px-3">
-                <ul className="list-unstyled mb-0">
-                    <li className="pl-0 pb-2"><i className="fas fa-circle mr-1 cdp-text-primary"></i> In my contract</li>
-                    <li className="pl-0 pb-2"><i className="fas fa-circle mr-1 cdp-text-secondary"></i> Not In my contract</li>
-                </ul>
-            </Popover.Content>
-        </Popover>
-    );
-
-    const workplacehintpopup = (
-        <Popover id="popover-basic" className="shadow-lg">
-            <Popover.Content className="px-3">
-                <ul className="list-unstyled mb-0">
-                    <li className="pl-0 pb-2"><i className="fas fa-check mr-1 cdp-text-primary"></i> Valid</li>
-                    <li className="pl-0 pb-2"><i className="fas fa-times mr-1 cdp-text-secondary"></i> Invalid </li>
-                </ul>
-            </Popover.Content>
-        </Popover>
-    );
-
     const searchHcps = (newPage) => {
         axios.post(`/api/okla/hcps/search?page=${newPage}`, formData)
             .then(response => {
@@ -138,15 +116,16 @@ const SearchProfessionalHcp = () => {
             formikRef.current.setFieldValue('onekeyId', hcpProfile.individual_id_onekey || '');
         }
 
-        if (!isAssigned && userCountries && userCountries.length && hcpProfile && (!selectedCountries || !selectedCountries.length)) {
-            const country = (getCountries()).find(c => c.countryIso2.toLowerCase() === hcpProfile.country_iso2.toLowerCase());
+        if (!isAssigned && userCountries && userCountries.length && hcpProfile && (!selectedCountries || !selectedCountries.length) && allCountries && allCountries.length) {
+            const hcpCountry = allCountries.find(c => c.country_iso2.toLowerCase() === hcpProfile.country_iso2.toLowerCase());
+            const country = (getCountries()).find(c => c.value.toLowerCase() === hcpCountry.codbase.toLowerCase());
             if (country) {
                 setSelectedCountries([country]);
                 formikRef.current.setFieldValue('countries', [country]);
             }
             setIsAssigned(true);
         }
-    }, [userCountries, hcpProfile]);
+    }, [userCountries, hcpProfile, allCountries]);
 
     const getCountries = () => userCountries.map(country => ({ value: country.codbase, label: country.codbase_desc, countryIso2: country.country_iso2 }));
     const getSpecialties = () => specialties.map(i => ({ value: i.codIdOnekey.split('.')[2], label: i.codDescription }));
@@ -167,6 +146,28 @@ const SearchProfessionalHcp = () => {
             </components.Option>
         );
     };
+
+    const nameHintPopup = (
+        <Popover id="popover-basic" className="shadow-lg">
+            <Popover.Content className="px-3">
+                <ul className="list-unstyled mb-0">
+                    <li className="pl-0 pb-2"><i className="fas fa-circle mr-1 cdp-text-primary"></i> In my contract</li>
+                    <li className="pl-0 pb-2"><i className="fas fa-circle mr-1 cdp-text-secondary"></i> Not In my contract</li>
+                </ul>
+            </Popover.Content>
+        </Popover>
+    );
+
+    const workplaceHintPopup = (
+        <Popover id="popover-basic" className="shadow-lg">
+            <Popover.Content className="px-3">
+                <ul className="list-unstyled mb-0">
+                    <li className="pl-0 pb-2"><i className="fas fa-check mr-1 cdp-text-primary"></i> Valid</li>
+                    <li className="pl-0 pb-2"><i className="fas fa-times mr-1 cdp-text-secondary"></i> Invalid </li>
+                </ul>
+            </Popover.Content>
+        </Popover>
+    );
 
     return (
         <main className="app__content cdp-light-bg h-100">
@@ -351,7 +352,7 @@ const SearchProfessionalHcp = () => {
                                 <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
                                     <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Search Result</h4>
                                     <div className="d-flex justify-content-between align-items-center">
-                                       
+
                                     </div>
                                 </div>
 
@@ -360,13 +361,13 @@ const SearchProfessionalHcp = () => {
                                     <table className="table table-hover table-sm mb-0 cdp-table">
                                         <thead className="cdp-bg-primary text-white cdp-table__header">
                                             <tr>
-                                            <th>Name <OverlayTrigger trigger="click" rootClose placement="right" overlay={namehintpopup}>
-                                                <i className="fas fa-info-circle ml-1 text-white" role="button"></i>
-                                            </OverlayTrigger></th>
+                                                <th>Name <OverlayTrigger trigger="click" rootClose placement="right" overlay={nameHintPopup}>
+                                                    <i className="fas fa-info-circle ml-1 text-white" role="button"></i>
+                                                </OverlayTrigger></th>
                                                 <th>Specialty</th>
-                                            <th>Workplace <OverlayTrigger trigger="click" rootClose placement="right" overlay={workplacehintpopup}>
-                                                <i className="fas fa-info-circle ml-1 text-white" role="button"></i>
-                                            </OverlayTrigger></th>
+                                                <th>Workplace <OverlayTrigger trigger="click" rootClose placement="right" overlay={workplaceHintPopup}>
+                                                    <i className="fas fa-info-circle ml-1 text-white" role="button"></i>
+                                                </OverlayTrigger></th>
                                                 <th>Onekey ID</th>
                                                 <th>Individual - Identifier</th>
                                                 <th>Country</th>
@@ -401,7 +402,7 @@ const SearchProfessionalHcp = () => {
                                                         <td>
                                                             <Dropdown>
                                                                 <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle btn">
-                                                                 </Dropdown.Toggle>
+                                                                </Dropdown.Toggle>
                                                                 <Dropdown.Menu>
                                                                     <Dropdown.Item onClick={() => setSelectedIndividual({ id: user.individualEid, codbase: user.codbase })}>Details</Dropdown.Item>
                                                                 </Dropdown.Menu>
