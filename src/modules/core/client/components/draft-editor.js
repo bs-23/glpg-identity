@@ -47,7 +47,7 @@ let draftJsToHTMLOptions = {
                 element: 'a',
                 attributes: {
                     href: data.url,
-                    target: '_blank'
+                    target: data.targetOption
                 }
             };
         }
