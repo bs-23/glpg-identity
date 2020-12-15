@@ -124,12 +124,12 @@ const SearchOrganizationHcp = () => {
                 <div className="row">
                     <div className="col-12 px-0 px-sm-3">
                         <div className="shadow-sm bg-light pb-3">
-                            <div className="d-sm-flex justify-content-between align-items-center p-3">
+                            <div className="d-flex justify-content-between align-items-center p-3">
                                 <h4 className="cdp-text-primary font-weight-bold mb-0 mr-sm-4 mr-1">OKLA Search</h4>
                                 <div className="d-flex align-items-center pl-3">
                                     <div>
-                                        <NavLink className="custom-tab custom-tab__secondary px-3 py-3 border" to="/hcps/discover-professionals"><i className="far fa-user mr-2"></i>Health Care Professional</NavLink>
-                                        <NavLink className="custom-tab custom-tab__secondary px-4 py-3 border" to="/hcps/discover-organizations"><i className="far fa-building mr-2"></i>Health Care Organization</NavLink>
+                                        <NavLink className="custom-tab custom-tab__secondary px-3 py-3 border" to="/hcps/discover-professionals"><i className="far fa-user mr-2"></i><span className="d-none d-sm-inline-block">Health Care Professional</span></NavLink>
+                                        <NavLink className="custom-tab custom-tab__secondary px-4 py-3 border" to="/hcps/discover-organizations"><i className="far fa-building mr-2"></i><span className="d-none d-sm-inline-block">Health Care Organization</span></NavLink>
                                     </div>
                                 </div>
                             </div>
