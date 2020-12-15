@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import { Form, Formik, Field, ErrorMessage, FieldArray } from "formik";
 import { useToasts } from 'react-toast-notifications';
@@ -38,7 +38,7 @@ const FaqForm = (props) => {
                         arrayHelpers.remove(idx);
                     }
                     arrayHelpers.push(optionId);
-                };
+                }
             } else {
                 if (allOptionID && (optionId === allOptionID)) {
                     arrayHelpers.form.setFieldValue(name, []);

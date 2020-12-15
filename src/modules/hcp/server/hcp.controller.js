@@ -405,7 +405,7 @@ async function updateHcps(req, res) {
         }
 
         await Promise.all(Hcps.map(async hcp => {
-            const { id, email, first_name, last_name, uuid, specialty_onekey, country_iso2, telephone, comment, _rowIndex } = trimRequestBody(hcp);
+            const { id, email, first_name, last_name, uuid, specialty_onekey, country_iso2, telephone, _rowIndex } = trimRequestBody(hcp);
 
             if(!id) {
                 response.errors.push(new Error(_rowIndex, 'id', 'ID is missing.'));
@@ -459,7 +459,7 @@ async function updateHcps(req, res) {
                 const uuid_2_from_master_data = (master_data.uuid_2 || '');
 
                 uuid_from_master_data = [uuid_1_from_master_data, uuid_2_from_master_data]
-                    .find(id => id.replace(/[-]/gi, '') === uuidWithoutSpecialCharacter);
+                    .find(hcp_id => hcp_id.replace(/[-]/gi, '') === uuidWithoutSpecialCharacter);
 
                 const doesUUIDExist = await Hcp.findOne({
                     where: {
@@ -1017,7 +1017,7 @@ async function getHcpProfile(req, res) {
             return res.status(404).send(response);
         }
 
-        response.data = getHcpViewModel(doc.dataValues);;
+        response.data = getHcpViewModel(doc.dataValues);
 
         const userConsents = await HcpConsents.findAll({
             where: { user_id: doc.id },
@@ -1633,11 +1633,6 @@ async function updateHCPUserConsents(req, res) {
                 const hcpConsent = await HcpConsents.findOne({ where: { user_id: hcpUser.id, consent_id: consentId } });
 
                 if (!hcpConsent || consentResponse) return;
-
-                if (hcpConsent && consentResponse === false) {
-                    hcpConsent.opt_type = 'opt-out';
-                    hcpConsent.consent_confirmed = false;
-                }
 
                 await hcpConsent.update({ opt_type: 'opt-out', consent_confirmed: false });
             }));

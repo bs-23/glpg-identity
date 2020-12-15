@@ -1,5 +1,3 @@
-import Types from './permission-set.types';
-
 const initialState = {
 
 };

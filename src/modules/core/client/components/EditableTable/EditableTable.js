@@ -124,7 +124,7 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
                 getUpdatedCells,
                 formikProps
             }, done);
-        };
+        }
     }
 
     const handleInputKeyDown = async (e, handleBlur) => {

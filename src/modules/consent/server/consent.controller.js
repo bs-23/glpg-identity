@@ -694,7 +694,7 @@ async function updateCdpConsent(req, res) {
                 .filter(translation => translation.country_iso2 && translation.lang_code && translation.rich_text)
                 .map(async (translation) => {
                     const locale = `${translation.lang_code.toLowerCase()}_${translation.country_iso2.toUpperCase()}`;
-                    const [consentTransation, translationCreated] = await ConsentLanguage.findOrCreate({
+                    const [, translationCreated] = await ConsentLanguage.findOrCreate({
                         where: {
                             consent_id: consent.id,
                             locale: {

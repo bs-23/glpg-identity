@@ -57,8 +57,8 @@ let draftJsToHTMLOptions = {
 export default function DraftEditor({ onChangeHTML, htmlContent }) {
     const [editorState, setEditorState] = React.useState(() => EditorState.createEmpty());
 
-    const convertContentToHtml = (editorState) => {
-        const editorContentInHTML = stateToHTML(editorState.getCurrentContent(), draftJsToHTMLOptions);
+    const convertContentToHtml = (state) => {
+        const editorContentInHTML = stateToHTML(state.getCurrentContent(), draftJsToHTMLOptions);
         return editorContentInHTML;
     }
 
@@ -94,10 +94,10 @@ export default function DraftEditor({ onChangeHTML, htmlContent }) {
         return cleanedupHtml;
     }
 
-    const handleEditorChange = (editorState) => {
+    const handleEditorChange = (state) => {
         if (onChangeHTML) {
-            const editorContentInHTML = convertContentToHtml(editorState);
-            const plainText = editorState.getCurrentContent().getPlainText();
+            const editorContentInHTML = convertContentToHtml(state);
+            const plainText = state.getCurrentContent().getPlainText();
             const props = {
                 plainText,
                 cleanupEmptyHtmlTags
@@ -105,13 +105,13 @@ export default function DraftEditor({ onChangeHTML, htmlContent }) {
             onChangeHTML(editorContentInHTML, props);
         }
 
-        setEditorState(editorState);
+        setEditorState(state);
     }
 
     useEffect(() => {
         if(htmlContent) {
-            const editorState = convertHTMLtoState(htmlContent);
-            setEditorState(editorState);
+            const state = convertHTMLtoState(htmlContent);
+            setEditorState(state);
         }
     }, []);
 
