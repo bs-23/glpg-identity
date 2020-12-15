@@ -90,19 +90,24 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
                             </ul>
                         </Tab>
                         <Tab eventKey="Identifiers" title="Identifiers">
-                            <div>
-                                <div>
-                                    Identifiers:
-                                    <div className="ml-3">OneKey Individual ID: {hcpDetails.individualEid}</div>
-                                    {
-                                        hcpDetails.externalIdentifiers.map((identifier, identifierIdx) => (
-                                            <div key={identifierIdx} className="ml-3">{identifier.name}: {identifier.value}</div>
-                                        ))
-                                    }
-                                </div>
-
-                                <div>Status: {hcpDetails.isValid ? 'Valid' : 'Invalid'}</div>
-                            </div>
+                            <ul className="okla-search__details-items">
+                                <li className="okla-search__details-item">
+                                    <strong className="okla-search__details-title">OneKey Individual ID</strong>
+                                    <span className="okla-search__details-value">{hcpDetails.individualEid}</span>
+                                </li>
+                                {
+                                    hcpDetails.externalIdentifiers.map((identifier, identifierIdx) => (
+                                    <li className="okla-search__details-item">
+                                            <strong className="okla-search__details-title">{identifier.name}</strong>
+                                            <span className="okla-search__details-value">{identifier.value}</span>
+                                    </li>
+                                    ))
+                                }
+                                <li className="okla-search__details-item">
+                                    <strong className="okla-search__details-title">Status</strong>
+                                    <span className="okla-search__details-value">{hcpDetails.isValid ? 'Valid' : 'Invalid'}</span>
+                                </li>
+                            </ul>
                         </Tab>
                         <Tab eventKey="Workplace" title="Workplace">
                             {/* <div>
@@ -130,7 +135,7 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
                             <Dropdown>
                                 <Dropdown.Toggle
                                     variant=""
-                                    className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle btn">
+                                    className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center dropdown-toggle btn">
                                     {selectedWorkplace?.name || selectedWorkplace?.alternateName}
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
@@ -145,46 +150,36 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
                             </Dropdown>
 
                             {selectedWorkplace &&
-                                <div className="row">
+                                <div className="py-5">
                                     <div className="row">
-                                        <div className="col-6">
+                                        <div className="col-12 col-sm-6 pb-3">
                                             <div className="mt-1 font-weight-bold">Name</div>
                                             <div>{selectedWorkplace.name || '--'}</div>
                                         </div>
-                                        <div className="col-6">
+                                        <div className="col-12 col-sm-6 pb-3">
                                             <div className="mt-1 font-weight-bold">Type</div>
                                             <div>{selectedWorkplace.type}</div>
                                         </div>
-                                    </div>
-
-                                    <div className="row">
-                                        <div className="col-6">
+                                        <div className="col-12 col-sm-6 pb-3">
                                             <div className="mt-1 font-weight-bold">Main activity?</div>
                                             <div>{selectedWorkplace.isMainActivity ? 'Yes' : 'No'}</div>
                                         </div>
-                                        <div className="col-6">
+                                        <div className="col-12 col-sm-6 pb-3">
                                             <div className="mt-1 font-weight-bold">Status</div>
                                             <div>{selectedWorkplace.isValid ? 'Valid' : 'Invalid'}</div>
                                         </div>
-                                    </div>
-
-                                    <div className="row">
-                                        <div className="col-4">
+                                        <div className="col-12 col-sm-6 pb-3">
                                             <div className="mt-1 font-weight-bold">Address</div>
                                             <div>{selectedWorkplace.address}</div>
                                         </div>
-                                        <div className="col-4">
+                                        <div className="col-12 col-sm-6 pb-3">
                                             <div className="mt-1 font-weight-bold">City</div>
                                             <div>{selectedWorkplace.city}</div>
                                         </div>
-
-                                        <div className="col-4">
+                                        <div className="col-12 col-sm-6 pb-3">
                                             <div className="mt-1 font-weight-bold">Post Code</div>
                                             <div>{selectedWorkplace.postCode}</div>
-                                        </div>
                                     </div>
-
-                                    <div className="row">
                                         <div className="col-12">
                                             <div className="mt-1 font-weight-bold">Contact Numbers:</div>
                                             {selectedWorkplace.contactNumbers.map((c, i) => (<div key={'tel-' + i}>{c.type}: {c.number}</div>))}
