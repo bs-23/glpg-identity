@@ -90,7 +90,7 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
                 const updatedData = success;
                 let newIntitialValue = formikBag.values;
 
-                updatedData.map(({ rowIndex, property, value }) => {
+                updatedData.forEach(({ rowIndex, property, value }) => {
                     const inputName = `rows[${rowIndex}].${property}`;
                     newIntitialValue = setIn(newIntitialValue, inputName, value);
                 });
