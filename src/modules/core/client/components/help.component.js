@@ -38,47 +38,50 @@ export default function Help() {
                                 <ul className="list-group shadow-sm faq__list-group mb-4">
                                     <li className="list-group-item d-flex justify-content-between align-items-center">
                                         <div className="d-flex align-items-center">
-                                            <i className="fas fa-tachometer-alt fa-2x cdp-text-secondary"></i>
-                                            <span className="px-3">General Questions</span>
+                                            <i className="fas fa-tachometer-alt fa-2x cdp-text-secondary faq__list-group-icon"></i>
+                                            <span className="pr-3 font-weight-bold">General Questions</span>
                                             <span className="badge badge-light badge-pill cdp-text-primary">14</span>
                                         </div>
                                         <i className="fas fa-external-link-square-alt cdp-text-primary faq__list-group--modal-open"></i>
                                     </li>
                                 </ul>
-                                
                                 <ul className="list-group shadow-sm faq__list-group mb-4">
                                     <li className="list-group-item d-flex justify-content-between align-items-center">
                                         <div className="d-flex align-items-center">
-                                            <i className="icon icon-data-consent-management icon-2x cdp-text-secondary"></i>
-                                            <span className="px-3">Data Privacy & Consent Management</span>
+                                            <i className="icon icon-data-consent-management icon-2x cdp-text-secondary faq__list-group-icon"></i>
+                                            <span className="pr-3 font-weight-bold">Data Privacy & Consent Management</span>
                                             <span className="badge badge-light badge-pill cdp-text-primary">14</span>
                                         </div>
                                         <i className="fas fa-external-link-square-alt cdp-text-primary faq__list-group--modal-open"></i>
                                     </li>
                                     <li className="list-group-item d-flex justify-content-between align-items-center">
                                         <div className="d-flex align-items-center">
-                                            <span className="pr-3 pl-5">Manage New Consent</span>
+                                            <i className="icon icon-manage-profile icon-2x cdp-text-primary faq__list-group-icon"></i>
+                                            <span className="pr-3">Manage New Consent</span>
                                             <span className="badge badge-light badge-pill cdp-text-primary">1</span>
                                         </div>
                                         <i className="fas fa-external-link-square-alt cdp-text-primary faq__list-group--modal-open"></i>
                                     </li>
                                     <li className="list-group-item d-flex justify-content-between align-items-center">
                                         <div className="d-flex align-items-center">
-                                            <span className="pr-3 pl-5">Configure Consent Category</span>
+                                            <i className="icon icon-accept icon-2x cdp-text-primary faq__list-group-icon"></i>
+                                            <span className="pr-3">Configure Consent Category</span>
                                             <span className="badge badge-light badge-pill cdp-text-primary">1</span>
                                         </div>
                                         <i className="fas fa-external-link-square-alt cdp-text-primary faq__list-group--modal-open"></i>
                                     </li>
                                     <li className="list-group-item d-flex justify-content-between align-items-center">
                                         <div className="d-flex align-items-center">
-                                            <span className="pr-3 pl-5">Assign Consent to Country</span>
+                                            <i className="icon icon-global icon-2x cdp-text-primary faq__list-group-icon"></i>
+                                            <span className="pr-3">Assign Consent to Country</span>
                                             <span className="badge badge-light badge-pill cdp-text-primary">1</span>
                                         </div>
                                         <i className="fas fa-external-link-square-alt cdp-text-primary faq__list-group--modal-open"></i>
                                     </li>
                                     <li className="list-group-item d-flex justify-content-between align-items-center">
                                         <div className="d-flex align-items-center">
-                                            <span className="pr-3 pl-5">Generate Data Privacy Report & Consent Performance Management Report</span>
+                                            <i className="icon icon-handshake icon-2x cdp-text-primary faq__list-group-icon"></i>
+                                            <span className="pr-3">Generate Data Privacy Report & Consent Performance Management Report</span>
                                             <span className="badge badge-light badge-pill cdp-text-primary">1</span>
                                         </div>
                                         <i className="fas fa-external-link-square-alt cdp-text-primary faq__list-group--modal-open"></i>
@@ -89,22 +92,24 @@ export default function Help() {
                                 <ul className="list-group shadow-sm faq__list-group mb-4">
                                     <li className="list-group-item d-flex justify-content-between align-items-center">
                                         <div className="d-flex align-items-center">
-                                            <i className="icon icon-information-management icon-2x cdp-text-secondary"></i>
-                                            <span className="px-3">Information Management</span>
+                                            <i className="icon icon-information-management icon-2x cdp-text-secondary faq__list-group-icon"></i>
+                                            <span className="pr-3 font-weight-bold">Information Management</span>
                                             <span className="badge badge-light badge-pill cdp-text-primary">14</span>
                                         </div>
                                         <i className="fas fa-external-link-square-alt cdp-text-primary faq__list-group--modal-open"></i>
                                     </li>
                                     <li className="list-group-item d-flex justify-content-between align-items-center">
                                         <div className="d-flex align-items-center">
-                                            <span className="pr-3 pl-5">Manage HCP Master Data</span>
+                                            <i class="icon icon-secure icon-2x cdp-text-primary faq__list-group-icon"></i>
+                                            <span className="pr-3">Manage HCP Master Data</span>
                                             <span className="badge badge-light badge-pill cdp-text-primary">1</span>
                                         </div>
                                         <i className="fas fa-external-link-square-alt cdp-text-primary faq__list-group--modal-open"></i>
                                     </li>
                                     <li className="list-group-item d-flex justify-content-between align-items-center">
                                         <div className="d-flex align-items-center">
-                                            <span className="pr-3 pl-5">Discover Missing HCPs and HCOs</span>
+                                            <i class="icon icon-search-globally icon-2x cdp-text-primary faq__list-group-icon"></i>
+                                            <span className="pr-3">Discover Missing HCPs and HCOs</span>
                                             <span className="badge badge-light badge-pill cdp-text-primary">1</span>
                                         </div>
                                         <i className="fas fa-external-link-square-alt cdp-text-primary faq__list-group--modal-open"></i>
@@ -113,36 +118,48 @@ export default function Help() {
                                 <ul className="list-group shadow-sm faq__list-group mb-4">
                                     <li className="list-group-item d-flex justify-content-between align-items-center">
                                         <div className="d-flex align-items-center">
-                                            <i className="icon icon-customer-data-platform icon-2x cdp-text-secondary"></i>
-                                            <span className="px-3">Management of Customer Data Platform</span>
+                                            <i className="icon icon-customer-data-platform icon-2x cdp-text-secondary faq__list-group-icon"></i>
+                                            <span className="pr-3 font-weight-bold">Management of Customer Data Platform</span>
                                             <span className="badge badge-light badge-pill cdp-text-primary">14</span>
                                         </div>
                                         <i className="fas fa-external-link-square-alt cdp-text-primary faq__list-group--modal-open"></i>
                                     </li>
                                     <li className="list-group-item d-flex justify-content-between align-items-center">
                                         <div className="d-flex align-items-center">
-                                            <span className="pr-3 pl-5">User & Access Management</span>
+                                            <i class="icon icon-user-setting icon-2x cdp-text-primary faq__list-group-icon"></i>
+                                            <span className="pr-3">User & Access Management</span>
                                             <span className="badge badge-light badge-pill cdp-text-primary">1</span>
                                         </div>
                                         <i className="fas fa-external-link-square-alt cdp-text-primary faq__list-group--modal-open"></i>
                                     </li>
                                     <li className="list-group-item d-flex justify-content-between align-items-center">
                                         <div className="d-flex align-items-center">
-                                            <span className="pr-3 pl-5">Manage Profiles</span>
+                                            <i class="icon icon-user-heart icon-2x cdp-text-primary faq__list-group-icon"></i>
+                                            <span className="pr-3">Manage Profiles</span>
                                             <span className="badge badge-light badge-pill cdp-text-primary">1</span>
                                         </div>
                                         <i className="fas fa-external-link-square-alt cdp-text-primary faq__list-group--modal-open"></i>
                                     </li>
                                     <li className="list-group-item d-flex justify-content-between align-items-center">
                                         <div className="d-flex align-items-center">
-                                            <span className="pr-3 pl-5">Manage Permission Sets</span>
+                                            <i class="icon icon-key icon-2x cdp-text-primary faq__list-group-icon"></i>
+                                            <span className="pr-3">Define Roles</span>
                                             <span className="badge badge-light badge-pill cdp-text-primary">1</span>
                                         </div>
                                         <i className="fas fa-external-link-square-alt cdp-text-primary faq__list-group--modal-open"></i>
                                     </li>
                                     <li className="list-group-item d-flex justify-content-between align-items-center">
                                         <div className="d-flex align-items-center">
-                                            <span className="pr-3 pl-5">Manage FAQs</span>
+                                            <i class="icon icon-role icon-2x cdp-text-primary faq__list-group-icon"></i>
+                                            <span className="pr-3">Manage Permission Sets</span>
+                                            <span className="badge badge-light badge-pill cdp-text-primary">1</span>
+                                        </div>
+                                        <i className="fas fa-external-link-square-alt cdp-text-primary faq__list-group--modal-open"></i>
+                                    </li>
+                                    <li className="list-group-item d-flex justify-content-between align-items-center">
+                                        <div className="d-flex align-items-center">
+                                            <i class="icon icon-help icon-2x cdp-text-primary faq__list-group-icon"></i>
+                                            <span className="pr-3">Manage FAQs</span>
                                             <span className="badge badge-light badge-pill cdp-text-primary">1</span>
                                         </div>
                                         <i className="fas fa-external-link-square-alt cdp-text-primary faq__list-group--modal-open"></i>
