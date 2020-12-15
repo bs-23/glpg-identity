@@ -26,13 +26,14 @@ async function getFaqItem(req, res) {
     }
 }
 
-function sort_category(items, orderType) {
+function sort_category(items, orderType, limit, offset) {
 
-    const rows = items.rows.map(c => {
+    let rows = items.rows.map(c => {
         const categoryTitleList = [];
         c.categories.forEach(element => {
             categoryTitleList.push(faqCategories.find(x => x.slug === element).title);
         });
+
         const category = categoryTitleList[0];
         const createdBy = `${c.createdByUser.first_name} ${c.createdByUser.last_name}`;
         const updatedBy = `${c.updatedByUser.first_name} ${c.updatedByUser.last_name}`;
@@ -43,6 +44,8 @@ function sort_category(items, orderType) {
 
     rows.sort((a, b) => (a.category > b.category) ?
         (orderType === 'asc' ? -1 : 1) : ((b.category > a.category) ? (orderType === 'asc' ? 1 : -1) : 0));
+
+    rows = rows.slice(offset, offset + limit);
 
     const data = { ...items, rows: rows };
     return data;
@@ -110,14 +113,13 @@ async function getFaqItems(req, res) {
             offset: orderBy === 'categories' ? null : offset,
             limit: orderBy === 'categories' ? null : limit,
             order: orderBy === 'categories' ? [] : order,
-            // raw: true
 
         });
 
 
         let data = [];
         if (orderBy === 'categories') {
-            data = sort_category(response, orderType).rows;
+            data = sort_category(response, orderType, limit, offset).rows;
 
         } else {
             data = response.rows.map(c => {
@@ -157,7 +159,7 @@ async function createFaqItem(req, res) {
     try {
         const { question, answer, categories } = req.body;
 
-        const faq = await Faq.findOne({ where: { question: { [Op.iLike]: question } } });
+        const faq = await Faq.findOne({ where: { question: { [Op.iLike]: question.trim() } } });
 
         if (faq) return res.status(404).send("This question already exists");
         const inclusions = [
@@ -177,7 +179,7 @@ async function createFaqItem(req, res) {
 
 
         const response = await Faq.create({
-            question,
+            question: question.trim(),
             answer,
             categories,
             created_by: req.user.id,

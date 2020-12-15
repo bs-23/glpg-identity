@@ -128,6 +128,7 @@ const FaqForm = (props) => {
                             question: props.editMode ? props.editData.question : '',
                             categories: props.editMode ? convertSlugToId(props.editData.categories) : [],
                             answer: props.editMode ? props.editData.answer : '',
+                            answer_plaintext: props.editMode ? props.editData.answer : ''
                         }}
                         validationSchema={faqSchema}
                         displayName="FaqForm"
@@ -182,11 +183,12 @@ const FaqForm = (props) => {
                                             <div className="form-group pt-3">
                                                 <label className="font-weight-bold" htmlFor='answer'>Answer <span className="text-danger">*</span></label>
                                                 <div className="border rounded draft-editor">
-                                                    <DraftEditor htmlContent={formikProps.initialValues.answer} onChangeHTML={(html) => {
-                                                        formikProps.setFieldValue('answer', html);
-
+                                                    <DraftEditor htmlContent={formikProps.initialValues.answer} onChangeHTML={(html, {plainText, cleanupEmptyHtmlTags}) => {
+                                                        formikProps.setFieldValue('answer', cleanupEmptyHtmlTags(html));
+                                                        formikProps.setFieldValue('answer_plaintext', plainText);
                                                     }} />
                                                 </div>
+                                                <div className="invalid-feedback"><ErrorMessage name="answer_plaintext" /></div>
                                                 <div className="invalid-feedback"><ErrorMessage name="answer" /></div>
                                             </div>
                                         </div>

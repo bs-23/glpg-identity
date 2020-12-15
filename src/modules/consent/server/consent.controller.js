@@ -669,7 +669,7 @@ async function updateCdpConsent(req, res) {
 
         const consentWithSamePreference = await Consent.findOne({
             where: {
-                preference: { [Op.iLike]: preference },
+                preference: { [Op.iLike]: preference.trim() },
                 id: { [Op.ne]: id }
             }
         });
@@ -679,8 +679,8 @@ async function updateCdpConsent(req, res) {
         if (!consent) return res.status(404).send('Consent not found.');
 
         await consent.update({
-            preference,
-            slug: preference,
+            preference: preference.trim(),
+            slug: preference.trim(),
             category_id,
             legal_basis,
             is_active,
@@ -956,14 +956,14 @@ async function updateConsentCategory(req, res) {
             where: {
                 id: { [Op.not]: req.params.id },
                 title: {
-                    [Op.iLike]: title
+                    [Op.iLike]: title.trim()
                 }
             }
         });
 
         if (isTitleExists) return res.status(400).send('The consent category already exists.');
 
-        const data = await consentCategory.update({ title, slug: title, updated_by: req.user.id });
+        const data = await consentCategory.update({ title: title.trim(), slug: title.trim(), updated_by: req.user.id });
 
         await logService.log({
             event_type: 'UPDATE',

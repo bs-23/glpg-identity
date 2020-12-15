@@ -19,8 +19,8 @@ export const ApprovalRejectSchema = object().shape({
             is: 'other',
             then: string()
                 .test('has-only-spaces', 'This field must not be empty.', comment => comment && comment.trim())
-                .required('This field must not be empty.')
-                .max(500, 'This field must be at most 500 characters long.'),
+                .test('max-char', 'This field must be at most 500 characters long.', comment => (comment || '').trim().length <= 500)
+                .required('This field must not be empty.'),
             otherwise: string()
         }),
         otherwise: string()
