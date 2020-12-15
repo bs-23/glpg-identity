@@ -234,13 +234,6 @@ const SearchProfessionalHcp = () => {
                                                     autoDismiss: true
                                                 });
                                             });
-
-                                        // const response = await axios.post('/api/okla/hcps/search', data);
-                                        // setUsers(response.data);
-                                        // setFormData(data);
-                                        // setCurrentPage(1);
-                                        // actions.setSubmitting(false);
-                                        // scrollToResult(response.data.results.length === 0);
                                     }}
                                 >
                                     {formikProps => (
