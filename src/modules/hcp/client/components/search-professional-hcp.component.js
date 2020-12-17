@@ -83,7 +83,10 @@ const SearchProfessionalHcp = () => {
                 scrollToResult(response.data.results.length === 0);
             })
             .catch(err => {
-                addToast('Sorry! Search failed. Please, try again.', {
+                const message = err.response.status === 400
+                    ? err.response.data
+                    : 'Sorry! Search failed. Please, try again.';
+                addToast(message, {
                     appearance: 'error',
                     autoDismiss: true
                 });
@@ -106,10 +109,10 @@ const SearchProfessionalHcp = () => {
             const parameters = codbases.join('&');
             if (parameters) {
                 const response = await axios.get(`/api/hcps/specialties?${parameters}`);
-                const filtered = hcpSpecialty ? response.data.filter(i => i.codIdOnekey === hcpSpecialty): [];
-                if(filtered && filtered.length) {
-                    setSelectedSpecialties([{label: filtered[0].codDescription, value: filtered[0].codIdOnekey.split('.')[2]}]);
-                    formikRef.current.setFieldValue('specialties', [{label: filtered[0].codDescription, value: filtered[0].codIdOnekey.split('.')[2]}]);
+                const filtered = hcpSpecialty ? response.data.filter(i => i.codIdOnekey === hcpSpecialty) : [];
+                if (filtered && filtered.length) {
+                    setSelectedSpecialties([{ label: filtered[0].codDescription, value: filtered[0].codIdOnekey.split('.')[2] }]);
+                    formikRef.current.setFieldValue('specialties', [{ label: filtered[0].codDescription, value: filtered[0].codIdOnekey.split('.')[2] }]);
                 }
                 setSpecialties(response.data);
             }
@@ -141,8 +144,6 @@ const SearchProfessionalHcp = () => {
                 formikRef.current.setFieldValue('individualEid', hcpProfile.individual_id_onekey || '');
                 setHcpSpecialty(hcpProfile.specialty_onekey);
             }
-
-            console.log("ekhane ashssi", hcpProfile);
 
             if (!isAssigned && userCountries && userCountries.length && hcpProfile && (!selectedCountries || !selectedCountries.length) && allCountries && allCountries.length) {
                 const hcpCountry = allCountries.find(c => c.country_iso2.toLowerCase() === hcpProfile.country_iso2.toLowerCase());
@@ -253,8 +254,10 @@ const SearchProfessionalHcp = () => {
                                                 scrollToResult(response.data.results.length === 0);
                                             })
                                             .catch(err => {
-                                                console.log(err)
-                                                addToast('Sorry! Search failed. Please, try again.', {
+                                                const message = err.response.status === 400
+                                                    ? err.response.data
+                                                    : 'Sorry! Search failed. Please, try again.';
+                                                addToast(message, {
                                                     appearance: 'error',
                                                     autoDismiss: true
                                                 });

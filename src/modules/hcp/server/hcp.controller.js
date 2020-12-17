@@ -1770,7 +1770,11 @@ async function searchOklaHcps(req, res) {
         res.json(data);
     } catch (err) {
         console.error(err);
-        res.status(500).send('Internal server error');
+        if (err.response.status === 400) {
+            res.status(400).send(err.response.data.response.errors[0].message);
+        } else {
+            res.status(500).send('Internal server error');
+        }
     }
 }
 
@@ -1863,7 +1867,11 @@ async function searchOklaHcos(req, res) {
         res.json(data);
     } catch (err) {
         console.error(err);
-        res.status(500).send('Internal server error');
+        if (err.response.status === 400) {
+            res.status(400).send(err.response.data.response.errors[0].message);
+        } else {
+            res.status(500).send('Internal server error');
+        }
     }
 }
 

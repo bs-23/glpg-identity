@@ -9,9 +9,11 @@ import { getAllCountries } from '../../../core/client/country/country.actions';
 import OklaHcoDetails from './okla-hco-details.component';
 import getUserPermittedCountries from '../../../core/client/util/user-country';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
+import { useToasts } from 'react-toast-notifications';
 
 const SearchOrganizationHcp = () => {
     const dispatch = useDispatch();
+    const { addToast } = useToasts();
 
     const countries = useSelector(state => state.countryReducer.countries);
     const allCountries = useSelector(state => state.countryReducer.allCountries);
@@ -58,7 +60,13 @@ const SearchOrganizationHcp = () => {
                 scrollToResult(response.data.results.length === 0);
             })
             .catch(err => {
-                console.log(err);
+                const message = err.response.status === 400
+                    ? err.response.data
+                    : 'Sorry! Search failed. Please, try again.';
+                addToast(message, {
+                    appearance: 'error',
+                    autoDismiss: true
+                });
             })
     };
 
@@ -156,12 +164,22 @@ const SearchOrganizationHcp = () => {
                                         data.codbases = data.countries.map(i => i.value);
                                         delete data.countries;
 
-                                        const response = await axios.post('/api/okla/hcos/search', data);
-                                        setHcos(response.data);
-                                        setFormData(data);
-                                        setCurrentPage(1);
-                                        actions.setSubmitting(false);
-                                        scrollToResult(response.data.results.length === 0);
+                                        try {
+                                            const response = await axios.post('/api/okla/hcos/search', data);
+                                            setHcos(response.data);
+                                            setFormData(data);
+                                            setCurrentPage(1);
+                                            actions.setSubmitting(false);
+                                            scrollToResult(response.data.results.length === 0);
+                                        } catch (err) {
+                                            const message = err.response.status === 400
+                                                ? err.response.data
+                                                : 'Sorry! Search failed. Please, try again.';
+                                            addToast(message, {
+                                                appearance: 'error',
+                                                autoDismiss: true
+                                            });
+                                        }
                                     }}
                                 >
                                     {formikProps => (
@@ -295,9 +313,9 @@ const SearchOrganizationHcp = () => {
                                     <table className="table table-hover table-sm mb-0 cdp-table">
                                         <thead className="cdp-bg-primary text-white cdp-table__header">
                                             <tr>
-                                            <th>Name <OverlayTrigger trigger="click" rootClose placement="right" overlay={namehintpopup}>
-                                                <i className="fas fa-info-circle ml-1 text-white" role="button"></i>
-                                            </OverlayTrigger></th>
+                                                <th>Name <OverlayTrigger trigger="click" rootClose placement="right" overlay={namehintpopup}>
+                                                    <i className="fas fa-info-circle ml-1 text-white" role="button"></i>
+                                                </OverlayTrigger></th>
                                                 <th>Specialty</th>
                                                 <th>Address</th>
                                                 <th>City</th>
