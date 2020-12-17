@@ -32,7 +32,6 @@
         &-value {
             color: #636A70;
             font-size: 18px;
-            font-weight: 600;
         }
     }
 
@@ -40,6 +39,9 @@
         margin-right: 30px;
         flex-direction: column;
         width: 270px;
+        @media (min-width: $screen-phone) {
+            border-bottom: 0px;
+        }
 
         .nav-link {
             background: #F2F2F2;
@@ -88,5 +90,14 @@
                 }
             }
         }
+    }
+}
+
+.custom-modal-size {
+    max-width: 950px;
+
+    @media (max-width: $screen-desktop) {
+        max-width: 100%;
+        margin: 0.5rem;
     }
 }
