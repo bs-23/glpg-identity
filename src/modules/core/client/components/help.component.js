@@ -70,7 +70,7 @@ export default function Help() {
                             <div className="col-12"><h3 className="cdp-text-primary py-3">Topics</h3></div>
                             {
                                 faqData.map((category, index) => (
-                                    <div key={index} className="col-12 col-sm-6 col-lg-6ÖÖ">
+                                    <div key={index} className="col-12 col-sm-6 col-lg-6">
                                         <ul className="list-group shadow-sm faq__list-group mb-4">
                                             {category.subcategories.map((topics, id) => (
                                                 <li key={id} className="list-group-item d-flex justify-content-between align-items-center">
