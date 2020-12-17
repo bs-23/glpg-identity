@@ -2,9 +2,9 @@ import React from 'react';
 import { Route, useRouteMatch } from 'react-router-dom';
 import { FaqClientRoutes, faqReducer, Faq } from './faq';
 import { UserClientRoutes, userReducer, userActions, Login, Dashboard, ForgotPassword, ResetPassword, MyProfile } from './user';
-import { ProfileClientRoutes, profileReducer } from './profile';
-import { RoleClientRoutes, roleReducer } from './role';
-import { PermissionSetClientRoutes, permissionSetReducer, PermissionSetDetailsModal } from './permission-set';
+import { ProfileClientRoutes, profileReducer, ManageProfiles } from './profile';
+import { RoleClientRoutes, roleReducer, ManageRoles } from './role';
+import { PermissionSetClientRoutes, permissionSetReducer, PermissionSetDetailsModal, ManagePermissionSets } from './permission-set';
 
 export function PlatformRoutes() {
     const { path } = useRouteMatch();
@@ -33,5 +33,8 @@ export {
     ResetPassword,
     MyProfile,
     PermissionSetDetailsModal,
-    Faq
+    Faq,
+    ManagePermissionSets,
+    ManageProfiles,
+    ManageRoles
 };
