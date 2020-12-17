@@ -28,9 +28,9 @@ const SearchProfessionalHcp = () => {
     const [specialties, setSpecialties] = useState([]);
     const [selectedSpecialties, setSelectedSpecialties] = useState([]);
     const [selectedIndividual, setSelectedIndividual] = useState(null);
-    // const [isInContract, setIsInContract] = useState(false);
-    // const [phonetic, setPhonetic] = useState(false);
-    // const [duplicates, setDuplicates] = useState(false);
+    const [isInContract, setIsInContract] = useState(false);
+    const [phonetic, setPhonetic] = useState(false);
+    const [duplicates, setDuplicates] = useState(false);
     const [users, setUsers] = useState({});
     const [formData, setFormData] = useState({});
     const [currentPage, setCurrentPage] = useState(1);
@@ -45,9 +45,9 @@ const SearchProfessionalHcp = () => {
         setCurrentPage(1);
         setSelectedCountries([]);
         setSelectedSpecialties([]);
-        // setIsInContract(false);
-        // setDuplicates(false);
-        // setPhonetic(false);
+        setIsInContract(false);
+        setDuplicates(false);
+        setPhonetic(false);
         setUsers({});
         props.resetForm();
         setIsAssigned(false);
@@ -267,7 +267,13 @@ const SearchProfessionalHcp = () => {
                                     {formikProps => (
                                         <Form
                                             onSubmit={formikProps.handleSubmit}
-                                            onChange={() => changeUrl()}
+                                            onChange={e => {
+                                                if (e.target.id !== 'isInContractCheckbox'
+                                                    && e.target.id !== 'phoneticCheckbox'
+                                                    && e.target.id !== 'duplicatesCheckbox') {
+                                                    changeUrl();
+                                                }
+                                            }}
                                         >
                                             <div className="row align-items-center">
                                                 <div className="col-12 col-sm-6 col-lg-4">
@@ -301,39 +307,39 @@ const SearchProfessionalHcp = () => {
                                                             type="checkbox"
                                                             className="custom-control-input"
                                                             name="isInContract"
-                                                            id="customControlInline"
-                                                            // checked={isInContract}
+                                                            id="isInContractCheckbox"
+                                                            checked={isInContract}
                                                             onChange={(e) => {
                                                                 formikProps.values.isInContract = e.target.checked;
-                                                                // setIsInContract(e.target.checked);
+                                                                setIsInContract(e.target.checked);
                                                             }} />
-                                                        <label className="custom-control-label" for="customControlInline">In My Contract</label>
+                                                        <label className="custom-control-label" for="isInContractCheckbox">In My Contract</label>
                                                     </div>
                                                     <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-2">
                                                         <input
                                                             type="checkbox"
                                                             className="custom-control-input"
                                                             name="phonetic"
-                                                            id="customControlInline2"
-                                                            // checked={phonetic}
+                                                            id="phoneticCheckbox"
+                                                            checked={phonetic}
                                                             onChange={(e) => {
                                                                 formikProps.values.phonetic = e.target.checked;
-                                                                // setPhonetic(e.target.checked);
+                                                                setPhonetic(e.target.checked);
                                                             }} />
-                                                        <label className="custom-control-label" for="customControlInline2">Phonetic</label>
+                                                        <label className="custom-control-label" for="phoneticCheckbox">Phonetic</label>
                                                     </div>
                                                     <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-2">
                                                         <input
                                                             type="checkbox"
                                                             className="custom-control-input"
                                                             name="duplicates"
-                                                            id="customControlInline3"
-                                                            // checked={duplicates}
+                                                            id="duplicatesCheckbox"
+                                                            checked={duplicates}
                                                             onChange={(e) => {
                                                                 formikProps.values.duplicates = e.target.checked;
-                                                                // setDuplicates(e.target.checked);
+                                                                setDuplicates(e.target.checked);
                                                             }} />
-                                                        <label className="custom-control-label" for="customControlInline3">Duplicates</label>
+                                                        <label className="custom-control-label" for="duplicatesCheckbox">Duplicates</label>
                                                     </div>
                                                 </div>
                                             </div>
