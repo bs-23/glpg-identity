@@ -98,7 +98,7 @@ export default function Help() {
                                             selectedfaq.map((item, index) => (
                                                 <Card key={index}>
                                                     <Accordion.Collapse eventKey={index + ""}>
-                                                        <Card.Body>{parse(item.answer)}</Card.Body>
+                                                        <Card.Body>{parse(parse(item.answer))}</Card.Body>
                                                     </Accordion.Collapse>
                                                     <Accordion.Toggle as={Card.Header} eventKey={index + ""} className="p-3 d-flex align-items-baseline justify-content-between" role="button">
                                                         <span className="faq__question">{item.question}</span>
