@@ -515,7 +515,7 @@ async function updateHcps(req, res) {
         await Promise.all(hcpModelInstances.map(async (hcp, index) => {
             const updatedPropertiesLog = [];
 
-            Object.keys(hcpsToUpdate[index]).map(key => {
+            Object.keys(hcpsToUpdate[index]).forEach(key => {
                 if(hcpsToUpdate[index][key]) {
                     const updatedPropertyLogObject = {
                         field: key,
@@ -543,7 +543,7 @@ async function updateHcps(req, res) {
 
         hcpModelInstances.map((hcpModelIns, idx) => {
             const { _rowIndex } = hcpModelIns.dataValues;
-            Object.keys(hcpsToUpdate[idx]).map(key => {
+            Object.keys(hcpsToUpdate[idx]).forEach(key => {
                 if(hcpsToUpdate[idx][key]) response.data.push(new Data(_rowIndex, key, hcpModelIns.dataValues[key]));
             })
         });
