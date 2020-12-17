@@ -40,7 +40,7 @@ export default function Help() {
             const subcategories = topics.filter(x => x.category === element);
             subcategories.forEach(item => {
                 delete item.category;
-                item.faq = faq.filter(x => x.categories.indexOf(item.slug) >= 0);
+                item.faq = faq.filter(x => x.topics.indexOf(item.slug) >= 0);
             });
             faqWithTopics.push({
                 category: element,
