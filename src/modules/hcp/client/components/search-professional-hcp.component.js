@@ -52,6 +52,7 @@ const SearchProfessionalHcp = () => {
         props.resetForm();
         setIsAssigned(false);
         setHcpProfile(null);
+        setHcpSpecialty(null);
 
         if (params.get('id')) history.push('/hcps/discover-professionals');
     };
