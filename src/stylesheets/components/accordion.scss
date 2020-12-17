@@ -155,6 +155,48 @@
             z-index: 1;
         }*/
     }
+
+    &__tabs {
+        border-bottom: 1px solid $primary-color;
+
+        .nav-link {
+            &:hover {
+                border-color: transparent;
+            }
+
+            &.active {
+                background: $primary-color;
+                color: $white-color;
+                border-bottom: 1px solid $primary-color;
+            }
+        }
+    }
+
+    &__in-modal {
+        .faq__header {
+            display: none !important;
+        }
+    }
+
+    &__list-group {
+
+        &--modal-open {
+            display: none;
+        }
+
+        .list-group-item:hover {
+            @extend .cdp-light-bg;
+            cursor: pointer;
+
+            .faq__list-group--modal-open {
+                display: block;
+            }
+        }
+
+        &-icon {
+            width: 50px;
+        }
+    }
 }
 
 .help-center {

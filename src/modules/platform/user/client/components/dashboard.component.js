@@ -57,7 +57,7 @@ export default function Dashboard() {
                         </div>
                     </div>
                     <div className="col-12 col-lg-4 col-xl-3 py-3 app__content-panel-right">
-                        <Faq category="general" />
+                        <Faq topic="general-information" />
                     </div>
                 </div>
             </div>

@@ -10,6 +10,7 @@ import { getCountryConsents, deleteCountryConsent, getCdpConsents } from '../con
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Popover from 'react-bootstrap/Popover';
 import parse from 'html-react-parser';
+import Faq from '../../../platform/faq/client/faq.component';
 
 const CountryConsents = () => {
     const dispatch = useDispatch();
@@ -22,6 +23,10 @@ const CountryConsents = () => {
     const [showDelete, setShowDelete] = useState(false);
     const [consentToDelete, setConsentToDelete] = useState(null);
     const [consentId, setConsentId] = useState(null);
+
+    const [showFaq, setShowFaq] = useState(false);
+    const handleCloseFaq = () => setShowFaq(false);
+    const handleShowFaq = () => setShowFaq(true);
 
     const countries = useSelector(state => state.countryReducer.countries);
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
@@ -99,7 +104,7 @@ const CountryConsents = () => {
         const countriesDetails = [];
         (loggedInUser.countries || []).forEach(c_iso2 => {
             const countryDetails = countries.find(c => c.country_iso2.toLowerCase() === c_iso2.toLowerCase());
-            if(countryDetails){
+            if (countryDetails) {
                 countriesDetails.push(countryDetails);
             }
         });
@@ -121,8 +126,16 @@ const CountryConsents = () => {
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/consent">Data Privacy & Consent Management</NavLink></li>
                                 <li className="breadcrumb-item active"><span>Manage Consent Per Country</span></li>
+                                <li className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help icon-2x cdp-text-secondary"></i></li>
                             </ol>
                         </nav>
+
+                        <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Questions You May Have</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body className="faq__in-modal"><Faq topic="configure-consent-country" /></Modal.Body>
+                        </Modal>
                     </div>
                 </div>
                 <div className="row">
@@ -147,61 +160,61 @@ const CountryConsents = () => {
 
                         {
                             getGroupedCountryConsents().map((countryConsent, countryConsentIndex) =>
-                                (
-                                    <div className="table-responsive shadow-sm bg-white mb-3" key={countryConsentIndex}>
-                                        <table className="table table-hover table-sm mb-0 cdp-table mb-2">
-                                            <thead className="cdp-bg-primary-lighter cdp-table__header">
-                                                <tr>
-                                                    <th colSpan="4"><div className="d-flex align-items-center text-white"><img alt={countryConsent.name} src={countryConsent.flagUrl} height="18" className="mr-2" /> {countryConsent.name}</div></th>
-                                                </tr>
-                                            </thead>
-                                            <thead className="cdp-table__header">
-                                                <tr>
-                                                    <th width="40%">Preference / Purpose</th>
-                                                    <th width="20%">Available Localizations</th>
-                                                    <th width="20%">Opt Type</th>
-                                                    <th width="20%">Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="cdp-table__body bg-white">
-                                                {
-                                                    countryConsent.consents.map((consent, coonsentIndex) =>
-                                                        (
-                                                            <tr key={coonsentIndex}>
-                                                                <td>
-                                                                    <span type="button" className="btn btn-link cdp-text-primary p-0" onClick={() => showConsentDetailsModal(consent.id)}>
-                                                                        <i className="fas fa-caret-right mr-1"></i>{consent.preference} {consent.is_active ? '' : '(Inactive)'}
-                                                                    </span>
-                                                                </td>
-                                                                <td>
-                                                                    {consent.translations && consent.translations.length > 0 && consent.translations.map(translation => (
-                                                                        <OverlayTrigger key={translation.id}
-                                                                            placement="top"
-                                                                            delay={{ show: 250, hide: 400 }}
-                                                                            overlay={
-                                                                                <Popover className="popup-customize" id={`popover-positioned-top`}>
-                                                                                    <Popover.Content className="popup-customize__content">
-                                                                                        <div>{parse(translation.rich_text)}</div>
-                                                                                    </Popover.Content>
-                                                                                </Popover>
-                                                                            }
+                            (
+                                <div className="table-responsive shadow-sm bg-white mb-3" key={countryConsentIndex}>
+                                    <table className="table table-hover table-sm mb-0 cdp-table mb-2">
+                                        <thead className="cdp-bg-primary-lighter cdp-table__header">
+                                            <tr>
+                                                <th colSpan="4"><div className="d-flex align-items-center text-white"><img alt={countryConsent.name} src={countryConsent.flagUrl} height="18" className="mr-2" /> {countryConsent.name}</div></th>
+                                            </tr>
+                                        </thead>
+                                        <thead className="cdp-table__header">
+                                            <tr>
+                                                <th width="40%">Preference / Purpose</th>
+                                                <th width="20%">Available Localizations</th>
+                                                <th width="20%">Opt Type</th>
+                                                <th width="20%">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="cdp-table__body bg-white">
+                                            {
+                                                countryConsent.consents.map((consent, coonsentIndex) =>
+                                                (
+                                                    <tr key={coonsentIndex}>
+                                                        <td>
+                                                            <span type="button" className="btn btn-link cdp-text-primary p-0" onClick={() => showConsentDetailsModal(consent.id)}>
+                                                                <i className="fas fa-caret-right mr-1"></i>{consent.preference} {consent.is_active ? '' : '(Inactive)'}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            {consent.translations && consent.translations.length > 0 && consent.translations.map(translation => (
+                                                                <OverlayTrigger key={translation.id}
+                                                                    placement="top"
+                                                                    delay={{ show: 250, hide: 400 }}
+                                                                    overlay={
+                                                                        <Popover className="popup-customize" id={`popover-positioned-top`}>
+                                                                            <Popover.Content className="popup-customize__content">
+                                                                                <div>{parse(translation.rich_text)}</div>
+                                                                            </Popover.Content>
+                                                                        </Popover>
+                                                                    }
 
-                                                                        >
-                                                                            <span className="badge badge-secondary-light shadow-sm font-weight-bold-light mr-1 text-dark">{translation.locale}</span>
-                                                                        </OverlayTrigger>
-                                                                    ))}</td>
-                                                                <td>{consent.optType.text}</td>
-                                                                <td>
-                                                                    <button className="btn btn-link cdp-text-primary p-0 mr-3" onClick={() => setEdit(consent)}><i className="fas fa-tasks mr-1"></i>Manage opt type</button> <button onClick={() => setDeleteModal(consent.country_consent_id, consent.preference, countryConsent.name)} className="btn btn-link text-danger p-0"><i className="far fa-trash-alt mr-1"></i>Remove</button>
-                                                                </td>
-                                                            </tr>
-                                                        )
-                                                    )
-                                                }
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                )
+                                                                >
+                                                                    <span className="badge badge-secondary-light shadow-sm font-weight-bold-light mr-1 text-dark">{translation.locale}</span>
+                                                                </OverlayTrigger>
+                                                            ))}</td>
+                                                        <td>{consent.optType.text}</td>
+                                                        <td>
+                                                            <button className="btn btn-link cdp-text-primary p-0 mr-3" onClick={() => setEdit(consent)}><i className="fas fa-tasks mr-1"></i>Manage opt type</button> <button onClick={() => setDeleteModal(consent.country_consent_id, consent.preference, countryConsent.name)} className="btn btn-link text-danger p-0"><i className="far fa-trash-alt mr-1"></i>Remove</button>
+                                                        </td>
+                                                    </tr>
+                                                )
+                                                )
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )
                             )
                         }
 

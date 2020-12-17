@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useToasts } from 'react-toast-notifications';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
-
+import Faq from '../../../platform/faq/client/faq.component';
 import CategorySchema from './category.schema';
 import { getConsentCategories, getConsentCategory, createConsentCategory, updateConsentCategory } from './category.actions';
 
@@ -13,6 +13,9 @@ const ConsentCategories = () => {
     const { addToast } = useToasts();
     const [consentCategoryId, setConsentCategoryId] = useState(undefined);
     const [showForm, setShowForm] = useState(false);
+    const [showFaq, setShowFaq] = useState(false);
+    const handleCloseFaq = () => setShowFaq(false);
+    const handleShowFaq = () => setShowFaq(true);
 
     const toggleForm = (id) => {
         setConsentCategoryId(id);
@@ -27,7 +30,7 @@ const ConsentCategories = () => {
     }, []);
 
     useEffect(() => {
-        if(consentCategoryId) {
+        if (consentCategoryId) {
             dispatch(getConsentCategory(consentCategoryId));
         }
     }, [consentCategoryId]);
@@ -42,8 +45,15 @@ const ConsentCategories = () => {
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/consent">Data Privacy & Consent Management</NavLink></li>
                                 <li className="breadcrumb-item active"><span>Consent Categories</span></li>
+                                <li className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help icon-2x cdp-text-secondary"></i></li>
                             </ol>
                         </nav>
+                        <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Questions You May Have</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body className="faq__in-modal"><Faq topic="configure-consent-category" /></Modal.Body>
+                        </Modal>
                     </div>
                 </div>
                 <div className="row">
@@ -57,7 +67,7 @@ const ConsentCategories = () => {
                             </div>
                         </div>
 
-                        { consent_categories.length > 0 &&
+                        {consent_categories.length > 0 &&
                             <div className="table-responsive shadow-sm bg-white">
                                 <table className="table table-hover table-sm mb-0 cdp-table">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
@@ -70,14 +80,14 @@ const ConsentCategories = () => {
                                         </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
-                                        { consent_categories.map((row, index) => (
+                                        {consent_categories.map((row, index) => (
                                             <tr key={index}>
                                                 <td>{row.title}</td>
                                                 <td>{row.slug}</td>
                                                 <td>{row.createdBy || '--'}</td>
                                                 <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                 <td>
-                                                    <button className="btn cdp-btn-link-primary p-0 mr-3" onClick={() => {toggleForm(row.id)}}>
+                                                    <button className="btn cdp-btn-link-primary p-0 mr-3" onClick={() => { toggleForm(row.id) }}>
                                                         <i className="fas fa-pen mr-2"></i>Edit
                                                     </button>
                                                 </td>
@@ -88,7 +98,7 @@ const ConsentCategories = () => {
                             </div>
                         }
 
-                        { consent_categories.length === 0 &&
+                        {consent_categories.length === 0 &&
                             <div className="row justify-content-center mt-sm-5 pt-5 mb-3">
                                 <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">
                                     <i class="icon icon-team icon-6x cdp-text-secondary"></i>
@@ -100,7 +110,7 @@ const ConsentCategories = () => {
                 </div>
             </div>
 
-            <Modal dialogClassName="modal-90w modal-customize"centered show={showForm} onHide={toggleForm}>
+            <Modal dialogClassName="modal-90w modal-customize" centered show={showForm} onHide={toggleForm}>
                 <Modal.Header closeButton>
                     <Modal.Title>
                         Consent category
@@ -115,8 +125,8 @@ const ConsentCategories = () => {
                         enableReinitialize={true}
                         validationSchema={CategorySchema}
                         onSubmit={(values, actions) => {
-                            if(consentCategoryId) {
-                                dispatch(updateConsentCategory(consentCategoryId, values)).then(function() {
+                            if (consentCategoryId) {
+                                dispatch(updateConsentCategory(consentCategoryId, values)).then(function () {
                                     toggleForm(null);
                                     addToast('Consent category updated successfully', {
                                         appearance: 'success',
@@ -129,7 +139,7 @@ const ConsentCategories = () => {
                                     });
                                 });
                             } else {
-                                dispatch(createConsentCategory(values)).then(function() {
+                                dispatch(createConsentCategory(values)).then(function () {
                                     toggleForm(null);
                                     actions.resetForm();
                                     addToast('Consent category created successfully', {
@@ -154,7 +164,7 @@ const ConsentCategories = () => {
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="title">Title <span className="text-danger">*</span></label>
                                             <Field data-testid="title" className="form-control" type="text" name="title" />
-                                            <div className="invalid-feedback" data-testid="titleError"><ErrorMessage name="title"/></div>
+                                            <div className="invalid-feedback" data-testid="titleError"><ErrorMessage name="title" /></div>
                                         </div>
                                     </div>
                                 </div>

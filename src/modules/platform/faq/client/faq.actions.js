@@ -21,6 +21,16 @@ export function getFaqItems(query = "") {
     };
 }
 
+export function getFaqCategories() {
+    return {
+        type: Types.GET_FAQ_CATEGORIES,
+        payload: axios({
+            method: 'get',
+            url: `/api/faq/category`
+        })
+    };
+}
+
 export function createFaqItem(data) {
     return {
         type: Types.POST_FAQ_ITEM,

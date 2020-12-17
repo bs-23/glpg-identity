@@ -5,13 +5,8 @@ const logService = require(path.join(process.cwd(), 'src/modules/core/server/aud
 const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
 const Sequelize = require('sequelize');
 const { IgnorePlugin } = require('webpack');
+const faqCategories = require('../faq.json');
 
-const faqCategories = [
-    { id: "0", title: "General", slug: "general" },
-    { id: "1", title: "Information Management", slug: "information" },
-    { id: "2", title: "Management of Customer Data Platform", slug: "cdp" },
-    { id: "3", title: "Data Privacy & Consent Management", slug: "privacy" }
-];
 
 async function getFaqItem(req, res) {
     try {
@@ -30,20 +25,20 @@ function sort_category(items, orderType, limit, offset) {
 
     let rows = items.rows.map(c => {
         const categoryTitleList = [];
-        c.categories.forEach(element => {
-            categoryTitleList.push(faqCategories.find(x => x.slug === element).title);
+        c.topics.forEach(element => {
+            categoryTitleList.push(faqCategories.topics.find(x => x.slug === element).title);
         });
 
-        const category = categoryTitleList[0];
+        const topic = categoryTitleList[0];
         const createdBy = `${c.createdByUser.first_name} ${c.createdByUser.last_name}`;
         const updatedBy = `${c.updatedByUser.first_name} ${c.updatedByUser.last_name}`;
         delete c.dataValues.createdByUser;
         delete c.dataValues.updatedByUser;
-        return { ...c.dataValues, category, createdBy, updatedBy }
+        return { ...c.dataValues, topic, createdBy, updatedBy }
     });
 
-    rows.sort((a, b) => (a.category > b.category) ?
-        (orderType === 'asc' ? -1 : 1) : ((b.category > a.category) ? (orderType === 'asc' ? 1 : -1) : 0));
+    rows.sort((a, b) => (a.topic > b.topic) ?
+        (orderType === 'asc' ? -1 : 1) : ((b.topic > a.topic) ? (orderType === 'asc' ? 1 : -1) : 0));
 
     rows = rows.slice(offset, offset + limit);
 
@@ -54,13 +49,15 @@ function sort_category(items, orderType, limit, offset) {
 
 async function getFaqItems(req, res) {
     try {
+
+
         const page = req.query.page ? req.query.page - 1 : 0;
         if (page < 0) return res.status(404).send("page must be greater or equal 1");
 
         const limit = req.query.limit ? req.query.limit : 30;
         const offset = page * limit;
 
-        const category = req.query.category === 'null' || req.query.category === undefined ? null : req.query.category;
+        const topic = req.query.topic === 'null' || req.query.topic === undefined ? null : req.query.topic;
 
         const orderBy = req.query.orderBy === 'null'
             ? null
@@ -70,13 +67,13 @@ async function getFaqItems(req, res) {
             : 'asc';
 
         let order = [
-            ['created_at', 'DESC'],
+            ['updated_at', 'DESC'],
             ['id', 'DESC']
         ];
 
-        const sortableColumns = ['question', 'answer', 'categories', 'updated_at'];
+        const sortableColumns = ['question', 'answer', 'topics', 'updated_at'];
 
-        if (orderBy === 'categories') orderType === 'asc' ? orderType = 'desc' : orderType = 'asc';
+        if (orderBy === 'topics') orderType === 'asc' ? orderType = 'desc' : orderType = 'asc';
 
         if (orderBy && sortableColumns.includes(orderBy)) {
             order.splice(0, 0, [orderBy, orderType]);
@@ -87,8 +84,8 @@ async function getFaqItems(req, res) {
         }
 
         const filter = {
-            categories: {
-                [Op.overlap]: [category]
+            topics: {
+                [Op.overlap]: [topic]
             }
         };
 
@@ -109,16 +106,16 @@ async function getFaqItems(req, res) {
 
         const response = await Faq.findAndCountAll({
             include: inclusions,
-            where: category ? filter : {},
-            offset: orderBy === 'categories' ? null : offset,
-            limit: orderBy === 'categories' ? null : limit,
-            order: orderBy === 'categories' ? [] : order,
+            where: topic ? filter : {},
+            offset: orderBy === 'topics' || req.query.page === 'null' ? null : offset,
+            limit: orderBy === 'topics' ? req.query.page === 'null' : limit,
+            order: orderBy === 'topics' ? [] : order,
 
         });
 
 
         let data = [];
-        if (orderBy === 'categories') {
+        if (orderBy === 'topics') {
             data = sort_category(response, orderType, limit, offset).rows;
 
         } else {
@@ -144,7 +141,7 @@ async function getFaqItems(req, res) {
                 total: response.count,
                 start: limit * page + 1,
                 end: offset + limit > response.count ? parseInt(response.count) : parseInt(offset + limit),
-                category: category,
+                topic: topic,
             }
         }
 
@@ -155,9 +152,18 @@ async function getFaqItems(req, res) {
     }
 }
 
+async function getFaqCategories(req, res) {
+    try {
+        res.json(faqCategories.topics);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 async function createFaqItem(req, res) {
     try {
-        const { question, answer, categories } = req.body;
+        const { question, answer, topics } = req.body;
 
         const faq = await Faq.findOne({ where: { question: { [Op.iLike]: question.trim() } } });
 
@@ -166,7 +172,7 @@ async function createFaqItem(req, res) {
         const response = await Faq.create({
             question: question.trim(),
             answer,
-            categories,
+            topics,
             created_by: req.user.id,
             updated_by: req.user.id
         });
@@ -194,7 +200,7 @@ async function createFaqItem(req, res) {
 async function updateFaqItem(req, res) {
     try {
 
-        const { question, answer, categories } = req.body;
+        const { question, answer, topics } = req.body;
 
         const inclusions = [
             {
@@ -229,7 +235,7 @@ async function updateFaqItem(req, res) {
         delete faq.dataValues.createdByUser;
         delete faq.dataValues.updatedByUser;
 
-        await faq.update({ question, answer, categories });
+        await faq.update({ question, answer, topics });
 
         await logService.log({
             event_type: 'UPDATE',
@@ -280,6 +286,7 @@ async function deleteFaqItem(req, res) {
 
 exports.getFaqItem = getFaqItem;
 exports.getFaqItems = getFaqItems;
+exports.getFaqCategories = getFaqCategories;
 exports.createFaqItem = createFaqItem;
 exports.updateFaqItem = updateFaqItem;
 exports.deleteFaqItem = deleteFaqItem;

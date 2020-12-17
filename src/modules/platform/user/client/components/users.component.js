@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { getUsers } from '../user.actions';
 import axios from 'axios';
+import Modal from 'react-bootstrap/Modal';
+import Faq from '../../../faq/client/faq.component';
 
 const safeGet = (object, property) => {
     const propData = (object || {})[property];
@@ -24,6 +26,10 @@ export default function Users() {
     const [codBase, setCodBase] = useState(null);
     const [userCountries, setUserCountries] = useState([]);
     const [sort, setSort] = useState({ type: 'asc', value: null });
+
+    const [showFaq, setShowFaq] = useState(false);
+    const handleCloseFaq = () => setShowFaq(false);
+    const handleShowFaq = () => setShowFaq(true);
 
     const userdata = useSelector(state => state.userReducer.users);
     const countries = useSelector(state => state.countryReducer.countries);
@@ -69,7 +75,7 @@ export default function Users() {
 
         countryArr.sort((a, b) => (a.codbase_desc > b.codbase_desc) ? 1 : -1);
         countryArr.forEach((element, key) => {
-            if(!element) return;
+            if (!element) return;
             countryString = countryString + element.codbase_desc;
             if (key < countryArr.length - 1) countryString = countryString + ', ';
         });
@@ -151,8 +157,15 @@ export default function Users() {
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/platform">Management of Customer Data platform</NavLink></li>
                                 <li className="breadcrumb-item active"><span>CDP User List</span></li>
+                                <li className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help icon-2x cdp-text-secondary"></i></li>
                             </ol>
                         </nav>
+                        <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Questions You May Have</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body className="faq__in-modal"><Faq topic="manage-access" /></Modal.Body>
+                        </Modal>
                     </div>
                 </div>
                 <div className="row">

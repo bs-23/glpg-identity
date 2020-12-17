@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import FaqForm from './faq-form.component';
-import { getFaqItems, deleteFaqItem } from './faq.actions';
+import { getFaqItems, deleteFaqItem, getFaqCategories } from './faq.actions';
 import { useSelector, useDispatch } from 'react-redux';
 import parse from 'html-react-parser';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Modal from 'react-bootstrap/Modal';
 import { useToasts } from 'react-toast-notifications';
+import Faq from '../../../platform/faq/client/faq.component';
 
 export default function ManageFaq() {
     const [show, setShow] = useState(false);
     const faqData = useSelector(state => state.faqReducer.faq_items);
-    const serviceCategories = useSelector(state => state.faqReducer.faq_categories);
+    const serviceTopics = useSelector(state => state.faqReducer.faq_topics);
     const [editMode, setEditMode] = useState(false);
     const [editData, setEditData] = useState(null);
-    const [, setCategory] = useState(null);
+    const [topic, setTopic] = useState(null);
     const [sort, setSort] = useState({ type: 'asc', value: null });
     const [showDelete, setShowDelete] = useState(false);
     const [deleteId, setDeleteId] = useState(false);
@@ -23,6 +24,9 @@ export default function ManageFaq() {
     const location = useLocation();
     const history = useHistory();
     const params = new URLSearchParams(window.location.search);
+    const [showFaq, setShowFaq] = useState(false);
+    const handleCloseFaq = () => setShowFaq(false);
+    const handleShowFaq = () => setShowFaq(true);
 
     const deleteFaq = () => {
         dispatch(deleteFaqItem(deleteId)).then(() => {
@@ -43,7 +47,7 @@ export default function ManageFaq() {
         let orderType = params.get('orderType');
         const orderBy = params.get('orderBy');
         const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
-        const category = faqCategory ? encodeURIComponent(faqCategory) : encodeURIComponent(params.get('category'));
+        const topic = faqCategory ? encodeURIComponent(faqCategory) : encodeURIComponent(params.get('topic'));
 
         if (!pageChange) {
             if (orderBy && !orderType) {
@@ -58,7 +62,7 @@ export default function ManageFaq() {
         }
 
         const url = `?page=${page}`
-            + (category && category !== 'null' ? `&category=${category}` : '')
+            + (topic && topic !== 'null' ? `&topic=${topic}` : '')
             + (orderColumn && orderColumn !== 'null' ? `&orderBy=${orderColumn}` : '')
             + (orderColumn && orderType && orderType !== 'null' ? `&orderType=${orderType}` : '');
 
@@ -66,17 +70,19 @@ export default function ManageFaq() {
     }
 
     useEffect(() => {
-        setCategory(params.get('category') ? params.get('category') : null);
+        if (faqData.metadata) { faqData.metadata.topic = null; }
+        setTopic(params.get('topic') ? params.get('topic') : null);
+        dispatch(getFaqCategories());
         dispatch(getFaqItems(location.search));
         setSort({ type: params.get('orderType') || 'asc', value: params.get('orderBy') });
     }, [location]);
 
     const pageLeft = () => {
-        if (faqData.metadata.page > 1) urlChange(faqData.metadata.page - 1, faqData.metadata.category, params.get('orderBy'), true);
+        if (faqData.metadata.page > 1) urlChange(faqData.metadata.page - 1, faqData.metadata.topic, params.get('orderBy'), true);
     };
 
     const pageRight = () => {
-        if (faqData.metadata.end !== faqData.metadata.total) urlChange(faqData.metadata.page + 1, faqData.metadata.category, params.get('orderBy'), true);
+        if (faqData.metadata.end !== faqData.metadata.total) urlChange(faqData.metadata.page + 1, faqData.metadata.topic, params.get('orderBy'), true);
     };
 
     return (
@@ -89,8 +95,15 @@ export default function ManageFaq() {
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/platform">Management of Customer Data platform</NavLink></li>
                                 <li className="breadcrumb-item active"><span>FAQ</span></li>
+                                <li className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help icon-2x cdp-text-secondary"></i></li>
                             </ol>
                         </nav>
+                        <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Questions You May Have</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body className="faq__in-modal"><Faq topic="manage-faqs" /></Modal.Body>
+                        </Modal>
                     </div>
                 </div>
 
@@ -98,19 +111,18 @@ export default function ManageFaq() {
                     <div className="col-12">
                         <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
                             <h4 class="cdp-text-primary font-weight-bold mb-3 mb-sm-0">FAQ List</h4>
-                            {serviceCategories.length > 0 && faqData.metadata &&
+                            {serviceTopics && serviceTopics.length > 0 && faqData.metadata &&
                                 <div class="d-flex justify-content-between align-items-center">
                                     <Dropdown className="ml-auto dropdown-customize">
                                         <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center">
-                                            <i className="icon icon-filter mr-2 mb-n1"></i> {!faqData.metadata.category ? 'Filter by Category' : serviceCategories.find(x => x.slug === faqData.metadata.category).title}
+                                            <i className="icon icon-filter mr-2 mb-n1"></i> {faqData.metadata.topic === null || history.action === "PUSH" ? 'Filter by Topics' : serviceTopics.find(x => x.slug === faqData.metadata.topic).title}
                                         </Dropdown.Toggle>
                                         <Dropdown.Menu>
-                                            {
-                                                faqData.metadata.category && <Dropdown.Item onClick={() => urlChange(1, 'null', params.get('orderBy'))}>All</Dropdown.Item>
+                                            {serviceTopics.length > 0 && faqData.metadata.topic && <Dropdown.Item onClick={() => urlChange(1, 'null', params.get('orderBy'))}>All</Dropdown.Item>
                                             }
                                             {
-                                                serviceCategories.length > 0 && serviceCategories.map((item, index) => (
-                                                    item.title !== faqData.metadata.category && <Dropdown.Item key={index} onClick={() => urlChange(1, item.slug, params.get('orderBy'))}>{item.title}</Dropdown.Item>
+                                                serviceTopics.length > 0 && serviceTopics.map((item, index) => (
+                                                    item.title !== faqData.metadata.topic && <Dropdown.Item key={index} onClick={() => urlChange(1, item.slug, params.get('orderBy'))}>{item.title}</Dropdown.Item>
                                                 ))
                                             }
                                         </Dropdown.Menu>
@@ -123,15 +135,15 @@ export default function ManageFaq() {
                             }
                         </div>
 
-                        {faqData.faq && faqData.faq.length > 0 && serviceCategories && serviceCategories.length > 0 &&
+                        {faqData.faq && faqData.faq.length > 0 && serviceTopics && serviceTopics.length > 0 &&
                             <div className="table-responsive shadow-sm bg-white">
                                 <table className="table table-hover table-sm mb-0 cdp-table">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
-                                            <th width="25%"><span className={sort.value === 'question' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'question')}>Question<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                            <th width="35%"><span className={sort.value === 'answer' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'answer')}>Answer<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                            <th width="22%"><span className={sort.value === 'categories' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'categories')}>Category<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                            <th width="10%"><span className={sort.value === 'created_by' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'created_by')}>Created By<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                            <th width="25%"><span className={sort.value === 'question' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.topic, 'question')}>Question<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                            <th width="35%"><span className={sort.value === 'answer' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.topic, 'answer')}>Answer<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                            <th width="22%"><span className={sort.value === 'topics' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.topic, 'topics')}>Topics<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                            <th width="10%"><span className={sort.value === 'created_by' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.topic, 'created_by')}>Created By<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                             <th width="8%">Action</th>
                                         </tr>
                                     </thead>
@@ -139,9 +151,11 @@ export default function ManageFaq() {
                                         {faqData.faq.map((row, index) => (
                                             <tr key={index}>
                                                 <td className="text-break">{row.question}</td>
-                                                <td className="text-break cdp-link-secondary">{parse(row.answer)}</td>
-                                                <td className="text-break">{ row.categories && row.categories.map((item, key) => (
-                                                    (serviceCategories.find(x => x.slug === item).title) + (key < row.categories.length - 1 ? ', ' : '')))}
+                                                <td className="text-break cdp-link-secondary">{parse(parse(row.answer))}</td>
+                                                <td className="text-break">
+                                                    {row.topics && row.topics.map((item, key) => (
+                                                        (serviceTopics.find(x => x.slug === item).title) + (key < row.topics.length - 1 ? ', ' : '')))}
+
                                                 </td>
                                                 <td className="text-break">{row.createdBy}</td>
                                                 <td><Dropdown className="ml-auto dropdown-customize">
@@ -184,7 +198,7 @@ export default function ManageFaq() {
                             </div>
                         }
 
-                        <FaqForm editMode={editMode} editData={editData} serviceCategory={serviceCategories} changeShow={(val) => setShow(val)} show={show} />
+                        <FaqForm editMode={editMode} editData={editData} serviceTopics={serviceTopics} changeShow={(val) => setShow(val)} show={show} />
 
                         <Modal centered show={showDelete} onHide={() => setShowDelete(false)}>
                             <Modal.Header closeButton>

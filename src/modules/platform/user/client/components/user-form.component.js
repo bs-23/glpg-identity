@@ -21,7 +21,7 @@ export default function UserForm() {
     const countries = useSelector(state => state.countryReducer.countries);
 
     const generateCountryIconPath = (country) => {
-        if(country) return `/assets/flag/flag-${country.toLowerCase().replace(/ /g, "-")}.svg`;
+        if (country) return `/assets/flag/flag-${country.toLowerCase().replace(/ /g, "-")}.svg`;
         return `/assets/flag/flag-placeholder.svg`;
     }
 
@@ -50,6 +50,7 @@ export default function UserForm() {
                                 <li className="breadcrumb-item"><NavLink to="/platform/">Management of Customer Data platform</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/platform/users">CDP User List</NavLink></li>
                                 <li className="breadcrumb-item active"><span>Add New User</span></li>
+                                <li className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help icon-2x cdp-text-secondary"></i></li>
                             </ol>
                         </nav>
                     </div>
@@ -98,7 +99,7 @@ export default function UserForm() {
                                         {formikProps => (
                                             <Form onSubmit={formikProps.handleSubmit}>
                                                 <div className="row">
-                                                <div className="col-12 col-lg-8 col-xl-6">
+                                                    <div className="col-12 col-lg-8 col-xl-6">
                                                         <div className="row">
                                                             <div className="col-12 col-sm-6">
                                                                 <div className="form-group">
@@ -129,27 +130,27 @@ export default function UserForm() {
                                                                             <span className="input-group-btn">
                                                                                 <Dropdown>
                                                                                     {
-                                                                                        countries.map( (country, index) => {
+                                                                                        countries.map((country, index) => {
                                                                                             return index === selectedCountryCode ? (
-                                                                                            <Dropdown.Toggle key={index} variant="" className="p-1 pt-2 px-2 pr-0 d-flex align-items-center rounded-0">
-                                                                                                <img height="20" width="20" src={generateCountryIconPath(country.codbase_desc)} title={country.codbase_desc} />
-                                                                                                <span className="country-phone-code pl-1">{ CountryCodesObject[country.country_iso2] }</span>
-                                                                                            </Dropdown.Toggle>) : null
+                                                                                                <Dropdown.Toggle key={index} variant="" className="p-1 pt-2 px-2 pr-0 d-flex align-items-center rounded-0">
+                                                                                                    <img height="20" width="20" src={generateCountryIconPath(country.codbase_desc)} title={country.codbase_desc} />
+                                                                                                    <span className="country-phone-code pl-1">{CountryCodesObject[country.country_iso2]}</span>
+                                                                                                </Dropdown.Toggle>) : null
                                                                                         })
                                                                                     }
                                                                                     <Dropdown.Menu>
                                                                                         {
-                                                                                            countries.map( (country, index) => {
+                                                                                            countries.map((country, index) => {
                                                                                                 return index === selectedCountryCode ? null :
-                                                                                                (<Dropdown.Item onClick={() => {
-                                                                                                    setSelectedCountryCode(index);
-                                                                                                    const countryCode = CountryCodesObject[countries[index].country_iso2];
-                                                                                                    formikProps.setFieldValue('country_code', countryCode);
-                                                                                                }} key={index} className="px-2 d-flex align-items-center">
-                                                                                                    <img height="20" width="20" src={generateCountryIconPath(country.codbase_desc)} title={country.codbase_desc} />
-                                                                                                    <span className="country-name pl-2">{ country.codbase_desc }</span>
-                                                                                                    <span className="country-phone-code pl-1">{ CountryCodesObject[country.country_iso2] }</span>
-                                                                                                </Dropdown.Item>)
+                                                                                                    (<Dropdown.Item onClick={() => {
+                                                                                                        setSelectedCountryCode(index);
+                                                                                                        const countryCode = CountryCodesObject[countries[index].country_iso2];
+                                                                                                        formikProps.setFieldValue('country_code', countryCode);
+                                                                                                    }} key={index} className="px-2 d-flex align-items-center">
+                                                                                                        <img height="20" width="20" src={generateCountryIconPath(country.codbase_desc)} title={country.codbase_desc} />
+                                                                                                        <span className="country-name pl-2">{country.codbase_desc}</span>
+                                                                                                        <span className="country-phone-code pl-1">{CountryCodesObject[country.country_iso2]}</span>
+                                                                                                    </Dropdown.Item>)
                                                                                             })
                                                                                         }
                                                                                     </Dropdown.Menu>
@@ -158,10 +159,10 @@ export default function UserForm() {
                                                                             <Field data-testid="phone" className="form-control rounded" type="text" name="phone" />
                                                                         </div>
                                                                     </div>
-                                                                <div className="invalid-feedback">
-                                                                    <ErrorMessage name="phone" data-testid="phoneError" />
+                                                                    <div className="invalid-feedback">
+                                                                        <ErrorMessage name="phone" data-testid="phoneError" />
+                                                                    </div>
                                                                 </div>
-                                                            </div>
 
                                                             </div>
                                                             <div className="col-12 col-sm-6">
@@ -181,12 +182,12 @@ export default function UserForm() {
                                                                     <label className="font-weight-bold" htmlFor="role">User Role</label>
                                                                     <Field as="select" name="role" className="form-control">
                                                                         <option className="p-2" defaultValue value={""}> Select a role </option>
-                                                                        {roles ? roles.map(role => <option className="p-2" key={role.id} value={role.id}>{role.title}</option>) : null }
+                                                                        {roles ? roles.map(role => <option className="p-2" key={role.id} value={role.id}>{role.title}</option>) : null}
                                                                     </Field>
                                                                     <div className="invalid-feedback">
                                                                         <ErrorMessage name="role" />
-                                                                </div>
-                                                            </div> : <div className="pt-sm-3 mt-sm-2">No roles are found. <NavLink className="link-secondary" to="/platform/roles">Please click here to manage roles</NavLink></div>}
+                                                                    </div>
+                                                                </div> : <div className="pt-sm-3 mt-sm-2">No roles are found. <NavLink className="link-secondary" to="/platform/roles">Please click here to manage roles</NavLink></div>}
                                                             </div>
                                                         </div>
                                                         <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" >Submit</button>
