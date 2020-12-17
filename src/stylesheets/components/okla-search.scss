@@ -18,7 +18,7 @@
 
         &-item {
             padding: 0px 10px 20px 0px;
-            flex: 0 0 33%;
+            flex: 0 0 50%;
             white-space: nowrap;
         }
 
@@ -94,7 +94,11 @@
 }
 
 .custom-modal-size {
-    max-width: 950px;
+    max-width: 1050px;
+
+    @media (max-width: $screen-lg-desktop) {
+        max-width: 950px;
+    }
 
     @media (max-width: $screen-desktop) {
         max-width: 100%;
