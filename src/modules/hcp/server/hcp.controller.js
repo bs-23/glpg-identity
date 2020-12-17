@@ -515,7 +515,7 @@ async function updateHcps(req, res) {
         await Promise.all(hcpModelInstances.map(async (hcp, index) => {
             const updatedPropertiesLog = [];
 
-            Object.keys(hcpsToUpdate[index]).map(key => {
+            Object.keys(hcpsToUpdate[index]).forEach(key => {
                 if(hcpsToUpdate[index][key]) {
                     const updatedPropertyLogObject = {
                         field: key,
@@ -543,7 +543,7 @@ async function updateHcps(req, res) {
 
         hcpModelInstances.map((hcpModelIns, idx) => {
             const { _rowIndex } = hcpModelIns.dataValues;
-            Object.keys(hcpsToUpdate[idx]).map(key => {
+            Object.keys(hcpsToUpdate[idx]).forEach(key => {
                 if(hcpsToUpdate[idx][key]) response.data.push(new Data(_rowIndex, key, hcpModelIns.dataValues[key]));
             })
         });
@@ -1770,7 +1770,11 @@ async function searchOklaHcps(req, res) {
         res.json(data);
     } catch (err) {
         console.error(err);
-        res.status(500).send('Internal server error');
+        if (err.response.status === 400) {
+            res.status(400).send(err.response.data.response.errors[0].message);
+        } else {
+            res.status(500).send('Internal server error');
+        }
     }
 }
 
@@ -1863,7 +1867,11 @@ async function searchOklaHcos(req, res) {
         res.json(data);
     } catch (err) {
         console.error(err);
-        res.status(500).send('Internal server error');
+        if (err.response.status === 400) {
+            res.status(400).send(err.response.data.response.errors[0].message);
+        } else {
+            res.status(500).send('Internal server error');
+        }
     }
 }
 

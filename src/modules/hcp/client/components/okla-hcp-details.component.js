@@ -40,7 +40,7 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
     }, [hcpDetails, selectedTab]);
 
     return <Modal
-        size="lg"
+        dialogClassName='custom-modal-size'
         centered
         show={!!hcpDetails}
         onHide={() => hideHcpDetails()}>

@@ -121,7 +121,7 @@ const FaqForm = (props) => {
                 <Modal.Title className="modal-title_small">{props.editMode ? 'Edit FAQ' : 'Add New FAQ'}</Modal.Title>
             </Modal.Header>
 
-            {props.serviceCategory.length > 0 && props.serviceCategory.length > 0 &&
+            {props.serviceCategory.length > 0 &&
                 <div className="consent-manage">
                     <Formik
                         initialValues={{

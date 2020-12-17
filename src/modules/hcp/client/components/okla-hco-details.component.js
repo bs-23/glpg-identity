@@ -27,7 +27,7 @@ const OklaHcoDetails = ({ hco, setSelectedHco }) => {
     }, [hco]);
 
     return <Modal
-        size="lg"
+        dialogClassName='custom-modal-size'
         centered
         show={!!hcoDetails}
         onHide={() => hideHcoDetails()}>
