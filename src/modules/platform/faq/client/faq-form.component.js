@@ -170,7 +170,7 @@ const FaqForm = (props) => {
                                                                             </div>
                                                                         ))}</React.Fragment>
                                                                 }</div>)}
-                                                            <div className="invalid-feedback"><ErrorMessage name="categories" /></div>
+                                                            <div className="invalid-feedback col-12"><ErrorMessage name="categories" /></div>
                                                         </div>
                                                     )} />
                                             </div>
