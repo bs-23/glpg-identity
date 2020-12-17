@@ -368,6 +368,7 @@ const SearchProfessionalHcp = () => {
                                                             onChange={selectedOption => {
                                                                 formikProps.setFieldValue('specialties', Array.isArray(selectedOption) ? selectedOption : []);
                                                                 setSelectedSpecialties(selectedOption || []);
+                                                                changeUrl();
                                                             }}
                                                         />
                                                     </div>
