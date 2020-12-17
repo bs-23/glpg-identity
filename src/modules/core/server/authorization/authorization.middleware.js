@@ -12,6 +12,7 @@ const Application = require(path.join(process.cwd(), "src/modules/application/se
 const User_Role = require(path.join(process.cwd(), "src/modules/platform/role/server/user-role.model.js"));
 const Role_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/role-permissionSet.model.js"));
 const Role = require(path.join(process.cwd(), "src/modules/platform/role/server/role.model.js"));
+const logService = require(path.join(process.cwd(), "src/modules/core/server/audit/audit.service.js"));
 
 const AdminGuard = (req, res, next) => {
     if (!req.user) return res.status(401).send('unauthorized');
@@ -163,6 +164,10 @@ const ModuleGuard = (moduleName) => {
         let all_permissions = userPermissions.concat(rolePermissions);
 
         if (!isPermitted(moduleName, all_permissions)) {
+            await logService.log({
+                event_type: 'UNAUTHORIZE',
+                actor: req.user.id
+            });
             return res
                 .status(403)
                 .send('Forbidden! You are not authorized to view this page');

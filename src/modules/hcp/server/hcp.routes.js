@@ -12,6 +12,9 @@ module.exports = app => {
     app.route('/api/hcps/:id')
         .put(CDPAuthStrategy, controller.editHcp);
 
+    app.route('/api/hcps/specialties')
+        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getSpecialtiesForCdp);
+
     app.route('/api/hcp-profiles/registration-lookup')
         .post(passport.authenticate('application-jwt', { session: false }), controller.registrationLookup);
 
@@ -53,6 +56,7 @@ module.exports = app => {
         .put(passport.authenticate('application-jwt', { session: false }), controller.updateHCPUserConsents);
 
     app.route('/api/hcp-profiles/:id')
+        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getHcpProfile)
         .get(passport.authenticate('application-jwt', { session: false }), controller.getHcpProfile)
         .put(passport.authenticate('application-jwt', { session: false }), controller.editHcp);
 };

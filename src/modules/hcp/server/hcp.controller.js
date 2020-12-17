@@ -405,7 +405,7 @@ async function updateHcps(req, res) {
         }
 
         await Promise.all(Hcps.map(async hcp => {
-            const { id, email, first_name, last_name, uuid, specialty_onekey, country_iso2, telephone, comment, _rowIndex } = trimRequestBody(hcp);
+            const { id, email, first_name, last_name, uuid, specialty_onekey, country_iso2, telephone, _rowIndex } = trimRequestBody(hcp);
 
             if(!id) {
                 response.errors.push(new Error(_rowIndex, 'id', 'ID is missing.'));
@@ -459,7 +459,7 @@ async function updateHcps(req, res) {
                 const uuid_2_from_master_data = (master_data.uuid_2 || '');
 
                 uuid_from_master_data = [uuid_1_from_master_data, uuid_2_from_master_data]
-                    .find(id => id.replace(/[-]/gi, '') === uuidWithoutSpecialCharacter);
+                    .find(hcp_id => hcp_id.replace(/[-]/gi, '') === uuidWithoutSpecialCharacter);
 
                 const doesUUIDExist = await Hcp.findOne({
                     where: {
@@ -514,7 +514,7 @@ async function updateHcps(req, res) {
         await Promise.all(hcpModelInstances.map(async (hcp, index) => {
             const updatedPropertiesLog = [];
 
-            Object.keys(hcpsToUpdate[index]).map(key => {
+            Object.keys(hcpsToUpdate[index]).forEach(key => {
                 if(hcpsToUpdate[index][key]) {
                     const updatedPropertyLogObject = {
                         field: key,
@@ -542,7 +542,7 @@ async function updateHcps(req, res) {
 
         hcpModelInstances.map((hcpModelIns, idx) => {
             const { _rowIndex } = hcpModelIns.dataValues;
-            Object.keys(hcpsToUpdate[idx]).map(key => {
+            Object.keys(hcpsToUpdate[idx]).forEach(key => {
                 if(hcpsToUpdate[idx][key]) response.data.push(new Data(_rowIndex, key, hcpModelIns.dataValues[key]));
             })
         });
@@ -1017,7 +1017,7 @@ async function getHcpProfile(req, res) {
             return res.status(404).send(response);
         }
 
-        response.data = getHcpViewModel(doc.dataValues);;
+        response.data = getHcpViewModel(doc.dataValues);
 
         const userConsents = await HcpConsents.findAll({
             where: { user_id: doc.id },
@@ -1151,6 +1151,16 @@ async function changePassword(req, res) {
 
     const response = new Response({}, []);
 
+    async function log(object_id, actor, message) {
+        await logService.log({
+            event_type: 'UPDATE',
+            object_id,
+            table_name: 'hcp_profiles',
+            actor,
+            remarks: message
+        });
+    }
+
     if (!email || !current_password || !new_password || !confirm_password) {
         response.errors.push(new CustomError('Missing required parameters.', 400));
         return res.status(400).send(response);
@@ -1199,6 +1209,9 @@ async function changePassword(req, res) {
         doc.update({ password: new_password, password_updated_at: new Date(Date.now()) });
 
         response.data = 'Password changed successfully.';
+
+        await log(doc.id, req.user.id, 'Password change success');
+
         res.send(response);
     } catch (err) {
         console.error(err);
@@ -1210,6 +1223,16 @@ async function changePassword(req, res) {
 async function resetPassword(req, res) {
     const response = new Response({}, []);
 
+    async function log(object_id, actor, message, event_type="BAD_REQUEST") {
+        await logService.log({
+            event_type,
+            object_id,
+            table_name: 'hcp_profiles',
+            actor,
+            remarks: message
+        });
+    }
+
     try {
         const doc = await Hcp.findOne({ where: { reset_password_token: req.query.token } });
 
@@ -1219,41 +1242,49 @@ async function resetPassword(req, res) {
         }
 
         if (await PasswordPolicies.minimumPasswordAge(doc.password_updated_at)) {
+            await log(doc.id, req.user.id, 'HCP Password reset failed');
             response.errors.push(new CustomError(`You cannot change password before 1 day`, 4202));
             return res.status(400).send(response);
         }
 
         if (doc.reset_password_expires < Date.now()) {
+            await log(doc.id, req.user.id, 'HCP Password reset failed');
             response.errors.push(new CustomError('Password reset token has been expired. Please request again.', 4400));
             return res.status(400).send(response);
         }
 
         if (req.body.new_password !== req.body.confirm_password) {
+            await log(doc.id, req.user.id, 'HCP Password reset failed');
             response.errors.push(new CustomError(`Password and confirm password doesn't match.`, 4201));
             return res.status(400).send(response);
         }
 
         if (await PasswordPolicies.isOldPassword(req.body.new_password, doc)) {
+            await log(doc.id, req.user.id, 'HCP Password reset failed');
             response.errors.push(new CustomError(`New password can not be your previously used password.`, 4203));
             return res.status(400).send(response);
         }
 
         if (!PasswordPolicies.validatePassword(req.body.new_password)) {
+            await log(doc.id, req.user.id, 'HCP Password reset failed');
             response.errors.push(new CustomError(`Password must contain atleast a digit, an uppercase, a lowercase and a special character and must be 8 to 50 characters long.`, 4200));
             return res.status(400).send(response);
         }
 
         if (!PasswordPolicies.hasValidCharacters(req.body.new_password)) {
+            await log(doc.id, req.user.id, 'HCP Password reset failed');
             response.errors.push(new CustomError(`Password has one or more invalid character.`, 4200));
             return res.status(400).send(response);
         }
 
         if (PasswordPolicies.isCommonPassword(req.body.new_password, doc)) {
+            await log(doc.id, req.user.id, 'HCP Password reset failed');
             response.errors.push(new CustomError(`Password can not be commonly used passwords or personal info. Try a different one.`, 400));
             return res.status(400).send(response);
         }
 
         if (req.body.new_password !== req.body.confirm_password) {
+            await log(doc.id, req.user.id, 'HCP Password reset failed');
             response.errors.push(new CustomError(`Password and confirm password doesn't match.`, 4201));
             return res.status(400).send(response);
         }
@@ -1261,6 +1292,8 @@ async function resetPassword(req, res) {
         if (doc.password) await PasswordPolicies.saveOldPassword(doc);
 
         const is_firsttime_setup = !doc.password;
+
+        const wasAccountLocked = doc.failed_auth_attempt >= 5;
 
         await doc.update({ password: req.body.new_password, password_updated_at: new Date(Date.now()), reset_password_token: null, reset_password_expires: null });
 
@@ -1273,6 +1306,9 @@ async function resetPassword(req, res) {
             message: 'Password reset successfully.',
             is_firsttime_setup
         };
+
+        if(wasAccountLocked) await log(doc.id, req.user.id, 'HCP Password reset success. Account unlocked', 'UPDATE');
+        else await log(doc.id, req.user.id, 'HCP Password reset success', 'UPDATE');
 
         res.json(response);
     } catch (err) {
@@ -1525,6 +1561,24 @@ async function getAccessToken(req, res) {
                 ? userLockedError
                 : new CustomError('Invalid email or password.', 401);
 
+            if (doc && doc.failed_auth_attempt >= 5) {
+                await logService.log({
+                    event_type: 'LOGIN',
+                    object_id: doc.id,
+                    table_name: 'hcp_profiles',
+                    actor: req.user.id,
+                    remarks: 'HCP Login failed. Account locked'
+                });
+            } else if(doc && doc.password && !doc.validPassword(password)) {
+                await logService.log({
+                    event_type: 'LOGIN',
+                    object_id: doc.id,
+                    table_name: 'hcp_profiles',
+                    actor: req.user.id,
+                    remarks: 'HCP login failed. Wrong password'
+                });
+            }
+
             response.errors.push(error);
             return res.status(401).json(response);
         }
@@ -1538,6 +1592,14 @@ async function getAccessToken(req, res) {
         await doc.update(
             { failed_auth_attempt: 0 },
             { where: { email: email } });
+
+        await logService.log({
+            event_type: 'LOGIN',
+            object_id: doc.id,
+            table_name: 'hcp_profiles',
+            actor: req.user.id,
+            remarks: 'HCP Login success'
+        });
 
         res.json(response);
     } catch (err) {
@@ -1572,11 +1634,6 @@ async function updateHCPUserConsents(req, res) {
 
                 if (!hcpConsent || consentResponse) return;
 
-                if (hcpConsent && consentResponse === false) {
-                    hcpConsent.opt_type = 'opt-out';
-                    hcpConsent.consent_confirmed = false;
-                }
-
                 await hcpConsent.update({ opt_type: 'opt-out', consent_confirmed: false });
             }));
         }
@@ -1597,6 +1654,41 @@ async function updateHCPUserConsents(req, res) {
     }
 }
 
+async function getSpecialtiesForCdp(req, res) {
+    try {
+        const { codbases } = req.query;
+
+        const specialties = await sequelize.datasyncConnector.query(`
+            SELECT codbase, cod_id_onekey, cod_locale, cod_description
+            FROM ciam.vwspecialtymaster as Specialty
+            WHERE LOWER(cod_locale) = 'en'
+            ${codbases
+                ? 'AND LOWER(codbase) = ' + (Array.isArray(codbases)
+                    ? 'ANY($codbases)'
+                    : '$codbases')
+                : ''}
+            ORDER BY cod_description ASC;
+            `, {
+            bind: {
+                codbases: codbases && Array.isArray(codbases)
+                    ? codbases.map(c => c.toLowerCase())
+                    : (codbases || '').toLowerCase()
+            },
+            type: QueryTypes.SELECT
+        });
+
+        const viewModels = (specialties || []).map(({ codbase, cod_id_onekey, cod_description }) => ({
+            codbase,
+            codIdOnekey: cod_id_onekey,
+            codDescription: cod_description
+        }));
+        res.json(viewModels);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 exports.getHcps = getHcps;
 exports.editHcp = editHcp;
 exports.registrationLookup = registrationLookup;
@@ -1614,3 +1706,4 @@ exports.getHCPUserConsents = getHCPUserConsents;
 exports.updateHcps = updateHcps;
 exports.getSpecialtiesWithEnglishTranslation = getSpecialtiesWithEnglishTranslation;
 exports.updateHCPUserConsents = updateHCPUserConsents;
+exports.getSpecialtiesForCdp = getSpecialtiesForCdp;

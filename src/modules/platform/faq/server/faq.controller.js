@@ -44,7 +44,7 @@ function sort_category(items, orderType, limit, offset) {
 
     const data = { ...items, rows: rows };
     return data;
-};
+}
 
 
 async function getFaqItems(req, res) {
@@ -165,27 +165,12 @@ async function createFaqItem(req, res) {
     try {
         const { question, answer, topics } = req.body;
 
-        const faq = await Faq.findOne({ where: { question: { [Op.iLike]: question } } });
+        const faq = await Faq.findOne({ where: { question: { [Op.iLike]: question.trim() } } });
 
         if (faq) return res.status(404).send("This question already exists");
-        const inclusions = [
-            {
-                model: User,
-                as: 'createdByUser',
-                attributes: ['first_name', 'last_name'],
-
-            },
-            {
-                model: User,
-                as: 'updatedByUser',
-                attributes: ['first_name', 'last_name']
-            }
-        ];
-
-
 
         const response = await Faq.create({
-            question,
+            question: question.trim(),
             answer,
             topics,
             created_by: req.user.id,

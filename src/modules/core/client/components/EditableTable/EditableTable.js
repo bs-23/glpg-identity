@@ -29,7 +29,7 @@ const addValidationToSchema = (schema, columns) => {
     return modifiedSchema;
 }
 
-const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children, onSubmit, onDirtyChange, sortOn, sortType, singleRowEditing, ...props }) => {
+const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children, onSubmit, onDirtyChange, sortOn, sortType, singleRowEditing, selectedRow, ...props }) => {
     const [editingCell, setEditingCell] = useState(null);
     const [rawRows, setRawRows] = useState([]);
     const formikRef = useRef();
@@ -90,7 +90,7 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
                 const updatedData = success;
                 let newIntitialValue = formikBag.values;
 
-                updatedData.map(({ rowIndex, property, value }) => {
+                updatedData.forEach(({ rowIndex, property, value }) => {
                     const inputName = `rows[${rowIndex}].${property}`;
                     newIntitialValue = setIn(newIntitialValue, inputName, value);
                 });
@@ -124,7 +124,7 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
                 getUpdatedCells,
                 formikProps
             }, done);
-        };
+        }
     }
 
     const handleInputKeyDown = async (e, handleBlur) => {
@@ -238,6 +238,7 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
                                     onCellSwitchToEdit={handleCellSwitchToEdit}
                                     onInputKeyDown={handleInputKeyDown}
                                     editableTableProps={{ getUpdatedRows, getUpdatedCells }}
+                                    selectedRow={selectedRow}
                                 />
                             )}
                         </tbody>

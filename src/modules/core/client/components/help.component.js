@@ -20,7 +20,6 @@ export default function Help() {
 
     useEffect(() => {
         if (faq.faq && faq.faq.length > 0 && faqTopics) {
-            console.log("here");
             setFaqData(faqMapping(faqTopics, faq.faq));
         }
 

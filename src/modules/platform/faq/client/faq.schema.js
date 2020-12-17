@@ -1,5 +1,4 @@
 import { string, object, array } from 'yup';
-import XRegExp from 'xregexp';
 
 
 function isNotEmpty(answer) {
@@ -27,6 +26,7 @@ function hasSpace(str) {
 
 export const faqSchema = object().shape({
     question: string()
+        .transform(value => value.trim())
         .max(60, 'This field must be at most 60 characters long.')
         .required('This field must not be empty.')
         .test('has-emoji', 'Emoji is not allowed',
@@ -38,6 +38,9 @@ export const faqSchema = object().shape({
         .max(1500, 'Maximum character limit has been exceeded.')
         .test('is-empty', 'This field must not be empty.',
             answer => isNotEmpty(answer)),
+    answer_plaintext: string()
+        .transform(value => value.trim())
+        .required('This field must not be empty.'),
     topics:
         array()
             .of(string())

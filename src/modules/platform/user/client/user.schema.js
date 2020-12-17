@@ -1,4 +1,4 @@
-import { string, object, ref, array } from 'yup';
+import { string, object, ref } from 'yup';
 import XRegExp from 'xregexp';
 
 const PHONE_MAX_LENGTH = 25;

@@ -172,3 +172,29 @@ textarea.form-control {
         padding-left: 95px;
     }
 }
+
+
+.multiselect {
+
+    &__menu {
+        z-index: 9999 !important;
+    }
+
+    &__control {
+        &--is-focused {
+            border-color: #80bdff !important;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+        }
+    }
+
+    &__option {
+        &--is-selected {
+            background: $primary-color-lighter !important;
+            margin-top: 3px !important;
+        }
+    }
+}
+
+.selected {
+    background: #144d4312;
+}

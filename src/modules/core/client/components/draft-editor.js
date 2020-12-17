@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import {stateToHTML} from 'draft-js-export-html';
 import { ContentState, EditorState, convertFromHTML } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
@@ -47,7 +47,7 @@ let draftJsToHTMLOptions = {
                 element: 'a',
                 attributes: {
                     href: data.url,
-                    target: '_blank'
+                    target: data.targetOption
                 }
             };
         }
@@ -57,8 +57,8 @@ let draftJsToHTMLOptions = {
 export default function DraftEditor({ onChangeHTML, htmlContent }) {
     const [editorState, setEditorState] = React.useState(() => EditorState.createEmpty());
 
-    const convertContentToHtml = () => {
-        const editorContentInHTML = stateToHTML(editorState.getCurrentContent(), draftJsToHTMLOptions);
+    const convertContentToHtml = (state) => {
+        const editorContentInHTML = stateToHTML(state.getCurrentContent(), draftJsToHTMLOptions);
         return editorContentInHTML;
     }
 
@@ -73,23 +73,51 @@ export default function DraftEditor({ onChangeHTML, htmlContent }) {
         return EditorState.createWithContent(state);
     }
 
-    useEffect(() => {
-        if (onChangeHTML) {
-            const editorContentInHTML = convertContentToHtml();
-            onChangeHTML(editorContentInHTML);
+    const cleanupEmptyHtmlTags = (html) => {
+        let cleanedupHtml = html;
+
+        while(true) {
+            cleanedupHtml = html
+                .replace(/<p[^>]*>(\s|&nbsp;)*<\/p>/g, '')
+                .replace(/<u[^>]*>(\s|&nbsp;)*<\/u>/g, '')
+                .replace(/<strong[^>]*>(\s|&nbsp;)*<\/strong>/g, '')
+                .replace(/<em[^>]*>(\s|&nbsp;)*<\/em>/g, '')
+                .replace(/(?<=<p>)(&nbsp;)*/g, '')
+                .replace(/(&nbsp;)*(?=<\/p>)/g, '')
+                .replace(/(?<=<p>(<strong>|<u>|<em>))&nbsp;/g, '')
+                .replace(/&nbsp;/g, '');
+
+            if(cleanedupHtml.length === html.length) break;
+            html = cleanedupHtml;
         }
-    }, [editorState]);
+
+        return cleanedupHtml;
+    }
+
+    const handleEditorChange = (state) => {
+        if (onChangeHTML) {
+            const editorContentInHTML = convertContentToHtml(state);
+            const plainText = state.getCurrentContent().getPlainText();
+            const props = {
+                plainText,
+                cleanupEmptyHtmlTags
+            }
+            onChangeHTML(editorContentInHTML, props);
+        }
+
+        setEditorState(state);
+    }
 
     useEffect(() => {
         if(htmlContent) {
-            const editorState = convertHTMLtoState(htmlContent);
-            setEditorState(editorState);
+            const state = convertHTMLtoState(htmlContent);
+            setEditorState(state);
         }
     }, []);
 
     return <Editor
         editorState={editorState}
-        onEditorStateChange={setEditorState}
+        onEditorStateChange={handleEditorChange}
         toolbar={toolbarOptions}
     />
 }

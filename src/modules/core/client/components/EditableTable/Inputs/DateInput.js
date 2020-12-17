@@ -11,11 +11,11 @@ const DateInput = ({ onChange, value, ...props }) => {
     const date = value ? formatDate(new Date(value)) : '';
 
     const handleChange = e => {
-        const { name, value } = e.target;
+        const { name, value: updatedDate } = e.target;
 
         const newEventObject = {
             target: {
-                value: new Date(value).toISOString(),
+                value: new Date(updatedDate).toISOString(),
                 name
             }
         };
