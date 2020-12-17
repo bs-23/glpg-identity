@@ -93,7 +93,7 @@ const ConsentManagement = () => {
                                         <NavLink to="/consent/consent-performance-report/cdp" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
                                             <i className="icon icon-handshake icon-3x cdp-list-group__icon"></i>
                                             <span>
-                                                <strong className="mb-2 h4 d-block cdp-list-group__link-title">Generate Data Privacy Report & Consent Performance Management Report </strong>
+                                                <strong className="mb-2 h4 d-block cdp-list-group__link-title">Generate Data Privacy & Consent Performance Report </strong>
                                                 <span className="d-block cdp-list-group__link-description">Manage User request to generate data privacy reports on individual level, Consent Performance Report of total amount of consents grouped by consent type and grouped by HCO -Health Care Organization where the HCP works.</span>
                                                 <span className="d-block cdp-list-group__link-activity">within 5 - 10 minutes</span>
                                             </span>
