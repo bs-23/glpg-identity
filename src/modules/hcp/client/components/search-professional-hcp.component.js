@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useRef, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Redirect } from 'react-router-dom';
+import { useHistory } from "react-router";
 import { NavLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, Formik, Field } from 'formik';
@@ -17,6 +18,7 @@ const SearchProfessionalHcp = () => {
     const formikRef = useRef();
     const location = useLocation();
     const { addToast } = useToasts();
+    const history = useHistory();
 
     const countries = useSelector(state => state.countryReducer.countries);
     const allCountries = useSelector(state => state.countryReducer.allCountries);
@@ -26,6 +28,9 @@ const SearchProfessionalHcp = () => {
     const [specialties, setSpecialties] = useState([]);
     const [selectedSpecialties, setSelectedSpecialties] = useState([]);
     const [selectedIndividual, setSelectedIndividual] = useState(null);
+    // const [isInContract, setIsInContract] = useState(false);
+    // const [phonetic, setPhonetic] = useState(false);
+    // const [duplicates, setDuplicates] = useState(false);
     const [users, setUsers] = useState({});
     const [formData, setFormData] = useState({});
     const [currentPage, setCurrentPage] = useState(1);
@@ -54,8 +59,15 @@ const SearchProfessionalHcp = () => {
         setCurrentPage(1);
         setSelectedCountries([]);
         setSelectedSpecialties([]);
+        // setIsInContract(false);
+        // setDuplicates(false);
+        // setPhonetic(false);
         setUsers({});
         props.resetForm();
+        setIsAssigned(false);
+        setHcpProfile(null);
+
+        if (params.get('id')) history.push('/hcps/discover-professionals');
     };
 
     const scrollToResult = (isEmpty) => {
@@ -121,23 +133,29 @@ const SearchProfessionalHcp = () => {
     }, [location]);
 
     useEffect(() => {
-        if (hcpProfile) {
-            formikRef.current.setFieldValue('firstName', hcpProfile.first_name || '');
-            formikRef.current.setFieldValue('lastName', hcpProfile.last_name || '');
-            formikRef.current.setFieldValue('individualEid', hcpProfile.individual_id_onekey || '');
-            setHcpSpecialty(hcpProfile.specialty_onekey);
+        if (params.get('id')) {
+
+            if (hcpProfile) {
+                formikRef.current.setFieldValue('firstName', hcpProfile.first_name || '');
+                formikRef.current.setFieldValue('lastName', hcpProfile.last_name || '');
+                formikRef.current.setFieldValue('individualEid', hcpProfile.individual_id_onekey || '');
+                setHcpSpecialty(hcpProfile.specialty_onekey);
+            }
+
+            console.log("ekhane ashssi", hcpProfile);
+
+            if (!isAssigned && userCountries && userCountries.length && hcpProfile && (!selectedCountries || !selectedCountries.length) && allCountries && allCountries.length) {
+                const hcpCountry = allCountries.find(c => c.country_iso2.toLowerCase() === hcpProfile.country_iso2.toLowerCase());
+                const country = (getCountries()).find(c => c.value.toLowerCase() === hcpCountry.codbase.toLowerCase());
+                if (country) {
+                    setSelectedCountries([country]);
+                    formikRef.current.setFieldValue('countries', [country]);
+                }
+                setIsAssigned(true);
+            }
         }
 
-        if (!isAssigned && userCountries && userCountries.length && hcpProfile && (!selectedCountries || !selectedCountries.length) && allCountries && allCountries.length) {
-            const hcpCountry = allCountries.find(c => c.country_iso2.toLowerCase() === hcpProfile.country_iso2.toLowerCase());
-            const country = (getCountries()).find(c => c.value.toLowerCase() === hcpCountry.codbase.toLowerCase());
-            if (country) {
-                setSelectedCountries([country]);
-                formikRef.current.setFieldValue('countries', [country]);
-            }
-            setIsAssigned(true);
-        }
-    }, [userCountries, hcpProfile, allCountries]);
+    }, [location, userCountries, hcpProfile, allCountries]);
 
     const getCountries = () => userCountries.map(country => ({ value: country.codbase, label: country.codbase_desc, countryIso2: country.country_iso2 }));
     const getSpecialties = () => specialties.map(i => ({ value: i.codIdOnekey.split('.')[2], label: i.codDescription }));
@@ -222,6 +240,12 @@ const SearchProfessionalHcp = () => {
 
                                         axios.post('/api/okla/hcps/search', data)
                                             .then(response => {
+                                                if (params.get('id')) {
+                                                    setHcpProfile(null);
+                                                    setIsAssigned(false);
+                                                    history.push('/hcps/discover-professionals');
+                                                }
+
                                                 setUsers(response.data);
                                                 setFormData(data);
                                                 setCurrentPage(1);
@@ -229,6 +253,7 @@ const SearchProfessionalHcp = () => {
                                                 scrollToResult(response.data.results.length === 0);
                                             })
                                             .catch(err => {
+                                                console.log(err)
                                                 addToast('Sorry! Search failed. Please, try again.', {
                                                     appearance: 'error',
                                                     autoDismiss: true
@@ -265,15 +290,42 @@ const SearchProfessionalHcp = () => {
 
                                                 <div className="col-12 col-sm-6 col-lg-8 pt-3">
                                                     <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-2">
-                                                        <input type="checkbox" className="custom-control-input" name="isInContract" id="customControlInline" onChange={(e) => formikProps.values.isInContract = e.target.checked} />
+                                                        <input
+                                                            type="checkbox"
+                                                            className="custom-control-input"
+                                                            name="isInContract"
+                                                            id="customControlInline"
+                                                            // checked={isInContract}
+                                                            onChange={(e) => {
+                                                                formikProps.values.isInContract = e.target.checked;
+                                                                // setIsInContract(e.target.checked);
+                                                            }} />
                                                         <label className="custom-control-label" for="customControlInline">In My Contract</label>
                                                     </div>
                                                     <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-2">
-                                                        <input type="checkbox" className="custom-control-input" name="phonetic" id="customControlInline2" onChange={(e) => formikProps.values.phonetic = e.target.checked} />
+                                                        <input
+                                                            type="checkbox"
+                                                            className="custom-control-input"
+                                                            name="phonetic"
+                                                            id="customControlInline2"
+                                                            // checked={phonetic}
+                                                            onChange={(e) => {
+                                                                formikProps.values.phonetic = e.target.checked;
+                                                                // setPhonetic(e.target.checked);
+                                                            }} />
                                                         <label className="custom-control-label" for="customControlInline2">Phonetic</label>
                                                     </div>
                                                     <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-2">
-                                                        <input type="checkbox" className="custom-control-input" name="duplicates" id="customControlInline3" onChange={(e) => formikProps.values.duplicates = e.target.checked} />
+                                                        <input
+                                                            type="checkbox"
+                                                            className="custom-control-input"
+                                                            name="duplicates"
+                                                            id="customControlInline3"
+                                                            // checked={duplicates}
+                                                            onChange={(e) => {
+                                                                formikProps.values.duplicates = e.target.checked;
+                                                                // setDuplicates(e.target.checked);
+                                                            }} />
                                                         <label className="custom-control-label" for="customControlInline3">Duplicates</label>
                                                     </div>
                                                 </div>
@@ -449,7 +501,7 @@ const SearchProfessionalHcp = () => {
                 }
 
                 {users.results && users.results.length <= 0 &&
-                    <div className="row justify-content-center my-5 py-5 mb-3">
+                    <div className="row justify-content-center my-5 py-5 mb-3" id="empty-search-result">
                         <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">
                             <i className="icon icon-team icon-6x cdp-text-secondary"></i>
                             <h3 className="font-weight-bold cdp-text-primary pt-4">No Health Care Professionals found</h3>
