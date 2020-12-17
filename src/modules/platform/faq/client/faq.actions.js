@@ -12,8 +12,6 @@ export function fetchFaqItem(id) {
 }
 
 export function getFaqItems(query = "") {
-
-    console.log(query);
     return {
         type: Types.GET_FAQ_ITEMS,
         payload: axios({
