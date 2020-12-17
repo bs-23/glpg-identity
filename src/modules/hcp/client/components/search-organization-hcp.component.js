@@ -66,7 +66,7 @@ const SearchOrganizationHcp = () => {
         if (currentPage === 1) return;
         searchHcos(currentPage - 1);
     };
-    
+
     const pageRight = () => {
         if (currentPage === Math.ceil(hcos.totalNumberOfResults / hcos.resultSize)) return;
         searchHcos(currentPage + 1);
@@ -343,7 +343,7 @@ const SearchOrganizationHcp = () => {
                 }
 
                 {hcos.results && hcos.results.length <= 0 &&
-                    <div className="row justify-content-center my-5 py-5 mb-3">
+                    <div className="row justify-content-center my-5 py-5 mb-3" id="empty-search-result">
                         <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">
                             <i className="far fa-building fa-4x cdp-text-secondary"></i>
                             <h3 className="font-weight-bold cdp-text-primary pt-4">No Health Care Organizations found</h3>
