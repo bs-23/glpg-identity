@@ -3,18 +3,47 @@ import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
 import parse from 'html-react-parser';
 import { useSelector, useDispatch } from 'react-redux';
-import { getFaqItems } from '../../../platform/faq/client/faq.actions';
+import { getFaqItems, getFaqCategories } from '../../../platform/faq/client/faq.actions';
 import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import { Tabs, Tab } from 'react-bootstrap';
+import Axios from 'axios';
 
 export default function Help() {
     const faqData = useSelector(state => state.faqReducer.faq_items);
+    const faqTopics = useSelector(state => state.faqReducer.faq_topics);
     const dispatch = useDispatch();
-    //const [key, setKey] = useState('home');
 
     useEffect(() => {
-        dispatch(getFaqItems());
+        if (faqData.faq && faqData.faq.length > 0 && faqTopics) {
+            console.log(faqMapping(faqTopics, faqData.faq));
+        }
+
+    }, [faqData, faqTopics]);
+
+    useEffect(() => {
+        dispatch(getFaqItems("?page=null"));
+        dispatch(getFaqCategories());
     }, []);
+
+    const faqMapping = (topics, faq) => {
+
+        const faqWithTopics = [];
+
+        const parentCategories = [...new Set(Object.values(topics).map((item) => item.category))];
+
+        parentCategories.forEach(element => {
+            const subcategories = topics.filter(x => x.category === element);
+            subcategories.forEach(item => {
+                delete item.category;
+                item.faq = faq.filter(x => x.categories.indexOf(item.slug) >= 0);
+            });
+            faqWithTopics.push({
+                category: element,
+                subcategories: subcategories
+            });
+        });
+        return faqWithTopics;
+    }
 
     return (
         <React.Fragment>
@@ -194,113 +223,6 @@ export default function Help() {
                             </div>
                         </div>
                     </div>}
-                    <div className="row">
-                        <div className="col-12">
-                            <div className="d-sm-flex justify-content-between align-items-center">
-                                <h4 className="cdp-text-primary font-weight-bold py-3">
-                                    CDP Help Center
-                                </h4>
-                            </div>
-                            <div className="help-center">
-
-                                {faqData.faq && faqData.faq.length > 0 && <div className="row">
-                                    <div className="col-12">
-                                        <Tabs defaultActiveKey="General" className="faq__tabs">
-                                            <Tab eventKey="General" title="General Questions">
-                                                
-                                            </Tab>
-                                            <Tab eventKey="Information" title="Information Management">
-                                                <div className="faq p-3">
-                                                    <Accordion className="faq__body">
-                                                        {faqData.faq.filter(f => f.categories.includes('information')).map((faq, index) => (
-                                                            <Card key={index}>
-                                                                <Accordion.Collapse eventKey={index + ""}>
-                                                                    <Card.Body>{parse(faq.answer)}</Card.Body>
-                                                                </Accordion.Collapse>
-                                                                <Accordion.Toggle as={Card.Header} eventKey={index + ""} className="px-3 py-2 d-flex align-items-baseline justify-content-between" role="button">
-                                                                    <span className="faq__question">{faq.question}</span>
-                                                                    <i className="icon icon-arrow-down ml-2 faq__icon-down"></i>
-                                                                </Accordion.Toggle>
-                                                            </Card>
-                                                        ))}
-                                                        {faqData.faq.filter(f => f.categories.includes('information')).length === 0 &&
-                                                            <Card>
-                                                                <Card.Body className="text-center">
-                                                                    <i className="icon icon-help cdp-text-secondary icon-3x"></i>
-                                                                    <p className="pt-3 font-weight-bold"> No data found related to this category.</p>
-                                                                </Card.Body>
-                                                            </Card>
-                                                        }
-                                                    </Accordion>
-                                                </div>
-                                            </Tab>
-                                            <Tab eventKey="Customer" title="Management of Customer Data Platform">
-                                                <div className="faq p-3">
-                                                    <Accordion className="faq__body">
-                                                        {faqData.faq.filter(f => f.categories.includes('cdp')).map((faq, index) => (
-                                                            <Card key={index}>
-                                                                <Accordion.Collapse eventKey={index + ""}>
-                                                                    <Card.Body>{parse(faq.answer)}</Card.Body>
-                                                                </Accordion.Collapse>
-                                                                <Accordion.Toggle as={Card.Header} eventKey={index + ""} className="px-3 py-2 d-flex align-items-baseline justify-content-between" role="button">
-                                                                    <span className="faq__question">{faq.question}</span>
-                                                                    <i className="icon icon-arrow-down ml-2 faq__icon-down"></i>
-                                                                </Accordion.Toggle>
-                                                            </Card>
-                                                        ))}
-                                                        {faqData.faq.filter(f => f.categories.includes('cdp')).length === 0 &&
-                                                            <Card>
-                                                                <Card.Body className="text-center">
-                                                                    <i className="icon icon-help cdp-text-secondary icon-3x"></i>
-                                                                    <p className="pt-3 font-weight-bold"> No data found related to this category.</p>
-                                                                </Card.Body>
-                                                            </Card>
-                                                        }
-                                                    </Accordion>
-                                                </div>
-                                            </Tab>
-                                            <Tab eventKey="Privacy" title="Data Privacy Consent Management">
-                                                <div className="faq p-3">
-                                                    <Accordion className="faq__body">
-                                                        {faqData.faq.filter(f => f.categories.includes('privacy')).map((faq, index) => (
-                                                            <Card key={index}>
-                                                                <Accordion.Collapse eventKey={index + ""}>
-                                                                    <Card.Body>{parse(faq.answer)}</Card.Body>
-                                                                </Accordion.Collapse>
-                                                                <Accordion.Toggle as={Card.Header} eventKey={index + ""} className="px-3 py-2 d-flex align-items-baseline justify-content-between" role="button">
-                                                                    <span className="faq__question">{faq.question}</span>
-                                                                    <i className="icon icon-arrow-down ml-2 faq__icon-down"></i>
-                                                                </Accordion.Toggle>
-                                                            </Card>
-                                                        ))}
-                                                        {faqData.faq.filter(f => f.categories.includes('privacy')).length === 0 &&
-                                                            <Card>
-                                                                <Card.Body className="text-center">
-                                                                    <i className="icon icon-help cdp-text-secondary icon-3x"></i>
-                                                                    <p className="pt-3 font-weight-bold"> No data found related to this category.</p>
-                                                                </Card.Body>
-                                                            </Card>
-                                                        }
-                                                    </Accordion>
-                                                </div>
-                                            </Tab>
-                                        </Tabs>
-                                    </div>
-                                </div>}
-
-                                {faqData.faq && faqData.faq.length === 0 &&
-                                    <div className="row justify-content-center">
-                                        <div className="col-12 col-md-6">
-                                            <div className="bg-white text-center py-3 px-2 border rounded shadow-sm">
-                                                <i className="icon icon-help icon-3x cdp-text-secondary faq__no-data-found-lg-icon"></i>
-                                                <h3 className="cdp-text-primary">No data found!</h3>
-                                            </div>
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </main>
         </React.Fragment>

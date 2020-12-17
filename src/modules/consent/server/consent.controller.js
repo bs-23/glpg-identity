@@ -169,6 +169,7 @@ async function getCdpConsentsReport(req, res) {
 
         const consent_filter = {
             'opt_type': opt_type ? { [Op.eq]: opt_type } : { [Op.or]: opt_types },
+            [Op.or]: [{ 'consent_confirmed': true }, { 'opt_type': 'opt-out' }],
             '$hcp_profile.application_id$': req.user.type === 'admin' ? { [Op.or]: application_list } : userPermittedApplications,
             '$hcp_profile.country_iso2$': codbase ? { [Op.any]: [countries_with_ignorecase] } : { [Op.any]: [country_iso2_list_with_ignorecase] },
         };
@@ -558,7 +559,7 @@ async function createConsent(req, res) {
     try {
         let { preference, category_id, legal_basis, is_active, translations } = req.body;
 
-        if (!preference || !category_id || !legal_basis) {
+        if (!preference.trim() || !category_id || !legal_basis) {
             return res.status(400).send('Invalid request.');
         }
 
@@ -583,11 +584,11 @@ async function createConsent(req, res) {
 
         const [consent, created] = await Consent.findOrCreate({
             where: {
-                preference: { [Op.iLike]: preference }
+                preference: { [Op.iLike]: preference.trim() }
             },
             defaults: {
-                preference,
-                slug: preference,
+                preference: preference.trim(),
+                slug: preference.trim(),
                 category_id,
                 legal_basis,
                 is_active,
@@ -637,7 +638,7 @@ async function createConsent(req, res) {
             object_id: data.id,
             table_name: 'consents',
             actor: req.user.id,
-            remarks: `"${data.preference}" consent created`
+            remarks: `"${data.preference.trim()}" consent created`
         });
 
         res.json(data);
@@ -914,12 +915,12 @@ async function createConsentCategory(req, res) {
         const [data, created] = await ConsentCategory.findOrCreate({
             where: {
                 title: {
-                    [Op.iLike]: req.body.title
+                    [Op.iLike]: req.body.title.trim()
                 }
             },
             defaults: {
-                title: req.body.title,
-                slug: req.body.title,
+                title: req.body.title.trim(),
+                slug: req.body.title.trim(),
                 created_by: req.user.id,
                 updated_by: req.user.id
             }
@@ -934,7 +935,7 @@ async function createConsentCategory(req, res) {
             object_id: data.id,
             table_name: 'consent_categories',
             actor: req.user.id,
-            remarks: `"${data.title}" consent category created`
+            remarks: `"${data.title.trim()}" consent category created`
         });
 
         res.json(data);

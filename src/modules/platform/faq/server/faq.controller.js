@@ -4,6 +4,9 @@ const { Op } = require('sequelize');
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
 const Sequelize = require('sequelize');
+const { IgnorePlugin } = require('webpack');
+const faqCategories = require('../faq.json');
+
 
 async function getFaqItem(req, res) {
     try {
@@ -18,8 +21,36 @@ async function getFaqItem(req, res) {
     }
 }
 
+function sort_category(items, orderType, limit, offset) {
+
+    let rows = items.rows.map(c => {
+        const categoryTitleList = [];
+        c.categories.forEach(element => {
+            categoryTitleList.push(faqCategories.topics.find(x => x.slug === element).title);
+        });
+
+        const category = categoryTitleList[0];
+        const createdBy = `${c.createdByUser.first_name} ${c.createdByUser.last_name}`;
+        const updatedBy = `${c.updatedByUser.first_name} ${c.updatedByUser.last_name}`;
+        delete c.dataValues.createdByUser;
+        delete c.dataValues.updatedByUser;
+        return { ...c.dataValues, category, createdBy, updatedBy }
+    });
+
+    rows.sort((a, b) => (a.category > b.category) ?
+        (orderType === 'asc' ? -1 : 1) : ((b.category > a.category) ? (orderType === 'asc' ? 1 : -1) : 0));
+
+    rows = rows.slice(offset, offset + limit);
+
+    const data = { ...items, rows: rows };
+    return data;
+};
+
+
 async function getFaqItems(req, res) {
     try {
+
+
         const page = req.query.page ? req.query.page - 1 : 0;
         if (page < 0) return res.status(404).send("page must be greater or equal 1");
 
@@ -72,25 +103,35 @@ async function getFaqItems(req, res) {
             }
         ];
 
+
         const response = await Faq.findAndCountAll({
             include: inclusions,
             where: category ? filter : {},
-            offset,
-            limit,
-            order: order
+            offset: orderBy === 'categories' || req.query.page === 'null' ? null : offset,
+            limit: orderBy === 'categories' ? req.query.page === 'null' : limit,
+            order: orderBy === 'categories' ? [] : order,
+
         });
 
-        const data = response.rows.map(c => {
-            const createdBy = `${c.createdByUser.first_name} ${c.createdByUser.last_name}`;
-            const updatedBy = `${c.updatedByUser.first_name} ${c.updatedByUser.last_name}`;
-            delete c.dataValues.createdByUser;
-            delete c.dataValues.updatedByUser;
-            return {
-                ...c.dataValues,
-                createdBy,
-                updatedBy
-            }
-        });
+
+        let data = [];
+        if (orderBy === 'categories') {
+            data = sort_category(response, orderType, limit, offset).rows;
+
+        } else {
+            data = response.rows.map(c => {
+                const createdBy = `${c.createdByUser.first_name} ${c.createdByUser.last_name}`;
+                const updatedBy = `${c.updatedByUser.first_name} ${c.updatedByUser.last_name}`;
+                delete c.dataValues.createdByUser;
+                delete c.dataValues.updatedByUser;
+                return {
+                    ...c.dataValues,
+                    createdBy,
+                    updatedBy
+                }
+            });
+        }
+
 
         const responseData = {
             faq: data,
@@ -105,6 +146,20 @@ async function getFaqItems(req, res) {
         }
 
         res.json(responseData);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function getFaqCategories(req, res) {
+    try {
+
+
+
+
+
+        res.json(faqCategories.topics);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -251,6 +306,7 @@ async function deleteFaqItem(req, res) {
 
 exports.getFaqItem = getFaqItem;
 exports.getFaqItems = getFaqItems;
+exports.getFaqCategories = getFaqCategories;
 exports.createFaqItem = createFaqItem;
 exports.updateFaqItem = updateFaqItem;
 exports.deleteFaqItem = deleteFaqItem;

@@ -41,8 +41,8 @@ describe('Hcp user component', () => {
         data = {
             data: {
                 users: [
-                    { id: '1', first_name: 'a', last_name: 'a', email: 'a', telephone: '1', uuid: '1', status: 'not_verified', opt_types: 'double-opt-in' },
-                    { id: '2', first_name: 'b', last_name: 'b', email: 'b', telephone: '2', uuid: '2', status: 'not_verified', opt_types: 'double-opt-in' }
+                    { id: '1', first_name: 'a', last_name: 'a', email: 'a', telephone: '1', uuid: '1', status: 'not_verified', opt_types: ['double-opt-in'] },
+                    { id: '2', first_name: 'b', last_name: 'b', email: 'b', telephone: '2', uuid: '2', status: 'not_verified', opt_types: ['double-opt-in'] }
                 ],
                 country_iso2: null,
                 end: 1,

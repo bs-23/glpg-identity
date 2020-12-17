@@ -1,14 +1,8 @@
 import Types from './faq.types';
-
 const initialState = {
     faq_item: null,
     faq_items: {},
-    faq_categories: [
-        { id: "0", title: "General", slug: "general" },
-        { id: "1", title: "Information Management", slug: "information" },
-        { id: "2", title: "Management of Customer Data Platform", slug: "cdp" },
-        { id: "3", title: "Data Privacy & Consent Management", slug: "privacy" }
-    ]
+    faq_topics: []
 };
 
 export default function reducer(state = initialState, action) {
@@ -22,14 +16,14 @@ export default function reducer(state = initialState, action) {
         }
 
         case Types.GET_FAQ_CATEGORIES_FULFILLED: {
-            return { ...state, faq_categories: action.payload.data };
+            return { ...state, faq_topics: action.payload.data };
         }
 
 
         case Types.POST_FAQ_CATEGORY_FULFILLED: {
             return {
                 ...state,
-                faq_categories: [...state.faq_categories, action.payload.data]
+                faq_topics: [...state.faq_topics, action.payload.data]
             };
         }
 
@@ -61,7 +55,7 @@ export default function reducer(state = initialState, action) {
         case Types.PUT_FAQ_CATEGORY_FULFILLED: {
             return {
                 ...state,
-                faq_categories: (state.faq_categories).map(item => {
+                faq_topics: (state.faq_topics).map(item => {
                     if (item.id === action.payload.data.id) {
                         return action.payload.data
                     }

@@ -130,7 +130,7 @@ async function createPermissionSet(req, res) {
             defaults: {
                 title: title,
                 slug: title.replace(/ +/g, '_').toLowerCase(),
-                description,
+                description: (description || '').trim(),
                 countries: countries ? countries : [],
                 created_by: req.user.id,
                 updated_by: req.user.id
@@ -195,7 +195,7 @@ async function editPermissionSet(req, res) {
             title: title.trim(),
             slug: title.trim().replace(/ /g, '_').toLowerCase(),
             countries: countries ? countries : [],
-            description,
+            description: (description || '').trim(),
             updated_by: req.user.id
         });
 

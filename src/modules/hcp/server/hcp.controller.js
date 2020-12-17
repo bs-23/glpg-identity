@@ -41,9 +41,8 @@ const hcpValidation = () => {
             .max(20, 'This field must be at most 20 characters long.')
             .required('This field must not be empty.'),
         telephone: string()
-            .matches(/^[+]?[\/0-9]*$/, 'This field only contains digits or plus')
+            .matches(/^(?:[+]?[0-9]*|[0-9]{2,3}[\/]?[0-9]*)$/, 'Must be a valid phone number')
             .transform(value => value === '' ? undefined : value)
-            .min(7, 'This field must be at least 7 characters long')
             .max(25,'This field must be at most 25 characters long')
             .nullable()
     }
@@ -277,7 +276,9 @@ async function getHcps(req, res) {
             const opt_types = new Set();
 
             hcp['hcpConsents'].map(hcpConsent => {
-                opt_types.add(hcpConsent.opt_type);
+                if(hcpConsent.consent_confirmed || hcpConsent.opt_type === 'opt-out') {
+                    opt_types.add(hcpConsent.opt_type);
+                }
             });
 
             hcp.dataValues.opt_types = [...opt_types];
@@ -534,7 +535,7 @@ async function updateHcps(req, res) {
                 object_id: hcp.id,
                 table_name: 'hcp_profiles',
                 actor: req.user.id,
-                remarks: Hcps[index].comment,
+                remarks: Hcps[index].comment.trim(),
                 changes: JSON.stringify(allUpdateRecordsForLogging[index])
             });
         }));
@@ -880,6 +881,8 @@ async function confirmConsents(req, res) {
             });
         }
 
+        await hcpUser.update({ is_email_verified: true });
+
         hcpUser.status = hcpUser.individual_id_onekey ? 'self_verified' : 'manually_verified';
         await addPasswordResetTokenToUser(hcpUser);
 
@@ -951,7 +954,7 @@ async function approveHCPUser(req, res) {
             object_id: hcpUser.id,
             table_name: 'hcp_profiles',
             actor: req.user.id,
-            remarks: req.body.comment
+            remarks: (req.body.comment || '').trim()
         });
 
         res.json(response);
@@ -988,7 +991,7 @@ async function rejectHCPUser(req, res) {
             object_id: hcpUser.id,
             table_name: 'hcp_archives',
             actor: req.user.id,
-            remarks: req.body.comment
+            remarks: (req.body.comment || '').trim()
         });
 
         await hcpUser.destroy();
@@ -1437,6 +1440,35 @@ async function getSpecialtiesWithEnglishTranslation(req, res) {
             },
             type: QueryTypes.SELECT
         });
+
+        if (!masterDataSpecialties.length) {
+            const codbaseCountry = await sequelize.datasyncConnector.query(`
+                SELECT * FROM ciam.vwcountry
+                WHERE LOWER(countryname) = $codbase_desc;`, {
+                bind: {
+                    codbase_desc: countries[0].codbase_desc.toLowerCase()
+                },
+                type: QueryTypes.SELECT
+            });
+
+            const localeUsingParentCountryISO = `${locale.split('_')[0]}_${codbaseCountry[0].country_iso2}`;
+
+            masterDataSpecialties = await sequelize.datasyncConnector.query(`
+                SELECT cod_id_onekey, codbase, cod_description, cod_locale
+                FROM ciam.vwspecialtymaster as Specialty
+                WHERE cod_id_onekey in
+                        (SELECT cod_id_onekey
+                        FROM ciam.vwspecialtymaster as Specialty
+                        WHERE LOWER(cod_locale) = $locale AND LOWER(codbase) = $codbase)
+                    AND (LOWER(cod_locale) = 'en' OR LOWER(cod_locale) = $locale)
+                `, {
+                bind: {
+                    locale: localeUsingParentCountryISO.toLowerCase(),
+                    codbase: countries[0].codbase.toLowerCase()
+                },
+                type: QueryTypes.SELECT
+            });
+        }
 
         if (!masterDataSpecialties || masterDataSpecialties.length === 0) {
             response.data = [];
