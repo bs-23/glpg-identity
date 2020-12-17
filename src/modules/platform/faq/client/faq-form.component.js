@@ -135,12 +135,12 @@ const FaqForm = (props) => {
 
                                                 <FieldArray
                                                     name="categories"
-                                                    render={arrayHelpers => (
-                                                        <div>
+                                                render={arrayHelpers => (
+                                                    <div className="row">
                                                             {topics.map((category, index) =>
-                                                                <div key={index}>{
+                                                                <div className="mb-3 col-12 col-sm-6" key={index}>{
                                                                     <React.Fragment>
-                                                                        <span className="text-primary">
+                                                                        <span className="cdp-text-primary pb-2 font-weight-bold">
                                                                             {category.category === 'general' ? "General" :
                                                                                 category.category === 'information' ? "Information Management" :
                                                                                     category.category === 'cdp' ? "Management of Customer Data Platform" :
@@ -148,12 +148,14 @@ const FaqForm = (props) => {
                                                                             }
                                                                         </span>
                                                                         {category.subcategories.map((topic, id) => (
-                                                                            <div key={id}>
+                                                                            <div className="custom-control custom-checkbox" key={id}>
                                                                                 <label key={topic.title}></label>
                                                                                 <input
                                                                                     name="categories"
                                                                                     type="checkbox"
-                                                                                    value={topic}
+                                                                                    className="custom-control-input"
+                                                                                    value={topic.title}
+                                                                                    id={topic.title}
                                                                                     checked={arrayHelpers.form.values.categories.includes(topic.slug)}
                                                                                     onChange={e => {
                                                                                         if (e.target.checked) {
@@ -164,7 +166,7 @@ const FaqForm = (props) => {
                                                                                         }
                                                                                     }}
                                                                                 />
-                                                                                <span>{topic.title}</span>
+                                                                                <label for={topic.title} className="custom-control-label">{topic.title}</label>
                                                                             </div>
                                                                         ))}</React.Fragment>
                                                                 }</div>)}
