@@ -86,6 +86,8 @@ describe('Login component', () => {
         };
         fakeAxios.onPost('/api/login').reply(200, savedUser);
         fakeAxios.onGet('/api/countries').reply(200);
+        fakeAxios.onGet('/api/all_countries').reply(200, []);
+        fakeAxios.onGet('/api/faq?page=1&topic=general-information&limit=5').reply(200);
 
         await waitFor(() => {
             fireEvent.change(email, { target: { value: 'test@gmail.com' } });
@@ -93,10 +95,10 @@ describe('Login component', () => {
         });
 
         // Turn this back on when recaptcha is enabled in login component
-        act(() => {
-            const mockedField = getByTestId("captcha");
-            mockedField[Object.keys(mockedField)[1]].testprops.setFieldValue("recaptchaToken", 'token')
-        })
+        // act(() => {
+        //     const mockedField = getByTestId("captcha");
+        //     mockedField[Object.keys(mockedField)[1]].testprops.setFieldValue("recaptchaToken", 'token')
+        // })
 
         fireEvent.click(submit);
 
