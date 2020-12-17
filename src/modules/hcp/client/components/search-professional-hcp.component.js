@@ -39,20 +39,6 @@ const SearchProfessionalHcp = () => {
     const [hcpSpecialty, setHcpSpecialty] = useState();
 
     const params = new URLSearchParams(window.location.search);
-    const initialFormValues = {
-        countries: [],
-        isInContract: false,
-        phonetic: false,
-        duplicates: false,
-        firstName: '',
-        lastName: '',
-        address: '',
-        city: '',
-        postCode: '',
-        onekeyId: '',
-        individualEid: '',
-        specialties: [],
-    };
 
     const resetSearch = (props) => {
         setFormData({});
@@ -166,6 +152,14 @@ const SearchProfessionalHcp = () => {
         return country && country.countryname;
     }
 
+    const changeUrl = () => {
+        if (params.get('id')) {
+            setHcpProfile(null);
+            setIsAssigned(false);
+            history.push('/hcps/discover-professionals');
+        }
+    }
+
     const CustomOption = ({ children, ...props }) => {
         return (
             <components.Option {...props}>
@@ -229,7 +223,20 @@ const SearchProfessionalHcp = () => {
                             <div className="add-user mx-3 mt-0 p-3 bg-white rounded border">
                                 <Formik
                                     innerRef={formikRef}
-                                    initialValues={initialFormValues}
+                                    initialValues={{
+                                        countries: [],
+                                        isInContract: false,
+                                        phonetic: false,
+                                        duplicates: false,
+                                        firstName: '',
+                                        lastName: '',
+                                        address: '',
+                                        city: '',
+                                        postCode: '',
+                                        onekeyId: '',
+                                        individualEid: '',
+                                        specialties: [],
+                                    }}
                                     displayName="SearchForm"
                                     onSubmit={async (values, actions) => {
                                         const data = { ...values };
@@ -237,15 +244,8 @@ const SearchProfessionalHcp = () => {
                                         data.codbases = data.countries.map(i => i.value);
                                         delete data.countries;
 
-
                                         axios.post('/api/okla/hcps/search', data)
                                             .then(response => {
-                                                if (params.get('id')) {
-                                                    setHcpProfile(null);
-                                                    setIsAssigned(false);
-                                                    history.push('/hcps/discover-professionals');
-                                                }
-
                                                 setUsers(response.data);
                                                 setFormData(data);
                                                 setCurrentPage(1);
@@ -262,7 +262,10 @@ const SearchProfessionalHcp = () => {
                                     }}
                                 >
                                     {formikProps => (
-                                        <Form onSubmit={formikProps.handleSubmit}>
+                                        <Form
+                                            onSubmit={formikProps.handleSubmit}
+                                            onChange={() => changeUrl()}
+                                        >
                                             <div className="row align-items-center">
                                                 <div className="col-12 col-sm-6 col-lg-4">
                                                     <div className="form-group">
@@ -283,6 +286,7 @@ const SearchProfessionalHcp = () => {
                                                                 formikProps.values.countries = selectedOption;
                                                                 setSelectedCountries(selectedOption || []);
                                                                 setSelectedSpecialties([]);
+                                                                changeUrl();
                                                             }}
                                                         />
                                                     </div>
