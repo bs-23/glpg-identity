@@ -18,7 +18,7 @@ import HcpRoutes from "../../hcp/client/hcp.routes";
 import ConsentRoutes from "../../consent/client/consent.routes";
 import SwaggerLogin from '../../../config/server/lib/swagger/swagger-login.component';
 import store from './store';
-import { getCountries } from '../../core/client/country/country.actions';
+import { getAllCountries } from '../../core/client/country/country.actions';
 import HelpComponent from '../../core/client/components/help.component';
 
 const { getSignedInUserProfile } = userActions;
@@ -69,7 +69,7 @@ export default function App() {
 
     useEffect(() => {
         dispatch(getSignedInUserProfile()).then(() => {
-            dispatch(getCountries());
+            dispatch(getAllCountries());
         }).catch(err => {
             if (err.response && err.response.status === 401) removeCookie('logged_in', { path: '/' });
         });

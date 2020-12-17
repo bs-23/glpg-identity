@@ -20,11 +20,11 @@ export function getCountries() {
 }
 
 export function getAllCountries() {
-    let { allCountries: countries } = store.getState().countryReducer;
-    if (countries && countries.length) {
+    let { allCountries } = store.getState().countryReducer;
+    if (allCountries && allCountries.length) {
         return {
             type: Types.GET_ALL_COUNTRIES_FULFILLED,
-            payload: { data: countries }
+            payload: { data: allCountries }
         };
     }
     return {

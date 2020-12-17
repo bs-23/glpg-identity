@@ -1,18 +1,16 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { Form, Formik, Field, ErrorMessage } from 'formik';
+import { useSelector } from 'react-redux';
+import { Form, Formik, Field } from 'formik';
 import Select, { components } from 'react-select';
 import Dropdown from 'react-bootstrap/Dropdown';
-import { getAllCountries } from '../../../core/client/country/country.actions';
 import OklaHcoDetails from './okla-hco-details.component';
 import getUserPermittedCountries from '../../../core/client/util/user-country';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
 import { useToasts } from 'react-toast-notifications';
 
 const SearchOrganizationHcp = () => {
-    const dispatch = useDispatch();
     const { addToast } = useToasts();
 
     const countries = useSelector(state => state.countryReducer.countries);
@@ -91,7 +89,6 @@ const SearchOrganizationHcp = () => {
             else setSpecialties([]);
         }
         getSpecialties();
-        dispatch(getAllCountries());
     }, [selectedCountries, countries]);
 
     const getCountries = () => userCountries.map(country => ({ value: country.codbase, label: country.codbase_desc }));

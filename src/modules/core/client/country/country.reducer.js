@@ -15,9 +15,12 @@ export default function reducer(state = initialState, action) {
         }
 
         case Types.GET_ALL_COUNTRIES_FULFILLED: {
+            const allCountries = action.payload.data;
+            const countries = allCountries.filter(c => c.codbase_desc === c.countryname)
             return {
                 ...state,
-                allCountries: action.payload.data
+                countries: countries,
+                allCountries: allCountries
             };
         }
     }

@@ -7,7 +7,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Form, Formik, Field } from 'formik';
 import Select, { components } from 'react-select';
 import Dropdown from 'react-bootstrap/Dropdown';
-import { getAllCountries } from '../../../core/client/country/country.actions';
 import OklaHcpDetails from './okla-hcp-details.component';
 import getUserPermittedCountries from '../../../core/client/util/user-country';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
@@ -106,7 +105,6 @@ const SearchProfessionalHcp = () => {
             else setSpecialties([]);
         }
         getSpecialties();
-        dispatch(getAllCountries());
     }, [selectedCountries, hcpSpecialty]);
 
     useEffect(() => {
