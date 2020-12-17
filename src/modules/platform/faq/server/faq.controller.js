@@ -49,6 +49,8 @@ function sort_category(items, orderType, limit, offset) {
 
 async function getFaqItems(req, res) {
     try {
+
+
         const page = req.query.page ? req.query.page - 1 : 0;
         if (page < 0) return res.status(404).send("page must be greater or equal 1");
 
@@ -105,8 +107,8 @@ async function getFaqItems(req, res) {
         const response = await Faq.findAndCountAll({
             include: inclusions,
             where: category ? filter : {},
-            offset: orderBy === 'categories' ? null : offset,
-            limit: orderBy === 'categories' ? null : limit,
+            offset: orderBy === 'categories' || req.query.page === 'null' ? null : offset,
+            limit: orderBy === 'categories' ? req.query.page === 'null' : limit,
             order: orderBy === 'categories' ? [] : order,
 
         });
@@ -150,36 +152,14 @@ async function getFaqItems(req, res) {
     }
 }
 
-async function getFaqWithCategory(req, res) {
+async function getFaqCategories(req, res) {
     try {
 
 
 
-        const faq = await Faq.findAll({
-            raw: true
-        });
-
-        const response = [];
-
-        const parentCategories = [...new Set(Object.values(faqCategories.topics).map((item) => item.category))];
-
-        parentCategories.forEach(element => {
-            const subcategories = faqCategories.topics.filter(x => x.category === element);
-            subcategories.forEach(element => {
-                delete element.category;
-                //faq.map();
-            });
-            response.push({
-                category: element,
-                subcategories: subcategories
-            });
-        });
-
-        console.log(faq);
 
 
-
-        res.json(response);
+        res.json(faqCategories.topics);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -326,7 +306,7 @@ async function deleteFaqItem(req, res) {
 
 exports.getFaqItem = getFaqItem;
 exports.getFaqItems = getFaqItems;
-exports.getFaqWithCategory = getFaqWithCategory;
+exports.getFaqCategories = getFaqCategories;
 exports.createFaqItem = createFaqItem;
 exports.updateFaqItem = updateFaqItem;
 exports.deleteFaqItem = deleteFaqItem;

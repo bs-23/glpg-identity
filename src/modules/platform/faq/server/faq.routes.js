@@ -11,7 +11,7 @@ module.exports = app => {
 
 
     app.route('/api/faq/category')
-        .get(CDPAuthStrategy, controller.getFaqWithCategory);
+        .get(CDPAuthStrategy, controller.getFaqCategories);
 
     app.route('/api/faq/:id')
         .get(CDPAuthStrategy, controller.getFaqItem)

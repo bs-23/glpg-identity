@@ -12,11 +12,24 @@ export function fetchFaqItem(id) {
 }
 
 export function getFaqItems(query = "") {
+
+    console.log(query);
     return {
         type: Types.GET_FAQ_ITEMS,
         payload: axios({
             method: 'get',
             url: `/api/faq${query}`
+        })
+    };
+}
+
+export function getFaqCategories() {
+    console.log("here");
+    return {
+        type: Types.GET_FAQ_CATEGORIES,
+        payload: axios({
+            method: 'get',
+            url: `/api/faq/category`
         })
     };
 }
