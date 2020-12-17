@@ -24,7 +24,7 @@ const Faq = sequelize.cdpConnector.define('faq', {
             this.setDataValue('answer', validator.escape(value));
         }
     },
-    categories: {
+    topics: {
         type: DataTypes.ARRAY(DataTypes.STRING)
     },
     created_by: {

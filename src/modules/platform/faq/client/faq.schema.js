@@ -38,15 +38,9 @@ export const faqSchema = object().shape({
         .max(1500, 'Maximum character limit has been exceeded.')
         .test('is-empty', 'This field must not be empty.',
             answer => isNotEmpty(answer)),
-    categories:
+    topics:
         array()
             .of(string())
             .min(1, 'Must select at least one topic')
             .required('Must select at least one topic')
-});
-
-export const FaqCategorySchema = object().shape({
-    title: string()
-        .max(60, 'This field must be at most 50 characters long.')
-        .required('This field must not be empty.'),
 });

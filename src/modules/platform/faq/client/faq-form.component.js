@@ -28,7 +28,7 @@ const FaqForm = (props) => {
     const convertSlugToId = (arr) => {
         const convertArray = [];
         arr.forEach(element => {
-            convertArray.push(props.serviceCategory.find(x => x.slug === element).id);
+            convertArray.push(props.serviceTopics.find(x => x.slug === element).id);
         });
         return convertArray;
 
@@ -37,7 +37,7 @@ const FaqForm = (props) => {
     const sortArrayWithTitle = (array) => {
         const catgory_title_list = [];
         array.forEach(element => {
-            catgory_title_list.push(props.serviceCategory.find(x => x.id === element).title);
+            catgory_title_list.push(props.serviceTopics.find(x => x.id === element).title);
         });
 
         catgory_title_list.sort();
@@ -45,16 +45,16 @@ const FaqForm = (props) => {
         const catgory_slug_list = [];
 
         catgory_title_list.forEach(element => {
-            catgory_slug_list.push(props.serviceCategory.find(x => x.title === element).slug);
+            catgory_slug_list.push(props.serviceTopics.find(x => x.title === element).slug);
         });
 
         return catgory_slug_list;
     }
 
     useEffect(() => {
-        const faqTopics = faqMapping(props.serviceCategory)
+        const faqTopics = faqMapping(props.serviceTopics)
         setTopics(faqTopics);
-    }, [props.serviceCategory]);
+    }, [props.serviceTopics]);
 
 
     const faqMapping = (topics) => {
@@ -82,12 +82,12 @@ const FaqForm = (props) => {
                 <Modal.Title className="modal-title_small">{props.editMode ? 'Edit FAQ' : 'Add New FAQ'}</Modal.Title>
             </Modal.Header>
 
-            {props.serviceCategory && props.serviceCategory.length > 0 &&
+            {props.serviceTopics && props.serviceTopics.length > 0 &&
                 <div className="consent-manage">
                     <Formik
                         initialValues={{
                             question: props.editMode ? props.editData.question : '',
-                            categories: props.editMode ? props.editData.categories : [],
+                            topics: props.editMode ? props.editData.topics : [],
                             answer: props.editMode ? props.editData.answer : '',
                         }}
                         validationSchema={faqSchema}
@@ -131,12 +131,12 @@ const FaqForm = (props) => {
                                             </div>
 
                                             <div className="form-group">
-                                                <label className="font-weight-bold" htmlFor='categories'>Select Topics <span className="text-danger">*</span></label>
+                                                <label className="font-weight-bold" htmlFor='topics'>Select Topics <span className="text-danger">*</span></label>
 
                                                 <FieldArray
-                                                    name="categories"
-                                                render={arrayHelpers => (
-                                                    <div className="row">
+                                                    name="topics"
+                                                    render={arrayHelpers => (
+                                                        <div className="row">
                                                             {topics.map((category, index) =>
                                                                 <div className="mb-3 col-12 col-sm-6" key={index}>{
                                                                     <React.Fragment>
@@ -151,17 +151,17 @@ const FaqForm = (props) => {
                                                                             <div className="custom-control custom-checkbox" key={id}>
                                                                                 <label key={topic.title}></label>
                                                                                 <input
-                                                                                    name="categories"
+                                                                                    name="topics"
                                                                                     type="checkbox"
                                                                                     className="custom-control-input"
                                                                                     value={topic.title}
                                                                                     id={topic.title}
-                                                                                    checked={arrayHelpers.form.values.categories.includes(topic.slug)}
+                                                                                    checked={arrayHelpers.form.values.topics.includes(topic.slug)}
                                                                                     onChange={e => {
                                                                                         if (e.target.checked) {
                                                                                             arrayHelpers.push(topic.slug);
                                                                                         } else {
-                                                                                            const idx = arrayHelpers.form.values.categories.indexOf(topic.slug);
+                                                                                            const idx = arrayHelpers.form.values.topics.indexOf(topic.slug);
                                                                                             arrayHelpers.remove(idx);
                                                                                         }
                                                                                     }}
@@ -170,7 +170,7 @@ const FaqForm = (props) => {
                                                                             </div>
                                                                         ))}</React.Fragment>
                                                                 }</div>)}
-                                                            <div className="invalid-feedback col-12"><ErrorMessage name="categories" /></div>
+                                                            <div className="invalid-feedback col-12"><ErrorMessage name="topics" /></div>
                                                         </div>
                                                     )} />
                                             </div>
