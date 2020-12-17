@@ -67,7 +67,7 @@ async function getFaqItems(req, res) {
             : 'asc';
 
         let order = [
-            ['created_at', 'DESC'],
+            ['updated_at', 'DESC'],
             ['id', 'DESC']
         ];
 

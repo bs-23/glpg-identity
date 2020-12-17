@@ -9,6 +9,7 @@ import { useDispatch } from 'react-redux';
 
 const FaqForm = (props) => {
     const [, setShow] = useState(false);
+    const [topics, setTopics] = useState([]);
     const { addToast } = useToasts();
     const dispatch = useDispatch();
     const handleClose = () => {
@@ -16,71 +17,6 @@ const FaqForm = (props) => {
         props.changeShow(false);
     };
 
-    const FormFieldFluid = ({ label, name, type, children, required = true, ...rest }) =>
-        <div className="form-group">
-            <label className="font-weight-bold" htmlFor="last_name">{label}{required && <span className="text-danger"> *</span>}</label>
-            {children || <Field className="form-control" type={type} name={name} {...rest} />}
-            <div className="invalid-feedback"><ErrorMessage name={name} /></div>
-        </div>
-
-
-    const ToggleList = ({ name, options, labelExtractor, idExtractor, allOptionID }) => {
-        const isChecked = (id, arrayHelpers) => arrayHelpers.form.values[name].includes(id);
-
-        const handleChange = (e, arrayHelpers) => {
-            const optionId = e.target.value;
-            if (e.target.checked) {
-                if (allOptionID && (optionId === allOptionID)) {
-                    arrayHelpers.form.setFieldValue(name, options.map(op => idExtractor(op)));
-                } else {
-                    if (arrayHelpers.form.values[name].includes(allOptionID)) {
-                        const idx = arrayHelpers.form.values[name].indexOf(allOptionID);
-                        arrayHelpers.remove(idx);
-                    }
-                    arrayHelpers.push(optionId);
-                };
-            } else {
-                if (allOptionID && (optionId === allOptionID)) {
-                    arrayHelpers.form.setFieldValue(name, []);
-                } else {
-                    let filteredOptionIds = arrayHelpers.form.values[name].filter(id => id !== allOptionID).filter(id => id !== optionId);
-                    arrayHelpers.form.setFieldValue(name, filteredOptionIds);
-                }
-            }
-        }
-
-        const allOptionsObject = options.find(op => idExtractor(op) === allOptionID);
-
-        if (allOptionsObject) {
-            options = options.filter(op => idExtractor(op) !== allOptionID);
-            options.unshift(allOptionsObject);
-        }
-
-
-
-        return <FieldArray
-            name={name}
-            render={arrayHelpers => (
-                options.map(item => <label key={idExtractor(item)} className="row align-items-center">
-                    <span className="switch-label text-left col-9 col-sm-6">{labelExtractor(item)}</span>
-                    <span className="col-3 col-sm-6">
-                        <span className="switch">
-                            <input name={name}
-                                className="custom-control-input"
-                                type="checkbox"
-                                value={idExtractor(item)}
-                                id={idExtractor(item)}
-                                checked={isChecked(idExtractor(item), arrayHelpers)}
-                                onChange={(e) => handleChange(e, arrayHelpers)}
-                                disabled={item.hasOwnProperty('disabled') ? item.disabled : false}
-                            />
-                            <span className="slider round"></span>
-                        </span>
-                    </span>
-                </label>)
-            )}
-        />
-    }
 
     const showToast = (msg, type) => {
         addToast(msg, {
@@ -115,6 +51,31 @@ const FaqForm = (props) => {
         return catgory_slug_list;
     }
 
+    useEffect(() => {
+        const faqTopics = faqMapping(props.serviceCategory)
+        setTopics(faqTopics);
+    }, [props.serviceCategory]);
+
+
+    const faqMapping = (topics) => {
+
+        const faqWithTopics = [];
+
+        const parentCategories = [...new Set(Object.values(topics).map((item) => item.category))];
+
+        parentCategories.forEach(element => {
+            const subcategories = topics.filter(x => x.category === element);
+            subcategories.forEach(item => {
+                delete item.category;
+            });
+            faqWithTopics.push({
+                category: element,
+                subcategories: subcategories
+            });
+        });
+        return faqWithTopics;
+    }
+
     return (
         <Modal size="lg" centered show={props.show} onHide={handleClose}>
             <Modal.Header closeButton>
@@ -126,14 +87,12 @@ const FaqForm = (props) => {
                     <Formik
                         initialValues={{
                             question: props.editMode ? props.editData.question : '',
-                            categories: props.editMode ? convertSlugToId(props.editData.categories) : [],
+                            categories: props.editMode ? props.editData.categories : [],
                             answer: props.editMode ? props.editData.answer : '',
                         }}
                         validationSchema={faqSchema}
                         displayName="FaqForm"
                         onSubmit={(values, actions) => {
-                            values.categories = sortArrayWithTitle(values.categories);
-
                             if (props.editMode) {
                                 dispatch(editFaqItem(values, props.editData.id)).then(() => {
                                     actions.resetForm();
@@ -170,15 +129,50 @@ const FaqForm = (props) => {
                                                 <Field className="form-control preference" type='text' name='question' id='question' />
                                                 <div className="invalid-feedback"><ErrorMessage name="question" /></div>
                                             </div>
-                                            <FormFieldFluid label="Select Categories" name="categories" required={true} >
-                                                <ToggleList
-                                                    name="categories"
-                                                    options={props.serviceCategory}
-                                                    idExtractor={item => item.id}
-                                                    labelExtractor={item => item.title}
-                                                />
 
-                                            </FormFieldFluid>
+                                            <div className="form-group">
+                                                <label className="font-weight-bold" htmlFor='categories'>Select Topics <span className="text-danger">*</span></label>
+
+                                                <FieldArray
+                                                    name="categories"
+                                                    render={arrayHelpers => (
+                                                        <div>
+                                                            {topics.map((category, index) =>
+                                                                <div key={index}>{
+                                                                    <React.Fragment>
+                                                                        <span className="text-primary">
+                                                                            {category.category === 'general' ? "General" :
+                                                                                category.category === 'information' ? "Information Management" :
+                                                                                    category.category === 'cdp' ? "Management of Customer Data Platform" :
+                                                                                        "Data Privacy & Consent Management"
+                                                                            }
+                                                                        </span>
+                                                                        {category.subcategories.map((topic, id) => (
+                                                                            <div key={id}>
+                                                                                <label key={topic.title}></label>
+                                                                                <input
+                                                                                    name="categories"
+                                                                                    type="checkbox"
+                                                                                    value={topic}
+                                                                                    checked={arrayHelpers.form.values.categories.includes(topic.slug)}
+                                                                                    onChange={e => {
+                                                                                        if (e.target.checked) {
+                                                                                            arrayHelpers.push(topic.slug);
+                                                                                        } else {
+                                                                                            const idx = arrayHelpers.form.values.categories.indexOf(topic.slug);
+                                                                                            arrayHelpers.remove(idx);
+                                                                                        }
+                                                                                    }}
+                                                                                />
+                                                                                <span>{topic.title}</span>
+                                                                            </div>
+                                                                        ))}</React.Fragment>
+                                                                }</div>)}
+                                                            <div className="invalid-feedback"><ErrorMessage name="categories" /></div>
+                                                        </div>
+                                                    )} />
+                                            </div>
+
                                             <div className="form-group pt-3">
                                                 <label className="font-weight-bold" htmlFor='answer'>Answer <span className="text-danger">*</span></label>
                                                 <div className="border rounded draft-editor">

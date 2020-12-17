@@ -4,7 +4,7 @@ import XRegExp from 'xregexp';
 
 function isNotEmpty(answer) {
     if (answer === '<p><br></p>') return false;
-    if (answer.replace(/&nbsp;/g, '') === '<p></p>') return false;
+    if (answer && answer.replace(/&nbsp;/g, '') === '<p></p>') return false;
     return true;
 }
 

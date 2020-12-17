@@ -67,9 +67,12 @@ export default function ManageFaq() {
 
     useEffect(() => {
 
+        console.log(history.action);
     }, []);
 
+
     useEffect(() => {
+        if (faqData.metadata) { faqData.metadata.category = null; }
         setCategory(params.get('category') ? params.get('category') : null);
         dispatch(getFaqCategories());
         dispatch(getFaqItems(location.search));
@@ -112,11 +115,10 @@ export default function ManageFaq() {
                                 <div class="d-flex justify-content-between align-items-center">
                                     <Dropdown className="ml-auto dropdown-customize">
                                         <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center">
-                                            <i className="icon icon-filter mr-2 mb-n1"></i> {!faqData.metadata.category ? 'Filter by Category' : serviceCategories.find(x => x.slug === faqData.metadata.category).title}
+                                            <i className="icon icon-filter mr-2 mb-n1"></i> {faqData.metadata.category === null || history.action === "PUSH" ? 'Filter by Topics' : serviceCategories.find(x => x.slug === faqData.metadata.category).title}
                                         </Dropdown.Toggle>
                                         <Dropdown.Menu>
-                                            {
-                                                faqData.metadata.category && <Dropdown.Item onClick={() => urlChange(1, 'null', params.get('orderBy'))}>All</Dropdown.Item>
+                                            {serviceCategories.length > 0 && faqData.metadata.category && <Dropdown.Item onClick={() => urlChange(1, 'null', params.get('orderBy'))}>All</Dropdown.Item>
                                             }
                                             {
                                                 serviceCategories.length > 0 && serviceCategories.map((item, index) => (
@@ -140,7 +142,7 @@ export default function ManageFaq() {
                                         <tr>
                                             <th width="25%"><span className={sort.value === 'question' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'question')}>Question<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                             <th width="35%"><span className={sort.value === 'answer' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'answer')}>Answer<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                            <th width="22%"><span className={sort.value === 'categories' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'categories')}>Category<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                            <th width="22%"><span className={sort.value === 'categories' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'categories')}>Topic<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                             <th width="10%"><span className={sort.value === 'created_by' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'created_by')}>Created By<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                             <th width="8%">Action</th>
                                         </tr>

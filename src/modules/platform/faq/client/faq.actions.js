@@ -24,7 +24,6 @@ export function getFaqItems(query = "") {
 }
 
 export function getFaqCategories() {
-    console.log("here");
     return {
         type: Types.GET_FAQ_CATEGORIES,
         payload: axios({
