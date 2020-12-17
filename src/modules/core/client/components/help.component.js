@@ -20,10 +20,11 @@ export default function Help() {
 
     useEffect(() => {
         if (faq.faq && faq.faq.length > 0 && faqTopics) {
+            console.log("here");
             setFaqData(faqMapping(faqTopics, faq.faq));
         }
 
-    }, [faq, faqTopics]);
+    }, [faq]);
 
     useEffect(() => {
         dispatch(getFaqItems("?page=null"));
@@ -70,7 +71,7 @@ export default function Help() {
                             <div className="col-12"><h3 className="cdp-text-primary py-3">Topics</h3></div>
                             {
                                 faqData.map((category, index) => (
-                                    <div key={index} className="col-12 col-sm-6 col-lg-6">
+                                    <div key={index} className="col-12 col-sm-6 col-lg-6ÖÖ">
                                         <ul className="list-group shadow-sm faq__list-group mb-4">
                                             {category.subcategories.map((topics, id) => (
                                                 <li key={id} className="list-group-item d-flex justify-content-between align-items-center">
@@ -94,25 +95,25 @@ export default function Help() {
                                 </Modal.Header>
                                 <Modal.Body className="faq">
                                     <Accordion defaultActiveKey="0" className="faq__body">
-                                    {
-                                        selectedfaq.map((item, index) => (
-                                            <Card key={index}>
-                                                <Accordion.Collapse eventKey={index + ""}>
-                                                    <Card.Body>{item.answer}</Card.Body>
-                                                </Accordion.Collapse>
-                                                <Accordion.Toggle as={Card.Header} eventKey={index + ""} className="p-3 d-flex align-items-baseline justify-content-between" role="button">
-                                                    <span className="faq__question">{parse(item.question)}</span>
-                                                    <i className="icon icon-arrow-down ml-2 faq__icon-down"></i>
-                                                </Accordion.Toggle>
-                                            </Card>
-                                        ))
-                                    }
-                                    {selectedfaq.length === 0 ?
+                                        {
+                                            selectedfaq.map((item, index) => (
+                                                <Card key={index}>
+                                                    <Accordion.Collapse eventKey={index + ""}>
+                                                        <Card.Body>{parse(item.answer)}</Card.Body>
+                                                    </Accordion.Collapse>
+                                                    <Accordion.Toggle as={Card.Header} eventKey={index + ""} className="p-3 d-flex align-items-baseline justify-content-between" role="button">
+                                                        <span className="faq__question">{item.question}</span>
+                                                        <i className="icon icon-arrow-down ml-2 faq__icon-down"></i>
+                                                    </Accordion.Toggle>
+                                                </Card>
+                                            ))
+                                        }
+                                        {selectedfaq.length === 0 ?
                                             <div className="bg-white text-center py-3 px-2 border-0">
                                                 <i className="icon icon-help icon-3x cdp-text-secondary"></i>
                                                 <h5 className="cdp-text-primary pt-4">No data found related to this service category</h5>
                                             </div> : null
-                                    }
+                                        }
                                     </Accordion>
                                 </Modal.Body>
 

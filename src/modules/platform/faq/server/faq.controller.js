@@ -57,7 +57,7 @@ async function getFaqItems(req, res) {
         const limit = req.query.limit ? req.query.limit : 30;
         const offset = page * limit;
 
-        const category = req.query.category === 'null' || req.query.category === undefined ? null : req.query.category;
+        const category = req.query.topic === 'null' || req.query.topic === undefined ? null : req.query.topic;
 
         const orderBy = req.query.orderBy === 'null'
             ? null

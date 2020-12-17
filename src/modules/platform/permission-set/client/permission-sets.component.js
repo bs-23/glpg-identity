@@ -7,6 +7,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import { LinkContainer } from 'react-router-bootstrap';
 import PermissionSetForm from './permission-set-form.component';
 import PermissionSetDetails from "./permission-sets-details";
+import Faq from '../../../platform/faq/client/faq.component';
 
 export default function ManagePermissionSets() {
     const [permissionSets, setPermissionSets] = useState([]);
@@ -16,6 +17,9 @@ export default function ManagePermissionSets() {
     const match = useRouteMatch();
     const history = useHistory();
     const location = useLocation();
+    const [showFaq, setShowFaq] = useState(false);
+    const handleCloseFaq = () => setShowFaq(false);
+    const handleShowFaq = () => setShowFaq(true);
 
     const getPermissionSets = async () => {
         const response = await axios.get('/api/permissionSets');
@@ -23,22 +27,22 @@ export default function ManagePermissionSets() {
     }
 
     const getCountryNamesFromCodes = (country_codes) => {
-        if(!country_codes || !country_codes.length) return '';
+        if (!country_codes || !country_codes.length) return '';
         const country_names = [];
         country_codes.forEach(code => {
             const countryDetails = countries.find(c => c.country_iso2 === code);
-            if(countryDetails) country_names.push(countryDetails.codbase_desc);
+            if (countryDetails) country_names.push(countryDetails.codbase_desc);
         });
         return country_names.sort().join(', ');
     }
 
     const getServiceCategoryNames = (data) => {
-        if(!data.ps_sc) return '';
+        if (!data.ps_sc) return '';
         return data.ps_sc.map(item => item.serviceCategory.title).sort().join(', ');
     }
 
     const getApplicationNames = (data) => {
-        if(!data.ps_app) return '';
+        if (!data.ps_app) return '';
         return data.ps_app.map(item => item.application.name).sort().join(', ');
     }
 
@@ -59,7 +63,7 @@ export default function ManagePermissionSets() {
     }
 
     useEffect(() => {
-        if(location.state && location.state.showCreateModal) setPermissionModalShow(true);
+        if (location.state && location.state.showCreateModal) setPermissionModalShow(true);
         getPermissionSets();
     }, []);
 
@@ -73,8 +77,15 @@ export default function ManagePermissionSets() {
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/platform">Management of Customer Data Platform</NavLink></li>
                                 <li className="breadcrumb-item active"><span>Manage Permission Sets</span></li>
+                                <li className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help icon-2x cdp-text-secondary"></i></li>
                             </ol>
                         </nav>
+                        <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Questions You May Have</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body className="faq__in-modal"><Faq topic="manage-permission-set" /></Modal.Body>
+                        </Modal>
                     </div>
                 </div>
                 <div className="row">
@@ -165,7 +176,7 @@ export default function ManagePermissionSets() {
                                     </Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
-                                    <PermissionSetDetails permissionSetId={props.match && props.match.params.id}/>
+                                    <PermissionSetDetails permissionSetId={props.match && props.match.params.id} />
                                 </Modal.Body>
                             </Modal>}
                         </Route>

@@ -478,7 +478,7 @@ export default function hcpUsers() {
                                 <Modal.Header closeButton>
                                     <Modal.Title>Questions You May Have</Modal.Title>
                                 </Modal.Header>
-                                <Modal.Body className="faq__in-modal"><Faq category="information" /></Modal.Body>
+                                <Modal.Body className="faq__in-modal"><Faq topic="manage-hcp" /></Modal.Body>
                             </Modal>
                         </nav>
                     </div>

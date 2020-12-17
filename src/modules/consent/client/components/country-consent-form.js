@@ -72,8 +72,8 @@ const CountryConsentForm = (props) => {
                         }}
                     >
                         {formikProps => (
-                        <Form onSubmit={formikProps.handleSubmit}>
-                            <Modal.Body className="p-4">
+                            <Form onSubmit={formikProps.handleSubmit}>
+                                <Modal.Body className="p-4">
                                     <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
@@ -91,7 +91,7 @@ const CountryConsentForm = (props) => {
                                                 <label className="font-weight-bold" htmlFor="consent_id">Select Consent <span className="text-danger">*</span></label>
                                                 <Field disabled={props.editable ? true : false} data-testid="consent" as="select" name="consent_id" className="form-control">
                                                     <option key="select-consent" value="" disabled>--Select Consent--</option>
-                                                    {props.consents.map(item => <option key={item.id} value={item.id}>{props.editable ? props.options.preference + (props.options.is_active ? '' : ' (Inactive)') : item.preference+ (item.is_active ? '' : ' (Inactive)')}</option>)}
+                                                    {props.consents.map(item => <option key={item.id} value={item.id}>{props.editable ? props.options.preference + (props.options.is_active ? '' : ' (Inactive)') : item.preference + (item.is_active ? '' : ' (Inactive)')}</option>)}
                                                 </Field>
                                                 <div className="invalid-feedback"><ErrorMessage name="consent_id" /></div>
                                             </div>

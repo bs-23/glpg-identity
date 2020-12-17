@@ -7,6 +7,7 @@ import parse from 'html-react-parser';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Modal from 'react-bootstrap/Modal';
 import { useToasts } from 'react-toast-notifications';
+import Faq from '../../../platform/faq/client/faq.component';
 
 export default function ManageFaq() {
     const [show, setShow] = useState(false);
@@ -23,6 +24,9 @@ export default function ManageFaq() {
     const location = useLocation();
     const history = useHistory();
     const params = new URLSearchParams(window.location.search);
+    const [showFaq, setShowFaq] = useState(false);
+    const handleCloseFaq = () => setShowFaq(false);
+    const handleShowFaq = () => setShowFaq(true);
 
     const deleteFaq = () => {
         dispatch(deleteFaqItem(deleteId)).then(() => {
@@ -43,7 +47,7 @@ export default function ManageFaq() {
         let orderType = params.get('orderType');
         const orderBy = params.get('orderBy');
         const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
-        const category = faqCategory ? encodeURIComponent(faqCategory) : encodeURIComponent(params.get('category'));
+        const category = faqCategory ? encodeURIComponent(faqCategory) : encodeURIComponent(params.get('topic'));
 
         if (!pageChange) {
             if (orderBy && !orderType) {
@@ -58,7 +62,7 @@ export default function ManageFaq() {
         }
 
         const url = `?page=${page}`
-            + (category && category !== 'null' ? `&category=${category}` : '')
+            + (category && category !== 'null' ? `&topic=${category}` : '')
             + (orderColumn && orderColumn !== 'null' ? `&orderBy=${orderColumn}` : '')
             + (orderColumn && orderType && orderType !== 'null' ? `&orderType=${orderType}` : '');
 
@@ -73,7 +77,7 @@ export default function ManageFaq() {
 
     useEffect(() => {
         if (faqData.metadata) { faqData.metadata.category = null; }
-        setCategory(params.get('category') ? params.get('category') : null);
+        setCategory(params.get('topic') ? params.get('topic') : null);
         dispatch(getFaqCategories());
         dispatch(getFaqItems(location.search));
         setSort({ type: params.get('orderType') || 'asc', value: params.get('orderBy') });
@@ -102,8 +106,15 @@ export default function ManageFaq() {
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/platform">Management of Customer Data platform</NavLink></li>
                                 <li className="breadcrumb-item active"><span>FAQ</span></li>
+                                <li className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help icon-2x cdp-text-secondary"></i></li>
                             </ol>
                         </nav>
+                        <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Questions You May Have</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body className="faq__in-modal"><Faq topic="manage-faqs" /></Modal.Body>
+                        </Modal>
                     </div>
                 </div>
 
@@ -142,7 +153,7 @@ export default function ManageFaq() {
                                         <tr>
                                             <th width="25%"><span className={sort.value === 'question' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'question')}>Question<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                             <th width="35%"><span className={sort.value === 'answer' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'answer')}>Answer<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                            <th width="22%"><span className={sort.value === 'categories' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'categories')}>Topic<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                            <th width="22%"><span className={sort.value === 'categories' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'categories')}>Topics<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                             <th width="10%"><span className={sort.value === 'created_by' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.category, 'created_by')}>Created By<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                             <th width="8%">Action</th>
                                         </tr>
@@ -151,7 +162,7 @@ export default function ManageFaq() {
                                         {faqData.faq.map((row, index) => (
                                             <tr key={index}>
                                                 <td className="text-break">{row.question}</td>
-                                                <td className="text-break cdp-link-secondary">{parse(row.answer)}</td>
+                                                <td className="text-break cdp-link-secondary">{parse(parse(row.answer))}</td>
                                                 <td className="text-break">
                                                     {row.categories && row.categories.map((item, key) => (
                                                         (serviceCategories.find(x => x.slug === item).title) + (key < row.categories.length - 1 ? ', ' : '')))}

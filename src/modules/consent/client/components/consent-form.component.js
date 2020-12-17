@@ -10,6 +10,7 @@ import { createConsent, updateConsent } from '../consent.actions';
 import CountryCodes from 'country-codes-list';
 import { consentSchema } from '../consent.schema';
 import DraftEditor from '../../../core/client/components/draft-editor';
+import Faq from '../../../platform/faq/client/faq.component';
 
 const ConsentForm = (props) => {
     const CountryCodesObject = Object.values(CountryCodes.customList('countryCode', '{countryCode} {officialLanguageCode} {officialLanguageNameEn}'));
@@ -26,6 +27,9 @@ const ConsentForm = (props) => {
     const [showError, setShowError] = useState(false);
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
     const countries = useSelector(state => state.countryReducer.countries);
+    const [showFaq, setShowFaq] = useState(false);
+    const handleCloseFaq = () => setShowFaq(false);
+    const handleShowFaq = () => setShowFaq(true);
 
     const legalBasisList = [
         { id: 'consent', value: 'Consent' },
@@ -198,8 +202,15 @@ const ConsentForm = (props) => {
                                     <li className="breadcrumb-item"><NavLink to="/consent/">Data Privacy & Consent Management</NavLink></li>
                                     <li className="breadcrumb-item"><NavLink to="/consent/list">CDP Consents</NavLink></li>
                                     <li className="breadcrumb-item active"><span>{consentId ? 'Edit Consent' : 'Add new Consent'}</span></li>
+                                    <li className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help icon-2x cdp-text-secondary"></i></li>
                                 </ol>
                             </nav>
+                            <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
+                                <Modal.Header closeButton>
+                                    <Modal.Title>Questions You May Have</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body className="faq__in-modal"><Faq topic="manage-consent" /></Modal.Body>
+                            </Modal>
                         </div>
                     </div>
                 </div>

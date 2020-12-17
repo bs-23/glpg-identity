@@ -41,8 +41,8 @@ export const faqSchema = object().shape({
     categories:
         array()
             .of(string())
-            .min(1, 'Must select at least one category')
-            .required('Must select at least one category')
+            .min(1, 'Must select at least one topic')
+            .required('Must select at least one topic')
 });
 
 export const FaqCategorySchema = object().shape({

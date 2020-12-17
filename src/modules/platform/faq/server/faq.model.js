@@ -3,6 +3,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
+const validator = require('validator');
 
 const Faq = sequelize.cdpConnector.define('faq', {
     id: {
@@ -18,7 +19,10 @@ const Faq = sequelize.cdpConnector.define('faq', {
     },
     answer: {
         allowNull: false,
-        type: DataTypes.STRING(1500)
+        type: DataTypes.STRING(1500),
+        set(value) {
+            this.setDataValue('answer', validator.escape(value));
+        }
     },
     categories: {
         type: DataTypes.ARRAY(DataTypes.STRING)
