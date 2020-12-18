@@ -187,7 +187,7 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
                                     </div>
                                 </div>}
 
-                            {selectedWorkplace && <MapView location={selectedWorkplace.location} />}
+                            {selectedWorkplace && selectedWorkplace.location && <MapView location={selectedWorkplace.location} />}
                         </Tab>
                     </Tabs>
                 </div>
