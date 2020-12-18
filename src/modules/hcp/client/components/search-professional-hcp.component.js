@@ -314,7 +314,7 @@ const SearchProfessionalHcp = () => {
                                                 </div>
 
                                                 <div className="col-12 col-sm-6 col-lg-8 pt-3">
-                                                    <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-2">
+                                                    <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-4">
                                                         <input
                                                             type="checkbox"
                                                             className="custom-control-input"
@@ -327,7 +327,7 @@ const SearchProfessionalHcp = () => {
                                                             }} />
                                                         <label className="custom-control-label" for="isInContractCheckbox">In My Contract</label>
                                                     </div>
-                                                    <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-2">
+                                                    <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-4">
                                                         <input
                                                             type="checkbox"
                                                             className="custom-control-input"
