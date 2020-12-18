@@ -2,7 +2,8 @@ import Types from './faq.types';
 const initialState = {
     faq_item: null,
     faq_items: {},
-    faq_topics: []
+    faq_topics: [],
+    faq_list: {}
 };
 
 export default function reducer(state = initialState, action) {
@@ -13,6 +14,10 @@ export default function reducer(state = initialState, action) {
 
         case Types.GET_FAQ_ITEMS_FULFILLED: {
             return { ...state, faq_items: action.payload.data };
+        }
+
+        case Types.GET_FAQ_ITEMS_FOR_FAQ_FULFILLED: {
+            return { ...state, faq_list: action.payload.data };
         }
 
         case Types.GET_FAQ_CATEGORIES_FULFILLED: {

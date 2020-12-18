@@ -95,7 +95,7 @@ export default function ManageFaq() {
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/platform">Management of Customer Data platform</NavLink></li>
                                 <li className="breadcrumb-item active"><span>FAQ</span></li>
-                                <li className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help icon-2x cdp-text-secondary"></i></li>
+                                <li className="ml-auto mr-3"><i type="button" onClick={() => handleShowFaq()} className="icon icon-help icon-2x cdp-text-secondary"></i></li>
                             </ol>
                         </nav>
                         <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>

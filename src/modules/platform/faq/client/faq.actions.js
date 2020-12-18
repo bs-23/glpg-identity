@@ -62,3 +62,13 @@ export function deleteFaqItem(id) {
         })
     };
 }
+
+export function getFaqItemsForFaq(query = "") {
+    return {
+        type: Types.GET_FAQ_ITEMS_FOR_FAQ,
+        payload: axios({
+            method: 'get',
+            url: `/api/faq${query}`
+        })
+    };
+}

@@ -4,15 +4,15 @@ import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
 import parse from 'html-react-parser';
 import { useSelector, useDispatch } from 'react-redux';
-import { getFaqItems } from '../../../platform/faq/client/faq.actions';
+import { getFaqItemsForFaq } from '../../../platform/faq/client/faq.actions';
 
 export default function Faq(props) {
     const [show, setShow] = React.useState();
-    const faqData = useSelector(state => state.faqReducer.faq_items);
+    const faqData = useSelector(state => state.faqReducer.faq_list);
     const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(getFaqItems(`?page=1&topic=${props.topic}&limit=5`));
+        dispatch(getFaqItemsForFaq(`?page=${props.page ? props.page : 1}&topic=${props.topic}&limit=5`));
     }, []);
 
     return (
@@ -27,6 +27,7 @@ export default function Faq(props) {
                 <Accordion defaultActiveKey="0" className="faq__body">
                     {faqData.faq && faqData.faq.map((faq, index) => (
                         <Card key={index}>
+
                             <Accordion.Collapse eventKey={index + ""}>
                                 <Card.Body>{parse(parse(faq.answer))}</Card.Body>
                             </Accordion.Collapse>

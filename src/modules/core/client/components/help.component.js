@@ -69,33 +69,42 @@ export default function Help() {
 
                             <div className="col-12"><h3 className="cdp-text-primary py-3">Topics</h3></div>
 
-                            {/* <div className="col-12 col-sm-6 col-lg-6">
-                                <ul class="list-group shadow-sm faq__list-group mb-4"><li class="list-group-item d-flex justify-content-between align-items-center"><div class="d-flex align-items-center"><i class="fas fa-tachometer-alt fa-2x cdp-text-secondary faq__list-group-icon"></i><span class="pr-3">General Information</span><span class="badge badge-light badge-pill cdp-text-primary">4</span></div><i class="fas fa-external-link-square-alt cdp-text-primary faq__list-group--modal-open"></i></li></ul>
-                            </div>
                             <div className="col-12 col-sm-6 col-lg-6">
-                                <ul class="list-group shadow-sm faq__list-group mb-4"><li class="list-group-item d-flex justify-content-between align-items-center"><div class="d-flex align-items-center"><i class="fas fa-tachometer-alt fa-2x cdp-text-secondary faq__list-group-icon"></i><span class="pr-3">General Information</span><span class="badge badge-light badge-pill cdp-text-primary">4</span></div><i class="fas fa-external-link-square-alt cdp-text-primary faq__list-group--modal-open"></i></li></ul>
-                                <ul class="list-group shadow-sm faq__list-group mb-4"><li class="list-group-item d-flex justify-content-between align-items-center"><div class="d-flex align-items-center"><i class="fas fa-tachometer-alt fa-2x cdp-text-secondary faq__list-group-icon"></i><span class="pr-3">General Information</span><span class="badge badge-light badge-pill cdp-text-primary">4</span></div><i class="fas fa-external-link-square-alt cdp-text-primary faq__list-group--modal-open"></i></li></ul>
-                            </div>*/}
+                                {faqData.map((category, index) => (
+                                    (index % 2) === 0 && <ul key={index} className="list-group shadow-sm faq__list-group mb-4">
+                                        {category.subcategories.map((topics, id) => (
+                                            <li key={id} className="list-group-item d-flex justify-content-between align-items-center">
+                                                <div className="d-flex align-items-center">
+                                                    <i className={`${topics.icon} ${id === 0 ? 'cdp-text-secondary' : 'cdp-text-primary'} faq__list-group-icon`}></i>
+                                                    <span className="pr-3">{topics.title}</span>
+                                                    <span className="badge badge-light badge-pill cdp-text-primary">{topics.faq.length}</span>
+                                                </div>
+                                                <i className="fas fa-external-link-square-alt cdp-text-primary faq__list-group--modal-open" onClick={() => handleShow(topics.faq)}></i>
+                                            </li>
+                                        ))}
 
-                            {
-                                faqData.map((category, index) => (
-                                    <div key={index} className="col-12 col-sm-6 col-lg-6">
-                                        <ul className="list-group shadow-sm faq__list-group mb-4">
-                                            {category.subcategories.map((topics, id) => (
-                                                <li key={id} className="list-group-item d-flex justify-content-between align-items-center">
-                                                    <div className="d-flex align-items-center">
-                                                        <i className={`${topics.icon} ${id === 0 ? 'cdp-text-secondary' : 'cdp-text-primary'} faq__list-group-icon`}></i>
-                                                        <span className="pr-3">{topics.title}</span>
-                                                        <span className="badge badge-light badge-pill cdp-text-primary">{topics.faq.length}</span>
-                                                    </div>
-                                                    <i className="fas fa-external-link-square-alt cdp-text-primary faq__list-group--modal-open" onClick={() => handleShow(topics.faq)}></i>
-                                                </li>
-                                            ))}
+                                    </ul>
+                                ))}
+                            </div>
 
-                                        </ul>
-                                    </div>
-                                ))
-                            }
+                            <div className="col-12 col-sm-6 col-lg-6">
+                                {faqData.map((category, index) => (
+                                    (index % 2) !== 0 && <ul key={index} className="list-group shadow-sm faq__list-group mb-4">
+                                        {category.subcategories.map((topics, id) => (
+                                            <li key={id} className="list-group-item d-flex justify-content-between align-items-center">
+                                                <div className="d-flex align-items-center">
+                                                    <i className={`${topics.icon} ${id === 0 ? 'cdp-text-secondary' : 'cdp-text-primary'} faq__list-group-icon`}></i>
+                                                    <span className="pr-3">{topics.title}</span>
+                                                    <span className="badge badge-light badge-pill cdp-text-primary">{topics.faq.length}</span>
+                                                </div>
+                                                <i className="fas fa-external-link-square-alt cdp-text-primary faq__list-group--modal-open" onClick={() => handleShow(topics.faq)}></i>
+                                            </li>
+                                        ))}
+
+                                    </ul>
+                                ))}
+                            </div>
+
 
                             <Modal size="lg" centered show={show} onHide={handleClose}>
                                 <Modal.Header closeButton>
