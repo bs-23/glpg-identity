@@ -30,8 +30,8 @@ describe('HCP Routes', () => {
     it('Should get hcp user by id', async () => {
         const response = await request
             .get(`/api/hcp-profiles/${defaultUser.id}`)
-            .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`])
-            // .set('Authorization', 'bearer ' + defaultApplication.access_token);
+            // .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`])
+            .set('Authorization', 'bearer ' + defaultApplication.access_token);
 
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveProperty('data');
@@ -41,8 +41,8 @@ describe('HCP Routes', () => {
     it('Should get 404 when userID does not exist - Get HCP Profile', async () => {
         const response = await request
             .get(`/api/hcp-profiles/${faker.random.uuid()}`)
-            .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`])
-            // .set('Authorization', 'bearer ' + defaultApplication.access_token)
+            // .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`])
+            .set('Authorization', 'bearer ' + defaultApplication.access_token)
 
         expect(response.statusCode).toBe(404);
         expect(response.body).toHaveProperty('errors');
