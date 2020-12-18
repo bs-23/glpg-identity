@@ -85,6 +85,7 @@ export default function DraftEditor({ onChangeHTML, htmlContent }) {
                 .replace(/(?<=<p>)(&nbsp;)*/g, '')
                 .replace(/(&nbsp;)*(?=<\/p>)/g, '')
                 .replace(/(?<=<p>(<strong>|<u>|<em>))&nbsp;/g, '')
+                .replace(/(\s)*(?=<\/[^>]*>)/g, '')
                 .replace(/&nbsp;/g, '');
 
             if(cleanedupHtml.length === html.length) break;
