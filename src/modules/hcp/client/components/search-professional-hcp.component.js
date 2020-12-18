@@ -115,7 +115,7 @@ const SearchProfessionalHcp = () => {
 
     useEffect(() => {
         const getHcpProfile = async (id) => {
-            const { data: hcpProfile } = await axios.get(`/api/hcp-profiles/${id}`);
+            const { data: hcpProfile } = await axios.get(`/api/hcps/${id}`);
             setHcpProfile(hcpProfile.data);
         }
 
