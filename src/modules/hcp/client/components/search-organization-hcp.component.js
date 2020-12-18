@@ -9,6 +9,8 @@ import OklaHcoDetails from './okla-hco-details.component';
 import getUserPermittedCountries from '../../../core/client/util/user-country';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
 import { useToasts } from 'react-toast-notifications';
+import Faq from '../../../platform/faq/client/faq.component';
+import Modal from 'react-bootstrap/Modal';
 
 const SearchOrganizationHcp = () => {
     const { addToast } = useToasts();
@@ -24,6 +26,9 @@ const SearchOrganizationHcp = () => {
     const [hcos, setHcos] = useState({});
     const [formData, setFormData] = useState({});
     const [currentPage, setCurrentPage] = useState(1);
+    const [showFaq, setShowFaq] = useState(false);
+    const handleCloseFaq = () => setShowFaq(false);
+    const handleShowFaq = () => setShowFaq(true);
 
     const resetSearch = (props) => {
         setFormData({});
@@ -121,8 +126,15 @@ const SearchOrganizationHcp = () => {
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/hcps">Information Management</NavLink></li>
                                 <li className="breadcrumb-item active"><span>Discover HCPs</span></li>
+                                <li className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help icon-2x cdp-text-secondary"></i></li>
                             </ol>
                         </nav>
+                        <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Questions You May Have</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body className="faq__in-modal"><Faq topic="discover-hcp" /></Modal.Body>
+                        </Modal>
                     </div>
                 </div>
 
