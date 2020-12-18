@@ -290,7 +290,7 @@ const SearchProfessionalHcp = () => {
                                             <div className="row align-items-center">
                                                 <div className="col-12 col-sm-6 col-lg-4">
                                                     <div className="form-group">
-                                                        <label for="exampleInputEmail1">Countries</label>
+                                                        <label for="exampleInputEmail1">Countries <span className="text-danger">*</span></label>
                                                         <Select
                                                             defaultValue={[]}
                                                             isMulti={true}

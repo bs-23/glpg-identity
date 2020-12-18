@@ -278,10 +278,10 @@ async function getOklaHcpDetails(req, res) {
                 name,
                 address: workplace.workplaceAddresses['P,1'].address.addressLongLabel,
                 postCode: workplace.workplaceAddresses['P,1'].address.longPostalCode,
-                location: {
+                location: workplace.workplaceAddresses['P,1'].address.geocodingAddresses.W ? {
                     latitude: workplace.workplaceAddresses['P,1'].address.geocodingAddresses.W.latitude,
                     longitude: workplace.workplaceAddresses['P,1'].address.geocodingAddresses.W.longitude
-                },
+                } : null,
                 city: workplace.workplaceAddresses['P,1'].address.postalTownReference.villageLabel,
                 contactNumbers,
                 type: workplace.typeCorporateLabel,

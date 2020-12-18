@@ -40,7 +40,7 @@ export default function Faq(props) {
 
                     {faqData.metadata && faqData.metadata.total > 5 &&
                         <Card className="border-0">
-                            <NavLink to="help" className="p-3 pb-0 mb-0 w-100 d-flex align-items-center bg-white cdp-text-secondary">
+                            <NavLink to="/help" className="p-3 pb-0 mb-0 w-100 d-flex align-items-center bg-white cdp-text-secondary">
                                 Visit CDP help center for more
                             </NavLink>
                         </Card>
@@ -52,7 +52,7 @@ export default function Faq(props) {
                         <i className="icon icon-help icon-3x cdp-text-secondary"></i>
                         <h5 className="cdp-text-primary pt-4">No data found related to this service category</h5>
                         <p className="py-2 mb-4">Click the button below for more information</p>
-                        <NavLink to="help" className="btn cdp-btn-secondary text-white px-5 py-2 font-weight-bold">
+                        <NavLink to="/help" className="btn cdp-btn-secondary text-white px-5 py-2 font-weight-bold">
                             <i className="fas fa-list-ul pr-1"></i> CDP Help Center
                         </NavLink>
                     </div>
