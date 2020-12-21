@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Types from './hcp.types';
-import store from '../../core/client/store';
+import store from '../../../core/client/store';
 
 export function getHcpProfiles(page = 1, status, codbase, orderBy, orderType) {
 

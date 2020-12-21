@@ -4,7 +4,7 @@ import HcpUsers from "./components/hcp-users";
 import SearchProfessionalHcp from "./components/search-professional-hcp.component";
 import SearchOrganizationHcp from "./components/search-organization-hcp.component";
 import InformationManagement from './components/information-management.component';
-import PrivateRoute from "../../core/client/PrivateRoute";
+import PrivateRoute from "../../../core/client/PrivateRoute";
 
 export default function HcpRoutes() {
     let { path } = useRouteMatch();

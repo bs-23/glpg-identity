@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Faq } from '../../../platform';
+import { Faq } from '../../../../platform';
 
 const InformationManagement = () => {
     return (
@@ -26,7 +26,7 @@ const InformationManagement = () => {
                             <div className="row">
                                 <div className="col-12">
                                     <div className="list-group cdp-list-group">
-                                        <NavLink to="/hcps/list" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
+                                        <NavLink to="/information/list" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
                                             <i className="icon icon-secure icon-3x icon-3x cdp-list-group__icon"></i>
                                             <span>
                                                 <strong className="mb-2 h4 d-block cdp-list-group__link-title">Manage HCP Master Data</strong>
@@ -66,7 +66,7 @@ const InformationManagement = () => {
                                                 <span className="d-block cdp-list-group__link-activity">Drive Insights with enriched 3rd Party data within 10 - 15 minutes</span>
                                             </span>
                                         </NavLink>
-                                        <NavLink to="/hcps/discover-professionals" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
+                                        <NavLink to="/information/discover-professionals" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
                                             <i className="icon icon-search-globally icon-3x cdp-list-group__icon"></i>
                                             <span>
                                                 <strong className="mb-2 h4 d-block cdp-list-group__link-title">Discover Missing HCPs and HCOs</strong>

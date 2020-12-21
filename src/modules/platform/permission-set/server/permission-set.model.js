@@ -2,7 +2,7 @@ const path = require('path');
 const { DataTypes } = require('sequelize');
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
-const Application = require('../../../application/server/application.model');
+const Application = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.model'));
 const PermissionSet_ServiceCategory = require('./permissionSet-serviceCategory.model');
 const PermissionSet_Application = require('./permissionSet-application.model');
 const ServiceCategory = require('../../user/server/permission/service-category.model');

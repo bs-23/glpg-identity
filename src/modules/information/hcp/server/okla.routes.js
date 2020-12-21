@@ -1,7 +1,7 @@
 const path = require('path');
 const controller = require('./okla.controller');
-const { Modules } = require('../../core/server/authorization/authorization.constants');
-const { ModuleGuard } = require('../../core/server/authorization/authorization.middleware');
+const { Modules } = require('../../../core/server/authorization/authorization.constants');
+const { ModuleGuard } = require('../../../core/server/authorization/authorization.middleware');
 const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/platform/user/server/user-authentication.middleware.js'));
 
 module.exports = app => {

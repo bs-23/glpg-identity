@@ -8,9 +8,9 @@ import MockAdapter from 'axios-mock-adapter'
 import { ToastProvider } from 'react-toast-notifications';
 import { Provider } from 'react-redux';
 import store from '../../src/modules/core/client/store';
-import HcpUser from '../../src/modules/hcp/client/components/hcp-users';
+import HcpUser from '../../src/modules/information/hcp/client/components/hcp-users';
 import { login } from '../../src/modules/platform/user/client/user.actions';
-import { getHcpProfiles } from '../../src/modules/hcp/client/hcp.actions';
+import { getHcpProfiles } from '../../src/modules/information/hcp/client/hcp.actions';
 
 configure({ adapter: new Adapter() });
 

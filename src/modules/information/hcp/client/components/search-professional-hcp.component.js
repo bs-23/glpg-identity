@@ -8,10 +8,10 @@ import { Form, Formik, Field } from 'formik';
 import Select, { components } from 'react-select';
 import Dropdown from 'react-bootstrap/Dropdown';
 import OklaHcpDetails from './okla-hcp-details.component';
-import getUserPermittedCountries from '../../../core/client/util/user-country';
+import getUserPermittedCountries from '../../../../core/client/util/user-country';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
 import { useToasts } from 'react-toast-notifications';
-import Faq from '../../../platform/faq/client/faq.component';
+import Faq from '../../../../platform/faq/client/faq.component';
 import Modal from 'react-bootstrap/Modal';
 
 const SearchProfessionalHcp = () => {
@@ -59,7 +59,7 @@ const SearchProfessionalHcp = () => {
         setHcpProfile(null);
         setHcpSpecialty(null);
 
-        if (params.get('id')) history.push('/hcps/discover-professionals');
+        if (params.get('id')) history.push('/information/discover-professionals');
     };
 
     const scrollToResult = (isEmpty) => {
@@ -162,7 +162,7 @@ const SearchProfessionalHcp = () => {
         if (params.get('id')) {
             setHcpProfile(null);
             setIsAssigned(false);
-            history.push('/hcps/discover-professionals');
+            history.push('/information/discover-professionals');
         }
     }
 
@@ -207,7 +207,7 @@ const SearchProfessionalHcp = () => {
                         <nav aria-label="breadcrumb">
                             <ol className="breadcrumb rounded-0">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
-                                <li className="breadcrumb-item"><NavLink to="/hcps">Information Management</NavLink></li>
+                                <li className="breadcrumb-item"><NavLink to="/information">Information Management</NavLink></li>
                                 <li className="breadcrumb-item active"><span>Discover HCPs</span></li>
                                 <li className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help icon-2x cdp-text-secondary"></i></li>
                             </ol>
@@ -228,8 +228,8 @@ const SearchProfessionalHcp = () => {
                                 <h4 className="cdp-text-primary font-weight-bold mb-0 mr-sm-4 mr-1">OKLA Search</h4>
                                 <div className="d-flex align-items-center pl-3">
                                     <div>
-                                        <NavLink className="custom-tab custom-tab__secondary px-3 py-3 border" to="/hcps/discover-professionals"><i className="far fa-user mr-2"></i><span className="d-none d-sm-inline-block">Health Care Professional</span></NavLink>
-                                        <NavLink className="custom-tab custom-tab__secondary px-4 py-3 border" to="/hcps/discover-organizations"><i className="far fa-building mr-2"></i><span className="d-none d-sm-inline-block">Health Care Organization</span></NavLink>
+                                        <NavLink className="custom-tab custom-tab__secondary px-3 py-3 border" to="/information/discover-professionals"><i className="far fa-user mr-2"></i><span className="d-none d-sm-inline-block">Health Care Professional</span></NavLink>
+                                        <NavLink className="custom-tab custom-tab__secondary px-4 py-3 border" to="/information/discover-organizations"><i className="far fa-building mr-2"></i><span className="d-none d-sm-inline-block">Health Care Organization</span></NavLink>
                                     </div>
                                 </div>
                             </div>

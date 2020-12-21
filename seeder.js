@@ -23,7 +23,7 @@ async function init() {
         END $$;
     `);
 
-    const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
+    const Application = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.model'));
     const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
     const ConsentCategory = require(path.join(process.cwd(), 'src/modules/consent/server/consent-category.model'));
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
@@ -40,12 +40,12 @@ async function init() {
     const { Modules } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
     const Faq = require(path.join(process.cwd(), 'src/modules/platform/faq/server/faq.model.js'));
     require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model'));
-    require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-profile.model'));
-    require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-consents.model'));
-    require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-archives.model'));
+    require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-profile.model'));
+    require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-consents.model'));
+    require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-archives.model'));
     require(path.join(process.cwd(), 'src/modules/platform/user/server/reset-password.model.js'));
     require(path.join(process.cwd(), 'src/modules/core/server/password/password-history.model.js'));
-    require(path.join(process.cwd(), 'src/modules/application/server/data.model.js'));
+    require(path.join(process.cwd(), 'src/modules/platform/application/server/data.model.js'));
 
 
     await sequelize.cdpConnector.sync();

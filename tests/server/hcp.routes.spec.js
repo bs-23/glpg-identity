@@ -217,8 +217,8 @@ describe('HCP Routes', () => {
         let getNumberOfConfirmedUnconfirmedConsents;
 
         beforeAll(() => {
-            HCPModel = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-profile.model.js'));
-            HCPConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-consents.model.js'));
+            HCPModel = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-profile.model.js'));
+            HCPConsents = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-consents.model.js'));
 
             singleOptInConsent =  {
                 locale: 'nl_nl',

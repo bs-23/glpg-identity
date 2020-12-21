@@ -12,13 +12,13 @@ import axios from 'axios';
 import _ from 'lodash';
 import parse from 'html-react-parser';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
-import Faq from '../../../platform/faq/client/faq.component';
+import Faq from '../../../../platform/faq/client/faq.component';
 
-import { getAllCountries } from '../../../core/client/country/country.actions';
+import { getAllCountries } from '../../../../core/client/country/country.actions';
 import { getHcpProfiles, getHCPSpecialities } from '../hcp.actions';
 import { ApprovalRejectSchema, HcpInlineEditSchema } from '../hcp.schema';
 import uuidAuthorities from '../uuid-authorities.json';
-import EditableTable from '../../../core/client/components/EditableTable/EditableTable';
+import EditableTable from '../../../../core/client/components/EditableTable/EditableTable';
 
 const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
     const [comment, setComment] = useState("");
@@ -205,7 +205,7 @@ export default function hcpUsers() {
     const openDiscoverHcpsWindow = (hcp) => {
         const width = (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth) * 0.8;
         const height = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) * 0.9;
-        window.open(`/hcps/discover-professionals?id=${hcp.id}`, 'name', `width=${width || 600},height=${height || 400}`);
+        window.open(`/information/discover-professionals?id=${hcp.id}`, 'name', `width=${width || 600},height=${height || 400}`);
         setSelectedRow(hcp.id);
     }
 
@@ -477,7 +477,7 @@ export default function hcpUsers() {
                         <nav aria-label="breadcrumb">
                             <ol className="breadcrumb rounded-0">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
-                                <li className="breadcrumb-item"><NavLink to="/hcps">Information Management</NavLink></li>
+                                <li className="breadcrumb-item"><NavLink to="/information">Information Management</NavLink></li>
                                 <li className="breadcrumb-item active"><span>HCP Profile List</span></li>
                                 <li className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help icon-2x cdp-text-secondary"></i></li>
                             </ol>
