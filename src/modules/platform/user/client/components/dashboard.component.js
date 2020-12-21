@@ -10,7 +10,7 @@ export default function Dashboard() {
         <main className="app__content cdp-light-bg">
             <div className="container-fluid">
                 <div className="row h-100">
-                    <div className="col-12 col-lg-8 col-xl-9 py-3">
+                    <div className="col-12 col-lg-7 col-xl-8 py-3">
                         <div className="service">
                             <h4 className="service__header font-weight-bold pt-3 pb-4">
                                 Category of Services
@@ -57,7 +57,7 @@ export default function Dashboard() {
                             </div>
                         </div>
                     </div>
-                    <div className="col-12 col-lg-4 col-xl-3 py-3 app__content-panel-right">
+                    <div className="col-12 col-lg-5 col-xl-4 py-3 app__content-panel-right">
                         <div className="shadow-sm bg-white mb-3 cdp-inbox">
                             <h5 className="p-3 cdp-text-primary font-weight-bold mb-0 d-flex justify-content-between cdp-inbox__header">
                                CDP Queues / Tasks / Alerts
@@ -68,7 +68,41 @@ export default function Dashboard() {
                             <div>
                                 <Tabs defaultActiveKey={selectedTab} className="cdp-inbox__tab px-2" onSelect={(activeKey, e) => setSelectedTab(activeKey)}>
                                     <Tab eventKey="hcpaproval" title="HCP Approval">
-                                        <div className="cdp-inbox__tab-detail p-3">Coming soon...</div>
+                                        <div className="cdp-inbox__tab-detail">
+                                            <ul className="cdp-inbox__list p-0 m-0">
+                                                <li className="cdp-inbox__list-item d-flex justify-content-between align-items-center border-bottom py-3 px-3">
+                                                    <span className="cdp-inbox__list-item-col large cdp-text-primary font-weight-bold">xavier.bergnaum@delfina.info</span>
+                                                    <span className="cdp-inbox__list-item-col cdp-text-primary font-weight-bold px-3">25 Jun 2020</span>
+                                                    <span className="cdp-inbox__list-item-col">
+                                                        <button className="btn cdp-btn-secondary btn-sm text-white">Update Status</button>
+                                                    </span>
+                                                </li>
+                                                <li className="cdp-inbox__list-item d-flex justify-content-between align-items-center border-bottom py-3 px-3">
+                                                    <span className="cdp-inbox__list-item-col large cdp-text-primary font-weight-bold">xavier.bergnaum@delfina.info</span>
+                                                    <span className="cdp-inbox__list-item-col cdp-text-primary font-weight-bold px-3">25 Jun 2020</span>
+                                                    <span className="cdp-inbox__list-item-col">
+                                                        <button className="btn cdp-btn-secondary btn-sm text-white">Update Status</button>
+                                                    </span>
+                                                </li>
+                                                <li className="cdp-inbox__list-item d-flex justify-content-between align-items-center border-bottom py-3 px-3">
+                                                    <span className="cdp-inbox__list-item-col large cdp-text-primary font-weight-bold">xavier.bergnaum@delfina.info</span>
+                                                    <span className="cdp-inbox__list-item-col cdp-text-primary font-weight-bold px-3">25 Jun 2020</span>
+                                                    <span className="cdp-inbox__list-item-col">
+                                                        <button className="btn cdp-btn-secondary btn-sm text-white">Update Status</button>
+                                                    </span>
+                                                </li>
+                                                <li className="cdp-inbox__list-item d-flex justify-content-between align-items-center border-bottom py-3 px-3">
+                                                    <span className="cdp-inbox__list-item-col large cdp-text-primary font-weight-bold">xavier.bergnaum@delfina.info</span>
+                                                    <span className="cdp-inbox__list-item-col cdp-text-primary font-weight-bold px-3">25 Jun 2020</span>
+                                                    <span className="cdp-inbox__list-item-col">
+                                                        <button className="btn cdp-btn-secondary btn-sm text-white">Update Status</button>
+                                                    </span>
+                                                </li>
+                                            </ul>
+                                            <NavLink to="#" className="d-inline-block p-3 text-uppercase cdp-text-secondary active small font-weight-bold">
+                                                More Pending
+                                            </NavLink>
+                                        </div>
                                     </Tab>
                                     <Tab eventKey="consent" title="Consent" disabled>
                                         <div className="cdp-inbox__tab-detail p-3">Coming soon...</div>
