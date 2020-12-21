@@ -35,6 +35,8 @@ const hcpValidation = () => {
             .required('This field must not be empty.'),
         email: string()
             .email('This field should be a valid email address.')
+            .matches(/^.{1,64}@/, 'The part before @ of the email can be maximum 64 characters.')
+            .matches(/^.*[a-z]+.*@/, 'This field should be a valid email address.')
             .max(100, 'This field must be at most 100 characters long.')
             .required('This field must not be empty.'),
         uuid: string()
@@ -634,11 +636,14 @@ async function createHcpProfile(req, res) {
     const firstNameValidationStatus = await hcpValidator(first_name, 'first_name');
     const lastNameValidationStatus = await hcpValidator(last_name, 'last_name');
     const telephoneValidationStatus = await hcpValidator(telephone, 'telephone');
+    const emailValidationStatus = await hcpValidator(email, 'email');
 
     if (!email || !validator.isEmail(email)) {
         response.errors.push(new CustomError('Email address is missing or invalid.', 400, 'email'));
     } else if (email.length > 100) {
         response.errors.push(new CustomError('Email should be at most 100 characters', 400, 'email'));
+    } else if(!emailValidationStatus.valid) {
+        response.errors.push(new CustomError(emailValidationStatus.errors[0], 400, 'email'));
     }
 
     if (!uuid) {
