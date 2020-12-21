@@ -94,10 +94,44 @@ describe('Search hcp professional component', () => {
         expect(userSlice().loggedInUser).toEqual(savedUser);
     });
 
-    it('should set fill up user inputs', async () => {
-        const { debug, container, getAllByText, getByText } = render(wrapperComponent());
-        const countryLabel = getByText('countries');
-        debug(countryLabel)
-        debug(container);
+    it('should exist some texts', async () => {
+        // const { debug, container, getAllByText, getByText } =
+        render(wrapperComponent());
+        expect(screen.getByText('OKLA Search')).toBeTruthy();
+        expect(screen.getByText('Countries')).toBeTruthy();
+        expect(screen.getByText('In My Contract')).toBeTruthy();
+        expect(screen.getByText('Phonetic')).toBeTruthy();
+        expect(screen.getByText('Duplicates')).toBeTruthy();
+        expect(screen.getByText('Individual')).toBeTruthy();
+        expect(screen.getByText('First Name')).toBeTruthy();
+        expect(screen.getByText('Last Name')).toBeTruthy();
+        expect(screen.getByText('Specialty')).toBeTruthy();
+        expect(screen.getByText('Workplace')).toBeTruthy();
+        expect(screen.getByText('Address Label')).toBeTruthy();
+        expect(screen.getByText('City')).toBeTruthy();
+        expect(screen.getByText('Postal Code')).toBeTruthy();
+        expect(screen.getByText('Identifiers')).toBeTruthy();
+        expect(screen.getByText('Onekey ID')).toBeTruthy();
+        expect(screen.getByText('Individual - Identifier')).toBeTruthy();
+        expect(screen.getByText('CLEAR')).toBeTruthy();
+        expect(screen.getByText('SEARCH')).toBeTruthy();
+    });
+
+    it('should reset fields', async () => {
+        const { debug, container } = render(wrapperComponent());
+        const last_name = container.querySelector('input[name="lastName"]');
+        const clear_btn = screen.getByText('CLEAR');
+
+        await waitFor(() => {
+            fireEvent.change(last_name, { target: { value: 'a' } });
+        });
+
+        expect(last_name.value).toEqual('a');
+
+        await waitFor(() => {
+            fireEvent.click(clear_btn);
+        });
+
+        expect(last_name.value).toEqual('');
     });
 });
