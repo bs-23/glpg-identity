@@ -6,13 +6,13 @@ const axios = require('axios');
 const validator = require('validator');
 const { QueryTypes, Op, where, col, fn } = require('sequelize');
 const Hcp = require('./hcp-profile.model');
-const HcpArchives = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-archives.model'));
-const HcpConsents = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-consents.model'));
+const HcpArchives = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-archives.model'));
+const HcpConsents = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-consents.model'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
 const ConsentLocale = require(path.join(process.cwd(), 'src/modules/consent/server/consent-locale.model'));
 const ConsentCountry = require(path.join(process.cwd(), 'src/modules/consent/server/consent-country.model'));
-const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
+const Application = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.model'));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
@@ -35,6 +35,8 @@ const hcpValidation = () => {
             .required('This field must not be empty.'),
         email: string()
             .email('This field should be a valid email address.')
+            .matches(/^.{1,64}@/, 'The part before @ of the email can be maximum 64 characters.')
+            .matches(/^.*[a-z]+.*@/, 'This field should be a valid email address.')
             .max(100, 'This field must be at most 100 characters long.')
             .required('This field must not be empty.'),
         uuid: string()
@@ -634,11 +636,14 @@ async function createHcpProfile(req, res) {
     const firstNameValidationStatus = await hcpValidator(first_name, 'first_name');
     const lastNameValidationStatus = await hcpValidator(last_name, 'last_name');
     const telephoneValidationStatus = await hcpValidator(telephone, 'telephone');
+    const emailValidationStatus = await hcpValidator(email, 'email');
 
     if (!email || !validator.isEmail(email)) {
         response.errors.push(new CustomError('Email address is missing or invalid.', 400, 'email'));
     } else if (email.length > 100) {
         response.errors.push(new CustomError('Email should be at most 100 characters', 400, 'email'));
+    } else if(!emailValidationStatus.valid) {
+        response.errors.push(new CustomError(emailValidationStatus.errors[0], 400, 'email'));
     }
 
     if (!uuid) {

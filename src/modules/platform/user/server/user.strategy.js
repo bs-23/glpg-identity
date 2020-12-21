@@ -11,7 +11,7 @@ const Role = require(path.join(process.cwd(), "src/modules/platform/role/server/
 const Role_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/role-permissionSet.model"));
 const PermissionSet_ServiceCateory = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-serviceCategory.model"));
 const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-application.model"));
-const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
+const Application = require(path.join(process.cwd(), "src/modules/platform/application/server/application.model"));
 const ServiceCategory = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/service-category.model.js"));
 
 module.exports = function () {

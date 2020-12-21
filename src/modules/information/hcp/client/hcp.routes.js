@@ -1,10 +1,10 @@
 import React from "react";
 import { Switch, useRouteMatch } from "react-router-dom";
-import HcpUsers from "./components/hcp-users";
+import HcpUsers from "./components/hcp-profiles.component";
 import SearchProfessionalHcp from "./components/search-professional-hcp.component";
 import SearchOrganizationHcp from "./components/search-organization-hcp.component";
 import InformationManagement from './components/information-management.component';
-import PrivateRoute from "../../core/client/PrivateRoute";
+import PrivateRoute from "../../../core/client/PrivateRoute";
 
 export default function HcpRoutes() {
     let { path } = useRouteMatch();

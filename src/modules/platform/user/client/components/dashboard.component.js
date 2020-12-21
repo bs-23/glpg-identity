@@ -17,7 +17,7 @@ export default function Dashboard() {
                             <div>
                                 <ul className="d-flex flex-wrap list-unstyled service__list">
                                     <li className="pr-sm-4 pb-4 service__item">
-                                        <NavLink to="/hcps" className="d-block py-5 px-3 service__link">
+                                        <NavLink to="/information" className="d-block py-5 px-3 service__link">
                                             <i className="icon icon-information-management d-block service__icon"></i>
                                             Information Management
                                         </NavLink>

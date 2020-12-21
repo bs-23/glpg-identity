@@ -1,68 +1,137 @@
-// import React from 'react';
-// import { render, waitFor, fireEvent, screen, act } from '@testing-library/react';
-// import { MemoryRouter } from 'react-router-dom';
-// import axios from 'axios'
-// import MockAdapter from 'axios-mock-adapter'
-// import { ToastProvider } from 'react-toast-notifications';
-// import { Provider } from 'react-redux';
-// import store from '../../src/modules/core/client/store';
-// import { ManageFaq } from '../../src/modules/platform';
+import ManageFaq from '../../src/modules/platform/faq/client/manage-faq.component';
+import React from 'react';
+import { render, waitFor, fireEvent, screen } from '@testing-library/react';
+import { configure, shallow } from 'enzyme';
+import Adapter from 'enzyme-adapter-react-16';
+import { MemoryRouter } from 'react-router-dom';
+import axios from 'axios'
+import MockAdapter from 'axios-mock-adapter'
+import { ToastProvider } from 'react-toast-notifications';
+import { Provider } from 'react-redux';
+import store from '../../src/modules/core/client/store';
 
-// describe('Manage FAQ component', () => {
-//     let fakeAxios;
 
-//     beforeAll(async () => {
-//         fakeAxios = new MockAdapter(axios);
+configure({ adapter: new Adapter() });
 
-//         const faqList = {
-//             "faq": [
-//                 {
-//                     "answer": "test answer",
-//                     "createdBy": "System Admin",
-//                     "created_at": "2020-12-18T08:27:45.169Z",
-//                     "created_by": "4fd2b94c-a8b3-4664-9c3a-3d18196f59bc",
-//                     "id": "5d694484-8cfe-46f5-8c1e-b6162d8ac791",
-//                     "question": "test question",
-//                     "topics": ["manage-faq"],
-//                     "updatedBy": "System Admin",
-//                     "updated_at": "2020-12-18T08:27:45.169Z",
-//                     "updated_by": "4fd2b94c-a8b3-4664-9c3a-3d18196f59bc"
-//                 }
-//             ],
-//             "metadata": {
-//                 "end": 1,
-//                 "limit": 30,
-//                 "page": 1,
-//                 "start": 1,
-//                 "topic": null,
-//                 "total": 1
-//             }
-//         };
+describe('Hcp user component', () => {
+    let fakeAxios;
 
-//         fakeAxios.onGet('/api/faq').reply(200, faqList);
-//     });
+    beforeAll(async () => {
+        fakeAxios = new MockAdapter(axios);
 
-//     const wrapperComponent = () => (
-//         <Provider store={store}>
-//             <MemoryRouter>
-//                 <ToastProvider>
-//                     <ManageFaq />
-//                 </ToastProvider>
-//             </MemoryRouter>
-//         </Provider>
-//     );
+        const faqs = {
+            "faq": [{
+                "id": "6a98a866-1902-4396-9d38-77eb06c22dda",
+                "question": "Key Benefits of a CDP",
+                "answer": "&lt;p&gt;CDPs improve your organization, better your customer relationships, and complement your current software and marketing efforts. Here are a handful of key benefits of having a CDP.&lt;&#x2F;p&gt;",
+                "topics": ["general-information"],
+                "createdBy": "System Admin",
+            }, {
+                "id": "35dc23d0-2f38-42b5-b1d6-b5cb76ff3907",
+                "question": "Data Collection",
+                "answer": "&lt;p&gt;The main advantage of a CDP is its ability to collect data from a variety of sources (both online and offline, with a variety of formats and structures) and convert that disparate data into a standardized form.&lt;&#x2F;p&gt;",
+                "topics": ["general-information"],
+                "createdBy": "System Admin",
+            }],
+            "metadata": {
+                "page": 1,
+                "limit": 30,
+                "total": 4,
+                "start": 1,
+                "end": 2,
+                "topic": null
+            }
+        }
 
-//     it('should render table', async () => {
-//         const { getByTestId, container, getByText } = render(wrapperComponent());
+        const faqCategories = [{
+            "category": "general",
+            "title": "General Information",
+            "slug": "general-information",
+            "icon": "fas fa-tachometer-alt fa-2x"
+        }, {
+            "category": "information",
+            "title": "Information Management",
+            "slug": "information-management",
+            "icon": "icon icon-information-management icon-2x"
+        }];
 
-//         await waitFor(() => {
-//             const tbody = container.querySelector('tbody');
-//             //expect(tbody).toBeTruthy();
-//             //  expect(tbody.childElementCount).toBe(1);
-//         });
+        const filteredFaqs = {
+            "faq": [{
+                "id": "6a98a866-1902-4396-9d38-77eb06c22dda",
+                "question": "Key Benefits of a CDP",
+                "answer": "&lt;p&gt;CDPs improve your organization, better your customer relationships, and complement your current software and marketing efforts. Here are a handful of key benefits of having a CDP.&lt;&#x2F;p&gt;",
+                "topics": ["general-information"],
+                "createdBy": "System Admin",
+            }],
+            "metadata": {
+                "page": 1,
+                "limit": 30,
+                "total": 4,
+                "start": 1,
+                "end": 1,
+                "topic": null
+            }
+        }
 
-//         // const question = await waitFor(() => getByText('test question'));
-//         // expect(question).toBeTruthy();
-//     });
+        fakeAxios.onGet('/api/faq').reply(200, faqs);
+        fakeAxios.onGet('/api/faq/category').reply(200, faqCategories);
+        fakeAxios.onGet('/api/faq?page=1&topic=general-information').reply(200, filteredFaqs);
+    });
 
-// });
+    const wrapperComponent = () => (
+        <Provider store={store}>
+            <MemoryRouter>
+                <ToastProvider>
+                    <ManageFaq />
+                </ToastProvider>
+            </MemoryRouter>
+        </Provider>
+    );
+
+    it('should render table', async () => {
+        const { getByTestId, container } = render(wrapperComponent());
+
+        await waitFor(() => {
+            const table = container.querySelector('table');
+            expect(table).toBeTruthy();
+        });
+
+        await waitFor(() => {
+            const tbody = container.querySelector('tbody');
+            expect(tbody).toBeTruthy();
+            expect(tbody.childElementCount).toBe(2);
+        });
+    });
+
+    it('should filter faqs by topic', async () => {
+        const { getByTestId, container, getByText, getAllByText } = render(wrapperComponent());
+
+        const filter_button = await waitFor(() => getByText('Filter by Topics'));
+
+        fireEvent.click(filter_button);
+
+        let filter_option;
+
+        await waitFor(() => {
+            filter_option = getAllByText('General Information');
+            expect(filter_option).toBeTruthy;
+        });
+
+        fireEvent.click(filter_option[0]);
+
+        await waitFor(() => {
+            const table = container.querySelector('table');
+            expect(table).toBeTruthy();
+        });
+
+        await waitFor(() => {
+            const tbody = container.querySelector('tbody');
+            expect(tbody).toBeTruthy();
+            expect(tbody.childElementCount).toBe(1);
+        });
+
+        const filtered_faq = await waitFor(() => getByText('Key Benefits of a CDP'));
+
+        expect(filtered_faq).toBeTruthy();
+    });
+});

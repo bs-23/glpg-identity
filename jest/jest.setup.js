@@ -24,8 +24,8 @@ module.exports = async function () {
     `);
 
     const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
-    const Hcp_profile = require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-profile.model'));
-    const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
+    const Hcp_profile = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-profile.model'));
+    const Application = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.model'));
     const ConsentCategory = require(path.join(process.cwd(), 'src/modules/consent/server/consent-category.model'));
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
     const ConsentLocale = require(path.join(process.cwd(), 'src/modules/consent/server/consent-locale.model'));
@@ -34,11 +34,11 @@ module.exports = async function () {
 
     require(path.join(process.cwd(), 'src/modules/consent/server/consent-country.model'));
     require(path.join(process.cwd(), 'src/modules/consent/server/consent-locale.model'));
-    require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-consents.model'));
+    require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-consents.model'));
     require(path.join(process.cwd(), 'src/modules/platform/user/server/reset-password.model.js'));
     require(path.join(process.cwd(), 'src/modules/core/server/password/password-history.model'));
-    require(path.join(process.cwd(), 'src/modules/hcp/server/hcp-archives.model.js'));
-    require(path.join(process.cwd(), 'src/modules/application/server/data.model.js'));
+    require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-archives.model.js'));
+    require(path.join(process.cwd(), 'src/modules/platform/application/server/data.model.js'));
 
     const PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permission-set.model.js"));
     const ServiceCategory = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/service-category.model.js"));
