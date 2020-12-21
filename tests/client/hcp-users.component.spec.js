@@ -8,7 +8,7 @@ import MockAdapter from 'axios-mock-adapter'
 import { ToastProvider } from 'react-toast-notifications';
 import { Provider } from 'react-redux';
 import store from '../../src/modules/core/client/store';
-import HcpUser from '../../src/modules/information/hcp/client/components/hcp-users';
+import { HCPUsers } from '../../src/modules/information/';
 import { login } from '../../src/modules/platform/user/client/user.actions';
 import { getHcpProfiles } from '../../src/modules/information/hcp/client/hcp.actions';
 
@@ -83,7 +83,7 @@ describe('Hcp user component', () => {
         <Provider store={store}>
             <MemoryRouter>
                 <ToastProvider>
-                    <HcpUser/>
+                    <HCPUsers />
                 </ToastProvider>
             </MemoryRouter>
         </Provider>
