@@ -8,7 +8,7 @@ import { BrowserRouter } from 'react-router-dom';
 import MockAdapter from 'axios-mock-adapter'
 import { ToastProvider } from 'react-toast-notifications';
 import store from '../../src/modules/core/client/store.js';
-import SearchProfessionalHcp from '../../src/modules/hcp/client/components/search-professional-hcp.component';
+import { SearchProfessionalHCP } from '../../src/modules/information';
 import { act } from 'react-dom/test-utils';
 import { screen } from '@testing-library/dom'
 import { login } from '../../src/modules/platform/user/client/user.actions';
@@ -79,7 +79,7 @@ describe('Search hcp professional component', () => {
         <BrowserRouter>
             <ToastProvider>
                 <Provider store={store}>
-                    <SearchProfessionalHcp/>
+                    <SearchProfessionalHCP/>
                 </Provider>
             </ToastProvider>
         </BrowserRouter>

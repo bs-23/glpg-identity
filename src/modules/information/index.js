@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, useRouteMatch } from 'react-router-dom';
-import { HCPClientRoutes, hcpReducer, HCPUsers, InformationManagement } from './hcp';
+import { HCPClientRoutes, hcpReducer, HCPUsers, InformationManagement,SearchOrganizationHCP, SearchProfessionalHCP } from './hcp';
 
 export function InformationRoutes() {
     const { path } = useRouteMatch();
@@ -15,5 +15,7 @@ export function InformationRoutes() {
 export {
     hcpReducer,
     HCPUsers,
-    InformationManagement
+    InformationManagement,
+    SearchOrganizationHCP,
+    SearchProfessionalHCP
 };
