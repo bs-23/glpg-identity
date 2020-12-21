@@ -1,12 +1,13 @@
 import axios from "axios";
 import { NavLink } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import { Form, Formik, Field, ErrorMessage, FieldArray } from "formik";
+import { Form, Formik, Field, ErrorMessage } from "formik";
 import { useToasts } from "react-toast-notifications";
 import { profileCreateSchema } from "./profile.schema";
 import { PermissionSetDetailsModal } from "../../../platform";
 import Faq from '../../../platform/faq/client/faq.component';
 import Modal from 'react-bootstrap/Modal';
+import { ToggleList } from '../../../core/client/components/reusable-ui.components';
 
 const FormField = ({ label, name, type, children, required = true, ...rest }) => <div className="col-12">
     <div className="form-group">
@@ -16,41 +17,26 @@ const FormField = ({ label, name, type, children, required = true, ...rest }) =>
     </div>
 </div>
 
-const ToggleList = ({ name, options, labelExtractor, idExtractor }) => {
-    const isChecked = (id, arrayHelpers) => arrayHelpers.form.values[name].includes(id);
-
-    const handleChange = (e, arrayHelpers) => {
-        const optionId = e.target.value;
-        if (e.target.checked) {
-            arrayHelpers.push(optionId);
-        }
-        else {
-            const idx = arrayHelpers.form.values[name].indexOf(optionId);
-            arrayHelpers.remove(idx);
-        }
+const ToggleListSlider = (props) => <ToggleList {...props} >
+    {
+        ({ name, id, label, currentOption, isChecked, onChange, disabled }) =>
+        <label key={id} className="d-flex justify-content-between align-items-center pt-1">
+            <span className="switch-label">{label} {currentOption.type && <span className="text-muted small text-capitalize font-italic d-block"> Type: {currentOption.type}</span>}</span>
+            <span className="switch">
+                <input name={name}
+                    className="custom-control-input"
+                    type="checkbox"
+                    value={id}
+                    id={id}
+                    checked={isChecked}
+                    onChange={onChange}
+                    disabled={disabled}
+                />
+                <span className="slider round"></span>
+            </span>
+        </label>
     }
-
-    return <FieldArray
-        name={name}
-        render={arrayHelpers => (
-            options.map(item => <label key={idExtractor(item)} className="d-flex justify-content-between align-items-center pt-1">
-                <span className="switch-label">{labelExtractor(item)} {item.type && <span className="text-muted small text-capitalize font-italic d-block"> Type: {item.type}</span>}</span>
-                <span className="switch">
-                    <input name={name}
-                        className="custom-control-input"
-                        type="checkbox"
-                        value={idExtractor(item)}
-                        id={idExtractor(item)}
-                        checked={isChecked(idExtractor(item), arrayHelpers)}
-                        onChange={(e) => handleChange(e, arrayHelpers)}
-                        disabled={item.hasOwnProperty('disabled') ? item.disabled : false}
-                    />
-                    <span className="slider round"></span>
-                </span>
-            </label>)
-        )}
-    />
-}
+</ToggleList>
 
 const ProfileForm = ({ onSuccess, permissionSets, preFill }) => {
     const { addToast } = useToasts();
@@ -114,7 +100,7 @@ const ProfileForm = ({ onSuccess, permissionSets, preFill }) => {
                                     <div className="col-12">
                                         <div className="row">
                                             <FormField name="permissionSets" label="Select Permission Sets">
-                                                <ToggleList name="permissionSets" options={getToggleListOptions()} idExtractor={item => item.id} labelExtractor={item => item.title} />
+                                                <ToggleListSlider name="permissionSets" options={getToggleListOptions()} valueExtractor={item => item.id} idExtractor={item => item.id} labelExtractor={item => item.title} />
                                             </FormField>
                                         </div>
                                         <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting} > Submit </button>
