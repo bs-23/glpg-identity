@@ -1,6 +1,4 @@
 import ManageFaq from '../../src/modules/platform/faq/client/manage-faq.component';
-
-
 import React from 'react';
 import { render, waitFor, fireEvent, screen } from '@testing-library/react';
 import { configure, shallow } from 'enzyme';

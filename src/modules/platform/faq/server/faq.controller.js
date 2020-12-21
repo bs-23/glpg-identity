@@ -54,6 +54,7 @@ async function getFaqItems(req, res) {
         const page = req.query.page ? req.query.page - 1 : 0;
         if (page < 0) return res.status(404).send("page must be greater or equal 1");
 
+
         const limit = req.query.limit ? req.query.limit : 30;
         const offset = page * limit;
 
@@ -108,7 +109,7 @@ async function getFaqItems(req, res) {
             include: inclusions,
             where: topic ? filter : {},
             offset: orderBy === 'topics' || req.query.page === 'null' ? null : offset,
-            limit: orderBy === 'topics' ? req.query.page === 'null' : limit,
+            limit: orderBy === 'topics' || req.query.page === 'null' ? null : limit,
             order: orderBy === 'topics' ? [] : order,
 
         });
