@@ -15,7 +15,7 @@ export default function ManageFaq() {
     const serviceTopics = useSelector(state => state.faqReducer.faq_topics);
     const [editMode, setEditMode] = useState(false);
     const [editData, setEditData] = useState(null);
-    const [topic, setTopic] = useState(null);
+    // const [topic, setTopic] = useState(null);
     const [sort, setSort] = useState({ type: 'asc', value: null });
     const [showDelete, setShowDelete] = useState(false);
     const [deleteId, setDeleteId] = useState(false);
@@ -71,7 +71,7 @@ export default function ManageFaq() {
 
     useEffect(() => {
         if (faqData.metadata) { faqData.metadata.topic = null; }
-        setTopic(params.get('topic') ? params.get('topic') : null);
+        // setTopic(params.get('topic') ? params.get('topic') : null);
         dispatch(getFaqCategories());
         dispatch(getFaqItems(location.search));
         setSort({ type: params.get('orderType') || 'asc', value: params.get('orderBy') });

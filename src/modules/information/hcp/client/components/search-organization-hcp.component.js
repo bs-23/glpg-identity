@@ -84,7 +84,7 @@ const SearchOrganizationHcp = () => {
     }
 
     useEffect(() => {
-        const getSpecialties = async () => {
+        const fetchSpecialties = async () => {
             const codbases = selectedCountries.map(item => `codbases=${item.value}`);
             const parameters = codbases.join('&');
             if (parameters) {
@@ -93,7 +93,7 @@ const SearchOrganizationHcp = () => {
             }
             else setSpecialties([]);
         }
-        getSpecialties();
+        fetchSpecialties();
     }, [selectedCountries, countries]);
 
     const getCountries = () => userCountries.map(country => ({ value: country.codbase, label: country.codbase_desc }));

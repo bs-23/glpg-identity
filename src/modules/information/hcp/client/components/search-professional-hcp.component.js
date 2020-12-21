@@ -1,9 +1,9 @@
 import axios from 'axios';
 import React, { useRef, useEffect, useState } from 'react';
-import { useLocation, Redirect } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useHistory } from "react-router";
 import { NavLink } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Form, Formik, Field } from 'formik';
 import Select, { components } from 'react-select';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -15,7 +15,6 @@ import Faq from '../../../../platform/faq/client/faq.component';
 import Modal from 'react-bootstrap/Modal';
 
 const SearchProfessionalHcp = () => {
-    const dispatch = useDispatch();
     const formikRef = useRef();
     const location = useLocation();
     const { addToast } = useToasts();
@@ -96,7 +95,7 @@ const SearchProfessionalHcp = () => {
     };
 
     useEffect(() => {
-        const getSpecialties = async () => {
+        const fetchSpecialties = async () => {
             const codbases = selectedCountries.map(item => `codbases=${item.value}`);
             const parameters = codbases.join('&');
             if (parameters) {
@@ -110,13 +109,13 @@ const SearchProfessionalHcp = () => {
             }
             else setSpecialties([]);
         }
-        getSpecialties();
+        fetchSpecialties();
     }, [selectedCountries, hcpSpecialty]);
 
     useEffect(() => {
         const getHcpProfile = async (id) => {
-            const { data: hcpProfile } = await axios.get(`/api/hcps/${id}`);
-            setHcpProfile(hcpProfile.data);
+            const { data: hcpUserProfile } = await axios.get(`/api/hcps/${id}`);
+            setHcpProfile(hcpUserProfile.data);
         }
 
         if (params.get('id')) {

@@ -83,7 +83,7 @@ async function searchOklaHcps(req, res) {
             const activitiesOfIndividual = groupedByIndividuals[individualEid];
             const onekeyEidList = activitiesOfIndividual.map(i => i.onekeyEid);
             const individual = activitiesOfIndividual[0].individual;
-            const isInContract = activitiesOfIndividual[0].isInContract;
+            const isIndividualInContract = activitiesOfIndividual[0].isInContract;
 
             const workplaces = activitiesOfIndividual.map(g => {
                 const workplace = g.workplace;
@@ -104,7 +104,7 @@ async function searchOklaHcps(req, res) {
                 })
                 : undefined;
 
-            const res = {
+            const response = {
                 firstName: individual.firstName,
                 lastName: individual.lastName,
                 specialties,
@@ -114,11 +114,11 @@ async function searchOklaHcps(req, res) {
                 codbase: activitiesOfIndividual[0].codBase,
                 workplaces,
                 onekeyEidList,
-                isInContract,
+                isInContract: isIndividualInContract,
                 isValid: individual.statusCorporateLabel === 'Valid'
             };
 
-            results.push(res);
+            results.push(response);
         });
 
         const data = {
@@ -197,7 +197,7 @@ async function searchOklaHcos(req, res) {
 
         const { response: searchResponse } = await searchOkla(queryObj);
 
-        const results = searchResponse.results.map(({ isInContract, country, codBase, workplace }) => {
+        const results = searchResponse.results.map(({ isInContract: isItInContract, country, codBase, workplace }) => {
             const name = [workplace.managerWorkplaceUsualName, workplace.usualName].filter(i => i).join(' - ');
             const specialties = workplace.qualifications
                 ? Object.keys(workplace.qualifications).map(key => {
@@ -207,7 +207,7 @@ async function searchOklaHcos(req, res) {
             return {
                 name,
                 workplaceEid: workplace.workplaceEid,
-                isInContract,
+                isInContract: isItInContract,
                 isValid: workplace.statusCorporateLabel === 'Valid',
                 specialties,
                 countryIso2: country,

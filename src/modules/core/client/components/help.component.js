@@ -3,7 +3,7 @@ import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
 import { useSelector, useDispatch } from 'react-redux';
 import { getFaqItems, getFaqCategories } from '../../../platform/faq/client/faq.actions';
-import { NavLink, useLocation, useHistory } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import Modal from 'react-bootstrap/Modal';
 import parse from 'html-react-parser';
 
@@ -13,8 +13,8 @@ export default function Help() {
     const [faqData, setFaqData] = useState(null);
     const [selectedfaq, setSelectedfaq] = useState([]);
     const [show, setShow] = useState(false);
-    const handleClose = () => { setShow(false), setSelectedfaq([]) };
-    const handleShow = (faq) => { setShow(true); setSelectedfaq(faq); };
+    const handleClose = () => { setShow(false); setSelectedfaq([]) };
+    const handleShow = (selectedFaq) => { setShow(true); setSelectedfaq(selectedFaq); };
 
     const dispatch = useDispatch();
 
@@ -30,7 +30,7 @@ export default function Help() {
         dispatch(getFaqCategories());
     }, []);
 
-    const faqMapping = (topics, faq) => {
+    const faqMapping = (topics, faqs) => {
 
         const faqWithTopics = [];
 
@@ -40,7 +40,7 @@ export default function Help() {
             const subcategories = topics.filter(x => x.category === element);
             subcategories.forEach(item => {
                 delete item.category;
-                item.faq = faq.filter(x => x.topics.indexOf(item.slug) >= 0);
+                item.faq = faqs.filter(x => x.topics.indexOf(item.slug) >= 0);
             });
             faqWithTopics.push({
                 category: element,

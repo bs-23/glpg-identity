@@ -25,31 +25,31 @@ const FaqForm = (props) => {
         });
     };
 
-    const convertSlugToId = (arr) => {
-        const convertArray = [];
-        arr.forEach(element => {
-            convertArray.push(props.serviceTopics.find(x => x.slug === element).id);
-        });
-        return convertArray;
+    // const convertSlugToId = (arr) => {
+    //     const convertArray = [];
+    //     arr.forEach(element => {
+    //         convertArray.push(props.serviceTopics.find(x => x.slug === element).id);
+    //     });
+    //     return convertArray;
 
-    }
+    // }
 
-    const sortArrayWithTitle = (array) => {
-        const catgory_title_list = [];
-        array.forEach(element => {
-            catgory_title_list.push(props.serviceTopics.find(x => x.id === element).title);
-        });
+    // const sortArrayWithTitle = (array) => {
+    //     const catgory_title_list = [];
+    //     array.forEach(element => {
+    //         catgory_title_list.push(props.serviceTopics.find(x => x.id === element).title);
+    //     });
 
-        catgory_title_list.sort();
+    //     catgory_title_list.sort();
 
-        const catgory_slug_list = [];
+    //     const catgory_slug_list = [];
 
-        catgory_title_list.forEach(element => {
-            catgory_slug_list.push(props.serviceTopics.find(x => x.title === element).slug);
-        });
+    //     catgory_title_list.forEach(element => {
+    //         catgory_slug_list.push(props.serviceTopics.find(x => x.title === element).slug);
+    //     });
 
-        return catgory_slug_list;
-    }
+    //     return catgory_slug_list;
+    // }
 
     useEffect(() => {
         const faqTopics = faqMapping(props.serviceTopics)
@@ -57,14 +57,14 @@ const FaqForm = (props) => {
     }, [props.serviceTopics]);
 
 
-    const faqMapping = (topics) => {
+    const faqMapping = (allTopics) => {
 
         const faqWithTopics = [];
 
-        const parentCategories = [...new Set(Object.values(topics).map((item) => item.category))];
+        const parentCategories = [...new Set(Object.values(allTopics).map((item) => item.category))];
 
         parentCategories.forEach(element => {
-            const subcategories = topics.filter(x => x.category === element);
+            const subcategories = allTopics.filter(x => x.category === element);
             subcategories.forEach(item => {
                 delete item.category;
             });
