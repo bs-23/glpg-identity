@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
 import { NavLink } from 'react-router-dom';
 import { Faq } from '../../../../platform';
+import { Tabs, Tab } from 'react-bootstrap';
 
 export default function Dashboard() {
-
+    const [selectedTab, setSelectedTab] = useState('hcpaproval');
 
     return (
         <main className="app__content cdp-light-bg">
@@ -57,8 +58,32 @@ export default function Dashboard() {
                         </div>
                     </div>
                     <div className="col-12 col-lg-4 col-xl-3 py-3 app__content-panel-right">
-                        <div className="shadow-sm bg-whitem mb-3">
-                            Inbox
+                        <div className="shadow-sm bg-white mb-3 cdp-inbox">
+                            <h5 className="p-3 cdp-text-primary font-weight-bold mb-0 d-flex justify-content-between cdp-inbox__header">
+                               CDP Queues / Tasks / Alerts
+                                <i onClick={() => setShow(true)} type="button" class="icon icon-expand faq-icon-expand faq__icon-toggle d-none d-lg-block"></i>
+                                <i class="icon icon-minimize faq-icon-minimize  d-none faq__icon-toggle" type="button" onClick={() => setShow(false)}></i>
+                                <i className="icon icon-help faq__icon-help d-block d-lg-none"></i>
+                            </h5>
+                            <div>
+                                <Tabs defaultActiveKey={selectedTab} className="cdp-inbox__tab px-2" onSelect={(activeKey, e) => setSelectedTab(activeKey)}>
+                                    <Tab eventKey="hcpaproval" title="HCP Approval">
+                                        <div className="cdp-inbox__tab-detail p-3">Coming soon...</div>
+                                    </Tab>
+                                    <Tab eventKey="consent" title="Consent" disabled>
+                                        <div className="cdp-inbox__tab-detail p-3">Coming soon...</div>
+                                    </Tab>
+                                    <Tab eventKey="emailcampaign" title="Email Campaign" disabled>
+                                        <div className="cdp-inbox__tab-detail p-3">Coming soon...</div>
+                                    </Tab>
+                                    <Tab eventKey="samplerequest" title="Sample Request" disabled>
+                                        <div className="cdp-inbox__tab-detail p-3">Coming soon...</div>
+                                    </Tab>
+                                    <Tab eventKey="chatbot" title="Chatbot" disabled>
+                                        <div className="cdp-inbox__tab-detail p-3">Coming soon...</div>
+                                    </Tab>
+                                </Tabs>
+                            </div>
                         </div>
                         <Faq topic="general-information" />
                     </div>
