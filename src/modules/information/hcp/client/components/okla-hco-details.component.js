@@ -44,15 +44,15 @@ const OklaHcoDetails = ({ hco, setSelectedHco }) => {
                             <div className="row">
                                 <div className="col-12 mb-3">
                                     <strong className="okla-search__details-title">Name</strong>
-                                    <span className="okla-search__details-value">{hcoDetails?.name}</span>
+                                    <span className="okla-search__details-value">{hcoDetails?.name || '--'}</span>
                                 </div>
                                 <div className="col-12 col-sm-6 mb-3">
                                     <strong className="okla-search__details-title">OneKey Workplace ID</strong>
-                                    <span className="okla-search__details-value">{hcoDetails.workplaceEid}</span>
+                                    <span className="okla-search__details-value">{hcoDetails.workplaceEid || '--'}</span>
                                 </div>
                                 <div className="col-12 col-sm-6 mb-3">
                                     <strong className="okla-search__details-title">Specialties</strong>
-                                    <span className="okla-search__details-value">{hcoDetails.specialties.join(', ')}</span>
+                                    <span className="okla-search__details-value">{hcoDetails.specialties ? hcoDetails.specialties.join(', ') : '--'}</span>
                                 </div>
                                 <div className="col-12 col-sm-6 mb-3">
                                     <strong className="okla-search__details-title">Status</strong>
@@ -64,11 +64,11 @@ const OklaHcoDetails = ({ hco, setSelectedHco }) => {
                                 </div>
                                 <div className="col-12 col-sm-6 mb-3">
                                     <strong className="okla-search__details-title">Type</strong>
-                                    <span className="okla-search__details-value">{hcoDetails.type}</span>
+                                    <span className="okla-search__details-value">{hcoDetails.type || '--'}</span>
                                 </div>
                                 <div className="col-12 col-sm-6 mb-3">
                                     <strong className="okla-search__details-title">Activity</strong>
-                                    <span className="okla-search__details-value">{hcoDetails.activity}</span>
+                                    <span className="okla-search__details-value">{hcoDetails.activity || '--'}</span>
                                 </div>
                             </div>
                         </Tab>
@@ -81,15 +81,15 @@ const OklaHcoDetails = ({ hco, setSelectedHco }) => {
 
                                 <div className="col-12 col-sm-6 mb-3">
                                     <strong className="okla-search__details-title">Address</strong>
-                                    <span className="okla-search__details-value">{hcoDetails.address}</span>
+                                    <span className="okla-search__details-value">{hcoDetails.address || '--'}</span>
                                 </div>
                                 <div className="col-12 col-sm-6 mb-3">
                                     <strong className="okla-search__details-title">City</strong>
-                                    <span className="okla-search__details-value">{hcoDetails.city}</span>
+                                    <span className="okla-search__details-value">{hcoDetails.city || '--'}</span>
                                 </div>
                                 <div className="col-12 col-sm-6 mb-3">
                                     <strong className="okla-search__details-title">Post Code</strong>
-                                    <span className="okla-search__details-value">{hcoDetails.postCode}</span>
+                                    <span className="okla-search__details-value">{hcoDetails.postCode || '--'}</span>
                                 </div>
                                 <div className="col-12 col-sm-6 mb-3">
                                     <strong className="okla-search__details-title">Country</strong>

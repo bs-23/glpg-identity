@@ -43,10 +43,10 @@ async function searchOklaHcps(req, res) {
             specialties: 'individual.speciality1',
             onekeyId: 'activity.activityEid',
             individualEid: 'individual.individualEid',
-            externalKey: 'individual.externalKeys.value'
+            externalIdentifier: 'individual.externalKeys.value'
         };
 
-        const exactSearchFields = ['onekeyId', 'individualEid', 'specialties', 'externalKey'];
+        const exactSearchFields = ['onekeyId', 'individualEid', 'specialties', 'externalIdentifier'];
 
         const fields = Object.keys(fieldNameMap).map(key => {
             let value = req.body[key];
