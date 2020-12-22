@@ -33,18 +33,18 @@ const OklaHcoDetails = ({ hco, setSelectedHco }) => {
         onHide={() => hideHcoDetails()}>
         <Modal.Header closeButton>
             <Modal.Title>
-               HCO Details
+                HCO Details
             </Modal.Title>
         </Modal.Header>
         <Modal.Body>
             {hcoDetails ? (
                 <div className="okla-search__details">
-                    <Tabs defaultActiveKey={selectedTab} className="okla-search__tabs" onSelect={(activeKey,e) => setSelectedTab(activeKey)}>
+                    <Tabs defaultActiveKey={selectedTab} className="okla-search__tabs" onSelect={(activeKey, e) => setSelectedTab(activeKey)}>
                         <Tab eventKey="Identifiers" title="Identifiers">
                             <div className="row">
                                 <div className="col-12 mb-3">
                                     <strong className="okla-search__details-title">Name</strong>
-                                    <span className="okla-search__details-value">{hcoDetails?.name || '--'}</span>
+                                    <span className="okla-search__details-value">{hcoDetails.name || '--'}</span>
                                 </div>
                                 <div className="col-12 col-sm-6 mb-3">
                                     <strong className="okla-search__details-title">OneKey Workplace ID</strong>
