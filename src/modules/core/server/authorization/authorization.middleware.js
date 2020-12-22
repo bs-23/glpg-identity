@@ -13,6 +13,7 @@ const User_Role = require(path.join(process.cwd(), "src/modules/platform/role/se
 const Role_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/role-permissionSet.model.js"));
 const Role = require(path.join(process.cwd(), "src/modules/platform/role/server/role.model.js"));
 const logService = require(path.join(process.cwd(), "src/modules/core/server/audit/audit.service.js"));
+const { getUserWithPermissionRelations } = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/permissions.js"));
 
 const AdminGuard = (req, res, next) => {
     if (!req.user) return res.status(401).send('unauthorized');
@@ -31,97 +32,7 @@ const isPermitted = (module, permissions) => {
 };
 
 async function getUserWithProfiles(id) {
-    const userWithPermissions = await User.findOne({
-        where: { id },
-        include: [
-            {
-                model: User_Role,
-                as: 'userRoles',
-                include: [{
-                    model: Role,
-                    as: 'role',
-                    include: [{
-                        model: Role_PermissionSet,
-                        as: 'role_ps',
-                        include: [{
-                            model: PermissionSet,
-                            as: 'ps',
-                            include: [
-                                {
-                                    model: PermissionSet_ServiceCateory,
-                                    as: 'ps_sc',
-                                    include: [
-                                        {
-                                            model: ServiceCategory,
-                                            as: 'serviceCategory',
-
-                                        }
-                                    ]
-
-                                },
-                                {
-                                    model: PermissionSet_Application,
-                                    as: 'ps_app',
-                                    include: [
-                                        {
-                                            model: Application,
-                                            as: 'application',
-
-                                        }
-                                    ]
-
-                                }
-                            ]
-
-                        }]
-                    }]
-
-                }]
-            },
-            {
-
-                model: UserProfile,
-                as: 'userProfile',
-                include: [{
-                    model: UserProfile_PermissionSet,
-                    as: 'up_ps',
-                    include: [{
-                        model: PermissionSet,
-                        as: 'ps',
-                        include: [
-                            {
-                                model: PermissionSet_ServiceCateory,
-                                as: 'ps_sc',
-                                include: [
-                                    {
-                                        model: ServiceCategory,
-                                        as: 'serviceCategory',
-
-                                    }
-                                ]
-
-                            },
-                            {
-                                model: PermissionSet_Application,
-                                as: 'ps_app',
-                                include: [
-                                    {
-                                        model: Application,
-                                        as: 'application',
-
-                                    }
-                                ]
-
-                            }
-                        ]
-
-                    }]
-                }]
-            }
-
-        ]
-    });
-
+    const userWithPermissions = await getUserWithPermissionRelations({ id });
     return userWithPermissions;
 }
 
