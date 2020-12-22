@@ -40,21 +40,22 @@ async function searchOklaHcps(req, res) {
             address: 'address.dispatchLabel',
             city: 'address.villageLabel',
             postCode: 'address.longPostalCode',
+            specialties: 'individual.speciality1',
             onekeyId: 'activity.activityEid',
             individualEid: 'individual.individualEid',
-            specialties: 'individual.speciality1'
+            externalKey: 'individual.externalKeys.value'
         };
 
-        const exactFields = ['onekeyId', 'individualEid', 'specialties'];
+        const exactSearchFields = ['onekeyId', 'individualEid', 'specialties', 'externalKey'];
 
         const fields = Object.keys(fieldNameMap).map(key => {
             let value = req.body[key];
             if (Array.isArray(value) && value.length === 0) value = null;
-            const isExact = exactFields.includes(key);
+            const isSearchMethodExact = exactSearchFields.includes(key);
             if (value) {
                 return {
                     name: fieldNameMap[key],
-                    method: isExact
+                    method: isSearchMethodExact
                         ? 'EXACT'
                         : phonetic === true
                             ? 'PHONETIC'

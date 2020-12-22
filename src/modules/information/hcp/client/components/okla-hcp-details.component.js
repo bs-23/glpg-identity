@@ -84,7 +84,7 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
                                     <span className="okla-search__details-value">{getCountryName(hcpDetails.countryIso2)}</span>
                                 </li>
                                 <li className="okla-search__details-item">
-                                    <strong className="okla-search__details-title">Specailty</strong>
+                                    <strong className="okla-search__details-title">Specialty</strong>
                                     <span className="okla-search__details-value">{hcpDetails.specialties.join(', ')}</span>
                                 </li>
                             </ul>
