@@ -57,35 +57,35 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
                             <ul className="okla-search__details-items">
                                 <li className="okla-search__details-item">
                                     <strong className="okla-search__details-title">Salutation</strong>
-                                    <span className="okla-search__details-value">{hcpDetails.salutation}</span>
+                                    <span className="okla-search__details-value">{hcpDetails.salutation || '--'}</span>
                                 </li>
                                 <li className="okla-search__details-item">
                                     <strong className="okla-search__details-title">Name</strong>
-                                    <span className="okla-search__details-value">{hcpDetails?.firstName} {hcpDetails?.lastName}</span>
+                                    <span className="okla-search__details-value">{hcpDetails.firstName} {hcpDetails.lastName}</span>
                                 </li>
                                 <li className="okla-search__details-item">
                                     <strong className="okla-search__details-title">Title</strong>
-                                    <span className="okla-search__details-value">{hcpDetails.title}</span>
+                                    <span className="okla-search__details-value">{hcpDetails.title || '--'}</span>
                                 </li>
                                 <li className="okla-search__details-item">
                                     <strong className="okla-search__details-title">Gender</strong>
-                                    <span className="okla-search__details-value">{hcpDetails.gender}</span>
+                                    <span className="okla-search__details-value">{hcpDetails.gender || '--'}</span>
                                 </li>
                                 <li className="okla-search__details-item">
                                     <strong className="okla-search__details-title">Graduation Year</strong>
-                                    <span className="okla-search__details-value">{hcpDetails.graduationYear}</span>
+                                    <span className="okla-search__details-value">{hcpDetails.graduationYear || '--'}</span>
                                 </li>
                                 <li className="okla-search__details-item">
                                     <strong className="okla-search__details-title">Birth Year</strong>
-                                    <span className="okla-search__details-value">{hcpDetails.birthYear}</span>
+                                    <span className="okla-search__details-value">{hcpDetails.birthYear || '--'}</span>
                                 </li>
                                 <li className="okla-search__details-item">
                                     <strong className="okla-search__details-title">Country</strong>
                                     <span className="okla-search__details-value">{getCountryName(hcpDetails.countryIso2)}</span>
                                 </li>
                                 <li className="okla-search__details-item">
-                                    <strong className="okla-search__details-title">Specailty</strong>
-                                    <span className="okla-search__details-value">{hcpDetails.specialties.join(', ')}</span>
+                                    <strong className="okla-search__details-title">Specialty</strong>
+                                    <span className="okla-search__details-value">{hcpDetails.specialties ? hcpDetails.specialties.join(', ') : '--'}</span>
                                 </li>
                             </ul>
                         </Tab>
@@ -93,14 +93,14 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
                             <ul className="okla-search__details-items">
                                 <li className="okla-search__details-item">
                                     <strong className="okla-search__details-title">OneKey Individual ID</strong>
-                                    <span className="okla-search__details-value">{hcpDetails.individualEid}</span>
+                                    <span className="okla-search__details-value">{hcpDetails.individualEid || '--'}</span>
                                 </li>
                                 {
                                     hcpDetails.externalIdentifiers.map((identifier, identifierIdx) => (
-                                    <li className="okla-search__details-item" key={'id-'+identifierIdx}>
+                                        <li className="okla-search__details-item" key={'id-' + identifierIdx}>
                                             <strong className="okla-search__details-title">{identifier.name}</strong>
                                             <span className="okla-search__details-value">{identifier.value}</span>
-                                    </li>
+                                        </li>
                                     ))
                                 }
                                 <li className="okla-search__details-item">
@@ -110,33 +110,11 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
                             </ul>
                         </Tab>
                         <Tab eventKey="Workplace" title="Workplace">
-                            {/* <div>
-                                {selectedWorkplace && <MapView location={selectedWorkplace.location} />}
-
-                                <div>Workplaces:</div>
-                                {
-                                    hcpDetails.workplaces.map((workplace, idx) => (
-                                        <div key={workplace.id} className={`p-2 border-bottom ${selectedWorkplace && workplace.id === selectedWorkplace.id ? 'selected' : ''}`} id={'wp-' + idx} onClick={() => { setSelectedWorkplace(workplace); }}>
-                                            <span>{workplace.isMainActivity
-                                                ? '★'
-                                                : workplace.isValid
-                                                    ? <i className="fas fa-check mr-1 cdp-text-primary"></i>
-                                                    : <i className="fas fa-times mr-1 cdp-text-secondary"></i>}
-                                            </span>
-                                            <span className="ml-1">{workplace.name}</span>
-                                            <span className="ml-1">| {workplace.type}</span>
-                                            <span className="ml-1">| {workplace.address}</span>
-                                            <span className="ml-1">| {workplace.city}, {workplace.postCode}</span>
-                                            {workplace.contactNumbers.map((c, i) => (<div key={'tel-' + i}>{c.type}: {c.number}</div>))}
-                                        </div>
-                                    ))
-                                }
-                            </div> */}
                             <Dropdown>
                                 <Dropdown.Toggle
                                     variant=""
                                     className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center dropdown-toggle btn">
-                                    {selectedWorkplace?.name || selectedWorkplace?.alternateName}
+                                    {selectedWorkplace ? selectedWorkplace.name || selectedWorkplace.alternateName : ''}
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
                                     {hcpDetails.workplaces.map((workplace, idx) => (
@@ -179,7 +157,7 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
                                         <div className="col-12 col-sm-6 pb-3">
                                             <div className="mt-1 font-weight-bold">Post Code</div>
                                             <div>{selectedWorkplace.postCode}</div>
-                                    </div>
+                                        </div>
                                         <div className="col-12">
                                             <div className="mt-1 font-weight-bold">Contact Numbers:</div>
                                             {selectedWorkplace.contactNumbers.map((c, i) => (<div key={'tel-' + i}>{c.type}: {c.number}</div>))}
