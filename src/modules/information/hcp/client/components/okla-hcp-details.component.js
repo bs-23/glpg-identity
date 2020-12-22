@@ -61,7 +61,7 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
                                 </li>
                                 <li className="okla-search__details-item">
                                     <strong className="okla-search__details-title">Name</strong>
-                                    <span className="okla-search__details-value">{hcpDetails?.firstName} {hcpDetails?.lastName}</span>
+                                    <span className="okla-search__details-value">{hcpDetails.firstName} {hcpDetails.lastName}</span>
                                 </li>
                                 <li className="okla-search__details-item">
                                     <strong className="okla-search__details-title">Title</strong>
@@ -110,33 +110,11 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
                             </ul>
                         </Tab>
                         <Tab eventKey="Workplace" title="Workplace">
-                            {/* <div>
-                                {selectedWorkplace && <MapView location={selectedWorkplace.location} />}
-
-                                <div>Workplaces:</div>
-                                {
-                                    hcpDetails.workplaces.map((workplace, idx) => (
-                                        <div key={workplace.id} className={`p-2 border-bottom ${selectedWorkplace && workplace.id === selectedWorkplace.id ? 'selected' : ''}`} id={'wp-' + idx} onClick={() => { setSelectedWorkplace(workplace); }}>
-                                            <span>{workplace.isMainActivity
-                                                ? '★'
-                                                : workplace.isValid
-                                                    ? <i className="fas fa-check mr-1 cdp-text-primary"></i>
-                                                    : <i className="fas fa-times mr-1 cdp-text-secondary"></i>}
-                                            </span>
-                                            <span className="ml-1">{workplace.name}</span>
-                                            <span className="ml-1">| {workplace.type}</span>
-                                            <span className="ml-1">| {workplace.address}</span>
-                                            <span className="ml-1">| {workplace.city}, {workplace.postCode}</span>
-                                            {workplace.contactNumbers.map((c, i) => (<div key={'tel-' + i}>{c.type}: {c.number}</div>))}
-                                        </div>
-                                    ))
-                                }
-                            </div> */}
                             <Dropdown>
                                 <Dropdown.Toggle
                                     variant=""
                                     className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center dropdown-toggle btn">
-                                    {selectedWorkplace?.name || selectedWorkplace?.alternateName}
+                                    {selectedWorkplace ? selectedWorkplace.name || selectedWorkplace.alternateName : ''}
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
                                     {hcpDetails.workplaces.map((workplace, idx) => (
