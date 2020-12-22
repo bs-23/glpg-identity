@@ -1,15 +1,19 @@
 const passport = require('passport');
 const path = require('path');
 const controller = require('./hcp.controller');
-const { Modules } = require('../../core/server/authorization/authorization.constants');
-const { ModuleGuard } = require('../../core/server/authorization/authorization.middleware');
+const { Modules } = require('../../../core/server/authorization/authorization.constants');
+const { ModuleGuard } = require('../../../core/server/authorization/authorization.middleware');
 const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/platform/user/server/user-authentication.middleware.js'));
 
 module.exports = app => {
     app.route('/api/hcps')
         .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getHcps);
 
+    app.route('/api/hcps/specialties')
+        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getSpecialtiesForCdp);
+
     app.route('/api/hcps/:id')
+        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getHcpProfile)
         .put(CDPAuthStrategy, controller.editHcp);
 
     app.route('/api/hcp-profiles/registration-lookup')

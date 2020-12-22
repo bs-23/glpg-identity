@@ -4,15 +4,15 @@ import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
 import parse from 'html-react-parser';
 import { useSelector, useDispatch } from 'react-redux';
-import { getFaqItems } from '../../../platform/faq/client/faq.actions';
+import { getFaqItemsForFaq } from '../../../platform/faq/client/faq.actions';
 
 export default function Faq(props) {
     const [show, setShow] = React.useState();
-    const faqData = useSelector(state => state.faqReducer.faq_items);
+    const faqData = useSelector(state => state.faqReducer.faq_list);
     const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(getFaqItems(`?page=1&category=${props.category}&limit=5`));
+        dispatch(getFaqItemsForFaq(`?page=${props.page ? props.page : 1}&topic=${props.topic}&limit=5`));
     }, []);
 
     return (
@@ -27,8 +27,9 @@ export default function Faq(props) {
                 <Accordion defaultActiveKey="0" className="faq__body">
                     {faqData.faq && faqData.faq.map((faq, index) => (
                         <Card key={index}>
+
                             <Accordion.Collapse eventKey={index + ""}>
-                                <Card.Body>{parse(faq.answer)}</Card.Body>
+                                <Card.Body>{parse(parse(faq.answer))}</Card.Body>
                             </Accordion.Collapse>
                             <Accordion.Toggle as={Card.Header} eventKey={index + ""} className="p-3 d-flex align-items-baseline justify-content-between" role="button">
                                 <span className="faq__question">{faq.question}</span>
@@ -39,19 +40,19 @@ export default function Faq(props) {
 
                     {faqData.metadata && faqData.metadata.total > 5 &&
                         <Card className="border-0">
-                            <NavLink to="help" className="p-3 pb-0 mb-0 w-100 d-flex align-items-center bg-white cdp-text-secondary">
+                            <NavLink to="/help" className="p-3 pb-0 mb-0 w-100 d-flex align-items-center bg-white cdp-text-secondary">
                                 Visit CDP help center for more
                             </NavLink>
                         </Card>
                     }
                 </Accordion>
 
-                { faqData.faq && faqData.faq.length === 0 &&
+                {faqData.faq && faqData.faq.length === 0 &&
                     <div className="bg-white text-center py-3 px-2 border-top">
                         <i className="icon icon-help icon-3x cdp-text-secondary"></i>
                         <h5 className="cdp-text-primary pt-4">No data found related to this service category</h5>
                         <p className="py-2 mb-4">Click the button below for more information</p>
-                        <NavLink to="help" className="btn cdp-btn-secondary text-white px-5 py-2 font-weight-bold">
+                        <NavLink to="/help" className="btn cdp-btn-secondary text-white px-5 py-2 font-weight-bold">
                             <i className="fas fa-list-ul pr-1"></i> CDP Help Center
                         </NavLink>
                     </div>

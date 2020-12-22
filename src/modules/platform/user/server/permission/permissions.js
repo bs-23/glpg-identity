@@ -1,6 +1,6 @@
 const path = require('path');
 const _ = require('lodash');
-const Application = require(path.join(process.cwd(), 'src/modules/application/server/application.model'));
+const Application = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.model'));
 const UserProfile = require(path.join(process.cwd(), "src/modules/platform/profile/server/user-profile.model.js"));
 const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/userProfile-permissionSet.model.js"));
 const User_Role = require(path.join(process.cwd(), "src/modules/platform/role/server/user-role.model.js"));
@@ -169,36 +169,32 @@ async function getPermissionsFromPermissionSet(permissionSet) {
 async function getRequestingUserPermissions(user) {
     if(!user) return [[], [], []];
 
-    let role_applications = [];
-    let role_countries = [];
-    let role_service_categories = [];
-
-    let profile_applications = [];
-    let profile_countries = [];
-    let profile_service_categories = [];
+    let applications = [];
+    let countries = [];
+    let service_categories = [];
 
     if (user.userProfile) {
         const profilePermissionSets = user.userProfile.up_ps;
         for (const userProPermSet of profilePermissionSets) {
-            const [applications, countries, serviceCategories] = await getPermissionsFromPermissionSet(userProPermSet.ps);
-            profile_applications = profile_applications.concat(applications);
-            profile_countries = profile_countries.concat(countries);
-            profile_service_categories = profile_service_categories.concat(serviceCategories);
+            const [profile_applications, profile_countries, profile_serviceCategories] = await getPermissionsFromPermissionSet(userProPermSet.ps);
+            applications = applications.concat(profile_applications);
+            countries = countries.concat(profile_countries);
+            service_categories = service_categories.concat(profile_serviceCategories);
         }
     }
 
     for (const userRole of user.userRoles) {
         for (const rolePermSet of userRole.role.role_ps) {
-            const [applications, countries, serviceCategories] = await getPermissionsFromPermissionSet(rolePermSet.ps);
-            role_applications = role_applications.concat(applications);
-            role_countries = role_countries.concat(countries);
-            role_service_categories = role_service_categories.concat(serviceCategories);
+            const [role_applications, role_countries, role_serviceCategories] = await getPermissionsFromPermissionSet(rolePermSet.ps);
+            applications = applications.concat(role_applications);
+            countries = countries.concat(role_countries);
+            service_categories = service_categories.concat(role_serviceCategories);
         }
     }
 
-    const user_countries = [...new Set(role_countries.concat(profile_countries))];
-    const user_applications = _.uniqBy(role_applications.concat(profile_applications), app => app.slug);
-    const user_service_categories = _.uniqBy(role_service_categories.concat(profile_service_categories), sc => sc.slug);
+    const user_countries = [...new Set(countries)];
+    const user_applications = _.uniqBy(applications, app => app.slug);
+    const user_service_categories = _.uniqBy(service_categories, sc => sc.slug);
 
     return [user_applications, user_countries, user_service_categories];
 }

@@ -1,4 +1,4 @@
-import { string, object, ref, array } from 'yup';
+import { string, object, ref } from 'yup';
 import XRegExp from 'xregexp';
 
 const PHONE_MAX_LENGTH = 25;
@@ -13,12 +13,12 @@ const isPhoneMaxLengthValid = (parent) => {
 function validatePassword(password) {
     const minLength = 8;
     const maxLength = 50;
-    const hasUppercase = new RegExp("^(?=.*[A-Z])").test(password);
-    const hasLowercase = new RegExp("^(?=.*[a-z])").test(password);
-    const hasDigit = new RegExp("^(?=.*[0-9])").test(password);
-    const hasSpecialCharacter = new RegExp("[!\"#$%&'\(\)\*\+,\-\.\\\\/:;<=>\?@\[\\]\^_`\{\|\}\~]").test(password);
+    const containsUppercase = new RegExp("^(?=.*[A-Z])").test(password);
+    const containsLowercase = new RegExp("^(?=.*[a-z])").test(password);
+    const containsDigit = new RegExp("^(?=.*[0-9])").test(password);
+    const containsSpecialCharacter = new RegExp("[!\"#$%&'\(\)\*\+,\-\.\\\\/:;<=>\?@\[\\]\^_`\{\|\}\~]").test(password);
 
-    if (password && (password.length < minLength || password.length > maxLength || !hasUppercase || !hasLowercase || !hasDigit || !hasSpecialCharacter)) {
+    if (password && (password.length < minLength || password.length > maxLength || !containsUppercase || !containsLowercase || !containsDigit || !containsSpecialCharacter)) {
         return false;
     }
 
@@ -26,9 +26,9 @@ function validatePassword(password) {
 }
 
 function hasValidCharacters(password) {
-    var pattern = new RegExp("^[a-zA-Z0-9!\"#$%&'\(\)\*\+,\-\.\\\\/:;<=>\?@\[\\]\^_`\{\|\}\~]*$");
-    const containsValidCharacters = pattern.test(password);
-    return containsValidCharacters;
+    var validCharacterPattern = new RegExp("^[a-zA-Z0-9!\"#$%&'\(\)\*\+,\-\.\\\\/:;<=>\?@\[\\]\^_`\{\|\}\~]*$");
+    const containsValidCharacter = validCharacterPattern.test(password);
+    return containsValidCharacter;
 }
 
 function isEmailLengthValid(email) {
@@ -46,7 +46,7 @@ export const loginSchema = object().shape({
     // recaptchaToken: string().nullable().required('Captcha verification required')
 });
 
-export const registerSchema = object().shape({
+const cdpUserSchema = {
     first_name: string()
         .matches(XRegExp('^[\\pL]+(?:\\s[\\pL]+)*$'), 'This field should contain letters only')
         .min(2, 'This field must be at least 2 characters long')
@@ -54,7 +54,6 @@ export const registerSchema = object().shape({
         .required('This field must not be empty'),
     last_name: string()
         .matches(XRegExp('^[\\pL]+(?:\\s[\\pL]+)*$'), 'This field should contain letters only')
-        // .matches(XRegExp('^\\pL+$'), 'This field only contains letters')
         .min(2, 'This field must be at least 2 characters long')
         .max(50, 'This field must be at most 50 characters long')
         .required('This field must not be empty'),
@@ -63,7 +62,13 @@ export const registerSchema = object().shape({
         .max(100, 'This field must be at most 100 characters long')
         .required('This field must not be empty')
         .test('is-valid-email-length', 'The part before @ of the email can be maximum 64 characters ',
-            email => isEmailLengthValid(email)),
+            email => isEmailLengthValid(email))
+};
+
+export const registerSchema = object().shape({
+    first_name: cdpUserSchema.first_name,
+    last_name: cdpUserSchema.last_name,
+    email: cdpUserSchema.email,
     phone: string()
         .matches(/^[0-9]*$/, 'This field only contains digits')
         .min(4, 'This field must be at least 4 characters long')
@@ -115,23 +120,9 @@ export const forgotPasswordSchema = object().shape({
 });
 
 export const updateMyProfileSchema = object().shape({
-    first_name: string()
-        .matches(XRegExp('^[\\pL]+(?:\\s[\\pL]+)*$'), 'This field should contain letters only')
-        .min(2, 'This field must be at least 2 characters long')
-        .max(50, 'This field must be at most 50 characters long')
-        .required('This field must not be empty'),
-    last_name: string()
-        .matches(XRegExp('^[\\pL]+(?:\\s[\\pL]+)*$'), 'This field should contain letters only')
-        // .matches(XRegExp('^\\pL+$'), 'This field only contains letters')
-        .min(2, 'This field must be at least 2 characters long')
-        .max(50, 'This field must be at most 50 characters long')
-        .required('This field must not be empty'),
-    email: string()
-        .email('This field should be a valid email address')
-        .max(100, 'This field must be at most 100 characters long')
-        .required('This field must not be empty')
-        .test('is-valid-email-length', 'The part before @ of the email can be maximum 64 characters ',
-            email => isEmailLengthValid(email)),
+    first_name: cdpUserSchema.first_name,
+    last_name: cdpUserSchema.last_name,
+    email: cdpUserSchema.email,
     phone: string().when('isCountryFlagActive', {
         is: true,
         then: string().matches(/^[0-9]*$/, 'This field only contains digits')

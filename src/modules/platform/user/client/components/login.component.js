@@ -2,13 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useCookies } from 'react-cookie';
-import ReCAPTCHA from 'react-google-recaptcha';
+// import ReCAPTCHA from 'react-google-recaptcha';
 import { useToasts } from 'react-toast-notifications';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 
 import { login } from '../user.actions';
 import { loginSchema } from '../user.schema';
-import { getCountries } from '../../../../core/client/country/country.actions';
+import { getAllCountries } from '../../../../core/client/country/country.actions';
 
 export default function Login() {
     const dispatch = useDispatch();
@@ -41,7 +41,7 @@ export default function Login() {
                                             grant_type: 'password',
                                             recaptchaToken: '1234' // values.recaptchaToken
                                         })).then( response => {
-                                            dispatch(getCountries());
+                                            dispatch(getAllCountries());
                                             setCookie('logged_in', true, { path: '/' });
                                         }).catch(error => {
                                             addToast(error.response.data, {

@@ -31,7 +31,7 @@ const BackendErrorMessage = ({ name }) => (
     </Field>
 )
 
-const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCell, formikProps, singleRowEditing, onInputChange, onInputKeyDown, editableTableProps }) => {
+const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCell, formikProps, singleRowEditing, onInputChange, onInputKeyDown, editableTableProps, selectedRow }) => {
     const { handleBlur, handleChange, initialValues, values, dirty } = formikProps;
 
     const isCellInvalid = (name) => {
@@ -158,7 +158,10 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
         </React.Fragment>
     })
 
-    return columns && row && <tr className={singleRowEditing && rowChangeStatus ? 'edited' : ''}>
+    const editStatus = singleRowEditing && rowChangeStatus ? 'edited' : '';
+    const selectionStatus = row.id === selectedRow ? 'selected' : '';
+
+    return columns && row && <tr className={`${editStatus} ${selectionStatus}`}>
         {renderRow()}
     </tr>;
 }

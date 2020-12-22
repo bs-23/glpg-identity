@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useState, useEffect } from 'react';
 import { Form, Formik, Field, FieldArray, ErrorMessage } from "formik";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { useToasts } from "react-toast-notifications";
 import { permissionSetCreateSchema } from "./permission-set.schema";
 
@@ -95,7 +95,7 @@ const ToggleList = ({ name, options, labelExtractor, idExtractor, allOptionID })
                     arrayHelpers.remove(idx);
                 }
                 arrayHelpers.push(optionId);
-            };
+            }
         }
         else {
             if(allOptionID && (optionId === allOptionID)){

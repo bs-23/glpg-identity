@@ -14,12 +14,13 @@ import NoMatch from "./NoMatch";
 import PublicRoute from "./PublicRoute";
 import PrivateRoute from "./PrivateRoute";
 import { Dashboard, Login, ForgotPassword, ResetPassword, PlatformRoutes, userActions, MyProfile } from "../../platform";
-import HcpRoutes from "../../hcp/client/hcp.routes";
+// import HcpRoutes from "../../information/hcp/client/hcp.routes";
 import ConsentRoutes from "../../consent/client/consent.routes";
 import SwaggerLogin from '../../../config/server/lib/swagger/swagger-login.component';
 import store from './store';
-import { getCountries } from '../../core/client/country/country.actions';
+import { getAllCountries } from '../../core/client/country/country.actions';
 import HelpComponent from '../../core/client/components/help.component';
+import { InformationRoutes } from '../../information';
 
 const { getSignedInUserProfile } = userActions;
 
@@ -69,7 +70,7 @@ export default function App() {
 
     useEffect(() => {
         dispatch(getSignedInUserProfile()).then(() => {
-            dispatch(getCountries());
+            dispatch(getAllCountries());
         }).catch(err => {
             if (err.response && err.response.status === 401) removeCookie('logged_in', { path: '/' });
         });
@@ -84,7 +85,7 @@ export default function App() {
 
                 <PrivateRoute exact path="/" component={Dashboard}/>
 
-                <Route path="/hcps" component={HcpRoutes}/>
+                {/* <Route path="/hcps" component={HcpRoutes}/> */}
 
                 <Route path='/consent' component={ConsentRoutes}/>
 
@@ -95,6 +96,8 @@ export default function App() {
                 <Route path="/forbidden" component={Forbidden}/>
 
                 <Route path="/platform" component={PlatformRoutes}/>
+
+                <Route path="/information" component={InformationRoutes}/>
 
                 <Route path="/my-profile" component={MyProfile}/>
 

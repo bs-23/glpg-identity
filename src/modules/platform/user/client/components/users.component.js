@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { getUsers } from '../user.actions';
 import axios from 'axios';
+import Modal from 'react-bootstrap/Modal';
+import Faq from '../../../faq/client/faq.component';
 
 const safeGet = (object, property) => {
     const propData = (object || {})[property];
@@ -25,6 +27,10 @@ export default function Users() {
     const [userCountries, setUserCountries] = useState([]);
     const [sort, setSort] = useState({ type: 'asc', value: null });
 
+    const [showFaq, setShowFaq] = useState(false);
+    const handleCloseFaq = () => setShowFaq(false);
+    const handleShowFaq = () => setShowFaq(true);
+
     const userdata = useSelector(state => state.userReducer.users);
     const countries = useSelector(state => state.countryReducer.countries);
     const params = new URLSearchParams(window.location.search);
@@ -39,9 +45,9 @@ export default function Users() {
             return role_permission_sets.map(rps => safeGet(rps, 'ps')('countries')());
         }) : [];
 
-        const userCountries = union(flatten(profile_countries), flatten(roles_countries)).filter(e => e);
+        const user_countries = union(flatten(profile_countries), flatten(roles_countries)).filter(e => e);
 
-        return userCountries;
+        return user_countries;
     }
 
     const extractLoggedInUserCountries = (data) => {
@@ -54,9 +60,9 @@ export default function Users() {
             return role_permission_sets.map(rps => safeGet(rps, 'countries')() || []);
         }) : [];
 
-        const userCountries = union(flatten(profile_countries), flatten(roles_countries)).filter(e => e);
+        const user_countries = union(flatten(profile_countries), flatten(roles_countries)).filter(e => e);
 
-        return userCountries;
+        return user_countries;
     }
 
     const sortCountries = (user_countries) => {
@@ -69,7 +75,7 @@ export default function Users() {
 
         countryArr.sort((a, b) => (a.codbase_desc > b.codbase_desc) ? 1 : -1);
         countryArr.forEach((element, key) => {
-            if(!element) return;
+            if (!element) return;
             countryString = countryString + element.codbase_desc;
             if (key < countryArr.length - 1) countryString = countryString + ', ';
         });
@@ -80,8 +86,8 @@ export default function Users() {
     useEffect(() => {
         async function getCountries() {
             const userProfile = (await axios.get('/api/users/profile')).data;
-            const userCountries = extractLoggedInUserCountries(userProfile);
-            setUserCountries(fetchUserCountries(userCountries, countries));
+            const user_countries = extractLoggedInUserCountries(userProfile);
+            setUserCountries(fetchUserCountries(user_countries, countries));
         }
         getCountries();
     }, []);
@@ -151,8 +157,15 @@ export default function Users() {
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/platform">Management of Customer Data platform</NavLink></li>
                                 <li className="breadcrumb-item active"><span>CDP User List</span></li>
+                                <li className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help icon-2x cdp-text-secondary"></i></li>
                             </ol>
                         </nav>
+                        <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Questions You May Have</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body className="faq__in-modal"><Faq topic="manage-access" /></Modal.Body>
+                        </Modal>
                     </div>
                 </div>
                 <div className="row">
@@ -176,7 +189,7 @@ export default function Users() {
                                     </Dropdown.Menu>
                                 </Dropdown>
 
-                                <NavLink to="/platform/users/create" className="btn cdp-btn-secondary text-white ml-2">
+                                <NavLink to="/platform/create-user" className="btn cdp-btn-secondary text-white ml-2">
                                     <i className="icon icon-plus pr-1"></i> Create new user
                                 </NavLink>
                             </div>
@@ -239,7 +252,7 @@ export default function Users() {
                                     <i class="icon icon-team icon-6x cdp-text-secondary"></i>
                                     <h3 className="font-weight-bold cdp-text-primary pt-4">No Users Found!</h3>
                                     <h4 className="cdp-text-primary pt-3 pb-5">Click on the button below to create new one</h4>
-                                    <NavLink to="/platform/users/create" className="btn cdp-btn-secondary text-white px-5 py-2 font-weight-bold">
+                                    <NavLink to="/platform/create-user" className="btn cdp-btn-secondary text-white px-5 py-2 font-weight-bold">
                                         <i className="icon icon-plus pr-1"></i> Create New User
                                     </NavLink>
                                 </div>

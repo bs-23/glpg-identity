@@ -40,6 +40,8 @@ export const HcpInlineEditSchema = object().shape({
         .required('This field must not be empty.'),
     email: string()
         .email('This field should be a valid email address.')
+        .matches(/^.{1,64}@/, 'The part before @ of the email can be maximum 64 characters.')
+        .matches(/^.*[a-z]+.*@/, 'This field should be a valid email address.')
         .max(100, 'This field must be at most 100 characters long.')
         .required('This field must not be empty.'),
     uuid: string()

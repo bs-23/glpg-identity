@@ -1,5 +1,3 @@
-import Types from './profile.types';
-
 const initialState = {
 };
 

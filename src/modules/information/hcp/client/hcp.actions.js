@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Types from './hcp.types';
-import store from '../../core/client/store';
+import store from '../../../core/client/store';
 
 export function getHcpProfiles(page = 1, status, codbase, orderBy, orderType) {
 
@@ -84,5 +84,39 @@ export function getHCPSpecialities(country_iso2, locale) {
             }))
             .catch(error => reject(error));
         })
+    };
+}
+
+export function getOklaHcpDetails(codbase, individualEid) {
+    return {
+        type: Types.GET_OKLA_HCP_DETAILS,
+        payload: axios({
+            method: 'get',
+            url: `/api/okla/hcps/${codbase}/${individualEid}`
+        })
+    };
+}
+
+export function setOklaHcpDetails(hcpDetails) {
+    return {
+        type: Types.SET_OKLA_HCP_DETAILS,
+        payload: hcpDetails
+    };
+}
+
+export function getOklaHcoDetails(codbase, workplaceEid) {
+    return {
+        type: Types.GET_OKLA_HCO_DETAILS,
+        payload: axios({
+            method: 'get',
+            url: `/api/okla/hcos/${codbase}/${workplaceEid}`
+        })
+    };
+}
+
+export function setOklaHcoDetails(hcoDetails) {
+    return {
+        type: Types.SET_OKLA_HCO_DETAILS,
+        payload: hcoDetails
     };
 }

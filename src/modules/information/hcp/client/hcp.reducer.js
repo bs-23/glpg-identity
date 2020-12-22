@@ -2,7 +2,9 @@ import Types from "./hcp.types";
 
 const initialState = {
     hcps: {},
-    specialties: {}
+    specialties: {},
+    oklaHcpDetails: null,
+    oklaHcoDetails: null
 };
 
 function sortItems(itms, val, type) {
@@ -61,6 +63,34 @@ export default function reducer(state = initialState, action) {
                     ...newSpcialtyState
                 }
             };
+        }
+
+        case Types.GET_OKLA_HCP_DETAILS_FULFILLED: {
+            return {
+                ...state,
+                oklaHcpDetails: action.payload.data
+            };
+        }
+
+        case Types.SET_OKLA_HCP_DETAILS: {
+            return {
+                ...state,
+                oklaHcpDetails: action.payload
+            }
+        }
+
+        case Types.GET_OKLA_HCO_DETAILS_FULFILLED: {
+            return {
+                ...state,
+                oklaHcoDetails: action.payload.data
+            };
+        }
+
+        case Types.SET_OKLA_HCO_DETAILS: {
+            return {
+                ...state,
+                oklaHcoDetails: action.payload
+            }
         }
     }
 

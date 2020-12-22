@@ -1,10 +1,9 @@
 import { string, object, array } from 'yup';
-import XRegExp from 'xregexp';
 
 
 function isNotEmpty(answer) {
     if (answer === '<p><br></p>') return false;
-    if (answer.replace(/&nbsp;/g, '') === '<p></p>') return false;
+    if (answer && answer.replace(/&nbsp;/g, '') === '<p></p>') return false;
     return true;
 }
 
@@ -35,19 +34,16 @@ export const faqSchema = object().shape({
         .test('has-special-charecters', 'Only space is not allowed',
             question => hasSpace(question)),
     answer: string()
-        .max(1500, 'Maximum character limit has been exceeded.'),
+        .required('This field must not be empty.')
+        .max(1500, 'Maximum character limit has been exceeded.')
+        .test('is-empty', 'This field must not be empty.',
+            answer => isNotEmpty(answer)),
     answer_plaintext: string()
         .transform(value => value.trim())
         .required('This field must not be empty.'),
-    categories:
+    topics:
         array()
             .of(string())
-            .min(1, 'Must select at least one category')
-            .required('Must select at least one category')
-});
-
-export const FaqCategorySchema = object().shape({
-    title: string()
-        .max(60, 'This field must be at most 50 characters long.')
-        .required('This field must not be empty.'),
+            .min(1, 'Must select at least one topic')
+            .required('Must select at least one topic')
 });

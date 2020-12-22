@@ -12,7 +12,7 @@ const Role = require(path.join(process.cwd(), "src/modules/platform/role/server/
 const Role_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/role-permissionSet.model"));
 const PermissionSet_ServiceCateory = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-serviceCategory.model"));
 const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-application.model"));
-const Application = require(path.join(process.cwd(), "src/modules/application/server/application.model"));
+const Application = require(path.join(process.cwd(), "src/modules/platform/application/server/application.model"));
 const ServiceCategory = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/service-category.model.js"));
 
 const CDPAuthStrategy = (req, res, next) => (
@@ -126,13 +126,13 @@ const CDPAuthStrategy = (req, res, next) => (
 
                 const updatedAccessToken = generateAccessToken(userInstanceFromDB);
 
-                req.logIn(userInstanceFromDB, { session: false }, function(err) {
-                    if (err) { return next(err); }
+                req.logIn(userInstanceFromDB, { session: false }, function(error) {
+                    if (error) { return next(error); }
                     res.cookie('access_token', updatedAccessToken, { httpOnly: true, sameSite: true, signed: true });
                     res.cookie('refresh_token', userInstanceFromDB.refresh_token, { httpOnly: true, sameSite: true, signed: true });
                     next();
                 });
-            } catch(err) {
+            } catch(error) {
                 res.clearCookie('access_token');
                 res.clearCookie('refresh_token');
                 res.clearCookie('logged_in');
@@ -141,8 +141,8 @@ const CDPAuthStrategy = (req, res, next) => (
             return;
         }
 
-        req.logIn(user, { session: false }, function (err) {
-            if (err) { return next(err); }
+        req.logIn(user, { session: false }, function (error) {
+            if (error) { return next(error); }
             next();
         });
     })

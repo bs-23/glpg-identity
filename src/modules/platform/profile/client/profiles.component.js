@@ -1,55 +1,42 @@
 import axios from "axios";
 import { NavLink } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import { Form, Formik, Field, ErrorMessage, FieldArray } from "formik";
+import { Form, Formik, Field, ErrorMessage } from "formik";
 import { useToasts } from "react-toast-notifications";
-import Modal from 'react-bootstrap/Modal';
 import { profileCreateSchema } from "./profile.schema";
 import { PermissionSetDetailsModal } from "../../../platform";
+import Faq from '../../../platform/faq/client/faq.component';
+import Modal from 'react-bootstrap/Modal';
+import { ToggleList } from '../../../core/client/components/reusable-ui.components';
 
-const FormField = ({ label, name, type, children, required=true, ...rest }) => <div className="col-12">
+const FormField = ({ label, name, type, children, required = true, ...rest }) => <div className="col-12">
     <div className="form-group">
-        <label className="font-weight-bold" htmlFor="last_name">{ label }{required && <span className="text-danger">*</span>}</label>
-        { children || <Field className="form-control" type={type} name={name} {...rest} /> }
+        <label className="font-weight-bold" htmlFor="last_name">{label}{required && <span className="text-danger">*</span>}</label>
+        {children || <Field className="form-control" type={type} name={name} {...rest} />}
         <div className="invalid-feedback"><ErrorMessage name={name} /></div>
     </div>
 </div>
 
-const ToggleList = ({ name, options, labelExtractor, idExtractor }) => {
-    const isChecked = (id, arrayHelpers) => arrayHelpers.form.values[name].includes(id);
-
-    const handleChange = (e, arrayHelpers) => {
-        const optionId = e.target.value;
-        if (e.target.checked) {
-            arrayHelpers.push(optionId);
-        }
-        else {
-            const idx = arrayHelpers.form.values[name].indexOf(optionId);
-            arrayHelpers.remove(idx);
-        }
+const ToggleListSlider = (props) => <ToggleList {...props} >
+    {
+        ({ name, id, label, currentOption, isChecked, onChange, disabled }) =>
+        <label key={id} className="d-flex justify-content-between align-items-center pt-1">
+            <span className="switch-label">{label} {currentOption.type && <span className="text-muted small text-capitalize font-italic d-block"> Type: {currentOption.type}</span>}</span>
+            <span className="switch">
+                <input name={name}
+                    className="custom-control-input"
+                    type="checkbox"
+                    value={id}
+                    id={id}
+                    checked={isChecked}
+                    onChange={onChange}
+                    disabled={disabled}
+                />
+                <span className="slider round"></span>
+            </span>
+        </label>
     }
-
-    return <FieldArray
-                name={name}
-                render={arrayHelpers => (
-                    options.map(item => <label key={idExtractor(item)} className="d-flex justify-content-between align-items-center pt-1">
-                        <span className="switch-label">{labelExtractor(item)} {item.type && <span className="text-muted small text-capitalize font-italic d-block"> Type: {item.type}</span>}</span>
-                        <span className="switch">
-                            <input name={name}
-                                className="custom-control-input"
-                                type="checkbox"
-                                value={idExtractor(item)}
-                                id={idExtractor(item)}
-                                checked={isChecked(idExtractor(item), arrayHelpers)}
-                                onChange={(e) => handleChange(e, arrayHelpers)}
-                                disabled={item.hasOwnProperty('disabled') ? item.disabled : false}
-                            />
-                            <span className="slider round"></span>
-                        </span>
-                    </label>)
-                )}
-            />
-}
+</ToggleList>
 
 const ProfileForm = ({ onSuccess, permissionSets, preFill }) => {
     const { addToast } = useToasts();
@@ -79,7 +66,7 @@ const ProfileForm = ({ onSuccess, permissionSets, preFill }) => {
     const getToggleListOptions = () => {
         const selectedPermissionSets = preFill ? preFill.permissionssetIDs ? preFill.permissionssetIDs : [] : [];
         const filteredPermissionSet = permissionSets.filter(ps => selectedPermissionSets.includes(ps.id) || ps.type === 'custom');
-        return filteredPermissionSet.map(ps => ({...ps, disabled: ps.type === 'standard'}));
+        return filteredPermissionSet.map(ps => ({ ...ps, disabled: ps.type === 'standard' }));
     }
 
     return <div className="row">
@@ -102,7 +89,7 @@ const ProfileForm = ({ onSuccess, permissionSets, preFill }) => {
                                 <div className="row">
                                     <div className="col-12">
                                         <div className="row">
-                                            <FormField label="Title" type="text" name="title"/>
+                                            <FormField label="Title" type="text" name="title" />
                                         </div>
                                     </div>
                                     <div className="col-12">
@@ -113,7 +100,7 @@ const ProfileForm = ({ onSuccess, permissionSets, preFill }) => {
                                     <div className="col-12">
                                         <div className="row">
                                             <FormField name="permissionSets" label="Select Permission Sets">
-                                                <ToggleList name="permissionSets" options={getToggleListOptions()} idExtractor={item => item.id} labelExtractor={item => item.title} />
+                                                <ToggleListSlider name="permissionSets" options={getToggleListOptions()} valueExtractor={item => item.id} idExtractor={item => item.id} labelExtractor={item => item.title} />
                                             </FormField>
                                         </div>
                                         <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting} > Submit </button>
@@ -134,6 +121,9 @@ export default function ManageProfiles() {
     const [modalShow, setModalShow] = useState({ createProfile: false, permissionSetDetails: false });
     const [profileEditData, setProfileEditData] = useState(null);
     const [permissionSetDetailID, setPermissionSetDetailID] = useState(null);
+    const [showFaq, setShowFaq] = useState(false);
+    const handleCloseFaq = () => setShowFaq(false);
+    const handleShowFaq = () => setShowFaq(true);
 
     const getProfiles = async () => {
         const { data } = await axios.get('/api/profiles');
@@ -151,13 +141,13 @@ export default function ManageProfiles() {
     }
 
     const extractPermissionSetNames = (data) => {
-        if(!data || !data.up_ps || !data.up_ps.length) return '';
+        if (!data || !data.up_ps || !data.up_ps.length) return '';
         return data.up_ps.map((item, index) => {
             return <React.Fragment key={item.permissionSetId}>
                 <a type="button" className="link-with-underline" key={item.permissionSetId} onClick={() => handlePermissionSetClick(item.permissionSetId)}>
                     {item.ps.title}
                 </a>
-            {index < data.up_ps.length-1 ? <span>,&nbsp;</span> : null}
+                {index < data.up_ps.length - 1 ? <span>,&nbsp;</span> : null}
             </React.Fragment>
         });
     }
@@ -183,7 +173,8 @@ export default function ManageProfiles() {
             id: data.id,
             title: data.title,
             description: data.description,
-            permissionssetIDs: (data.up_ps || []).map(item => item.permissionSetId) };
+            permissionssetIDs: (data.up_ps || []).map(item => item.permissionSetId)
+        };
         setProfileEditData(editData);
         setModalShow({ ...modalShow, createProfile: true });
     }
@@ -203,8 +194,15 @@ export default function ManageProfiles() {
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/platform">Management of Customer Data Platform</NavLink></li>
                                 <li className="breadcrumb-item active"><span>Manage Profiles</span></li>
+                                <li className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help icon-2x cdp-text-secondary"></i></li>
                             </ol>
                         </nav>
+                        <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Questions You May Have</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body className="faq__in-modal"><Faq topic="manage-profile" /></Modal.Body>
+                        </Modal>
                     </div>
                 </div>
                 <div className="row">

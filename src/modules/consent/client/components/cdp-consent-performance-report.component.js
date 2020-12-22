@@ -8,7 +8,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { LinkContainer } from 'react-router-bootstrap';
 import axios from 'axios';
 import { getAllCountries } from '../../../core/client/country/country.actions';
-
+import Faq from '../../../platform/faq/client/faq.component';
 import _ from 'lodash';
 import parse from 'html-react-parser';
 import { getConsentReport } from '../consent.actions';
@@ -24,6 +24,10 @@ const CdpConsentPerformanceReport = () => {
     const [consents_report, modify_consents_report] = useState(consents_init_report);
     const countries = useSelector(state => state.countryReducer.countries);
     const allCountries = useSelector(state => state.countryReducer.allCountries);
+
+    const [showFaq, setShowFaq] = useState(false);
+    const handleCloseFaq = () => setShowFaq(false);
+    const handleShowFaq = () => setShowFaq(true);
 
     const pageLeft = () => {
         if (consents_report.page > 1) dispatch(getConsentReport(consents_report.page - 1, consents_report.codbase, consents_report.opt_type, consents_report.orderBy, consents_report.orderType));
@@ -118,8 +122,15 @@ const CdpConsentPerformanceReport = () => {
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/consent">Data Privacy & Consent Management</NavLink></li>
                                 <li className="breadcrumb-item active"><span>Consent Performance Report</span></li>
+                                <li className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help icon-2x cdp-text-secondary"></i></li>
                             </ol>
                         </nav>
+                        <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Questions You May Have</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body className="faq__in-modal"><Faq topic="consent-performance-report" /></Modal.Body>
+                        </Modal>
                     </div>
                 </div>
                 <div className="row">

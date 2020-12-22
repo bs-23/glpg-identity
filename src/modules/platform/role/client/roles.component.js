@@ -1,55 +1,42 @@
 import axios from "axios";
 import { NavLink, Link } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import { Form, Formik, Field, ErrorMessage, FieldArray } from "formik";
+import { Form, Formik, Field, ErrorMessage } from "formik";
 import { useToasts } from "react-toast-notifications";
 import Modal from 'react-bootstrap/Modal';
 import { roleCreateSchema } from "./role.schema";
 import { PermissionSetDetailsModal } from "../../../platform";
+import Faq from '../../../platform/faq/client/faq.component';
+import { ToggleList } from '../../../core/client/components/reusable-ui.components';
 
-const FormField = ({ label, name, type, required=true, children, ...rest }) => <div className="col-12">
+const FormField = ({ label, name, type, required = true, children, ...rest }) => <div className="col-12">
     <div className="form-group">
-        <label className="font-weight-bold" htmlFor="last_name">{ label }{required && <span className="text-danger">*</span>}</label>
-        { children || <Field className="form-control" type={type} name={name} {...rest} /> }
+        <label className="font-weight-bold" htmlFor="last_name">{label}{required && <span className="text-danger">*</span>}</label>
+        {children || <Field className="form-control" type={type} name={name} {...rest} />}
         <div className="invalid-feedback"><ErrorMessage name={name} /></div>
     </div>
 </div>
 
-const ToggleList = ({ name, options, labelExtractor, idExtractor }) => {
-    const isChecked = (id, arrayHelpers) => arrayHelpers.form.values[name].includes(id);
-
-    const handleChange = (e, arrayHelpers) => {
-        const optionId = e.target.value;
-        if (e.target.checked) {
-            arrayHelpers.push(optionId);
-        }
-        else {
-            const idx = arrayHelpers.form.values[name].indexOf(optionId);
-            arrayHelpers.remove(idx);
-        }
+const ToggleListSlider = (props) => <ToggleList {...props} >
+    {
+        ({ id, name, label, value, isChecked, onChange, disabled }) =>
+        <label key={id} className="d-flex justify-content-between align-items-center">
+            <span className="switch-label">{label}</span>
+            <span className="switch">
+                <input name={name}
+                    className="custom-control-input"
+                    type="checkbox"
+                    value={value}
+                    id={id}
+                    checked={isChecked}
+                    onChange={onChange}
+                    disabled={disabled}
+                />
+                <span className="slider round"></span>
+            </span>
+        </label>
     }
-
-    return <FieldArray
-                name={name}
-                render={arrayHelpers => (
-                    options.map(item => <label key={idExtractor(item)} className="d-flex justify-content-between align-items-center">
-                        <span className="switch-label">{labelExtractor(item)}</span>
-                        <span className="switch">
-                            <input name={name}
-                                className="custom-control-input"
-                                type="checkbox"
-                                value={idExtractor(item)}
-                                id={idExtractor(item)}
-                                checked={isChecked(idExtractor(item), arrayHelpers)}
-                                onChange={(e) => handleChange(e, arrayHelpers)}
-                                disabled={item.hasOwnProperty('disabled') ? item.disabled : false}
-                            />
-                            <span className="slider round"></span>
-                        </span>
-                    </label>)
-                )}
-            />
-}
+</ToggleList>
 
 const RoleForm = ({ onSuccess, permissionSets, preFill }) => {
     const { addToast } = useToasts();
@@ -101,7 +88,7 @@ const RoleForm = ({ onSuccess, permissionSets, preFill }) => {
                                 <div className="row">
                                     <div className="col-12">
                                         <div className="row">
-                                            <FormField label="Title" type="text" name="title"/>
+                                            <FormField label="Title" type="text" name="title" />
                                         </div>
                                     </div>
                                     <div className="col-12">
@@ -113,8 +100,8 @@ const RoleForm = ({ onSuccess, permissionSets, preFill }) => {
                                         <div className="row">
                                             <FormField name="permissionSets" label="Select Permission Sets">
                                                 {filteredPermissonSet.length ?
-                                                    <ToggleList name="permissionSets" options={filteredPermissonSet} idExtractor={item => item.id} labelExtractor={item => item.title} /> :
-                                                    <div>No custom permission set found. <Link to={{ pathname: "/platform/permission-sets", state: { showCreateModal: true } }}  >Click here to create one.</Link></div> }
+                                                    <ToggleListSlider name="permissionSets" options={filteredPermissonSet} valueExtractor={item => item.id} idExtractor={item => item.id} labelExtractor={item => item.title} /> :
+                                                    <div>No custom permission set found. <Link to={{ pathname: "/platform/permission-sets", state: { showCreateModal: true } }}  >Click here to create one.</Link></div>}
                                             </FormField>
                                         </div>
                                         <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting || !filteredPermissonSet.length} > Submit </button>
@@ -135,6 +122,9 @@ export default function ManageRoles() {
     const [modalShow, setModalShow] = useState({ createRole: false, permissionSetDetails: false });
     const [roleEditData, setRoleEditData] = useState(null);
     const [permissionSetDetailID, setPermissionSetDetailID] = useState(null);
+    const [showFaq, setShowFaq] = useState(false);
+    const handleCloseFaq = () => setShowFaq(false);
+    const handleShowFaq = () => setShowFaq(true);
 
     const getRoles = async () => {
         const { data } = await axios.get('/api/roles');
@@ -152,14 +142,14 @@ export default function ManageRoles() {
     }
 
     const extractPermissionSetNames = (data) => {
-        if(!data) return '';
-        if(!data.role_ps || !data.role_ps.length) return '';
+        if (!data) return '';
+        if (!data.role_ps || !data.role_ps.length) return '';
         return data.role_ps.map((item, index) => {
             return <React.Fragment key={item.permissionSetId}>
                 <a type="button" className="link-with-underline" onClick={() => handlePermissionSetClick(item.permissionSetId)}>
                     {item.ps.title}
                 </a>
-                {index < data.role_ps.length-1 ? <span>,&nbsp;</span> : null}
+                {index < data.role_ps.length - 1 ? <span>,&nbsp;</span> : null}
             </React.Fragment>
         });
     }
@@ -185,7 +175,8 @@ export default function ManageRoles() {
             id: data.id,
             title: data.title,
             description: data.description,
-            permissionssetIDs: (data.role_ps || []).map(item => item.permissionSetId) };
+            permissionssetIDs: (data.role_ps || []).map(item => item.permissionSetId)
+        };
         setRoleEditData(editData);
         setModalShow({ ...modalShow, createRole: true });
     }
@@ -205,8 +196,15 @@ export default function ManageRoles() {
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/platform">Management of Customer Data Platform</NavLink></li>
                                 <li className="breadcrumb-item active"><span>Define Roles</span></li>
+                                <li className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help icon-2x cdp-text-secondary"></i></li>
                             </ol>
                         </nav>
+                        <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Questions You May Have</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body className="faq__in-modal"><Faq topic="define-roles" /></Modal.Body>
+                        </Modal>
                     </div>
                 </div>
                 <div className="row">
@@ -224,9 +222,9 @@ export default function ManageRoles() {
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
                                             <th width="25%" className="py-2">Title</th>
-                                        <th width="40%" className="py-2">Description</th>
-                                        <th width="25%" className="py-2">Permission Sets</th>
-                                        <th width="10%" className="py-2">Action</th>
+                                            <th width="40%" className="py-2">Description</th>
+                                            <th width="25%" className="py-2">Permission Sets</th>
+                                            <th width="10%" className="py-2">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
