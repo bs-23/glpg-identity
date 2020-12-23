@@ -132,6 +132,7 @@ const SearchProfessionalHcp = () => {
                 formikRef.current.setFieldValue('firstName', hcpProfile.first_name || '');
                 formikRef.current.setFieldValue('lastName', hcpProfile.last_name || '');
                 formikRef.current.setFieldValue('individualEid', hcpProfile.individual_id_onekey || '');
+                formikRef.current.setFieldValue('externalIdentifier', hcpProfile.uuid || '');
                 setHcpSpecialty(hcpProfile.specialty_onekey);
             }
 
@@ -247,6 +248,7 @@ const SearchProfessionalHcp = () => {
                                         postCode: '',
                                         onekeyId: '',
                                         individualEid: '',
+                                        externalIdentifier: '',
                                         specialties: [],
                                     }}
                                     displayName="SearchForm"
@@ -426,6 +428,12 @@ const SearchProfessionalHcp = () => {
                                                         <Field className="form-control individual" type='text' name='individualEid' id='individual' />
                                                     </div>
                                                 </div>
+                                                <div className="col-12 col-sm-4">
+                                                    <div className="form-group">
+                                                        <label for="Individual ">UUID</label>
+                                                        <Field className="form-control externalIdentifier" type='text' name='externalIdentifier' id='externalIdentifier' />
+                                                    </div>
+                                                </div>
                                             </div>
 
                                             <div className="row">
@@ -433,7 +441,7 @@ const SearchProfessionalHcp = () => {
                                                     <button type="reset" className="btn btn-block btn-secondary mt-4 p-2" onClick={() => resetSearch(formikProps)}>CLEAR</button>
                                                 </div>
                                                 <div className="col-6">
-                                                    <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!selectedCountries || !selectedCountries.length || !(formikProps.values.firstName || formikProps.values.lastName || formikProps.values.address || formikProps.values.city || formikProps.values.postCode || formikProps.values.onekeyId || formikProps.values.individualEid || (selectedSpecialties && selectedSpecialties.length))}>SEARCH</button>
+                                                    <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!selectedCountries || !selectedCountries.length || !(formikProps.values.firstName || formikProps.values.lastName || formikProps.values.address || formikProps.values.city || formikProps.values.postCode || formikProps.values.onekeyId || formikProps.values.individualEid || formikProps.values.externalIdentifier || (selectedSpecialties && selectedSpecialties.length))}>SEARCH</button>
                                                 </div>
                                             </div>
                                         </Form>
