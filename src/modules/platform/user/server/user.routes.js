@@ -13,10 +13,6 @@ module.exports = app => {
         .get(CDPAuthStrategy, ModuleGuard(Modules.PLATFORM.value), controller.getUsers)
         .post(CDPAuthStrategy, ModuleGuard(Modules.PLATFORM.value), controller.createUser);
 
-    app.route('/api/users/filter-options')
-        .get(CDPAuthStrategy, controller.getFilterOptions)
-        .post(CDPAuthStrategy, controller.updateFilterOptions);
-
     app.route('/api/users/profile')
         .get(CDPAuthStrategy, controller.getSignedInUserProfile)
         .put(CDPAuthStrategy, controller.updateSignedInUserProfile)

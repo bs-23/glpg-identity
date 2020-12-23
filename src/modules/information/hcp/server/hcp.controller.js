@@ -20,6 +20,8 @@ const PasswordPolicies = require(path.join(process.cwd(), 'src/modules/core/serv
 const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/platform/user/server/permission/permissions.js'));
 const XRegExp = require('xregexp');
 const { string }  = require('yup');
+const Filter = require(path.join(process.cwd(), "src/modules/core/server/filter/filter.model.js"));
+const filterService = require(path.join(process.cwd(), 'src/modules/platform/user/server/filter.js'));
 
 const hcpValidation = () => {
     const schema = {
@@ -153,6 +155,83 @@ function ignoreCaseArray(str) {
     return [str.toLowerCase(), str.toUpperCase(), str.charAt(0).toLowerCase() + str.charAt(1).toUpperCase(), str.charAt(0).toUpperCase() + str.charAt(1).toLowerCase()];
 }
 
+function generateFilterOptions(currentFilter, defaultFilter) {
+    if (!currentFilter || !currentFilter.option || !currentFilter.option.filters || currentFilter.option.filter === 0)
+        return defaultFilter;
+
+    // if (currentFilter.option.filters.length === 1 || !currentFilter.option.logic) {
+    //     const filter = currentFilter.option.filters[0];
+    //     defaultFilter[filter.fieldName] = filterService.getValueOptions(filter);
+
+    //     return defaultFilter;
+    // }
+
+    console.log('Default filter: ', defaultFilter);
+    let customFilter = { ...defaultFilter };
+
+    const nodes = currentFilter.option.logic
+        ? currentFilter.option.logic.split(" ")
+        : ['1'];
+    console.log('Logic nodes: ', nodes.join());
+
+    let prevOperator;
+    const groupedQueries = [];
+    for (let index = 0; index < nodes.length; index++) {
+        const node = nodes[index];
+        const prev = index > 0 ? nodes[index - 1] : null;
+        const next = index < nodes.length - 1 ? nodes[index + 1] : null;
+
+        const findFilter = (name) => {
+            return currentFilter.option.filters.find(f => f.name === name);
+        };
+
+        if (node === "and" && prevOperator === "and") {
+            const filter = findFilter(next);
+            const query = { [filter.fieldName]: filterService.getValueOptions(filter) };
+            const currentParent = groupedQueries[groupedQueries.length - 1];
+            currentParent.values.push(query);
+        } else if (node === "and") {
+            const leftFilter = findFilter(prev);
+            const rightFilter = findFilter(next);
+            const group = {
+                operator: "and",
+                values: [
+                    { [leftFilter.fieldName]: filterService.getValueOptions(leftFilter) },
+                    { [rightFilter.fieldName]: filterService.getValueOptions(rightFilter) }
+                ]
+            };
+            groupedQueries.push(group);
+        } else if (node !== "or" && prev !== "and" && next !== "and") {
+            const filter = findFilter(node);
+            const query = { [filter.fieldName]: filterService.getValueOptions(filter) };
+            groupedQueries.push(query);
+        }
+
+        prevOperator = node === "and" || node === "or" ? node : prevOperator;
+    }
+
+    console.log('Grouped queries: ', groupedQueries.map((a) => JSON.stringify(a)));
+
+    if (groupedQueries.length > 1) {
+        customFilter[Op.or] = groupedQueries.map(q => {
+            if (q.operator === 'and') {
+                return { [Op.and]: q.values };
+            }
+            return q;
+        });
+    } else {
+        const query = groupedQueries[0];
+        if (query.operator === 'and') {
+            customFilter[Op.and] = query.values;
+        } else {
+            customFilter = { ...customFilter, ...query };
+        }
+    }
+    console.log('Custom filter: ', customFilter);
+
+    return customFilter;
+}
+
 async function getHcps(req, res) {
     const response = new Response({}, []);
 
@@ -239,8 +318,14 @@ async function getHcps(req, res) {
         order.push(['created_at', 'DESC']);
         order.push(['id', 'DESC']);
 
+        const currentFilter = await Filter.findOne({
+            where: { user_id: req.user.id, table_name: 'cdp-users' }
+        });
+
+        const filterOptions = generateFilterOptions(currentFilter, hcp_filter);
+
         const hcps = await Hcp.findAll({
-            where: hcp_filter,
+            where: filterOptions,
             include: [{
                 model: HcpConsents,
                 as: 'hcpConsents',
@@ -288,7 +373,7 @@ async function getHcps(req, res) {
         });
 
         const totalUser = await Hcp.count({//counting total data for pagintaion
-            where: hcp_filter
+            where: filterOptions
         });
 
         const hcp_users = [];

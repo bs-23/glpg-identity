@@ -22,8 +22,6 @@ const Application = require(path.join(process.cwd(), "src/modules/platform/appli
 const PasswordPolicies = require(path.join(process.cwd(), "src/modules/core/server/password/password-policies.js"));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const { QueryTypes, Op, where, col, fn, literal } = require('sequelize');
-const Filter = require(path.join(process.cwd(), "src/modules/core/server/filter/filter.model.js"));
-const filterService = require(path.join(process.cwd(), 'src/modules/platform/user/server/filter.js'));
 const { getRequestingUserPermissions, getPermissionsFromPermissionSet } = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/permissions.js"));
 
 function generateAccessToken(doc) {
@@ -508,83 +506,6 @@ async function createUser(req, res) {
     }
 }
 
-function generateFilterOptions(currentFilter, defaultFilter) {
-    if (!currentFilter || !currentFilter.option || !currentFilter.option.filters || currentFilter.option.filter === 0)
-        return defaultFilter;
-
-    // if (currentFilter.option.filters.length === 1 || !currentFilter.option.logic) {
-    //     const filter = currentFilter.option.filters[0];
-    //     defaultFilter[filter.fieldName] = filterService.getValueOptions(filter);
-
-    //     return defaultFilter;
-    // }
-
-    console.log('Default filter: ', defaultFilter);
-    let customFilter = { ...defaultFilter };
-
-    const nodes = currentFilter.option.logic
-        ? currentFilter.option.logic.split(" ")
-        : ['1'];
-    console.log('Logic nodes: ', nodes.join());
-
-    let prevOperator;
-    const groupedQueries = [];
-    for (let index = 0; index < nodes.length; index++) {
-        const node = nodes[index];
-        const prev = index > 0 ? nodes[index - 1] : null;
-        const next = index < nodes.length - 1 ? nodes[index + 1] : null;
-
-        const findFilter = (name) => {
-            return currentFilter.option.filters.find(f => f.name === name);
-        };
-
-        if (node === "and" && prevOperator === "and") {
-            const filter = findFilter(next);
-            const query = { [filter.fieldName]: filterService.getValueOptions(filter) };
-            const currentParent = groupedQueries[groupedQueries.length - 1];
-            currentParent.values.push(query);
-        } else if (node === "and") {
-            const leftFilter = findFilter(prev);
-            const rightFilter = findFilter(next);
-            const group = {
-                operator: "and",
-                values: [
-                    { [leftFilter.fieldName]: filterService.getValueOptions(leftFilter) },
-                    { [rightFilter.fieldName]: filterService.getValueOptions(rightFilter) }
-                ]
-            };
-            groupedQueries.push(group);
-        } else if (node !== "or" && prev !== "and" && next !== "and") {
-            const filter = findFilter(node);
-            const query = { [filter.fieldName]: filterService.getValueOptions(filter) };
-            groupedQueries.push(query);
-        }
-
-        prevOperator = node === "and" || node === "or" ? node : prevOperator;
-    }
-
-    console.log('Grouped queries: ', groupedQueries.map((a) => JSON.stringify(a)));
-
-    if (groupedQueries.length > 1) {
-        customFilter[Op.or] = groupedQueries.map(q => {
-            if (q.operator === 'and') {
-                return { [Op.and]: q.values };
-            }
-            return q;
-        });
-    } else {
-        const query = groupedQueries[0];
-        if (query.operator === 'and') {
-            customFilter[Op.and] = query.values;
-        } else {
-            customFilter = { ...customFilter, ...query };
-        }
-    }
-    console.log('Custom filter: ', customFilter);
-
-    return customFilter;
-}
-
 async function getUsers(req, res) {
     try {
         const page = req.query.page ? req.query.page - 1 : 0;
@@ -642,19 +563,11 @@ async function getUsers(req, res) {
             order.splice(1, 0, [{ model: User, as: 'createdByUser' }, 'last_name', orderType]);
         }
 
-        const defaultFilter = {
-            id: { [Op.ne]: signedInId },
-            type: 'basic'
-        };
-
-        const currentFilter = await Filter.findOne({
-            where: { user_id: req.user.id, list_name: 'cdp-users' }
-        });
-
-        const filterOptions = generateFilterOptions(currentFilter, defaultFilter);
-
         const {count: countByUser, rows: users} = await User.findAndCountAll({
-            where: filterOptions,
+            where: {
+                id: { [Op.ne]: signedInId },
+                type: 'basic'
+            },
             offset,
             limit,
             order: order,
@@ -1284,49 +1197,6 @@ async function verifySite(captchaResponseToken) {
     }
 }
 
-async function getFilterOptions(req, res) {
-    try {
-        const filterOptions = await filterService.getFilterOptions(req.user);
-
-        const [currentFilter,] = await Filter.findOrCreate({
-            where: { user_id: req.user.id, list_name: 'cdp-users' },
-            defaults: {
-                option: {}
-            }
-        });
-
-        const data = {
-            filterOptions,
-            currentFilter: currentFilter.option
-        }
-        res.json(data);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Internal server error');
-    }
-}
-
-async function updateFilterOptions(req, res) {
-    try {
-        const filters = req.body;
-
-        const currentFilter = await Filter.findOne({
-            where: { user_id: req.user.id, list_name: 'cdp-users' }
-        });
-
-        if (currentFilter) {
-            await currentFilter.update({
-                option: filters
-            });
-        }
-
-        res.sendStatus(200);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Internal server error');
-    }
-}
-
 exports.login = login;
 exports.logout = logout;
 exports.createUser = createUser;
@@ -1336,8 +1206,6 @@ exports.getUsers = getUsers;
 exports.getUser = getUser;
 exports.sendPasswordResetLink = sendPasswordResetLink;
 exports.resetPassword = resetPassword;
-exports.getFilterOptions = getFilterOptions;
-exports.updateFilterOptions = updateFilterOptions;
 exports.updateUserDetails = updateUserDetails;
 exports.updateSignedInUserProfile = updateSignedInUserProfile;
 exports.generateAccessToken = generateAccessToken;

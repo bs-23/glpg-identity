@@ -1,8 +1,8 @@
-const path = require("path");
-const { DataTypes } = require("sequelize");
-const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequelize"));
+const path = require('path');
+const { DataTypes } = require('sequelize');
+const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 
-const Filter = sequelize.cdpConnector.define("filter", {
+const FilterSettings = sequelize.cdpConnector.define('filter_settings', {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -13,7 +13,7 @@ const Filter = sequelize.cdpConnector.define("filter", {
         allowNull: false,
         type: DataTypes.UUID
     },
-    list_name: {
+    table_name: {
         allowNull: false,
         type: DataTypes.STRING
     },
@@ -22,11 +22,11 @@ const Filter = sequelize.cdpConnector.define("filter", {
         type: DataTypes.JSON
     },
 }, {
-    schema: "cdp",
-    tableName: "filter",
+    schema: 'cdp',
+    tableName: 'filter_settings',
     timestamps: true,
-    createdAt: "created_at",
-    updatedAt: "updated_at"
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
 });
 
-module.exports = Filter;
+module.exports = FilterSettings;
