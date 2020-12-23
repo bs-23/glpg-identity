@@ -23,9 +23,9 @@ export default function Inbox(){
       <div className={`shadow-sm bg-white mb-3 cdp-inbox ${show ? "cdp-inbox__expand" : ""}`}>
       <h5 className="p-3 cdp-text-primary font-weight-bold mb-0 d-flex justify-content-between cdp-inbox__header">
         CDP Queues / Tasks / Alerts
-        <i onClick={() => setShow(true)} type="button" class="icon icon-expand faq-icon-expand faq__icon-toggle d-none d-lg-block"></i>
-        <i class="icon icon-minimize faq-icon-minimize  d-none faq__icon-toggle" type="button" onClick={() => setShow(false)}></i>
-        <i className="icon icon-help faq__icon-help d-block d-lg-none"></i>
+        <i onClick={() => setShow(true)} type="button" class="icon icon-expand cdp-inbox__icon-expand cdp-inbox__icon-toggle d-none d-lg-block"></i>
+              <i class="icon icon-minimize cdp-inbox__icon-minimize cdp-inbox__icon-toggle" type="button" onClick={() => setShow(false)}></i>
+              <i className="far fa-bell cdp-inbox__icon-bell d-block d-lg-none"></i>
       </h5>
       <div>
         <Tabs defaultActiveKey={selectedTab} className="cdp-inbox__tab px-2" onSelect={(activeKey, e) => setSelectedTab(activeKey)}>
