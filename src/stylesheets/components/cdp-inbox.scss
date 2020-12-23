@@ -54,4 +54,41 @@
             }
         }
     }
+
+    &__icon {
+        &-minimize {
+            display: none;
+        }
+
+        &-toggle {
+            font-size: 25px;
+        }
+
+        &-bell {
+            font-size: 30px;
+        }
+    }
+
+    &__expand {
+        position: absolute;
+        left: 15px;
+        top: 14px;
+        width: calc(100% - 30px);
+        height: calc(100% - 32px) !important;
+        z-index: 1000;
+
+        .cdp-inbox {
+            &__icon-expand {
+                display: none !important;
+            }
+
+            &__icon-minimize {
+                display: inline-block;
+            }
+
+            &__icon-expand {
+                display: none !important;
+            }
+        }
+    }
 }
