@@ -8,7 +8,7 @@ import { BrowserRouter } from 'react-router-dom';
 import MockAdapter from 'axios-mock-adapter'
 import { ToastProvider } from 'react-toast-notifications';
 import store from '../../src/modules/core/client/store.js';
-import ConsentPerformanceReport from '../../src/modules/consent/client/components/veeva-consent-performance-report.component';
+import ConsentPerformanceReport from '../../src/modules/consent/client/components/cdp-consent-performance-report.component';
 import { getVeevaConsentReport } from '../../src/modules/consent/client/consent.actions';
 import { act } from 'react-dom/test-utils';
 import { screen } from '@testing-library/dom'
@@ -16,7 +16,7 @@ import { login } from '../../src/modules/platform/user/client/user.actions';
 
 configure({ adapter: new Adapter() });
 
-describe('Veeva consent performance report component', () => {
+describe('Cdp consent performance report component', () => {
     let mockAxios;
     let savedUser;
     let consent_report;
@@ -77,18 +77,43 @@ describe('Veeva consent performance report component', () => {
 
         consent_report = {
             "data": {
-                "hcp_consents" : [
+                "hcp_consents": [
                     {
+                        "consent_id": "ebea072a-81d4-4507-a46b-cb365ea0c6db",
                         "opt_type": "single-opt-in",
-                        "onekeyid": "WFRM00520786",
-                        "uuid_mixed": "10004028311",
-                        "country_code": "FR",
-                        "name": "ADAMAH STANISLAS AMOUZOUGAN",
-                        "email": "adamah.amouzougan@chu-st-etienne.fr",
+                        "consent_confirmed": true,
+                        "updated_at": "2020-12-18T08:53:16.887Z",
+                        "hcp_profile": {
+                            "id": "a00c9d13-909c-49ed-96ee-21e201f8c992",
+                            "application_id": "a7959308-7ec5-4090-94ff-2367113a454d",
+                            "uuid": "19058207801",
+                            "individual_id_onekey": "WNLN00027139",
+                            "salutation": "Mr",
+                            "first_name": "J.E.",
+                            "last_name": "López Matta",
+                            "email": "brandxqa+validnl@gmail.com",
+                            "telephone": "0715265018",
+                            "birthdate": null,
+                            "country_iso2": "nl",
+                            "language_code": "nl",
+                            "locale": "nl_NL",
+                            "specialty_onekey": "SP.WNL.77",
+                            "status": "self_verified",
+                            "is_email_verified": false,
+                            "failed_auth_attempt": 0,
+                            "password_updated_at": "2020-12-18T08:53:36.830Z",
+                            "reset_password_token": null,
+                            "reset_password_expires": null,
+                            "origin_url": "https://www-dev.jyseleca.nl",
+                            "created_at": "2020-12-18T08:53:16.867Z",
+                            "updated_at": "2020-12-18T08:53:36.859Z"
+                        },
                         "legal_basis": "consent",
-                        "preference": "Galapagos news",
-                        "given_date": "2020-10-16T10:25:18.000Z"
-                    },
+                        "given_date": "2020-12-18T08:53:16.887Z",
+                        "preference": "Galapagos Terms of Use",
+                        "category": "General Consent",
+                        "type": "general-consent"
+                    }
                 ],
                 "page": 1,
                 "limit": 30,
@@ -99,11 +124,12 @@ describe('Veeva consent performance report component', () => {
                 "opt_type": "",
                 "countries": ["BE","FR","DE","IT","NL","ES","GB"],
                 "orderBy": "",
-                "orderType": "ASC"
+                "orderType": ""
             },
             "errors":[]
         }
-        mockAxios.onGet('/api/veeva-consent-performance-report').reply(200, consent_report);
+
+        mockAxios.onGet('/api/cdp-consent-performance-report').reply(200, consent_report);
     });
 
     const userSlice = () => store.getState().userReducer;
@@ -134,8 +160,10 @@ describe('Veeva consent performance report component', () => {
             expect(screen.getByText('Customer Data Platform')).toBeTruthy();
             expect(screen.getByText('Filter by Country')).toBeTruthy();
             expect(screen.getByText('Filter by Opt Type')).toBeTruthy();
-            expect(screen.getByText('Name')).toBeTruthy();
+            expect(screen.getByText('First Name')).toBeTruthy();
+            expect(screen.getByText('Last Name')).toBeTruthy();
             expect(screen.getByText('Email')).toBeTruthy();
+            expect(screen.getByText('Consent Type')).toBeTruthy();
             expect(screen.getByText('Opt Type')).toBeTruthy();
             expect(screen.getByText('Legal Basis')).toBeTruthy();
             expect(screen.getByText('Preferences')).toBeTruthy();
