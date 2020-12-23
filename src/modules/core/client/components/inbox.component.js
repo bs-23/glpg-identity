@@ -8,8 +8,8 @@ import StatusupdateModal from './statusUpdateModal.component';
 
 export default function Inbox(){
   const dispatch = useDispatch();
+  const [show, setShow] = React.useState();
   const [selectedTab, setSelectedTab] = useState('hcpaproval');
-  const [userToStatusUpdate, setuserToStatusUpdate] = useState({});
   const [showModal, setShowModal] = useState(false);
   const getHcps=()=>{
     dispatch(getHcpProfiles(1, 'not_verified'));
@@ -20,7 +20,7 @@ export default function Inbox(){
   const hcps = useSelector(state => state.hcpReducer.hcps);
  
   return(
-    <div className="shadow-sm bg-white mb-3 cdp-inbox">
+      <div className={`shadow-sm bg-white mb-3 cdp-inbox ${show ? "cdp-inbox__expand" : ""}`}>
       <h5 className="p-3 cdp-text-primary font-weight-bold mb-0 d-flex justify-content-between cdp-inbox__header">
         CDP Queues / Tasks / Alerts
         <i onClick={() => setShow(true)} type="button" class="icon icon-expand faq-icon-expand faq__icon-toggle d-none d-lg-block"></i>
