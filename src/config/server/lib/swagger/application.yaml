@@ -47,3 +47,85 @@ paths:
                     description: The access_token is invalid or expired.
                 4401:
                     description: The refresh_token is invalid or expired.
+    /api/applications/data:
+        post:
+            tags:
+                - applications
+            summary: Create data from client portals.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                type:
+                                    type: string
+                                data:
+                                    type: string
+                            required:
+                                - type
+                                - data
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: string
+                                            type:
+                                                type: string
+                                            data:
+                                                type: string
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+                400:
+                    description: Bad request.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+    /api/applications/data/{id}:
+        get:
+            tags:
+                - applications
+            summary: Get data.
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  description: the data identifier, as id
+                  schema:
+                    type: string
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: string
+                                            type:
+                                                type: string
+                                            data:
+                                                type: string
+                                            applicaiton:
+                                                type: object
+                                                properties:
+                                                    id:
+                                                        type: string
+                                                    name:
+                                                        type: string
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"

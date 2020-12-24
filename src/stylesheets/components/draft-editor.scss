@@ -1,0 +1,49 @@
+.DraftEditor-root,
+.DraftEditor-editorContainer,
+.public-DraftEditor-content {
+  /* padding: 5px;
+  margin: 5px; */
+}
+
+.public-DraftEditorPlaceholder-root {
+  /* margin-top: 28px;
+  margin-left: 25px; */
+}
+
+.public-DraftEditorPlaceholder-inner {
+  /* background: rgba(0, 0, 0, .5);
+  color: white; */
+}
+
+.DraftEditor-root {
+  /* min-height: 100px !important; */
+}
+
+.public-DraftEditor-content {
+   /* border: 1px solid blue; */
+   min-height: 100px !important;    /* This controls the height of the editor */
+}
+
+.DraftEditor-editorContainer {
+  /* border: 1px solid green; */
+}
+
+.public-DraftStyleDefault-block {
+  /* border: 1px solid red; */
+  /* margin: 5px 0; */
+}
+
+.draft-editor {
+    .rdw-editor-main {
+        a { color: $secondary-color;}
+    }
+}
+
+.rdw-link-modal {
+    height: auto !important;
+}
+
+.public-DraftEditor-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}

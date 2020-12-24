@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import Faq from '../../../shared/client/components/faq.component';
+import { Faq } from '../../../platform';
 
 const ConsentManagement = () => {
     return (
@@ -26,7 +26,7 @@ const ConsentManagement = () => {
                             <div className="row">
                                 <div className="col-12">
                                     <div className="list-group cdp-list-group">
-                                        <NavLink to="#" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link disabled">
+                                        <NavLink to="/consent/list" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
                                             <i className="icon icon-manage-profile icon-3x icon-3x cdp-list-group__icon"></i>
                                             <span>
                                                 <strong className="mb-2 h4 d-block cdp-list-group__link-title">Manage New Consent</strong>
@@ -34,15 +34,15 @@ const ConsentManagement = () => {
                                                 <span className="d-block cdp-list-group__link-activity">within 5 - 10 minutes</span>
                                             </span>
                                         </NavLink>
-                                        <NavLink to="#" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link disabled">
+                                        <NavLink to="/consent/consent-categories" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
                                             <i className="icon icon-accept icon-3x cdp-list-group__icon"></i>
                                             <span>
-                                                <strong className="mb-2 h4 d-block cdp-list-group__link-title">Configure Consent Type</strong>
-                                                <span className="d-block cdp-list-group__link-description">Manage consent types such as  Soft opt-in or opt-out related to medical (scientific) and marketing (sales) consents.</span>
+                                                <strong className="mb-2 h4 d-block cdp-list-group__link-title">Configure Consent Category</strong>
+                                                <span className="d-block cdp-list-group__link-description">Manage consent categories such as medical (scientific) or marketing (sales) consents.</span>
                                                 <span className="d-block cdp-list-group__link-activity">within 5 - 10 minutes</span>
                                             </span>
                                         </NavLink>
-                                        <NavLink to="#" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link disabled">
+                                        <NavLink to="/consent/manage-consents-per-country" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
                                             <i className="icon icon-global icon-3x cdp-list-group__icon"></i>
                                             <span>
                                                 <strong className="mb-2 h4 d-block cdp-list-group__link-title">Assign Consent to Country</strong>
@@ -93,7 +93,7 @@ const ConsentManagement = () => {
                                         <NavLink to="/consent/consent-performance-report/cdp" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
                                             <i className="icon icon-handshake icon-3x cdp-list-group__icon"></i>
                                             <span>
-                                                <strong className="mb-2 h4 d-block cdp-list-group__link-title">Generate Data Privacy Report & Consent Performance Management Report </strong>
+                                                <strong className="mb-2 h4 d-block cdp-list-group__link-title">Generate Data Privacy & Consent Performance Report </strong>
                                                 <span className="d-block cdp-list-group__link-description">Manage User request to generate data privacy reports on individual level, Consent Performance Report of total amount of consents grouped by consent type and grouped by HCO -Health Care Organization where the HCP works.</span>
                                                 <span className="d-block cdp-list-group__link-activity">within 5 - 10 minutes</span>
                                             </span>
@@ -103,8 +103,8 @@ const ConsentManagement = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="col-12 col-lg-4 col-xl-3 py-3">
-                        <Faq />
+                    <div className="col-12 col-lg-4 col-xl-3 py-3 app__content-panel-right">
+                        <Faq topic="data-privacy" />
                     </div>
                 </div>
             </div>

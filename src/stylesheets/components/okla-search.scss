@@ -1,0 +1,107 @@
+.okla-search {
+
+    &__details {
+        min-height: 350px;
+        display: flex;
+
+        .tab-content {
+            flex: 0 0 calc(100% - 270px);
+        }
+
+        &-items {
+            list-style: none;
+            padding: 0px;
+            margin: 0px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        &-item {
+            padding: 0px 10px 20px 0px;
+            flex: 0 0 50%;
+            white-space: nowrap;
+        }
+
+        &-title {
+            display: block;
+            color: #202020;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        &-value {
+            color: #636A70;
+            font-size: 18px;
+        }
+    }
+
+    &__tabs {
+        margin-right: 30px;
+        flex-direction: column;
+        width: 270px;
+        @media (min-width: $screen-phone) {
+            border-bottom: 0px;
+        }
+
+        .nav-link {
+            background: #F2F2F2;
+            margin-bottom: 5px;
+            border: none;
+            padding: 20px;
+            font-size: 26px;
+            font-weight: 600;
+            color: #222020;
+            border-left: 9px solid #F2F2F2;
+            border-radius: 0px;
+
+            &.active {
+                border-left: 9px solid #F69223;
+            }
+        }
+    }
+
+    @media (max-width: $screen-phone) {
+
+        &__details {
+            display: block;
+
+            &-title,
+            &-value {
+                font-size: 16px;
+            }
+        }
+
+        &__tabs {
+            flex-direction: row;
+            margin-right: 0px;
+            margin-bottom: 20px;
+            width: 100%;
+
+            .nav-link {
+                margin-bottom: 0px;
+                border-left: 0px;
+                border-bottom: 5px solid #F2F2F2;
+                padding: 10px;
+                font-size: 16px;
+
+                &.active {
+                    border-bottom: 5px solid $secondary-color;
+                    border-left: 0px;
+                }
+            }
+        }
+    }
+}
+
+.custom-modal-size {
+    max-width: 1050px;
+
+    @media (max-width: $screen-lg-desktop) {
+        max-width: 950px;
+    }
+
+    @media (max-width: $screen-desktop) {
+        max-width: 100%;
+        margin: 0.5rem;
+    }
+}

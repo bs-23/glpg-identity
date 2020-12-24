@@ -1,24 +1,18 @@
-import React, { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import React from 'react';
+import { useSelector } from 'react-redux';
 import { useCookies } from 'react-cookie';
-import { getCountries } from '../../../user/client/user.actions'
-import { useHistory } from "react-router-dom";
-// import Dropdown from 'react-bootstrap/Dropdown';
+import { useHistory } from 'react-router-dom';
+import _ from 'lodash';
 
 export default function Navbar() {
     const [, setCookie, removeCookie] = useCookies();
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
-    const countries = useSelector(state => state.userReducer.countries);
-    const { first_name, last_name } = loggedInUser;
-    const dispatch = useDispatch()
+    const countries = useSelector(state => state.countryReducer.countries);
     const history = useHistory();
 
-    useEffect(() => {
-        dispatch(getCountries())
-    }, [])
+    const { first_name, last_name, applications: userApplications, countries: userCountries } = loggedInUser;
 
     const handleLogOut = () => {
-        // alert('clicked auto');
         setCookie('logged_in', '', { path: '/' });
         removeCookie('logged_in');
     }
@@ -33,8 +27,8 @@ export default function Navbar() {
     }
 
     const renderCountryIcons = () => {
-        if(loggedInUser.countries){
-            const selectedCountries = countries && countries.filter(c => loggedInUser.countries.includes(c.country_iso2) ? true : false).map(c => c.codbase_desc)
+        if(userCountries){
+            const selectedCountries = countries && countries.filter(c => userCountries.includes(c.country_iso2) ? true : false).map(c => c.codbase_desc)
             return selectedCountries.map( country => {
                 return <img key={country} height="26" width="26" src={generateCountryIconPath(country)} onError={addFallbackIcon} title={country} alt="Flag" className="ml-1" />;
             })
@@ -42,14 +36,16 @@ export default function Navbar() {
     }
 
     const renderApplicationIcon = () => {
-        if(loggedInUser.application){
-            const { name, logo_link } = loggedInUser.application
-            return <img src={logo_link} title={name} alt={`${name} Logo`} width="122" />
+        if(userApplications){
+            return userApplications.map(app => {
+                const { name, logo_link, slug } = app;
+                return <img className="ml-2" key={slug} src={logo_link} title={name} alt={`${name} Logo`} width="122" />
+            })
         }
     }
 
     const myProfileClickHandler = () => {
-        history.push('/users/my-profile');
+        history.push('/my-profile');
     }
 
     return (
@@ -86,7 +82,7 @@ export default function Navbar() {
                                 </div>
                             </div>}
                             <div className="mb-2 mb-sm-0 d-flex justify-content-end align-items-center">
-                                <button className="mr-2 btn cdp-btn-secondary text-white" onClick={myProfileClickHandler}><i className="icon icon-user-round mr-1 app__header-icon-user d-none d-sm-inline-block"></i> <span className="">{first_name + " " + last_name}</span></button>
+                                <button className="mr-2 btn cdp-btn-secondary text-white my-profile__btn" onClick={myProfileClickHandler}><i className="icon icon-user-round mr-1 app__header-icon-user "></i> <span className="d-none d-sm-inline-block">{first_name + " " + last_name}</span></button>
                                 <a className="btn cdp-btn-outline-primary d-flex align-items-center" onClick={handleLogOut} href="/api/logout"><i className="icon icon-logout mr-1 app__header-icon-logout"></i>Sign out</a>
                             </div>
                         </div>

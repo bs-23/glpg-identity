@@ -40,7 +40,10 @@
 }
 
 input:checked + .slider {
-    background-color: #144D43;
+    background-color: $primary-color;
+}
+input[disabled]:checked + .slider {
+    background: $primary-color-lighter;
 }
 
 input[disabled]:checked + .slider {
@@ -102,6 +105,9 @@ input:checked + .slider:before {
 
 .custom-checkbox .custom-control-input:focus ~ .custom-control-label::before {
     box-shadow: none !important;
+}
+.custom-control-input:focus ~ .custom-control-label::before {
+    box-shadow: 0 0 0 0.2rem rgba(20, 77, 67, .25) !important;
 }
 
 .custom-control-label::before {
@@ -165,4 +171,30 @@ textarea.form-control {
     .form-control {
         padding-left: 95px;
     }
+}
+
+
+.multiselect {
+
+    &__menu {
+        z-index: 9999 !important;
+    }
+
+    &__control {
+        &--is-focused {
+            border-color: #80bdff !important;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+        }
+    }
+
+    &__option {
+        &--is-selected {
+            background: $primary-color-lighter !important;
+            margin-top: 3px !important;
+        }
+    }
+}
+
+.selected {
+    background: #144d4312;
 }

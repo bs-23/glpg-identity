@@ -128,7 +128,12 @@ paths:
                                 type: object
                                 properties:
                                     data:
-                                        type: string
+                                        type: object
+                                        properties:
+                                            is_firsttime_setup:
+                                                type: boolean
+                                            message:
+                                                type: string
                                     errors:
                                         $ref: "#/components/schemas/errorBodyInSuccess"
                 401:
@@ -175,7 +180,9 @@ paths:
                                         properties:
                                             password_reset_token:
                                                 type: string
-                                            retention_period:
+                                            user_id:
+                                                type: string
+                                            message:
                                                 type: string
                                     errors:
                                         $ref: "#/components/schemas/errorBodyInSuccess"
@@ -233,7 +240,7 @@ paths:
                 - name: id
                   in: path
                   required: true
-                  description: the user identifier, as id
+                  description: the user identifier
                   schema:
                     type: string
             responses:
@@ -264,7 +271,7 @@ paths:
                 - name: id
                   in: path
                   required: true
-                  description: the user identifier, as id
+                  description: the user identifier
                   schema:
                     type: string
             requestBody:
@@ -301,12 +308,67 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/errorResponse"
 
+    /api/hcp-profiles/{id}/consents:
+            put:
+                tags:
+                    - hcp-profiles
+                summary: Update consents of an HCP user.
+                parameters:
+                    - name: id
+                      in: path
+                      required: true
+                      description: the user identifier
+                      schema:
+                        type: string
+                requestBody:
+                    required: true
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    consents:
+                                        type: array
+                                        items:
+                                            type: object
+                                            description: Key value pair of consent id and answer
+                                            example: { consent_id: true/false }
+                responses:
+                    200:
+                        description: The request has succeeded.
+                        content:
+                            application/json:
+                                schema:
+                                    type: object
+                                    properties:
+                                        id:
+                                            type: string
+                                        consents:
+                                            type: array
+                                            items:
+                                                type: object
+                                                description: Key value pair of consent id and answer
+                                                example: { consent_id: true/false }
+
+                    400:
+                        description: Bad request
+                        content:
+                            applicaiton/json:
+                                schema:
+                                    $ref: "#/components/schemas/errorResponse"
+
     /api/hcp-profiles/specialties:
         get:
             tags:
                 - hcp-profiles
             summary: Get specialties by locale.
             parameters:
+                - name: country_iso2
+                  in: query
+                  required: true
+                  description: Case insensitive ISO-2 code of the country
+                  schema:
+                    type: string
                 - name: locale
                   in: query
                   required: true
@@ -418,6 +480,18 @@ components:
                     type: string
                 birthdate:
                     type: string
+                password_reset_token:
+                    type: string
+                consent_confirmation_token:
+                    type: string
+                language_code:
+                    type: string
+                locale:
+                    type: string
+                individual_id_onekey:
+                    type: string
+                origin_url:
+                    type: string
         resetHcpPassword:
             type: object
             properties:
@@ -467,9 +541,9 @@ components:
                     type: string
                 language_code:
                     type: string
-                locale:
-                    type: string
                 specialty_onekey:
+                    type: string
+                origin_url:
                     type: string
                 consents:
                     type: array
@@ -485,6 +559,7 @@ components:
               - language_code
               - locale
               - specialty_onekey
+              - origin_url
         confirmConsent:
             type: object
             properties:

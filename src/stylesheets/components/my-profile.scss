@@ -1,4 +1,11 @@
 .my-profile {
+    &__btn {
+        max-width: 200px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
     &__sidebar {
         position: sticky;
         top: 15px;

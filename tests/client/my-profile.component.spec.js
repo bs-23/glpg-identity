@@ -8,8 +8,8 @@ import MockAdapter from 'axios-mock-adapter'
 import { Provider } from 'react-redux';
 import { ToastProvider } from 'react-toast-notifications';
 import store from '../../src/modules/core/client/store';
-import { getSignedInUserProfile } from '../../src/modules/user/client/user.actions';
-import MyProfile from '../../src/modules/user/client/components/my-profile/my-profile.component';
+import { getSignedInUserProfile } from '../../src/modules/platform/user/client/user.actions';
+import MyProfile from '../../src/modules/platform/user/client/components/my-profile/my-profile.component';
 
 configure({ adapter: new Adapter() });
 

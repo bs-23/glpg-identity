@@ -1,9 +1,11 @@
 @charset "UTF-8";
 
+$font-path: "../../../../wwwroot/assets/fonts";
+
 @font-face {
     font-family: "cdp-icon";
-    src: url("/assets/fonts/cdp-icon.eot");
-    src: url("/assets/fonts/cdp-icon.eot?#iefix") format("embedded-opentype"), url("/assets/fonts/cdp-icon.woff") format("woff"), url("/assets/fonts/cdp-icon.ttf") format("truetype"), url("/assets/fonts/cdp-icon.svg#cdp-icon") format("svg");
+    src: url(#{$font-path}/cdp-icon.eot);
+    src: url(#{$font-path}/cdp-icon.eot?#iefix) format("embedded-opentype"), url(#{$font-path}/cdp-icon.woff) format("woff"), url(#{$font-path}/cdp-icon.ttf) format("truetype"), url(#{$font-path}/cdp-icon.svg#cdp-icon) format("svg");
     font-weight: normal;
     font-style: normal;
 }
@@ -274,6 +276,14 @@
     content: "\37";
 }
 
+
+.icon-minimize:before {
+    content: "\38";
+}
+
+.icon-expand:before {
+    content: "\39";
+}
 
 //custome css
 $class-slug: icon- !default;

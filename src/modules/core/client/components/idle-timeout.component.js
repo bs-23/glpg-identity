@@ -1,3 +1,4 @@
+import axios from 'axios';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import { useCookies } from 'react-cookie';
@@ -8,16 +9,21 @@ import React, { useEffect, useState } from 'react';
 export default function IdleTimeOutModalComponent(props) {
     const location = useLocation();
     const [show, setShow] = useState(props.show);
-    const [cookies, setCookie, removeCookie] = useCookies();
+    const [, setCookie, removeCookie] = useCookies();
 
     const handleShow = () => (location.pathname !== '/login' && location.pathname !== '/swagger/login' && location.pathname != '/api-docs/') ? setShow(true) : setShow(false);
     const handleClose = () => setShow(false);
 
     const handleLogout = () => {
-        if(cookies.logged_in) window.location.href = '/api/logout';
+        axios.get('/api/users/profile')
+        .then(res => {
+            window.location.href = '/api/logout';
+            setCookie('logged_in', '', { path: '/' });
+            removeCookie('logged_in');
+        })
+        .catch(err => {
 
-        setCookie('logged_in', '', { path: '/' });
-        removeCookie('logged_in');
+        })
     };
 
     useIdleTimer({

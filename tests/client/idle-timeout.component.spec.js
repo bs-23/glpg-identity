@@ -11,7 +11,7 @@ import store from '../../src/modules/core/client/store.js';
 import IdleTimeout from '../../src/modules/core/client/components/idle-timeout.component';
 import { act } from 'react-dom/test-utils';
 import { screen } from '@testing-library/dom'
-import { login } from '../../src/modules/user/client/user.actions';
+import { login } from '../../src/modules/platform/user/client/user.actions';
 
 configure({ adapter: new Adapter() });
 
@@ -22,7 +22,13 @@ describe('Idle time out component', () => {
     beforeEach( async () => {
         mockAxios = new MockAdapter(axios);
 
-        savedUser = { name: 'a', email: 'test@gmail.com'};
+        savedUser = {
+            "applications": [],
+            "countries": [],
+            "email": "test@gmail.com",
+            "name": "a",
+            "serviceCategories": []
+        };
         mockAxios.onPost('/api/login').reply(200, savedUser);
         mockAxios.onGet('/api/logout').reply(200);
 

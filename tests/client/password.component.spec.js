@@ -7,8 +7,8 @@ import { Provider } from 'react-redux';
 import store from '../../src/modules/core/client/store.js';
 import axios from 'axios'
 import MockAdapter from 'axios-mock-adapter'
-import PasswordForm from '../../src/modules/user/client/components/my-profile/password.component';
-import { login } from '../../src/modules/user/client/user.actions';
+import PasswordForm from '../../src/modules/platform/user/client/components/my-profile/password.component';
+import { login } from '../../src/modules/platform/user/client/user.actions';
 import { ToastProvider } from 'react-toast-notifications';
 
 configure({ adapter: new Adapter() });
@@ -20,7 +20,13 @@ describe('PasswordForm component', () => {
     beforeEach(async () => {
         fakeAxios = new MockAdapter(axios)
 
-        savedUser = { name: 'a', email: 'test@gmail.com'};
+        savedUser = {
+            "applications": [],
+            "countries": [],
+            "email": "test@gmail.com",
+            "name": "a",
+            "serviceCategories": [],
+        };
         fakeAxios.onPost('/api/login').reply(200, savedUser);
 
         await store.dispatch(login({

@@ -23,7 +23,7 @@ module.exports = async function () {
                 "style-src": ["'self'", "'unsafe-inline'", "fonts.googleapis.com"],
                 "font-src": ["'self'", "fonts.googleapis.com", "fonts.gstatic.com", "data:"],
                 "frame-src": ["'self'", "https://www.google.com"],
-                "img-src": ["'self'", "data:", nodecache.getValue('S3_BUCKET_URL')],
+                "img-src": ["'self'", "data:", nodecache.getValue('S3_BUCKET_URL'), "https://a.tile.openstreetmap.org", "https://b.tile.openstreetmap.org", "https://c.tile.openstreetmap.org"],
                 "frame-ancestors": ["'self'"],
                 "base-uri": ["'self'"],
                 "block-all-mixed-content": [],
