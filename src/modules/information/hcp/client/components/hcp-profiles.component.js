@@ -19,6 +19,7 @@ import { getHcpProfiles, getHCPSpecialities } from '../hcp.actions';
 import { ApprovalRejectSchema, HcpInlineEditSchema } from '../hcp.schema';
 import uuidAuthorities from '../uuid-authorities.json';
 import EditableTable from '../../../../core/client/components/EditableTable/EditableTable';
+import { MultiFilter } from "../../../../core/client/components/MultiFilter";
 
 const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
     const [comment, setComment] = useState("");
@@ -86,7 +87,7 @@ export default function hcpUsers() {
     const handleCloseFaq = () => setShowFaq(false);
     const handleShowFaq = () => setShowFaq(true);
 
-    const [show, setShow] = useState({ profileManage: false, updateStatus: false, saveConfirmation: false });
+    const [show, setShow] = useState({ profileManage: false, updateStatus: false, saveConfirmation: false, filterSidebar: false });
     const [currentUser, setCurrentUser] = useState({});
     const { addToast } = useToasts();
     const [sort, setSort] = useState({ type: 'ASC', value: null });
@@ -535,6 +536,7 @@ export default function hcpUsers() {
                                 <div className="d-flex pt-3 pt-sm-0">
                                     {countries && hcps['countries'] &&
                                         <React.Fragment>
+                                            <button onClick={() => setShow({ ...show, filterSidebar: true })} >Filter</button>
                                             <div title={tableDirty ? "Save or reset changes to use filter options" : null}>
                                                 <Dropdown className={`ml-auto dropdown-customize mr-2 ${tableDirty ? 'hcp-inline-disable' : ''}`}>
                                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center">
@@ -867,6 +869,11 @@ export default function hcpUsers() {
                         </div>
                     </div>
                 </div>
+                {show.filterSidebar &&
+                    <MultiFilter
+                        onHide={() => setShow({ ...show, filterSidebar: false })}
+                        onExecute={() => null}
+                    />}
             </div>
         </main >
     );
