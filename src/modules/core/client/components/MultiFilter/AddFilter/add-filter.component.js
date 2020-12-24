@@ -14,166 +14,8 @@ const style = {
     }
 }
 
-const filterOptions = [
-    {
-        "fieldName": "first_name",
-        "valueType": "text",
-        "displayText": "First Name",
-        "operators": [
-            {
-                "key": "equal",
-                "displayText": "Equals to"
-            },
-            {
-                "key": "contains",
-                "displayText": "Contains"
-            },
-            {
-                "key": "starts-with",
-                "displayText": "Starts With"
-            }
-        ]
-    },
-    {
-        "fieldName": "last_name",
-        "valueType": "text",
-        "displayText": "Last Name",
-        "operators": [
-            {
-                "key": "equal",
-                "displayText": "Equals to"
-            },
-            {
-                "key": "contains",
-                "displayText": "Contains"
-            },
-            {
-                "key": "starts-with",
-                "displayText": "Starts With"
-            }
-        ]
-    },
-    {
-        "fieldName": "email",
-        "valueType": "text",
-        "displayText": "Email",
-        "operators": [
-            {
-                "key": "equal",
-                "displayText": "Equals to"
-            },
-            {
-                "key": "contains",
-                "displayText": "Contains"
-            },
-            {
-                "key": "starts-with",
-                "displayText": "Starts With"
-            }
-        ]
-    },
-    {
-        "fieldName": "countries",
-        "valueType": "select",
-        "displayText": "Country",
-        "operators": [
-            {
-                "key": "equal",
-                "displayText": "Equals to"
-            }
-        ],
-        "options": [
-            {
-                "key": "BE",
-                "displayText": "Belgium"
-            },
-            {
-                "key": "FR",
-                "displayText": "France"
-            },
-            {
-                "key": "DE",
-                "displayText": "Germany"
-            },
-            {
-                "key": "IT",
-                "displayText": "Italy"
-            },
-            {
-                "key": "NL",
-                "displayText": "Netherlands"
-            },
-            {
-                "key": "ES",
-                "displayText": "Spain"
-            },
-            {
-                "key": "GB",
-                "displayText": "United Kingdom"
-            }
-        ]
-    },
-    {
-        "fieldName": "created_at",
-        "valueType": "date",
-        "displayText": "Creation Date",
-        "operators": [
-            {
-                "key": "equal",
-                "displayText": "Equals to"
-            },
-            {
-                "key": "less-than",
-                "displayText": "Before"
-            },
-            {
-                "key": "greater-than",
-                "displayText": "After"
-            }
-        ]
-    },
-    {
-        "fieldName": "expiry_date",
-        "valueType": "date",
-        "displayText": "Expiry Date",
-        "operators": [
-            {
-                "key": "equal",
-                "displayText": "Equals to"
-            },
-            {
-                "key": "less-than",
-                "displayText": "Before"
-            },
-            {
-                "key": "greater-than",
-                "displayText": "After"
-            }
-        ]
-    },
-    {
-        "fieldName": "created_by",
-        "valueType": "text",
-        "displayText": "Created By",
-        "operators": [
-            {
-                "key": "equal",
-                "displayText": "Equals to"
-            },
-            {
-                "key": "contains",
-                "displayText": "Contains"
-            },
-            {
-                "key": "starts-with",
-                "displayText": "Starts With"
-            }
-        ]
-    }
-];
-
 const AddFilter = (props) => {
-    const { onDone, onAddMoreFilter, filters: existingFilters } = props;
+    const { onDone, onAddMoreFilter, filters: existingFilters, filterOptions } = props;
     const [filters, setFilters] = useState([]);
 
     const handleAddMoreFilter = () => {
@@ -187,7 +29,6 @@ const AddFilter = (props) => {
     }
 
     const handleDone = (e) => {
-        console.log('Done ', filters)
         onDone && onDone(filters);
     }
 
@@ -203,26 +44,26 @@ const AddFilter = (props) => {
         setFilters(existingFilters);
     }, []);
 
-    console.log("Filters: ", filters);
-
     return <div style={style.container}>
         <div className="bg-light p-2">Add Filter</div>
-        {
-            filters && filters.map((filter, index) =>
-                <Filter
-                    key={filter.name}
-                    name={filter.name}
-                    index={index}
-                    fieldValue={filter.field}
-                    operatorValue={filter.operator}
-                    value={filter.value}
-                    filterOptions={filterOptions}
-                    onChange={handleChange}
-                />
-            )
-        }
-        <Button className="btn cdp-btn-outline-primary my-2 btn-block" label="+ add more filter" onClick={handleAddMoreFilter} />
-        <Button className="btn cdp-btn-secondary btn-block text-white" label="Done" onClick={handleDone} />
+        <div className="px-3 pb-3">
+            {
+                filters && filters.map((filter, index) =>
+                    <Filter
+                        key={filter.name}
+                        name={filter.name}
+                        index={index}
+                        fieldValue={filter.field}
+                        operatorValue={filter.operator}
+                        value={filter.value}
+                        filterOptions={filterOptions}
+                        onChange={handleChange}
+                    />
+                )
+            }
+            <Button className="btn cdp-btn-outline-primary my-2 btn-block" label="+ add more filter" onClick={handleAddMoreFilter} />
+            <Button className="btn cdp-btn-secondary btn-block text-white" label="Done" onClick={handleDone} />
+        </div>
     </div>
 }
 

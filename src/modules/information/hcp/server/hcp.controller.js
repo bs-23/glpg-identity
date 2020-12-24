@@ -393,7 +393,7 @@ async function getHcps(req, res) {
             total: totalUser,
             start: limit * page + 1,
             end: offset + limit > totalUser ? totalUser : offset + limit,
-            status: status ? status : null,
+            // status: status ? status : null,
             codbase: codbase ? codbase : null,
             countries: userPermittedCountries
         };
