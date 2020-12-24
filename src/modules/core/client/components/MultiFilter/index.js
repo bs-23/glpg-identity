@@ -1,1 +1,1 @@
-export { default as MultiFilter } from './multi-filter.componet';
+export { default as MultiFilter } from './MultiFilterSidebar/multi-filter.componet';
