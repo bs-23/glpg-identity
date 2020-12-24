@@ -318,11 +318,11 @@ async function getHcps(req, res) {
         order.push(['created_at', 'DESC']);
         order.push(['id', 'DESC']);
 
-        const currentFilter = await Filter.findOne({
-            where: { user_id: req.user.id, table_name: 'cdp-users' }
-        });
+        // const currentFilter = await Filter.findOne({
+        //     where: { user_id: req.user.id, table_name: 'cdp-users' }
+        // });
 
-        const filterOptions = generateFilterOptions(currentFilter, hcp_filter);
+        const filterOptions = hcp_filter; // generateFilterOptions(currentFilter, hcp_filter);
 
         const hcps = await Hcp.findAll({
             where: filterOptions,
