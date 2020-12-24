@@ -5,9 +5,13 @@ const { ModuleGuard } = require(path.join(process.cwd(), 'src/modules/core/serve
 const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/platform/user/server/user-authentication.middleware.js'));
 
 module.exports = app => {
+    app.route('/api/filter/:id')
+        .put(CDPAuthStrategy, controller.updateUserFilter);
+
+    app.route('/api/filter/options')
+        .get(CDPAuthStrategy, controller.getFilterOptions);
 
     app.route('/api/filter')
-        .get(CDPAuthStrategy, controller.getFilterOptions)
-        .post(CDPAuthStrategy, controller.updateFilterOptions);
-
+        .get(CDPAuthStrategy, controller.getUserFilters)
+        .post(CDPAuthStrategy, controller.createUserFilter);
 };

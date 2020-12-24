@@ -9,6 +9,10 @@ const FilterSettings = sequelize.cdpConnector.define('filter_settings', {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4
     },
+    title: {
+        allowNull: false,
+        type: DataTypes.STRING
+    },
     user_id: {
         allowNull: false,
         type: DataTypes.UUID
@@ -17,7 +21,7 @@ const FilterSettings = sequelize.cdpConnector.define('filter_settings', {
         allowNull: false,
         type: DataTypes.STRING
     },
-    option: {
+    settings: {
         allowNull: false,
         type: DataTypes.JSON
     },
