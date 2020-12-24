@@ -18,7 +18,6 @@ const style = {
     sidebar: {
         background: 'white',
         width: '20%',
-        padding: '20px'
     }
 }
 
@@ -35,7 +34,7 @@ const MultiFilter = (props) => {
 
     return <div style={style.container} onClick={handleOnClick} >
         <div style={style.sidebar}>
-            <span>Filters</span>
+            <h3 className="px-3 pt-3 cdp-text-primary">Filters</h3>
             <Formik
                 onSubmit={onExecute}
                 initialValues={{
@@ -45,17 +44,17 @@ const MultiFilter = (props) => {
             >
                 {(formikProps) =>
                     <React.Fragment>
-                        <div>
-                            <Button label="Execute" onClick={formikProps.submitForm} />
-                            <Button label="Cancel" onClick={onHide} />
+                        <div className="shadow-sm p-3 d-flex">
+                            <Button className="btn cdp-btn-secondary mr-1 btn-block text-white" label="Execute" onClick={formikProps.submitForm} />
+                            <Button className="btn cdp-btn-outline-primary ml-1 btn-block mt-0" label="Cancel" onClick={onHide} />
                         </div>
-                        <div>
-                            <div>
-                                <label className="" for="scope">
+                        <div className="bg-light p-3">
+                            <div className="mb-3">
+                                <label className="d-block" for="scope">
                                     Scope
                                 </label>
                                 <Field
-                                    className=""
+                                    className="form-control"
                                     id="scope"
                                     as="select"
                                     name="scope"
@@ -64,12 +63,12 @@ const MultiFilter = (props) => {
                                     <option className="p-2" value=''> Select an Option </option>
                                 </Field>
                             </div>
-                            <div>
-                                <label className="" for="source">
+                            <div className="mb-3">
+                                <label className="d-block" for="source">
                                     Source
                                 </label>
                                 <Field
-                                    className=""
+                                    className="form-control"
                                     id="source"
                                     as="select"
                                     name="source"
@@ -78,7 +77,7 @@ const MultiFilter = (props) => {
                                     <option className="p-2" value=''> Select an Option </option>
                                 </Field>
                             </div>
-                            <span onClick={() => setShow({ ...show, addFilter: true })}>+ Add Filter</span>
+                            <span className="cdp-text-primary" onClick={() => setShow({ ...show, addFilter: true })}><i class="fas fa-plus"></i> Add Filter</span>
                         </div>
                         {show.addFilter && <AddFilter onDone={() => setShow({ ...show, addFilter: false })} />}
                     </React.Fragment>
