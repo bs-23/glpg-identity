@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Formik, Field } from 'formik';
 
-import { Button } from './UI-Elements';
-import AddFilter from './add-filter.component';
+import { Button } from './common';
+import AddFilter from './AddFilter/add-filter.component';
 
 const style = {
     container: {
@@ -38,7 +38,10 @@ const MultiFilter = (props) => {
             <span>Filters</span>
             <Formik
                 onSubmit={onExecute}
-                initialValues={{}}
+                initialValues={{
+                    scope: '',
+                    source: ''
+                }}
             >
                 {(formikProps) =>
                     <React.Fragment>
