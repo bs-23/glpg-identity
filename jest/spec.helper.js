@@ -183,6 +183,9 @@ module.exports = {
         }
 
     },
+    okla: {
+
+    },
     serviceCategories: [
         { id: userManagementServiceCategoryID, title: "Management of Customer Data Platform", slug: "platform", created_by: defaultAdminId, updated_by: defaultAdminId },
         { id: HCPServiceCategoryID, title: "HCP", slug: "information", created_by: defaultAdminId, updated_by: defaultAdminId },
