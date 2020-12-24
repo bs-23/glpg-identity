@@ -19,7 +19,7 @@ const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodeca
 const PasswordPolicies = require(path.join(process.cwd(), 'src/modules/core/server/password/password-policies.js'));
 const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/platform/user/server/permission/permissions.js'));
 const XRegExp = require('xregexp');
-const { string }  = require('yup');
+const { string } = require('yup');
 const Filter = require(path.join(process.cwd(), "src/modules/core/server/filter/filter.model.js"));
 const filterService = require(path.join(process.cwd(), 'src/modules/platform/user/server/filter.js'));
 
@@ -47,18 +47,18 @@ const hcpValidation = () => {
         telephone: string()
             .matches(/^(?:[+]?[0-9]*|[0-9]{2,3}[\/]?[0-9]*)$/, 'Must be a valid phone number')
             .transform(value => value === '' ? undefined : value)
-            .max(25,'This field must be at most 25 characters long')
+            .max(25, 'This field must be at most 25 characters long')
             .nullable()
     }
 
     return {
         validate: async (value, schemaName) => {
-            try{
+            try {
                 await schema[schemaName].validate(value);
                 return {
                     valid: true
                 };
-            }catch(err){
+            } catch (err) {
                 return {
                     valid: false,
                     errors: err.errors
@@ -143,9 +143,9 @@ async function addPasswordResetTokenToUser(user) {
     await user.save();
 }
 
-var trimRequestBody = function(reqBody){
+var trimRequestBody = function (reqBody) {
     Object.keys(reqBody).forEach(key => {
-        if(typeof reqBody[key] === 'string')
+        if (typeof reqBody[key] === 'string')
             reqBody[key] = reqBody[key].trim();
     });
     return reqBody;
@@ -247,40 +247,20 @@ async function getHcps(req, res) {
 
         const [userPermittedApplications, userPermittedCountries] = await getUserPermissions(req.user.id);
 
-        async function getCountryIso2() {
-            const user_codbase_list_for_iso2 = (await sequelize.datasyncConnector.query(
-                `SELECT * FROM ciam.vwcountry where ciam.vwcountry.country_iso2 = ANY($countries);`, {
-                bind: {
-                    countries: userPermittedCountries
-                },
-                type: QueryTypes.SELECT
-            }
-            )).map(i => i.codbase);
+        const allCountries = await sequelize.datasyncConnector.query(
+            `SELECT * FROM ciam.vwcountry`,
+            { type: QueryTypes.SELECT }
+        );
 
-            const user_country_iso2_list = (await sequelize.datasyncConnector.query(
-                `SELECT * FROM ciam.vwcountry where ciam.vwcountry.codbase = ANY($codbases);`,
-                {
-                    bind: {
-                        codbases: user_codbase_list_for_iso2
-                    },
-                    type: QueryTypes.SELECT
-                }
-            )).map(i => i.country_iso2);
+        const user_codbase_list_for_iso2 = allCountries.filter(c => userPermittedCountries.includes(c.country_iso2))
+            .map(i => i.codbase);
 
-            return user_country_iso2_list;
-        }
+        const country_iso2_list = allCountries.filter(c => user_codbase_list_for_iso2.includes(c.codbase))
+            .map(i => i.country_iso2);
 
-        const country_iso2_list = await getCountryIso2();
         const ignorecase_of_country_iso2_list = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
 
-        const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(
-            `SELECT * FROM ciam.vwcountry WHERE ciam.vwcountry.codbase = $codbase;`, {
-            bind: {
-                codbase: codbase || ''
-            },
-            type: QueryTypes.SELECT
-        }
-        )).map(i => i.country_iso2);
+        const country_iso2_list_for_codbase = allCountries.filter(ac => ac.codbase.toLowerCase() === codbase.toLowerCase()).map(i => i.country_iso2);
 
         const selected_iso2_list_for_codbase = country_iso2_list_for_codbase.filter(i => country_iso2_list.includes(i));
         const ignorecase_of_selected_iso2_list_for_codbase = [].concat.apply([], selected_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
@@ -361,7 +341,7 @@ async function getHcps(req, res) {
             const opt_types = new Set();
 
             hcp['hcpConsents'].map(hcpConsent => {
-                if(hcpConsent.consent_confirmed || hcpConsent.opt_type === 'opt-out') {
+                if (hcpConsent.consent_confirmed || hcpConsent.opt_type === 'opt-out') {
                     opt_types.add(hcpConsent.opt_type);
                 }
             });
@@ -484,7 +464,7 @@ async function updateHcps(req, res) {
     }
 
     try {
-        if(!Array.isArray(Hcps)) {
+        if (!Array.isArray(Hcps)) {
             response.error.push(new CustomError('Must be an array', 400));
             return res.status(400).send(response);
         }
@@ -492,7 +472,7 @@ async function updateHcps(req, res) {
         await Promise.all(Hcps.map(async hcp => {
             const { id, email, first_name, last_name, uuid, specialty_onekey, country_iso2, telephone, _rowIndex } = trimRequestBody(hcp);
 
-            if(!id) {
+            if (!id) {
                 response.errors.push(new Error(_rowIndex, 'id', 'ID is missing.'));
             }
 
@@ -502,24 +482,25 @@ async function updateHcps(req, res) {
                 response.errors.push(new Error(_rowIndex, 'id', 'User not found.'));
             }
 
-            if(email) {
-                if(!validator.isEmail(email)) {
+            if (email) {
+                if (!validator.isEmail(email)) {
                     response.errors.push(new Error(_rowIndex, 'email', 'Invalid email'));
-                }else{
+                } else {
                     const doesEmailExist = await Hcp.findOne({
                         where: {
                             id: { [Op.ne]: id },
-                            email: { [Op.iLike]: `${email}` } }
+                            email: { [Op.iLike]: `${email}` }
                         }
+                    }
                     );
 
-                    if(doesEmailExist) {
+                    if (doesEmailExist) {
                         response.errors.push(new Error(_rowIndex, 'email', 'Email already exists'));
                     }
 
-                    if(emailsToUpdate.has(email)) {
+                    if (emailsToUpdate.has(email)) {
                         emailsToUpdate.get(email).push(_rowIndex);
-                    }else{
+                    } else {
                         emailsToUpdate.set(email, [_rowIndex]);
                     }
                 }
@@ -527,7 +508,7 @@ async function updateHcps(req, res) {
 
             let uuid_from_master_data;
 
-            if(uuid) {
+            if (uuid) {
                 let master_data = {};
 
                 const uuidWithoutSpecialCharacter = uuid.replace(/[-]/gi, '');
@@ -559,9 +540,9 @@ async function updateHcps(req, res) {
                     response.errors.push(new Error(_rowIndex, 'uuid', 'UUID already exists.'));
                 }
 
-                if(uuidsToUpdate.has(uuid_from_master_data || uuid)) {
+                if (uuidsToUpdate.has(uuid_from_master_data || uuid)) {
                     uuidsToUpdate.get(uuid_from_master_data || uuid).push(_rowIndex);
-                }else{
+                } else {
                     uuidsToUpdate.set(uuid_from_master_data || uuid, [_rowIndex]);
                 }
             }
@@ -581,18 +562,18 @@ async function updateHcps(req, res) {
         }));
 
         emailsToUpdate.forEach((listOfIndex) => {
-            if(listOfIndex.length > 1) {
+            if (listOfIndex.length > 1) {
                 listOfIndex.map(ind => response.errors.push(new Error(ind, 'email', 'Email matches with another row.')))
             }
         })
 
         uuidsToUpdate.forEach((listOfIndex) => {
-            if(listOfIndex.length > 1) {
+            if (listOfIndex.length > 1) {
                 listOfIndex.map(ind => response.errors.push(new Error(ind, 'uuid', 'UUID matches with another row.')))
             }
         })
 
-        if(response.errors && response.errors.length) {
+        if (response.errors && response.errors.length) {
             return res.status(400).send(response);
         }
 
@@ -600,7 +581,7 @@ async function updateHcps(req, res) {
             const updatedPropertiesLog = [];
 
             Object.keys(hcpsToUpdate[index]).forEach(key => {
-                if(hcpsToUpdate[index][key]) {
+                if (hcpsToUpdate[index][key]) {
                     const updatedPropertyLogObject = {
                         field: key,
                         old_value: hcp.dataValues[key],
@@ -628,7 +609,7 @@ async function updateHcps(req, res) {
         hcpModelInstances.map((hcpModelIns, idx) => {
             const { _rowIndex } = hcpModelIns.dataValues;
             Object.keys(hcpsToUpdate[idx]).forEach(key => {
-                if(hcpsToUpdate[idx][key]) response.data.push(new Data(_rowIndex, key, hcpModelIns.dataValues[key]));
+                if (hcpsToUpdate[idx][key]) response.data.push(new Data(_rowIndex, key, hcpModelIns.dataValues[key]));
             })
         });
 
@@ -725,7 +706,7 @@ async function createHcpProfile(req, res) {
         response.errors.push(new CustomError('Email address is missing or invalid.', 400, 'email'));
     } else if (email.length > 100) {
         response.errors.push(new CustomError('Email should be at most 100 characters', 400, 'email'));
-    } else if(!emailValidationStatus.valid) {
+    } else if (!emailValidationStatus.valid) {
         response.errors.push(new CustomError(emailValidationStatus.errors[0], 400, 'email'));
     }
 
@@ -745,7 +726,7 @@ async function createHcpProfile(req, res) {
         response.errors.push(new CustomError('First name is missing.', 400, 'first_name'));
     } else if (first_name.length > 50) {
         response.errors.push(new CustomError('First name should be at most 50 characters', 400, 'first_name'));
-    } else if(!firstNameValidationStatus.valid) {
+    } else if (!firstNameValidationStatus.valid) {
         response.errors.push(new CustomError(firstNameValidationStatus.errors[0], 400, 'first_name'));
     }
 
@@ -753,7 +734,7 @@ async function createHcpProfile(req, res) {
         response.errors.push(new CustomError('Last name is missing.', 400, 'last_name'));
     } else if (last_name.length > 50) {
         response.errors.push(new CustomError('Last name should be at most 50 characters', 400, 'last_name'));
-    } else if(!lastNameValidationStatus.valid) {
+    } else if (!lastNameValidationStatus.valid) {
         response.errors.push(new CustomError(lastNameValidationStatus.errors[0], 400, 'last_name'));
     }
 
@@ -779,7 +760,7 @@ async function createHcpProfile(req, res) {
 
     if (telephone && telephone.length > 25) {
         response.errors.push(new CustomError('Telephone number should be at most 25 digits including country code', 400, 'telephone'));
-    } else if(!telephoneValidationStatus.valid) {
+    } else if (!telephoneValidationStatus.valid) {
         response.errors.push(new CustomError(telephoneValidationStatus.errors[0], 400, 'telephone'));
     }
 
@@ -1187,7 +1168,7 @@ async function getHCPUserConsents(req, res) {
             }, attributes: ['consent_id', 'rich_text']
         });
 
-        if(userConsentDetails) {
+        if (userConsentDetails) {
             const codbaseCountry = await sequelize.datasyncConnector.query(`
                 SELECT * FROM ciam.vwcountry
                 WHERE countryname = (SELECT codbase_desc FROM ciam.vwcountry
@@ -1311,7 +1292,7 @@ async function changePassword(req, res) {
 async function resetPassword(req, res) {
     const response = new Response({}, []);
 
-    async function log(object_id, actor, message, event_type="BAD_REQUEST") {
+    async function log(object_id, actor, message, event_type = "BAD_REQUEST") {
         await logService.log({
             event_type,
             object_id,
@@ -1395,7 +1376,7 @@ async function resetPassword(req, res) {
             is_firsttime_setup
         };
 
-        if(wasAccountLocked) await log(doc.id, req.user.id, 'HCP Password reset success. Account unlocked', 'UPDATE');
+        if (wasAccountLocked) await log(doc.id, req.user.id, 'HCP Password reset success. Account unlocked', 'UPDATE');
         else await log(doc.id, req.user.id, 'HCP Password reset success', 'UPDATE');
 
         res.json(response);
@@ -1657,7 +1638,7 @@ async function getAccessToken(req, res) {
                     actor: req.user.id,
                     remarks: 'HCP Login failed. Account locked'
                 });
-            } else if(doc && doc.password && !doc.validPassword(password)) {
+            } else if (doc && doc.password && !doc.validPassword(password)) {
                 await logService.log({
                     event_type: 'LOGIN',
                     object_id: doc.id,
