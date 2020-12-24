@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Tabs, Tab } from 'react-bootstrap';
 import { NavLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { getHcpProfiles } from '../../../information/hcp/client/hcp.actions'; 
+import { getHcpProfiles } from '../../../information/hcp/client/hcp.actions';
 import { isArray } from "lodash";
 import StatusupdateModal from './statusUpdateModal.component';
 
@@ -18,7 +18,7 @@ export default function Inbox(){
     getHcps();
   }, []);
   const hcps = useSelector(state => state.hcpReducer.hcps);
- 
+
   return(
       <div className={`shadow-sm bg-white mb-3 cdp-inbox ${show ? "cdp-inbox__expand" : ""}`}>
       <h5 className="p-3 cdp-text-primary font-weight-bold mb-0 d-flex justify-content-between cdp-inbox__header">
@@ -31,7 +31,7 @@ export default function Inbox(){
         <Tabs defaultActiveKey={selectedTab} className="cdp-inbox__tab px-2" onSelect={(activeKey, e) => setSelectedTab(activeKey)}>
           <Tab eventKey="hcpaproval" title="HCP Approval">
             <div className="cdp-inbox__tab-detail">
-              {hcps.users !== undefined && 
+              {hcps.users !== undefined &&
                 hcps.users.map((user, key) => <ul className="cdp-inbox__list p-0 m-0">
                     <li className="cdp-inbox__list-item d-flex justify-content-between  align-items-center border-bottom py-3 px-3">
                       <span className="cdp-inbox__list-item-col large cdp-text-primary font-weight-bold">{user.email}</span>
@@ -46,9 +46,10 @@ export default function Inbox(){
                   </ul>
                 )
               }
-              <NavLink to="/information/list?page=1&status=not_verified" className="d-inline-block p-3 text-uppercase cdp-text-secondary active small font-weight-bold">
-                More Pending
-              </NavLink>
+            {hcps.users !== undefined && hcps.users.length !== 0 ?
+                <NavLink to="/in formation/list?page=1&status=not_verified" className="d-inline-block p-3 text-uppercase cdp-text-secondary active small font-weight-bold">More Pending</NavLink>
+                :
+            <div className="d-inline-block p-3 text-uppercase cdp-text-secondary active small font-weight-bold">No Data Found</div>}
             </div>
           </Tab>
           <Tab eventKey="consent" title="Consent" disabled>
