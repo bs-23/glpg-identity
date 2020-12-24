@@ -4,11 +4,12 @@ import { Field } from 'formik';
 const Filter = (props) => {
     const {
         name,
-        fields,
+        index,
+        value,
         fieldValue,
-        operators,
         operatorValue,
-        values
+        filterOptions,
+        onChange
     } = props;
 
     return <div>
@@ -22,10 +23,11 @@ const Filter = (props) => {
                 id="field"
                 as="select"
                 name="field"
-                value=""
+                value={fieldValue}
+                onChange={(e) => onChange(e, index)}
             >
                 <option className="p-2" value=''> Select an Option </option>
-                {fields && fields.map(item => <option key={item.key} value={item.key} >{item.displayText}</option>)}
+                {filterOptions && filterOptions.map(filter => <option key={filter.fieldName} value={filter.fieldName} >{filter.displayText}</option>)}
             </Field>
         </div>
         <div>
@@ -38,9 +40,12 @@ const Filter = (props) => {
                 as="select"
                 name="operator"
                 value={operatorValue}
+                onChange={(e) => onChange(e, index)}
             >
-                <option className="p-2" value=''> Select an Option </option>
-                {operators && operators.map(item => <option key={item.key} value={item.key} >{item.displayText}</option>)}
+                <>
+                    <option className="p-2" value=''> Select an Option </option>
+                    {filterOptions && filterOptions.find(filter => filter.fieldName === fieldValue)?.operators?.map(item => <option key={item.key} value={item.key} >{item.displayText}</option>)}
+                </>
             </Field>
         </div>
         <div>
@@ -51,7 +56,8 @@ const Filter = (props) => {
                 className=""
                 id="value"
                 name="value"
-                value=""
+                value={value}
+                onChange={(e) => onChange(e, index)}
             ></Field>
         </div>
     </div>

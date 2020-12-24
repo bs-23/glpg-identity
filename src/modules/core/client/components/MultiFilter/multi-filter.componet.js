@@ -22,6 +22,15 @@ const style = {
     }
 }
 
+const filters = [
+    {
+        name: 'Filter 01',
+        field: 'last_name',
+        operator: 'equal',
+        value: ''
+    }
+]
+
 const MultiFilter = (props) => {
     const { onHide, onExecute } = props;
 
@@ -80,7 +89,7 @@ const MultiFilter = (props) => {
                             </div>
                             <span onClick={() => setShow({ ...show, addFilter: true })}>+ Add Filter</span>
                         </div>
-                        {show.addFilter && <AddFilter onDone={() => setShow({ ...show, addFilter: false })} />}
+                        {show.addFilter && <AddFilter filters={filters} onDone={() => setShow({ ...show, addFilter: false })} />}
                     </React.Fragment>
                 }
             </Formik>
