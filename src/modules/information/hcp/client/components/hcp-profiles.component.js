@@ -135,7 +135,26 @@ export default function hcpUsers() {
         searchParams.forEach(element => {
             searchObj[element.split("=")[0]] = element.split("=")[1];
         });
-        dispatch(getHcpProfiles(searchObj.page, searchObj.status, searchObj.codbase, searchObj.orderBy, searchObj.orderType));
+
+        const filterSettings = {
+            filters: [
+                // {
+                //     name: "2",
+                //     fieldName: "first_name",
+                //     operator: "equal",
+                //     value: "dfdfd"
+                // },
+                {
+                    name: "1",
+                    fieldName: "last_name",
+                    operator: "equal",
+                    value: ["Rifat","khk"]
+                }
+            ],
+            // logic: "1 or 2"
+        };
+
+        dispatch(getHcpProfiles(searchObj.page, searchObj.status, searchObj.codbase, searchObj.orderBy, searchObj.orderType, null));
         setSort({ type: params.get('orderType'), value: params.get('orderBy') });
     };
 

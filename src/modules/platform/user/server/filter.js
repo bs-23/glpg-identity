@@ -53,7 +53,15 @@ async function getCountries(user) {
 
 async function getFilterOptions(user) {
     const countries = (await getCountries(user))
-        .map(c => ({ key: c.country_iso2, displayText: c.countryname }));
+        .map(c => ({ value: c.codbase, displayText: c.countryname }));
+
+    const statusOptions = [
+        { value: 'self_verified', displayText: 'Self Verified' },
+        { value: ['self_verified', 'manually_verified'], displayText: 'All Verified' },
+        { value: 'manually_verified', displayText: 'Manually Verified' },
+        { value: 'consent_pending', displayText: 'Consent Pending' },
+        { value: 'not_verified', displayText: 'Not Verified' },
+    ];
 
     const filterOptions = [
         {
@@ -82,6 +90,13 @@ async function getFilterOptions(user) {
             options: countries
         },
         {
+            fieldName: 'status',
+            valueType: 'select',
+            displayText: 'Status',
+            operators: getSelectOperators(),
+            options: statusOptions
+        },
+        {
             fieldName: 'created_at',
             valueType: 'date',
             displayText: 'Creation Date',
@@ -104,7 +119,7 @@ async function getFilterOptions(user) {
     return filterOptions;
 }
 
-function getValueOptions(filter) {
+function getQueryValue(filter) {
     if (filter.operator === 'equal') {
         return Array.isArray(filter.value)
             ? { [Op.or]: filter.value }
@@ -141,4 +156,4 @@ function getValueOptions(filter) {
 };
 
 exports.getFilterOptions = getFilterOptions;
-exports.getValueOptions = getValueOptions;
+exports.getQueryValue = getQueryValue;

@@ -7,7 +7,7 @@ const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/platfo
 
 module.exports = app => {
     app.route('/api/hcps')
-        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getHcps);
+        .post(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getHcps);
 
     app.route('/api/hcps/specialties')
         .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getSpecialtiesForCdp);

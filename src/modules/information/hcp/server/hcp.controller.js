@@ -156,12 +156,12 @@ function ignoreCaseArray(str) {
 }
 
 function generateFilterOptions(currentFilter, defaultFilter) {
-    if (!currentFilter || !currentFilter.option || !currentFilter.option.filters || currentFilter.option.filter === 0)
+    if (!currentFilter || !currentFilter.filters || currentFilter.filter === 0)
         return defaultFilter;
 
     // if (currentFilter.option.filters.length === 1 || !currentFilter.option.logic) {
     //     const filter = currentFilter.option.filters[0];
-    //     defaultFilter[filter.fieldName] = filterService.getValueOptions(filter);
+    //     defaultFilter[filter.fieldName] = filterService.getQueryValue(filter);
 
     //     return defaultFilter;
     // }
@@ -169,8 +169,8 @@ function generateFilterOptions(currentFilter, defaultFilter) {
     console.log('Default filter: ', defaultFilter);
     let customFilter = { ...defaultFilter };
 
-    const nodes = currentFilter.option.logic
-        ? currentFilter.option.logic.split(" ")
+    const nodes = currentFilter.logic && currentFilter.filters.length > 1
+        ? currentFilter.logic.split(" ")
         : ['1'];
     console.log('Logic nodes: ', nodes.join());
 
@@ -182,12 +182,12 @@ function generateFilterOptions(currentFilter, defaultFilter) {
         const next = index < nodes.length - 1 ? nodes[index + 1] : null;
 
         const findFilter = (name) => {
-            return currentFilter.option.filters.find(f => f.name === name);
+            return currentFilter.filters.find(f => f.name === name);
         };
 
         if (node === "and" && prevOperator === "and") {
             const filter = findFilter(next);
-            const query = { [filter.fieldName]: filterService.getValueOptions(filter) };
+            const query = { [filter.fieldName]: filterService.getQueryValue(filter) };
             const currentParent = groupedQueries[groupedQueries.length - 1];
             currentParent.values.push(query);
         } else if (node === "and") {
@@ -196,14 +196,14 @@ function generateFilterOptions(currentFilter, defaultFilter) {
             const group = {
                 operator: "and",
                 values: [
-                    { [leftFilter.fieldName]: filterService.getValueOptions(leftFilter) },
-                    { [rightFilter.fieldName]: filterService.getValueOptions(rightFilter) }
+                    { [leftFilter.fieldName]: filterService.getQueryValue(leftFilter) },
+                    { [rightFilter.fieldName]: filterService.getQueryValue(rightFilter) }
                 ]
             };
             groupedQueries.push(group);
         } else if (node !== "or" && prev !== "and" && next !== "and") {
             const filter = findFilter(node);
-            const query = { [filter.fieldName]: filterService.getValueOptions(filter) };
+            const query = { [filter.fieldName]: filterService.getQueryValue(filter) };
             groupedQueries.push(query);
         }
 
@@ -238,10 +238,12 @@ async function getHcps(req, res) {
     try {
         const page = req.query.page ? +req.query.page - 1 : 0;
         const limit = 15;
-        let status = req.query.status === undefined ? null : req.query.status;
-        if (status && status.indexOf(',') !== -1) status = status.split(',');
+        // let status = req.query.status === undefined ? null : req.query.status;
+        // if (status && status.indexOf(',') !== -1) status = status.split(',');
         const codbase = req.query.codbase === 'undefined' ? null : req.query.codbase;
         const offset = page * limit;
+
+        const currentFilter = req.body;
 
         const [userPermittedApplications, userPermittedCountries] = await getUserPermissions(req.user.id);
 
@@ -286,9 +288,9 @@ async function getHcps(req, res) {
         const specialty_list = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwspecialtymaster", { type: QueryTypes.SELECT });
 
         const hcp_filter = {
-            status: status === null
-                ? { [Op.or]: ['self_verified', 'manually_verified', 'consent_pending', 'not_verified', null] }
-                : status,
+            // status: status === null
+            //     ? { [Op.or]: ['self_verified', 'manually_verified', 'consent_pending', 'not_verified', null] }
+            //     : status,
             application_id: userPermittedApplications.length
                 ? userPermittedApplications.map(app => app.id)
                 : null,
@@ -318,11 +320,7 @@ async function getHcps(req, res) {
         order.push(['created_at', 'DESC']);
         order.push(['id', 'DESC']);
 
-        // const currentFilter = await Filter.findOne({
-        //     where: { user_id: req.user.id, table_name: 'cdp-users' }
-        // });
-
-        const filterOptions = hcp_filter; // generateFilterOptions(currentFilter, hcp_filter);
+        const filterOptions = generateFilterOptions(currentFilter, hcp_filter);
 
         const hcps = await Hcp.findAll({
             where: filterOptions,
