@@ -11,14 +11,14 @@ const Filter = (props) => {
         values
     } = props;
 
-    return <div>
-        <span>{name}</span>
+    return <div className="pb-2">
+        <div className="cdp-text-secondary font-weight-bold">{name}</div>
         <div>
-            <label className="" for="field">
+            <label className="pt-2 mb-1" for="field">
                 Field
             </label>
             <Field
-                className=""
+                className="form-control form-control-sm"
                 id="field"
                 as="select"
                 name="field"
@@ -29,11 +29,11 @@ const Filter = (props) => {
             </Field>
         </div>
         <div>
-            <label className="" for="operator">
+            <label className="pt-2 mb-1" for="operator">
                 Operator
             </label>
             <Field
-                className=""
+                className="form-control form-control-sm"
                 id="operator"
                 as="select"
                 name="operator"
@@ -44,11 +44,11 @@ const Filter = (props) => {
             </Field>
         </div>
         <div>
-            <label className="" for="value">
+            <label className="pt-2 mb-1" for="value">
                 Value
             </label>
             <Field
-                className=""
+                className="form-control form-control-sm"
                 id="value"
                 name="value"
                 value=""

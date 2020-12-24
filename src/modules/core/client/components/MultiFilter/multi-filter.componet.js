@@ -50,11 +50,11 @@ const MultiFilter = (props) => {
                         </div>
                         <div className="bg-light p-3">
                             <div className="mb-3">
-                                <label className="d-block" for="scope">
+                                <label className="d-block pt-2 mb-1" for="scope">
                                     Scope
                                 </label>
                                 <Field
-                                    className="form-control"
+                                    className="form-control form-control-sm"
                                     id="scope"
                                     as="select"
                                     name="scope"
@@ -64,11 +64,11 @@ const MultiFilter = (props) => {
                                 </Field>
                             </div>
                             <div className="mb-3">
-                                <label className="d-block" for="source">
+                                <label className="d-block pt-2 mb-1" for="source">
                                     Source
                                 </label>
                                 <Field
-                                    className="form-control"
+                                    className="form-control form-control-sm"
                                     id="source"
                                     as="select"
                                     name="source"
@@ -77,7 +77,7 @@ const MultiFilter = (props) => {
                                     <option className="p-2" value=''> Select an Option </option>
                                 </Field>
                             </div>
-                            <span className="cdp-text-primary" onClick={() => setShow({ ...show, addFilter: true })}><i class="fas fa-plus"></i> Add Filter</span>
+                            <span type="button" className="cdp-text-primary" onClick={() => setShow({ ...show, addFilter: true })}><i class="fas fa-plus"></i> Add Filter</span>
                         </div>
                         {show.addFilter && <AddFilter onDone={() => setShow({ ...show, addFilter: false })} />}
                     </React.Fragment>

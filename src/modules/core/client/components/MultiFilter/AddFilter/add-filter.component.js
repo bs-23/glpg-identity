@@ -7,7 +7,6 @@ const style = {
     container: {
         position: 'absolute',
         right: '20%',
-        padding: '20px',
         background: 'white',
         border: '1px solid darkgreen',
         borderRadius: '5px',
@@ -34,11 +33,14 @@ const AddFilter = (props) => {
     }, [props]);
 
     return <div style={style.container}>
-        <span>Add Filter</span>
-        <Filter name="Filter 01" operators={operators} operatorValue={'equals'} />
-        <Filter name="Filter 02" operators={operators} operatorValue={'greater-than'}  />
-        <Button label="+ add more filter" onClick={onAddMoreFilter}/>
-        <Button label="Done" onClick={onDone}/>
+        <div className="bg-light p-2">Add Filter</div>
+        <div className="p-2">
+            <Filter name="Filter 01" operators={operators} operatorValue={'equals'} />
+            <Filter name="Filter 02" operators={operators} operatorValue={'greater-than'} />
+            <Button className="btn cdp-btn-outline-primary my-2 btn-block" label="+ add more filter" onClick={onAddMoreFilter} />
+            <Button className="btn cdp-btn-secondary btn-block text-white" label="Done" onClick={onDone} />
+        </div>
+       
     </div>
 }
 
