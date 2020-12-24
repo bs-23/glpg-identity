@@ -32,8 +32,8 @@ export default function Inbox(){
           <Tab eventKey="hcpaproval" title="HCP Approval">
             <div className="cdp-inbox__tab-detail">
               {hcps.users !== undefined &&
-                hcps.users.map((user, key) => <ul className="cdp-inbox__list p-0 m-0">
-                    <li className="cdp-inbox__list-item d-flex justify-content-between  align-items-center border-bottom py-3 px-3">
+                hcps.users.map((user, key) => <ul key ={key}  className="cdp-inbox__list p-0 m-0">
+                    <li  className="cdp-inbox__list-item d-flex justify-content-between  align-items-center border-bottom py-3 px-3">
                       <span className="cdp-inbox__list-item-col large cdp-text-primary font-weight-bold">{user.email}</span>
                     <span className="cdp-inbox__list-item-col cdp-text-primary font-weight-bold px-3">{new Date(user.created_at).toLocaleDateString('en-GB', {
                       day: 'numeric', month: 'short', year: 'numeric'
