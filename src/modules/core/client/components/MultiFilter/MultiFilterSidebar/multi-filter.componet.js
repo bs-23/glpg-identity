@@ -31,166 +31,8 @@ const filters = [
     }
 ]
 
-const filterOptions = [
-    {
-        "fieldName": "first_name",
-        "valueType": "text",
-        "displayText": "First Name",
-        "operators": [
-            {
-                "key": "equal",
-                "displayText": "Equals to"
-            },
-            {
-                "key": "contains",
-                "displayText": "Contains"
-            },
-            {
-                "key": "starts-with",
-                "displayText": "Starts With"
-            }
-        ]
-    },
-    {
-        "fieldName": "last_name",
-        "valueType": "text",
-        "displayText": "Last Name",
-        "operators": [
-            {
-                "key": "equal",
-                "displayText": "Equals to"
-            },
-            {
-                "key": "contains",
-                "displayText": "Contains"
-            },
-            {
-                "key": "starts-with",
-                "displayText": "Starts With"
-            }
-        ]
-    },
-    {
-        "fieldName": "email",
-        "valueType": "text",
-        "displayText": "Email",
-        "operators": [
-            {
-                "key": "equal",
-                "displayText": "Equals to"
-            },
-            {
-                "key": "contains",
-                "displayText": "Contains"
-            },
-            {
-                "key": "starts-with",
-                "displayText": "Starts With"
-            }
-        ]
-    },
-    {
-        "fieldName": "countries",
-        "valueType": "select",
-        "displayText": "Country",
-        "operators": [
-            {
-                "key": "equal",
-                "displayText": "Equals to"
-            }
-        ],
-        "options": [
-            {
-                "key": "BE",
-                "displayText": "Belgium"
-            },
-            {
-                "key": "FR",
-                "displayText": "France"
-            },
-            {
-                "key": "DE",
-                "displayText": "Germany"
-            },
-            {
-                "key": "IT",
-                "displayText": "Italy"
-            },
-            {
-                "key": "NL",
-                "displayText": "Netherlands"
-            },
-            {
-                "key": "ES",
-                "displayText": "Spain"
-            },
-            {
-                "key": "GB",
-                "displayText": "United Kingdom"
-            }
-        ]
-    },
-    {
-        "fieldName": "created_at",
-        "valueType": "date",
-        "displayText": "Creation Date",
-        "operators": [
-            {
-                "key": "equal",
-                "displayText": "Equals to"
-            },
-            {
-                "key": "less-than",
-                "displayText": "Before"
-            },
-            {
-                "key": "greater-than",
-                "displayText": "After"
-            }
-        ]
-    },
-    {
-        "fieldName": "expiry_date",
-        "valueType": "date",
-        "displayText": "Expiry Date",
-        "operators": [
-            {
-                "key": "equal",
-                "displayText": "Equals to"
-            },
-            {
-                "key": "less-than",
-                "displayText": "Before"
-            },
-            {
-                "key": "greater-than",
-                "displayText": "After"
-            }
-        ]
-    },
-    {
-        "fieldName": "created_by",
-        "valueType": "text",
-        "displayText": "Created By",
-        "operators": [
-            {
-                "key": "equal",
-                "displayText": "Equals to"
-            },
-            {
-                "key": "contains",
-                "displayText": "Contains"
-            },
-            {
-                "key": "starts-with",
-                "displayText": "Starts With"
-            }
-        ]
-    }
-];
-
 const MultiFilter = (props) => {
-    const { onHide, onExecute, hideOnClickAway } = props;
+    const { onHide, onExecute, hideOnClickAway, options } = props;
 
     const [show, setShow] = useState({
         addFilter: false
@@ -206,12 +48,12 @@ const MultiFilter = (props) => {
     }
 
     const getFieldDisplayText = (fieldName) => {
-        const filter = filterOptions.find(filter => filter.fieldName === fieldName);
+        const filter = options.find(filter => filter.fieldName === fieldName);
         return filter ? filter.displayText : '';
     }
 
     const getOperatorDisplayText = (fieldName, operatorName) => {
-        const filter = filterOptions.find(filter => filter.fieldName === fieldName);
+        const filter = options.find(filter => filter.fieldName === fieldName);
         if(!filter) return '';
         const operator = filter.operators.find(op => op.key === operatorName);
         return operator ? operator.displayText : '';
@@ -307,7 +149,7 @@ const MultiFilter = (props) => {
                         {show.addFilter &&
                             <AddFilter
                                 filters={formikProps.values.filters}
-                                filterOptions={filterOptions}
+                                filterOptions={options}
                                 onDone={(filters) => handleAddFilterDone(filters, formikProps)}
                             />
                         }

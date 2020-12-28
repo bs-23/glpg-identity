@@ -1,5 +1,6 @@
 import React from 'react';
 import { Field } from 'formik';
+import Input from './input.component';
 
 const Filter = (props) => {
     const {
@@ -52,13 +53,22 @@ const Filter = (props) => {
             <label className="pt-2 mb-1" for="value">
                 Value
             </label>
-            <Field
+            {/* <Field
                 className="form-control form-control-sm"
                 id="value"
                 name="value"
                 value={value}
                 onChange={(e) => onChange(e, index)}
-            ></Field>
+            ></Field> */}
+            {<Input
+                className="form-control form-control-sm"
+                id="value"
+                name="value"
+                value={value}
+                selectOptions={filterOptions && filterOptions.find(filter => filter.fieldName === fieldValue)?.options}
+                type={filterOptions && filterOptions.find(filter => filter.fieldName === fieldValue)?.valueType}
+                onChange={(e) => onChange(e, index)}
+            />}
         </div>
     </div>
 }

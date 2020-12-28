@@ -19,7 +19,7 @@ import { getHcpProfiles, getHCPSpecialities } from '../hcp.actions';
 import { ApprovalRejectSchema, HcpInlineEditSchema } from '../hcp.schema';
 import uuidAuthorities from '../uuid-authorities.json';
 import EditableTable from '../../../../core/client/components/EditableTable/EditableTable';
-import { MultiFilter } from "../../../../core/client/components/MultiFilter";
+import { HCPFilter }  from "../../../../information";
 
 const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
     const [comment, setComment] = useState("");
@@ -889,7 +889,7 @@ export default function hcpUsers() {
                     </div>
                 </div>
                 {show.filterSidebar &&
-                    <MultiFilter
+                    <HCPFilter
                         onHide={() => setShow({ ...show, filterSidebar: false })}
                         onExecute={() => null}
                     />}
