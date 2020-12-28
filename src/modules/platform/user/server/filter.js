@@ -6,6 +6,7 @@ const { getRequestingUserPermissions } = require(path.join(process.cwd(), "src/m
 function getStringOperators() {
     return [
         { key: 'equal', displayText: 'Equals to' },
+        // { key: 'case-insensitive-equal', displayText: 'Equals to (Case-insensitive)' },
         { key: 'contains', displayText: 'Contains' },
         { key: 'starts-with', displayText: 'Starts With' }
     ];
@@ -83,7 +84,7 @@ async function getFilterOptions(user) {
             operators: getStringOperators()
         },
         {
-            fieldName: 'countries',
+            fieldName: 'country',
             valueType: 'select',
             displayText: 'Country',
             operators: getSelectOperators(),
@@ -119,31 +120,39 @@ async function getFilterOptions(user) {
     return filterOptions;
 }
 
-function getQueryValue(filter) {
+function getFilterQuery(filter) {
+    let queryValue;
+
     if (filter.operator === 'equal') {
-        return Array.isArray(filter.value)
+        queryValue = Array.isArray(filter.value)
             ? { [Op.or]: filter.value }
             : { [Op.eq]: filter.value };
     }
 
+    // if (filter.operator === 'case-insensitive-equal') {
+    //     queryValue = Array.isArray(filter.value)
+    //         ? { [Op.or]: filter.value }
+    //         : { [Op.iLike]: filter.value };
+    // }
+
     if (filter.operator === 'contains') {
-        return { [Op.like]: `%${filter.value}%` };
+        queryValue = { [Op.like]: `%${filter.value}%` };
     }
 
     if (filter.operator === 'starts-with') {
-        return { [Op.like]: `${filter.value}%` }
+        queryValue = { [Op.like]: `${filter.value}%` }
     }
 
     if (filter.operator === 'less-than') {
-        return { [Op.lt]: filter.value };
+        queryValue = { [Op.lt]: filter.value };
     }
 
     if (filter.operator === 'greater-than') {
-        return { [Op.gt]: filter.value };
+        queryValue = { [Op.gt]: filter.value };
     }
 
     if (filter.operator === 'greater-than-or-equal') {
-        return { [Op.gte]: filter.value };
+        queryValue = { [Op.gte]: filter.value };
     }
 
     if (filter.operator === 'less-than-or-equal') {
@@ -151,9 +160,11 @@ function getQueryValue(filter) {
     }
 
     if (filter.operator === 'between') {
-        return { [Op.notBetween]: filter.value };
+        queryValue = { [Op.notBetween]: filter.value };
     }
+
+    return { [filter.fieldName]: queryValue };
 };
 
 exports.getFilterOptions = getFilterOptions;
-exports.getQueryValue = getQueryValue;
+exports.getFilterQuery = getFilterQuery;
