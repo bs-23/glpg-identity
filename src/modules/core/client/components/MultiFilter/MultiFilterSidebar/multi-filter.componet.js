@@ -217,6 +217,13 @@ const MultiFilter = (props) => {
         return operator ? operator.displayText : '';
     }
 
+    const handleRemoveFilter = (index, props) => {
+        const allFilers = props.values.filters;
+        if(allFilers) {
+            props.setFieldValue('filters', allFilers.filter((value, ind) => ind !== index));
+        }
+    }
+
     return <div style={style.container} onClick={handleOnClick} >
         <div style={style.sidebar}>
             <h3 className="px-3 pt-3 cdp-text-primary">Filters</h3>
@@ -243,6 +250,7 @@ const MultiFilter = (props) => {
                                         operatorName={getOperatorDisplayText(filter.field, filter.operator)}
                                         values={filter.value}
                                         index={index}
+                                        onRemove={(index) => handleRemoveFilter(index, formikProps)}
                                     />
                                 </div>
                             )}
