@@ -23,7 +23,7 @@ const Filter = (props) => {
                 className="form-control form-control-sm"
                 id="field"
                 as="select"
-                name="field"
+                name="fieldName"
                 value={fieldValue}
                 onChange={(e) => onChange(e, index)}
             >

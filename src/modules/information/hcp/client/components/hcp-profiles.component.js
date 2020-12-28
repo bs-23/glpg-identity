@@ -129,32 +129,37 @@ export default function hcpUsers() {
         });
     }
 
-    const loadHcpProfiles = () => {
+    const loadHcpProfiles = (filterSetting) => {
         const searchObj = {};
         const searchParams = location.search.slice(1).split("&");
         searchParams.forEach(element => {
             searchObj[element.split("=")[0]] = element.split("=")[1];
         });
 
-        const filterSettings = {
-            filters: [
-                // {
-                //     name: "2",
-                //     fieldName: "first_name",
-                //     operator: "equal",
-                //     value: "dfdfd"
-                // },
-                {
-                    name: "1",
-                    fieldName: "last_name",
-                    operator: "equal",
-                    value: ["Rifat","khk"]
-                }
-            ],
-            // logic: "1 or 2"
-        };
+        // const filterSettings = {
+        //     filters: [
+        //         // {
+        //         //     name: "2",
+        //         //     fieldName: "first_name",
+        //         //     operator: "equal",
+        //         //     value: "dfdfd"
+        //         // },
+        //         {
+        //             name: "1",
+        //             fieldName: "last_name",
+        //             operator: "equal",
+        //             value: ["Rifat","khk"]
+        //         }
+        //     ],
+        //     // logic: "1 or 2"
+        // };
 
-        dispatch(getHcpProfiles(searchObj.page, searchObj.status, searchObj.codbase, searchObj.orderBy, searchObj.orderType, null));
+        const requestBody = {
+            filters: filterSetting,
+            logic: ''
+        }
+
+        dispatch(getHcpProfiles(searchObj.page, searchObj.status, searchObj.codbase, searchObj.orderBy, searchObj.orderType, requestBody));
         setSort({ type: params.get('orderType'), value: params.get('orderBy') });
     };
 
@@ -891,7 +896,7 @@ export default function hcpUsers() {
                 {show.filterSidebar &&
                     <HCPFilter
                         onHide={() => setShow({ ...show, filterSidebar: false })}
-                        onExecute={() => null}
+                        onExecute={({ filters }) => loadHcpProfiles(filters)}
                     />}
             </div>
         </main >

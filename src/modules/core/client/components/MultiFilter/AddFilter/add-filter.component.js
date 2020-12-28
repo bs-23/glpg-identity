@@ -20,8 +20,8 @@ const AddFilter = (props) => {
 
     const handleAddMoreFilter = () => {
         const emptyFilter = {
-            name: "Filter " + (filters.length + 1),
-            field: '',
+            name: String(filters.length + 1),
+            fieldName: '',
             operator: '',
             value: ''
         };
@@ -53,7 +53,7 @@ const AddFilter = (props) => {
                         key={filter.name}
                         name={filter.name}
                         index={index}
-                        fieldValue={filter.field}
+                        fieldValue={filter.fieldName}
                         operatorValue={filter.operator}
                         value={filter.value}
                         filterOptions={filterOptions}

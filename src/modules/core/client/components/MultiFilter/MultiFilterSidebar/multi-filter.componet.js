@@ -22,14 +22,7 @@ const style = {
     }
 }
 
-const filters = [
-    {
-        name: 'Filter 01',
-        field: 'last_name',
-        operator: 'equal',
-        value: ''
-    }
-]
+
 
 const MultiFilter = (props) => {
     const { onHide, onExecute, hideOnClickAway, options } = props;
@@ -78,22 +71,31 @@ const MultiFilter = (props) => {
                 initialValues={{
                     scope: '',
                     source: '',
-                    filters: filters || []
+                    filters: []
                 }}
                 enableReinitialize
             >
                 {(formikProps) =>
                     <React.Fragment>
                         <div className="shadow-sm p-3 d-flex">
-                            <Button className="btn cdp-btn-secondary mr-1 btn-block text-white" label="Execute" onClick={formikProps.submitForm} />
-                            <Button className="btn cdp-btn-outline-primary ml-1 btn-block mt-0" label="Cancel" onClick={onHide} />
+                            <Button
+                                className="btn cdp-btn-secondary mr-1 btn-block text-white"
+                                label="Execute"
+                                onClick={formikProps.submitForm}
+                                disabled={formikProps.values.filters.length === 0}
+                            />
+                            <Button
+                                className="btn cdp-btn-outline-primary ml-1 btn-block mt-0"
+                                label="Cancel"
+                                onClick={onHide}
+                            />
                         </div>
                         <div className="bg-light p-3">
                             {formikProps.values.filters.map((filter, index) =>
                                 <div className="mb-3" key={filter.name}>
                                     <FilterSummary
-                                        fieldName={getFieldDisplayText(filter.field)}
-                                        operatorName={getOperatorDisplayText(filter.field, filter.operator)}
+                                        fieldName={getFieldDisplayText(filter.fieldName)}
+                                        operatorName={getOperatorDisplayText(filter.fieldName, filter.operator)}
                                         values={filter.value}
                                         index={index}
                                         onRemove={(index) => handleRemoveFilter(index, formikProps)}
