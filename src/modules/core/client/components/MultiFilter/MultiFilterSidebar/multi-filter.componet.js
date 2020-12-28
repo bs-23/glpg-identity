@@ -3,7 +3,7 @@ import { Formik, Field } from 'formik';
 
 import { Button } from '../common';
 import AddFilter from '../AddFilter/add-filter.component';
-import { FilterSummary } from './components';
+import { FilterSummary, FilterLogic } from './components';
 
 const style = {
     container: {
@@ -31,170 +31,12 @@ const filters = [
     }
 ]
 
-const filterOptions = [
-    {
-        "fieldName": "first_name",
-        "valueType": "text",
-        "displayText": "First Name",
-        "operators": [
-            {
-                "key": "equal",
-                "displayText": "Equals to"
-            },
-            {
-                "key": "contains",
-                "displayText": "Contains"
-            },
-            {
-                "key": "starts-with",
-                "displayText": "Starts With"
-            }
-        ]
-    },
-    {
-        "fieldName": "last_name",
-        "valueType": "text",
-        "displayText": "Last Name",
-        "operators": [
-            {
-                "key": "equal",
-                "displayText": "Equals to"
-            },
-            {
-                "key": "contains",
-                "displayText": "Contains"
-            },
-            {
-                "key": "starts-with",
-                "displayText": "Starts With"
-            }
-        ]
-    },
-    {
-        "fieldName": "email",
-        "valueType": "text",
-        "displayText": "Email",
-        "operators": [
-            {
-                "key": "equal",
-                "displayText": "Equals to"
-            },
-            {
-                "key": "contains",
-                "displayText": "Contains"
-            },
-            {
-                "key": "starts-with",
-                "displayText": "Starts With"
-            }
-        ]
-    },
-    {
-        "fieldName": "countries",
-        "valueType": "select",
-        "displayText": "Country",
-        "operators": [
-            {
-                "key": "equal",
-                "displayText": "Equals to"
-            }
-        ],
-        "options": [
-            {
-                "key": "BE",
-                "displayText": "Belgium"
-            },
-            {
-                "key": "FR",
-                "displayText": "France"
-            },
-            {
-                "key": "DE",
-                "displayText": "Germany"
-            },
-            {
-                "key": "IT",
-                "displayText": "Italy"
-            },
-            {
-                "key": "NL",
-                "displayText": "Netherlands"
-            },
-            {
-                "key": "ES",
-                "displayText": "Spain"
-            },
-            {
-                "key": "GB",
-                "displayText": "United Kingdom"
-            }
-        ]
-    },
-    {
-        "fieldName": "created_at",
-        "valueType": "date",
-        "displayText": "Creation Date",
-        "operators": [
-            {
-                "key": "equal",
-                "displayText": "Equals to"
-            },
-            {
-                "key": "less-than",
-                "displayText": "Before"
-            },
-            {
-                "key": "greater-than",
-                "displayText": "After"
-            }
-        ]
-    },
-    {
-        "fieldName": "expiry_date",
-        "valueType": "date",
-        "displayText": "Expiry Date",
-        "operators": [
-            {
-                "key": "equal",
-                "displayText": "Equals to"
-            },
-            {
-                "key": "less-than",
-                "displayText": "Before"
-            },
-            {
-                "key": "greater-than",
-                "displayText": "After"
-            }
-        ]
-    },
-    {
-        "fieldName": "created_by",
-        "valueType": "text",
-        "displayText": "Created By",
-        "operators": [
-            {
-                "key": "equal",
-                "displayText": "Equals to"
-            },
-            {
-                "key": "contains",
-                "displayText": "Contains"
-            },
-            {
-                "key": "starts-with",
-                "displayText": "Starts With"
-            }
-        ]
-    }
-];
-
 const MultiFilter = (props) => {
-    const { onHide, onExecute, hideOnClickAway } = props;
+    const { onHide, onExecute, hideOnClickAway, options } = props;
 
     const [show, setShow] = useState({
         addFilter: false
-    })
+    });
 
     const handleOnClick = (e) => {
         if(e.target === e.currentTarget) if(hideOnClickAway === true) onHide();
@@ -206,15 +48,26 @@ const MultiFilter = (props) => {
     }
 
     const getFieldDisplayText = (fieldName) => {
-        const filter = filterOptions.find(filter => filter.fieldName === fieldName);
+        const filter = options.find(filter => filter.fieldName === fieldName);
         return filter ? filter.displayText : '';
     }
 
     const getOperatorDisplayText = (fieldName, operatorName) => {
-        const filter = filterOptions.find(filter => filter.fieldName === fieldName);
+        const filter = options.find(filter => filter.fieldName === fieldName);
         if(!filter) return '';
         const operator = filter.operators.find(op => op.key === operatorName);
         return operator ? operator.displayText : '';
+    }
+
+    const handleRemoveFilter = (index, props) => {
+        const allFilers = props.values.filters;
+        if(allFilers) {
+            props.setFieldValue('filters', allFilers.filter((value, ind) => ind !== index));
+        }
+    }
+
+    const handleRemoveAll = (props) => {
+        props.setFieldValue('filters', []);
     }
 
     return <div style={style.container} onClick={handleOnClick} >
@@ -243,6 +96,7 @@ const MultiFilter = (props) => {
                                         operatorName={getOperatorDisplayText(filter.field, filter.operator)}
                                         values={filter.value}
                                         index={index}
+                                        onRemove={(index) => handleRemoveFilter(index, formikProps)}
                                     />
                                 </div>
                             )}
@@ -274,13 +128,31 @@ const MultiFilter = (props) => {
                                     <option className="p-2" value=''> Select an Option </option>
                                 </Field>
                             </div>
-                            <span type="button" className="cdp-text-primary" onClick={() => setShow({ ...show, addFilter: true })}><i class="fas fa-plus"></i> Add Filter</span>
+                            <div className="d-flex justify-content-between mb-2">
+                                <span type="button" className="cdp-text-primary" onClick={() => setShow({ ...show, addFilter: true })}>
+                                    <i class="fas fa-plus"></i> Add Filter
+                                </span>
+                                <span onClick={() => handleRemoveAll(formikProps)}>Remove All</span>
+                            </div>
+                            {formikProps.values.filters.length > 1 &&
+                                <div className="d-flex flex-column">
+                                    <div className="d-flex justify-content-between">
+                                        <span type="button" className="cdp-text-primary mb-2" onClick={() => null}>
+                                            <i class="fas fa-plus"></i> Add Filter Logic
+                                        </span>
+                                        <span onClick={() => null}>Clear</span>
+                                    </div>
+                                    <FilterLogic className="border  border-secondary rounded" />
+                                </div>
+                            }
                         </div>
-                        {show.addFilter && <AddFilter
-                            filters={formikProps.values.filters}
-                            filterOptions={filterOptions}
-                            onDone={(filters) => handleAddFilterDone(filters, formikProps)}
-                        />}
+                        {show.addFilter &&
+                            <AddFilter
+                                filters={formikProps.values.filters}
+                                filterOptions={options}
+                                onDone={(filters) => handleAddFilterDone(filters, formikProps)}
+                            />
+                        }
                     </React.Fragment>
                 }
             </Formik>
