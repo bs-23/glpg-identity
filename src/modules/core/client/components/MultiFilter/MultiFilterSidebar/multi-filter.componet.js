@@ -3,7 +3,7 @@ import { Formik, Field } from 'formik';
 
 import { Button } from '../common';
 import AddFilter from '../AddFilter/add-filter.component';
-import { FilterSummary } from './components';
+import { FilterSummary, FilterLogic } from './components';
 
 const style = {
     container: {
@@ -194,7 +194,7 @@ const MultiFilter = (props) => {
 
     const [show, setShow] = useState({
         addFilter: false
-    })
+    });
 
     const handleOnClick = (e) => {
         if(e.target === e.currentTarget) if(hideOnClickAway === true) onHide();
@@ -222,6 +222,10 @@ const MultiFilter = (props) => {
         if(allFilers) {
             props.setFieldValue('filters', allFilers.filter((value, ind) => ind !== index));
         }
+    }
+
+    const handleRemoveAll = (props) => {
+        props.setFieldValue('filters', []);
     }
 
     return <div style={style.container} onClick={handleOnClick} >
@@ -282,13 +286,31 @@ const MultiFilter = (props) => {
                                     <option className="p-2" value=''> Select an Option </option>
                                 </Field>
                             </div>
-                            <span type="button" className="cdp-text-primary" onClick={() => setShow({ ...show, addFilter: true })}><i class="fas fa-plus"></i> Add Filter</span>
+                            <div className="d-flex justify-content-between mb-2">
+                                <span type="button" className="cdp-text-primary" onClick={() => setShow({ ...show, addFilter: true })}>
+                                    <i class="fas fa-plus"></i> Add Filter
+                                </span>
+                                <span onClick={() => handleRemoveAll(formikProps)}>Remove All</span>
+                            </div>
+                            {formikProps.values.filters.length > 1 &&
+                                <div className="d-flex flex-column">
+                                    <div className="d-flex justify-content-between">
+                                        <span type="button" className="cdp-text-primary mb-2" onClick={() => null}>
+                                            <i class="fas fa-plus"></i> Add Filter Logic
+                                        </span>
+                                        <span onClick={() => null}>Clear</span>
+                                    </div>
+                                    <FilterLogic className="border  border-secondary rounded" />
+                                </div>
+                            }
                         </div>
-                        {show.addFilter && <AddFilter
-                            filters={formikProps.values.filters}
-                            filterOptions={filterOptions}
-                            onDone={(filters) => handleAddFilterDone(filters, formikProps)}
-                        />}
+                        {show.addFilter &&
+                            <AddFilter
+                                filters={formikProps.values.filters}
+                                filterOptions={filterOptions}
+                                onDone={(filters) => handleAddFilterDone(filters, formikProps)}
+                            />
+                        }
                     </React.Fragment>
                 }
             </Formik>
