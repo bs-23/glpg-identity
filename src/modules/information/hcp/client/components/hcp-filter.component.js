@@ -11,7 +11,7 @@ const HCPFilter = ({ onHide, onExecute }) => {
 
     const userCountryFilterOption = loggedInUser.countries.reduce((acc, c) => {
         const country = allCountries.find(ac => c.toLowerCase() === ac.country_iso2.toLowerCase());
-        country &&  acc.push({ value: c, displayText: country.countryname });
+        country &&  acc.push({ value: country.codbase, displayText: country.codbase_desc });
         return acc;
     }, []);
     const filterOptions = getFilterOptions(userCountryFilterOption);

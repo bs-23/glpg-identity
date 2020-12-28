@@ -29,7 +29,7 @@ export function getFilterOptions(userCountries) {
             operators: operators.getStringOperators()
         },
         {
-            fieldName: 'country_iso2',
+            fieldName: 'country',
             valueType: 'select',
             displayText: 'Country',
             operators: operators.getSelectOperators(),
