@@ -155,8 +155,30 @@ function ignoreCaseArray(str) {
     return [str.toLowerCase(), str.toUpperCase(), str.charAt(0).toLowerCase() + str.charAt(1).toUpperCase(), str.charAt(0).toUpperCase() + str.charAt(1).toLowerCase()];
 }
 
-function generateFilterOptions(currentFilter, defaultFilter) {
-    if (!currentFilter || !currentFilter.filters || currentFilter.filter === 0)
+async function generateFilterOptions(currentFilterSettings, userPermittedApplications, userPermittedCountries) {
+    const allCountries = await sequelize.datasyncConnector.query(
+        `SELECT * FROM ciam.vwcountry`,
+        { type: QueryTypes.SELECT }
+    );
+
+    const user_codbase_list_for_iso2 = allCountries.filter(c => userPermittedCountries.includes(c.country_iso2))
+        .map(i => i.codbase);
+
+    const user_country_iso2_list = allCountries.filter(c => user_codbase_list_for_iso2.includes(c.codbase))
+        .map(i => i.country_iso2);
+
+    const ignorecase_of_country_iso2_list = [].concat.apply([], user_country_iso2_list.map(i => ignoreCaseArray(i)));
+
+    const defaultFilter = {
+        application_id: userPermittedApplications.length
+            ? userPermittedApplications.map(app => app.id)
+            : null,
+        country_iso2: ignorecase_of_country_iso2_list.length
+            ? ignorecase_of_country_iso2_list
+            : null
+    };
+
+    if (!currentFilterSettings || !currentFilterSettings.filters || currentFilterSettings.filter === 0)
         return defaultFilter;
 
     // if (currentFilter.option.filters.length === 1 || !currentFilter.option.logic) {
@@ -169,25 +191,50 @@ function generateFilterOptions(currentFilter, defaultFilter) {
     console.log('Default filter: ', defaultFilter);
     let customFilter = { ...defaultFilter };
 
-    const nodes = currentFilter.logic && currentFilter.filters.length > 1
-        ? currentFilter.logic.split(" ")
+    const nodes = currentFilterSettings.logic && currentFilterSettings.filters.length > 1
+        ? currentFilterSettings.logic.split(" ")
         : ['1'];
     console.log('Logic nodes: ', nodes.join());
 
     let prevOperator;
     const groupedQueries = [];
+    const findFilter = (name) => {
+        return currentFilterSettings.filters.find(f => f.name === name);
+    };
+
+    const generateQueryObject = (filterObj) => {
+        /** Country filter is specially handled as
+         *  there can be multiple country under a Codbase and
+         *  hcp_profiles table saves country_iso2, not codbase
+         */
+        if (filterObj.fieldName === 'country') {
+            delete customFilter.country_iso2;
+            const country_iso2_list_for_codbase = allCountries.filter(ac => ac.codbase.toLowerCase() === filterObj.value.toLowerCase()).map(i => i.country_iso2);
+
+            const selected_iso2_list_for_codbase = country_iso2_list_for_codbase.filter(i => user_country_iso2_list.includes(i));
+            const ignorecase_of_selected_iso2_list_for_codbase = [].concat.apply([], selected_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
+            queryValue = ignorecase_of_selected_iso2_list_for_codbase.length
+                ? ignorecase_of_selected_iso2_list_for_codbase
+                : null;
+
+            return {
+                ['country_iso2']: ignorecase_of_selected_iso2_list_for_codbase.length
+                    ? ignorecase_of_selected_iso2_list_for_codbase
+                    : null
+            };
+        }
+
+        return filterService.getFilterQuery(filterObj);
+    };
+
     for (let index = 0; index < nodes.length; index++) {
         const node = nodes[index];
         const prev = index > 0 ? nodes[index - 1] : null;
         const next = index < nodes.length - 1 ? nodes[index + 1] : null;
 
-        const findFilter = (name) => {
-            return currentFilter.filters.find(f => f.name === name);
-        };
-
         if (node === "and" && prevOperator === "and") {
             const filter = findFilter(next);
-            const query = { [filter.fieldName]: filterService.getQueryValue(filter) };
+            const query = generateQueryObject(filter);
             const currentParent = groupedQueries[groupedQueries.length - 1];
             currentParent.values.push(query);
         } else if (node === "and") {
@@ -196,14 +243,14 @@ function generateFilterOptions(currentFilter, defaultFilter) {
             const group = {
                 operator: "and",
                 values: [
-                    { [leftFilter.fieldName]: filterService.getQueryValue(leftFilter) },
-                    { [rightFilter.fieldName]: filterService.getQueryValue(rightFilter) }
+                    generateQueryObject(leftFilter),
+                    generateQueryObject(rightFilter)
                 ]
             };
             groupedQueries.push(group);
         } else if (node !== "or" && prev !== "and" && next !== "and") {
             const filter = findFilter(node);
-            const query = { [filter.fieldName]: filterService.getQueryValue(filter) };
+            const query = generateQueryObject(filter);
             groupedQueries.push(query);
         }
 
@@ -238,50 +285,14 @@ async function getHcps(req, res) {
     try {
         const page = req.query.page ? +req.query.page - 1 : 0;
         const limit = 15;
-        // let status = req.query.status === undefined ? null : req.query.status;
-        // if (status && status.indexOf(',') !== -1) status = status.split(',');
-        const codbase = req.query.codbase === 'undefined' ? null : req.query.codbase;
+        // const codbase = req.query.codbase === 'undefined' ? null : req.query.codbase;
         const offset = page * limit;
 
         const currentFilter = req.body;
 
         const [userPermittedApplications, userPermittedCountries] = await getUserPermissions(req.user.id);
 
-        const allCountries = await sequelize.datasyncConnector.query(
-            `SELECT * FROM ciam.vwcountry`,
-            { type: QueryTypes.SELECT }
-        );
-
-        const user_codbase_list_for_iso2 = allCountries.filter(c => userPermittedCountries.includes(c.country_iso2))
-            .map(i => i.codbase);
-
-        const country_iso2_list = allCountries.filter(c => user_codbase_list_for_iso2.includes(c.codbase))
-            .map(i => i.country_iso2);
-
-        const ignorecase_of_country_iso2_list = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
-
-        const country_iso2_list_for_codbase = allCountries.filter(ac => ac.codbase.toLowerCase() === codbase.toLowerCase()).map(i => i.country_iso2);
-
-        const selected_iso2_list_for_codbase = country_iso2_list_for_codbase.filter(i => country_iso2_list.includes(i));
-        const ignorecase_of_selected_iso2_list_for_codbase = [].concat.apply([], selected_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
-
-        const specialty_list = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwspecialtymaster", { type: QueryTypes.SELECT });
-
-        const hcp_filter = {
-            // status: status === null
-            //     ? { [Op.or]: ['self_verified', 'manually_verified', 'consent_pending', 'not_verified', null] }
-            //     : status,
-            application_id: userPermittedApplications.length
-                ? userPermittedApplications.map(app => app.id)
-                : null,
-            country_iso2: codbase
-                ? ignorecase_of_selected_iso2_list_for_codbase.length
-                    ? ignorecase_of_selected_iso2_list_for_codbase
-                    : null
-                : ignorecase_of_country_iso2_list.length
-                    ? ignorecase_of_country_iso2_list
-                    : null,
-        };
+        const specialty_list = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwspecialtymaster', { type: QueryTypes.SELECT });
 
         const orderBy = req.query.orderBy === 'null'
             ? null
@@ -300,7 +311,7 @@ async function getHcps(req, res) {
         order.push(['created_at', 'DESC']);
         order.push(['id', 'DESC']);
 
-        const filterOptions = generateFilterOptions(currentFilter, hcp_filter);
+        const filterOptions = await generateFilterOptions(currentFilter, userPermittedApplications, userPermittedCountries);
 
         const hcps = await Hcp.findAll({
             where: filterOptions,
@@ -374,7 +385,7 @@ async function getHcps(req, res) {
             start: limit * page + 1,
             end: offset + limit > totalUser ? totalUser : offset + limit,
             // status: status ? status : null,
-            codbase: codbase ? codbase : null,
+            // codbase: codbase ? codbase : null,
             countries: userPermittedCountries
         };
 
