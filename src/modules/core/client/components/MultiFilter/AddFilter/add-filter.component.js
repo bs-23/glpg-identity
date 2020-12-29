@@ -48,6 +48,12 @@ const AddFilter = (props) => {
         setFilters(selectedFilters);
     }
 
+    const handleRemove = (index) => {
+        console.log(index)
+        const filtersAfterRemoval = filters.filter((filter, ind) => ind !== index);
+        setFilters(filtersAfterRemoval);
+    }
+
     // useEffect(() => {
     //     setFilters(existingFilters);
     // }, []);
@@ -80,6 +86,7 @@ const AddFilter = (props) => {
                         value={filter.value}
                         filterOptions={filterOptions}
                         onChange={handleChange}
+                        onRemove={handleRemove}
                     />
                 )
             }
