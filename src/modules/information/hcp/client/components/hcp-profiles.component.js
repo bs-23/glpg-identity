@@ -154,10 +154,12 @@ export default function hcpUsers() {
         //     // logic: "1 or 2"
         // };
 
-        const requestBody = {
-            filters: filterSetting,
-            logic: ''
-        }
+        const requestBody = filterSetting && filterSetting.filters.length
+            ? {
+                filters: filterSetting.filters,
+                logic: filterSetting.logic
+            }
+            : null;
 
         dispatch(getHcpProfiles(searchObj.page, searchObj.status, searchObj.codbase, searchObj.orderBy, searchObj.orderType, requestBody));
         setSort({ type: params.get('orderType'), value: params.get('orderBy') });
@@ -896,7 +898,7 @@ export default function hcpUsers() {
                 {show.filterSidebar &&
                     <HCPFilter
                         onHide={() => setShow({ ...show, filterSidebar: false })}
-                        onExecute={({ filters }) => loadHcpProfiles(filters)}
+                        onExecute={(filterSetting) => loadHcpProfiles(filterSetting)}
                     />}
             </div>
         </main >

@@ -17,6 +17,7 @@ const style = {
 const AddFilter = (props) => {
     const { onDone, onAddMoreFilter, filters: existingFilters, filterOptions, filterPresets } = props;
     const [filters, setFilters] = useState([]);
+    const [selectedFilter, setSelectedFilter] = useState([]);
 
     const handleAddMoreFilter = () => {
         const emptyFilter = {
@@ -29,7 +30,7 @@ const AddFilter = (props) => {
     }
 
     const handleDone = (e) => {
-        onDone && onDone(filters);
+        onDone && onDone(filters, selectedFilter);
     }
 
     const handleChange = (e, index) => {
@@ -42,8 +43,8 @@ const AddFilter = (props) => {
 
     const handlePresentChange = (e) => {
         const presetTitle = e.target.value;
-        console.log(presetTitle);
         const selectedFilters = filterPresets.find(fp => fp.title === presetTitle).settings.filters || [];
+        setSelectedFilter(presetTitle);
         setFilters(selectedFilters);
     }
 
