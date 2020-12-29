@@ -14,15 +14,11 @@ const User_Role = require(path.join(process.cwd(), "src/modules/platform/role/se
 const Role_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/role-permissionSet.model"));
 const Role = require(path.join(process.cwd(), "src/modules/platform/role/server/role.model"));
 const PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permission-set.model"));
-const PermissionSet_ServiceCateory = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-serviceCategory.model"));
-const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-application.model"));
-const ServiceCategory = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/service-category.model"));
 const axios = require("axios");
-const Application = require(path.join(process.cwd(), "src/modules/platform/application/server/application.model"));
 const PasswordPolicies = require(path.join(process.cwd(), "src/modules/core/server/password/password-policies.js"));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const { QueryTypes, Op, where, col, fn, literal } = require('sequelize');
-const { getRequestingUserPermissions, getPermissionsFromPermissionSet } = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/permissions.js"));
+const { getRequestingUserPermissions, getPermissionsFromPermissionSet, getUserWithPermissionRelations } = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/permissions.js"));
 
 function generateAccessToken(doc) {
     return jwt.sign({
@@ -236,96 +232,10 @@ async function login(req, res) {
         if(grant_type === 'password') {
             if(!username || !password || !recaptchaToken) return res.status(400).send('Invalid credentials.');
 
-            user = await User.findOne({
-                where: {
-                    email: {
-                        [Op.iLike]: `${username}`
-                    }
-                },
-                include: [{
-                    model: UserProfile,
-                    as: 'userProfile',
-                    include: [{
-                        model: UserProfile_PermissionSet,
-                        as: 'up_ps',
-                        include: [{
-                            model: PermissionSet,
-                            as: 'ps',
-                            include: [
-                                {
-                                    model: PermissionSet_ServiceCateory,
-                                    as: 'ps_sc',
-                                    include: [
-                                        {
-                                            model: ServiceCategory,
-                                            as: 'serviceCategory',
-
-                                        }
-                                    ]
-
-                                },
-                                {
-                                    model: PermissionSet_Application,
-                                    as: 'ps_app',
-                                    include: [
-                                        {
-                                            model: Application,
-                                            as: 'application',
-                                            attributes: ['id', 'name', 'slug', 'logo_link']
-                                        }
-                                    ]
-
-                                }
-                            ]
-
-                        }]
-                    }]
-                },
-                {
-                    model: User_Role,
-                    as: 'userRoles',
-                    include: [{
-                        model: Role,
-                        as: 'role',
-                        include: [{
-                            model: Role_PermissionSet,
-                            as: 'role_ps',
-                            include: [{
-                                model: PermissionSet,
-                                as: 'ps',
-                                include: [
-                                    {
-                                        model: PermissionSet_ServiceCateory,
-                                        as: 'ps_sc',
-                                        include: [
-                                            {
-                                                model: ServiceCategory,
-                                                as: 'serviceCategory',
-
-                                            }
-                                        ]
-
-                                    },
-                                    {
-                                        model: PermissionSet_Application,
-                                        as: 'ps_app',
-                                        include: [
-                                            {
-                                                model: Application,
-                                                as: 'application',
-                                                attributes: ['id', 'name', 'slug', 'logo_link']
-                                            }
-                                        ]
-
-                                    }
-                                ]
-
-                            }]
-                        }]
-
-                    }]
+            user = await getUserWithPermissionRelations({
+                email: {
+                    [Op.iLike]: `${username}`
                 }
-                ],
             });
 
             if (user && user.status === 'inactive') return res.status(401).send('Account not active.');
@@ -347,16 +257,6 @@ async function login(req, res) {
                 const errorMessage = user && user.dataValues.failed_auth_attempt >= 5
                     ? userLockedMessage
                     : 'Invalid username or password.';
-
-                // if(user && user.failed_auth_attempt >= 5) {
-                //     await logService.log({
-                //         event_type: 'LOGIN',
-                //         object_id: user.id,
-                //         table_name: 'users',
-                //         actor: user.id,
-                //         remarks:
-                //     });
-                // }
 
                 return res.status(401).send(errorMessage);
             }
@@ -724,96 +624,7 @@ async function getUsers(req, res) {
 
 async function getUser(req, res) {
     try {
-        const user = await User.findOne({
-            where: {
-                id: req.params.id
-            },
-            include: [{
-                model: UserProfile,
-                as: 'userProfile',
-                include: [{
-                    model: UserProfile_PermissionSet,
-                    as: 'up_ps',
-                    include: [{
-                        model: PermissionSet,
-                        as: 'ps',
-                        include: [
-                            {
-                                model: PermissionSet_ServiceCateory,
-                                as: 'ps_sc',
-                                include: [
-                                    {
-                                        model: ServiceCategory,
-                                        as: 'serviceCategory',
-
-                                    }
-                                ]
-
-                            },
-                            {
-                                model: PermissionSet_Application,
-                                as: 'ps_app',
-                                include: [
-                                    {
-                                        model: Application,
-                                        as: 'application',
-
-                                    }
-                                ]
-
-                            }
-                        ]
-
-                    }]
-                }]
-            },
-            {
-                model: User_Role,
-                as: 'userRoles',
-                include: [{
-                    model: Role,
-                    as: 'role',
-                    include: [{
-                        model: Role_PermissionSet,
-                        as: 'role_ps',
-                        include: [{
-                            model: PermissionSet,
-                            as: 'ps',
-                            include: [
-                                {
-                                    model: PermissionSet_ServiceCateory,
-                                    as: 'ps_sc',
-                                    include: [
-                                        {
-                                            model: ServiceCategory,
-                                            as: 'serviceCategory',
-
-                                        }
-                                    ]
-
-                                },
-                                {
-                                    model: PermissionSet_Application,
-                                    as: 'ps_app',
-                                    include: [
-                                        {
-                                            model: Application,
-                                            as: 'application',
-
-                                        }
-                                    ]
-
-                                }
-                            ]
-
-                        }]
-                    }]
-
-                }]
-            }
-            ],
-        });
-
+        const user = await getUserWithPermissionRelations({ id: req.params.id });
 
         if (!user) return res.status(404).send("User is not found or may be removed");
 
