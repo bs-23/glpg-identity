@@ -94,18 +94,61 @@ const SearchProfessionalHcp = () => {
         searchHcps(currentPage + 1);
     };
 
+    const groupSpecialties = specialties => {
+        // codDescription: "Abdominal / Digestive Surgery"
+        // codIdOnekey: "SP.WFR.CD"
+        // codbase: "WFR"
+
+        // specialties = [
+        //     {
+        //         codDescription: "Abdominal / Digestive Surgery",
+        //         codIdOnekey: ["SP.WFR.CD", "SP.WFR.09"],
+        //         codbase: ["WFR", "WBE"]
+        //     }
+        // ]
+
+        const marked = {};
+        const idxMap = {};
+        const groupedSpecialties = [];
+        let idx = 0;
+
+        specialties.forEach( specialty => {
+            const value = specialty.codDescription.toLowerCase().split(' ').join('');
+            if(!specialty.codIdOnekey) return;
+
+            if(!marked[value]){
+                marked[value] = true;
+                idxMap[value] = idx++;
+                groupedSpecialties.push({
+                    codDescription: specialty.codDescription,
+                    codIdOnekeys: [specialty.codIdOnekey],
+                    codbases: [specialty.codbase]
+                });
+            }
+            else {
+                const index = idxMap[value];
+                groupedSpecialties[index].codIdOnekeys.push(specialty.codIdOnekey);
+                groupedSpecialties[index].codbases.push(specialty.codbase);
+            }
+        });
+        return groupedSpecialties;
+    }
+
     useEffect(() => {
         const fetchSpecialties = async () => {
             const codbases = selectedCountries.map(item => `codbases=${item.value}`);
             const parameters = codbases.join('&');
             if (parameters) {
                 const response = await axios.get(`/api/hcps/specialties?${parameters}`);
-                const filtered = hcpSpecialty ? response.data.filter(i => i.codIdOnekey === hcpSpecialty) : [];
+                const groupedSpecialties = groupSpecialties(response.data);
+
+                const filtered = hcpSpecialty ? groupedSpecialties.filter(i => i.codIdOnekeys.includes(hcpSpecialty)) : [];
+
                 if (filtered && filtered.length) {
-                    setSelectedSpecialties([{ label: filtered[0].codDescription, value: filtered[0].codIdOnekey.split('.')[2] }]);
-                    formikRef.current.setFieldValue('specialties', [{ label: filtered[0].codDescription, value: filtered[0].codIdOnekey.split('.')[2] }]);
+                    setSelectedSpecialties([{ label: filtered[0].codDescription, value: filtered[0].codIdOnekeys }]);
+                    formikRef.current.setFieldValue('specialties', [{ label: filtered[0].codDescription, value: filtered[0].codIdOnekeys }]);
                 }
-                setSpecialties(response.data);
+                setSpecialties(groupedSpecialties);
             }
             else setSpecialties([]);
         }
@@ -150,7 +193,7 @@ const SearchProfessionalHcp = () => {
     }, [location, userCountries, hcpProfile, allCountries]);
 
     const getCountries = () => userCountries.map(country => ({ value: country.codbase, label: country.codbase_desc, countryIso2: country.country_iso2 }));
-    const getSpecialties = () => specialties.map(i => ({ value: i.codIdOnekey.split('.')[2], label: i.codDescription }));
+    const getSpecialties = () => specialties.map(i => ({ value: i.codIdOnekeys, label: i.codDescription }));
 
     const getCountryName = (country_iso2) => {
         if (!allCountries || !country_iso2) return null;
@@ -266,7 +309,13 @@ const SearchProfessionalHcp = () => {
                                     displayName="SearchForm"
                                     onSubmit={async (values, actions) => {
                                         const data = { ...values };
-                                        data.specialties = data.specialties.map(i => i.value);
+                                        const updatedSpecialties = []
+                                        data.specialties.forEach(group => {
+                                            group.value.forEach(item => {
+                                                updatedSpecialties.push(item.split('.')[2]);
+                                            });
+                                        });
+                                        data.specialties = updatedSpecialties;
                                         data.codbases = data.countries.map(i => i.value);
                                         delete data.countries;
 
