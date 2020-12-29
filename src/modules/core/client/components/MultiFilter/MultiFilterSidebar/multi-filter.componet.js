@@ -30,13 +30,18 @@ const MultiFilter = (props) => {
     const [show, setShow] = useState({
         addFilter: false
     });
+    // const [selectedFilter, setSelectedFilter] = useState(null);
 
     const handleOnClick = (e) => {
         if(e.target === e.currentTarget) if(hideOnClickAway === true) onHide();
     }
 
-    const handleAddFilterDone = (filters, formikProps) => {
+    const handleAddFilterDone = (filters, formikProps, selectedFilter) => {
         formikProps.setFieldValue('filters', formikProps.values.filters.concat(filters));
+        const logic = filterPresets && filterPresets.length
+            ? filterPresets.find(fp => fp.title === selectedFilter)?.settings.logic
+            : '';
+        formikProps.setFieldValue('logic', logic);
         setShow({ ...show, addFilter: false });
     }
 
@@ -71,7 +76,8 @@ const MultiFilter = (props) => {
                 initialValues={{
                     scope: '',
                     source: '',
-                    filters: []
+                    filters: [],
+                    logic: ''
                 }}
                 enableReinitialize
             >
@@ -82,7 +88,7 @@ const MultiFilter = (props) => {
                                 className="btn cdp-btn-secondary mr-1 btn-block text-white"
                                 label="Execute"
                                 onClick={formikProps.submitForm}
-                                disabled={formikProps.values.filters.length === 0}
+                                // disabled={formikProps.values.filters.length === 0}
                             />
                             <Button
                                 className="btn cdp-btn-outline-primary ml-1 btn-block mt-0"
@@ -144,7 +150,10 @@ const MultiFilter = (props) => {
                                         </span>
                                         <span onClick={() => null}>Clear</span>
                                     </div>
-                                    <FilterLogic className="border  border-secondary rounded" />
+                                    <FilterLogic
+                                        className="border  border-secondary rounded"
+                                        logic={formikProps.values.logic}
+                                    />
                                 </div>
                             }
                         </div>
@@ -153,7 +162,7 @@ const MultiFilter = (props) => {
                                 filterPresets={filterPresets}
                                 filters={formikProps.values.filters}
                                 filterOptions={options}
-                                onDone={(filters) => handleAddFilterDone(filters, formikProps)}
+                                onDone={(filters, selectedFilter) => handleAddFilterDone(filters, formikProps, selectedFilter)}
                             />
                         }
                     </React.Fragment>
