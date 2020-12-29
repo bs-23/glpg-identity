@@ -15,7 +15,7 @@ const style = {
 }
 
 const AddFilter = (props) => {
-    const { onDone, onAddMoreFilter, filters: existingFilters, filterOptions } = props;
+    const { onDone, onAddMoreFilter, filters: existingFilters, filterOptions, filterPresets } = props;
     const [filters, setFilters] = useState([]);
 
     const handleAddMoreFilter = () => {
@@ -40,13 +40,34 @@ const AddFilter = (props) => {
         setFilters(updatedFilters);
     }
 
-    useEffect(() => {
-        setFilters(existingFilters);
-    }, []);
+    const handlePresentChange = (e) => {
+        const presetTitle = e.target.value;
+        console.log(presetTitle);
+        const selectedFilters = filterPresets.find(fp => fp.title === presetTitle).settings.filters || [];
+        setFilters(selectedFilters);
+    }
+
+    // useEffect(() => {
+    //     setFilters(existingFilters);
+    // }, []);
 
     return <div style={style.container}>
         <div className="bg-light p-2">Add Filter</div>
         <div className="px-3 pb-3">
+            {
+                filterPresets && filterPresets.length &&
+                <div className="mb-2">
+                    <label className="pt-2 mb-1">Select From Existing Filters</label>
+                    <select className="form-control form-control-sm" name="selectedFilterPreset" onChange={handlePresentChange}>
+                        <option value="">Select an option</option>
+                        {
+                            filterPresets.map((filter, index) =>
+                                <option key={filter.title} value={filter.title}>{filter.title}</option>
+                            )
+                        }
+                    </select>
+                </div>
+            }
             {
                 filters && filters.map((filter, index) =>
                     <Filter

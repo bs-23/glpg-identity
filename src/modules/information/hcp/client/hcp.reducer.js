@@ -92,6 +92,13 @@ export default function reducer(state = initialState, action) {
                 oklaHcoDetails: action.payload
             }
         }
+
+        case Types.GET_HCP_FILTER_SETTINGS_FULFILLED: {
+            return {
+                ...state,
+                filterPresets: action.payload.data
+            }
+        }
     }
 
     // case Types.EDIT_HCPS_FULFILLED: {

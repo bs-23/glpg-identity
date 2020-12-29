@@ -25,7 +25,7 @@ const style = {
 
 
 const MultiFilter = (props) => {
-    const { onHide, onExecute, hideOnClickAway, options } = props;
+    const { onHide, onExecute, hideOnClickAway, options, filterPresets } = props;
 
     const [show, setShow] = useState({
         addFilter: false
@@ -36,7 +36,7 @@ const MultiFilter = (props) => {
     }
 
     const handleAddFilterDone = (filters, formikProps) => {
-        formikProps.setFieldValue('filters', filters);
+        formikProps.setFieldValue('filters', formikProps.values.filters.concat(filters));
         setShow({ ...show, addFilter: false });
     }
 
@@ -150,6 +150,7 @@ const MultiFilter = (props) => {
                         </div>
                         {show.addFilter &&
                             <AddFilter
+                                filterPresets={filterPresets}
                                 filters={formikProps.values.filters}
                                 filterOptions={options}
                                 onDone={(filters) => handleAddFilterDone(filters, formikProps)}

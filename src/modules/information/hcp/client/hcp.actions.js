@@ -121,3 +121,13 @@ export function setOklaHcoDetails(hcoDetails) {
         payload: hcoDetails
     };
 }
+
+export function getHcpFilterSettings() {
+    return {
+        type: Types.GET_HCP_FILTER_SETTINGS,
+        payload: axios({
+            method: 'get',
+            url: '/api/filter?table=hcp-profiles'
+        })
+    };
+}
