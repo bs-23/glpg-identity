@@ -37,7 +37,11 @@ const MultiFilter = (props) => {
     }
 
     const handleAddFilterDone = (filters, formikProps, selectedFilter) => {
-        formikProps.setFieldValue('filters', formikProps.values.filters.concat(filters));
+        const allFilters = formikProps.values.filters.concat(filters).map((filter, ind) => {
+            filter.name = String(ind+1);
+            return filter;
+        });
+        formikProps.setFieldValue('filters', allFilters);
         const logic = filterPresets && filterPresets.length
             ? filterPresets.find(fp => fp.title === selectedFilter)?.settings.logic
             : '';
@@ -58,9 +62,13 @@ const MultiFilter = (props) => {
     }
 
     const handleRemoveFilter = (index, props) => {
-        const allFilers = props.values.filters;
-        if(allFilers) {
-            props.setFieldValue('filters', allFilers.filter((value, ind) => ind !== index));
+        const allFilters = props.values.filters;
+        if(allFilters) {
+            const allFiltersAfterRemoval = allFilters.filter((value, ind) => ind !== index).map((filter, index) => {
+                filter.name = String(index+1);
+                return filter;
+            });
+            props.setFieldValue('filters', allFiltersAfterRemoval);
         }
     }
 
