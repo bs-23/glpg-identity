@@ -17,6 +17,7 @@ const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodeca
                 src/modules/platform/faq/server,
                 src/modules/platform/permission-set/server,
                 src/modules/information/hcp/server,
+                src/modules/consent/client,
                 src/modules/consent/server,
                 src/modules/platform/application/server,
                 src/modules/core/client,

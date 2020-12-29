@@ -12,19 +12,9 @@ const PermissionSet_ServiceCateory = require(path.join(process.cwd(), "src/modul
 const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-application.model.js"));
 const ServiceCategory = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/service-category.model.js"));
 
-async function getUserPermissions(userId) {
-    let profile_applications = [];
-    let profile_countries = [];
-    let profile_service_categories = [];
-
-    let role_applications = [];
-    let role_countries = [];
-    let role_service_categories = [];
-
+const getUserWithPermissionRelations = async (whereCondition) => {
     const user = await User.findOne({
-        where: {
-            id: userId
-        },
+        where: whereCondition,
         include: [{
             model: UserProfile,
             as: 'userProfile',
@@ -52,13 +42,10 @@ async function getUserPermissions(userId) {
                                 {
                                     model: Application,
                                     as: 'application',
-
                                 }
                             ]
-
                         }
                     ]
-
                 }]
             }]
         },
@@ -84,7 +71,6 @@ async function getUserPermissions(userId) {
                                         as: 'serviceCategory',
                                     }
                                 ]
-
                             },
                             {
                                 model: PermissionSet_Application,
@@ -95,80 +81,18 @@ async function getUserPermissions(userId) {
                                         as: 'application',
                                     }
                                 ]
-
                             }
                         ]
                     }]
                 }]
-
             }]
         }
         ]
     });
-
-    if (user.userProfile) {
-        const profilePermissionSets = user.userProfile.up_ps;
-        for (const userProPermSet of profilePermissionSets) {
-            const [applications, countries, serviceCategories] = await getPermissionsFromPermissionSet(userProPermSet.ps);
-            profile_applications = profile_applications.concat(applications);
-            profile_countries = profile_countries.concat(countries);
-            profile_service_categories = profile_service_categories.concat(serviceCategories);
-        }
-    }
-
-    for (const userRole of user.userRoles) {
-        for (const rolePermSet of userRole.role.role_ps) {
-            const [applications, countries, serviceCategories] = await getPermissionsFromPermissionSet(rolePermSet.ps);
-            role_applications = role_applications.concat(applications);
-            role_countries = role_countries.concat(countries);
-            role_service_categories = role_service_categories.concat(serviceCategories);
-        }
-
-    }
-
-    const user_countries = [...new Set(role_countries.concat(profile_countries))];
-    const user_applications = _.uniqBy(role_applications.concat(profile_applications), app => app.slug);
-    const user_service_categories = _.uniqBy(role_service_categories.concat(profile_service_categories), sc => sc.slug);
-
-    return [user_applications, user_countries, user_service_categories];
+    return user;
 }
 
-async function getPermissionsFromPermissionSet(permissionSet) {
-    let applications = [];
-    let countries = [];
-    let serviceCategories = [];
-
-    if (permissionSet.ps_app) {
-        for (const ps_app of permissionSet.ps_app) {
-            const { id, name, slug, logo_link} = ps_app.application;
-
-            const userApplication = { id, name, slug, logo_link };
-
-
-            applications.push(userApplication);
-        }
-    }
-
-    if(permissionSet.ps_sc){
-        for (const ps_sc of permissionSet.ps_sc) {
-            const userServiceCategory = ps_sc.serviceCategory;
-
-
-            serviceCategories.push(userServiceCategory);
-        }
-    }
-
-    if (permissionSet.countries) {
-        countries = permissionSet.countries;
-    }
-
-
-    return [applications, countries, serviceCategories];
-}
-
-async function getRequestingUserPermissions(user) {
-    if(!user) return [[], [], []];
-
+async function getProfileAndRolePermissions(user) {
     let applications = [];
     let countries = [];
     let service_categories = [];
@@ -199,6 +123,56 @@ async function getRequestingUserPermissions(user) {
     return [user_applications, user_countries, user_service_categories];
 }
 
+async function getUserPermissions(userId) {
+    const user = await getUserWithPermissionRelations({ id: userId });
+
+    if(!user) return [[], [], []];
+
+    const [user_applications, user_countries, user_service_categories] = await getProfileAndRolePermissions(user);
+
+    return [user_applications, user_countries, user_service_categories];
+}
+
+async function getPermissionsFromPermissionSet(permissionSet) {
+    let applications = [];
+    let countries = [];
+    let serviceCategories = [];
+
+    if (permissionSet.ps_app) {
+        for (const ps_app of permissionSet.ps_app) {
+            const { id, name, slug, logo_link} = ps_app.application;
+
+            const userApplication = { id, name, slug, logo_link };
+
+            applications.push(userApplication);
+        }
+    }
+
+    if(permissionSet.ps_sc){
+        for (const ps_sc of permissionSet.ps_sc) {
+            const userServiceCategory = ps_sc.serviceCategory;
+
+            serviceCategories.push(userServiceCategory);
+        }
+    }
+
+    if (permissionSet.countries) {
+        countries = permissionSet.countries;
+    }
+
+
+    return [applications, countries, serviceCategories];
+}
+
+async function getRequestingUserPermissions(user) {
+    if(!user) return [[], [], []];
+
+    const [user_applications, user_countries, user_service_categories] = await getProfileAndRolePermissions(user);
+
+    return [user_applications, user_countries, user_service_categories];
+}
+
 exports.getUserPermissions = getUserPermissions;
 exports.getRequestingUserPermissions = getRequestingUserPermissions;
 exports.getPermissionsFromPermissionSet = getPermissionsFromPermissionSet;
+exports.getUserWithPermissionRelations = getUserWithPermissionRelations;
