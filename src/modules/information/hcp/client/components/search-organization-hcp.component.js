@@ -55,6 +55,18 @@ const SearchOrganizationHcp = () => {
         </Popover>
     );
 
+    const searchHintPopup = (
+        <Popover id="searchHintPopup" className="shadow-lg">
+            <Popover.Content className="px-3">
+                <p>To enable the search button please select countries filed and one other field. e.g.</p>
+                <ul className="list-unstyled mb-0">
+                    <li className="pl-0 pb-2"><strong>Countries</strong> Belgium</li>
+                    <li className="pl-0 pb-2"><strong>Specialty</strong> Cardiology</li>
+                </ul>
+            </Popover.Content>
+        </Popover>
+    );
+
     const searchHcos = (newPage) => {
         axios.post(`/api/okla/hcos/search?page=${newPage}`, formData)
             .then(response => {
@@ -297,7 +309,12 @@ const SearchOrganizationHcp = () => {
                                                     <button type="reset" className="btn btn-block btn-secondary mt-4 p-2" onClick={() => resetSearch(formikProps)}>CLEAR</button>
                                                 </div>
                                                 <div className="col-6">
-                                                    <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!formikProps.values.countries || !formikProps.values.countries.length || !(formikProps.values.address || formikProps.values.city || formikProps.values.postCode || formikProps.values.onekeyId || formikProps.values.workplaceEid || (selectedSpecialties && selectedSpecialties.length))}> SEARCH </button>
+                                                    <div className="d-flex align-items-center">
+                                                        <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2 okla-search__btn-search" disabled={!formikProps.values.countries || !formikProps.values.countries.length || !(formikProps.values.address || formikProps.values.city || formikProps.values.postCode || formikProps.values.onekeyId || formikProps.values.workplaceEid || (selectedSpecialties && selectedSpecialties.length))}> SEARCH </button>
+                                                        <OverlayTrigger trigger="click" rootClose placement="left" overlay={searchHintPopup}>
+                                                            <i className="fas fa-info-circle mt-4 ml-2 cdp-text-primary" role="button"></i>
+                                                        </OverlayTrigger>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </Form>

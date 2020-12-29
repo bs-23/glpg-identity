@@ -199,6 +199,18 @@ const SearchProfessionalHcp = () => {
         </Popover>
     );
 
+    const searchHintPopup = (
+        <Popover id="searchHintPopup" className="shadow-lg">
+            <Popover.Content className="px-3">
+                <p>To enable the search button please select countries filed and one other field. e.g.</p>
+                <ul className="list-unstyled mb-0">
+                    <li className="pl-0 pb-2"><strong>Countries</strong> Belgium</li>
+                    <li className="pl-0 pb-2"><strong>Specialty</strong> Cardiology</li>
+                </ul>
+            </Popover.Content>
+        </Popover>
+    );
+
     return (
         <main className="app__content cdp-light-bg h-100">
             <div className="container-fluid">
@@ -441,7 +453,12 @@ const SearchProfessionalHcp = () => {
                                                     <button type="reset" className="btn btn-block btn-secondary mt-4 p-2" onClick={() => resetSearch(formikProps)}>CLEAR</button>
                                                 </div>
                                                 <div className="col-6">
-                                                    <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!selectedCountries || !selectedCountries.length || !(formikProps.values.firstName || formikProps.values.lastName || formikProps.values.address || formikProps.values.city || formikProps.values.postCode || formikProps.values.onekeyId || formikProps.values.individualEid || formikProps.values.externalIdentifier || (selectedSpecialties && selectedSpecialties.length))}>SEARCH</button>
+                                                    <div className="d-flex align-items-center">
+                                                        <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2 okla-search__btn-search" disabled={!selectedCountries || !selectedCountries.length || !(formikProps.values.firstName || formikProps.values.lastName || formikProps.values.address || formikProps.values.city || formikProps.values.postCode || formikProps.values.onekeyId || formikProps.values.individualEid || formikProps.values.externalIdentifier || (selectedSpecialties && selectedSpecialties.length))}>SEARCH</button>
+                                                        <OverlayTrigger trigger="click" rootClose placement="left" overlay={searchHintPopup}>
+                                                            <i className="fas fa-info-circle mt-4 ml-2 cdp-text-primary" role="button"></i>
+                                                        </OverlayTrigger>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </Form>
