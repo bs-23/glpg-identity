@@ -33,11 +33,9 @@ const AddFilter = (props) => {
         onDone && onDone(filters, filterPresets.find(fp => fp.id === selectedFilter));
     }
 
-    const handleChange = (e, index) => {
-        const targetName = e.target.name;
-        const targetValue = e.target.value;
+    const handleChange = (propertyName, value, index) => {
         const updatedFilters = [...filters];
-        updatedFilters[index][targetName] = targetValue;
+        updatedFilters[index][propertyName] = value;
         setFilters(updatedFilters);
     }
 
