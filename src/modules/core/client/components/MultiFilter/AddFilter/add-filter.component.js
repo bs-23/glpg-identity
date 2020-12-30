@@ -30,7 +30,7 @@ const AddFilter = (props) => {
     }
 
     const handleDone = (e) => {
-        onDone && onDone(filters, selectedFilter);
+        onDone && onDone(filters, filterPresets.find(fp => fp.id === selectedFilter));
     }
 
     const handleChange = (e, index) => {
@@ -41,10 +41,10 @@ const AddFilter = (props) => {
         setFilters(updatedFilters);
     }
 
-    const handlePresentChange = (e) => {
-        const presetTitle = e.target.value;
-        const selectedFilters = filterPresets.find(fp => fp.title === presetTitle).settings.filters || [];
-        setSelectedFilter(presetTitle);
+    const handlePresetChange = (e) => {
+        const presetID = e.target.value;
+        const selectedFilters = filterPresets.find(fp => fp.id === presetID).settings.filters || [];
+        setSelectedFilter(presetID);
         setFilters(selectedFilters);
     }
 
@@ -65,11 +65,11 @@ const AddFilter = (props) => {
                 filterPresets && filterPresets.length &&
                 <div className="mb-2">
                     <label className="pt-2 mb-1">Select From Existing Filters</label>
-                    <select className="form-control form-control-sm" name="selectedFilterPreset" onChange={handlePresentChange}>
+                    <select className="form-control form-control-sm" name="selectedFilterPreset" onChange={handlePresetChange}>
                         <option value="">Select an option</option>
                         {
                             filterPresets.map((filter, index) =>
-                                <option key={filter.title} value={filter.title}>{filter.title}</option>
+                                <option key={filter.id} value={filter.id}>{filter.title}</option>
                             )
                         }
                     </select>

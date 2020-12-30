@@ -26,7 +26,7 @@ async function getUserFilters(req, res) {
             }
         });
 
-        const data = userFilters.map(({ title, settings }) => ({ title, settings }));
+        const data = userFilters.map(({ id, title, settings }) => ({ id, title, settings }));
         res.json(data);
     } catch (err) {
         console.error(err);
@@ -41,14 +41,14 @@ async function createUserFilter(req, res) {
         if (!settings) return res.status(400).send('Filter settings cannot be null');
         if (!title) return res.status(400).send('Filter title cannot be null');
 
-        await FilterSettings.create({
+        const filter = await FilterSettings.create({
             title,
             user_id: req.user.id,
             table_name: table,
             settings
         });
 
-        res.sendStatus(200);
+        res.json(filter);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -78,7 +78,25 @@ async function updateUserFilter(req, res) {
     }
 }
 
+async function getFilterSetting(req, res) {
+    try {
+        const { id } = req.params;
+        if (!id) return res.status(400).send('Must provide id.');
+
+        const filter = await FilterSettings.findOne({
+            where: { id },
+            attributes: ['id', 'title', 'table_name', 'settings']
+        });
+
+        res.json(filter);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 exports.getFilterOptions = getFilterOptions;
 exports.getUserFilters = getUserFilters;
 exports.createUserFilter = createUserFilter;
 exports.updateUserFilter = updateUserFilter;
+exports.getFilterSetting = getFilterSetting;

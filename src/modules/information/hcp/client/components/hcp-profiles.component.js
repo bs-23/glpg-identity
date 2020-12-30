@@ -94,6 +94,7 @@ export default function hcpUsers() {
     const [tableDirty, setTableDirty] = useState(false);
     const [editableTableProps, setEditableTableProps] = useState({});
     const [selectedRow, setSelectedRow] = useState(null);
+    const [selectedFilterSetting, setSelectedFilterSetting] = useState(null);
 
     const hcps = useSelector(state => state.hcpReducer.hcps);
     const specialties = useSelector(state => state.hcpReducer.specialties);
@@ -129,30 +130,61 @@ export default function hcpUsers() {
         });
     }
 
+    const handleFilterExecute = async (multiFilterSetting) => {
+        // const params = new URLSearchParams(location.search);
+        const filterID = multiFilterSetting.selectedSettingID;
+        console.log('========', multiFilterSetting);
+        const filterSetting = {
+            title: multiFilterSetting.filterSettingName,
+            table: "hcp-profiles",
+            settings: {
+                filters: multiFilterSetting.filters,
+                logic: multiFilterSetting.logic
+            }
+        }
+        if(multiFilterSetting.shouldSaveFilter) {
+            if(filterID) {
+                try{
+                    await axios.put(`/api/filter/${filterID}`, filterSetting);
+                    // Success => redirect to /hcps/list?filter=asd213s23 (Using the ID)
+                    history.push(`/information/list?filter=${filterID}`);
+                }catch(err){
+                    addToast('There was an error updating the filter setting.', {
+                        appearance: 'success',
+                        autoDismiss: true
+                    });
+                }
+            }else {
+                try{
+                    const { data } = await axios.post('/api/filter', filterSetting);
+                    history.push(`/information/list?filter=${data.id}`);
+                    // Get the new Filter ID. Now redirect to /hcps/list?filter=asd213s23 (Using the ID)
+                    // loadHcpProfiles(filterSetting);
+                }catch(err){
+                    addToast('There was an error creating the filter setting.', {
+                        appearance: 'success',
+                        autoDismiss: true
+                    });
+                }
+            }
+        }
+        else {
+            console.log(multiFilterSetting);
+            setSelectedFilterSetting(filterSetting);
+            history.push(
+                filterID
+                    ? '/information/list' + `?filter=${filterID}`
+                    : '/information/list'
+            );
+        };
+    }
+
     const loadHcpProfiles = (filterSetting) => {
         const searchObj = {};
         const searchParams = location.search.slice(1).split("&");
         searchParams.forEach(element => {
             searchObj[element.split("=")[0]] = element.split("=")[1];
         });
-
-        // const filterSettings = {
-        //     filters: [
-        //         // {
-        //         //     name: "2",
-        //         //     fieldName: "first_name",
-        //         //     operator: "equal",
-        //         //     value: "dfdfd"
-        //         // },
-        //         {
-        //             name: "1",
-        //             fieldName: "last_name",
-        //             operator: "equal",
-        //             value: ["Rifat","khk"]
-        //         }
-        //     ],
-        //     // logic: "1 or 2"
-        // };
 
         const requestBody = filterSetting && filterSetting.filters.length
             ? {
@@ -493,7 +525,22 @@ export default function hcpUsers() {
     }, []);
 
     useEffect(() => {
-        loadHcpProfiles();
+        const params = new URLSearchParams(location.search);
+        const filterID = params.get('filter');
+        if(filterID) axios.get(`/api/filter/${filterID}`)
+            .then(res => {
+                setSelectedFilterSetting(res.data);
+                loadHcpProfiles(res.data.settings);
+            })
+        else {
+            const filterSetting = selectedFilterSetting
+                ? {
+                    filters: selectedFilterSetting.settings.filters,
+                    logic: selectedFilterSetting.settings.logic
+                }
+                : null
+            loadHcpProfiles(filterSetting);
+        };
     }, [location]);
 
     return (
@@ -897,8 +944,9 @@ export default function hcpUsers() {
                 </div>
                 {show.filterSidebar &&
                     <HCPFilter
+                        selectedFilterSetting={selectedFilterSetting}
                         onHide={() => setShow({ ...show, filterSidebar: false })}
-                        onExecute={(filterSetting) => loadHcpProfiles(filterSetting)}
+                        onExecute={handleFilterExecute}
                     />}
             </div>
         </main >

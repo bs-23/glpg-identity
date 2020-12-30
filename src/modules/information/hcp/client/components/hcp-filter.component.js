@@ -4,11 +4,12 @@ import { MultiFilter } from "../../../../core/client/components/MultiFilter";
 import { useSelector, useDispatch } from 'react-redux';
 import { getHcpFilterSettings } from '../hcp.actions';
 
-const HCPFilter = ({ onHide, onExecute }) => {
+const HCPFilter = ({ selectedFilterSetting, onHide, onExecute }) => {
     const allCountries = useSelector(state => state.countryReducer.allCountries);
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
     const userFilters = useSelector(state => state.hcpReducer.filterPresets);
     const dispatch = useDispatch();
+
 
     const userCountryFilterOption = loggedInUser.countries.reduce((acc, c) => {
         const country = allCountries.find(ac => c.toLowerCase() === ac.country_iso2.toLowerCase());
@@ -23,6 +24,9 @@ const HCPFilter = ({ onHide, onExecute }) => {
 
     return <MultiFilter
         filterPresets={userFilters}
+        selectedSetting={(selectedFilterSetting || {}).settings}
+        selectedSettingTitle={(selectedFilterSetting || {}).title}
+        selectedSettingID={(selectedFilterSetting || {}).id}
         options={filterOptions}
         onHide={onHide}
         onExecute={onExecute}

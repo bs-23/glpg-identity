@@ -6,6 +6,7 @@ const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/platfo
 
 module.exports = app => {
     app.route('/api/filter/:id')
+        .get(CDPAuthStrategy, controller.getFilterSetting)
         .put(CDPAuthStrategy, controller.updateUserFilter);
 
     app.route('/api/filter/options')
