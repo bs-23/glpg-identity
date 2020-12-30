@@ -138,7 +138,7 @@ describe('Consent Routes', () => {
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
-    it('Should assign consent to country', async () => {
+    it('Should assign consent to country and update it', async () => {
         const response1 = await request
             .post(`/api/cdp-consents`)
             .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
@@ -158,7 +158,7 @@ describe('Consent Routes', () => {
             });
 
         const response2 = await request
-            .get(`/api/consent/country`)
+            .post(`/api/consent/country`)
             .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
             .send({
                 consent_id: response1.body.id,
@@ -168,5 +168,15 @@ describe('Consent Routes', () => {
 
         expect(response2.statusCode).toBe(200);
         expect(response2.res.headers['content-type']).toMatch('application/json');
+
+        const response3 = await request
+            .put(`/api/consent/country/${response2.body.id}`)
+            .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
+            .send({
+                opt_type: "double-opt-in"
+            })
+
+        expect(response3.statusCode).toBe(200);
+        expect(response3.res.headers['content-type']).toMatch('application/json');
     });
 });
