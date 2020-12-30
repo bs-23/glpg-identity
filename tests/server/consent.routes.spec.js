@@ -42,7 +42,7 @@ describe('Consent Routes', () => {
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
-    it('Should get consent performance report', async () => {
+    it('Should get cdp consent performance report', async () => {
         const response = await request
             .get(`/api/cdp-consent-performance-report`)
             .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
@@ -51,12 +51,60 @@ describe('Consent Routes', () => {
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
-    it('Should get datasync consent performance report', async () => {
+    it('Should get veeva consent performance report', async () => {
         const response = await request
-            .get(`/api/datasync_consent-performance-report`)
+            .get(`/api/veeva-consent-performance-report`)
             .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
 
         expect(response.statusCode).toBe(200);
-        expect(response.res.headers['content-type']).toMatch('text/html');
+        expect(response.res.headers['content-type']).toMatch('application/json');
+    });
+
+    it('Should get all process activities', async () => {
+        const response = await request
+            .get(`/api/get-all-process-activities`)
+            .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
+
+        expect(response.statusCode).toBe(200);
+        expect(response.res.headers['content-type']).toMatch('application/json');
+    });
+
+    it('Should get one veeva consent details with consent id', async () => {
+        const response = await request
+            .get(`/api/consents/WNLN01326483`)
+            .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
+
+        expect(response.statusCode).toBe(200);
+        expect(response.res.headers['content-type']).toMatch('application/json');
+    });
+
+    it('Should add cpd consent and get the details with consent id', async () => {
+        const response1 = await request
+        .post(`/api/cdp-consents`)
+        .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
+        .send({
+            category_id: "fe037405-c676-4d98-bd05-85008900c838",
+            legal_basis: "consent",
+            preference: "a",
+            translations: [
+                {
+                    id: 0.649082766786877,
+                    country_iso2: "be",
+                    lang_code: "nl",
+                    rich_text: "<p>a</p>"
+                }
+            ],
+            is_active: true
+        });
+
+        expect(response1.statusCode).toBe(200);
+        expect(response1.res.headers['content-type']).toMatch('application/json');
+
+        const response2 = await request
+            .get(`/api/cdp-consents/${response1.body.id}`)
+            .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
+
+        expect(response2.statusCode).toBe(200);
+        expect(response2.res.headers['content-type']).toMatch('application/json');
     });
 });
