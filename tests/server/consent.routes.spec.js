@@ -186,4 +186,13 @@ describe('Consent Routes', () => {
         expect(response4.statusCode).toBe(200);
         expect(response4.res.headers['content-type']).toMatch('text/plain');
     });
+
+    it('Should get consent categories', async () => {
+        const response = await request
+            .get(`/api/privacy/consent-categories`)
+            .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
+
+        expect(response.statusCode).toBe(200);
+        expect(response.res.headers['content-type']).toMatch('application/json');
+    });
 });
