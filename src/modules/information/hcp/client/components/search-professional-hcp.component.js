@@ -95,18 +95,6 @@ const SearchProfessionalHcp = () => {
     };
 
     const groupSpecialties = specialties => {
-        // codDescription: "Abdominal / Digestive Surgery"
-        // codIdOnekey: "SP.WFR.CD"
-        // codbase: "WFR"
-
-        // specialties = [
-        //     {
-        //         codDescription: "Abdominal / Digestive Surgery",
-        //         codIdOnekey: ["SP.WFR.CD", "SP.WFR.09"],
-        //         codbase: ["WFR", "WBE"]
-        //     }
-        // ]
-
         const marked = {};
         const idxMap = {};
         const groupedSpecialties = [];
