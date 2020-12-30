@@ -135,7 +135,7 @@ export default function hcpUsers() {
             searchObj[element.split("=")[0]] = element.split("=")[1];
         });
 
-        let queryString = searchObj.codbase !== undefined ? `page=${searchObj.page}&status=${searchObj.status}&codbase=${searchObj.codbase}&orderBy=${searchObj.orderBy}&orderType=${searchObj.orderType}` : ''
+        let queryString = searchObj.codbase !== undefined ? `page=${searchObj.page}&status=${searchObj.status}&codbase=${searchObj.codbase}&orderBy=${searchObj.orderBy}&orderType=${searchObj.orderType}` : '';
 
         dispatch(getHcpProfiles(queryString));
 
