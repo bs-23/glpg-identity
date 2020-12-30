@@ -1,0 +1,30 @@
+.filter {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    display: flex;
+    justify-content: flex-end;
+
+    &__panel {
+        background: white;
+        width: 302px;
+        box-shadow: -9px 13px 30px -10px #C5C5C5;
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__section {
+        flex: auto;
+    }
+
+    &__sub-panel {
+        position: absolute;
+        right: 302px;
+        background: white;
+        border: 1px solid darkgreen;
+        border-radius: 5px;
+        width: 302px;
+    }
+}

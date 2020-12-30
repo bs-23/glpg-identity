@@ -3,17 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '../common';
 import { Filter } from './components';
 
-const style = {
-    container: {
-        position: 'absolute',
-        right: '20%',
-        background: 'white',
-        border: '1px solid darkgreen',
-        borderRadius: '5px',
-        width: '20%'
-    }
-}
-
 const AddFilter = (props) => {
     const { onDone, onAddMoreFilter, filters: existingFilters, filterOptions, filterPresets } = props;
     const [filters, setFilters] = useState([]);
@@ -58,8 +47,8 @@ const AddFilter = (props) => {
     //     setFilters(existingFilters);
     // }, []);
 
-    return <div style={style.container}>
-        <div className="bg-light p-2">Add Filter</div>
+    return <div className="filter__sub-panel">
+        <div className="bg-light p-2 rounded-top">Add Filter</div>
         <div className="px-3 pb-3">
             {
                 filterPresets && filterPresets.length &&
