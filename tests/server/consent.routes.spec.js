@@ -138,7 +138,7 @@ describe('Consent Routes', () => {
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
-    it('Should assign consent to country and update it', async () => {
+    it('Should assign consent to country and update it, then delete it', async () => {
         const response1 = await request
             .post(`/api/cdp-consents`)
             .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
@@ -178,5 +178,12 @@ describe('Consent Routes', () => {
 
         expect(response3.statusCode).toBe(200);
         expect(response3.res.headers['content-type']).toMatch('application/json');
+
+        const response4 = await request
+            .delete(`/api/consent/country/${response2.body.id}`)
+            .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
+
+        expect(response4.statusCode).toBe(200);
+        expect(response4.res.headers['content-type']).toMatch('text/plain');
     });
 });
