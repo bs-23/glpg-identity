@@ -33,15 +33,6 @@ describe('Consent Routes', () => {
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
-    it('Should get all country consents', async () => {
-        const response = await request
-            .get(`/api/consent/country`)
-            .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
-
-        expect(response.statusCode).toBe(200);
-        expect(response.res.headers['content-type']).toMatch('application/json');
-    });
-
     it('Should get cdp consent performance report', async () => {
         const response = await request
             .get(`/api/cdp-consent-performance-report`)
@@ -136,5 +127,46 @@ describe('Consent Routes', () => {
 
         expect(response.statusCode).toBe(200);
         expect(response.res.headers['content-type']).toMatch('application/json');
+    });
+
+    it('Should get all country consents', async () => {
+        const response = await request
+            .get(`/api/consent/country`)
+            .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
+
+        expect(response.statusCode).toBe(200);
+        expect(response.res.headers['content-type']).toMatch('application/json');
+    });
+
+    it('Should assign consent to country', async () => {
+        const response1 = await request
+            .post(`/api/cdp-consents`)
+            .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
+            .send({
+                category_id: "fe037405-c676-4d98-bd05-85008900c838",
+                legal_basis: "consent",
+                preference: "z",
+                translations: [
+                    {
+                        id: "d95abe6c-d71b-4124-9ebb-e5daf73869e7",
+                        country_iso2: "be",
+                        lang_code: "nl",
+                        rich_text: "<p>a</p>"
+                    }
+                ],
+                is_active: true
+            });
+
+        const response2 = await request
+            .get(`/api/consent/country`)
+            .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
+            .send({
+                consent_id: response1.body.id,
+                country_iso2: "BE",
+                opt_type: "single-opt-in"
+            })
+
+        expect(response2.statusCode).toBe(200);
+        expect(response2.res.headers['content-type']).toMatch('application/json');
     });
 });
