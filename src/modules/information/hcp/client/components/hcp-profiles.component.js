@@ -134,7 +134,11 @@ export default function hcpUsers() {
         searchParams.forEach(element => {
             searchObj[element.split("=")[0]] = element.split("=")[1];
         });
-        dispatch(getHcpProfiles(searchObj.page, searchObj.status, searchObj.codbase, searchObj.orderBy, searchObj.orderType));
+
+        let queryString = searchObj.codbase !== undefined ? `page=${searchObj.page}&status=${searchObj.status}&codbase=${searchObj.codbase}&orderBy=${searchObj.orderBy}&orderType=${searchObj.orderType}` : '';
+
+        dispatch(getHcpProfiles(queryString));
+
         setSort({ type: params.get('orderType'), value: params.get('orderBy') });
     };
 

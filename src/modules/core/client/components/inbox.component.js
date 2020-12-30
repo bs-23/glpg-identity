@@ -12,12 +12,12 @@ export default function Inbox(){
   const [selectedTab, setSelectedTab] = useState('hcpaproval');
   const [showModal, setShowModal] = useState(false);
   const getHcps=()=>{
-    dispatch(getHcpProfiles(1, 'not_verified'));
+      dispatch(getHcpProfiles('?page=1&status=not_verified&limit=5'));
   }
+  let hcps = useSelector(state => state.hcpReducer.hcps);
   useEffect(() => {
     getHcps();
   }, []);
-  const hcps = useSelector(state => state.hcpReducer.hcps);
 
   return(
       <div className={`shadow-sm bg-white mb-3 cdp-inbox ${show ? "cdp-inbox__expand" : ""}`}>
@@ -31,7 +31,7 @@ export default function Inbox(){
         <Tabs defaultActiveKey={selectedTab} className="cdp-inbox__tab px-2" onSelect={(activeKey, e) => setSelectedTab(activeKey)}>
           <Tab eventKey="hcpaproval" title="HCP Approval">
             <div className="cdp-inbox__tab-detail">
-              {hcps.users !== undefined &&
+            {hcps.users !== undefined &&
                 hcps.users.map((user, key) => <ul key ={key}  className="cdp-inbox__list p-0 m-0">
                     <li  className="cdp-inbox__list-item d-flex justify-content-between  align-items-center border-bottom py-3 px-3">
                       <span className="cdp-inbox__list-item-col large cdp-text-primary font-weight-bold">{user.email}</span>
@@ -47,7 +47,7 @@ export default function Inbox(){
                 )
               }
             {hcps.users !== undefined && hcps.users.length !== 0 ?
-                <NavLink to="/in formation/list?page=1&status=not_verified" className="d-inline-block p-3 text-uppercase cdp-text-secondary active small font-weight-bold">More Pending</NavLink>
+                <NavLink to="/information/list?page=1&status=not_verified" className="d-inline-block p-3 text-uppercase cdp-text-secondary active small font-weight-bold">More Pending</NavLink>
                 :
             <div className="d-inline-block p-3 text-uppercase cdp-text-secondary active small font-weight-bold">No Data Found</div>}
             </div>

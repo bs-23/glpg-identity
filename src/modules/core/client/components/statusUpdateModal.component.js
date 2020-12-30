@@ -4,7 +4,7 @@ import Modal from 'react-bootstrap/Modal';
 import axios from 'axios';
 import { useToasts } from 'react-toast-notifications';
 import { useSelector, useDispatch } from 'react-redux';
-import { getHcpProfiles } from '../../../information/hcp/client/hcp.actions'; 
+import { getHcpProfiles } from '../../../information/hcp/client/hcp.actions';
 import { ApprovalRejectSchema } from '../../../information/hcp/client/hcp.schema';
 
 export default function statusupdateModal(props) {
@@ -15,7 +15,6 @@ export default function statusupdateModal(props) {
 
   const getConsentsForUser = async () => {
     const { data } = await axios.get(`/api/hcp-profiles/${user.id}/consents`);
-    console.log("consent user: ",data)
     setConsentForUser({ ...user, consents: data.data });
   }
 
@@ -24,7 +23,7 @@ export default function statusupdateModal(props) {
       appearance: 'success',
       autoDismiss: true
     })
-   dispatch(getHcpProfiles(1, 'not_verified'));
+     dispatch(getHcpProfiles('?page=1&status=not_verified&limit=5'));
    onHide();
   }
 
@@ -36,7 +35,9 @@ export default function statusupdateModal(props) {
     });
     onHide();
   }
-
+    // useEffect(() => {
+    //     dispatch(getHcpProfiles('page=1&status=not_verified&limit=5'));
+    // }, []);
 return(
 <Modal
   show={show}
