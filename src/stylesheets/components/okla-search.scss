@@ -60,6 +60,14 @@
         }
     }
 
+    &__btn {
+        &-search:not(:disabled) {
+            & + i {
+                display: none !important;
+            }
+        }
+    }
+
     @media (max-width: $screen-phone) {
 
         &__details {
