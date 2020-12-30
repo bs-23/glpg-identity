@@ -55,6 +55,18 @@ const SearchOrganizationHcp = () => {
         </Popover>
     );
 
+    const searchHintPopup = (
+        <Popover id="searchHintPopup" className="shadow-lg">
+            <Popover.Content className="px-3">
+                <p>To enable the search button please select countries filed and one other field. e.g.</p>
+                <ul className="list-unstyled mb-0">
+                    <li className="pl-0 pb-2"><strong>Countries</strong> Belgium</li>
+                    <li className="pl-0 pb-2"><strong>Specialty</strong> Cardiology</li>
+                </ul>
+            </Popover.Content>
+        </Popover>
+    );
+
     const searchHcos = (newPage) => {
         axios.post(`/api/okla/hcos/search?page=${newPage}`, formData)
             .then(response => {
@@ -83,13 +95,42 @@ const SearchOrganizationHcp = () => {
         searchHcos(currentPage + 1);
     }
 
+    const groupSpecialties = specialties => {
+        const marked = {};
+        const idxMap = {};
+        const groupedSpecialties = [];
+        let idx = 0;
+
+        specialties.forEach( specialty => {
+            if(!specialty.codIdOnekey) return;
+            const value = specialty.codDescription.toLowerCase().split(' ').join('');
+
+            if(!marked[value]){
+                marked[value] = true;
+                idxMap[value] = idx++;
+                groupedSpecialties.push({
+                    codDescription: specialty.codDescription,
+                    codIdOnekeys: [specialty.codIdOnekey],
+                    codbases: [specialty.codbase]
+                });
+            }
+            else {
+                const index = idxMap[value];
+                groupedSpecialties[index].codIdOnekeys.push(specialty.codIdOnekey);
+                groupedSpecialties[index].codbases.push(specialty.codbase);
+            }
+        });
+        return groupedSpecialties;
+    }
+
     useEffect(() => {
         const fetchSpecialties = async () => {
             const codbases = selectedCountries.map(item => `codbases=${item.value}`);
             const parameters = codbases.join('&');
             if (parameters) {
                 const response = await axios.get(`/api/hcps/specialties?${parameters}`);
-                setSpecialties(response.data);
+                const groupedSpecialties = groupSpecialties(response.data);
+                setSpecialties(groupedSpecialties);
             }
             else setSpecialties([]);
         }
@@ -97,7 +138,7 @@ const SearchOrganizationHcp = () => {
     }, [selectedCountries, countries]);
 
     const getCountries = () => userCountries.map(country => ({ value: country.codbase, label: country.codbase_desc }));
-    const getSpecialties = () => specialties.map(i => ({ value: i.codIdOnekey.split('.')[2], label: i.codDescription }));
+    const getSpecialties = () => specialties.map(i => ({ value: i.codIdOnekeys, label: i.codDescription }));
 
     const getCountryName = (country_iso2) => {
         if (!allCountries || !country_iso2) return null;
@@ -169,7 +210,13 @@ const SearchOrganizationHcp = () => {
                                     displayName="SearchForm"
                                     onSubmit={async (values, actions) => {
                                         const data = { ...values };
-                                        data.specialties = data.specialties.map(i => i.value);
+                                        const updatedSpecialties = []
+                                        data.specialties.forEach(group => {
+                                            group.value.forEach(item => {
+                                                updatedSpecialties.push(item.split('.')[2]);
+                                            });
+                                        });
+                                        data.specialties = updatedSpecialties;
                                         data.codbases = data.countries.map(i => i.value);
                                         delete data.countries;
 
@@ -297,7 +344,12 @@ const SearchOrganizationHcp = () => {
                                                     <button type="reset" className="btn btn-block btn-secondary mt-4 p-2" onClick={() => resetSearch(formikProps)}>CLEAR</button>
                                                 </div>
                                                 <div className="col-6">
-                                                    <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!formikProps.values.countries || !formikProps.values.countries.length || !(formikProps.values.address || formikProps.values.city || formikProps.values.postCode || formikProps.values.onekeyId || formikProps.values.workplaceEid || (selectedSpecialties && selectedSpecialties.length))}> SEARCH </button>
+                                                    <div className="d-flex align-items-center">
+                                                        <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2 okla-search__btn-search" disabled={!formikProps.values.countries || !formikProps.values.countries.length || !(formikProps.values.address || formikProps.values.city || formikProps.values.postCode || formikProps.values.onekeyId || formikProps.values.workplaceEid || (selectedSpecialties && selectedSpecialties.length))}> SEARCH </button>
+                                                        <OverlayTrigger trigger="click" rootClose placement="left" overlay={searchHintPopup}>
+                                                            <i className="fas fa-info-circle mt-4 ml-2 cdp-text-primary" role="button"></i>
+                                                        </OverlayTrigger>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </Form>
