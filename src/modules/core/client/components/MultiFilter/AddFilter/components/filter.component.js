@@ -15,7 +15,7 @@ const Filter = (props) => {
         onRemove
     } = props;
 
-    const type = filterOptions.find(filter => filter.fieldName === fieldValue)?.valueType;
+    const type = filterOptions.find(filter => filter.fieldName === fieldValue)?.valueType || 'text';
 
     const getOptions = () => {
         const filter = filterOptions.find(filter => filter.fieldName === fieldValue);
@@ -26,6 +26,38 @@ const Filter = (props) => {
     const getSelectedOptions = () => {
         const selectedOptions = (getOptions()).filter(o => (value || []).some(v => v === o.value));
         return selectedOptions;
+    };
+
+    const handleKeyDown = (e) => {
+        if (!e.target.value) return;
+
+        if (e.key === 'Enter') {
+            onChange(e.target.name, [...value, e.target.value], index);
+            const inputElem = document.getElementById(fieldValue + index);
+            if (inputElem) {
+                setTimeout(() => {
+                    inputElem.value = '';
+                }, 10);
+            }
+        }
+    };
+
+    const handleSubmit = () => {
+        const inputElem = document.getElementById(fieldValue + index);
+        if (!inputElem.value) return;
+        onChange(inputElem.name, [...value, inputElem.value], index);
+
+        if (inputElem) {
+            setTimeout(() => {
+                inputElem.value = '';
+            }, 10);
+        }
+    };
+
+    const removeItem = (idx) => {
+        const newValues = [...value];
+        newValues.splice(idx, 1);
+        onChange('value', newValues, index);
     };
 
     return <div className="pb-3 mb-3 border-bottom">
@@ -78,8 +110,8 @@ const Filter = (props) => {
                 value={value}
                 onChange={(e) => onChange(e, index)}
             ></Field> */}
-            {type === 'select'
-                ? <Select
+            {type === 'select' &&
+                <Select
                     defaultValue={[]}
                     isMulti={true}
                     name={fieldValue}
@@ -93,14 +125,32 @@ const Filter = (props) => {
                         onChange('value', value, index);
                     }}
                 />
-                : <Input
+            }
+
+            {type === 'text' &&
+                <div>
+                    {value && value.map((v, i) => (
+                        <span className="pr-1 pl-1 mr-1 bg-secondary rounded" key={'val-' + i}>{v} <span className="rounded bg-danger" onClick={() => removeItem(i)}>x</span></span>
+                    ))}
+                    <Input
+                        className="form-control form-control-sm"
+                        id={fieldValue + index}
+                        name="value"
+                        type='text'
+                        onKeyDown={handleKeyDown} />
+                    <button className="mt-1" onClick={handleSubmit}>Add more</button>
+                </div>
+            }
+
+            {type !== 'text' && type !== 'select' &&
+                <Input
                     className="form-control form-control-sm"
                     id="value"
                     name="value"
                     value={value}
-                    type={type || 'text'}
-                    onChange={(e) => onChange(e.target.name, e.target.value, index)}
-                />}
+                    type={type}
+                    onChange={(e) => onChange(e.target.name, [...value, e.target.value], index)} />
+            }
         </div>
     </div>
 }
