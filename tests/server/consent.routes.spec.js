@@ -195,4 +195,33 @@ describe('Consent Routes', () => {
         expect(response.statusCode).toBe(200);
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
+
+    it('Should create consent category, update it and get details of it', async () => {
+        const response1 = await request
+            .post(`/api/privacy/consent-categories`)
+            .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
+            .send({
+                title: "a"
+            })
+
+        expect(response1.statusCode).toBe(200);
+        expect(response1.res.headers['content-type']).toMatch('application/json');
+
+        const response2 = await request
+            .put(`/api/privacy/consent-categories/${response1.body.id}`)
+            .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
+            .send({
+                title: "aa"
+            })
+
+        expect(response2.statusCode).toBe(200);
+        expect(response2.res.headers['content-type']).toMatch('application/json');
+
+        const response3 = await request
+            .get(`/api/privacy/consent-categories/${response1.body.id}`)
+            .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
+
+        expect(response3.statusCode).toBe(200);
+        expect(response3.res.headers['content-type']).toMatch('application/json');
+    });
 });
