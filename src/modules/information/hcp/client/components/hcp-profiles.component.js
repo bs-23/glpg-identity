@@ -131,9 +131,8 @@ export default function hcpUsers() {
     }
 
     const handleFilterExecute = async (multiFilterSetting) => {
-        // const params = new URLSearchParams(location.search);
         const filterID = multiFilterSetting.selectedSettingID;
-        console.log('========', multiFilterSetting);
+
         const filterSetting = {
             title: multiFilterSetting.filterSettingName,
             table: "hcp-profiles",
@@ -142,11 +141,11 @@ export default function hcpUsers() {
                 logic: multiFilterSetting.logic
             }
         }
+
         if(multiFilterSetting.shouldSaveFilter) {
             if(filterID) {
                 try{
                     await axios.put(`/api/filter/${filterID}`, filterSetting);
-                    // Success => redirect to /hcps/list?filter=asd213s23 (Using the ID)
                     history.push(`/information/list?filter=${filterID}`);
                 }catch(err){
                     addToast('There was an error updating the filter setting.', {
@@ -158,8 +157,6 @@ export default function hcpUsers() {
                 try{
                     const { data } = await axios.post('/api/filter', filterSetting);
                     history.push(`/information/list?filter=${data.id}`);
-                    // Get the new Filter ID. Now redirect to /hcps/list?filter=asd213s23 (Using the ID)
-                    // loadHcpProfiles(filterSetting);
                 }catch(err){
                     addToast('There was an error creating the filter setting.', {
                         appearance: 'success',
@@ -169,13 +166,8 @@ export default function hcpUsers() {
             }
         }
         else {
-            console.log(multiFilterSetting);
-            setSelectedFilterSetting(filterSetting);
-            history.push(
-                filterID
-                    ? '/information/list' + `?filter=${filterID}`
-                    : '/information/list'
-            );
+            const { settings } = filterSetting;
+            loadHcpProfiles({ filters: settings.filters, logic: settings.logic });
         };
     }
 

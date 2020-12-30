@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Formik, Field } from 'formik';
+import _ from 'lodash';
 
 import { Button } from '../common';
 import AddFilter from '../AddFilter/add-filter.component';
@@ -144,7 +145,12 @@ const MultiFilter = (props) => {
                                 </Field>
                             </div>
                             {formikProps.values.filterSettingName &&
-                                <div className="cdp-text-secondary font-weight-bold mb-3">Selected Filter: {formikProps.values.filterSettingName}</div>
+                                <div className="cdp-text-secondary font-weight-bold mb-3">
+                                    Selected Filter: {formikProps.values.filterSettingName}
+                                    {selectedSetting && !_.isEqual(selectedSetting.filters, formikProps.values.filters) &&
+                                        <span className="invalid-feedback">Unsaved</span>
+                                    }
+                                </div>
                             }
                             {formikProps.values.filters.map((filter, index) =>
                                 <div className="mb-3" key={filter.name}>
