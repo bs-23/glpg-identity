@@ -14,10 +14,10 @@ const Filter = (props) => {
         onRemove
     } = props;
 
-    return <div className="pb-2">
-        <div className="d-flex">
-            <div className="d-flex w-100 mr-2"></div>
-            <i className="fas fa-times mr-2" onClick={() => onRemove(index)} />
+    return <div className="pb-3 mb-3 border-bottom">
+        <div className="d-flex justify-content-between">
+            <div className="mr-2 cdp-text-secondary">Filter {index}</div>
+            <i className="fas fa-times mr-2 text-danger" onClick={() => onRemove(index)} />
         </div>
         <div>
             <label className="pt-2 mb-1" for="field">

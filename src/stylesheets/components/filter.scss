@@ -26,5 +26,7 @@
         border: 1px solid darkgreen;
         border-radius: 5px;
         width: 302px;
+        max-height: 500px;
+        overflow-y: auto;
     }
 }
