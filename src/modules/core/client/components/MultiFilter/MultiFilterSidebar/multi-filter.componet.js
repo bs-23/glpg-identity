@@ -6,25 +6,6 @@ import { Button } from '../common';
 import AddFilter from '../AddFilter/add-filter.component';
 import { FilterSummary, FilterLogic } from './components';
 
-const style = {
-    container: {
-        position: 'absolute',
-        background: '#5a5a5a4a',
-        right: '0px',
-        top: '0px',
-        bottom: '0px',
-        left: '0px',
-        display: 'flex',
-        justifyContent: 'flex-end'
-    },
-    sidebar: {
-        background: 'white',
-        width: '20%',
-    }
-}
-
-
-
 const MultiFilter = (props) => {
     const {
         onHide,
@@ -95,9 +76,9 @@ const MultiFilter = (props) => {
         props.setFieldValue('shouldSaveFilter', false);
     }
 
-    return <div style={style.container} onClick={handleOnClick} >
-        <div style={style.sidebar}>
-            <h3 className="px-3 pt-3 cdp-text-primary">Filters</h3>
+    return <div className="filter" onClick={handleOnClick} >
+        <div className="filter__panel">
+            <h3 className="px-3 pt-3 cdp-text-primary filter__header">Filters</h3>
             <Formik
                 onSubmit={onExecute}
                 initialValues={{
@@ -116,7 +97,7 @@ const MultiFilter = (props) => {
             >
                 {(formikProps) =>
                     <React.Fragment>
-                        <div className="shadow-sm p-3 d-flex">
+                        <div className="shadow-sm p-3 d-flex filter__btn-section">
                             <Button
                                 className="btn cdp-btn-secondary mr-1 btn-block text-white"
                                 label="Execute"
@@ -129,7 +110,7 @@ const MultiFilter = (props) => {
                                 onClick={onHide}
                             />
                         </div>
-                        <div className="bg-light p-3">
+                        <div className="bg-light p-3 filter__section">
                             <div className="mb-3">
                                 <label className="d-block pt-2 mb-1" for="scope">
                                     Scope

@@ -208,8 +208,7 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
          *  hcp_profiles table saves country_iso2, not codbase
          */
         if (filterObj.fieldName === 'country') {
-            delete customFilter.country_iso2;
-            const country_iso2_list_for_codbase = allCountries.filter(ac => ac.codbase.toLowerCase() === filterObj.value.toLowerCase()).map(i => i.country_iso2);
+            const country_iso2_list_for_codbase = allCountries.filter(ac => filterObj.value.some(v => ac.codbase.toLowerCase() === v.toLowerCase())).map(i => i.country_iso2);
 
             const selected_iso2_list_for_codbase = country_iso2_list_for_codbase.filter(i => user_country_iso2_list.includes(i));
             const ignorecase_of_selected_iso2_list_for_codbase = [].concat.apply([], selected_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
@@ -217,6 +216,7 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
                 ? ignorecase_of_selected_iso2_list_for_codbase
                 : null;
 
+            delete customFilter.country_iso2;
             return {
                 ['country_iso2']: ignorecase_of_selected_iso2_list_for_codbase.length
                     ? ignorecase_of_selected_iso2_list_for_codbase
