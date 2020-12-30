@@ -205,7 +205,7 @@ describe('Okla Routes', () => {
         const searchResponse = {
             totalNumberOfResults: 18,
             numberOfIndividuals: 5,
-            resultSize: 17,
+            resultSize: 30,
             results: [
                 {
                     firstName: 'Johan',
