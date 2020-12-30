@@ -125,7 +125,7 @@ async function searchOklaHcps(req, res) {
         const data = {
             totalNumberOfResults: searchResponse.totalNumberOfResults,
             numberOfIndividuals: searchResponse.numberOfIndividuals,
-            resultSize: searchResponse.resultSize,
+            resultSize: limit,
             results
         }
         res.json(data);
