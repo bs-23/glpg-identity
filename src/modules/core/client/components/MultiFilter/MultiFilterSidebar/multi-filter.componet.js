@@ -83,7 +83,6 @@ const MultiFilter = (props) => {
                 onSubmit={onExecute}
                 initialValues={{
                     scope: '',
-                    source: '',
                     filters: [],
                     logic: ''
                 }}
@@ -125,20 +124,6 @@ const MultiFilter = (props) => {
                                     id="scope"
                                     as="select"
                                     name="scope"
-                                    value=""
-                                >
-                                    <option className="p-2" value=''> Select an Option </option>
-                                </Field>
-                            </div>
-                            <div className="mb-3">
-                                <label className="d-block pt-2 mb-1" for="source">
-                                    Source
-                                </label>
-                                <Field
-                                    className="form-control form-control-sm"
-                                    id="source"
-                                    as="select"
-                                    name="source"
                                     value=""
                                 >
                                     <option className="p-2" value=''> Select an Option </option>

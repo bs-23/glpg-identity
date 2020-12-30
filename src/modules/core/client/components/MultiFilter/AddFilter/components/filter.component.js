@@ -10,11 +10,15 @@ const Filter = (props) => {
         fieldValue,
         operatorValue,
         filterOptions,
-        onChange
+        onChange,
+        onRemove
     } = props;
 
     return <div className="pb-2">
-        <div className="cdp-text-secondary font-weight-bold">{name}</div>
+        <div className="d-flex">
+            <div className="d-flex w-100 mr-2"></div>
+            <i className="fas fa-times mr-2" onClick={() => onRemove(index)} />
+        </div>
         <div>
             <label className="pt-2 mb-1" for="field">
                 Field
