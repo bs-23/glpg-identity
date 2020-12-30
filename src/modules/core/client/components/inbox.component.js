@@ -14,10 +14,10 @@ export default function Inbox(){
   const getHcps=()=>{
       dispatch(getHcpProfiles('?page=1&status=not_verified&limit=5'));
   }
+  let hcps = useSelector(state => state.hcpReducer.hcps);
   useEffect(() => {
     getHcps();
   }, []);
-  const hcps = useSelector(state => state.hcpReducer.hcps);
 
   return(
       <div className={`shadow-sm bg-white mb-3 cdp-inbox ${show ? "cdp-inbox__expand" : ""}`}>

@@ -2,8 +2,7 @@ import axios from 'axios';
 import Types from './hcp.types';
 import store from '../../../core/client/store';
 
-export function getHcpProfiles(
-    query = "") {
+export function getHcpProfiles(query = "") {
     return {
         type: Types.GET_HCPS,
         payload: axios({
