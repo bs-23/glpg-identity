@@ -189,7 +189,8 @@ export default function hcpUsers() {
             }
             : null;
 
-        dispatch(getHcpProfiles(searchObj.page, searchObj.status, searchObj.codbase, searchObj.orderBy, searchObj.orderType, requestBody));
+        // dispatch(getHcpProfiles(searchObj.page, searchObj.status, searchObj.codbase, searchObj.orderBy, searchObj.orderType, requestBody));
+        dispatch(getHcpProfiles(location.search, requestBody));
         setSort({ type: params.get('orderType'), value: params.get('orderBy') });
     };
 
