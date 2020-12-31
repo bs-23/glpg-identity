@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -95,11 +95,14 @@ export default function hcpUsers() {
     const [editableTableProps, setEditableTableProps] = useState({});
     const [selectedRow, setSelectedRow] = useState(null);
     const [selectedFilterSetting, setSelectedFilterSetting] = useState(null);
+    const [isFilterEnabled, setIsFilterEnabled] = useState(false);
 
     const hcps = useSelector(state => state.hcpReducer.hcps);
     const specialties = useSelector(state => state.hcpReducer.specialties);
     const countries = useSelector(state => state.countryReducer.countries);
     const allCountries = useSelector(state => state.countryReducer.allCountries);
+
+    const hcpFilterRef = useRef();
 
     const pageLeft = () => {
         if (hcps.page > 1) urlChange(hcps.page - 1, hcps.codbase, hcps.status, params.get('orderBy'), true);
@@ -169,6 +172,7 @@ export default function hcpUsers() {
             const { settings } = filterSetting;
             loadHcpProfiles({ filters: settings.filters, logic: settings.logic });
         };
+        setIsFilterEnabled(true);
     }
 
     const loadHcpProfiles = (filterSetting) => {
@@ -494,6 +498,13 @@ export default function hcpUsers() {
         }
     ];
 
+    const resetFilter = () => {
+        setSelectedFilterSetting();
+        setIsFilterEnabled(false);
+        hcpFilterRef.current.multiFilterProps.resetFilter();
+        history.push('/information/list');
+    }
+
     const handleTableDirtyStatusChange = (dirty) => {
         setTableDirty(dirty);
         window.tableDirty = dirty;
@@ -522,6 +533,7 @@ export default function hcpUsers() {
         if(filterID) axios.get(`/api/filter/${filterID}`)
             .then(res => {
                 setSelectedFilterSetting(res.data);
+                setIsFilterEnabled(true);
                 loadHcpProfiles(res.data.settings);
             })
         else {
@@ -601,7 +613,8 @@ export default function hcpUsers() {
                                 <div className="d-flex pt-3 pt-sm-0">
                                     {countries && hcps['countries'] &&
                                         <React.Fragment>
-                                        <button className="btn cdp-btn-outline-primary mr-3" onClick={() => setShow({ ...show, filterSidebar: true })} ><i class="fas fa-filter mr-2"></i> Filter</button>
+                                            <button className="btn cdp-btn-outline-primary mr-3" onClick={() => setShow({ ...show, filterSidebar: true })} ><i class="fas fa-filter mr-2"></i> Filter</button>
+                                            {isFilterEnabled && <button className="btn cdp-btn-outline-primary mr-3" onClick={resetFilter} ><i class="fas fa-filter mr-2"></i> Reset Filter </button>}
                                             <div title={tableDirty ? "Save or reset changes to use filter options" : null}>
                                                 <Dropdown className={`ml-auto dropdown-customize mr-2 ${tableDirty ? 'hcp-inline-disable' : ''}`}>
                                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center">
@@ -934,12 +947,13 @@ export default function hcpUsers() {
                         </div>
                     </div>
                 </div>
-                {show.filterSidebar &&
-                    <HCPFilter
-                        selectedFilterSetting={selectedFilterSetting}
-                        onHide={() => setShow({ ...show, filterSidebar: false })}
-                        onExecute={handleFilterExecute}
-                    />}
+                <HCPFilter
+                    ref={hcpFilterRef}
+                    show={show.filterSidebar}
+                    selectedFilterSetting={selectedFilterSetting}
+                    onHide={() => setShow({ ...show, filterSidebar: false })}
+                    onExecute={handleFilterExecute}
+                />
             </div>
         </main >
     );

@@ -49,7 +49,7 @@ const AddFilter = (props) => {
         <div className="bg-light p-2 rounded-top">Add Filter</div>
         <div className="px-3 pb-3">
             {
-                filterPresets && filterPresets.length &&
+                filterPresets && filterPresets.length > 0 &&
                 <div className="mb-2">
                     <label className="pt-2 mb-1">Select From Existing Filters</label>
                     <select className="form-control form-control-sm" name="selectedFilterPreset" onChange={handlePresetChange}>
