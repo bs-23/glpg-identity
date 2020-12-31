@@ -18,7 +18,7 @@ const FilterSummary = (props) => {
             </div>
             <div>
                 <span className="mr-3">{operatorName}</span>
-                <span>{values.join(', ')}</span>
+                <span>{Array.isArray(values) ? values.join(', ') : values}</span>
             </div>
         </div>
     </div>
