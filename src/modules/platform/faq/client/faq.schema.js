@@ -40,10 +40,9 @@ export const faqSchema = object().shape({
         .test('has-special-charecters', 'Only space is not allowed',
             question => hasSpace(question)),
     answer: string()
-        //.max(1500, 'Maximum character limit has been exceeded.')
         .test('is-empty', 'This field must not be empty.',
             answer => isNotEmpty(answer))
-        .test('is-exceeded', 'Maximum character limit has been exceeded.',
+        .test('is-exceeded', 'Maximum character limit has been exceeded(This limit includes HTML tags and styles)',
             answer => isExceeded(answer)),
     answer_plaintext: string()
         .transform(value => value.trim())
