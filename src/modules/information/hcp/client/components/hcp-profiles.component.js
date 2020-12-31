@@ -129,16 +129,7 @@ export default function hcpUsers() {
     }
 
     const loadHcpProfiles = () => {
-        const searchObj = {};
-        const searchParams = location.search.slice(1).split("&");
-        searchParams.forEach(element => {
-            searchObj[element.split("=")[0]] = element.split("=")[1];
-        });
-
-        let queryString = searchObj.codbase !== undefined ? `page=${searchObj.page}&status=${searchObj.status}&codbase=${searchObj.codbase}&orderBy=${searchObj.orderBy}&orderType=${searchObj.orderType}` : '';
-
-        dispatch(getHcpProfiles(queryString));
-
+        dispatch(getHcpProfiles(location.search));
         setSort({ type: params.get('orderType'), value: params.get('orderBy') });
     };
 
