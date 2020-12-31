@@ -13,7 +13,7 @@ import store from '../../src/modules/core/client/store';
 
 configure({ adapter: new Adapter() });
 
-describe('Hcp user component', () => {
+describe('Manage Faq component', () => {
     let fakeAxios;
 
     beforeAll(async () => {
