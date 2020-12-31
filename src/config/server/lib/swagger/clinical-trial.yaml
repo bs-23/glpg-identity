@@ -1,0 +1,216 @@
+paths:
+    /api/clinical-trials/sync:
+        post:
+            tags:
+                - clinical-trials
+            summary: Sync data with https://clinicaltrials.gov .
+            requestBody:
+                required: false
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                username:
+                                    type: string
+                                password:
+                                    type: string
+                                grant_type:
+                                    type: string
+                                refresh_token:
+                                    type: string
+                            required:
+                                - username
+                                - password
+                                - grant_type
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: object
+                                properties:
+                                    token_type:
+                                        type: string
+                                    access_token:
+                                        type: string
+                                    expires_in:
+                                        type: string
+                                    refresh_token:
+                                        type: string
+                400:
+                    description: The request is missing required parameters.
+                401:
+                    description: Invalid email or password.
+                4400:
+                    description: The access_token is invalid or expired.
+                4401:
+                    description: The refresh_token is invalid or expired.
+
+    /api/clinical-trials/search:
+        get:
+            tags:
+                - clinical-trials
+            summary: Get all clinical trials relevent to search fields.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                type:
+                                    type: string
+                                data:
+                                    type: string
+                            required:
+                                - type
+                                - data
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: string
+                                            type:
+                                                type: string
+                                            data:
+                                                type: string
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+                400:
+                    description: Bad request.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+    /api/clinical-trials/search/{id}:
+        get:
+            tags:
+                - clinical-trials
+            summary: Get detail of a specific field.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                type:
+                                    type: string
+                                data:
+                                    type: string
+                            required:
+                                - type
+                                - data
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: string
+                                            type:
+                                                type: string
+                                            data:
+                                                type: string
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+                400:
+                    description: Bad request.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+    
+    /api/clinical-trials/diseases:
+        get:
+            tags:
+                - clinical-trials
+            summary: Get data.
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  description: the data identifier, as id
+                  schema:
+                    type: string
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: string
+                                            type:
+                                                type: string
+                                            data:
+                                                type: string
+                                            applicaiton:
+                                                type: object
+                                                properties:
+                                                    id:
+                                                        type: string
+                                                    name:
+                                                        type: string
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+
+    /api/clinical-trials/Glossaries:
+        get:
+            tags:
+                - clinical-trials
+            summary: Get data.
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  description: the data identifier, as id
+                  schema:
+                    type: string
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: string
+                                            type:
+                                                type: string
+                                            data:
+                                                type: string
+                                            applicaiton:
+                                                type: object
+                                                properties:
+                                                    id:
+                                                        type: string
+                                                    name:
+                                                        type: string
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"

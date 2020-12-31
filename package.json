@@ -12,6 +12,7 @@
         "pm2:docker": "cross-env NODE_ENV=production pm2-runtime start server.js --name cdp",
         "production": "run-s webpack:production pm2:docker",
         "seed": "node seeder.js",
+        "dbdropper": "node dbdropper.js",
         "test": "jest --forceExit --detectOpenHandles",
         "sonarqube": "node sonarqube.js"
     },
