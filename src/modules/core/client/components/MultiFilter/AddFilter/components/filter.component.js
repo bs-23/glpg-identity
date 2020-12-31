@@ -2,6 +2,7 @@ import React from 'react';
 import { Field } from 'formik';
 import Input from './input.component';
 import Select from 'react-select';
+import { WithContext as ReactTags } from 'react-tag-input';
 
 const Filter = (props) => {
     const {
@@ -28,37 +29,24 @@ const Filter = (props) => {
         return selectedOptions;
     };
 
-    const handleKeyDown = (e) => {
-        if (!e.target.value) return;
-
-        if (e.key === 'Enter') {
-            onChange(e.target.name, [...value, e.target.value], index);
-            const inputElem = document.getElementById(fieldValue + index);
-            if (inputElem) {
-                setTimeout(() => {
-                    inputElem.value = '';
-                }, 10);
-            }
-        }
-    };
-
-    const handleSubmit = () => {
-        const inputElem = document.getElementById(fieldValue + index);
-        if (!inputElem.value) return;
-        onChange(inputElem.name, [...value, inputElem.value], index);
-
-        if (inputElem) {
-            setTimeout(() => {
-                inputElem.value = '';
-            }, 10);
-        }
-    };
-
-    const removeItem = (idx) => {
+    const handleDelete = (i) => {
         const newValues = [...value];
-        newValues.splice(idx, 1);
+        newValues.splice(i, 1);
         onChange('value', newValues, index);
     };
+
+    const handleAddition = (tag) => {
+        onChange('value', [...value, tag.text], index);
+    };
+
+    const handleInputBlur = (tagText) => {
+        if (tagText) onChange('value', [...value, tagText], index);
+    };
+
+    const getTags = () => {
+        return (value || []).map(v => ({ id: v, text: v }));
+    };
+
 
     return <div className="pb-3 mb-3 border-bottom">
         <div className="d-flex justify-content-between">
@@ -129,16 +117,13 @@ const Filter = (props) => {
 
             {type === 'text' &&
                 <div>
-                    {value && value.map((v, i) => (
-                        <span className="pr-1 pl-1 mr-1 bg-secondary rounded" key={'val-' + i}>{v} <span className="rounded bg-danger" onClick={() => removeItem(i)}>x</span></span>
-                    ))}
-                    <Input
-                        className="form-control form-control-sm"
-                        id={fieldValue + index}
-                        name="value"
-                        type='text'
-                        onKeyDown={handleKeyDown} />
-                    <button className="mt-1" onClick={handleSubmit}>Add more</button>
+                    <ReactTags
+                        tags={getTags()}
+                        delimiters={[13]} // key codes for Enter
+                        handleDelete={handleDelete}
+                        handleAddition={handleAddition}
+                        handleInputBlur={handleInputBlur}
+                    />
                 </div>
             }
 

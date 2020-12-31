@@ -155,7 +155,7 @@ function ignoreCaseArray(str) {
     return [str.toLowerCase(), str.toUpperCase(), str.charAt(0).toLowerCase() + str.charAt(1).toUpperCase(), str.charAt(0).toUpperCase() + str.charAt(1).toLowerCase()];
 }
 
-async function generateFilterOptions(currentFilterSettings, userPermittedApplications, userPermittedCountries) {
+async function generateFilterOptions(currentFilterSettings, userPermittedApplications, userPermittedCountries, status) {
     const allCountries = await sequelize.datasyncConnector.query(
         `SELECT * FROM ciam.vwcountry`,
         { type: QueryTypes.SELECT }
@@ -177,6 +177,13 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
             ? ignorecase_of_country_iso2_list
             : null
     };
+
+    if (status) {
+        defaultFilter.status = status;
+        //  === null
+        //         ? { [Op.or]: ['self_verified', 'manually_verified', 'consent_pending', 'not_verified', null] }
+        //         : status,
+    }
 
     if (!currentFilterSettings || !currentFilterSettings.filters || currentFilterSettings.filter === 0)
         return defaultFilter;
@@ -284,8 +291,10 @@ async function getHcps(req, res) {
 
     try {
         const page = req.query.page ? +req.query.page - 1 : 0;
-        const limit = 15;
-        // const codbase = req.query.codbase === 'undefined' ? null : req.query.codbase;
+        const limit = req.query.limit ? +req.query.limit : 15;
+        let status = req.query.status === undefined ? null : req.query.status;
+        if (status && status.indexOf(',') !== -1) status = status.split(',');
+        const codbase = req.query.codbase === 'undefined' ? null : req.query.codbase;
         const offset = page * limit;
 
         const currentFilter = req.body;
@@ -311,7 +320,7 @@ async function getHcps(req, res) {
         order.push(['created_at', 'DESC']);
         order.push(['id', 'DESC']);
 
-        const filterOptions = await generateFilterOptions(currentFilter, userPermittedApplications, userPermittedCountries);
+        const filterOptions = await generateFilterOptions(currentFilter, userPermittedApplications, userPermittedCountries, status);
 
         const hcps = await Hcp.findAll({
             where: filterOptions,
@@ -384,7 +393,7 @@ async function getHcps(req, res) {
             total: totalUser,
             start: limit * page + 1,
             end: offset + limit > totalUser ? totalUser : offset + limit,
-            // status: status ? status : null,
+            status: status ? status : null,
             // codbase: codbase ? codbase : null,
             countries: userPermittedCountries
         };
