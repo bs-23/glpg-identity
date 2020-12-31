@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Tabs, Tab } from 'react-bootstrap';
+//import { Tabs, Tab } from 'react-bootstrap';
 import { NavLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { getHcpProfiles } from '../../../information/hcp/client/hcp.actions';
 import { isArray } from "lodash";
 import StatusupdateModal from './statusUpdateModal.component';
+import { Tabs, TabList, Tab, PanelList, Panel } from 'react-tabtab';
+
 
 export default function Inbox(){
   const dispatch = useDispatch();
@@ -26,9 +28,47 @@ export default function Inbox(){
         <i onClick={() => setShow(true)} type="button" class="icon icon-expand cdp-inbox__icon-expand cdp-inbox__icon-toggle d-none d-lg-block"></i>
               <i class="icon icon-minimize cdp-inbox__icon-minimize cdp-inbox__icon-toggle" type="button" onClick={() => setShow(false)}></i>
               <i className="far fa-bell cdp-inbox__icon-bell d-block d-lg-none"></i>
-      </h5>
-      <div>
-        <Tabs defaultActiveKey={selectedTab} className="cdp-inbox__tab px-2" onSelect={(activeKey, e) => setSelectedTab(activeKey)}>
+          </h5>
+          <div className="cdp-inbox__tab">
+              <Tabs showArrowButton={true} showModalButton={false}>
+                  <TabList>
+                      <Tab>HCP Approval</Tab>
+                      <Tab>Consent</Tab>
+                      <Tab>Email Campaign</Tab>
+                      <Tab>Sample Request</Tab>
+                      <Tab>Chatbot</Tab>
+                  </TabList>
+                  <PanelList>
+                      <Panel>
+                          <div className="cdp-inbox__tab-detail">
+                              {hcps.users !== undefined &&
+                                  hcps.users.map((user, key) => <ul key={key} className="cdp-inbox__list p-0 m-0">
+                                      <li className="cdp-inbox__list-item d-flex justify-content-between  align-items-center border-bottom py-3 px-3">
+                                          <span className="cdp-inbox__list-item-col large cdp-text-primary font-weight-bold">{user.email}</span>
+                                          <span className="cdp-inbox__list-item-col cdp-text-primary font-weight-bold px-3">{new Date(user.created_at).toLocaleDateString('en-GB', {
+                                              day: 'numeric', month: 'short', year: 'numeric'
+                                          }).replace(/ /g, ' ')}</span>
+                                          <span className="cdp-inbox__list-item-col">
+                                              <button className="btn cdp-btn-secondary btn-sm text-white" onClick={() => { setShowModal(true) }}>Update Status</button>
+                                          </span>
+                                      </li>
+                                      {showModal && <StatusupdateModal user={user} show={showModal} onHide={() => { setShowModal(false) }} />}
+                                  </ul>
+                                  )
+                              }
+                              {hcps.users !== undefined && hcps.users.length !== 0 ?
+                                  <NavLink to="/in formation/list?page=1&status=not_verified" className="d-inline-block p-3 text-uppercase cdp-text-secondary active small font-weight-bold">More Pending</NavLink>
+                                  : <h5 className="d-block py-5 px-2 text-uppercase cdp-text-secondary active text-center mb-0"><i className="far fa-folder-open mr-2"></i>No Data Found</h5>}
+                          </div>
+                      </Panel>
+                      <Panel><div className="cdp-inbox__tab-detail"><h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary "></i>Coming soon...</h5></div></Panel>
+                      <Panel><div className="cdp-inbox__tab-detail"><h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary "></i>Coming soon...</h5></div></Panel>
+                      <Panel><div className="cdp-inbox__tab-detail"><h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary "></i>Coming soon...</h5></div></Panel>
+                      <Panel><div className="cdp-inbox__tab-detail"><h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary "></i>Coming soon...</h5></div></Panel>
+                  </PanelList>
+              </Tabs>
+
+              {/* <Tabs defaultActiveKey={selectedTab} className="cdp-inbox__tab px-2" onSelect={(activeKey, e) => setSelectedTab(activeKey)}>
           <Tab eventKey="hcpaproval" title="HCP Approval">
             <div className="cdp-inbox__tab-detail">
               {hcps.users !== undefined &&
@@ -63,7 +103,7 @@ export default function Inbox(){
           <Tab eventKey="chatbot" title="Chatbot" disabled>
             <div className="cdp-inbox__tab-detail p-3">Coming soon...</div>
           </Tab>
-        </Tabs>
+        </Tabs> */}
       </div>
     </div>
   );
