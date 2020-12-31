@@ -3,7 +3,6 @@ import { operators } from '../../../../core/client/components/MultiFilter';
 export function getFilterOptions(userCountries) {
     const statusOptions = [
         { value: 'self_verified', displayText: 'Self Verified' },
-        { value: ['self_verified', 'manually_verified'], displayText: 'All Verified' },
         { value: 'manually_verified', displayText: 'Manually Verified' },
         { value: 'consent_pending', displayText: 'Consent Pending' },
         { value: 'not_verified', displayText: 'Not Verified' },

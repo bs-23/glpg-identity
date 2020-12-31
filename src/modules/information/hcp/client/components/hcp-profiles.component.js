@@ -95,6 +95,7 @@ export default function hcpUsers() {
     const [editableTableProps, setEditableTableProps] = useState({});
     const [selectedRow, setSelectedRow] = useState(null);
     const [selectedFilterSetting, setSelectedFilterSetting] = useState(null);
+    const [tempFilterSetting, setTempFilterSetting] = useState(null);
     const [isFilterEnabled, setIsFilterEnabled] = useState(false);
 
     const hcps = useSelector(state => state.hcpReducer.hcps);
@@ -189,6 +190,7 @@ export default function hcpUsers() {
             }
             : null;
 
+        setTempFilterSetting(requestBody);
         // dispatch(getHcpProfiles(searchObj.page, searchObj.status, searchObj.codbase, searchObj.orderBy, searchObj.orderType, requestBody));
         dispatch(getHcpProfiles(location.search, requestBody));
         setSort({ type: params.get('orderType'), value: params.get('orderBy') });
@@ -500,6 +502,7 @@ export default function hcpUsers() {
     ];
 
     const resetFilter = () => {
+        setTempFilterSetting();
         setSelectedFilterSetting();
         setIsFilterEnabled(false);
         hcpFilterRef.current.multiFilterProps.resetFilter();
@@ -543,7 +546,7 @@ export default function hcpUsers() {
                     filters: selectedFilterSetting.settings.filters,
                     logic: selectedFilterSetting.settings.logic
                 }
-                : null
+                : tempFilterSetting
             loadHcpProfiles(filterSetting);
         };
     }, [location]);

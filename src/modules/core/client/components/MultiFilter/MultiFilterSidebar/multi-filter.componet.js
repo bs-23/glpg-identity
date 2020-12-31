@@ -37,11 +37,11 @@ const MultiFilter = (props, ref) => {
             filterSettingName: '',
             selectedSettingID: ''
         });
-    }
+    };
 
     const handleOnClick = (e) => {
         if(e.target === e.currentTarget) if(hideOnClickAway === true) onHide();
-    }
+    };
 
     const handleAddFilterDone = (filters, formikProps, selectedFilter) => {
         const allFiltersMerged = [...formikProps.values.filters, ...filters];
@@ -73,19 +73,19 @@ const MultiFilter = (props, ref) => {
         }
 
         setShow({ ...show, addFilter: false });
-    }
+    };
 
     const getFieldDisplayText = (fieldName) => {
         const filter = options.find(filter => filter.fieldName === fieldName);
         return filter ? filter.displayText : '';
-    }
+    };
 
     const getOperatorDisplayText = (fieldName, operatorName) => {
         const filter = options.find(filter => filter.fieldName === fieldName);
         if(!filter) return '';
         const operator = filter.operators.find(op => op.key === operatorName);
         return operator ? operator.displayText : '';
-    }
+    };
 
     const handleRemoveFilter = (index, props) => {
         const allFilters = props.values.filters;
@@ -96,17 +96,23 @@ const MultiFilter = (props, ref) => {
             });
             props.setFieldValue('filters', allFiltersAfterRemoval);
         }
-    }
+    };
 
     const handleRemoveAll = (props) => {
         props.setFieldValue('filters', []);
         props.setFieldValue('logic', '');
         props.setFieldValue('shouldSaveFilter', false);
-    }
+    };
 
     const handleExecute = (values, actions) => {
         actions.setFieldValue('lastAppliedFilters', values.filters);
         onExecute(values, actions);
+    };
+
+    const getSummaryValueText = (filter) => {
+        const currentFilter = options.find(o => o.fieldName === filter.fieldName);
+        if (!currentFilter || currentFilter.valueType !== 'select') return filter.value;
+        return currentFilter.options.filter(o => filter.value.some(f => f === o.value)).map(f => f.displayText);
     }
 
     useImperativeHandle(ref, () => ({
@@ -180,7 +186,7 @@ const MultiFilter = (props, ref) => {
                                         <FilterSummary
                                             fieldName={getFieldDisplayText(filter.fieldName)}
                                             operatorName={getOperatorDisplayText(filter.fieldName, filter.operator)}
-                                            values={filter.value}
+                                            values={getSummaryValueText(filter)}
                                             index={index}
                                             onRemove={(index) => handleRemoveFilter(index, formikProps)}
                                         />
