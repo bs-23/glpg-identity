@@ -145,7 +145,7 @@ const MultiFilter = (props, ref) => {
                             </div>
                             <div className="bg-light p-3 filter__section">
                                 <div className="mb-3">
-                                    <label className="d-block pt-2 mb-1" for="scope">
+                                    <label className="d-block mb-1" for="scope">
                                         Scope
                                     </label>
                                     <Field
@@ -206,11 +206,11 @@ const MultiFilter = (props, ref) => {
                                         }
                                     </React.Fragment>
                                 }
-                                <div className="d-flex justify-content-between mb-2">
+                                <div className="d-flex justify-content-between py-2 align-items-center">
                                     <span type="button" className="cdp-text-primary" onClick={() => setShow({ ...show, addFilter: true })}>
                                         <i class="fas fa-plus"></i> Add Filter
                                     </span>
-                                    <span onClick={() => handleRemoveAll(formikProps)}>Remove All</span>
+                                    <span className="small" type="button" onClick={() => handleRemoveAll(formikProps)}>Remove All</span>
                                 </div>
                                 {formikProps.values.filters.length > 1 &&
                                     <div className="d-flex flex-column">
