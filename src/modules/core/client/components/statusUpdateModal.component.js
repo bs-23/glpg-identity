@@ -35,9 +35,6 @@ export default function statusupdateModal(props) {
     });
     onHide();
   }
-    // useEffect(() => {
-    //     dispatch(getHcpProfiles('page=1&status=not_verified&limit=5'));
-    // }, []);
 return(
 <Modal
   show={show}
