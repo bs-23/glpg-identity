@@ -42,17 +42,14 @@ export default function reducer(state = initialState, action) {
         }
 
         case Types.PUT_FAQ_ITEM_FULFILLED: {
+            const faqArr = (state.faq_items.faq).filter(item => item.id !== action.payload.data.id);
+            faqArr.unshift(action.payload.data);
             return {
                 ...state,
                 faq_item: action.payload.data,
                 faq_items: {
                     ...state.faq_items,
-                    faq: (state.faq_items.faq).map(item => {
-                        if (item.id === action.payload.data.id) {
-                            return action.payload.data
-                        }
-                        return item
-                    })
+                    faq: faqArr
                 }
             }
         }
