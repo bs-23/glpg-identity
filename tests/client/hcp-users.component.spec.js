@@ -67,7 +67,7 @@ describe('Hcp user component', () => {
         fakeAxios.onGet('/api/hcp-profiles/1/consents').reply(200, []);
         fakeAxios.onPut('/api/hcp-profiles/update-hcps').reply(200, updated_field);
 
-        await store.dispatch(getHcpProfiles(1, status, country_iso2));
+        await store.dispatch(getHcpProfiles());
 
         countries = [ { countryid: 1, country_iso2: "IE", country_iso3: "IRL", codbase: "WUK", countryname: "Ireland"} ]
         fakeAxios.onGet('/api/countries').reply(200, countries);
