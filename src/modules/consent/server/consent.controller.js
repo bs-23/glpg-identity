@@ -894,7 +894,7 @@ async function getConsentCategories(req, res) {
         });
 
         const data = categories.map(c => {
-            const createdBy = `${c.createdByUser.first_name} ${c.createdByUser.last_name}`
+            const createdBy = `${c.createdByUser ? c.createdByUser.first_name : ''} ${c.createdByUser ? c.createdByUser.last_name : ''}`
             delete c.dataValues.createdByUser;
             delete c.dataValues.created_by;
             delete c.dataValues.updated_by;
