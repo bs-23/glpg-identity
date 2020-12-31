@@ -2,9 +2,9 @@ import axios from 'axios';
 import Types from './hcp.types';
 import store from '../../../core/client/store';
 
-export function getHcpProfiles(page = 1, status, codbase, orderBy, orderType, data) {
+export function getHcpProfiles(query = "", data) {
 
-    const url = `/api/hcps?page=${page}` + (status ? `&status=${status}` : '') + (codbase && codbase !== 'null' ? `&codbase=${codbase}` : '') + ((orderBy && orderType && orderBy !== 'null' && orderType !== 'null') ? `&orderBy=${orderBy}&orderType=${orderType}` : '');
+    const url = `/api/hcps${query}`;
 
     return {
         type: Types.GET_HCPS,

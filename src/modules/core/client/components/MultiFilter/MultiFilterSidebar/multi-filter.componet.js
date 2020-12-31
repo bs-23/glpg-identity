@@ -62,10 +62,10 @@ const MultiFilter = (props, ref) => {
 
         formikProps.setFieldValue('filters', allUniqueFilters);
 
-        const logic = filterPresets && filterPresets.length
-            ? filterPresets.find(fp => fp.id === selectedFilter?.id)?.settings.logic
-            : '';
-        formikProps.setFieldValue('logic', logic);
+        // const logic = filterPresets && filterPresets.length
+        //     ? filterPresets.find(fp => fp.id === selectedFilter?.id)?.settings.logic
+        //     : '';
+        // formikProps.setFieldValue('logic', logic);
 
         if(!formikProps.values.selectedSettingID && selectedFilter) {
             formikProps.setFieldValue('selectedSettingID', selectedFilter.id);
@@ -104,13 +104,19 @@ const MultiFilter = (props, ref) => {
         props.setFieldValue('shouldSaveFilter', false);
     }
 
+    const handleExecute = (values, actions) => {
+        actions.setFieldValue('lastAppliedFilters', values.filters);
+        onExecute(values, actions);
+    }
+
     useImperativeHandle(ref, () => ({
-        resetFilter
+        resetFilter,
+        values: formikBag && formikBag.values
     }));
 
     return <Formik
                 innerRef={formikRef}
-                onSubmit={onExecute}
+                onSubmit={handleExecute}
                 initialValues={{
                     scope: '',
                     filters: selectedSetting
@@ -118,10 +124,13 @@ const MultiFilter = (props, ref) => {
                         : [],
                     logic: selectedSetting
                         ? selectedSetting.logic
-                        : [],
+                        : '',
                     shouldSaveFilter: false,
                     filterSettingName: selectedSettingTitle || '',
-                    selectedSettingID: selectedSettingID || ''
+                    selectedSettingID: selectedSettingID || '',
+                    lastAppliedFilters: selectedSetting
+                        ? selectedSetting.filters
+                        : []
                 }}
                 enableReinitialize
             >
@@ -223,6 +232,8 @@ const MultiFilter = (props, ref) => {
                                         <FilterLogic
                                             className="border  border-secondary rounded"
                                             logic={formikProps.values.logic}
+                                            numberOfFilters={formikProps.values.filters.length}
+                                            onLogicChange={(logic) => formikProps.setFieldValue('logic', logic)}
                                         />
                                     </div>
                                 }

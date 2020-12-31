@@ -16,7 +16,6 @@ const CountryConsents = () => {
     const dispatch = useDispatch();
     const { addToast } = useToasts();
 
-    const [] = useState([]);
     const [show, setShow] = useState(false);
     const [editable, setEditable] = useState(false);
     const [editOption, setEditOption] = useState(null);

@@ -125,7 +125,7 @@ async function searchOklaHcps(req, res) {
         const data = {
             totalNumberOfResults: searchResponse.totalNumberOfResults,
             numberOfIndividuals: searchResponse.numberOfIndividuals,
-            resultSize: searchResponse.resultSize,
+            resultSize: limit,
             results
         }
         res.json(data);
@@ -162,8 +162,8 @@ async function searchOklaHcos(req, res) {
             address: 'address.addressLongLabel',
             city: 'address.villageLabel',
             postCode: 'address.longPostalCode',
-            onekeyId: 'activity.activityEid',
-            workplaceEid: 'workplace.workplaceEid',
+            onekeyId: 'workplace.workplaceEid',
+            workplaceEid: 'workplace.externalKeys.value',
             specialties: 'workplace.speciality1'
         };
 
@@ -259,7 +259,7 @@ async function getOklaHcpDetails(req, res) {
 
         const activitiesOfIndividual = searchResponse.results.filter(r => r.individual.individualEid === id);
 
-        const  onekeyEidList = activitiesOfIndividual.map(i => i.onekeyEid);
+        const onekeyEidList = activitiesOfIndividual.map(i => i.onekeyEid);
         const individual = activitiesOfIndividual[0].individual;
         const isInContract = activitiesOfIndividual[0].isInContract;
 
