@@ -21,6 +21,8 @@ const AddFilter = (props) => {
     };
 
     const [filters, setFilters] = useState([emptyFilter]);
+    const [isTouched, setIsTouched] = useState(false);
+
     // const [selectedFilter, setSelectedFilter] = useState([]);
 
     const handleAddMoreFilter = () => {
@@ -33,9 +35,29 @@ const AddFilter = (props) => {
         setFilters([...filters, emptyFilter]);
     }
 
+    const areFiltersValid = () => {
+        let isValid = true;
+        filters.forEach(f => {
+            if(!f.fieldName.length || !f.operator.length || !f.value.length) {
+                isValid = false;
+            }
+        })
+        return isValid;
+    }
+
+    const getFilterValidationError = (filter) => {
+        const validationError = {};
+        if(!filter.fieldName.length) validationError.fieldName = 'Field can not be empty.';
+        if(!filter.operator.length) validationError.operator = 'Field can not be empty.';
+        if(!filter.value.length) validationError.value = 'Field can not be empty.';
+        return validationError;
+    }
+
     const handleDone = (e) => {
         // onDone && onDone(filters, filterPresets.find(fp => fp.id === selectedFilter));
-        onDone && onDone(filters);
+        const isValid = areFiltersValid();
+        if(!isValid) setIsTouched(true);
+        else onDone && onDone(filters);
     }
 
     const handleChange = (propertyName, value, index) => {
@@ -89,6 +111,8 @@ const AddFilter = (props) => {
                         operatorValue={filter.operator}
                         value={filter.value}
                         filterOptions={filterOptions}
+                        isTouched={isTouched}
+                        validationError={getFilterValidationError(filter)}
                         onChange={handleChange}
                         onRemove={handleRemove}
                     />
