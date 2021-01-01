@@ -1782,6 +1782,18 @@ async function getHcpsFromDatasync(req, res) {
         const limit = req.query.limit ? +req.query.limit : 15;
         const offset = page * limit;
 
+
+        let orderBy = req.query.orderBy === 'null'
+            ? null
+            : req.query.orderBy;
+        const orderType = req.query.orderType === 'asc' || req.query.orderType === 'desc'
+            ? req.query.orderType
+            : 'asc';
+
+        const sortableColumns = ['firstname', 'lastname', 'individual_id_onekey', 'uuid_1', 'ind_status_desc', 'country_iso2', 'ind_type_desc'];
+
+        orderBy = sortableColumns.includes(orderBy) ? orderBy : 'firstname,lastname';
+
         const [, userPermittedCountries] = await getUserPermissions(req.user.id);
 
         const getUserPermittedCodbases = async () => {
@@ -1799,7 +1811,7 @@ async function getHcpsFromDatasync(req, res) {
         const hcps = await sequelize.datasyncConnector.query(`
             SELECT * FROM ciam.vwhcpmaster
             WHERE LOWER(codbase) = ANY($codbases)
-            ORDER BY firstname,lastname ASC
+            ORDER BY ${orderBy + ' ' + orderType}
             LIMIT $limit OFFSET $offset`, {
             bind: {
                 codbases: codbases,

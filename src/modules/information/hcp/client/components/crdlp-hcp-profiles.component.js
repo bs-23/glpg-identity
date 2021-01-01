@@ -6,17 +6,6 @@ import { getCrdlpHcpProfiles } from '../hcp.actions';
 import Modal from 'react-bootstrap/Modal';
 import Faq from '../../../../platform/faq/client/faq.component';
 
-const safeGet = (object, property) => {
-    const propData = (object || {})[property];
-    return (prop) => prop ? safeGet(propData, prop) : propData;
-};
-
-const flatten = (array) => {
-    return Array.isArray(array) ? [].concat(...array.map(flatten)) : array;
-}
-
-const union = (a, b) => [...new Set([...a, ...b])];
-
 export default function CrdlpHcpProfiles() {
     const dispatch = useDispatch();
     const location = useLocation();
@@ -175,7 +164,7 @@ export default function CrdlpHcpProfiles() {
                         </div>
 
                         <div>
-                            <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/cdp">CDP</NavLink>
+                            <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/cdp">Customer Data Platform</NavLink>
                             <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/crdlp">CRDLP</NavLink>
                         </div>
 
@@ -185,21 +174,23 @@ export default function CrdlpHcpProfiles() {
                                     <table className="table table-hover table-sm mb-0 cdp-table">
                                         <thead className="cdp-bg-primary text-white cdp-table__header">
                                             <tr>
-                                                <th width="20%"><span className={sort.value === 'first_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'first_name')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th width="20%"><span className={sort.value === 'firstname' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'firstname')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
-                                                <th width="20%"><span className={sort.value === 'last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th width="20%"><span className={sort.value === 'lastname' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'lastname')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
-                                                <th width="15%"><span className="cdp-table__col-sorting">Onekey ID</span></th>
+                                                <th width="13%"><span className={sort.value === 'individual_id_onekey' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'individual_id_onekey')}>Onekey ID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
-                                                <th width="15%"><span className="cdp-table__col-sorting">UUID</span></th>
+                                                <th width="13%"><span className={sort.value === 'uuid_1' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'uuid_1')}>UUID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
-                                                <th width="10%"><span className={sort.value === 'status' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'status')}>Status<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th width="10%">Phone</th>
 
-                                                <th width="10%"><span className="cdp-table__col-sorting">Country</span></th>
+                                                <th width="4%"><span className={sort.value === 'ind_status_desc' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'ind_status_desc')}>Status<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
-                                                <th width="10%"><span className={sort.value === 'last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'last_name')}>Type<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th width="10%"><span className={sort.value === 'country_iso2' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'country_iso2')}>Country<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
-                                                {/* <th width="10%">Action</th> */}
+                                                <th width="10%"><span className={sort.value === 'ind_type_desc' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'ind_type_desc')}>Type<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+
+                                                <th width="10%">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody className="cdp-table__body bg-white">
@@ -209,13 +200,14 @@ export default function CrdlpHcpProfiles() {
                                                     <td className="text-break">{row.lastname}</td>
                                                     <td className="text-break">{row.individual_id_onekey || '--'}</td>
                                                     <td className="text-break">{row.uuid_1 || '--'}</td>
+                                                    <td className="text-break">{row.telephone || '--'}</td>
                                                     <td>{row.ind_status_desc}</td>
                                                     <td>{getCountryName(row.country_iso2)}</td>
                                                     <td>{row.ind_type_desc}</td>
 
-                                                    {/* <td>
-                                                        <NavLink to={`/platform/users/${row.id}`} className="btn cdp-btn-outline-primary btn-sm"><i class="icon icon-user mr-2"></i>Profile</NavLink>
-                                                    </td> */}
+                                                    <td>
+                                                        <button className="btn cdp-btn-outline-primary btn-sm"><i class="icon icon-user mr-2"></i>Profile</button>
+                                                    </td>
                                                 </tr>
                                             ))}
                                         </tbody>
