@@ -13,6 +13,8 @@ const Filter = (props) => {
         operatorValue,
         filterOptions,
         currentNumberOfFilters,
+        isTouched,
+        validationError,
         onChange,
         onRemove
     } = props;
@@ -69,6 +71,7 @@ const Filter = (props) => {
                 <option className="p-2" value=''> Select an Option </option>
                 {filterOptions && filterOptions.map(filter => <option key={filter.fieldName} value={filter.fieldName} >{filter.displayText}</option>)}
             </Field>
+            {isTouched && <div className="invalid-feedback">{validationError.fieldName}</div>}
         </div>
         <div>
             <label className="pt-2 mb-1 small font-weight-bold" for="operator">
@@ -87,33 +90,31 @@ const Filter = (props) => {
                     {filterOptions && filterOptions.find(filter => filter.fieldName === fieldValue)?.operators?.map(item => <option key={item.key} value={item.key} >{item.displayText}</option>)}
                 </>
             </Field>
+            {isTouched && <div className="invalid-feedback">{validationError.operator}</div>}
         </div>
         <div>
             <label className="pt-2 mb-1 small font-weight-bold" for="value">
                 Value
             </label>
-            {/* <Field
-                className="form-control form-control-sm"
-                id="value"
-                name="value"
-                value={value}
-                onChange={(e) => onChange(e, index)}
-            ></Field> */}
+
             {type === 'select' &&
-                <Select
-                    defaultValue={[]}
-                    isMulti={true}
-                    name={fieldValue}
-                    hideSelectedOptions={false}
-                    options={getOptions()}
-                    className="multiselect"
-                    classNamePrefix="multiselect"
-                    value={getSelectedOptions()}
-                    onChange={selectedOption => {
-                        const value = selectedOption.map(o => o.value);
-                        onChange('value', value, index);
-                    }}
-                />
+                <React.Fragment>
+                    <Select
+                        defaultValue={[]}
+                        isMulti={true}
+                        name={fieldValue}
+                        hideSelectedOptions={false}
+                        options={getOptions()}
+                        className="multiselect"
+                        classNamePrefix="multiselect"
+                        value={getSelectedOptions()}
+                        onChange={selectedOption => {
+                            const value = selectedOption.map(o => o.value);
+                            onChange('value', value, index);
+                        }}
+                    />
+                    {isTouched && <div className="invalid-feedback">{validationError.value}</div>}
+                </React.Fragment>
             }
 
             {type === 'text' &&
@@ -125,17 +126,22 @@ const Filter = (props) => {
                         handleAddition={handleAddition}
                         handleInputBlur={handleInputBlur}
                     />
+                    {isTouched && <div className="invalid-feedback">{validationError.value}</div>}
                 </div>
             }
 
             {type !== 'text' && type !== 'select' &&
-                <Input
-                    className="form-control form-control-sm"
-                    id="value"
-                    name="value"
-                    value={value}
-                    type={type}
-                    onChange={(e) => onChange(e.target.name, [...value, e.target.value], index)} />
+                <React.Fragment>
+                    <Input
+                        className="form-control form-control-sm"
+                        id="value"
+                        name="value"
+                        value={value}
+                        type={type}
+                        onChange={(e) => onChange(e.target.name, [...value, e.target.value], index)}
+                    />
+                    {isTouched && <div className="invalid-feedback">{validationError.value}</div>}
+                </React.Fragment>
             }
         </div>
     </div>
