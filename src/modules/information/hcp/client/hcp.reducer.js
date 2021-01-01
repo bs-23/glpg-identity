@@ -2,6 +2,7 @@ import Types from "./hcp.types";
 
 const initialState = {
     hcps: {},
+    crdlpHcps: {},
     specialties: {},
     oklaHcpDetails: null,
     oklaHcoDetails: null
@@ -41,6 +42,13 @@ export default function reducer(state = initialState, action) {
             return {
                 ...state,
                 hcps: action.payload.data.data
+            };
+        }
+
+        case Types.GET_CRDLP_HCPS_FULFILLED: {
+            return {
+                ...state,
+                crdlpHcps: action.payload.data
             };
         }
 

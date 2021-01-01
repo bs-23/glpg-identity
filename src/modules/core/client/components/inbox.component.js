@@ -57,7 +57,7 @@ export default function Inbox(){
                                   )
                               }
                               {hcps.users !== undefined && hcps.users.length !== 0 ?
-                                  <NavLink to="/information/list?page=1&status=not_verified" className="d-inline-block p-3 text-uppercase cdp-text-secondary active small font-weight-bold">More Pending</NavLink>
+                                  <NavLink to="/information/list/cdp?page=1&status=not_verified" className="d-inline-block p-3 text-uppercase cdp-text-secondary active small font-weight-bold">More Pending</NavLink>
                                   : <h5 className="d-block py-5 px-2 text-uppercase cdp-text-secondary active text-center mb-0"><i className="far fa-folder-open mr-2"></i>No Data Found</h5>}
                           </div>
                       </Panel>

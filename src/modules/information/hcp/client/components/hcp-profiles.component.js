@@ -150,7 +150,7 @@ export default function hcpUsers() {
             if(filterID) {
                 try{
                     await axios.put(`/api/filter/${filterID}`, filterSetting);
-                    history.push(`/information/list?filter=${filterID}`);
+                    history.push(`/information/list/cdp?filter=${filterID}`);
                 }catch(err){
                     addToast('There was an error updating the filter setting.', {
                         appearance: 'success',
@@ -160,7 +160,7 @@ export default function hcpUsers() {
             }else {
                 try{
                     const { data } = await axios.post('/api/filter', filterSetting);
-                    history.push(`/information/list?filter=${data.id}`);
+                    history.push(`/information/list/cdp?filter=${data.id}`);
                 }catch(err){
                     addToast('There was an error creating the filter setting.', {
                         appearance: 'success',
@@ -506,7 +506,7 @@ export default function hcpUsers() {
         setSelectedFilterSetting();
         setIsFilterEnabled(false);
         hcpFilterRef.current.multiFilterProps.resetFilter();
-        history.push('/information/list');
+        history.push('/information/list/cdp');
     }
 
     const handleTableDirtyStatusChange = (dirty) => {
@@ -661,6 +661,12 @@ export default function hcpUsers() {
                                 </div>
 
                             </div>
+
+                            <div>
+                                <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/cdp">CDP</NavLink>
+                                <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/crdlp">CRDLP</NavLink>
+                            </div>
+
                             <Modal
                                 size="lg"
                                 show={show.profileManage}

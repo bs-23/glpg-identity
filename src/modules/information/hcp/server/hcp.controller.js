@@ -180,9 +180,6 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
 
     if (status) {
         defaultFilter.status = status;
-        //  === null
-        //         ? { [Op.or]: ['self_verified', 'manually_verified', 'consent_pending', 'not_verified', null] }
-        //         : status,
     }
 
     if (!currentFilterSettings || !currentFilterSettings.filters || currentFilterSettings.filter === 0)
@@ -1778,6 +1775,70 @@ async function getSpecialtiesForCdp(req, res) {
     }
 }
 
+async function getHcpsFromDatasync(req, res) {
+    try {
+        const page = req.query.page ? +req.query.page - 1 : 0;
+        const codbase = req.query.codbase === 'undefined' ? null : req.query.codbase;
+        const limit = req.query.limit ? +req.query.limit : 15;
+        const offset = page * limit;
+
+        const [, userPermittedCountries] = await getUserPermissions(req.user.id);
+
+        const getUserPermittedCodbases = async () => {
+            const allCountries = await sequelize.datasyncConnector.query(
+                `SELECT * FROM ciam.vwcountry`,
+                { type: QueryTypes.SELECT }
+            );
+
+            const userCodBases = allCountries.filter(c => userPermittedCountries.includes(c.country_iso2)).map(c => c.codbase.toLowerCase());
+            return userCodBases;
+        };
+
+        const codbases = codbase ? [codbase.toLowerCase()] : await getUserPermittedCodbases();
+
+        const hcps = await sequelize.datasyncConnector.query(`
+            SELECT * FROM ciam.vwhcpmaster
+            WHERE LOWER(codbase) = ANY($codbases)
+            ORDER BY firstname,lastname ASC
+            LIMIT $limit OFFSET $offset`, {
+            bind: {
+                codbases: codbases,
+                limit: limit,
+                offset: offset
+            },
+            type: QueryTypes.SELECT
+        });
+
+        const countResponse = await sequelize.datasyncConnector.query(`
+            SELECT COUNT(*) FROM ciam.vwhcpmaster
+            WHERE LOWER(codbase) = ANY($codbases)`, {
+            bind: {
+                codbases: codbases
+
+            },
+            type: QueryTypes.SELECT
+        });
+
+        const totalUsers = Number(countResponse[0].count);
+
+        const data = {
+            users: hcps,
+            page: page + 1,
+            limit,
+            total: totalUsers,
+            start: limit * page + 1,
+            end: offset + limit > totalUsers ? totalUsers : offset + limit,
+            countries: userPermittedCountries,
+            codbase: codbase
+        };
+
+        res.json(data);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 exports.getHcps = getHcps;
 exports.editHcp = editHcp;
 exports.registrationLookup = registrationLookup;
@@ -1796,3 +1857,4 @@ exports.updateHcps = updateHcps;
 exports.getSpecialtiesWithEnglishTranslation = getSpecialtiesWithEnglishTranslation;
 exports.updateHCPUserConsents = updateHCPUserConsents;
 exports.getSpecialtiesForCdp = getSpecialtiesForCdp;
+exports.getHcpsFromDatasync = getHcpsFromDatasync;
