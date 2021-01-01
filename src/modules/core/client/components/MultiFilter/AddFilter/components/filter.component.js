@@ -12,6 +12,7 @@ const Filter = (props) => {
         fieldValue,
         operatorValue,
         filterOptions,
+        currentNumberOfFilters,
         onChange,
         onRemove
     } = props;
@@ -50,7 +51,7 @@ const Filter = (props) => {
 
     return <div className="pb-3 mb-3 border-bottom">
         <div className="d-flex justify-content-between">
-            <div className="mr-2 cdp-text-secondary">Filter {index}</div>
+            <div className="mr-2 cdp-text-secondary">Filter {currentNumberOfFilters+index+1}</div>
             <i className="fas fa-times mr-2 text-danger" onClick={() => onRemove(index)} />
         </div>
         <div>

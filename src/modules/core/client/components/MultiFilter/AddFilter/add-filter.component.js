@@ -4,9 +4,24 @@ import { Button } from '../common';
 import { Filter } from './components';
 
 const AddFilter = (props) => {
-    const { onDone, onAddMoreFilter, filters: existingFilters, filterOptions, filterPresets } = props;
-    const [filters, setFilters] = useState([]);
-    const [selectedFilter, setSelectedFilter] = useState([]);
+    const {
+        currentNumberOfFilters,
+        filters: existingFilters,
+        filterOptions,
+        filterPresets,
+        onAddMoreFilter,
+        onDone
+    } = props;
+
+    const emptyFilter = {
+        name: '',
+        fieldName: '',
+        operator: '',
+        value: ''
+    };
+
+    const [filters, setFilters] = useState([emptyFilter]);
+    // const [selectedFilter, setSelectedFilter] = useState([]);
 
     const handleAddMoreFilter = () => {
         const emptyFilter = {
@@ -19,7 +34,8 @@ const AddFilter = (props) => {
     }
 
     const handleDone = (e) => {
-        onDone && onDone(filters, filterPresets.find(fp => fp.id === selectedFilter));
+        // onDone && onDone(filters, filterPresets.find(fp => fp.id === selectedFilter));
+        onDone && onDone(filters);
     }
 
     const handleChange = (propertyName, value, index) => {
@@ -28,12 +44,12 @@ const AddFilter = (props) => {
         setFilters(updatedFilters);
     }
 
-    const handlePresetChange = (e) => {
-        const presetID = e.target.value;
-        const selectedFilters = filterPresets.find(fp => fp.id === presetID).settings.filters || [];
-        setSelectedFilter(presetID);
-        setFilters(selectedFilters);
-    }
+    // const handlePresetChange = (e) => {
+    //     const presetID = e.target.value;
+    //     const selectedFilters = filterPresets.find(fp => fp.id === presetID).settings.filters || [];
+    //     setSelectedFilter(presetID);
+    //     setFilters(selectedFilters);
+    // }
 
     const handleRemove = (index) => {
         console.log(index)
@@ -48,7 +64,7 @@ const AddFilter = (props) => {
     return <div className="filter__sub-panel">
         <div className="bg-light p-2 rounded-top">Add Filter</div>
         <div className="px-3 pb-3">
-            {
+            {/* {
                 filterPresets && filterPresets.length > 0 &&
                 <div className="mb-2">
                     <label className="pt-2 mb-1">Select From Existing Filters</label>
@@ -61,13 +77,14 @@ const AddFilter = (props) => {
                         }
                     </select>
                 </div>
-            }
+            } */}
             {
                 filters && filters.map((filter, index) =>
                     <Filter
                         key={filter.name}
                         name={filter.name}
                         index={index}
+                        currentNumberOfFilters={currentNumberOfFilters}
                         fieldValue={filter.fieldName}
                         operatorValue={filter.operator}
                         value={filter.value}
