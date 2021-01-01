@@ -14,7 +14,7 @@ import { useToasts } from 'react-toast-notifications';
 import Faq from '../../../../platform/faq/client/faq.component';
 import Modal from 'react-bootstrap/Modal';
 
-const SearchProfessionalHcp = (properties) => {
+const SearchProfessionalHcp = (props) => {
     const formikRef = useRef();
     const location = useLocation();
     const { addToast } = useToasts();
@@ -42,9 +42,9 @@ const SearchProfessionalHcp = (properties) => {
     const [isAssigned, setIsAssigned] = useState(false);
     const [hcpSpecialty, setHcpSpecialty] = useState();
 
-    const params = new URLSearchParams(properties.location.search);
+    const params = new URLSearchParams(props.location.search);
 
-    const resetSearch = (props) => {
+    const resetSearch = (properties) => {
         setFormData({});
         setCurrentPage(1);
         setSelectedCountries([]);
@@ -53,7 +53,7 @@ const SearchProfessionalHcp = (properties) => {
         setDuplicates(false);
         setPhonetic(false);
         setUsers({});
-        props.resetForm();
+        properties.resetForm();
         setIsAssigned(false);
         setHcpProfile(null);
         setHcpSpecialty(null);
