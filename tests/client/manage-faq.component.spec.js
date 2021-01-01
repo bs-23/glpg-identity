@@ -101,11 +101,27 @@ describe("Manage Faq component", () => {
             },
         };
 
+        const faq = {
+            id: "1",
+            question: "a",
+            answer: "a",
+            topics: ["general-information"],
+            created_by: "1",
+            updated_by: "1",
+            updated_at: "2021-01-01T11:22:27.723Z",
+            created_at: "2021-01-01T11:22:27.723Z",
+            createdBy: "System Admin",
+            updatedBy:"System Admin"
+        }
+
         fakeAxios.onGet("/api/faq").reply(200, faqs);
         fakeAxios.onGet("/api/faq/category").reply(200, faqCategories);
         fakeAxios
             .onGet("/api/faq?page=1&topic=general-information")
             .reply(200, filteredFaqs);
+
+        fakeAxios.onPost('/api/faq').reply(200, faq);
+
     });
 
     const userSlice = () => store.getState().userReducer;
@@ -175,5 +191,33 @@ describe("Manage Faq component", () => {
         );
 
         expect(filtered_faq).toBeTruthy();
+    });
+
+
+    it("should interact with add faq button", async () => {
+        const { debug, getByTestId, container, getByText, getAllByText } = render(
+            wrapperComponent()
+        );
+
+        const add_faq_button = await waitFor(() =>
+            getByText("Add New FAQ")
+        );
+
+        fireEvent.click(add_faq_button);
+        expect(screen.getByText('Select Topics')).toBeTruthy();
+        expect(screen.getAllByText('Answer')[1]).toBeTruthy();
+        expect(screen.getAllByText('Question')[1]).toBeTruthy();
+
+        const question = screen.getByRole('textbox', { name: 'Question *' });
+        const answer = screen.getByRole('textbox', { name: 'rdw-editor' });
+        const topic = screen.getByRole('checkbox', { name: 'General Information' })
+        const btn = screen.getByText('Submit');
+
+        await waitFor(() => { fireEvent.change(question, { target: { value: 'a' } }) });
+        fireEvent.click(topic);
+
+        await waitFor(() => {
+            fireEvent.click(topic);
+        });
     });
 });
