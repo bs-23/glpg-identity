@@ -146,13 +146,13 @@ export default function CrdlpHcpProfiles() {
 
                                                 <th width="13%"><span className={sort.value === 'uuid_1' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'uuid_1')}>UUID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
+                                                <th width="10%">Specialty</th>
+
                                                 <th width="10%">Phone</th>
 
                                                 <th width="4%"><span className={sort.value === 'ind_status_desc' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'ind_status_desc')}>Status<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
                                                 <th width="10%"><span className={sort.value === 'country_iso2' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'country_iso2')}>Country<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-
-                                                <th width="10%"><span className={sort.value === 'ind_type_desc' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'ind_type_desc')}>Type<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
                                                 <th width="10%">Action</th>
                                             </tr>
@@ -164,10 +164,10 @@ export default function CrdlpHcpProfiles() {
                                                     <td className="text-break">{row.lastname}</td>
                                                     <td className="text-break">{row.individual_id_onekey || '--'}</td>
                                                     <td className="text-break">{row.uuid_1 || '--'}</td>
+                                                    <td>{row.specialty}</td>
                                                     <td className="text-break">{row.telephone || '--'}</td>
                                                     <td>{row.ind_status_desc}</td>
                                                     <td>{getCountryName(row.country_iso2)}</td>
-                                                    <td>{row.ind_type_desc}</td>
 
                                                     <td>
                                                         <button className="btn cdp-btn-outline-primary btn-sm"><i class="icon icon-user mr-2"></i>Profile</button>
