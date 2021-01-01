@@ -36,4 +36,60 @@
         overflow-y: auto;
         margin-top: -100px;
     }
+
+    .ReactTags {
+        &__tags {
+        }
+
+        &__selected {
+        }
+
+        &__tag {
+            padding: 0px 5px;
+            background-color: #FDEFE0;
+            color: $primary-color;
+            font-size: 14px;
+            border-radius: 5px;
+            display: inline-flex;
+            align-items: center;
+            margin: 0px 5px 5px 0px;
+        }
+
+        &__remove {
+            border: none !important;
+            background: no-repeat;
+            color: $primary-color;
+            font-size: 16px;
+            padding-right: 0px;
+            line-height: normal;
+
+            &:hover {
+                font-weight: bold;
+            }
+        }
+
+        &__tagInputField {
+            display: block;
+            width: 100%;
+            font-weight: 400;
+            color: #495057;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #ced4da;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            height: calc(1.5em + 0.5rem + 2px);
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            border-radius: 0.2rem;
+
+            &:focus {
+                color: #495057;
+                background-color: #fff;
+                border-color: #80bdff;
+                outline: 0;
+                box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            }
+        }
+    }
 }

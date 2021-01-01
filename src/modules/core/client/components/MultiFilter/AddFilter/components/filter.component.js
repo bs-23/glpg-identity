@@ -54,7 +54,7 @@ const Filter = (props) => {
             <i className="fas fa-times mr-2 text-danger" onClick={() => onRemove(index)} />
         </div>
         <div>
-            <label className="pt-2 mb-1" for="field">
+            <label className="pt-2 mb-1 small font-weight-bold" for="field">
                 Field
             </label>
             <Field
@@ -70,7 +70,7 @@ const Filter = (props) => {
             </Field>
         </div>
         <div>
-            <label className="pt-2 mb-1" for="operator">
+            <label className="pt-2 mb-1 small font-weight-bold" for="operator">
                 Operator
             </label>
             <Field
@@ -88,7 +88,7 @@ const Filter = (props) => {
             </Field>
         </div>
         <div>
-            <label className="pt-2 mb-1" for="value">
+            <label className="pt-2 mb-1 small font-weight-bold" for="value">
                 Value
             </label>
             {/* <Field
