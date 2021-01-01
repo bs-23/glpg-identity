@@ -95,7 +95,6 @@ export default function hcpUsers() {
     const [editableTableProps, setEditableTableProps] = useState({});
     const [selectedRow, setSelectedRow] = useState(null);
     const [selectedFilterSetting, setSelectedFilterSetting] = useState(null);
-    const [tempFilterSetting, setTempFilterSetting] = useState(null);
     const [isFilterEnabled, setIsFilterEnabled] = useState(false);
 
     const hcps = useSelector(state => state.hcpReducer.hcps);
@@ -123,7 +122,7 @@ export default function hcpUsers() {
             appearance: 'success',
             autoDismiss: true
         })
-        loadHcpProfiles()
+        loadHcpProfiles();
     }
 
     const onUpdateStatusFailure = (error) => {
@@ -150,7 +149,7 @@ export default function hcpUsers() {
             if(filterID) {
                 try{
                     await axios.put(`/api/filter/${filterID}`, filterSetting);
-                    history.push(`/information/list?filter=${filterID}`);
+                    history.push(`/information/list/cdp?filter=${filterID}`);
                 }catch(err){
                     addToast('There was an error updating the filter setting.', {
                         appearance: 'success',
@@ -160,7 +159,7 @@ export default function hcpUsers() {
             }else {
                 try{
                     const { data } = await axios.post('/api/filter', filterSetting);
-                    history.push(`/information/list?filter=${data.id}`);
+                    history.push(`/information/list/cdp?filter=${data.id}`);
                 }catch(err){
                     addToast('There was an error creating the filter setting.', {
                         appearance: 'success',
@@ -171,8 +170,8 @@ export default function hcpUsers() {
         }
         else {
             const { settings } = filterSetting;
-            if(multiFilterSetting.selectedSettingID) history.push(`/information/list?filter=${multiFilterSetting.selectedSettingID}`)
-            else history.push(`/information/list`);
+            if(multiFilterSetting.selectedSettingID) history.push(`/information/list/cdp?filter=${multiFilterSetting.selectedSettingID}`)
+            else history.push(`/information/list/cdp`);
         };
         setIsFilterEnabled(true);
     }
@@ -191,8 +190,6 @@ export default function hcpUsers() {
             }
             : null;
 
-        setTempFilterSetting(requestBody);
-        // dispatch(getHcpProfiles(searchObj.page, searchObj.status, searchObj.codbase, searchObj.orderBy, searchObj.orderType, requestBody));
         dispatch(getHcpProfiles(location.search, requestBody));
         setSort({ type: params.get('orderType'), value: params.get('orderBy') });
     };
@@ -234,13 +231,51 @@ export default function hcpUsers() {
         return country && country.countryname;
     }
 
-    const getUuidAuthorities = (codbase) => {
-        if (codbase) {
-            const authorityByCountry = uuidAuthorities.filter(a => a.codbase.toLowerCase() === codbase.toLowerCase());
-            return authorityByCountry;
+    const renderUuidAuthorities = () => {
+        const authorityDropdown = (authorities) => {
+            return (<Dropdown>
+                <Dropdown.Toggle variant="" id="dropdown-basic" className="cdp-btn-outline-primary px-sm-3 px-2">
+                    UUID Authorities
+                </Dropdown.Toggle>
+                <Dropdown.Menu className="dropdown-menu__no-hover py-0">
+                    {
+                        authorities.map(authority =>
+                        (
+                            <Dropdown.Item
+                                key={authority.link} className="border-bottom py-2 px-3"
+                                onClick={() => openAuthorityLink(authority.link)}
+                                role="button"
+                            >
+                                <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height={authority.height} />
+                            </Dropdown.Item>
+                        )
+                        )
+                    }
+                </Dropdown.Menu>
+            </Dropdown>);
+        };
+
+        const { lastAppliedFilters } = isFilterEnabled ? hcpFilterRef.current.multiFilterProps.values || {} : {};
+
+        const countryFilter = (lastAppliedFilters || []).find(f => f.fieldName === 'country');
+
+        if (countryFilter) {
+            const authorityByCountry = uuidAuthorities.filter(a => countryFilter.value.some(v => a.codbase.toLowerCase() === v.toLowerCase()));
+
+            if (countryFilter.value.length > 1) {
+                return authorityDropdown(authorityByCountry);
+            }
+
+            return authorityByCountry.map(authority =>
+            (
+                <a key={authority.link} className="mr-3" role="button" onClick={() => openAuthorityLink(authority.link)}>
+                    <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height={authority.heightSingle} />
+                </a>
+            )
+            );
         }
 
-        return uuidAuthorities;
+        return authorityDropdown(uuidAuthorities);
     };
 
     const urlChange = (pageNo, codBase, status, orderColumn, pageChange = false) => {
@@ -503,11 +538,10 @@ export default function hcpUsers() {
     ];
 
     const resetFilter = () => {
-        setTempFilterSetting();
         setSelectedFilterSetting();
         setIsFilterEnabled(false);
         hcpFilterRef.current.multiFilterProps.resetFilter();
-        history.push('/information/list');
+        history.push('/information/list/cdp');
     }
 
     const handleTableDirtyStatusChange = (dirty) => {
@@ -578,91 +612,29 @@ export default function hcpUsers() {
                 <div className="row">
                     <div className="col-12">
                         <div>
-                            <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
-                                <div className="d-flex align-items-center justify-content-between">
-                                    <h4 className="cdp-text-primary font-weight-bold mb-0 mr-sm-4 mr-1">List of HCP User</h4>
-                                    <div className="">
-                                        <div>
-                                            {hcps.codbase ?
-                                                getUuidAuthorities(hcps.codbase).map(authority =>
-                                                (
-                                                    <a key={authority.link} className="mr-3" role="button" onClick={() => openAuthorityLink(authority.link)}>
-                                                        <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height={authority.heightSingle} />
-                                                    </a>
-                                                )
-                                                )
-                                                :
-                                                <Dropdown>
-                                                    <Dropdown.Toggle variant="" id="dropdown-basic" className="cdp-btn-outline-primary px-sm-3 px-2">
-                                                        UUID Authorities
-                                                    </Dropdown.Toggle>
-                                                    <Dropdown.Menu className="dropdown-menu__no-hover py-0">
-                                                        {
-                                                            getUuidAuthorities().map(authority =>
-                                                            (
-                                                                <Dropdown.Item
-                                                                    key={authority.link} className="border-bottom py-2 px-3"
-                                                                    onClick={() => openAuthorityLink(authority.link)}
-                                                                    role="button"
-                                                                >
-                                                                    <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height={authority.height} />
-                                                                </Dropdown.Item>
-                                                            )
-                                                            )
-                                                        }
-                                                    </Dropdown.Menu>
-                                                </Dropdown>
-                                            }
-                                        </div>
+                            <div className="d-sm-flex justify-content-between align-items-end mt-4">
+                                <div>
+                                    <h4 className="cdp-text-primary font-weight-bold mb-0 mr-sm-4 mr-1 d-flex pb-2">
+                                        List of HCP User
+                                    </h4>
+                                    <div>
+                                        <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/cdp">Customer Data Platform</NavLink>
+                                        <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/crdlp">CRDLP</NavLink>
                                     </div>
                                 </div>
-                                <div className="d-flex pt-3 pt-sm-0">
-                                    {countries && hcps['countries'] &&
-                                        <React.Fragment>
-                                            <button className={`btn cdp-btn-outline-primary mr-3 ${isFilterEnabled ? 'multifilter_enabled' : '' }`} onClick={() => setShow({ ...show, filterSidebar: true })} ><i class="fas fa-filter mr-2"></i> Filter</button>
-                                            {/* {isFilterEnabled && <button className="btn cdp-btn-outline-primary mr-3" onClick={resetFilter} ><i class="fas fa-filter mr-2"></i> Reset Filter </button>} */}
-                                            <div title={tableDirty ? "Save or reset changes to use filter options" : null}>
-                                                <Dropdown className={`ml-auto dropdown-customize mr-2 ${tableDirty ? 'hcp-inline-disable' : ''}`}>
-                                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center">
-                                                        <i className="icon icon-filter mr-2 mb-n1"></i> {hcps.codbase && (countries.find(i => i.codbase === hcps.codbase)) ? (countries.find(i => i.codbase === hcps.codbase)).codbase_desc : 'Filter by Country'}
-                                                    </Dropdown.Toggle>
-                                                    <Dropdown.Menu>
-                                                        <Dropdown.Item className={hcps.codbase === null ? 'd-none' : ''} onClick={() => urlChange(1, 'null', hcps.status, params.get('orderBy'), params.get('orderType'))}>All</Dropdown.Item>
-                                                        {
-                                                            countries.map((item, index) => (
-                                                                hcps.countries.includes(item.country_iso2) &&
-                                                                <Dropdown.Item key={index} className={hcps.countries.includes(item.country_iso2) && hcps.codbase === item.codbase ? 'd-none' : ''} onClick={() => urlChange(1, item.codbase, hcps.status, params.get('orderBy'), params.get('orderType'))}>
-                                                                    {
-                                                                        hcps.countries.includes(item.country_iso2) ? item.codbase_desc : null
-                                                                    }
-                                                                </Dropdown.Item>
-                                                            ))
-
-                                                        }
-                                                    </Dropdown.Menu>
-                                                </Dropdown>
-                                            </div>
-                                            <div title={tableDirty ? "Save or reset changes to use filter options" : null}>
-                                                <Dropdown className={`d-flex align-items-center show dropdown rounded pl-2 pr-1 dropdown cdp-bg-secondary text-white dropdown shadow-sm ${tableDirty ? 'hcp-inline-disable' : ''}`}>
-                                                    Status
-                                                    <Dropdown.Toggle variant="" className="ml-2 cdp-bg-secondary rounded-0 border-left text-white">
-                                                        {getSelectedStatus()}
-                                                    </Dropdown.Toggle>
-                                                    <Dropdown.Menu>
-                                                        <Dropdown.Item className={hcps.status === null ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, null, params.get('orderBy'), params.get('orderType'))}>All</Dropdown.Item>
-                                                        <Dropdown.Item className={isAllVerifiedStatus() ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, 'self_verified,manually_verified', params.get('orderBy'), params.get('orderType'))}>All Verified</Dropdown.Item>
-                                                        <Dropdown.Item className={hcps.status === 'self_verified' ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, 'self_verified', params.get('orderBy'), params.get('orderType'))}>Self Verified</Dropdown.Item>
-                                                        <Dropdown.Item className={hcps.status === 'manually_verified' ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, 'manually_verified', params.get('orderBy'), params.get('orderType'))}>Manually Verified</Dropdown.Item>
-                                                        <Dropdown.Item className={hcps.status === 'consent_pending' ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, 'consent_pending', params.get('orderBy'), params.get('orderType'))}>Consent Pending</Dropdown.Item>
-                                                        <Dropdown.Item className={hcps.status === 'not_verified' ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, 'not_verified', params.get('orderBy'), params.get('orderType'))}>Not Verified</Dropdown.Item>
-                                                    </Dropdown.Menu>
-                                                </Dropdown>
-                                            </div>
-                                        </React.Fragment>
-                                    }
+                                <div className="d-flex pt-3 pt-sm-0 mb-2">
+                                    <div className="mr-2">
+                                        <div>
+                                            {renderUuidAuthorities()}
+                                        </div>
+                                    </div>
+                                    <React.Fragment>
+                                        <button className={`btn cdp-btn-outline-primary mr-2 ${isFilterEnabled ? 'multifilter_enabled' : ''}`} onClick={() => setShow({ ...show, filterSidebar: true })} ><i class="fas fa-filter mr-2"></i> Filter</button>
+                                        {/* {isFilterEnabled && <button className="btn cdp-btn-outline-primary mr-3" onClick={resetFilter} ><i class="fas fa-filter mr-2"></i> Reset Filter </button>} */}
+                                    </React.Fragment>
                                 </div>
-
                             </div>
+
                             <Modal
                                 size="lg"
                                 show={show.profileManage}

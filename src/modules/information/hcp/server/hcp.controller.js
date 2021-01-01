@@ -180,9 +180,6 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
 
     if (status) {
         defaultFilter.status = status;
-        //  === null
-        //         ? { [Op.or]: ['self_verified', 'manually_verified', 'consent_pending', 'not_verified', null] }
-        //         : status,
     }
 
     if (!currentFilterSettings || !currentFilterSettings.filters || currentFilterSettings.filter === 0)
@@ -195,13 +192,11 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
     //     return defaultFilter;
     // }
 
-    console.log('Default filter: ', defaultFilter);
     let customFilter = { ...defaultFilter };
 
     const nodes = currentFilterSettings.logic && currentFilterSettings.filters.length > 1
         ? currentFilterSettings.logic.split(" ")
         : ['1'];
-    console.log('Logic nodes: ', nodes.join());
 
     let prevOperator;
     const groupedQueries = [];
@@ -264,8 +259,6 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
         prevOperator = node === "and" || node === "or" ? node : prevOperator;
     }
 
-    console.log('Grouped queries: ', groupedQueries.map((a) => JSON.stringify(a)));
-
     if (groupedQueries.length > 1) {
         customFilter[Op.or] = groupedQueries.map(q => {
             if (q.operator === 'and') {
@@ -281,7 +274,6 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
             customFilter = { ...customFilter, ...query };
         }
     }
-    console.log('Custom filter: ', customFilter);
 
     return customFilter;
 }
@@ -1778,6 +1770,82 @@ async function getSpecialtiesForCdp(req, res) {
     }
 }
 
+async function getHcpsFromDatasync(req, res) {
+    try {
+        const page = req.query.page ? +req.query.page - 1 : 0;
+        const codbase = req.query.codbase === 'undefined' ? null : req.query.codbase;
+        const limit = req.query.limit ? +req.query.limit : 15;
+        const offset = page * limit;
+
+
+        let orderBy = req.query.orderBy === 'null'
+            ? null
+            : req.query.orderBy;
+        const orderType = req.query.orderType === 'asc' || req.query.orderType === 'desc'
+            ? req.query.orderType
+            : 'asc';
+
+        const sortableColumns = ['firstname', 'lastname', 'individual_id_onekey', 'uuid_1', 'ind_status_desc', 'country_iso2', 'ind_type_desc'];
+
+        orderBy = sortableColumns.includes(orderBy) ? orderBy : 'firstname,lastname';
+
+        const [, userPermittedCountries] = await getUserPermissions(req.user.id);
+
+        const getUserPermittedCodbases = async () => {
+            const allCountries = await sequelize.datasyncConnector.query(
+                `SELECT * FROM ciam.vwcountry`,
+                { type: QueryTypes.SELECT }
+            );
+
+            const userCodBases = allCountries.filter(c => userPermittedCountries.includes(c.country_iso2)).map(c => c.codbase.toLowerCase());
+            return userCodBases;
+        };
+
+        const codbases = codbase ? [codbase.toLowerCase()] : await getUserPermittedCodbases();
+
+        const hcps = await sequelize.datasyncConnector.query(`
+            SELECT * FROM ciam.vwhcpmaster
+            WHERE LOWER(codbase) = ANY($codbases)
+            ORDER BY ${orderBy + ' ' + orderType}
+            LIMIT $limit OFFSET $offset`, {
+            bind: {
+                codbases: codbases,
+                limit: limit,
+                offset: offset
+            },
+            type: QueryTypes.SELECT
+        });
+
+        const countResponse = await sequelize.datasyncConnector.query(`
+            SELECT COUNT(*) FROM ciam.vwhcpmaster
+            WHERE LOWER(codbase) = ANY($codbases)`, {
+            bind: {
+                codbases: codbases
+
+            },
+            type: QueryTypes.SELECT
+        });
+
+        const totalUsers = Number(countResponse[0].count);
+
+        const data = {
+            users: hcps,
+            page: page + 1,
+            limit,
+            total: totalUsers,
+            start: limit * page + 1,
+            end: offset + limit > totalUsers ? totalUsers : offset + limit,
+            countries: userPermittedCountries,
+            codbase: codbase
+        };
+
+        res.json(data);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 exports.getHcps = getHcps;
 exports.editHcp = editHcp;
 exports.registrationLookup = registrationLookup;
@@ -1796,3 +1864,4 @@ exports.updateHcps = updateHcps;
 exports.getSpecialtiesWithEnglishTranslation = getSpecialtiesWithEnglishTranslation;
 exports.updateHCPUserConsents = updateHCPUserConsents;
 exports.getSpecialtiesForCdp = getSpecialtiesForCdp;
+exports.getHcpsFromDatasync = getHcpsFromDatasync;

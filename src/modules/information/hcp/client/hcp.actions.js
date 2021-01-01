@@ -16,6 +16,18 @@ export function getHcpProfiles(query = "", data) {
     };
 }
 
+export function getCrdlpHcpProfiles(query = "") {
+    const url = `/api/datasync/hcps${query}`;
+
+    return {
+        type: Types.GET_CRDLP_HCPS,
+        payload: axios({
+            method: 'get',
+            url
+        })
+    };
+}
+
 // export function editHcpProfiles(data, id) {
 //     return {
 //         type: Types.EDIT_HCPS,

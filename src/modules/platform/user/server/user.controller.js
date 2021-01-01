@@ -602,11 +602,7 @@ async function getUsers(req, res) {
         });
 
         const data = {
-            users: userViewModels.map(u => ({
-                first_name: u.first_name,
-                latst_name: u.last_name,
-                email: u.email
-            })),
+            users: userViewModels,
             page: page + 1,
             limit: limit,
             total: totalUser,
