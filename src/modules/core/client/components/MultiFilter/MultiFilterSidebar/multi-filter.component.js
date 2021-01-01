@@ -190,35 +190,7 @@ const MultiFilter = (props, ref) => {
                                         />
                                     </div>
                                 )}
-                                {formikProps.values.filters.length > 0 &&
-                                    <React.Fragment>
-                                        <label className="d-flex  align-items-center">
-                                            <span className="switch-label text-left pr-3">Save Filter</span>
-                                            <span className="switch">
-                                                <input
-                                                    className="custom-control-input"
-                                                    type="checkbox"
-                                                    name="shouldSaveFilter"
-                                                    checked={formikProps.values.shouldSaveFilter}
-                                                    value={formikProps.values.shouldSaveFilter}
-                                                    onChange={(e) => formikProps.handleChange(e)}
-                                                />
-                                                <span className="slider round"></span>
-                                            </span>
-                                        </label>
-                                        {formikProps.values.shouldSaveFilter &&
-                                            <div className="">
-                                                <label className="pt-2 mb-1">
-                                                    Filter Setting Name
-                                                </label>
-                                                <Field
-                                                    className="form-control form-control-sm"
-                                                    name="filterSettingName"
-                                                />
-                                            </div>
-                                        }
-                                    </React.Fragment>
-                                }
+                               
                                 <div className="d-flex justify-content-between py-2 align-items-center">
                                     <span type="button" className="cdp-text-primary" onClick={() => setShow({ ...show, addFilter: true })}>
                                         <i class="fas fa-plus"></i> Add Filter
@@ -233,14 +205,40 @@ const MultiFilter = (props, ref) => {
                                             </span>
                                         </div>
                                         <FilterLogic
-                                            className="border  border-secondary rounded"
+                                            className=""
                                             logic={formikProps.values.logic}
                                             numberOfFilters={formikProps.values.filters.length}
                                             onLogicChange={(logic) => formikProps.setFieldValue('logic', logic)}
                                         />
                                     </div>
+                                 }
+                        {formikProps.values.filters.length > 0 &&
+                            <React.Fragment>
+                                <label className="d-flex  align-items-center border-top mt-3 pt-2">
+                                    <span className="switch-label text-left pr-3">Save Filter</span>
+                                    <span className="switch">
+                                        <input
+                                            className="custom-control-input"
+                                            type="checkbox"
+                                            name="shouldSaveFilter"
+                                            checked={formikProps.values.shouldSaveFilter}
+                                            value={formikProps.values.shouldSaveFilter}
+                                            onChange={(e) => formikProps.handleChange(e)}
+                                        />
+                                        <span className="slider round"></span>
+                                    </span>
+                                </label>
+                                {formikProps.values.shouldSaveFilter &&
+                                    <div className="">
+                                        <Field
+                                            className="form-control form-control-sm"
+                                    name="filterSettingName"
+                                    placeholder="Add filter setting name"
+                                        />
+                                    </div>
+                                }
+                            </React.Fragment>
                         }
-
                         {show.addFilter &&
                             <AddFilter
                                 filterPresets={filterPresets}
@@ -251,7 +249,7 @@ const MultiFilter = (props, ref) => {
                         }
                             </div>
 
-                            <div className="p-3 d-flex filter__btn-section">
+                            <div className="p-3 d-flex filter__section-btn">
                                 <Button
                                     className="btn cdp-btn-secondary mr-1 btn-block text-white"
                                     label="Execute"
