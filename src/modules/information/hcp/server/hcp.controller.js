@@ -1785,7 +1785,7 @@ async function getHcpsFromDatasync(req, res) {
             ? req.query.orderType
             : 'asc';
 
-        const sortableColumns = ['firstname', 'lastname', 'individual_id_onekey', 'uuid_1', 'ind_status_desc', 'country_iso2', 'ind_type_desc'];
+        const sortableColumns = ['firstname', 'lastname', 'individual_id_onekey', 'uuid_1', 'ind_status_desc', 'country_iso2'];
 
         orderBy = sortableColumns.includes(orderBy) ? orderBy : 'firstname,lastname';
 
@@ -1816,6 +1816,7 @@ async function getHcpsFromDatasync(req, res) {
             type: QueryTypes.SELECT
         });
 
+
         const countResponse = await sequelize.datasyncConnector.query(`
             SELECT COUNT(*) FROM ciam.vwhcpmaster
             WHERE LOWER(codbase) = ANY($codbases)`, {
@@ -1825,8 +1826,28 @@ async function getHcpsFromDatasync(req, res) {
             },
             type: QueryTypes.SELECT
         });
-
         const totalUsers = Number(countResponse[0].count);
+
+        const individualIdOnekeyList = hcps.map(h => h.individual_id_onekey);
+        const hcpSpecialties = await sequelize.datasyncConnector.query(`
+            SELECT h.*, s.cod_description, s.cod_locale
+            FROM ciam.vwmaphcpspecialty AS h
+            INNER JOIN ciam.vwspecialtymaster AS s
+            ON (h.specialty_code = s.cod_id_onekey)
+            WHERE individual_id_onekey = ANY($individualIdOnekeyList) AND cod_locale='en'`, {
+            bind: {
+                individualIdOnekeyList: individualIdOnekeyList,
+            },
+            type: QueryTypes.SELECT
+        });
+
+        if (hcpSpecialties) {
+            hcps.forEach(hcp => {
+                const specialty = hcpSpecialties.find(s => s.individual_id_onekey === hcp.individual_id_onekey);
+                hcp.specialty = (specialty || {}).cod_description;
+                hcp.specialty_code = (specialty || {}).specialty_code;
+            });
+        }
 
         const data = {
             users: hcps,
