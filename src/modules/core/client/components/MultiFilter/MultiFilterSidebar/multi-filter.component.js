@@ -17,6 +17,7 @@ const MultiFilter = (props, ref) => {
         selectedSetting,
         selectedSettingTitle,
         selectedSettingID,
+        scopeOptions,
         onFilterSelect
     } = props;
 
@@ -164,7 +165,7 @@ const MultiFilter = (props, ref) => {
                         <div className="filter__panel">
                             <h3 className="px-3 pt-3 cdp-text-primary filter__header">Filters</h3>
                             <div className="bg-light p-3 filter__section">
-                                <div className="mb-3">
+                                {scopeOptions && <div className="mb-3">
                                     <label className="d-block mb-1" for="scope">
                                         Scope
                                     </label>
@@ -177,15 +178,7 @@ const MultiFilter = (props, ref) => {
                                     >
                                         <option className="p-2" value=''> Select an Option </option>
                                     </Field>
-                                </div>
-                                {formikProps.values.filterSettingName &&
-                                    <div className="cdp-text-secondary font-weight-bold mb-3">
-                                        Selected Filter: {formikProps.values.filterSettingName}
-                                        {selectedSetting && !_.isEqual(selectedSetting.filters, formikProps.values.filters) &&
-                                            <span className="invalid-feedback">Unsaved</span>
-                                        }
-                                    </div>
-                                }
+                                </div>}
                                 {formikProps.values.filters.map((filter, index) =>
                                     <div className="mb-3" key={filter.name}>
                                         <FilterSummary
@@ -238,7 +231,6 @@ const MultiFilter = (props, ref) => {
                                             <span type="button" className="cdp-text-primary mb-2" onClick={() => null}>
                                                 Add Filter Logic
                                             </span>
-                                            <span onClick={() => null}>Clear</span>
                                         </div>
                                         <FilterLogic
                                             className="border  border-secondary rounded"
@@ -258,7 +250,7 @@ const MultiFilter = (props, ref) => {
                             />
                         }
                             </div>
-                           
+
                             <div className="p-3 d-flex filter__btn-section">
                                 <Button
                                     className="btn cdp-btn-secondary mr-1 btn-block text-white"

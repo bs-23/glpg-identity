@@ -64,7 +64,7 @@ const FilterLogic = (props) => {
     return <div style={style} className={className ? className : "border border-secondary"}>
         {Array(numberOfFilters || 0).fill(0).map((e, ind) => {
             return <React.Fragment key={ind}>
-                <span className="mx-1">Filter {ind}</span>
+                <span className="mx-1">Filter {ind+1}</span>
                 {ind < numberOfFilters-1 &&
                     <select className="mx-1" name={ind} value={logicNodes[ind]} onChange={handleLogicChange}>
                         <option value='and'>AND</option>
