@@ -578,18 +578,27 @@ export default function hcpUsers() {
                 <div className="row">
                     <div className="col-12">
                         <div>
-                            <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
-                                <div className="d-flex align-items-center justify-content-between">
-                                    <h4 className="cdp-text-primary font-weight-bold mb-0 mr-sm-4 mr-1">List of HCP User</h4>
-                                    <div className="">
+                            <div className="d-sm-flex justify-content-between align-items-end mt-4">
+                                <div>
+                                    <h4 className="cdp-text-primary font-weight-bold mb-0 mr-sm-4 mr-1 d-flex">
+                                        List of HCP User
+                                        
+                                    </h4>
+                                    <div>
+                                        <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/cdp">Customer Data Platform</NavLink>
+                                        <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/crdlp">CRDLP</NavLink>                           
+                                    </div>
+                                </div>
+                                <div className="d-flex pt-3 pt-sm-0 mb-2">
+                                    <div className="mr-2">
                                         <div>
                                             {hcps.codbase ?
                                                 getUuidAuthorities(hcps.codbase).map(authority =>
-                                                (
-                                                    <a key={authority.link} className="mr-3" role="button" onClick={() => openAuthorityLink(authority.link)}>
-                                                        <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height={authority.heightSingle} />
-                                                    </a>
-                                                )
+                                                    (
+                                                        <a key={authority.link} className="mr-3" role="button" onClick={() => openAuthorityLink(authority.link)}>
+                                                            <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height={authority.heightSingle} />
+                                                        </a>
+                                                    )
                                                 )
                                                 :
                                                 <Dropdown>
@@ -599,15 +608,15 @@ export default function hcpUsers() {
                                                     <Dropdown.Menu className="dropdown-menu__no-hover py-0">
                                                         {
                                                             getUuidAuthorities().map(authority =>
-                                                            (
-                                                                <Dropdown.Item
-                                                                    key={authority.link} className="border-bottom py-2 px-3"
-                                                                    onClick={() => openAuthorityLink(authority.link)}
-                                                                    role="button"
-                                                                >
-                                                                    <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height={authority.height} />
-                                                                </Dropdown.Item>
-                                                            )
+                                                                (
+                                                                    <Dropdown.Item
+                                                                        key={authority.link} className="border-bottom py-2 px-3"
+                                                                        onClick={() => openAuthorityLink(authority.link)}
+                                                                        role="button"
+                                                                    >
+                                                                        <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height={authority.height} />
+                                                                    </Dropdown.Item>
+                                                                )
                                                             )
                                                         }
                                                     </Dropdown.Menu>
@@ -615,11 +624,9 @@ export default function hcpUsers() {
                                             }
                                         </div>
                                     </div>
-                                </div>
-                                <div className="d-flex pt-3 pt-sm-0">
                                     {countries && hcps['countries'] &&
                                         <React.Fragment>
-                                            <button className={`btn cdp-btn-outline-primary mr-3 ${isFilterEnabled ? 'multifilter_enabled' : '' }`} onClick={() => setShow({ ...show, filterSidebar: true })} ><i class="fas fa-filter mr-2"></i> Filter</button>
+                                            <button className={`btn cdp-btn-outline-primary mr-2 ${isFilterEnabled ? 'multifilter_enabled' : ''}`} onClick={() => setShow({ ...show, filterSidebar: true })} ><i class="fas fa-filter mr-2"></i> Filter</button>
                                             {/* {isFilterEnabled && <button className="btn cdp-btn-outline-primary mr-3" onClick={resetFilter} ><i class="fas fa-filter mr-2"></i> Reset Filter </button>} */}
                                             <div title={tableDirty ? "Save or reset changes to use filter options" : null}>
                                                 <Dropdown className={`ml-auto dropdown-customize mr-2 ${tableDirty ? 'hcp-inline-disable' : ''}`}>
@@ -661,13 +668,9 @@ export default function hcpUsers() {
                                         </React.Fragment>
                                     }
                                 </div>
-
                             </div>
 
-                            <div>
-                                <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/cdp">CDP</NavLink>
-                                <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/crdlp">CRDLP</NavLink>
-                            </div>
+                           
 
                             <Modal
                                 size="lg"
