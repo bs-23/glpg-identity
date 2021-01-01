@@ -45,8 +45,7 @@ export const faqSchema = object().shape({
         .test('is-exceeded', 'Maximum character limit has been exceeded(This limit includes HTML tags and styles)',
             answer => isExceeded(answer)),
     answer_plaintext: string()
-        .transform(value => value.trim())
-        .required('This field must not be empty.'),
+        .transform(value => value.trim()),
     topics:
         array()
             .of(string())
