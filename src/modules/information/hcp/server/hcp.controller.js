@@ -192,13 +192,11 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
     //     return defaultFilter;
     // }
 
-    console.log('Default filter: ', defaultFilter);
     let customFilter = { ...defaultFilter };
 
     const nodes = currentFilterSettings.logic && currentFilterSettings.filters.length > 1
         ? currentFilterSettings.logic.split(" ")
         : ['1'];
-    console.log('Logic nodes: ', nodes.join());
 
     let prevOperator;
     const groupedQueries = [];
@@ -261,8 +259,6 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
         prevOperator = node === "and" || node === "or" ? node : prevOperator;
     }
 
-    console.log('Grouped queries: ', groupedQueries.map((a) => JSON.stringify(a)));
-
     if (groupedQueries.length > 1) {
         customFilter[Op.or] = groupedQueries.map(q => {
             if (q.operator === 'and') {
@@ -278,7 +274,6 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
             customFilter = { ...customFilter, ...query };
         }
     }
-    console.log('Custom filter: ', customFilter);
 
     return customFilter;
 }

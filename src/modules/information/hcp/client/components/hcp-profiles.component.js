@@ -95,7 +95,6 @@ export default function hcpUsers() {
     const [editableTableProps, setEditableTableProps] = useState({});
     const [selectedRow, setSelectedRow] = useState(null);
     const [selectedFilterSetting, setSelectedFilterSetting] = useState(null);
-    const [tempFilterSetting, setTempFilterSetting] = useState(null);
     const [isFilterEnabled, setIsFilterEnabled] = useState(false);
 
     const hcps = useSelector(state => state.hcpReducer.hcps);
@@ -123,7 +122,7 @@ export default function hcpUsers() {
             appearance: 'success',
             autoDismiss: true
         })
-        loadHcpProfiles()
+        loadHcpProfiles();
     }
 
     const onUpdateStatusFailure = (error) => {
@@ -191,8 +190,6 @@ export default function hcpUsers() {
             }
             : null;
 
-        setTempFilterSetting(requestBody);
-        // dispatch(getHcpProfiles(searchObj.page, searchObj.status, searchObj.codbase, searchObj.orderBy, searchObj.orderType, requestBody));
         dispatch(getHcpProfiles(location.search, requestBody));
         setSort({ type: params.get('orderType'), value: params.get('orderBy') });
     };
@@ -234,13 +231,51 @@ export default function hcpUsers() {
         return country && country.countryname;
     }
 
-    const getUuidAuthorities = (codbase) => {
-        if (codbase) {
-            const authorityByCountry = uuidAuthorities.filter(a => a.codbase.toLowerCase() === codbase.toLowerCase());
-            return authorityByCountry;
+    const renderUuidAuthorities = () => {
+        const authorityDropdown = (authorities) => {
+            return (<Dropdown>
+                <Dropdown.Toggle variant="" id="dropdown-basic" className="cdp-btn-outline-primary px-sm-3 px-2">
+                    UUID Authorities
+                </Dropdown.Toggle>
+                <Dropdown.Menu className="dropdown-menu__no-hover py-0">
+                    {
+                        authorities.map(authority =>
+                        (
+                            <Dropdown.Item
+                                key={authority.link} className="border-bottom py-2 px-3"
+                                onClick={() => openAuthorityLink(authority.link)}
+                                role="button"
+                            >
+                                <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height={authority.height} />
+                            </Dropdown.Item>
+                        )
+                        )
+                    }
+                </Dropdown.Menu>
+            </Dropdown>);
+        };
+
+        const { lastAppliedFilters } = isFilterEnabled ? hcpFilterRef.current.multiFilterProps.values || {} : {};
+
+        const countryFilter = (lastAppliedFilters || []).find(f => f.fieldName === 'country');
+
+        if (countryFilter) {
+            const authorityByCountry = uuidAuthorities.filter(a => countryFilter.value.some(v => a.codbase.toLowerCase() === v.toLowerCase()));
+
+            if (countryFilter.value.length > 1) {
+                return authorityDropdown(authorityByCountry);
+            }
+
+            return authorityByCountry.map(authority =>
+            (
+                <a key={authority.link} className="mr-3" role="button" onClick={() => openAuthorityLink(authority.link)}>
+                    <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height={authority.heightSingle} />
+                </a>
+            )
+            );
         }
 
-        return uuidAuthorities;
+        return authorityDropdown(uuidAuthorities);
     };
 
     const urlChange = (pageNo, codBase, status, orderColumn, pageChange = false) => {
@@ -503,7 +538,6 @@ export default function hcpUsers() {
     ];
 
     const resetFilter = () => {
-        setTempFilterSetting();
         setSelectedFilterSetting();
         setIsFilterEnabled(false);
         hcpFilterRef.current.multiFilterProps.resetFilter();
@@ -591,36 +625,7 @@ export default function hcpUsers() {
                                 <div className="d-flex pt-3 pt-sm-0 mb-2">
                                     <div className="mr-2">
                                         <div>
-                                            {hcps.codbase ?
-                                                getUuidAuthorities(hcps.codbase).map(authority =>
-                                                    (
-                                                        <a key={authority.link} className="mr-3" role="button" onClick={() => openAuthorityLink(authority.link)}>
-                                                            <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height={authority.heightSingle} />
-                                                        </a>
-                                                    )
-                                                )
-                                                :
-                                                <Dropdown>
-                                                    <Dropdown.Toggle variant="" id="dropdown-basic" className="cdp-btn-outline-primary px-sm-3 px-2">
-                                                        UUID Authorities
-                                                    </Dropdown.Toggle>
-                                                    <Dropdown.Menu className="dropdown-menu__no-hover py-0">
-                                                        {
-                                                            getUuidAuthorities().map(authority =>
-                                                                (
-                                                                    <Dropdown.Item
-                                                                        key={authority.link} className="border-bottom py-2 px-3"
-                                                                        onClick={() => openAuthorityLink(authority.link)}
-                                                                        role="button"
-                                                                    >
-                                                                        <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height={authority.height} />
-                                                                    </Dropdown.Item>
-                                                                )
-                                                            )
-                                                        }
-                                                    </Dropdown.Menu>
-                                                </Dropdown>
-                                            }
+                                            {renderUuidAuthorities()}
                                         </div>
                                     </div>
                                     <React.Fragment>
