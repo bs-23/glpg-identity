@@ -1843,9 +1843,11 @@ async function getHcpsFromDatasync(req, res) {
 
         if (hcpSpecialties) {
             hcps.forEach(hcp => {
-                const specialty = hcpSpecialties.find(s => s.individual_id_onekey === hcp.individual_id_onekey);
-                hcp.specialty = (specialty || {}).cod_description;
-                hcp.specialty_code = (specialty || {}).specialty_code;
+                const specialties = hcpSpecialties.filter(s => s.individual_id_onekey === hcp.individual_id_onekey);
+                hcp.specialties = specialties.map(s => ({
+                    description: s.cod_description,
+                    code: s.specialty_code
+                }));
             });
         }
 

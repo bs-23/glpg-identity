@@ -14,6 +14,7 @@ export default function CrdlpHcpProfiles() {
     const [codBase, setCodBase] = useState(null);
     const [sort, setSort] = useState({ type: 'asc', value: null });
 
+    const [profileDetails, setProfileDetails] = useState(null);
     const [showFaq, setShowFaq] = useState(false);
     const handleCloseFaq = () => setShowFaq(false);
     const handleShowFaq = () => setShowFaq(true);
@@ -54,7 +55,6 @@ export default function CrdlpHcpProfiles() {
 
         history.push(location.pathname + url);
     };
-
 
     const pageLeft = () => {
         if (hcpUsers.page > 1) urlChange(hcpUsers.page - 1, hcpUsers.codBase, params.get('orderBy'), true);
@@ -159,18 +159,18 @@ export default function CrdlpHcpProfiles() {
                                         </thead>
                                         <tbody className="cdp-table__body bg-white">
                                             {hcpUsers.users.map((row, idx) => (
-                                                <tr key={'user-'+idx}>
+                                                <tr key={'user-' + idx}>
                                                     <td className="text-break">{row.firstname}</td>
                                                     <td className="text-break">{row.lastname}</td>
                                                     <td className="text-break">{row.individual_id_onekey || '--'}</td>
                                                     <td className="text-break">{row.uuid_1 || '--'}</td>
-                                                    <td>{row.specialty}</td>
+                                                    <td>{(row.specialties || []).map(s => s.description).join(', ')}</td>
                                                     <td className="text-break">{row.telephone || '--'}</td>
                                                     <td>{row.ind_status_desc}</td>
                                                     <td>{getCountryName(row.country_iso2)}</td>
 
                                                     <td>
-                                                        <button className="btn cdp-btn-outline-primary btn-sm"><i class="icon icon-user mr-2"></i>Profile</button>
+                                                        <button className="btn cdp-btn-outline-primary btn-sm" onClick={() => setProfileDetails(row)}><i class="icon icon-user mr-2" ></i>Profile</button>
                                                     </td>
                                                 </tr>
                                             ))}
@@ -198,6 +198,98 @@ export default function CrdlpHcpProfiles() {
                                 </div>
                             </div>
                         }
+
+                        <Modal
+                            size="lg"
+                            show={!!profileDetails}
+                            onHide={() => { setProfileDetails(null) }}
+                            dialogClassName="modal-customize mw-75"
+                            aria-labelledby="example-custom-modal-styling-title"
+                            centered
+                        >
+                            <Modal.Header closeButton>
+                                <Modal.Title id="example-custom-modal-styling-title">
+                                    Profile Details
+                                    </Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                {
+                                    profileDetails &&
+                                    <div className="px-4 py-3">
+                                        <div className="row">
+                                            <div className="col">
+                                                <h4 className="mt-1 font-weight-bold">{`${profileDetails.ind_prefixname_desc || ''} ${profileDetails.firstname || ''} ${profileDetails.lastname || ''}`}</h4>
+                                                <div>{(profileDetails.specialties || []).map(s => s.description).join(', ')}</div>
+                                            </div>
+                                        </div>
+                                        <div className="row mt-3">
+
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Gender</div>
+                                                <div className="">{profileDetails.gender_desc || '--'}</div>
+                                            </div>
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Professional Type</div>
+                                                <div className="">{profileDetails.ind_type_desc || '--'}</div>
+                                            </div>
+                                        </div>
+                                        <div className="row mt-3">
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">UUID</div>
+                                                <div className="">{profileDetails.uuid_1 || '--'}</div>
+                                            </div>
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">OneKeyID</div>
+                                                <div className="">{profileDetails.individual_id_onekey || '--'}</div>
+                                            </div>
+                                        </div>
+                                        <div className="row mt-3">
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Phone Number</div>
+                                                <div className="">{profileDetails.telephone || '--'}</div>
+                                            </div>
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Fax</div>
+                                                <div className="text-capitalize">{profileDetails.fax || '--'}</div>
+                                            </div>
+                                        </div>
+                                        <div className="row mt-3">
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Country</div>
+                                                <div className="">{getCountryName(profileDetails.country_iso2) || '--'}</div>
+                                            </div>
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Locale</div>
+                                                <div className="">{profileDetails.language_code ? profileDetails.language_code.toUpperCase() : '--'}</div>
+                                            </div>
+                                        </div>
+
+                                        <div className="row mt-3">
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Postal City</div>
+                                                <div className="">{profileDetails.postal_city || '--'}</div>
+                                            </div>
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Postal Code</div>
+                                                <div className="">{profileDetails.lgpostcode || '--'}</div>
+                                            </div>
+                                        </div>
+
+
+                                        <div className="row mt-3">
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Address</div>
+                                                <div className="">{profileDetails.adr_long_lbl || '--'}</div>
+                                            </div>
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Status</div>
+                                                <div className="text-capitalize">{profileDetails.ind_status_desc || '--'}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </Modal.Body>
+                        </Modal>
                     </div>
                 </div>
             </div>
