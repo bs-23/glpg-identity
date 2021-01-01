@@ -580,9 +580,8 @@ export default function hcpUsers() {
                         <div>
                             <div className="d-sm-flex justify-content-between align-items-end mt-4">
                                 <div>
-                                    <h4 className="cdp-text-primary font-weight-bold mb-0 mr-sm-4 mr-1 d-flex">
+                                    <h4 className="cdp-text-primary font-weight-bold mb-0 mr-sm-4 mr-1 d-flex pb-2">
                                         List of HCP User
-                                        
                                     </h4>
                                     <div>
                                         <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/cdp">Customer Data Platform</NavLink>
