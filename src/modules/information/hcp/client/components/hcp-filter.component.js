@@ -21,7 +21,7 @@ const HCPFilter = ({ selectedFilterSetting, onHide, onExecute, show }, ref) => {
 
     useEffect(() => {
         dispatch(getHcpFilterSettings());
-    }, []);
+    }, [show]);
 
     useImperativeHandle(ref, () => ({
         multiFilterProps: multiFilterRef.current

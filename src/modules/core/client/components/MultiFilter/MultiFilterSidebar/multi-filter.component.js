@@ -70,6 +70,7 @@ const MultiFilter = (props, ref) => {
         if(!formikProps.values.selectedSettingID && selectedFilter) {
             formikProps.setFieldValue('selectedSettingID', selectedFilter.id);
             formikProps.setFieldValue('filterSettingName', selectedFilter.title);
+            formikProps.setFieldValue('logic', selectedFilter.settings.logic);
         }
 
         setShow({ ...show, addFilter: false });
@@ -106,7 +107,21 @@ const MultiFilter = (props, ref) => {
 
     const handleExecute = (values, actions) => {
         actions.setFieldValue('lastAppliedFilters', values.filters);
+        actions.setFieldValue('lastAppliedLogic', values.logic);
+        if(!values.shouldSaveFilter && values.selectedSettingID) {
+            const selectedPreset = filterPresets.find(f => f.id === values.selectedSettingID);
+            if(
+                (selectedSetting && !_.isEqual(selectedSetting.filters, values.filters)) ||
+                (selectedPreset && !_.isEqual(selectedPreset.settings.filters, values.filters))
+            ) {
+                actions.setFieldValue('selectedSettingID', '');
+                actions.setFieldValue('filterSettingName', '');
+                values.selectedSettingID = '';
+                values.filterSettingName = '';
+            }
+        }
         onExecute(values, actions);
+        onHide();
     };
 
     const getSummaryValueText = (filter) => {
@@ -136,13 +151,16 @@ const MultiFilter = (props, ref) => {
                     selectedSettingID: selectedSettingID || '',
                     lastAppliedFilters: selectedSetting
                         ? selectedSetting.filters
-                        : []
+                        : [],
+                    lastAppliedLogic: selectedSetting
+                        ? selectedSetting.logic
+                        : ''
                 }}
                 enableReinitialize
             >
                 {(formikProps) =>
                     showSidePanel &&
-                    <div className="filter" onClick={handleOnClick} >
+                    <div className="filter" onClick={handleOnClick}>
                         <div className="filter__panel">
                             <h3 className="px-3 pt-3 cdp-text-primary filter__header">Filters</h3>
                             <div className="shadow-sm p-3 d-flex filter__btn-section">
