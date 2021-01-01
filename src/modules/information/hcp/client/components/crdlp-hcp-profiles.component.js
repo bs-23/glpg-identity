@@ -94,48 +94,18 @@ export default function CrdlpHcpProfiles() {
                 </div>
                 <div className="row">
                     <div className="col-12">
-                        <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
-                            <div className="d-flex align-items-center justify-content-between">
-                                <h4 className="cdp-text-primary font-weight-bold mb-0 mr-sm-4 mr-1">List of HCP User</h4>
-                                {/* <div className="">
-                                    <div>
-                                        {userdata.codbase ?
-                                            getUuidAuthorities(userdata.codbase).map(authority =>
-                                            (
-                                                <a key={authority.link} className="mr-3" role="button" onClick={() => openAuthorityLink(authority.link)}>
-                                                    <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height={authority.heightSingle} />
-                                                </a>
-                                            )
-                                            )
-                                            :
-                                            <Dropdown>
-                                                <Dropdown.Toggle variant="" id="dropdown-basic" className="cdp-btn-outline-primary px-sm-3 px-2">
-                                                    UUID Authorities
-                                                    </Dropdown.Toggle>
-                                                <Dropdown.Menu className="dropdown-menu__no-hover py-0">
-                                                    {
-                                                        getUuidAuthorities().map(authority =>
-                                                        (
-                                                            <Dropdown.Item
-                                                                key={authority.link} className="border-bottom py-2 px-3"
-                                                                onClick={() => openAuthorityLink(authority.link)}
-                                                                role="button"
-                                                            >
-                                                                <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height={authority.height} />
-                                                            </Dropdown.Item>
-                                                        )
-                                                        )
-                                                    }
-                                                </Dropdown.Menu>
-                                            </Dropdown>
-                                        }
-                                    </div>
-                                </div> */}
+                        <div className="d-sm-flex justify-content-between align-items-end mt-4">
+                            <div>
+                                <h4 className="cdp-text-primary font-weight-bold mb-0 mr-sm-4 mr-1 pb-2">List of HCP User</h4>
+                                <div>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/cdp">Customer Data Platform</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/crdlp">CRDLP</NavLink>
+                                </div>
                             </div>
-                            <div className="d-flex pt-3 pt-sm-0">
+                            <div className="d-flex pt-3 pt-sm-0 mb-2">
                                 {countries && hcpUsers['countries'] &&
                                     <React.Fragment>
-                                        <Dropdown className="ml-auto dropdown-customize mr-2">
+                                        <Dropdown className="ml-auto dropdown-customize">
                                             <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center">
                                                 <i className="icon icon-filter mr-2 mb-n1"></i> {hcpUsers.codbase && (countries.find(i => i.codbase === hcpUsers.codbase)) ? (countries.find(i => i.codbase === hcpUsers.codbase)).codbase_desc : 'Filter by Country'}
                                             </Dropdown.Toggle>
@@ -160,12 +130,6 @@ export default function CrdlpHcpProfiles() {
                                     </React.Fragment>
                                 }
                             </div>
-
-                        </div>
-
-                        <div>
-                            <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/cdp">Customer Data Platform</NavLink>
-                            <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/crdlp">CRDLP</NavLink>
                         </div>
 
                         {hcpUsers['users'] && hcpUsers['users'].length > 0 &&
