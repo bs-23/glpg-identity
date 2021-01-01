@@ -145,19 +145,6 @@ const MultiFilter = (props, ref) => {
                     <div className="filter" onClick={handleOnClick} >
                         <div className="filter__panel">
                             <h3 className="px-3 pt-3 cdp-text-primary filter__header">Filters</h3>
-                            <div className="shadow-sm p-3 d-flex filter__btn-section">
-                                <Button
-                                    className="btn cdp-btn-secondary mr-1 btn-block text-white"
-                                    label="Execute"
-                                    onClick={formikProps.submitForm}
-                                    disabled={formikProps.values.filters.length === 0}
-                                />
-                                <Button
-                                    className="btn cdp-btn-outline-primary ml-1 btn-block mt-0"
-                                    label="Close"
-                                    onClick={onHide}
-                                />
-                            </div>
                             <div className="bg-light p-3 filter__section">
                                 <div className="mb-3">
                                     <label className="d-block mb-1" for="scope">
@@ -242,16 +229,31 @@ const MultiFilter = (props, ref) => {
                                             onLogicChange={(logic) => formikProps.setFieldValue('logic', logic)}
                                         />
                                     </div>
-                                }
+                        }
+
+                        {show.addFilter &&
+                            <AddFilter
+                                filterPresets={filterPresets}
+                                filters={formikProps.values.filters}
+                                filterOptions={options}
+                                onDone={(filters, selectedFilter) => handleAddFilterDone(filters, formikProps, selectedFilter)}
+                            />
+                        }
                             </div>
-                            {show.addFilter &&
-                                <AddFilter
-                                    filterPresets={filterPresets}
-                                    filters={formikProps.values.filters}
-                                    filterOptions={options}
-                                    onDone={(filters, selectedFilter) => handleAddFilterDone(filters, formikProps, selectedFilter)}
+                           
+                            <div className="p-3 d-flex filter__btn-section">
+                                <Button
+                                    className="btn cdp-btn-secondary mr-1 btn-block text-white"
+                                    label="Execute"
+                                    onClick={formikProps.submitForm}
+                                    disabled={formikProps.values.filters.length === 0}
                                 />
-                            }
+                                <Button
+                                    className="btn cdp-btn-outline-primary ml-1 btn-block mt-0"
+                                    label="Close"
+                                    onClick={onHide}
+                                />
+                            </div>
                             </div>
                     </div>
                 }
