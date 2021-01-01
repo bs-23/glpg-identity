@@ -1,2 +1,2 @@
-export { default as MultiFilter } from './MultiFilterSidebar/multi-filter.componet';
+export { default as MultiFilter } from './MultiFilterSidebar/multi-filter.component';
 export * as operators from './operators';

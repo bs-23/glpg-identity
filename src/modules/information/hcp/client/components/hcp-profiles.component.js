@@ -171,7 +171,8 @@ export default function hcpUsers() {
         }
         else {
             const { settings } = filterSetting;
-            loadHcpProfiles({ filters: settings.filters, logic: settings.logic });
+            if(multiFilterSetting.selectedSettingID) history.push(`/information/list?filter=${multiFilterSetting.selectedSettingID}`)
+            else history.push(`/information/list`);
         };
         setIsFilterEnabled(true);
     }
@@ -541,12 +542,13 @@ export default function hcpUsers() {
                 loadHcpProfiles(res.data.settings);
             })
         else {
-            const filterSetting = selectedFilterSetting
+            const { lastAppliedFilters, lastAppliedLogic } = hcpFilterRef.current.multiFilterProps.values || {};
+            const filterSetting = lastAppliedFilters && lastAppliedFilters.length
                 ? {
-                    filters: selectedFilterSetting.settings.filters,
-                    logic: selectedFilterSetting.settings.logic
+                    filters: lastAppliedFilters,
+                    logic: lastAppliedLogic
                 }
-                : tempFilterSetting
+                : null;
             loadHcpProfiles(filterSetting);
         };
     }, [location]);
@@ -617,8 +619,8 @@ export default function hcpUsers() {
                                 <div className="d-flex pt-3 pt-sm-0">
                                     {countries && hcps['countries'] &&
                                         <React.Fragment>
-                                            <button className="btn cdp-btn-outline-primary mr-3" onClick={() => setShow({ ...show, filterSidebar: true })} ><i class="fas fa-filter mr-2"></i> Filter</button>
-                                            {isFilterEnabled && <button className="btn cdp-btn-outline-primary mr-3" onClick={resetFilter} ><i class="fas fa-filter mr-2"></i> Reset Filter </button>}
+                                            <button className={`btn cdp-btn-outline-primary mr-3 ${isFilterEnabled ? 'multifilter_enabled' : '' }`} onClick={() => setShow({ ...show, filterSidebar: true })} ><i class="fas fa-filter mr-2"></i> Filter</button>
+                                            {/* {isFilterEnabled && <button className="btn cdp-btn-outline-primary mr-3" onClick={resetFilter} ><i class="fas fa-filter mr-2"></i> Reset Filter </button>} */}
                                             <div title={tableDirty ? "Save or reset changes to use filter options" : null}>
                                                 <Dropdown className={`ml-auto dropdown-customize mr-2 ${tableDirty ? 'hcp-inline-disable' : ''}`}>
                                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center">

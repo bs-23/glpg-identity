@@ -17,6 +17,7 @@ const MultiFilter = (props, ref) => {
         selectedSetting,
         selectedSettingTitle,
         selectedSettingID,
+        scopeOptions,
         onFilterSelect
     } = props;
 
@@ -70,6 +71,7 @@ const MultiFilter = (props, ref) => {
         if(!formikProps.values.selectedSettingID && selectedFilter) {
             formikProps.setFieldValue('selectedSettingID', selectedFilter.id);
             formikProps.setFieldValue('filterSettingName', selectedFilter.title);
+            formikProps.setFieldValue('logic', selectedFilter.settings.logic);
         }
 
         setShow({ ...show, addFilter: false });
@@ -106,7 +108,21 @@ const MultiFilter = (props, ref) => {
 
     const handleExecute = (values, actions) => {
         actions.setFieldValue('lastAppliedFilters', values.filters);
+        actions.setFieldValue('lastAppliedLogic', values.logic);
+        if(!values.shouldSaveFilter && values.selectedSettingID) {
+            const selectedPreset = filterPresets.find(f => f.id === values.selectedSettingID);
+            if(
+                (selectedSetting && !_.isEqual(selectedSetting.filters, values.filters)) ||
+                (selectedPreset && !_.isEqual(selectedPreset.settings.filters, values.filters))
+            ) {
+                actions.setFieldValue('selectedSettingID', '');
+                actions.setFieldValue('filterSettingName', '');
+                values.selectedSettingID = '';
+                values.filterSettingName = '';
+            }
+        }
         onExecute(values, actions);
+        onHide();
     };
 
     const getSummaryValueText = (filter) => {
@@ -136,30 +152,20 @@ const MultiFilter = (props, ref) => {
                     selectedSettingID: selectedSettingID || '',
                     lastAppliedFilters: selectedSetting
                         ? selectedSetting.filters
-                        : []
+                        : [],
+                    lastAppliedLogic: selectedSetting
+                        ? selectedSetting.logic
+                        : ''
                 }}
                 enableReinitialize
             >
                 {(formikProps) =>
                     showSidePanel &&
-                    <div className="filter" onClick={handleOnClick} >
+                    <div className="filter" onClick={handleOnClick}>
                         <div className="filter__panel">
                             <h3 className="px-3 pt-3 cdp-text-primary filter__header">Filters</h3>
-                            <div className="shadow-sm p-3 d-flex filter__btn-section">
-                                <Button
-                                    className="btn cdp-btn-secondary mr-1 btn-block text-white"
-                                    label="Execute"
-                                    onClick={formikProps.submitForm}
-                                    disabled={formikProps.values.filters.length === 0}
-                                />
-                                <Button
-                                    className="btn cdp-btn-outline-primary ml-1 btn-block mt-0"
-                                    label="Close"
-                                    onClick={onHide}
-                                />
-                            </div>
                             <div className="bg-light p-3 filter__section">
-                                <div className="mb-3">
+                                {scopeOptions && <div className="mb-3">
                                     <label className="d-block mb-1" for="scope">
                                         Scope
                                     </label>
@@ -172,15 +178,7 @@ const MultiFilter = (props, ref) => {
                                     >
                                         <option className="p-2" value=''> Select an Option </option>
                                     </Field>
-                                </div>
-                                {formikProps.values.filterSettingName &&
-                                    <div className="cdp-text-secondary font-weight-bold mb-3">
-                                        Selected Filter: {formikProps.values.filterSettingName}
-                                        {selectedSetting && !_.isEqual(selectedSetting.filters, formikProps.values.filters) &&
-                                            <span className="invalid-feedback">Unsaved</span>
-                                        }
-                                    </div>
-                                }
+                                </div>}
                                 {formikProps.values.filters.map((filter, index) =>
                                     <div className="mb-3" key={filter.name}>
                                         <FilterSummary
@@ -192,35 +190,7 @@ const MultiFilter = (props, ref) => {
                                         />
                                     </div>
                                 )}
-                                {formikProps.values.filters.length > 0 &&
-                                    <React.Fragment>
-                                        <label className="d-flex  align-items-center">
-                                            <span className="switch-label text-left pr-3">Save Filter</span>
-                                            <span className="switch">
-                                                <input
-                                                    className="custom-control-input"
-                                                    type="checkbox"
-                                                    name="shouldSaveFilter"
-                                                    checked={formikProps.values.shouldSaveFilter}
-                                                    value={formikProps.values.shouldSaveFilter}
-                                                    onChange={(e) => formikProps.handleChange(e)}
-                                                />
-                                                <span className="slider round"></span>
-                                            </span>
-                                        </label>
-                                        {formikProps.values.shouldSaveFilter &&
-                                            <div className="">
-                                                <label className="pt-2 mb-1">
-                                                    Filter Setting Name
-                                                </label>
-                                                <Field
-                                                    className="form-control form-control-sm"
-                                                    name="filterSettingName"
-                                                />
-                                            </div>
-                                        }
-                                    </React.Fragment>
-                                }
+                               
                                 <div className="d-flex justify-content-between py-2 align-items-center">
                                     <span type="button" className="cdp-text-primary" onClick={() => setShow({ ...show, addFilter: true })}>
                                         <i class="fas fa-plus"></i> Add Filter
@@ -233,25 +203,65 @@ const MultiFilter = (props, ref) => {
                                             <span type="button" className="cdp-text-primary mb-2" onClick={() => null}>
                                                 Add Filter Logic
                                             </span>
-                                            <span onClick={() => null}>Clear</span>
                                         </div>
                                         <FilterLogic
-                                            className="border  border-secondary rounded"
+                                            className=""
                                             logic={formikProps.values.logic}
                                             numberOfFilters={formikProps.values.filters.length}
                                             onLogicChange={(logic) => formikProps.setFieldValue('logic', logic)}
                                         />
                                     </div>
+                                 }
+                        {formikProps.values.filters.length > 0 &&
+                            <React.Fragment>
+                                <label className="d-flex  align-items-center border-top mt-3 pt-2">
+                                    <span className="switch-label text-left pr-3">Save Filter</span>
+                                    <span className="switch">
+                                        <input
+                                            className="custom-control-input"
+                                            type="checkbox"
+                                            name="shouldSaveFilter"
+                                            checked={formikProps.values.shouldSaveFilter}
+                                            value={formikProps.values.shouldSaveFilter}
+                                            onChange={(e) => formikProps.handleChange(e)}
+                                        />
+                                        <span className="slider round"></span>
+                                    </span>
+                                </label>
+                                {formikProps.values.shouldSaveFilter &&
+                                    <div className="">
+                                        <Field
+                                            className="form-control form-control-sm"
+                                    name="filterSettingName"
+                                    placeholder="Add filter setting name"
+                                        />
+                                    </div>
                                 }
+                            </React.Fragment>
+                        }
+                        {show.addFilter &&
+                            <AddFilter
+                                filterPresets={filterPresets}
+                                filters={formikProps.values.filters}
+                                filterOptions={options}
+                                onDone={(filters, selectedFilter) => handleAddFilterDone(filters, formikProps, selectedFilter)}
+                            />
+                        }
                             </div>
-                            {show.addFilter &&
-                                <AddFilter
-                                    filterPresets={filterPresets}
-                                    filters={formikProps.values.filters}
-                                    filterOptions={options}
-                                    onDone={(filters, selectedFilter) => handleAddFilterDone(filters, formikProps, selectedFilter)}
+
+                            <div className="p-3 d-flex filter__section-btn">
+                                <Button
+                                    className="btn cdp-btn-secondary mr-1 btn-block text-white"
+                                    label="Execute"
+                                    onClick={formikProps.submitForm}
+                                    disabled={formikProps.values.filters.length === 0}
                                 />
-                            }
+                                <Button
+                                    className="btn cdp-btn-outline-primary ml-1 btn-block mt-0"
+                                    label="Close"
+                                    onClick={onHide}
+                                />
+                            </div>
                             </div>
                     </div>
                 }

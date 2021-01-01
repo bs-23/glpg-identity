@@ -1,9 +1,5 @@
 import React, { useEffect, useState } from 'react';
 
-const style = {
-    minHeight: '75px'
-}
-
 const FilterLogic = (props) => {
     const {
         className,
@@ -61,12 +57,12 @@ const FilterLogic = (props) => {
         else setLogicNodes(Array(numberOfFilters-1 || 0).fill('and'));
     }, [numberOfFilters, logic]);
 
-    return <div style={style} className={className ? className : "border border-secondary"}>
+    return <div className="d-flex flex-wrp align-items-center">
         {Array(numberOfFilters || 0).fill(0).map((e, ind) => {
             return <React.Fragment key={ind}>
-                <span className="mx-1">Filter {ind}</span>
+                <span className="mr-1">Filter {ind+1}</span>
                 {ind < numberOfFilters-1 &&
-                    <select className="mx-1" name={ind} value={logicNodes[ind]} onChange={handleLogicChange}>
+                    <select className="mx-1 form-control form-control-sm d-inline-block w-auto px-1" name={ind} value={logicNodes[ind]} onChange={handleLogicChange}>
                         <option value='and'>AND</option>
                         <option value='or'>OR</option>
                     </select>

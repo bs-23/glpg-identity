@@ -20,8 +20,8 @@ const HCPFilter = ({ selectedFilterSetting, onHide, onExecute, show }, ref) => {
     const filterOptions = getFilterOptions(userCountryFilterOption);
 
     useEffect(() => {
-        dispatch(getHcpFilterSettings());
-    }, []);
+        if(show) dispatch(getHcpFilterSettings());
+    }, [show]);
 
     useImperativeHandle(ref, () => ({
         multiFilterProps: multiFilterRef.current
