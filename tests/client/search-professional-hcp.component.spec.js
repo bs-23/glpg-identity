@@ -19,6 +19,8 @@ describe('Search hcp professional component', () => {
     let mockAxios;
     let savedUser;
 
+    console.log = jest.fn();
+
     beforeEach( async () => {
         mockAxios = new MockAdapter(axios);
 
