@@ -71,7 +71,12 @@ const SearchProfessionalHcp = (props) => {
             .then(response => {
                 setUsers(response.data);
                 setCurrentPage(newPage);
-                scrollToResult(response.data.results.length === 0);
+                try{
+                    scrollToResult(response.data.results.length === 0);
+                }
+                catch(err){
+                    console.log(err);
+                }
             })
             .catch(err => {
                 const message = err.response.status === 400
@@ -153,7 +158,6 @@ const SearchProfessionalHcp = (props) => {
             const id = params.get('id');
             getHcpProfile(id);
         }
-
     }, [location]);
 
     useEffect(() => {
@@ -313,7 +317,12 @@ const SearchProfessionalHcp = (props) => {
                                                 setFormData(data);
                                                 setCurrentPage(1);
                                                 actions.setSubmitting(false);
-                                                scrollToResult(response.data.results.length === 0);
+                                                try{
+                                                    scrollToResult(response.data.results.length === 0);
+                                                }
+                                                catch(err){
+                                                    console.log(err);
+                                                }
                                             })
                                             .catch(err => {
                                                 const message = err.response.status === 400
