@@ -85,7 +85,7 @@ const AddFilter = (props) => {
 
     return <div className="filter__sub-panel">
         <div className="bg-light p-2 rounded-top">Add Filter</div>
-        <div className="px-3 pb-3">
+        <div className="px-3 pb-3 pt-2">
             {/* {
                 filterPresets && filterPresets.length > 0 &&
                 <div className="mb-2">
