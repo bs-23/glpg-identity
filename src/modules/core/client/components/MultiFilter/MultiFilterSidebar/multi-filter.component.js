@@ -266,8 +266,16 @@ const MultiFilter = (props, ref) => {
                                         <option className="p-2" value=''> Select an Option </option>
                                     </Field>
                                 </div>}
-                                <div role="group" aria-labelledby="my-radio-group">
-                                    <label>
+                            <div role="group" aria-labelledby="my-radio-group">
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" class="custom-control-input mr-2" id="createnew" name="isChosenFromExisting" value="false" onChange={(e) => handleChooseFromExisting(e, formikProps)} />
+                                    <label class="custom-control-label" type="button" for="createnew">Create New</label>
+                                </div>
+                                <div class="custom-control custom-radio my-2">
+                                    <input type="radio" class="custom-control-input mr-2" id="chooseformexisting" name="isChosenFromExisting" value="true" onChange={(e) => handleChooseFromExisting(e, formikProps)} />
+                                    <label class="custom-control-label" type="button" for="chooseformexisting">Choose From Existing</label>
+                                </div>
+                            {/*<label>
                                         <Field
                                             className="mr-2"
                                             type="radio"
@@ -286,7 +294,7 @@ const MultiFilter = (props, ref) => {
                                             onChange={(e) => handleChooseFromExisting(e, formikProps)}
                                         />
                                         Choose From Existing
-                                    </label>
+                                    </label>*/}
                                 </div>
                                 {
                                     formikProps.values.isChosenFromExisting === 'true' && filterPresets && filterPresets.length > 0 &&
@@ -398,7 +406,7 @@ const MultiFilter = (props, ref) => {
                                     disabled={formikProps.values.filters.length === 0}
                                 />
                                 <Button
-                                    className="btn cdp-btn-outline-primary ml-1 btn-block mt-0"
+                                    className="btn cdp-btn-outline-primary ml-1 btn-block mt-0 w-auto"
                                     label="Close"
                                     onClick={handleClose}
                                 />
