@@ -1,6 +1,7 @@
 import React, { useState, useRef, useImperativeHandle, useEffect } from 'react';
 import { Formik, Field, ErrorMessage } from 'formik';
 import _ from 'lodash';
+import Dropdown from 'react-bootstrap/Dropdown';
 
 import { Button } from '../common';
 import AddFilter from '../AddFilter/add-filter.component';
@@ -27,6 +28,7 @@ const MultiFilter = (props, ref) => {
         addFilter: false
     });
     // const [selectedFilter, setSelectedFilter] = useState(null);
+    const [selectedScope, setSelectedScopre] = useState(null);
 
     const formikRef = useRef();
     const formikBag = formikRef.current;
@@ -247,102 +249,114 @@ const MultiFilter = (props, ref) => {
                 validationSchema={multiFilterSchema}
                 // enableReinitialize
             >
-                {(formikProps) =>
-                    showSidePanel &&
-                    <div className="filter" onClick={handleOnClick}>
-                        <div className="filter__panel">
-                            <h3 className="px-3 pt-3 cdp-text-primary filter__header">Filters</h3>
-                            <div className="bg-light p-3 filter__section">
-                                {scopeOptions && <div className="mb-3">
-                                    <label className="d-block mb-1" for="scope">
-                                        Scope
-                                    </label>
+        {(formikProps) =>
+            showSidePanel &&
+            <div className="filter" onClick={handleOnClick}>
+                <div className="filter__panel">
+                    <h3 className="px-3 pt-3 cdp-text-primary filter__header">Filters</h3>
+                    <div className="bg-light p-3 filter__section">
+                        {filterPresets && filterPresets.length > 0 &&
+                            <div role="group" aria-labelledby="my-radio-group">
+                                <label>
                                     <Field
-                                        className="form-control form-control-sm"
-                                        id="scope"
-                                        as="select"
-                                        name="scope"
-                                        value=""
-                                    >
-                                        <option className="p-2" value=''> Select an Option </option>
-                                    </Field>
-                                </div>}
-                                {filterPresets && filterPresets.length > 0 && <div role="group" aria-labelledby="my-radio-group">
-                                    <label>
-                                        <Field
-                                            className="mr-2"
-                                            type="radio"
-                                            name="isChosenFromExisting"
-                                            value="false"
-                                            onChange={(e) => handleChooseFromExisting(e, formikProps)}
-                                        />
+                                        className="mr-2"
+                                        type="radio"
+                                        name="isChosenFromExisting"
+                                        value="false"
+                                        onChange={(e) => handleChooseFromExisting(e, formikProps)}
+                                    />
                                         Create New
                                     </label>
-                                    <label>
-                                        <Field
-                                            className="mr-2"
-                                            type="radio"
-                                            name="isChosenFromExisting"
-                                            value="true"
-                                            onChange={(e) => handleChooseFromExisting(e, formikProps)}
-                                        />
+                                <label>
+                                    <Field
+                                        className="mr-2"
+                                        type="radio"
+                                        name="isChosenFromExisting"
+                                        value="true"
+                                        onChange={(e) => handleChooseFromExisting(e, formikProps)}
+                                    />
                                         Choose From Existing
                                     </label>
-                                </div>}
-                                {
-                                    formikProps.values.isChosenFromExisting === 'true' && filterPresets && filterPresets.length > 0 &&
-                                    <div className="mb-2">
-                                        <label className="pt-2 mb-1">Select From Existing Filters</label>
-                                        <Field as="select" className="form-control form-control-sm" name="selectedSettingID" onChange={handlePresetChange}>
-                                            {/* <React.Fragment> */}
-                                                <option value="">Select an option</option>
-                                                {
-                                                    filterPresets.map((filter, index) =>
-                                                        <option key={filter.id} value={filter.id}>{filter.title}</option>
-                                                    )
-                                                }
-                                            {/* </React.Fragment> */}
-                                        </Field>
-                                    </div>
-                                }
-                                {formikProps.values.filters.map((filter, index) =>
-                                    <div className="mb-3" key={filter.name}>
-                                        <FilterSummary
-                                            fieldName={getFieldDisplayText(filter.fieldName)}
-                                            operatorName={getOperatorDisplayText(filter.fieldName, filter.operator)}
-                                            values={getSummaryValueText(filter)}
-                                            index={index}
-                                            onRemove={(index) => handleRemoveFilter(index, formikProps)}
-                                        />
-                                    </div>
-                                )}
-
-                                <div className="d-flex justify-content-between py-2 align-items-center">
-                                    <span type="button" className="cdp-text-primary" onClick={() => setShow({ ...show, addFilter: true })}>
-                                        <i class="fas fa-plus"></i> Add Filter
-                                    </span>
-                                    {formikProps.values.filters.length > 0 &&
-                                        <span className="small" type="button" onClick={() => handleRemoveAll(formikProps)}>Remove All</span>
+                            </div>
+                        }
+                        {scopeOptions &&
+                            <div className="mb-3">
+                                <label className="d-block mb-1" for="scope">Scope</label>
+                                <Dropdown>
+                                    <Dropdown.Toggle
+                                        variant=""
+                                        className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center dropdown-toggle btn">
+                                        {selectedScope
+                                            ? <><i className="icon icon-filter mr-2 mb-n1"></i> {selectedScope.text}</>
+                                            : 'Select a scope'
+                                        }
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu>
+                                        {scopeOptions.map((scope, idx) => (
+                                            <Dropdown.Item
+                                                key={'scope-' + idx}
+                                                onClick={() => { setSelectedScopre(scope); }}>
+                                                <i className="icon icon-filter mr-2 mb-n1"></i> {scope.text}
+                                            </Dropdown.Item>
+                                        ))}
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            </div>
+                        }
+                        {
+                            formikProps.values.isChosenFromExisting === 'true' && filterPresets && filterPresets.length > 0 &&
+                            <div className="mb-2">
+                                <label className="pt-2 mb-1">Select From Existing Filters</label>
+                                <Field as="select" className="form-control form-control-sm" name="selectedSettingID" onChange={handlePresetChange}>
+                                    {/* <React.Fragment> */}
+                                    <option value="">Select an option</option>
+                                    {
+                                        filterPresets.map((filter, index) =>
+                                            <option key={filter.id} value={filter.id}>{filter.title}</option>
+                                        )
                                     }
-                                </div>
-                                {(formikProps.values.filters.length > 1) &&
-                                    <div className="d-flex flex-column">
-                                        <div className="d-flex justify-content-between">
-                                            <span type="button" className="cdp-text-primary mb-2" onClick={() => null}>
-                                                Add Filter Logic
+                                    {/* </React.Fragment> */}
+                                </Field>
+                            </div>
+                        }
+                        {formikProps.values.filters.map((filter, index) =>
+                            <div className="mb-3" key={filter.name}>
+                                <FilterSummary
+                                    fieldName={getFieldDisplayText(filter.fieldName)}
+                                    operatorName={getOperatorDisplayText(filter.fieldName, filter.operator)}
+                                    values={getSummaryValueText(filter)}
+                                    index={index}
+                                    onRemove={(index) => handleRemoveFilter(index, formikProps)}
+                                />
+                            </div>
+                        )}
+
+                        <div className="d-flex justify-content-between py-2 align-items-center">
+                            <span type="button" className="cdp-text-primary" onClick={() => setShow({ ...show, addFilter: true })}>
+                                <i class="fas fa-plus"></i> Add Filter
+                                    </span>
+                            {formikProps.values.filters.length > 0 &&
+                                <span className="small" type="button" onClick={() => handleRemoveAll(formikProps)}>Remove All</span>
+                            }
+                        </div>
+                        {(formikProps.values.filters.length > 1) &&
+                            <div className="d-flex flex-column">
+                                <div className="d-flex justify-content-between">
+                                    <span type="button" className="cdp-text-primary mb-2" onClick={() => null}>
+                                        Add Filter Logic
                                             </span>
-                                        </div>
-                                        <FilterLogic
-                                            className=""
-                                            logic={formikProps.values.logic}
-                                            numberOfFilters={formikProps.values.filters.length}
-                                            onLogicChange={(logic) => formikProps.setFieldValue('logic', logic)}
-                                        />
-                                        <div className="invalid-feedback">
-                                            <ErrorMessage name="logic" />
-                                        </div>
-                                    </div>
-                                 }
+                                </div>
+                                <FilterLogic
+                                    className=""
+                                    logic={formikProps.values.logic}
+                                    numberOfFilters={formikProps.values.filters.length}
+                                    onLogicChange={(logic) => formikProps.setFieldValue('logic', logic)}
+                                />
+                                <div className="invalid-feedback">
+                                    <ErrorMessage name="logic" />
+                                </div>
+                            </div>
+                        }
                         {formikProps.values.filters.length > 0 &&
                             <React.Fragment>
                                 <label className="d-flex  align-items-center border-top mt-3 pt-2">
@@ -395,7 +409,7 @@ const MultiFilter = (props, ref) => {
                                     className="btn cdp-btn-secondary mr-1 btn-block text-white"
                                     label={formikProps.values.shouldSaveFilter ? "Save & Execute" : "Execute"}
                                     onClick={formikProps.submitForm}
-                                    disabled={formikProps.values.filters.length === 0}
+                                    disabled={formikProps.values.filters.length === 0 || !onExecute}
                                 />
                                 <Button
                                     className="btn cdp-btn-outline-primary ml-1 btn-block mt-0"

@@ -1,10 +1,11 @@
 import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import Dropdown from 'react-bootstrap/Dropdown';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { getCrdlpHcpProfiles } from '../hcp.actions';
 import Modal from 'react-bootstrap/Modal';
 import Faq from '../../../../platform/faq/client/faq.component';
+import { HCPFilter } from '../../../../information';
 
 export default function CrdlpHcpProfiles() {
     const dispatch = useDispatch();
@@ -13,16 +14,20 @@ export default function CrdlpHcpProfiles() {
 
     const [codBase, setCodBase] = useState(null);
     const [sort, setSort] = useState({ type: 'asc', value: null });
-
     const [profileDetails, setProfileDetails] = useState(null);
     const [showFaq, setShowFaq] = useState(false);
-    const handleCloseFaq = () => setShowFaq(false);
-    const handleShowFaq = () => setShowFaq(true);
+    const [isFilterEnabled, setIsFilterEnabled] = useState(false);
+    const [showFilterSidebar, setShowFilterSidebar] = useState(false);
+    const [selectedFilterSetting, setSelectedFilterSetting] = useState(null);
+    const hcpFilterRef = useRef();
 
     const hcpUsers = useSelector(state => state.hcpReducer.crdlpHcps);
     const countries = useSelector(state => state.countryReducer.countries);
     const allCountries = useSelector(state => state.countryReducer.allCountries);
     const params = new URLSearchParams(window.location.search);
+
+    const handleCloseFaq = () => setShowFaq(false);
+    const handleShowFaq = () => setShowFaq(true);
 
     useEffect(() => {
         setCodBase(params.get('codbase') ? params.get('codbase') : null);
@@ -105,7 +110,7 @@ export default function CrdlpHcpProfiles() {
                             <div className="d-flex pt-3 pt-sm-0 mb-2">
                                 {countries && hcpUsers['countries'] &&
                                     <React.Fragment>
-                                        <Dropdown className="ml-auto dropdown-customize">
+                                        <Dropdown className="ml-auto dropdown-customize mr-2">
                                             <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center">
                                                 <i className="icon icon-filter mr-2 mb-n1"></i> {hcpUsers.codbase && (countries.find(i => i.codbase === hcpUsers.codbase)) ? (countries.find(i => i.codbase === hcpUsers.codbase)).codbase_desc : 'Filter by Country'}
                                             </Dropdown.Toggle>
@@ -127,6 +132,9 @@ export default function CrdlpHcpProfiles() {
                                                 }
                                             </Dropdown.Menu>
                                         </Dropdown>
+
+                                        <button className={`btn cdp-btn-outline-primary mr-2 ${isFilterEnabled ? 'multifilter_enabled' : ''}`} onClick={() => setShowFilterSidebar(true)} ><i class="fas fa-filter mr-2"></i> Filter</button>
+                                        {/* {isFilterEnabled && <button className="btn cdp-btn-outline-primary mr-3" onClick={resetFilter} ><i class="fas fa-filter mr-2"></i> Reset Filter </button>} */}
                                     </React.Fragment>
                                 }
                             </div>
@@ -297,6 +305,14 @@ export default function CrdlpHcpProfiles() {
                         </Modal>
                     </div>
                 </div>
+                <HCPFilter
+                    ref={hcpFilterRef}
+                    show={showFilterSidebar}
+                    selectedFilterSetting={selectedFilterSetting}
+                    onHide={() => setShowFilterSidebar(false)}
+                    // onExecute={handleFilterExecute}
+                    tableName="crdlp-hcp-profiles"
+                />
             </div>
         </main>
     );

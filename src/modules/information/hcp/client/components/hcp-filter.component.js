@@ -4,13 +4,22 @@ import { MultiFilter } from "../../../../core/client/components/MultiFilter";
 import { useSelector, useDispatch } from 'react-redux';
 import { getHcpFilterSettings } from '../hcp.actions';
 
-const HCPFilter = ({ selectedFilterSetting, onHide, onExecute, show }, ref) => {
+const HCPFilter = ({ selectedFilterSetting, onHide, onExecute, show, tableName }, ref) => {
     const allCountries = useSelector(state => state.countryReducer.allCountries);
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
-    const userFilters = useSelector(state => state.hcpReducer.filterPresets);
+    const userFilters = tableName === 'hcp-profiles'
+        ? useSelector(state => state.hcpReducer.filterPresetsCdp)
+        : useSelector(state => state.hcpReducer.filterPresetsCrdlp);
     const dispatch = useDispatch();
 
     const multiFilterRef = useRef();
+
+    const scopeOptions = tableName === 'crdlp-hcp-profiles' ? [
+        { key: 'scope-hcp', text: 'Health Care Professional' },
+        { key: 'scope-pe', text: 'Professional Engagements' },
+        { key: 'scope-hco', text: 'Health Care Organization' },
+        { key: 'scope-wa', text: 'Workplace Address' }
+    ] : null;
 
     const userCountryFilterOption = loggedInUser.countries.reduce((acc, c) => {
         const country = allCountries.find(ac => c.toLowerCase() === ac.country_iso2.toLowerCase());
@@ -20,7 +29,7 @@ const HCPFilter = ({ selectedFilterSetting, onHide, onExecute, show }, ref) => {
     const filterOptions = getFilterOptions(userCountryFilterOption);
 
     useEffect(() => {
-        if(show) dispatch(getHcpFilterSettings());
+        if(show) dispatch(getHcpFilterSettings(tableName));
     }, [show]);
 
     useImperativeHandle(ref, () => ({
@@ -37,6 +46,7 @@ const HCPFilter = ({ selectedFilterSetting, onHide, onExecute, show }, ref) => {
         onHide={onHide}
         onExecute={onExecute}
         ref={multiFilterRef}
+        scopeOptions={scopeOptions}
     />
 }
 

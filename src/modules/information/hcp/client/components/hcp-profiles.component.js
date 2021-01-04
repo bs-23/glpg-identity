@@ -931,6 +931,7 @@ export default function hcpUsers() {
                     selectedFilterSetting={selectedFilterSetting}
                     onHide={() => setShow({ ...show, filterSidebar: false })}
                     onExecute={handleFilterExecute}
+                    tableName="hcp-profiles"
                 />
             </div>
         </main >
