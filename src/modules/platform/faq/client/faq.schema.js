@@ -40,6 +40,7 @@ export const faqSchema = object().shape({
         .test('has-special-charecters', 'Only space is not allowed',
             question => hasSpace(question)),
     answer: string()
+        .required('This field must not be empty.')
         .test('is-empty', 'This field must not be empty.',
             answer => isNotEmpty(answer))
         .test('is-exceeded', 'Maximum character limit has been exceeded(This limit includes HTML tags and styles)',
