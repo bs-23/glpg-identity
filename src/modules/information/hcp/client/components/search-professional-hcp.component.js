@@ -14,7 +14,7 @@ import { useToasts } from 'react-toast-notifications';
 import Faq from '../../../../platform/faq/client/faq.component';
 import Modal from 'react-bootstrap/Modal';
 
-const SearchProfessionalHcp = () => {
+const SearchProfessionalHcp = (props) => {
     const formikRef = useRef();
     const location = useLocation();
     const { addToast } = useToasts();
@@ -42,9 +42,9 @@ const SearchProfessionalHcp = () => {
     const [isAssigned, setIsAssigned] = useState(false);
     const [hcpSpecialty, setHcpSpecialty] = useState();
 
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(props.location.search);
 
-    const resetSearch = (props) => {
+    const resetSearch = (properties) => {
         setFormData({});
         setCurrentPage(1);
         setSelectedCountries([]);
@@ -53,7 +53,7 @@ const SearchProfessionalHcp = () => {
         setDuplicates(false);
         setPhonetic(false);
         setUsers({});
-        props.resetForm();
+        properties.resetForm();
         setIsAssigned(false);
         setHcpProfile(null);
         setHcpSpecialty(null);
@@ -71,7 +71,12 @@ const SearchProfessionalHcp = () => {
             .then(response => {
                 setUsers(response.data);
                 setCurrentPage(newPage);
-                scrollToResult(response.data.results.length === 0);
+                try{
+                    scrollToResult(response.data.results.length === 0);
+                }
+                catch(err){
+                    console.log(err);
+                }
             })
             .catch(err => {
                 const message = err.response.status === 400
@@ -153,7 +158,6 @@ const SearchProfessionalHcp = () => {
             const id = params.get('id');
             getHcpProfile(id);
         }
-
     }, [location]);
 
     useEffect(() => {
@@ -313,7 +317,12 @@ const SearchProfessionalHcp = () => {
                                                 setFormData(data);
                                                 setCurrentPage(1);
                                                 actions.setSubmitting(false);
-                                                scrollToResult(response.data.results.length === 0);
+                                                try{
+                                                    scrollToResult(response.data.results.length === 0);
+                                                }
+                                                catch(err){
+                                                    console.log(err);
+                                                }
                                             })
                                             .catch(err => {
                                                 const message = err.response.status === 400

@@ -33,7 +33,6 @@ const FaqForm = (props) => {
 
 
     const faqMapping = (allTopics) => {
-
         const faqWithTopics = [];
 
         const parentCategories = [...new Set(Object.values(allTopics).map((item) => item.category))];
