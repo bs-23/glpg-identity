@@ -49,6 +49,30 @@ describe('Consent categories component', () => {
         mockAxios.onGet('/api/privacy/consent-categories').reply(200, consent_categories);
 
         await store.dispatch(getConsentCategories());
+
+        const category = {
+            id: "1",
+            title: "a",
+            slug: "a"
+        };
+        const created_category = {
+            id: "2",
+            title: "cc",
+            slug: "cc109",
+            created_by: "101",
+            updated_by: "101",
+            updated_at: "2021-01-04T11:12:27.349Z",
+            created_at: "2021-01-04T11:12:27.349Z",
+            createdBy: "test_user"
+        }
+        const updated_category = {
+            id: "1",
+            title: "bb",
+            slug: "bb109",
+        }
+        mockAxios.onGet('/api/privacy/consent-categories/1').reply(200, category);
+        mockAxios.onPost('/api/privacy/consent-categories').reply(200, created_category);
+        mockAxios.onPut('/api/privacy/consent-categories/1').reply(200, updated_category);
     });
 
     const userSlice = () => store.getState().userReducer;
@@ -83,5 +107,48 @@ describe('Consent categories component', () => {
             expect(screen.getByText('Created Date')).toBeTruthy();
             expect(screen.getByText('Action')).toBeTruthy();
         });
+    });
+
+    it('should create category', async () => {
+        const {debug} = render(wrapperComponent());
+
+        await waitFor(async () => {
+            const edit_btn = screen.getByText('Create new category');
+            fireEvent.click(edit_btn);
+        });
+
+        const title_input = screen.getByRole('textbox', { name: '' });
+        const save_btn = screen.getByRole('button', { name: 'Save changes' });
+
+        fireEvent.change(title_input, { target: { value: 'cc' } });
+
+        await waitFor(async () => {
+            fireEvent.click(save_btn);
+        });
+
+        expect(screen.getByText('cc')).toBeTruthy();
+        expect(screen.getByText('cc109')).toBeTruthy();
+        expect(screen.getByText('test_user')).toBeTruthy();
+    });
+
+    it('should edit category', async () => {
+        const {debug} = render(wrapperComponent());
+
+        await waitFor(async () => {
+            const edit_btn = screen.getByText('Edit');
+            fireEvent.click(edit_btn);
+        });
+
+        const title_input = screen.getByRole('textbox', { name: '' });
+        const save_btn = screen.getByRole('button', { name: 'Save changes' });
+
+        fireEvent.change(title_input, { target: { value: 'bb' } });
+
+        await waitFor(async () => {
+            fireEvent.click(save_btn);
+        });
+
+        expect(screen.getByText('bb')).toBeTruthy();
+        expect(screen.getByText('bb109')).toBeTruthy();
     });
 });
