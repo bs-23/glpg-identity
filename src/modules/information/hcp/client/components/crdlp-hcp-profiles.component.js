@@ -108,7 +108,7 @@ export default function CrdlpHcpProfiles() {
                                 </div>
                             </div>
                             <div className="d-flex pt-3 pt-sm-0 mb-2">
-                                <button className={`btn cdp-btn-outline-primary mr-2 ${isFilterEnabled ? 'multifilter_enabled' : ''}`} onClick={() => setShowFilterSidebar(true)} ><i class="fas fa-filter mr-2"></i> Filter</button>
+                                <button className={`btn cdp-btn-outline-primary ${isFilterEnabled ? 'multifilter_enabled' : ''}`} onClick={() => setShowFilterSidebar(true)} ><i class="fas fa-filter mr-2"></i> Filter</button>
                                 {/* {isFilterEnabled && <button className="btn cdp-btn-outline-primary mr-3" onClick={resetFilter} ><i class="fas fa-filter mr-2"></i> Reset Filter </button>} */}
                             </div>
                         </div>

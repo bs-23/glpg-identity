@@ -99,4 +99,50 @@
         position: relative;
         top: 2px;
     }
+
+    &__scope-dropdown {
+        .dropdown {
+            &-toggle {
+                &:hover,
+                &:active,
+                &:focus {
+                    color: $white-color;
+
+                    i {
+                        color: $white-color;
+                    }
+                }
+            }
+
+            &-menu {
+                padding: 0px;
+            }
+
+            &-item {
+                background: #F1F1F1;
+                width: 96%;
+                margin: 5px auto;
+                border-radius: 3px;
+                padding: 5px 10px;
+
+                &:hover {
+                    color: $primary-color;
+                }
+
+                &:active,
+                &:focus {
+                    background: $secondary-color;
+                    color: $white-color;
+
+                    i {
+                        color: $white-color;
+                    }
+                }
+            }
+        }
+    }
+
+    &__scope-tolltip {
+        border: 1px solid $secondary-color;
+    }
 }

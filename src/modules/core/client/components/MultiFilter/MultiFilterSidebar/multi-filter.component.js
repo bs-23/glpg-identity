@@ -7,6 +7,7 @@ import { Button } from '../common';
 import AddFilter from '../AddFilter/add-filter.component';
 import { FilterSummary, FilterLogic } from './components';
 import { multiFilterSchema } from './multi-filter.schema';
+import { OverlayTrigger, Popover } from 'react-bootstrap';
 import { buildLogicAfterAddition, buildLogicAfterRemoval } from '../utils';
 
 const MultiFilter = (props, ref) => {
@@ -94,6 +95,14 @@ const MultiFilter = (props, ref) => {
         const operator = filter.operators.find(op => op.key === operatorName);
         return operator ? operator.displayText : '';
     };
+
+    const scopeHintPopup = (
+        <Popover id="scopeHintPopup" className="shadow-lg filter__scope-tolltip">
+            <Popover.Content className="px-3">
+                You can select only one scope
+            </Popover.Content>
+        </Popover>
+    );
 
     const handleRemoveFilter = (index, props) => {
         const allFilters = props.values.filters;
@@ -271,13 +280,18 @@ const MultiFilter = (props, ref) => {
                                 </div>}
                                 {scopeOptions &&
                                     <div className="mb-3">
-                                        <label className="d-block mb-1" for="scope">Scope</label>
-                                        <Dropdown>
+                                        <label className="d-block mb-1" for="scope">
+                                        Scope
+                                        <OverlayTrigger trigger="click" rootClose placement="top" overlay={scopeHintPopup}>
+                                        <i className="fas fa-info-circle ml-2 text-secondary" role="button"></i>
+                                        </OverlayTrigger>
+                                        </label>
+                                        <Dropdown className="filter__scope-dropdown">
                                             <Dropdown.Toggle
                                                 variant=""
-                                                className="cdp-btn-outline-primary dropdown-toggle btn btn-block btn-sm d-flex align-items-center justify-content-between dropdown-toggle">
+                                                className="cdp-btn-outline-primary dropdown-toggle btn btn-block btn-sm d-flex justify-content-between dropdown-toggle">
                                                 {selectedScope
-                                                    ? <><i className={`${selectedScope.icon} mr-2 cdp-text-primary`}></i> {selectedScope.text}</>
+                                                    ? <><span><i className={`${selectedScope.icon} mr-2 cdp-text-primary`}></i> {selectedScope.text}</span></>
                                                     : 'Select a scope'
                                                 }
                                             </Dropdown.Toggle>
