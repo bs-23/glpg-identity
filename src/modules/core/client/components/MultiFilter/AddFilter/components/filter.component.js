@@ -133,6 +133,7 @@ const Filter = (props) => {
                         handleDelete={handleDelete}
                         handleAddition={handleAddition}
                         handleInputBlur={handleInputBlur}
+                        autofocus={false}
                     />
                     {isTouched && <div className="invalid-feedback">{validationError.value}</div>}
                 </div>
