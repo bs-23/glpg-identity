@@ -51,6 +51,14 @@ const Filter = (props) => {
     };
 
 
+    const handleFilterChange = (e) => {
+        const inputType = e.target.type;
+        if(inputType === 'date') {
+            onChange(e.target.name, e.target.value, index);
+        }
+        else onChange(e.target.name, [...value, e.target.value], index);
+    }
+
     return <div className="pb-3 mb-3 border-bottom">
         <div className="d-flex justify-content-between">
             <div className="mr-2 cdp-text-secondary">Filter {currentNumberOfFilters+index+1}</div>
@@ -138,7 +146,7 @@ const Filter = (props) => {
                         name="value"
                         value={value}
                         type={type}
-                        onChange={(e) => onChange(e.target.name, [...value, e.target.value], index)}
+                        onChange={handleFilterChange}
                     />
                     {isTouched && <div className="invalid-feedback">{validationError.value}</div>}
                 </React.Fragment>

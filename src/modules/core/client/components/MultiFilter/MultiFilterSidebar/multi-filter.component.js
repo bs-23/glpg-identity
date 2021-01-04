@@ -188,6 +188,7 @@ const MultiFilter = (props, ref) => {
         formikProps.setFieldValue('scope', '');
         formikProps.setFieldValue('lastAppliedFilters', []);
         formikProps.setFieldValue('lastAppliedLogic', []);
+        formikProps.setTouched({ 'filterSettingName': false });
         if(value === 'true') formikProps.setFieldValue('shouldSaveFilter', true);
         if(value === 'false') formikProps.setFieldValue('shouldSaveFilter', false);
     }
@@ -332,7 +333,6 @@ const MultiFilter = (props, ref) => {
                                             </span>
                                         </div>
                                         <FilterLogic
-                                            test={formikProps.values.logic}
                                             className=""
                                             logic={formikProps.values.logic}
                                             numberOfFilters={formikProps.values.filters.length}
