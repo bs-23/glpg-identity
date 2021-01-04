@@ -273,7 +273,7 @@ const MultiFilter = (props, ref) => {
                                         <Dropdown>
                                             <Dropdown.Toggle
                                                 variant=""
-                                                className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center dropdown-toggle btn">
+                                                className="cdp-btn-outline-primary dropdown-toggle btn btn-block btn-sm d-flex align-items-center justify-content-between dropdown-toggle">
                                                 {selectedScope
                                                     ? <><i className="icon icon-filter mr-2 mb-n1"></i> {selectedScope.text}</>
                                                     : 'Select a scope'
@@ -284,7 +284,7 @@ const MultiFilter = (props, ref) => {
                                                     <Dropdown.Item
                                                         key={'scope-' + idx}
                                                         onClick={() => { setSelectedScopre(scope); }}>
-                                                        <i className="icon icon-filter mr-2 mb-n1"></i> {scope.text}
+                                                        <i className="fas fa-user-md mr-2 cdp-text-primary mb-n1"></i> {scope.text}
                                                     </Dropdown.Item>
                                                 ))}
                                             </Dropdown.Menu>
