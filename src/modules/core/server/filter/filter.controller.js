@@ -2,7 +2,7 @@ const path = require('path');
 const FilterSettings = require(path.join(process.cwd(), "src/modules/core/server/filter/filter.model.js"));
 const filterService = require(path.join(process.cwd(), 'src/modules/platform/user/server/filter.js'));
 
-const tables = ['hcp-profiles', 'cdp-users']
+const tables = ['hcp-profiles', 'crdlp-hcp-profiles', 'cdp-users']
 
 async function getFilterOptions(req, res) {
     try {

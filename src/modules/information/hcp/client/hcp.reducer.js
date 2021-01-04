@@ -5,7 +5,9 @@ const initialState = {
     crdlpHcps: {},
     specialties: {},
     oklaHcpDetails: null,
-    oklaHcoDetails: null
+    oklaHcoDetails: null,
+    filterPresetsCdp: null,
+    filterPresetsCrdlp: null
 };
 
 function sortItems(itms, val, type) {
@@ -104,7 +106,7 @@ export default function reducer(state = initialState, action) {
         case Types.GET_HCP_FILTER_SETTINGS_FULFILLED: {
             return {
                 ...state,
-                filterPresets: action.payload.data
+                filterPresetsCdp: action.payload.data
             }
         }
     }

@@ -134,12 +134,12 @@ export function setOklaHcoDetails(hcoDetails) {
     };
 }
 
-export function getHcpFilterSettings() {
+export function getHcpFilterSettings(tableName) {
     return {
         type: Types.GET_HCP_FILTER_SETTINGS,
         payload: axios({
             method: 'get',
-            url: '/api/filter?table=hcp-profiles'
+            url: `/api/filter?table=${tableName}`
         })
     };
 }
