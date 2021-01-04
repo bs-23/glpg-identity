@@ -188,6 +188,7 @@ const MultiFilter = (props, ref) => {
         formikProps.setFieldValue('scope', '');
         formikProps.setFieldValue('lastAppliedFilters', []);
         formikProps.setFieldValue('lastAppliedLogic', []);
+        formikProps.setTouched({ 'filterSettingName': false });
         if(value === 'true') formikProps.setFieldValue('shouldSaveFilter', true);
         if(value === 'false') formikProps.setFieldValue('shouldSaveFilter', false);
     }
@@ -266,7 +267,7 @@ const MultiFilter = (props, ref) => {
                                         <option className="p-2" value=''> Select an Option </option>
                                     </Field>
                                 </div>}
-                                <div role="group" aria-labelledby="my-radio-group">
+                                {filterPresets && filterPresets.length > 0 && <div role="group" aria-labelledby="my-radio-group">
                                     <label>
                                         <Field
                                             className="mr-2"
@@ -287,7 +288,7 @@ const MultiFilter = (props, ref) => {
                                         />
                                         Choose From Existing
                                     </label>
-                                </div>
+                                </div>}
                                 {
                                     formikProps.values.isChosenFromExisting === 'true' && filterPresets && filterPresets.length > 0 &&
                                     <div className="mb-2">
@@ -332,7 +333,6 @@ const MultiFilter = (props, ref) => {
                                             </span>
                                         </div>
                                         <FilterLogic
-                                            test={formikProps.values.logic}
                                             className=""
                                             logic={formikProps.values.logic}
                                             numberOfFilters={formikProps.values.filters.length}
