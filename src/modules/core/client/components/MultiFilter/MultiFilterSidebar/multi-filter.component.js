@@ -281,7 +281,7 @@ const MultiFilter = (props, ref) => {
                                 </div>}
                                 {
                                     formikProps.values.isChosenFromExisting === 'true' && filterPresets && filterPresets.length > 0 &&
-                                    <div className="mb-2">
+                                    <div className="mb-3">
                                         <label className="pt-2 mb-1">Select From Existing Filters</label>
                                         <Field as="select" className="form-control form-control-sm" name="selectedSettingID" onChange={handlePresetChange}>
                                             {/* <React.Fragment> */}
@@ -296,7 +296,7 @@ const MultiFilter = (props, ref) => {
                                     </div>
                                 }
                                 {formikProps.values.filters.map((filter, index) =>
-                                    <div className="mb-3" key={filter.name}>
+                                    <div className="mb-2" key={filter.name}>
                                         <FilterSummary
                                             fieldName={getFieldDisplayText(filter.fieldName)}
                                             operatorName={getOperatorDisplayText(filter.fieldName, filter.operator)}
@@ -318,7 +318,7 @@ const MultiFilter = (props, ref) => {
                                 {(formikProps.values.filters.length > 1) &&
                                     <div className="d-flex flex-column">
                                         <div className="d-flex justify-content-between">
-                                            <span type="button" className="cdp-text-primary mb-2" onClick={() => null}>
+                                            <span type="button" className="cdp-text-primary mb-2 pt-2" onClick={() => null}>
                                                 Add Filter Logic
                                             </span>
                                         </div>

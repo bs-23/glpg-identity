@@ -41,7 +41,7 @@ const FilterLogic = (props) => {
         onLogicChange(logic);
     }
 
-    return <div className="d-flex flex-wrp align-items-center">
+    return <div className="d-flex flex-wrp align-items-center shadow-sm border p-2 rounded small">
         {filterNodes.map((e, ind) => {
             return <div key={ind}>
                 <span className="mr-1">Filter {e}</span>
