@@ -142,17 +142,17 @@ export default function CrdlpHcpProfiles() {
 
                                                 <th width="20%"><span className={sort.value === 'lastname' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'lastname')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
-                                                <th width="13%"><span className={sort.value === 'individual_id_onekey' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'individual_id_onekey')}>Onekey ID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th width="4%"><span className={sort.value === 'ind_status_desc' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'ind_status_desc')}>Status<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
                                                 <th width="13%"><span className={sort.value === 'uuid_1' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'uuid_1')}>UUID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+
+                                                <th width="13%"><span className={sort.value === 'individual_id_onekey' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'individual_id_onekey')}>Onekey ID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+
+                                                <th width="10%"><span className={sort.value === 'country_iso2' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'country_iso2')}>Country<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
                                                 <th width="10%">Specialty</th>
 
                                                 <th width="10%">Phone</th>
-
-                                                <th width="4%"><span className={sort.value === 'ind_status_desc' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'ind_status_desc')}>Status<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-
-                                                <th width="10%"><span className={sort.value === 'country_iso2' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'country_iso2')}>Country<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
                                                 <th width="10%">Action</th>
                                             </tr>
@@ -162,13 +162,15 @@ export default function CrdlpHcpProfiles() {
                                                 <tr key={'user-' + idx}>
                                                     <td className="text-break">{row.firstname}</td>
                                                     <td className="text-break">{row.lastname}</td>
-                                                    <td className="text-break">{row.individual_id_onekey || '--'}</td>
+                                                    <td>
+                                                        <i className={`fa fa-xs fa-circle ${(row.ind_status_desc || '').toLowerCase() === 'valid' ? 'text-success' : 'text-danger'} pr-2 hcp-status-icon`}></i>
+                                                        {row.ind_status_desc}
+                                                    </td>
                                                     <td className="text-break">{row.uuid_1 || '--'}</td>
+                                                    <td className="text-break">{row.individual_id_onekey || '--'}</td>
+                                                    <td>{getCountryName(row.country_iso2)}</td>
                                                     <td>{(row.specialties || []).map(s => s.description).join(', ')}</td>
                                                     <td className="text-break">{row.telephone || '--'}</td>
-                                                    <td>{row.ind_status_desc}</td>
-                                                    <td>{getCountryName(row.country_iso2)}</td>
-
                                                     <td>
                                                         <button className="btn cdp-btn-outline-primary btn-sm" onClick={() => setProfileDetails(row)}><i class="icon icon-user mr-2" ></i>Profile</button>
                                                     </td>
@@ -283,7 +285,10 @@ export default function CrdlpHcpProfiles() {
                                             </div>
                                             <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">Status</div>
-                                                <div className="text-capitalize">{profileDetails.ind_status_desc || '--'}</div>
+                                                <div className="text-capitalize">
+                                                    <i className={`fa fa-xs fa-circle ${(profileDetails.ind_status_desc || '').toLowerCase() === 'valid' ? 'text-success' : 'text-danger'} pr-2 hcp-status-icon`}></i>
+                                                    {profileDetails.ind_status_desc || '--'}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
