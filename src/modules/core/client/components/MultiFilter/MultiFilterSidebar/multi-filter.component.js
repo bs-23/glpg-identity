@@ -270,11 +270,11 @@ const MultiFilter = (props, ref) => {
                                 {filterPresets && filterPresets.length > 0 && <div role="group" aria-labelledby="my-radio-group">
                                 <div role="group" aria-labelledby="my-radio-group">
                                     <div class="custom-control custom-radio">
-                                        <input type="radio" class="custom-control-input mr-2" id="createnew" name="isChosenFromExisting" value="false" onChange={(e) => handleChooseFromExisting(e, formikProps)} />
+                                        <input type="radio" class="custom-control-input mr-2" id="createnew" name="isChosenFromExisting" value="false" onChange={(e) => handleChooseFromExisting(e, formikProps)} checked={formikProps.values.isChosenFromExisting === 'false'} />
                                         <label class="custom-control-label" type="button" for="createnew">Create New</label>
                                     </div>
                                     <div class="custom-control custom-radio my-2">
-                                        <input type="radio" class="custom-control-input mr-2" id="chooseformexisting" name="isChosenFromExisting" value="true" onChange={(e) => handleChooseFromExisting(e, formikProps)} />
+                                        <input type="radio" class="custom-control-input mr-2" id="chooseformexisting" name="isChosenFromExisting" value="true" onChange={(e) => handleChooseFromExisting(e, formikProps)} checked={formikProps.values.isChosenFromExisting === 'true'} />
                                         <label class="custom-control-label" type="button" for="chooseformexisting">Choose From Existing</label>
                                     </div>
                                 </div>
