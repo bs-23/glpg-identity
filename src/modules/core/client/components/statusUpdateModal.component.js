@@ -9,7 +9,7 @@ import { ApprovalRejectSchema } from '../../../information/hcp/client/hcp.schema
 
 export default function statusupdateModal(props) {
   const dispatch = useDispatch();
-  const { user, show, onHide} = props;
+    const { user, show, onHide, status, limit, list, onSort} = props;
   const [consentForUser, setConsentForUser] = useState({user});
   const { addToast } = useToasts();
 
@@ -23,7 +23,8 @@ export default function statusupdateModal(props) {
       appearance: 'success',
       autoDismiss: true
     })
-     dispatch(getHcpProfiles('?page=1&status=not_verified&limit=5'));
+     dispatch(getHcpProfiles(`?page=1&${status? status : ''}&limit=${limit}`));
+     list && onSort();
    onHide();
   }
 

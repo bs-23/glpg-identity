@@ -52,12 +52,13 @@ export default function Inbox(){
                                               <button className="btn cdp-btn-secondary btn-sm text-white" onClick={() => { setModalId(key); setShowModal(true) }}>Update Status</button>
                                           </span>
                                       </li>
-                                      {(showModal && modalId === key) && <StatusupdateModal user={user} show={showModal} onHide={() => { setShowModal(false) }} />}
+                                      {(showModal && modalId === key) && <StatusupdateModal user={user} limit={5} show={showModal} onHide={() => { setShowModal(false) }} status={'not_verified'}/>}
                                   </ul>
                                   )
                               }
                               {hcps.users !== undefined && hcps.users.length !== 0 ?
-                                  <NavLink to="/in formation/list?page=1&status=not_verified" className="d-inline-block p-3 text-uppercase cdp-text-secondary active small font-weight-bold">More Pending</NavLink>
+                                  <NavLink to="/information/list?page=1&status=not_verified" className="d-inline-block p-3 text-uppercase cdp-text-secondary active small font-weight-bold">
+                                      {hcps.users.length === 5 && 'More Pending'}</NavLink>
                                   : <h5 className="d-block py-5 px-2 text-uppercase cdp-text-secondary active text-center mb-0"><i className="far fa-folder-open mr-2"></i>No Data Found</h5>}
                           </div>
                       </Panel>
