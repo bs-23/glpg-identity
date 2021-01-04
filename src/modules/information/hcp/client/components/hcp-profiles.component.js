@@ -629,7 +629,7 @@ export default function hcpUsers() {
                                         </div>
                                     </div>
                                     <React.Fragment>
-                                        <button className={`btn cdp-btn-outline-primary mr-2 ${isFilterEnabled ? 'multifilter_enabled' : ''}`} onClick={() => setShow({ ...show, filterSidebar: true })} >
+                                        <button className={`btn cdp-btn-outline-primary ${isFilterEnabled ? 'multifilter_enabled' : ''}`} onClick={() => setShow({ ...show, filterSidebar: true })} >
                                             <i className={`fas fa-filter  ${isFilterEnabled ? '' : 'mr-2'}`}></i>
                                             <i className={`fas fa-database ${isFilterEnabled ? 'd-inline-block filter__sub-icon mr-1' : 'd-none'}`}></i>
                                             Filter
