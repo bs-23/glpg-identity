@@ -209,6 +209,8 @@ const MultiFilter = (props, ref) => {
             formikBag.setFieldValue('selectedSettingFilters', selectedSetting.filters);
             formikBag.setFieldValue('selectedSettingLogic', selectedSetting.logic);
             formikBag.setFieldValue('filterSettingName', selectedSettingTitle);
+            formikBag.setFieldValue('lastAppliedFilters', selectedSetting.filters);
+            formikBag.setFieldValue('lastAppliedLogic', selectedSetting.logic);
             if(!formikBag.touched.shouldSaveFilter) formikBag.setFieldValue('shouldSaveFilter', true);
         }
     }, [selectedSetting, selectedSettingTitle, selectedSettingID])

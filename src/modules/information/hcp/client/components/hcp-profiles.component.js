@@ -169,9 +169,10 @@ export default function hcpUsers() {
             }
         }
         else {
-            const { settings } = filterSetting;
-            if(multiFilterSetting.selectedSettingID) history.push(`/information/list/cdp?filter=${multiFilterSetting.selectedSettingID}`)
-            else history.push(`/information/list/cdp`);
+            // const { settings } = filterSetting;
+            // if(multiFilterSetting.selectedSettingID) history.push(`/information/list/cdp?filter=${multiFilterSetting.selectedSettingID}`)
+            // else history.push(`/information/list/cdp`);
+            history.push(`/information/list/cdp`);
         };
         setIsFilterEnabled(true);
     }
