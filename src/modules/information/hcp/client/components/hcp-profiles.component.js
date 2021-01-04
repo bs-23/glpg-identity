@@ -618,7 +618,7 @@ export default function hcpUsers() {
                                         List of HCP User
                                     </h4>
                                     <div>
-                                        <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/cdp">Customer Data Platform</NavLink>
+                                        <div className="custom-tab px-3 py-3 cdp-border-primary active">Customer Data Platform</div>
                                         <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/crdlp">CRDLP</NavLink>
                                     </div>
                                 </div>
