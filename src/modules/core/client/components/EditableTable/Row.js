@@ -142,7 +142,7 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
                             editableTableProps={editableTableProps}
                         />
                         : <Cell
-                            value={customOrCurrentCellValue}
+                            value={customOrCurrentCellValue || '--'}
                             editable={shouldBeEditable}
                             onSwitchToEditMode={e => onCellSwitchToEdit(rowIndex, colIndex, e)}
                             row={row}
