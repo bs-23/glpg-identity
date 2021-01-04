@@ -614,7 +614,7 @@ export default function hcpUsers() {
                 <div className="row">
                     <div className="col-12">
                         <div>
-                            <div className="d-sm-flex justify-content-between align-items-end mt-4">
+                            <div className="d-sm-flex justify-content-between align-items-end mt-1">
                                 <div>
                                     <h4 className="cdp-text-primary font-weight-bold mb-0 mr-sm-4 mr-1 d-flex pb-2">
                                         List of HCP User
