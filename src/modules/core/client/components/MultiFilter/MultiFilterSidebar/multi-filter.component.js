@@ -1,10 +1,12 @@
-import React, { useState, useRef, useImperativeHandle } from 'react';
-import { Formik, Field } from 'formik';
+import React, { useState, useRef, useImperativeHandle, useEffect } from 'react';
+import { Formik, Field, ErrorMessage } from 'formik';
 import _ from 'lodash';
 
 import { Button } from '../common';
 import AddFilter from '../AddFilter/add-filter.component';
 import { FilterSummary, FilterLogic } from './components';
+import { multiFilterSchema } from './multi-filter.schema';
+import { buildLogicAfterAddition, buildLogicAfterRemoval } from '../utils';
 
 const MultiFilter = (props, ref) => {
     const {
@@ -44,7 +46,12 @@ const MultiFilter = (props, ref) => {
         if(e.target === e.currentTarget) if(hideOnClickAway === true) onHide();
     };
 
-    const handleAddFilterDone = (filters, formikProps, selectedFilter) => {
+    const handleAddFilterDone = (filters, formikProps) => {
+        if(filters.length === 0) {
+            setShow({ ...show, addFilter: false });
+            return;
+        };
+
         const allFiltersMerged = [...formikProps.values.filters, ...filters];
         let uniqueFilters = [];
 
@@ -61,18 +68,15 @@ const MultiFilter = (props, ref) => {
             return filter;
         });
 
+        const lengthOfNewFiltersAdded = allUniqueFilters.length - formikProps.values.filters.length;
+
+        const newFilterIndices = [];
+        for(let i = 0; i < lengthOfNewFiltersAdded; ++i) newFilterIndices.push(String(formikProps.values.filters.length + i + 1));
+
+        const updatedLogic = buildLogicAfterAddition(newFilterIndices, formikProps.values.logic);
+
         formikProps.setFieldValue('filters', allUniqueFilters);
-
-        // const logic = filterPresets && filterPresets.length
-        //     ? filterPresets.find(fp => fp.id === selectedFilter?.id)?.settings.logic
-        //     : '';
-        // formikProps.setFieldValue('logic', logic);
-
-        // if(!formikProps.values.selectedSettingID && selectedFilter) {
-        //     formikProps.setFieldValue('selectedSettingID', selectedFilter.id);
-        //     formikProps.setFieldValue('filterSettingName', selectedFilter.title);
-        //     formikProps.setFieldValue('logic', selectedFilter.settings.logic);
-        // }
+        formikProps.setFieldValue('logic', updatedLogic);
 
         setShow({ ...show, addFilter: false });
     };
@@ -96,7 +100,11 @@ const MultiFilter = (props, ref) => {
                 filter.name = String(index+1);
                 return filter;
             });
+
+            const updatedLogic = buildLogicAfterRemoval(props.values.logic, index);
+
             props.setFieldValue('filters', allFiltersAfterRemoval);
+            props.setFieldValue('logic', updatedLogic);
         }
     };
 
@@ -110,12 +118,18 @@ const MultiFilter = (props, ref) => {
         actions.setFieldValue('lastAppliedFilters', values.filters);
         actions.setFieldValue('lastAppliedLogic', values.logic);
         if(!values.shouldSaveFilter && values.selectedSettingID) {
-            const selectedPreset = filterPresets.find(f => f.id === values.selectedSettingID);
-            if(
-                (selectedSetting && !_.isEqual(selectedSetting.filters, values.filters)) ||
-                (selectedPreset && !_.isEqual(selectedPreset.settings.filters, values.filters))
-            ) {
+            const currentSetting = {
+                filters: values.filters,
+                logic: values.logic
+            }
+            const selectedSetting = {
+                filters: values.selectedSettingFilters,
+                logic: values.selectedSettingLogic
+            }
+            if(selectedSetting && !_.isEqual(selectedSetting, currentSetting)) {
                 actions.setFieldValue('selectedSettingID', '');
+                actions.setFieldValue('selectedSettingFilters', []);
+                actions.setFieldValue('selectedSettingLogic', '');
                 actions.setFieldValue('filterSettingName', '');
                 actions.setFieldValue('isChosenFromExisting', 'false');
                 values.selectedSettingID = '';
@@ -137,6 +151,8 @@ const MultiFilter = (props, ref) => {
 
         if(selectedPresetID === '') {
             formikBag.setFieldValue('selectedSettingID', '');
+            formikBag.setFieldValue('selectedSettingFilters', []);
+            formikBag.setFieldValue('selectedSettingLogic', '');
             formikBag.setFieldValue('filterSettingName', '');
             formikBag.setFieldValue('filters', []);
             formikBag.setFieldValue('logic', '');
@@ -151,10 +167,13 @@ const MultiFilter = (props, ref) => {
         const { filters, logic } = filterPreset.settings;
 
         formikBag.setFieldValue('selectedSettingID', selectedPresetID);
+        formikBag.setFieldValue('selectedSettingFilters', filters);
+        formikBag.setFieldValue('selectedSettingLogic', logic);
         formikBag.setFieldValue('filterSettingName', filterPreset.title);
         formikBag.setFieldValue('filters', filters);
         formikBag.setFieldValue('logic', logic);
         formikBag.setFieldValue('shouldSaveFilter', true);
+        formikBag.validateForm();
     }
 
     const handleChooseFromExisting = (e, formikProps) => {
@@ -163,12 +182,33 @@ const MultiFilter = (props, ref) => {
         formikProps.setFieldValue('filters', []);
         formikProps.setFieldValue('logic', '');
         formikProps.setFieldValue('selectedSettingID', '');
+        formikProps.setFieldValue('selectedSettingFilters', []);
+        formikProps.setFieldValue('selectedSettingLogic', '');
         formikProps.setFieldValue('filterSettingName', '');
         formikProps.setFieldValue('scope', '');
-        formikProps.setFieldValue('shouldSaveFilter', true);
         formikProps.setFieldValue('lastAppliedFilters', []);
         formikProps.setFieldValue('lastAppliedLogic', []);
+        if(value === 'true') formikProps.setFieldValue('shouldSaveFilter', true);
+        if(value === 'false') formikProps.setFieldValue('shouldSaveFilter', false);
     }
+
+    const handleClose = () => {
+        setShow({ ...show, addFilter: false });
+        onHide && onHide();
+    }
+
+    useEffect(() => {
+        if(formikBag) {
+            formikBag.setFieldValue('isChosenFromExisting', 'true');
+            formikBag.setFieldValue('filters', selectedSetting.filters);
+            formikBag.setFieldValue('logic', selectedSetting.logic);
+            formikBag.setFieldValue('selectedSettingID', selectedSettingID);
+            formikBag.setFieldValue('selectedSettingFilters', selectedSetting.filters);
+            formikBag.setFieldValue('selectedSettingLogic', selectedSetting.logic);
+            formikBag.setFieldValue('filterSettingName', selectedSettingTitle);
+            if(!formikBag.touched.shouldSaveFilter) formikBag.setFieldValue('shouldSaveFilter', true);
+        }
+    }, [selectedSetting, selectedSettingTitle, selectedSettingID])
 
     useImperativeHandle(ref, () => ({
         resetFilter,
@@ -189,6 +229,12 @@ const MultiFilter = (props, ref) => {
                     shouldSaveFilter: selectedSettingID ? true : false,
                     filterSettingName: selectedSettingTitle || '',
                     selectedSettingID: selectedSettingID || '',
+                    selectedSettingFilters: selectedSetting
+                        ? selectedSetting.filters
+                        : [],
+                    selectedSettingLogic: selectedSetting
+                        ? selectedSetting.logic
+                        : '',
                     lastAppliedFilters: selectedSetting
                         ? selectedSetting.filters
                         : [],
@@ -197,7 +243,8 @@ const MultiFilter = (props, ref) => {
                         : '',
                     isChosenFromExisting: selectedSettingID ? 'true' : 'false'
                 }}
-                enableReinitialize
+                validationSchema={multiFilterSchema}
+                // enableReinitialize
             >
                 {(formikProps) =>
                     showSidePanel &&
@@ -277,7 +324,7 @@ const MultiFilter = (props, ref) => {
                                         <span className="small" type="button" onClick={() => handleRemoveAll(formikProps)}>Remove All</span>
                                     }
                                 </div>
-                                {formikProps.values.filters.length > 1 &&
+                                {(formikProps.values.filters.length > 1) &&
                                     <div className="d-flex flex-column">
                                         <div className="d-flex justify-content-between">
                                             <span type="button" className="cdp-text-primary mb-2" onClick={() => null}>
@@ -285,11 +332,15 @@ const MultiFilter = (props, ref) => {
                                             </span>
                                         </div>
                                         <FilterLogic
+                                            test={formikProps.values.logic}
                                             className=""
                                             logic={formikProps.values.logic}
                                             numberOfFilters={formikProps.values.filters.length}
                                             onLogicChange={(logic) => formikProps.setFieldValue('logic', logic)}
                                         />
+                                        <div className="invalid-feedback">
+                                            <ErrorMessage name="logic" />
+                                        </div>
                                     </div>
                                  }
                         {formikProps.values.filters.length > 0 &&
@@ -303,7 +354,10 @@ const MultiFilter = (props, ref) => {
                                             name="shouldSaveFilter"
                                             checked={formikProps.values.shouldSaveFilter}
                                             value={formikProps.values.shouldSaveFilter}
-                                            onChange={(e) => formikProps.handleChange(e)}
+                                            onChange={(e) => {
+                                                formikProps.setFieldTouched('shouldSaveFilter');
+                                                formikProps.handleChange(e);
+                                            }}
                                         />
                                         <span className="slider round"></span>
                                     </span>
@@ -315,6 +369,12 @@ const MultiFilter = (props, ref) => {
                                             name="filterSettingName"
                                             placeholder="Add filter setting name"
                                         />
+                                        {/* {formikProps.touched.filterSettingName && formikProps.values.filterSettingName.length === 0 &&
+                                            <div className="invalid-feedback">This field cannot be empty.</div>
+                                        } */}
+                                        <div className="invalid-feedback">
+                                            <ErrorMessage name="filterSettingName" />
+                                        </div>
                                     </div>
                                 }
                             </React.Fragment>
@@ -333,14 +393,14 @@ const MultiFilter = (props, ref) => {
                             <div className="p-3 d-flex filter__section-btn">
                                 <Button
                                     className="btn cdp-btn-secondary mr-1 btn-block text-white"
-                                    label={formikProps.values.shouldSaveFilter ? "Save and Execute" : "Execute"}
+                                    label={formikProps.values.shouldSaveFilter ? "Save & Execute" : "Execute"}
                                     onClick={formikProps.submitForm}
                                     disabled={formikProps.values.filters.length === 0}
                                 />
                                 <Button
                                     className="btn cdp-btn-outline-primary ml-1 btn-block mt-0"
                                     label="Close"
-                                    onClick={onHide}
+                                    onClick={handleClose}
                                 />
                             </div>
                             </div>
