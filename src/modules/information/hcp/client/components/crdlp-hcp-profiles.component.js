@@ -108,35 +108,8 @@ export default function CrdlpHcpProfiles() {
                                 </div>
                             </div>
                             <div className="d-flex pt-3 pt-sm-0 mb-2">
-                                {countries && hcpUsers['countries'] &&
-                                    <React.Fragment>
-                                        <Dropdown className="ml-auto dropdown-customize mr-2">
-                                            <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center">
-                                                <i className="icon icon-filter mr-2 mb-n1"></i> {hcpUsers.codbase && (countries.find(i => i.codbase === hcpUsers.codbase)) ? (countries.find(i => i.codbase === hcpUsers.codbase)).codbase_desc : 'Filter by Country'}
-                                            </Dropdown.Toggle>
-                                            <Dropdown.Menu>
-                                                {
-                                                    hcpUsers.codbase && <Dropdown.Item onClick={() => urlChange(1, 'null', params.get('orderBy'))}>All</Dropdown.Item>
-                                                }
-
-                                                {
-                                                    countries.map((item, index) => (
-                                                        hcpUsers.countries.includes(item.country_iso2) &&
-                                                        <Dropdown.Item key={index} className={hcpUsers.countries.includes(item.country_iso2) && hcpUsers.codbase === item.codbase ? 'd-none' : ''} onClick={() => urlChange(1, item.codbase, params.get('orderBy'), params.get('orderType'))}>
-                                                            {
-                                                                hcpUsers.countries.includes(item.country_iso2) ? item.codbase_desc : null
-                                                            }
-                                                        </Dropdown.Item>
-                                                    ))
-
-                                                }
-                                            </Dropdown.Menu>
-                                        </Dropdown>
-
-                                        <button className={`btn cdp-btn-outline-primary mr-2 ${isFilterEnabled ? 'multifilter_enabled' : ''}`} onClick={() => setShowFilterSidebar(true)} ><i class="fas fa-filter mr-2"></i> Filter</button>
-                                        {/* {isFilterEnabled && <button className="btn cdp-btn-outline-primary mr-3" onClick={resetFilter} ><i class="fas fa-filter mr-2"></i> Reset Filter </button>} */}
-                                    </React.Fragment>
-                                }
+                                <button className={`btn cdp-btn-outline-primary mr-2 ${isFilterEnabled ? 'multifilter_enabled' : ''}`} onClick={() => setShowFilterSidebar(true)} ><i class="fas fa-filter mr-2"></i> Filter</button>
+                                {/* {isFilterEnabled && <button className="btn cdp-btn-outline-primary mr-3" onClick={resetFilter} ><i class="fas fa-filter mr-2"></i> Reset Filter </button>} */}
                             </div>
                         </div>
 

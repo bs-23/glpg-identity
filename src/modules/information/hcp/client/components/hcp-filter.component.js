@@ -15,10 +15,10 @@ const HCPFilter = ({ selectedFilterSetting, onHide, onExecute, show, tableName }
     const multiFilterRef = useRef();
 
     const scopeOptions = tableName === 'crdlp-hcp-profiles' ? [
-        { key: 'scope-hcp', text: 'Health Care Professional' },
-        { key: 'scope-pe', text: 'Professional Engagements' },
-        { key: 'scope-hco', text: 'Health Care Organization' },
-        { key: 'scope-wa', text: 'Workplace Address' }
+        { key: 'scope-hcp', text: 'Health Care Professional', icon: 'fas fa-user-md' },
+        { key: 'scope-pe', text: 'Professional Engagements', icon: 'far fa-address-card' },
+        { key: 'scope-hco', text: 'Health Care Organization', icon: 'far fa-hospital' },
+        { key: 'scope-wa', text: 'Workplace Address', icon: 'fas fa-search-location' }
     ] : null;
 
     const userCountryFilterOption = loggedInUser.countries.reduce((acc, c) => {
