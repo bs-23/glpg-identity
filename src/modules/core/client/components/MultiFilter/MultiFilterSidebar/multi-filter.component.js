@@ -188,6 +188,7 @@ const MultiFilter = (props, ref) => {
         formikProps.setFieldValue('scope', '');
         formikProps.setFieldValue('lastAppliedFilters', []);
         formikProps.setFieldValue('lastAppliedLogic', []);
+        formikProps.setTouched({ 'filterSettingName': false });
         if(value === 'true') formikProps.setFieldValue('shouldSaveFilter', true);
         if(value === 'false') formikProps.setFieldValue('shouldSaveFilter', false);
     }
@@ -266,16 +267,8 @@ const MultiFilter = (props, ref) => {
                                         <option className="p-2" value=''> Select an Option </option>
                                     </Field>
                                 </div>}
-                            <div role="group" aria-labelledby="my-radio-group">
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input mr-2" id="createnew" name="isChosenFromExisting" value="false" onChange={(e) => handleChooseFromExisting(e, formikProps)} />
-                                    <label class="custom-control-label" type="button" for="createnew">Create New</label>
-                                </div>
-                                <div class="custom-control custom-radio my-2">
-                                    <input type="radio" class="custom-control-input mr-2" id="chooseformexisting" name="isChosenFromExisting" value="true" onChange={(e) => handleChooseFromExisting(e, formikProps)} />
-                                    <label class="custom-control-label" type="button" for="chooseformexisting">Choose From Existing</label>
-                                </div>
-                            {/*<label>
+                                {filterPresets && filterPresets.length > 0 && <div role="group" aria-labelledby="my-radio-group">
+                                    <label>
                                         <Field
                                             className="mr-2"
                                             type="radio"
@@ -294,8 +287,8 @@ const MultiFilter = (props, ref) => {
                                             onChange={(e) => handleChooseFromExisting(e, formikProps)}
                                         />
                                         Choose From Existing
-                                    </label>*/}
-                                </div>
+                                    </label>
+                                </div>}
                                 {
                                     formikProps.values.isChosenFromExisting === 'true' && filterPresets && filterPresets.length > 0 &&
                                     <div className="mb-2">
@@ -340,7 +333,6 @@ const MultiFilter = (props, ref) => {
                                             </span>
                                         </div>
                                         <FilterLogic
-                                            test={formikProps.values.logic}
                                             className=""
                                             logic={formikProps.values.logic}
                                             numberOfFilters={formikProps.values.filters.length}
@@ -406,7 +398,7 @@ const MultiFilter = (props, ref) => {
                                     disabled={formikProps.values.filters.length === 0}
                                 />
                                 <Button
-                                    className="btn cdp-btn-outline-primary ml-1 btn-block mt-0 w-auto"
+                                    className="btn cdp-btn-outline-primary ml-1 btn-block mt-0"
                                     label="Close"
                                     onClick={handleClose}
                                 />

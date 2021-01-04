@@ -99,7 +99,7 @@ export default function CrdlpHcpProfiles() {
                                 <h4 className="cdp-text-primary font-weight-bold mb-0 mr-sm-4 mr-1 pb-2">List of HCP User</h4>
                                 <div>
                                     <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/cdp">Customer Data Platform</NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/crdlp">CRDLP</NavLink>
+                                    <div className="custom-tab px-3 py-3 cdp-border-primary active">CRDLP</div>
                                 </div>
                             </div>
                             <div className="d-flex pt-3 pt-sm-0 mb-2">
