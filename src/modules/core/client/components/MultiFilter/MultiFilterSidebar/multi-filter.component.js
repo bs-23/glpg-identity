@@ -267,7 +267,7 @@ const MultiFilter = (props, ref) => {
                                         <option className="p-2" value=''> Select an Option </option>
                                     </Field>
                                 </div>}
-                                <div role="group" aria-labelledby="my-radio-group">
+                                {filterPresets && filterPresets.length > 0 && <div role="group" aria-labelledby="my-radio-group">
                                     <label>
                                         <Field
                                             className="mr-2"
@@ -288,7 +288,7 @@ const MultiFilter = (props, ref) => {
                                         />
                                         Choose From Existing
                                     </label>
-                                </div>
+                                </div>}
                                 {
                                     formikProps.values.isChosenFromExisting === 'true' && filterPresets && filterPresets.length > 0 &&
                                     <div className="mb-2">
