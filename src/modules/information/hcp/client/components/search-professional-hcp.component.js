@@ -246,6 +246,22 @@ const SearchProfessionalHcp = (props) => {
         </Popover>
     );
 
+    const activityOnekeyIDListHintPopup = (
+        <Popover id="activityOnekeyIDListHintPopup" className="shadow-lg remove-orange-triangle">
+            <Popover.Content className="px-3">
+                <p className="mb-0">HCP Professional Engagement</p>
+            </Popover.Content>
+        </Popover>
+    );
+
+    const activityOnekeyIDHintPopup = (
+        <Popover id="activityOnekeyIDHintPopup" className="shadow-lg remove-orange-triangle">
+            <Popover.Content className="px-3">
+                <p className="mb-0">HCP Professional Engagement</p>
+            </Popover.Content>
+        </Popover>
+    );
+    
     return (
         <main className="app__content cdp-light-bg h-100">
             <div className="container-fluid">
@@ -476,7 +492,12 @@ const SearchProfessionalHcp = (props) => {
                                             <div className="row">
                                                 <div className="col-12 col-sm-4">
                                                     <div className="form-group">
-                                                        <label for="OnekeyID">Onekey ID</label>
+                                                        <label for="OnekeyID">
+                                                            Activity Onekey ID
+                                                            <OverlayTrigger trigger="click" rootClose placement="top" overlay={activityOnekeyIDHintPopup}>
+                                                                <i className="fas fa-info-circle ml-1 text-secondary" role="button"></i>
+                                                            </OverlayTrigger>
+                                                        </label>
                                                         <Field className="form-control onekeyId" type='text' name='onekeyId' id='onekeyId' />
                                                     </div>
                                                 </div>
@@ -537,7 +558,8 @@ const SearchProfessionalHcp = (props) => {
                                                 <th>Workplace <OverlayTrigger trigger="click" rootClose placement="right" overlay={workplaceHintPopup}>
                                                     <i className="fas fa-info-circle ml-1 text-white" role="button"></i>
                                                 </OverlayTrigger></th>
-                                                <th>Onekey ID</th>
+                                                <th>Activity Onekey ID <OverlayTrigger trigger="click" rootClose placement="top" overlay={activityOnekeyIDListHintPopup}>
+                                                    <i className="fas fa-info-circle ml-1 text-white" role="button"></i></OverlayTrigger></th>
                                                 <th>Individual - Identifier</th>
                                                 <th>Country</th>
                                                 <th>Action</th>
