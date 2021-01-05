@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-//import { Tabs, Tab } from 'react-bootstrap';
 import { NavLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { getHcpProfiles } from '../../../information/hcp/client/hcp.actions';
@@ -10,7 +9,6 @@ import { Tabs, TabList, Tab, PanelList, Panel } from 'react-tabtab';
 export default function Inbox(){
   const dispatch = useDispatch();
   const [show, setShow] = React.useState();
-  const [selectedTab, setSelectedTab] = useState('hcpaproval');
   const [showModal, setShowModal] = useState(false);
   const [modalId, setModalId] = useState(null);
   const getHcps=()=>{
@@ -41,7 +39,7 @@ export default function Inbox(){
                   <PanelList>
                       <Panel>
                           <div className="cdp-inbox__tab-detail">
-                              {hcps.users !== undefined &&
+                              {hcps.users !== undefined && hcps.users.length < 6 &&
                                   hcps.users.map((user, key) => <ul key={key} className="cdp-inbox__list p-0 m-0">
                                       <li key={key} className="cdp-inbox__list-item d-flex justify-content-between  align-items-center border-bottom py-3 px-3">
                                           <span className="cdp-inbox__list-item-col large cdp-text-primary font-weight-bold">{user.email}</span>
@@ -52,7 +50,7 @@ export default function Inbox(){
                                               <button className="btn cdp-btn-secondary btn-sm text-white" onClick={() => { setModalId(key); setShowModal(true) }}>Update Status</button>
                                           </span>
                                       </li>
-                                      {(showModal && modalId === key) && <StatusupdateModal user={user} limit={5} show={showModal} onHide={() => { setShowModal(false) }} status={'not_verified'}/>}
+                                      {(showModal && modalId === key) && <StatusupdateModal user={user} show={showModal} onHide={() => { setShowModal(false) }} type={'inbox'}/>}
                                   </ul>
                                   )
                               }

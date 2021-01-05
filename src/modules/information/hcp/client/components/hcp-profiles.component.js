@@ -649,7 +649,7 @@ export default function hcpUsers() {
                                 </Modal.Body>
                             </Modal>
 
-                            <StatusupdateModal user={currentUser} limit={15} show={show.updateStatus} list= {true} onSort={()=>{ setSort({ type: params.get('orderType'), value: params.get('orderBy') })}} onHide={() => { setShow({ ...show, updateStatus: false })}} />
+                            <StatusupdateModal user={currentUser} show={show.updateStatus} type={'list'} onSort={()=>{ setSort({ type: params.get('orderType'), value: params.get('orderBy') })}} onHide={() => { setShow({ ...show, updateStatus: false })}} />
 
                             <SaveConfirmation
                                 show={show.saveConfirmation}
