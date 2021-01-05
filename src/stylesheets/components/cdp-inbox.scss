@@ -1,0 +1,135 @@
+.cdp-inbox {
+
+    &__header {
+    }
+
+    &__tab {
+        .sc-bdVaJa {
+            background: $gray-F2F2F2;
+
+            svg {
+                display: none;
+            }
+
+            & > div > div,
+            & > div > div + div {
+                font-family: "Font Awesome 5 Free";
+                font-weight: 900;
+                -moz-osx-font-smoothing: grayscale;
+                -webkit-font-smoothing: antialiased;
+                display: flex;
+                font-style: normal;
+                font-variant: normal;
+                text-rendering: auto;
+                line-height: 1;
+                border: none;
+                background: transparent;
+                align-items: center;
+                justify-content: center;
+                color: $primary-color-lighter;
+                font-size: 14px;
+
+                &:before {
+                    content: "";
+                }
+
+                &:hover {
+                    color: $primary-color;
+                }
+            }
+
+            & > div > div + div {
+                &:before {
+                    transform: rotate(180deg)
+                }
+            }
+        }
+
+        .sc-EHOje {
+            white-space: nowrap;
+            color: $primary-color !important;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 15px 3px 10px 3px;
+            margin: 0px 7px;
+            border-radius: 0px;
+            border: none;
+
+            &:hover {
+                border-bottom: 5px solid $secondary-color-lighter;
+            }
+
+            &.disabled {
+                color: $primary-color-lighter !important;
+            }
+
+            &[aria-selected="true"] {
+                background-color: inherit;
+                border-bottom: 5px solid $secondary-color;
+            }
+        }
+
+        &-detail {
+        }
+
+        [role="tabpanel"] {
+            padding: 0px;
+        }
+    }
+
+    &__list {
+
+        &-item {
+
+            &:hover {
+                background: $gray-FAFAFA;
+            }
+
+            &-col {
+                flex: 0 0 25%;
+                font-size: 13px;
+
+                &.large {
+                    flex: 0 50%;
+                }
+            }
+        }
+    }
+
+    &__icon {
+        &-minimize {
+            display: none;
+        }
+
+        &-toggle {
+            font-size: 25px;
+        }
+
+        &-bell {
+            font-size: 30px;
+        }
+    }
+
+    &__expand {
+        position: absolute;
+        left: 15px;
+        top: 14px;
+        width: calc(100% - 30px);
+        height: calc(100% - 32px) !important;
+        z-index: 1000;
+
+        .cdp-inbox {
+            &__icon-expand {
+                display: none !important;
+            }
+
+            &__icon-minimize {
+                display: inline-block;
+            }
+
+            &__icon-expand {
+                display: none !important;
+            }
+        }
+    }
+}

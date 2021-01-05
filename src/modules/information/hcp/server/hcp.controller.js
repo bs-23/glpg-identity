@@ -155,10 +155,9 @@ function ignoreCaseArray(str) {
 
 async function getHcps(req, res) {
     const response = new Response({}, []);
-
     try {
         const page = req.query.page ? +req.query.page - 1 : 0;
-        const limit = 15;
+        const limit = req.query.limit ? +req.query.limit : 15;
         let status = req.query.status === undefined ? null : req.query.status;
         if (status && status.indexOf(',') !== -1) status = status.split(',');
         const codbase = req.query.codbase === 'undefined' ? null : req.query.codbase;
