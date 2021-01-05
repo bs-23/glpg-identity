@@ -15,12 +15,6 @@ export default function Faq(props) {
         dispatch(getFaqItemsForFaq(`?page=${props.page ? props.page : 1}&topic=${props.topic}&limit=5`));
     }, []);
 
-    // const tagConverter = (str) => {
-    //     let isHTML = RegExp.prototype.test.bind(/(<([^>]+)>)/i);
-    //     console.log(isHTML(str));
-    //     return str;
-    // }
-
     return (
         <React.Fragment>
             <div className={`faq shadow-sm bg-white ${show ? "faq-expand" : ""}`}>
