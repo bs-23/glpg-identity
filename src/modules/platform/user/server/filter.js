@@ -1,5 +1,5 @@
 const path = require('path');
-const { Op, QueryTypes } = require('sequelize');
+const { Op, QueryTypes, where, fn, col } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const { getRequestingUserPermissions } = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/permissions.js"));
 
@@ -129,11 +129,11 @@ function getFilterQuery(filter) {
             : { [Op.eq]: filter.value };
     }
 
-    // if (filter.operator === 'case-insensitive-equal') {
-    //     queryValue = Array.isArray(filter.value)
-    //         ? { [Op.or]: filter.value }
-    //         : { [Op.iLike]: filter.value };
-    // }
+    if (filter.operator === 'ci-equal') {
+        queryValue = Array.isArray(filter.value)
+            ? { [Op.or]: filter.value.map(v => { return where(col(filter.fieldName), 'iLIKE', v); }) }
+            : { [Op.iLike]: filter.value };
+    }
 
     if (filter.operator === 'contains') {
         queryValue = { [Op.like]: `%${filter.value}%` };

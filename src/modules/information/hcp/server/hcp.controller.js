@@ -6,6 +6,7 @@ const axios = require('axios');
 const validator = require('validator');
 const { QueryTypes, Op, where, col, fn } = require('sequelize');
 const Hcp = require('./hcp-profile.model');
+const DatasyncHcp = require('./datasync-hcp-profile.model');
 const HcpArchives = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-archives.model'));
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-consents.model'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
@@ -20,6 +21,7 @@ const PasswordPolicies = require(path.join(process.cwd(), 'src/modules/core/serv
 const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/platform/user/server/permission/permissions.js'));
 const XRegExp = require('xregexp');
 const { string } = require('yup');
+const { filter } = require('lodash');
 const Filter = require(path.join(process.cwd(), "src/modules/core/server/filter/filter.model.js"));
 const filterService = require(path.join(process.cwd(), 'src/modules/platform/user/server/filter.js'));
 
@@ -155,32 +157,59 @@ function ignoreCaseArray(str) {
     return [str.toLowerCase(), str.toUpperCase(), str.charAt(0).toLowerCase() + str.charAt(1).toUpperCase(), str.charAt(0).toUpperCase() + str.charAt(1).toLowerCase()];
 }
 
-async function generateFilterOptions(currentFilterSettings, userPermittedApplications, userPermittedCountries, status) {
-    const allCountries = await sequelize.datasyncConnector.query(
-        `SELECT * FROM ciam.vwcountry`,
-        { type: QueryTypes.SELECT }
-    );
-
-    const user_codbase_list_for_iso2 = allCountries.filter(c => userPermittedCountries.includes(c.country_iso2))
-        .map(i => i.codbase);
-
-    const user_country_iso2_list = allCountries.filter(c => user_codbase_list_for_iso2.includes(c.codbase))
-        .map(i => i.country_iso2);
-
-    const ignorecase_of_country_iso2_list = [].concat.apply([], user_country_iso2_list.map(i => ignoreCaseArray(i)));
-
-    const defaultFilter = {
-        application_id: userPermittedApplications.length
-            ? userPermittedApplications.map(app => app.id)
-            : null,
-        country_iso2: ignorecase_of_country_iso2_list.length
-            ? ignorecase_of_country_iso2_list
-            : null
+async function generateFilterOptions(currentFilterSettings, userPermittedApplications, userPermittedCountries, status, table) {
+    const getAllCountries = async () => {
+        return await sequelize.datasyncConnector.query(
+            `SELECT * FROM ciam.vwcountry`,
+            { type: QueryTypes.SELECT }
+        );
     };
 
-    if (status) {
-        defaultFilter.status = status;
+    let allCountries = [];
+    let defaultFilter = {};
+
+    if (table === 'hcp_profiles') {
+        allCountries = await getAllCountries();
+
+        const user_codbase_list_for_iso2 = allCountries.filter(c => userPermittedCountries.includes(c.country_iso2))
+            .map(i => i.codbase);
+
+        const user_country_iso2_list = allCountries.filter(c => user_codbase_list_for_iso2.includes(c.codbase))
+            .map(i => i.country_iso2);
+
+        const ignorecase_of_country_iso2_list = [].concat.apply([], user_country_iso2_list.map(i => ignoreCaseArray(i)));
+
+        const defaultFilter = {
+            application_id: userPermittedApplications.length
+                ? userPermittedApplications.map(app => app.id)
+                : null,
+            country_iso2: ignorecase_of_country_iso2_list.length
+                ? ignorecase_of_country_iso2_list
+                : null
+        };
+
+        if (status) {
+            defaultFilter.status = status;
+        }
     }
+
+    if (table === 'datasync_hcp_profiles') {
+        const getUserPermittedCodbases = async () => {
+            const allCountries = await getAllCountries();
+
+            const userCodBases = allCountries.filter(c => userPermittedCountries.includes(c.country_iso2)).map(c => c.codbase.toLowerCase());
+            return userCodBases;
+        };
+
+        const countryFilter = (currentFilterSettings.filters || []).find(f => f.fieldName === 'codbase');
+        if (!countryFilter) {
+            const codbases = await getUserPermittedCodbases();
+            defaultFilter = {
+                [Op.or]: codbases.map(codbase => { return where(col('codbase'), 'iLIKE', codbase); })
+            };
+        }
+    }
+
 
     if (!currentFilterSettings || !currentFilterSettings.filters || currentFilterSettings.filter === 0)
         return defaultFilter;
@@ -286,7 +315,6 @@ async function getHcps(req, res) {
         const limit = req.query.limit ? +req.query.limit : 15;
         let status = req.query.status === undefined ? null : req.query.status;
         if (status && status.indexOf(',') !== -1) status = status.split(',');
-        const codbase = req.query.codbase === 'undefined' ? null : req.query.codbase;
         const offset = page * limit;
 
         const currentFilter = req.body;
@@ -312,7 +340,7 @@ async function getHcps(req, res) {
         order.push(['created_at', 'DESC']);
         order.push(['id', 'DESC']);
 
-        const filterOptions = await generateFilterOptions(currentFilter, userPermittedApplications, userPermittedCountries, status);
+        const filterOptions = await generateFilterOptions(currentFilter, userPermittedApplications, userPermittedCountries, status, 'hcp_profiles');
 
         const hcps = await Hcp.findAll({
             where: filterOptions,
@@ -324,7 +352,7 @@ async function getHcps(req, res) {
             attributes: { exclude: ['password', 'created_by', 'updated_by'] },
             offset,
             limit,
-            order: order
+            order
         });
 
         // await Promise.all(hcps.map(async hcp => {
@@ -1773,12 +1801,10 @@ async function getSpecialtiesForCdp(req, res) {
 async function getHcpsFromDatasync(req, res) {
     try {
         const page = req.query.page ? +req.query.page - 1 : 0;
-        const codbase = req.query.codbase === 'undefined' ? null : req.query.codbase;
         const limit = req.query.limit ? +req.query.limit : 15;
         const offset = page * limit;
 
-
-        let orderBy = req.query.orderBy === 'null'
+        const orderBy = req.query.orderBy === 'null'
             ? null
             : req.query.orderBy;
         const orderType = req.query.orderType === 'asc' || req.query.orderType === 'desc'
@@ -1787,46 +1813,28 @@ async function getHcpsFromDatasync(req, res) {
 
         const sortableColumns = ['firstname', 'lastname', 'individual_id_onekey', 'uuid_1', 'ind_status_desc', 'country_iso2'];
 
-        orderBy = sortableColumns.includes(orderBy) ? orderBy : 'firstname,lastname';
+        const order = [];
+        if (orderBy && (sortableColumns || []).includes(orderBy)) {
+            order.push([orderBy, orderType]);
+        }
+
+        if (orderBy !== 'firstname') order.push(['firstname', 'ASC']);
+        if (orderBy !== 'lastname') order.push(['lastname', 'ASC']);
+
+        const currentFilter = req.body;
 
         const [, userPermittedCountries] = await getUserPermissions(req.user.id);
 
-        const getUserPermittedCodbases = async () => {
-            const allCountries = await sequelize.datasyncConnector.query(
-                `SELECT * FROM ciam.vwcountry`,
-                { type: QueryTypes.SELECT }
-            );
+        const filterOptions = await generateFilterOptions(currentFilter, null, userPermittedCountries, null, 'datasync_hcp_profiles');
 
-            const userCodBases = allCountries.filter(c => userPermittedCountries.includes(c.country_iso2)).map(c => c.codbase.toLowerCase());
-            return userCodBases;
-        };
-
-        const codbases = codbase ? [codbase.toLowerCase()] : await getUserPermittedCodbases();
-
-        const hcps = await sequelize.datasyncConnector.query(`
-            SELECT * FROM ciam.vwhcpmaster
-            WHERE LOWER(codbase) = ANY($codbases)
-            ORDER BY ${orderBy + ' ' + orderType}
-            LIMIT $limit OFFSET $offset`, {
-            bind: {
-                codbases: codbases,
-                limit: limit,
-                offset: offset
-            },
-            type: QueryTypes.SELECT
+        const hcps = await DatasyncHcp.findAll({
+            where: filterOptions,
+            offset,
+            limit,
+            order
         });
 
-
-        const countResponse = await sequelize.datasyncConnector.query(`
-            SELECT COUNT(*) FROM ciam.vwhcpmaster
-            WHERE LOWER(codbase) = ANY($codbases)`, {
-            bind: {
-                codbases: codbases
-
-            },
-            type: QueryTypes.SELECT
-        });
-        const totalUsers = Number(countResponse[0].count);
+        const totalUsers = await DatasyncHcp.count({ where: filterOptions });
 
         const individualIdOnekeyList = hcps.map(h => h.individual_id_onekey);
         const hcpSpecialties = await sequelize.datasyncConnector.query(`
@@ -1844,7 +1852,7 @@ async function getHcpsFromDatasync(req, res) {
         if (hcpSpecialties) {
             hcps.forEach(hcp => {
                 const specialties = hcpSpecialties.filter(s => s.individual_id_onekey === hcp.individual_id_onekey);
-                hcp.specialties = specialties.map(s => ({
+                hcp.dataValues.specialties = specialties.map(s => ({
                     description: s.cod_description,
                     code: s.specialty_code
                 }));
@@ -1858,8 +1866,7 @@ async function getHcpsFromDatasync(req, res) {
             total: totalUsers,
             start: limit * page + 1,
             end: offset + limit > totalUsers ? totalUsers : offset + limit,
-            countries: userPermittedCountries,
-            codbase: codbase
+            countries: userPermittedCountries
         };
 
         res.json(data);

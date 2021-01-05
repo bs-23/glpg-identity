@@ -117,7 +117,7 @@ const Filter = (props) => {
                         classNamePrefix="multiselect"
                         value={getSelectedOptions()}
                         onChange={selectedOption => {
-                            const value = selectedOption.map(o => o.value);
+                            const value = (selectedOption || []).map(o => o.value);
                             onChange('value', value, index);
                         }}
                     />

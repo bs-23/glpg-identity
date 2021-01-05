@@ -4,16 +4,6 @@ const filterService = require(path.join(process.cwd(), 'src/modules/platform/use
 
 const tables = ['hcp-profiles', 'crdlp-hcp-profiles', 'cdp-users']
 
-async function getFilterOptions(req, res) {
-    try {
-        const filterOptions = await filterService.getFilterOptions(req.user);
-        res.json(filterOptions);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Internal server error');
-    }
-}
-
 async function getUserFilters(req, res) {
     try {
         const { table } = req.query;
@@ -95,7 +85,6 @@ async function getFilterSetting(req, res) {
     }
 }
 
-exports.getFilterOptions = getFilterOptions;
 exports.getUserFilters = getUserFilters;
 exports.createUserFilter = createUserFilter;
 exports.updateUserFilter = updateUserFilter;

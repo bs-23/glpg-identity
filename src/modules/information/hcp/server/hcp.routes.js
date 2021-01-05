@@ -61,5 +61,5 @@ module.exports = app => {
         .put(passport.authenticate('application-jwt', { session: false }), controller.editHcp);
 
     app.route('/api/datasync/hcps')
-        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getHcpsFromDatasync);
+        .post(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getHcpsFromDatasync);
 };

@@ -9,9 +9,6 @@ module.exports = app => {
         .get(CDPAuthStrategy, controller.getFilterSetting)
         .put(CDPAuthStrategy, controller.updateUserFilter);
 
-    app.route('/api/filter/options')
-        .get(CDPAuthStrategy, controller.getFilterOptions);
-
     app.route('/api/filter')
         .get(CDPAuthStrategy, controller.getUserFilters)
         .post(CDPAuthStrategy, controller.createUserFilter);

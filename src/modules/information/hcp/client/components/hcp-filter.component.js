@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useImperativeHandle } from 'react';
-import { getFilterOptions } from './hcp-filter-options';
+import { getFilterOptions, getDatasyncFilterOptions } from './hcp-filter-options';
 import { MultiFilter } from "../../../../core/client/components/MultiFilter";
 import { useSelector, useDispatch } from 'react-redux';
 import { getHcpFilterSettings } from '../hcp.actions';
@@ -26,7 +26,9 @@ const HCPFilter = ({ selectedFilterSetting, onHide, onExecute, show, tableName }
         country &&  acc.push({ value: country.codbase, displayText: country.codbase_desc });
         return acc;
     }, []);
-    const filterOptions = getFilterOptions(userCountryFilterOption);
+    const filterOptions = tableName === 'crdlp-hcp-profiles'
+        ? getDatasyncFilterOptions(userCountryFilterOption)
+        : getFilterOptions(userCountryFilterOption);
 
     useEffect(() => {
         if(show) dispatch(getHcpFilterSettings(tableName));
