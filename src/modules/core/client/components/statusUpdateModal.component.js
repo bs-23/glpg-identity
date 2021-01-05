@@ -23,8 +23,11 @@ export default function statusupdateModal(props) {
       appearance: 'success',
       autoDismiss: true
     })
-     dispatch(getHcpProfiles(`?page=1&${status? status : ''}&limit=${limit}`));
-     list && onSort();
+    if(list){
+        onSort();
+        dispatch(getHcpProfiles(location.search));
+    }
+    else dispatch(getHcpProfiles(`?page=1&${status ? status : ''}&limit=${limit}`));
    onHide();
   }
 
