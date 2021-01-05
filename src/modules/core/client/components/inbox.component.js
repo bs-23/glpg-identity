@@ -10,7 +10,6 @@ import { Tabs, TabList, Tab, PanelList, Panel } from 'react-tabtab';
 export default function Inbox(){
   const dispatch = useDispatch();
   const [show, setShow] = React.useState();
-  const [selectedTab, setSelectedTab] = useState('hcpaproval');
   const [showModal, setShowModal] = useState(false);
   const [modalId, setModalId] = useState(null);
   const getHcps=()=>{
