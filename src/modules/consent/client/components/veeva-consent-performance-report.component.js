@@ -15,9 +15,9 @@ import Faq from '../../../platform/faq/client/faq.component';
 
 const ConsentPerformanceReport = () => {
     const dispatch = useDispatch();
-    const [allOptTypes, setAllOptTypes] = useState(["single-opt-in", "double-opt-in", "opt-out"]);
+    const [allOptTypes, ] = useState(["single-opt-in", "double-opt-in", "opt-out"]);
     const [show, setShow] = useState({ profileManage: false, updateStatus: false });
-    const [currentAction, setCurrentAction] = useState({ userId: null, action: null });
+    const [ , setCurrentAction] = useState({ userId: null, action: null });
     const [currentUser, setCurrentUser] = useState({});
 
     const consents_report = useSelector(state => state.consentReducer.veeva_consents);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { NavLink } from 'react-router-dom';
 import { Faq } from '../../../../platform';
 import Inbox from '../../../../core/client/components/inbox.component';

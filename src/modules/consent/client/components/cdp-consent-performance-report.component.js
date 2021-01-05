@@ -17,7 +17,7 @@ const CdpConsentPerformanceReport = () => {
     const dispatch = useDispatch();
     const allOptTypes = ["single-opt-in", "double-opt-in", "opt-out"];
     const [show, setShow] = useState({ profileManage: false, updateStatus: false });
-    const [currentAction, setCurrentAction] = useState({ userId: null, action: null });
+    const [, setCurrentAction] = useState({ userId: null, action: null });
     const [currentUser, setCurrentUser] = useState({});
 
     const consents_init_report = useSelector(state => state.consentReducer.consents);

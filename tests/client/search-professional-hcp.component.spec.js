@@ -260,7 +260,6 @@ describe('Search hcp professional component', () => {
         expect(screen.getByText('City')).toBeTruthy();
         expect(screen.getByText('Postal Code')).toBeTruthy();
         expect(screen.getByText('Identifiers')).toBeTruthy();
-        expect(screen.getByText('Onekey ID')).toBeTruthy();
         expect(screen.getByText('Individual - Identifier')).toBeTruthy();
         expect(screen.getByText('CLEAR')).toBeTruthy();
         expect(screen.getByText('SEARCH')).toBeTruthy();
