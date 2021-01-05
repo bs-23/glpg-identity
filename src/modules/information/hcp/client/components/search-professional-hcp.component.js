@@ -99,13 +99,13 @@ const SearchProfessionalHcp = (props) => {
         searchHcps(currentPage + 1);
     };
 
-    const groupSpecialties = specialties => {
+    const groupSpecialties = specialtyList => {
         const marked = {};
         const idxMap = {};
         const groupedSpecialties = [];
         let idx = 0;
 
-        specialties.forEach( specialty => {
+        specialtyList.forEach( specialty => {
             const value = specialty.codDescription.toLowerCase().split(' ').join('');
             if(!specialty.codIdOnekey) return;
 
@@ -261,7 +261,7 @@ const SearchProfessionalHcp = (props) => {
             </Popover.Content>
         </Popover>
     );
-    
+
     return (
         <main className="app__content cdp-light-bg h-100">
             <div className="container-fluid">
@@ -401,7 +401,7 @@ const SearchProfessionalHcp = (props) => {
                                                             }} />
                                                         <label className="custom-control-label" for="isInContractCheckbox">In My Contract</label>
                                                     </div>
-                                                   
+
                                                 </div>
                                                 <div className="col-12 col-sm-6 col-lg-4">
                                                     <div className="form-group">
