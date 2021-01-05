@@ -103,13 +103,13 @@ const SearchOrganizationHcp = () => {
         searchHcos(currentPage + 1);
     }
 
-    const groupSpecialties = specialties => {
+    const groupSpecialties = specialtyList => {
         const marked = {};
         const idxMap = {};
         const groupedSpecialties = [];
         let idx = 0;
 
-        specialties.forEach( specialty => {
+        specialtyList.forEach( specialty => {
             if(!specialty.codIdOnekey) return;
             const value = specialty.codDescription.toLowerCase().split(' ').join('');
 
