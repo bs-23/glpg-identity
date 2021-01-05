@@ -387,8 +387,7 @@ const SearchProfessionalHcp = (props) => {
                                                         />
                                                     </div>
                                                 </div>
-
-                                                <div className="col-12 col-sm-6 col-lg-8 pt-3">
+                                                <div className="col-12 col-sm-6 col-lg-4 pt-3">
                                                     <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-4">
                                                         <input
                                                             type="checkbox"
@@ -402,31 +401,37 @@ const SearchProfessionalHcp = (props) => {
                                                             }} />
                                                         <label className="custom-control-label" for="isInContractCheckbox">In My Contract</label>
                                                     </div>
-                                                    <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-4">
-                                                        <input
-                                                            type="checkbox"
-                                                            className="custom-control-input"
-                                                            name="phonetic"
-                                                            id="phoneticCheckbox"
-                                                            checked={phonetic}
-                                                            onChange={(e) => {
-                                                                formikProps.values.phonetic = e.target.checked;
-                                                                setPhonetic(e.target.checked);
-                                                            }} />
-                                                        <label className="custom-control-label" for="phoneticCheckbox">Phonetic</label>
-                                                    </div>
-                                                    <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-2">
-                                                        <input
-                                                            type="checkbox"
-                                                            className="custom-control-input"
-                                                            name="duplicates"
-                                                            id="duplicatesCheckbox"
-                                                            checked={duplicates}
-                                                            onChange={(e) => {
-                                                                formikProps.values.duplicates = e.target.checked;
-                                                                setDuplicates(e.target.checked);
-                                                            }} />
-                                                        <label className="custom-control-label" for="duplicatesCheckbox">Duplicates</label>
+                                                   
+                                                </div>
+                                                <div className="col-12 col-sm-6 col-lg-4">
+                                                    <div className="form-group">
+                                                        <label className="d-block">Influence Search Results</label>
+                                                        <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-4">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="custom-control-input"
+                                                                name="phonetic"
+                                                                id="phoneticCheckbox"
+                                                                checked={phonetic}
+                                                                onChange={(e) => {
+                                                                    formikProps.values.phonetic = e.target.checked;
+                                                                    setPhonetic(e.target.checked);
+                                                                }} />
+                                                            <label className="custom-control-label" for="phoneticCheckbox">Phonetic</label>
+                                                        </div>
+                                                        <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-2">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="custom-control-input"
+                                                                name="duplicates"
+                                                                id="duplicatesCheckbox"
+                                                                checked={duplicates}
+                                                                onChange={(e) => {
+                                                                    formikProps.values.duplicates = e.target.checked;
+                                                                    setDuplicates(e.target.checked);
+                                                                }} />
+                                                            <label className="custom-control-label" for="duplicatesCheckbox">Duplicates</label>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
