@@ -335,13 +335,23 @@ const MultiFilter = (props, ref) => {
                                     </div>
                                 )}
 
-                        <div className="d-flex justify-content-between py-2 align-items-center">
-                            <span type="button" className="cdp-text-primary" onClick={() => setShow({ ...show, addFilter: true })}>
-                                <i class="fas fa-plus"></i> Add Filter
+                                <div className="d-flex justify-content-between py-2 align-items-center">
+                                    {show.addFilter &&
+                                        <AddFilter
+                                            filterPresets={filterPresets}
+                                            filters={formikProps.values.filters}
+                                            filterOptions={options}
+                                            currentNumberOfFilters={formikProps.values.filters.length}
+                                            onDone={(filters, selectedFilter) => handleAddFilterDone(filters, formikProps, selectedFilter)}
+                                        />
+                                    }
+                                    <span type="button" className="cdp-text-primary filter__add-filter" onClick={() => setShow({ ...show, addFilter: true })}>
+                                        <i class="fas fa-plus"></i> Add Filter
                                     </span>
                                     {formikProps.values.filters.length > 0 &&
                                         <span className="small" type="button" onClick={() => handleRemoveAll(formikProps)}>Remove All</span>
                                     }
+                                    
                                 </div>
                                 {(formikProps.values.filters.length > 1) &&
                                     <div className="d-flex flex-column">
@@ -397,15 +407,7 @@ const MultiFilter = (props, ref) => {
                                 }
                             </React.Fragment>
                         }
-                        {show.addFilter &&
-                            <AddFilter
-                                filterPresets={filterPresets}
-                                filters={formikProps.values.filters}
-                                filterOptions={options}
-                                currentNumberOfFilters={formikProps.values.filters.length}
-                                onDone={(filters, selectedFilter) => handleAddFilterDone(filters, formikProps, selectedFilter)}
-                            />
-                        }
+                       
                             </div>
 
                             <div className="p-3 d-flex filter__section-btn">
