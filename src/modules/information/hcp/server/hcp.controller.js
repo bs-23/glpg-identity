@@ -167,6 +167,7 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
 
     let allCountries = [];
     let defaultFilter = {};
+    let user_country_iso2_list = [];
 
     if (table === 'hcp_profiles') {
         allCountries = await getAllCountries();
@@ -174,7 +175,7 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
         const user_codbase_list_for_iso2 = allCountries.filter(c => userPermittedCountries.includes(c.country_iso2))
             .map(i => i.codbase);
 
-        const user_country_iso2_list = allCountries.filter(c => user_codbase_list_for_iso2.includes(c.codbase))
+        user_country_iso2_list = allCountries.filter(c => user_codbase_list_for_iso2.includes(c.codbase))
             .map(i => i.country_iso2);
 
         const ignorecase_of_country_iso2_list = [].concat.apply([], user_country_iso2_list.map(i => ignoreCaseArray(i)));
