@@ -10,27 +10,42 @@ const makeCustomSlug = (title) => {
     return convertToSlug(`${title} ${code}`);
 };
 
-const history = sequelize.clinitalTrialsDevConnectior.define('history', {
+const Location = sequelize.clinitalTrialsStageConnectior.define('locatioin', {
     id: {
         allowNull: false,
         primaryKey: true,
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4
     },
-    description: {
+    LocationFacility: {
         unique: false,
         allowNull: true,
-        type: DataTypes.STRING(60)
+        type: DataTypes.STRING(1024)
     },
-    value: {
-        unique: false,
-        allowNull: false,
-        type: DataTypes.STRING(10485760)
-    },
-    log: {
+    LocationCity: {
         unique: false,
         allowNull: false,
         type: DataTypes.STRING(1024)
+    },
+    LocationZip: {
+        unique: false,
+        allowNull: false,
+        type: DataTypes.STRING(1024)
+    },
+    LocationCountry: {
+        unique: false,
+        allowNull: false,
+        type: DataTypes.STRING(1024)
+    },
+    lat: {
+        unique: false,
+        allowNull: true,
+        type: DataTypes.FLOAT()
+    },
+    long: {
+        unique: false,
+        allowNull: true,
+        type: DataTypes.FLOAT()
     },
     created_by: {
         type: DataTypes.UUID
@@ -40,7 +55,7 @@ const history = sequelize.clinitalTrialsDevConnectior.define('history', {
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CLINICAL_TRIALS_SCHEMA')}`,
-    tableName: 'history',
+    tableName: 'location',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
@@ -48,4 +63,4 @@ const history = sequelize.clinitalTrialsDevConnectior.define('history', {
 
 
 
-module.exports = history;
+module.exports = Location;
