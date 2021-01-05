@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import Modal from 'react-bootstrap/Modal';
 import axios from 'axios';
 import { useToasts } from 'react-toast-notifications';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { getHcpProfiles } from '../../../information/hcp/client/hcp.actions';
 import { ApprovalRejectSchema } from '../../../information/hcp/client/hcp.schema';
 
 export default function statusupdateModal(props) {
   const dispatch = useDispatch();
-  const { user, show, onHide} = props;
+    const { user, show, onHide, type , onSort} = props;
   const [consentForUser, setConsentForUser] = useState({user});
   const { addToast } = useToasts();
 
@@ -23,7 +23,13 @@ export default function statusupdateModal(props) {
       appearance: 'success',
       autoDismiss: true
     })
-     dispatch(getHcpProfiles('?page=1&status=not_verified&limit=5'));
+    if(type == 'list'){
+        onSort();
+        dispatch(getHcpProfiles(location.search));
+    }
+    else if (type == 'inbox'){
+        dispatch(getHcpProfiles('?page=1&status=not_verified&limit=5'));
+    }
    onHide();
   }
 

@@ -67,6 +67,14 @@ const SearchOrganizationHcp = () => {
         </Popover>
     );
 
+    const activityOnekeyIDHintPopup = (
+        <Popover id="activityOnekeyIDHintPopup" className="shadow-lg remove-orange-triangle">
+            <Popover.Content className="px-3">
+                <p className="mb-0">HCO Professional Engagement</p>
+            </Popover.Content>
+        </Popover>
+    );
+
     const searchHcos = (newPage) => {
         axios.post(`/api/okla/hcos/search?page=${newPage}`, formData)
             .then(response => {
@@ -95,13 +103,13 @@ const SearchOrganizationHcp = () => {
         searchHcos(currentPage + 1);
     }
 
-    const groupSpecialties = specialties => {
+    const groupSpecialties = specialtyList => {
         const marked = {};
         const idxMap = {};
         const groupedSpecialties = [];
         let idx = 0;
 
-        specialties.forEach( specialty => {
+        specialtyList.forEach( specialty => {
             if(!specialty.codIdOnekey) return;
             const value = specialty.codDescription.toLowerCase().split(' ').join('');
 
@@ -264,19 +272,23 @@ const SearchOrganizationHcp = () => {
                                                         />
                                                     </div>
                                                 </div>
-
-                                                <div className="col-12 col-sm-6 col-lg-8 pt-3">
+                                                <div className="col-12 col-sm-6 col-lg-4 pt-3">
                                                     <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-4">
                                                         <input type="checkbox" className="custom-control-input" name="isInContract" id="customControlInline" onChange={(e) => formikProps.values.isInContract = e.target.checked} />
                                                         <label className="custom-control-label" for="customControlInline">In My Contract</label>
                                                     </div>
-                                                    <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-4">
-                                                        <input type="checkbox" className="custom-control-input" name="phonetic" id="customControlInline2" onChange={(e) => formikProps.values.phonetic = e.target.checked} />
-                                                        <label className="custom-control-label" for="customControlInline2">Phonetic</label>
-                                                    </div>
-                                                    <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-2">
-                                                        <input type="checkbox" className="custom-control-input" name="duplicates" id="customControlInline3" onChange={(e) => formikProps.values.duplicates = e.target.checked} />
-                                                        <label className="custom-control-label" for="customControlInline3">Duplicates</label>
+                                                </div>
+                                                <div className="col-12 col-sm-6 col-lg-4">
+                                                    <div className="form-group">
+                                                        <label className="d-block">Influence Search Results</label>
+                                                        <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-4">
+                                                            <input type="checkbox" className="custom-control-input" name="phonetic" id="customControlInline2" onChange={(e) => formikProps.values.phonetic = e.target.checked} />
+                                                            <label className="custom-control-label" for="customControlInline2">Phonetic</label>
+                                                        </div>
+                                                        <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-2">
+                                                            <input type="checkbox" className="custom-control-input" name="duplicates" id="customControlInline3" onChange={(e) => formikProps.values.duplicates = e.target.checked} />
+                                                            <label className="custom-control-label" for="customControlInline3">Duplicates</label>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -327,13 +339,18 @@ const SearchOrganizationHcp = () => {
                                             <div className="row">
                                                 <div className="col-12 col-sm-4">
                                                     <div className="form-group">
-                                                        <label for="OnekeyID">Onekey ID</label>
+                                                        <label for="OnekeyID">
+                                                            Workplace Onekey ID
+                                                            <OverlayTrigger trigger="click" rootClose placement="top" overlay={activityOnekeyIDHintPopup}>
+                                                                <i className="fas fa-info-circle ml-1 text-secondary" role="button"></i>
+                                                            </OverlayTrigger>
+                                                        </label>
                                                         <Field className="form-control onekeyId" type='text' name='onekeyId' id='onekeyId' />
                                                     </div>
                                                 </div>
                                                 <div className="col-12 col-sm-4">
                                                     <div className="form-group">
-                                                        <label for="workplaceEid">Workplace - Identifier</label>
+                                                        <label for="workplaceEid">Workplace UUID/Onekey ID</label>
                                                         <Field className="form-control individual" type='text' name='workplaceEid' id='workplaceEid' />
                                                     </div>
                                                 </div>
