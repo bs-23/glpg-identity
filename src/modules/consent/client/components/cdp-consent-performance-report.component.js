@@ -15,9 +15,9 @@ import { getConsentReport } from '../consent.actions';
 
 const CdpConsentPerformanceReport = () => {
     const dispatch = useDispatch();
-    const [allOptTypes, setAllOptTypes] = useState(["single-opt-in", "double-opt-in", "opt-out"]);
+    const allOptTypes = ["single-opt-in", "double-opt-in", "opt-out"];
     const [show, setShow] = useState({ profileManage: false, updateStatus: false });
-    const [currentAction, setCurrentAction] = useState({ userId: null, action: null });
+    const [, setCurrentAction] = useState({ userId: null, action: null });
     const [currentUser, setCurrentUser] = useState({});
 
     const consents_init_report = useSelector(state => state.consentReducer.consents);
@@ -136,7 +136,7 @@ const CdpConsentPerformanceReport = () => {
                 <div className="row">
                     <div className="col-12">
                         <div>
-                            <div className="d-sm-flex justify-content-between align-items-center mb-0 mt-4">
+                            <div className="d-sm-flex justify-content-between align-items-end mb-0 mt-4">
                                 <div>
                                     <h4 className="cdp-text-primary font-weight-bold mb-4">Consent Performance Report</h4>
                                     <div>
@@ -144,7 +144,7 @@ const CdpConsentPerformanceReport = () => {
                                         <NavLink className="custom-tab px-4 py-3 cdp-border-primary" to="/consent/consent-performance-report/veeva-crm"><img alt="Veeva CRM LOGO" src="/assets/logo/logo-veevacrm.svg" height="13" /></NavLink>
                                     </div>
                                 </div>
-                                <div className="d-flex pt-3 pt-sm-0">
+                                <div className="d-flex pt-3 pt-sm-0 mb-2">
                                     <React.Fragment>
                                         {countries && consents_report['countries'] &&
                                             <Dropdown className="ml-auto dropdown-customize mr-2">
@@ -180,7 +180,7 @@ const CdpConsentPerformanceReport = () => {
                                             </Dropdown>
                                         }
 
-                                        <Dropdown className="ml-auto dropdown-customize mr-2">
+                                        <Dropdown className="ml-auto dropdown-customize">
                                             <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center">
                                                 <i className="icon icon-filter mr-2 mb-n1"></i> {consents_report.opt_type && (allOptTypes.includes(consents_report.opt_type)) ? consents_report.opt_type : 'Filter by Opt Type'}
                                             </Dropdown.Toggle>

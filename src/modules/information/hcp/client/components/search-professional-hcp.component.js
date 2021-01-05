@@ -14,7 +14,7 @@ import { useToasts } from 'react-toast-notifications';
 import Faq from '../../../../platform/faq/client/faq.component';
 import Modal from 'react-bootstrap/Modal';
 
-const SearchProfessionalHcp = () => {
+const SearchProfessionalHcp = (props) => {
     const formikRef = useRef();
     const location = useLocation();
     const { addToast } = useToasts();
@@ -42,9 +42,9 @@ const SearchProfessionalHcp = () => {
     const [isAssigned, setIsAssigned] = useState(false);
     const [hcpSpecialty, setHcpSpecialty] = useState();
 
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(props.location.search);
 
-    const resetSearch = (props) => {
+    const resetSearch = (properties) => {
         setFormData({});
         setCurrentPage(1);
         setSelectedCountries([]);
@@ -53,7 +53,7 @@ const SearchProfessionalHcp = () => {
         setDuplicates(false);
         setPhonetic(false);
         setUsers({});
-        props.resetForm();
+        properties.resetForm();
         setIsAssigned(false);
         setHcpProfile(null);
         setHcpSpecialty(null);
@@ -71,7 +71,12 @@ const SearchProfessionalHcp = () => {
             .then(response => {
                 setUsers(response.data);
                 setCurrentPage(newPage);
-                scrollToResult(response.data.results.length === 0);
+                try{
+                    scrollToResult(response.data.results.length === 0);
+                }
+                catch(err){
+                    console.log(err);
+                }
             })
             .catch(err => {
                 const message = err.response.status === 400
@@ -94,18 +99,49 @@ const SearchProfessionalHcp = () => {
         searchHcps(currentPage + 1);
     };
 
+    const groupSpecialties = specialtyList => {
+        const marked = {};
+        const idxMap = {};
+        const groupedSpecialties = [];
+        let idx = 0;
+
+        specialtyList.forEach( specialty => {
+            const value = specialty.codDescription.toLowerCase().split(' ').join('');
+            if(!specialty.codIdOnekey) return;
+
+            if(!marked[value]){
+                marked[value] = true;
+                idxMap[value] = idx++;
+                groupedSpecialties.push({
+                    codDescription: specialty.codDescription,
+                    codIdOnekeys: [specialty.codIdOnekey],
+                    codbases: [specialty.codbase]
+                });
+            }
+            else {
+                const index = idxMap[value];
+                groupedSpecialties[index].codIdOnekeys.push(specialty.codIdOnekey);
+                groupedSpecialties[index].codbases.push(specialty.codbase);
+            }
+        });
+        return groupedSpecialties;
+    }
+
     useEffect(() => {
         const fetchSpecialties = async () => {
             const codbases = selectedCountries.map(item => `codbases=${item.value}`);
             const parameters = codbases.join('&');
             if (parameters) {
                 const response = await axios.get(`/api/hcps/specialties?${parameters}`);
-                const filtered = hcpSpecialty ? response.data.filter(i => i.codIdOnekey === hcpSpecialty) : [];
+                const groupedSpecialties = groupSpecialties(response.data);
+
+                const filtered = hcpSpecialty ? groupedSpecialties.filter(i => i.codIdOnekeys.includes(hcpSpecialty)) : [];
+
                 if (filtered && filtered.length) {
-                    setSelectedSpecialties([{ label: filtered[0].codDescription, value: filtered[0].codIdOnekey.split('.')[2] }]);
-                    formikRef.current.setFieldValue('specialties', [{ label: filtered[0].codDescription, value: filtered[0].codIdOnekey.split('.')[2] }]);
+                    setSelectedSpecialties([{ label: filtered[0].codDescription, value: filtered[0].codIdOnekeys }]);
+                    formikRef.current.setFieldValue('specialties', [{ label: filtered[0].codDescription, value: filtered[0].codIdOnekeys }]);
                 }
-                setSpecialties(response.data);
+                setSpecialties(groupedSpecialties);
             }
             else setSpecialties([]);
         }
@@ -122,7 +158,6 @@ const SearchProfessionalHcp = () => {
             const id = params.get('id');
             getHcpProfile(id);
         }
-
     }, [location]);
 
     useEffect(() => {
@@ -150,7 +185,7 @@ const SearchProfessionalHcp = () => {
     }, [location, userCountries, hcpProfile, allCountries]);
 
     const getCountries = () => userCountries.map(country => ({ value: country.codbase, label: country.codbase_desc, countryIso2: country.country_iso2 }));
-    const getSpecialties = () => specialties.map(i => ({ value: i.codIdOnekey.split('.')[2], label: i.codDescription }));
+    const getSpecialties = () => specialties.map(i => ({ value: i.codIdOnekeys, label: i.codDescription }));
 
     const getCountryName = (country_iso2) => {
         if (!allCountries || !country_iso2) return null;
@@ -195,6 +230,34 @@ const SearchProfessionalHcp = () => {
                     <li className="pl-0 pb-2"><i className="fas fa-check mr-1 cdp-text-primary"></i> Valid</li>
                     <li className="pl-0 pb-2"><i className="fas fa-times mr-1 cdp-text-secondary"></i> Invalid </li>
                 </ul>
+            </Popover.Content>
+        </Popover>
+    );
+
+    const searchHintPopup = (
+        <Popover id="searchHintPopup" className="shadow-lg">
+            <Popover.Content className="px-3">
+                <p>To enable the search button please select countries filed and one other field. e.g.</p>
+                <ul className="list-unstyled mb-0">
+                    <li className="pl-0 pb-2"><strong>Countries</strong> Belgium</li>
+                    <li className="pl-0 pb-2"><strong>Specialty</strong> Cardiology</li>
+                </ul>
+            </Popover.Content>
+        </Popover>
+    );
+
+    const activityOnekeyIDListHintPopup = (
+        <Popover id="activityOnekeyIDListHintPopup" className="shadow-lg remove-orange-triangle">
+            <Popover.Content className="px-3">
+                <p className="mb-0">HCP Professional Engagement</p>
+            </Popover.Content>
+        </Popover>
+    );
+
+    const activityOnekeyIDHintPopup = (
+        <Popover id="activityOnekeyIDHintPopup" className="shadow-lg remove-orange-triangle">
+            <Popover.Content className="px-3">
+                <p className="mb-0">HCP Professional Engagement</p>
             </Popover.Content>
         </Popover>
     );
@@ -254,7 +317,13 @@ const SearchProfessionalHcp = () => {
                                     displayName="SearchForm"
                                     onSubmit={async (values, actions) => {
                                         const data = { ...values };
-                                        data.specialties = data.specialties.map(i => i.value);
+                                        const updatedSpecialties = []
+                                        data.specialties.forEach(group => {
+                                            group.value.forEach(item => {
+                                                updatedSpecialties.push(item.split('.')[2]);
+                                            });
+                                        });
+                                        data.specialties = updatedSpecialties;
                                         data.codbases = data.countries.map(i => i.value);
                                         delete data.countries;
 
@@ -264,7 +333,12 @@ const SearchProfessionalHcp = () => {
                                                 setFormData(data);
                                                 setCurrentPage(1);
                                                 actions.setSubmitting(false);
-                                                scrollToResult(response.data.results.length === 0);
+                                                try{
+                                                    scrollToResult(response.data.results.length === 0);
+                                                }
+                                                catch(err){
+                                                    console.log(err);
+                                                }
                                             })
                                             .catch(err => {
                                                 const message = err.response.status === 400
@@ -313,8 +387,7 @@ const SearchProfessionalHcp = () => {
                                                         />
                                                     </div>
                                                 </div>
-
-                                                <div className="col-12 col-sm-6 col-lg-8 pt-3">
+                                                <div className="col-12 col-sm-6 col-lg-4 pt-3">
                                                     <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-4">
                                                         <input
                                                             type="checkbox"
@@ -328,31 +401,37 @@ const SearchProfessionalHcp = () => {
                                                             }} />
                                                         <label className="custom-control-label" for="isInContractCheckbox">In My Contract</label>
                                                     </div>
-                                                    <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-4">
-                                                        <input
-                                                            type="checkbox"
-                                                            className="custom-control-input"
-                                                            name="phonetic"
-                                                            id="phoneticCheckbox"
-                                                            checked={phonetic}
-                                                            onChange={(e) => {
-                                                                formikProps.values.phonetic = e.target.checked;
-                                                                setPhonetic(e.target.checked);
-                                                            }} />
-                                                        <label className="custom-control-label" for="phoneticCheckbox">Phonetic</label>
-                                                    </div>
-                                                    <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-2">
-                                                        <input
-                                                            type="checkbox"
-                                                            className="custom-control-input"
-                                                            name="duplicates"
-                                                            id="duplicatesCheckbox"
-                                                            checked={duplicates}
-                                                            onChange={(e) => {
-                                                                formikProps.values.duplicates = e.target.checked;
-                                                                setDuplicates(e.target.checked);
-                                                            }} />
-                                                        <label className="custom-control-label" for="duplicatesCheckbox">Duplicates</label>
+
+                                                </div>
+                                                <div className="col-12 col-sm-6 col-lg-4">
+                                                    <div className="form-group">
+                                                        <label className="d-block">Influence Search Results</label>
+                                                        <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-4">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="custom-control-input"
+                                                                name="phonetic"
+                                                                id="phoneticCheckbox"
+                                                                checked={phonetic}
+                                                                onChange={(e) => {
+                                                                    formikProps.values.phonetic = e.target.checked;
+                                                                    setPhonetic(e.target.checked);
+                                                                }} />
+                                                            <label className="custom-control-label" for="phoneticCheckbox">Phonetic</label>
+                                                        </div>
+                                                        <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-2">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="custom-control-input"
+                                                                name="duplicates"
+                                                                id="duplicatesCheckbox"
+                                                                checked={duplicates}
+                                                                onChange={(e) => {
+                                                                    formikProps.values.duplicates = e.target.checked;
+                                                                    setDuplicates(e.target.checked);
+                                                                }} />
+                                                            <label className="custom-control-label" for="duplicatesCheckbox">Duplicates</label>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -418,13 +497,18 @@ const SearchProfessionalHcp = () => {
                                             <div className="row">
                                                 <div className="col-12 col-sm-4">
                                                     <div className="form-group">
-                                                        <label for="OnekeyID">Onekey ID</label>
+                                                        <label for="OnekeyID">
+                                                            Activity Onekey ID
+                                                            <OverlayTrigger trigger="click" rootClose placement="top" overlay={activityOnekeyIDHintPopup}>
+                                                                <i className="fas fa-info-circle ml-1 text-secondary" role="button"></i>
+                                                            </OverlayTrigger>
+                                                        </label>
                                                         <Field className="form-control onekeyId" type='text' name='onekeyId' id='onekeyId' />
                                                     </div>
                                                 </div>
                                                 <div className="col-12 col-sm-4">
                                                     <div className="form-group">
-                                                        <label for="Individual ">Individual - Identifier</label>
+                                                        <label for="Individual ">Individual Onekey ID</label>
                                                         <Field className="form-control individual" type='text' name='individualEid' id='individual' />
                                                     </div>
                                                 </div>
@@ -441,7 +525,12 @@ const SearchProfessionalHcp = () => {
                                                     <button type="reset" className="btn btn-block btn-secondary mt-4 p-2" onClick={() => resetSearch(formikProps)}>CLEAR</button>
                                                 </div>
                                                 <div className="col-6">
-                                                    <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={!selectedCountries || !selectedCountries.length || !(formikProps.values.firstName || formikProps.values.lastName || formikProps.values.address || formikProps.values.city || formikProps.values.postCode || formikProps.values.onekeyId || formikProps.values.individualEid || formikProps.values.externalIdentifier || (selectedSpecialties && selectedSpecialties.length))}>SEARCH</button>
+                                                    <div className="d-flex align-items-center">
+                                                        <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2 okla-search__btn-search" disabled={!selectedCountries || !selectedCountries.length || !(formikProps.values.firstName || formikProps.values.lastName || formikProps.values.address || formikProps.values.city || formikProps.values.postCode || formikProps.values.onekeyId || formikProps.values.individualEid || formikProps.values.externalIdentifier || (selectedSpecialties && selectedSpecialties.length))}>SEARCH</button>
+                                                        <OverlayTrigger trigger="click" rootClose placement="left" overlay={searchHintPopup}>
+                                                            <i className="fas fa-info-circle mt-4 ml-2 cdp-text-primary" role="button"></i>
+                                                        </OverlayTrigger>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </Form>
@@ -474,8 +563,9 @@ const SearchProfessionalHcp = () => {
                                                 <th>Workplace <OverlayTrigger trigger="click" rootClose placement="right" overlay={workplaceHintPopup}>
                                                     <i className="fas fa-info-circle ml-1 text-white" role="button"></i>
                                                 </OverlayTrigger></th>
-                                                <th>Onekey ID</th>
-                                                <th>Individual - Identifier</th>
+                                                <th>Activity Onekey ID <OverlayTrigger trigger="click" rootClose placement="top" overlay={activityOnekeyIDListHintPopup}>
+                                                    <i className="fas fa-info-circle ml-1 text-white" role="button"></i></OverlayTrigger></th>
+                                                <th>Individual Onekey ID</th>
                                                 <th>Country</th>
                                                 <th>Action</th>
                                             </tr>

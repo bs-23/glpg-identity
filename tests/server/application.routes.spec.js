@@ -18,6 +18,8 @@ beforeAll(async () => {
 });
 
 describe('Application Routes', () => {
+    console.error = jest.fn();
+
     it('Should get access_token and refresh_token for valid username and password', async () => {
         const response = await request.post('/api/applications/token').send({
             username: defaultApplication.email,

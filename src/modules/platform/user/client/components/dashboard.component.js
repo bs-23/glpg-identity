@@ -1,15 +1,13 @@
-import React from 'react';
+import React from "react";
 import { NavLink } from 'react-router-dom';
 import { Faq } from '../../../../platform';
-
+import Inbox from '../../../../core/client/components/inbox.component';
 export default function Dashboard() {
-
-
     return (
         <main className="app__content cdp-light-bg">
             <div className="container-fluid">
                 <div className="row h-100">
-                    <div className="col-12 col-lg-8 col-xl-9 py-3">
+                    <div className="col-12 col-lg-7 col-xl-8 py-3">
                         <div className="service">
                             <h4 className="service__header font-weight-bold pt-3 pb-4">
                                 Category of Services
@@ -62,7 +60,8 @@ export default function Dashboard() {
                             </div>
                         </div>
                     </div>
-                    <div className="col-12 col-lg-4 col-xl-3 py-3 app__content-panel-right">
+                   <div className="col-12 col-lg-5 col-xl-4 py-3 app__content-panel-right">
+                      <Inbox />
                         <Faq topic="general-information" />
                     </div>
                 </div>
