@@ -508,7 +508,7 @@ const SearchProfessionalHcp = (props) => {
                                                 </div>
                                                 <div className="col-12 col-sm-4">
                                                     <div className="form-group">
-                                                        <label for="Individual ">Individual - Identifier</label>
+                                                        <label for="Individual ">Individual Onekey ID</label>
                                                         <Field className="form-control individual" type='text' name='individualEid' id='individual' />
                                                     </div>
                                                 </div>
@@ -565,7 +565,7 @@ const SearchProfessionalHcp = (props) => {
                                                 </OverlayTrigger></th>
                                                 <th>Activity Onekey ID <OverlayTrigger trigger="click" rootClose placement="top" overlay={activityOnekeyIDListHintPopup}>
                                                     <i className="fas fa-info-circle ml-1 text-white" role="button"></i></OverlayTrigger></th>
-                                                <th>Individual - Identifier</th>
+                                                <th>Individual Onekey ID</th>
                                                 <th>Country</th>
                                                 <th>Action</th>
                                             </tr>

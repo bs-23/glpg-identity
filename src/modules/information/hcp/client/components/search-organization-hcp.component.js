@@ -340,7 +340,7 @@ const SearchOrganizationHcp = () => {
                                                 <div className="col-12 col-sm-4">
                                                     <div className="form-group">
                                                         <label for="OnekeyID">
-                                                            Activity Onekey ID
+                                                            Workplace Onekey ID
                                                             <OverlayTrigger trigger="click" rootClose placement="top" overlay={activityOnekeyIDHintPopup}>
                                                                 <i className="fas fa-info-circle ml-1 text-secondary" role="button"></i>
                                                             </OverlayTrigger>
@@ -350,7 +350,7 @@ const SearchOrganizationHcp = () => {
                                                 </div>
                                                 <div className="col-12 col-sm-4">
                                                     <div className="form-group">
-                                                        <label for="workplaceEid">Workplace - Identifier</label>
+                                                        <label for="workplaceEid">Workplace UUID/Onekey ID</label>
                                                         <Field className="form-control individual" type='text' name='workplaceEid' id='workplaceEid' />
                                                     </div>
                                                 </div>
