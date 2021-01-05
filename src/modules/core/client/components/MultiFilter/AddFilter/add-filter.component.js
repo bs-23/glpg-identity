@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import { Button } from '../common';
 import { Filter } from './components';
+import ScrollBars from 'react-scrollbar';
 
 const AddFilter = (props) => {
     const {
@@ -79,14 +80,19 @@ const AddFilter = (props) => {
         setFilters(filtersAfterRemoval);
     }
 
+    const scrollBarStyle = {
+        maxHeight: '500px'
+    };
+    
     // useEffect(() => {
     //     setFilters(existingFilters);
     // }, []);
 
     return <div className="filter__sub-panel">
-        <div className="bg-light p-2 rounded-top">Add Filter</div>
-        <div className="px-3 pb-3 pt-2">
-            {/* {
+        <ScrollBars autoHide={false} smoothScrolling={true} style={scrollBarStyle}>
+            <div className="bg-light p-2 rounded-top">Add Filter</div>
+            <div className="px-3 pb-3 pt-2">
+                {/* {
                 filterPresets && filterPresets.length > 0 &&
                 <div className="mb-2">
                     <label className="pt-2 mb-1">Select From Existing Filters</label>
@@ -100,27 +106,29 @@ const AddFilter = (props) => {
                     </select>
                 </div>
             } */}
-            {
-                filters && filters.map((filter, index) =>
-                    <Filter
-                        key={filter.name}
-                        name={filter.name}
-                        index={index}
-                        currentNumberOfFilters={currentNumberOfFilters}
-                        fieldValue={filter.fieldName}
-                        operatorValue={filter.operator}
-                        value={filter.value}
-                        filterOptions={filterOptions}
-                        isTouched={isTouched}
-                        validationError={getFilterValidationError(filter)}
-                        onChange={handleChange}
-                        onRemove={handleRemove}
-                    />
-                )
-            }
-            <Button className="btn cdp-btn-outline-primary mt-4 btn-block" label="+ add more filter" onClick={handleAddMoreFilter} />
-            <Button className="btn cdp-btn-secondary btn-block text-white" label="Done" onClick={handleDone} />
-        </div>
+                {
+                    filters && filters.map((filter, index) =>
+                        <Filter
+                            key={filter.name}
+                            name={filter.name}
+                            index={index}
+                            currentNumberOfFilters={currentNumberOfFilters}
+                            fieldValue={filter.fieldName}
+                            operatorValue={filter.operator}
+                            value={filter.value}
+                            filterOptions={filterOptions}
+                            isTouched={isTouched}
+                            validationError={getFilterValidationError(filter)}
+                            onChange={handleChange}
+                            onRemove={handleRemove}
+                        />
+                    )
+                }
+                <Button className="btn cdp-btn-outline-primary mt-4 btn-block" label="+ add more filter" onClick={handleAddMoreFilter} />
+                <Button className="btn cdp-btn-secondary btn-block text-white" label="Done" onClick={handleDone} />
+            </div>
+        </ScrollBars>
+        
     </div>
 }
 
