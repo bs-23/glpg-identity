@@ -3,7 +3,6 @@ import { NavLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Modal from 'react-bootstrap/Modal';
-import { useToasts } from 'react-toast-notifications';
 import { getCdpConsents } from '../consent.actions';
 import ConsentComponent from './consent.component';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
@@ -12,7 +11,6 @@ import parse from 'html-react-parser';
 import Faq from '../../../platform/faq/client/faq.component';
 
 const ConsentsComponent = () => {
-    const { addToast } = useToasts();
     const dispatch = useDispatch();
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
     const [consentId, setConsentId] = useState(null);

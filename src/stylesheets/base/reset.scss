@@ -370,3 +370,16 @@ a {
     cursor: not-allowed;
     pointer-events: none;
 }
+
+
+.remove-orange-triangle {
+    & > .arrow::before,
+    &[x-placement^=top] > .arrow::before {
+        border-top-color: rgba(0, 0, 0, 0.25) !important;
+    }
+
+    & > .arrow::after,
+    &[x-placement^=top] > .arrow::after {
+        border-top-color: $white-color !important;
+    }
+}

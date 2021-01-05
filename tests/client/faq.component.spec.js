@@ -1,24 +1,41 @@
-import ManageFaq from '../../src/modules/platform/faq/client/manage-faq.component';
-import Faq from '../../src/modules/platform/faq/client/faq.component';
 import React from 'react';
-import { render, waitFor, fireEvent, screen } from '@testing-library/react';
+import { render, waitFor, fireEvent } from '@testing-library/react';
 import { configure, shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import { MemoryRouter } from 'react-router-dom';
-import axios from 'axios'
-import MockAdapter from 'axios-mock-adapter'
-import { ToastProvider } from 'react-toast-notifications';
+import axios from 'axios';
+import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
+import MockAdapter from 'axios-mock-adapter';
+import { ToastProvider } from 'react-toast-notifications';
 import store from '../../src/modules/core/client/store';
+import Faq from '../../src/modules/platform/faq/client/faq.component';
+import { act } from 'react-dom/test-utils';
+import { screen } from '@testing-library/dom'
+import { login } from '../../src/modules/platform/user/client/user.actions';
 
 
 configure({ adapter: new Adapter() });
 
 describe('Manage Faq component', () => {
     let fakeAxios;
+    let savedUser;
 
     beforeAll(async () => {
         fakeAxios = new MockAdapter(axios);
+
+        savedUser = {
+            "applications": [],
+            "countries": [],
+            "email": "test@gmail.com",
+            "name": "a",
+            "serviceCategories": []
+        };
+        fakeAxios.onPost('/api/login').reply(200, savedUser);
+
+        await store.dispatch(login({
+            email: 'test@gmail.com',
+            password: 'test'
+        }));
 
         const faqs = {
             "faq": [{
@@ -67,24 +84,30 @@ describe('Manage Faq component', () => {
         fakeAxios.onGet('/api/faq?page=1&topic=general-information&limit=5').reply(200, filteredFaqs);
     });
 
+    const userSlice = () => store.getState().userReducer;
+
     const wrapperComponent = () => (
-        <Provider store={store}>
-            <MemoryRouter>
-                <ToastProvider>
+        <BrowserRouter>
+            <ToastProvider>
+                <Provider store={store}>
                     <Faq topic="general-information" page={1} />
-                </ToastProvider>
-            </MemoryRouter>
-        </Provider>
+                </Provider>
+            </ToastProvider>
+        </BrowserRouter>
     );
+
 
     it('Should render Faq component', () => {
         const wrapper = shallow(wrapperComponent());
         expect(wrapper.exists()).toBe(true);
     });
 
-    it('should render list', async () => {
-        const { getByTestId, container, getByText } = render(wrapperComponent());
+    it('should set user', async () => {
+        expect(userSlice().loggedInUser).toEqual(savedUser);
+    });
 
+    it('should render list', async () => {
+        const { debug, getByTestId, container, getByText } = render(wrapperComponent());
 
         const faqHeader = await waitFor(() => getByText('Questions You May Have'));
         expect(faqHeader).toBeTruthy();
@@ -94,8 +117,5 @@ describe('Manage Faq component', () => {
             expect(faqBody).toBeTruthy();
             expect(faqBody.childElementCount).toBe(1);
         });
-
     });
-
-
 });

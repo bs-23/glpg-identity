@@ -37,7 +37,7 @@ async function searchOklaHcps(req, res) {
         const fieldNameMap = {
             firstName: 'individual.firstName',
             lastName: 'individual.lastName',
-            address: 'address.dispatchLabel',
+            address: 'address.addressLongLabel',
             city: 'address.villageLabel',
             postCode: 'address.longPostalCode',
             specialties: 'individual.speciality1',
@@ -125,7 +125,7 @@ async function searchOklaHcps(req, res) {
         const data = {
             totalNumberOfResults: searchResponse.totalNumberOfResults,
             numberOfIndividuals: searchResponse.numberOfIndividuals,
-            resultSize: searchResponse.resultSize,
+            resultSize: limit,
             results
         }
         res.json(data);
@@ -159,11 +159,11 @@ async function searchOklaHcos(req, res) {
         if (!codbases || !codbases.length) return res.status(400).send('Invalid Codbases.');
 
         const fieldNameMap = {
-            address: 'address.dispatchLabel',
+            address: 'address.addressLongLabel',
             city: 'address.villageLabel',
             postCode: 'address.longPostalCode',
-            onekeyId: 'activity.activityEid',
-            workplaceEid: 'workplace.workplaceEid',
+            onekeyId: 'workplace.workplaceEid',
+            workplaceEid: 'workplace.externalKeys.value',
             specialties: 'workplace.speciality1'
         };
 
@@ -259,7 +259,7 @@ async function getOklaHcpDetails(req, res) {
 
         const activitiesOfIndividual = searchResponse.results.filter(r => r.individual.individualEid === id);
 
-        const  onekeyEidList = activitiesOfIndividual.map(i => i.onekeyEid);
+        const onekeyEidList = activitiesOfIndividual.map(i => i.onekeyEid);
         const individual = activitiesOfIndividual[0].individual;
         const isInContract = activitiesOfIndividual[0].isInContract;
 

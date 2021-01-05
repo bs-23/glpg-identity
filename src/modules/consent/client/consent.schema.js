@@ -1,4 +1,4 @@
-import { string, object, ref, array, boolean } from 'yup';
+import { string, object, boolean } from 'yup';
 // import XRegExp from 'xregexp';
 
 export const consentSchema = object().shape({

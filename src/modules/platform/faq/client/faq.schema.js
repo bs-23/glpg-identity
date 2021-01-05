@@ -1,9 +1,15 @@
 import { string, object, array } from 'yup';
-
+const validator = require('validator');
 
 function isNotEmpty(answer) {
     if (answer === '<p><br></p>') return false;
     if (answer && answer.replace(/&nbsp;/g, '') === '<p></p>') return false;
+    return true;
+}
+function isExceeded(answer) {
+    if (answer && validator.escape(answer).length > 1500) {
+        return false;
+    }
     return true;
 }
 
@@ -35,12 +41,12 @@ export const faqSchema = object().shape({
             question => hasSpace(question)),
     answer: string()
         .required('This field must not be empty.')
-        .max(1500, 'Maximum character limit has been exceeded.')
         .test('is-empty', 'This field must not be empty.',
-            answer => isNotEmpty(answer)),
+            answer => isNotEmpty(answer))
+        .test('is-exceeded', 'Maximum character limit has been exceeded(This limit includes HTML tags and styles)',
+            answer => isExceeded(answer)),
     answer_plaintext: string()
-        .transform(value => value.trim())
-        .required('This field must not be empty.'),
+        .transform(value => value.trim()),
     topics:
         array()
             .of(string())

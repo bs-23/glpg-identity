@@ -6,6 +6,7 @@ import { faqSchema } from './faq.schema';
 import DraftEditor from '../../../core/client/components/draft-editor';
 import { createFaqItem, editFaqItem } from './faq.actions';
 import { useDispatch } from 'react-redux';
+import parse from 'html-react-parser';
 
 const FaqForm = (props) => {
     const [, setShow] = useState(false);
@@ -25,32 +26,6 @@ const FaqForm = (props) => {
         });
     };
 
-    // const convertSlugToId = (arr) => {
-    //     const convertArray = [];
-    //     arr.forEach(element => {
-    //         convertArray.push(props.serviceTopics.find(x => x.slug === element).id);
-    //     });
-    //     return convertArray;
-
-    // }
-
-    // const sortArrayWithTitle = (array) => {
-    //     const catgory_title_list = [];
-    //     array.forEach(element => {
-    //         catgory_title_list.push(props.serviceTopics.find(x => x.id === element).title);
-    //     });
-
-    //     catgory_title_list.sort();
-
-    //     const catgory_slug_list = [];
-
-    //     catgory_title_list.forEach(element => {
-    //         catgory_slug_list.push(props.serviceTopics.find(x => x.title === element).slug);
-    //     });
-
-    //     return catgory_slug_list;
-    // }
-
     useEffect(() => {
         const faqTopics = faqMapping(props.serviceTopics)
         setTopics(faqTopics);
@@ -58,7 +33,6 @@ const FaqForm = (props) => {
 
 
     const faqMapping = (allTopics) => {
-
         const faqWithTopics = [];
 
         const parentCategories = [...new Set(Object.values(allTopics).map((item) => item.category))];
@@ -88,8 +62,8 @@ const FaqForm = (props) => {
                         initialValues={{
                             question: props.editMode ? props.editData.question : '',
                             topics: props.editMode ? props.editData.topics : [],
-                            answer: props.editMode ? props.editData.answer : '',
-                            answer_plaintext: props.editMode ? props.editData.answer : ''
+                            answer: props.editMode ? parse(props.editData.answer) : '',
+                            answer_plaintext: props.editMode ? parse(props.editData.answer) : ''
                         }}
                         validationSchema={faqSchema}
                         displayName="FaqForm"
