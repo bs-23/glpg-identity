@@ -135,6 +135,7 @@ export default function hcpUsers() {
 
     const handleFilterExecute = async (multiFilterSetting) => {
         const filterID = multiFilterSetting.selectedSettingID;
+        const shouldUpdateFilter = multiFilterSetting.saveType === 'save_existing';
 
         const filterSetting = {
             title: multiFilterSetting.filterSettingName,
@@ -146,7 +147,7 @@ export default function hcpUsers() {
         }
 
         if(multiFilterSetting.shouldSaveFilter) {
-            if(filterID) {
+            if(filterID && shouldUpdateFilter) {
                 try{
                     await axios.put(`/api/filter/${filterID}`, filterSetting);
                     history.push(`/information/list/cdp?filter=${filterID}`);
