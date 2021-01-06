@@ -41,17 +41,17 @@ const Filter = (props) => {
     };
 
     const handleAddition = (tag) => {
-        onChange('value', [...value, tag.text], index);
+        if(!tag.text.trim()) return;
+        onChange('value', [...value, tag.text.trim()], index);
     };
 
     const handleInputBlur = (tagText) => {
-        if (tagText) onChange('value', [...value, tagText], index);
+        if (tagText && tagText.trim()) onChange('value', [...value, tagText.trim()], index);
     };
 
     const getTags = () => {
         return (value || []).map(v => ({ id: v, text: v }));
     };
-
 
     const handleFilterChange = (e) => {
         const inputType = e.target.type;
