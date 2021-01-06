@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { Button } from '../common';
 import { Filter } from './components';
@@ -7,10 +7,7 @@ import ScrollBars from 'react-scrollbar';
 const AddFilter = (props) => {
     const {
         currentNumberOfFilters,
-        filters: existingFilters,
         filterOptions,
-        filterPresets,
-        onAddMoreFilter,
         onDone
     } = props;
 
@@ -18,94 +15,107 @@ const AddFilter = (props) => {
         name: '',
         fieldName: '',
         operator: '',
-        value: ''
+        value: []
     };
 
     const [filters, setFilters] = useState([emptyFilter]);
+    const [validationErrors, setValidationErrors] = useState([{}]);
     const [isTouched, setIsTouched] = useState(false);
-
-    // const [selectedFilter, setSelectedFilter] = useState([]);
+    const [isFormValid, setIsFormValid] = useState(false);
 
     const handleAddMoreFilter = () => {
         const emptyFilter = {
             name: String(filters.length + 1),
             fieldName: '',
             operator: '',
-            value: ''
+            value: []
         };
         setFilters([...filters, emptyFilter]);
+        setValidationErrors([...validationErrors, {}]);
     }
 
-    const areFiltersValid = () => {
-        let isValid = true;
-        filters.forEach(f => {
-            if(!f.fieldName.length || !f.operator.length || !f.value.length) {
-                isValid = false;
-            }
-        })
-        return isValid;
-    }
+    // const areFiltersValid = () => {
+    //     let isValid = true;
+    //     filters.forEach(f => {
+    //         if(!f.fieldName.length || !f.operator.length || !f.value.length) {
+    //             isValid = false;
+    //         }
+    //     })
+    //     return isValid;
+    // }
 
-    const getFilterValidationError = (filter) => {
+    const getFilterValidationError = async (filter) => {
         const validationError = {};
-        if(!filter.fieldName.length) validationError.fieldName = 'Field can not be empty.';
-        if(!filter.operator.length) validationError.operator = 'Field can not be empty.';
-        if(!filter.value.length) validationError.value = 'Field can not be empty.';
+        const options = filterOptions.find(fo => fo.fieldName === filter.fieldName);
+        const valueSchema = (options || {}).schema;
+
+        if (!filter.fieldName.length) validationError.fieldName = 'Field can not be empty.';
+        if (!filter.operator.length) validationError.operator = 'Field can not be empty.';
+        if (!filter.value.length) validationError.value = 'Field can not be empty.';
+
+        if (valueSchema) {
+            try{
+                await valueSchema.validate(filter.value);
+            }catch(err) {
+                validationError.value = err.errors[0];
+            }
+        }
+
         return validationError;
     }
 
     const handleDone = (e) => {
-        // onDone && onDone(filters, filterPresets.find(fp => fp.id === selectedFilter));
-        const isValid = areFiltersValid();
-        if(!isValid) setIsTouched(true);
-        else onDone && onDone(filters);
+        setIsTouched(true);
+        if(!isFormValid) return;
+        onDone && onDone(filters);
     }
 
     const handleChange = (propertyName, value, index) => {
         const updatedFilters = [...filters];
+
         updatedFilters[index][propertyName] = value;
+
+        if (propertyName === 'fieldName') {
+            updatedFilters[index]['operator'] = '';
+            updatedFilters[index]['value'] = [];
+        };
+
         setFilters(updatedFilters);
     }
 
-    // const handlePresetChange = (e) => {
-    //     const presetID = e.target.value;
-    //     const selectedFilters = filterPresets.find(fp => fp.id === presetID).settings.filters || [];
-    //     setSelectedFilter(presetID);
-    //     setFilters(selectedFilters);
-    // }
-
     const handleRemove = (index) => {
-        console.log(index)
         const filtersAfterRemoval = filters.filter((filter, ind) => ind !== index);
+        const validationErrorsAfterRemoval = validationErrors.filter((ve, ind) => ind !== index);
         setFilters(filtersAfterRemoval);
+        setValidationErrors(validationErrorsAfterRemoval);
     }
 
     const scrollBarStyle = {
         maxHeight: '500px'
     };
-    
-    // useEffect(() => {
-    //     setFilters(existingFilters);
-    // }, []);
+
+    const validateForm = async () => {
+        let isValid = true;
+        const updatedValidationErrors = [...validationErrors];
+
+        await Promise.all(filters.map(async (filter, index) => {
+            const validationErrorMessage = await getFilterValidationError(filter);
+            updatedValidationErrors[index] = validationErrorMessage;
+            if(Object.keys(validationErrorMessage).length) isValid = false;
+        }))
+
+        setValidationErrors(updatedValidationErrors);
+        setIsFormValid(isValid);
+    }
+
+    useEffect(() => {
+        validateForm();
+    }, [filters])
 
     return <div className="filter__sub-panel">
         <ScrollBars autoHide={false} smoothScrolling={true} style={scrollBarStyle}>
             <div className="bg-light p-2 rounded-top">Add Filter</div>
             <div className="px-3 pb-3 pt-2">
-                {/* {
-                filterPresets && filterPresets.length > 0 &&
-                <div className="mb-2">
-                    <label className="pt-2 mb-1">Select From Existing Filters</label>
-                    <select className="form-control form-control-sm" name="selectedFilterPreset" onChange={handlePresetChange}>
-                        <option value="">Select an option</option>
-                        {
-                            filterPresets.map((filter, index) =>
-                                <option key={filter.id} value={filter.id}>{filter.title}</option>
-                            )
-                        }
-                    </select>
-                </div>
-            } */}
                 {
                     filters && filters.map((filter, index) =>
                         <Filter
@@ -118,7 +128,7 @@ const AddFilter = (props) => {
                             value={filter.value}
                             filterOptions={filterOptions}
                             isTouched={isTouched}
-                            validationError={getFilterValidationError(filter)}
+                            validationError={validationErrors[index]}
                             onChange={handleChange}
                             onRemove={handleRemove}
                         />
@@ -128,7 +138,6 @@ const AddFilter = (props) => {
                 <Button className="btn cdp-btn-secondary btn-block text-white" label="Done" onClick={handleDone} />
             </div>
         </ScrollBars>
-        
     </div>
 }
 

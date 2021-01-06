@@ -1,3 +1,4 @@
+import { string, array } from 'yup';
 import { operators } from '../../../../core/client/components/MultiFilter';
 
 export function getFilterOptions(userCountries) {
@@ -13,19 +14,25 @@ export function getFilterOptions(userCountries) {
             fieldName: 'first_name',
             valueType: 'text',
             displayText: 'First Name',
-            operators: operators.getStringOperators()
+            operators: operators.getStringOperators(),
+            maxLength: 50,
+            schema: array().of(string().required('This field can not be empty.'))
         },
         {
             fieldName: 'last_name',
             valueType: 'text',
             displayText: 'Last Name',
-            operators: operators.getStringOperators()
+            operators: operators.getStringOperators(),
+            maxLength: 50,
+            schema: array().of(string().required('This field can not be empty.'))
         },
         {
             fieldName: 'email',
             valueType: 'text',
             displayText: 'Email',
-            operators: operators.getStringOperators()
+            operators: operators.getStringOperators(),
+            maxLength: 100,
+            schema: array().of(string().required('This field can not be empty.'))
         },
         {
             fieldName: 'country',

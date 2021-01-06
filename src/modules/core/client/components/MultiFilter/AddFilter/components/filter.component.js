@@ -21,6 +21,8 @@ const Filter = (props) => {
 
     const type = filterOptions.find(filter => filter.fieldName === fieldValue)?.valueType || 'text';
 
+    const filterOption = filterOptions.find(fo => fo.fieldName === fieldValue) || {};
+
     const getOptions = () => {
         const filter = filterOptions.find(filter => filter.fieldName === fieldValue);
         const selectOptions = filter && filter.options ? filter.options : [];
@@ -134,6 +136,7 @@ const Filter = (props) => {
                         handleAddition={handleAddition}
                         handleInputBlur={handleInputBlur}
                         autofocus={false}
+                        maxLength={filterOption.maxLength}
                     />
                     {isTouched && <div className="invalid-feedback">{validationError.value}</div>}
                 </div>

@@ -4,6 +4,7 @@ export const multiFilterSchema = object().shape({
     filterSettingName: string().when('shouldSaveFilter', {
         is: true,
         then: string()
+            .transform(value => value.trim())
             .max(50, 'This field must be at most 50 characters long')
             .required('This field must not be empty'),
         otherwise: string()
