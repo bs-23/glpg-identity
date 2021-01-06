@@ -138,107 +138,89 @@ paths:
                 4401:
                     description: The refresh_token is invalid or expired.
 
-    /api/clinical-trials/search:
+    /api/clinical-trials/get-trials:
         get:
             tags:
                 - clinical-trials
-            summary: Get all clinical trials relevent to search fields.
-            requestBody:
-                required: true
-                content:
-                    application/json:
-                        schema:
-                            type: object
-                            properties:
-                                type:
-                                    type: string
-                                data:
-                                    type: string
-                            required:
-                                - type
-                                - data
-            responses:
-                200:
-                    description: The request has succeeded.
-                    content:
-                        applicaiton/json:
-                            schema:
-                                type: object
-                                properties:
-                                    data:
-                                        type: object
-                                        properties:
-                                            id:
-                                                type: string
-                                            type:
-                                                type: string
-                                            data:
-                                                type: string
-                                    errors:
-                                        $ref: "#/components/schemas/errorBodyInSuccess"
-                400:
-                    description: Bad request.
-                    content:
-                        applicaiton/json:
-                            schema:
-                                $ref: "#/components/schemas/errorResponse"
-    /api/clinical-trials/search/{id}:
-        get:
-            tags:
-                - clinical-trials
-            summary: Get detail of a specific field.
-            requestBody:
-                required: true
-                content:
-                    application/json:
-                        schema:
-                            type: object
-                            properties:
-                                type:
-                                    type: string
-                                data:
-                                    type: string
-                            required:
-                                - type
-                                - data
-            responses:
-                200:
-                    description: The request has succeeded.
-                    content:
-                        applicaiton/json:
-                            schema:
-                                type: object
-                                properties:
-                                    data:
-                                        type: object
-                                        properties:
-                                            id:
-                                                type: string
-                                            type:
-                                                type: string
-                                            data:
-                                                type: string
-                                    errors:
-                                        $ref: "#/components/schemas/errorBodyInSuccess"
-                400:
-                    description: Bad request.
-                    content:
-                        applicaiton/json:
-                            schema:
-                                $ref: "#/components/schemas/errorResponse"
-    
-    /api/clinical-trials/diseases:
-        get:
-            tags:
-                - clinical-trials
-            summary: Get data.
+            summary: get all (default first 100 items, when no parameter is given) or search trials by keyword
             parameters:
-                - name: id
-                  in: path
-                  required: true
-                  description: the data identifier, as id
+                - name: items_per_page
+                  in: query
+                  required: false
+                  description: determine how many items are shown in each page. (page_number*item_per_page)
+                  example: 100
                   schema:
                     type: string
+                - name: page_number
+                  in: query
+                  required: false
+                  description: retrive data from particular page.
+                  example: 1
+                  schema:
+                    type: string
+                - name: Status
+                  in: query
+                  type: string
+                  schema:
+                    type: array
+                    items:
+                        type: string
+                        enum:
+                        - RECSTATUS_RECRUITING
+                        - RECSTATUS_NOT_YET_RECRUITING
+                        - RECSTATUS_STUDY_COMPLETED
+                        - RECSTATUS_TERMINATED
+                    style: matrix
+                - name: Diseases
+                  in: query
+                  type: string
+                - name: Location
+                  in: query
+                  type: string
+                - name: Distance
+                  in: query
+                  type: string
+                - name: AgeRanges
+                  in: query
+                  type: string
+                  schema:
+                    type: array
+                    items:
+                        type: string
+                        enum:
+                        - AGERANGE_ONE
+                        - AGERANGE_TWO
+                        - AGERANGE_THREE
+                  style: matrix
+                  description: AGERANGE_ONE(0-17 years), AGERANGE_TWO(18-65 years), AGERANGE_THREE(66+years)
+                - name: Gender
+                  in: query
+                  type: string
+                  schema:
+                    type: array
+                    items:
+                        type: string
+                        enum:
+                        - GENDER_FEMALE
+                        - GENDER_MALE
+                        - GENDER_ALL
+                  style: matrix
+                - name: Phases
+                  in: query
+                  type: string
+                  schema:
+                    type: array
+                    items:
+                        type: string
+                        enum:
+                        - PHASE_1
+                        - PHASE_2
+                        - PHASE_3
+                        - PHASE_4
+                  style: matrix
+                - name: SearchTerm
+                  in: query
+                  type: string
             responses:
                 200:
                     description: The request has succeeded.
@@ -247,35 +229,40 @@ paths:
                             schema:
                                 type: object
                                 properties:
-                                    data:
-                                        type: object
-                                        properties:
-                                            id:
-                                                type: string
-                                            type:
-                                                type: string
-                                            data:
-                                                type: string
-                                            applicaiton:
-                                                type: object
-                                                properties:
-                                                    id:
-                                                        type: string
-                                                    name:
-                                                        type: string
-                                    errors:
-                                        $ref: "#/components/schemas/errorBodyInSuccess"
+                                    id:
+                                        type: string
+                                    description:
+                                        type: string
+                                    log:
+                                        type: string
+                                    created_by:
+                                        type: string
+                                    updated_by:
+                                        type: string
+                                    createdAt:
+                                        type: string
+                                    updatedAt:
+                                        type: string
+                400:
+                    description: The request is missing required parameters.
+                401:
+                    description: Invalid email or password.
+                4400:
+                    description: The access_token is invalid or expired.
+                4401:
+                    description: The refresh_token is invalid or expired.
 
-    /api/clinical-trials/Glossaries:
+    /api/clinical-trials/get_trial_details/{id}:
         get:
             tags:
                 - clinical-trials
-            summary: Get data.
+            summary: get detail fields of a trial
             parameters:
                 - name: id
                   in: path
                   required: true
                   description: the data identifier, as id
+                  example: 4a27321c-c062-4653-895b-08a40bb411cd
                   schema:
                     type: string
             responses:

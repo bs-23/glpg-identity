@@ -2,7 +2,7 @@ const path = require('path');
 const _ = require('lodash');
 const validator = require('validator');
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
-const history = require('./clinical-trials.history.model');
+const History = require('./clinical-trials.history.model');
 const https = require('https');
 const Trial = require('./clinical-trials.trial.model');
 const Location = require('./clinical-trials.location.model');
@@ -20,7 +20,7 @@ async function dumpAllData(req, res) {
         });
 
         resp.on('end', async () => {
-            let result = await history.create({
+            let result = await History.create({
                 description: description,
                 value: data,
                 log: urlToGetData,
@@ -50,7 +50,7 @@ async function dumpAllData(req, res) {
 async function showAllVersions(req, res) {
     const response = new Response({}, []);
     try{
-        let result = await history.findAll({
+        let result = await History.findAll({
             attributes: {
                 exclude: ['value']
 
@@ -74,8 +74,9 @@ async function showAllVersions(req, res) {
 async function mergeProcessData(req, res) {
     const response = new Response({}, []);
     const { ids } = req.body;
+    
     try{
-        let result = await history.findAll({
+        let result = await History.findAll({
             where: {
                 id: ids.includes(',')? ids.split(',') : [ids],
             }
@@ -128,8 +129,74 @@ async function mergeProcessData(req, res) {
     }
 }
 
+async function getTrials(req, res) {
+    const response = new Response({}, []);
+    let { items_per_page, page_no } = req.query;
+
+    page_no = page_no ? page_no : 1;
+    items_per_page = items_per_page? items_per_page : 100;
+
+    try{
+        let result = await Trial.findAll({
+            offset: items_per_page*page_no, 
+            limit: items_per_page, 
+            attributes: {
+                exclude: ['value']
+
+            }});
+
+        let total_item_count = await Trial.count();
+
+        if (!result) {
+            response.data = [];
+            return res.status(204).send(response);
+        }
+
+        response.data = {
+           search_result: result,
+           items: total_item_count
+        }
+        res.json(response);
+    } catch (err) {
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
+    }
+}
+
+async function getTrialDetails(req, res) {
+    const response = new Response({}, []);
+    
+    try{
+        if (!req.params.id) {
+            return res.status(400).send('Invalid request.');
+        }
+
+        id = req.params.id;
+        let result = await Trial.findOne({
+            where: {
+                id: id,
+            }
+        });
+
+        if (!result) {
+            response.data = [];
+            return res.status(204).send(response);
+        }
+
+        response.data = result;
+        res.json(response);
+    } catch (err) {
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
+    }
+}
+
 
 
 exports.dumpAllData = dumpAllData;
 exports.showAllVersions = showAllVersions;
 exports.mergeProcessData = mergeProcessData;
+exports.getTrials = getTrials;
+exports.getTrialDetails = getTrialDetails;

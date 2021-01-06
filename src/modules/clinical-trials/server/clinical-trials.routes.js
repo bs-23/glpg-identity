@@ -10,4 +10,8 @@ module.exports = app => {
         .get(auth, controller.showAllVersions);
     app.route('/api/clinical-trials/merge-process-data-stage')
         .post(auth, controller.mergeProcessData);
+    app.route('/api/clinical-trials/get-trials')
+        .get(auth, controller.getTrials);
+    app.route('/api/clinical-trials/get_trial_details/:id')
+        .get(auth, controller.getTrialDetails);
 };
