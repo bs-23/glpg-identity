@@ -141,6 +141,17 @@ export function getHcpFilterSettings(tableName) {
         payload: axios({
             method: 'get',
             url: `/api/filter?table=${tableName}`
+        }),
+        payload: new Promise((resolve, reject) => {
+            axios({
+                method: 'get',
+                url: `/api/filter?table=${tableName}`
+            })
+            .then(data => resolve({
+                data: data.data,
+                tableName
+            }))
+            .catch(error => reject(error));
         })
     };
 }

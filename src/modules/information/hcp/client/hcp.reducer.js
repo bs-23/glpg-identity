@@ -10,6 +10,11 @@ const initialState = {
     filterPresetsCrdlp: null
 };
 
+const tablePresetPathMap = {
+    'hcp-profiles': 'filterPresetsCdp',
+    'crdlp-hcp-profiles': 'filterPresetsCrdlp'
+}
+
 function sortItems(itms, val, type) {
     return itms.sort(function (a, b) {
         const count = a[val].length < b[val].length ? a[val].length : b[val].length;
@@ -104,9 +109,12 @@ export default function reducer(state = initialState, action) {
         }
 
         case Types.GET_HCP_FILTER_SETTINGS_FULFILLED: {
+            const tableName = action.payload.tableName;
+            const path = tablePresetPathMap[tableName];
+
             return {
                 ...state,
-                filterPresetsCdp: action.payload.data
+                [path]: action.payload.data
             }
         }
     }

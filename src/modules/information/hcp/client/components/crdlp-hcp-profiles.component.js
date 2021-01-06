@@ -2,8 +2,11 @@ import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import Dropdown from 'react-bootstrap/Dropdown';
 import React, { useEffect, useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { getCrdlpHcpProfiles } from '../hcp.actions';
+import { useToasts } from 'react-toast-notifications';
 import Modal from 'react-bootstrap/Modal';
+import axios from 'axios';
+
+import { getCrdlpHcpProfiles } from '../hcp.actions';
 import Faq from '../../../../platform/faq/client/faq.component';
 import { HCPFilter } from '../../../../information';
 
@@ -26,13 +29,32 @@ export default function CrdlpHcpProfiles() {
     const allCountries = useSelector(state => state.countryReducer.allCountries);
     const params = new URLSearchParams(window.location.search);
 
+    const { addToast } = useToasts();
+
     const handleCloseFaq = () => setShowFaq(false);
     const handleShowFaq = () => setShowFaq(true);
 
     useEffect(() => {
         setCodBase(params.get('codbase') ? params.get('codbase') : null);
-        dispatch(getCrdlpHcpProfiles(location.search));
         setSort({ type: params.get('orderType') || 'asc', value: params.get('orderBy') });
+
+        const filterID = params.get('filter');
+        if(filterID) axios.get(`/api/filter/${filterID}`)
+            .then(res => {
+                setSelectedFilterSetting(res.data);
+                setIsFilterEnabled(true);
+                dispatch(getCrdlpHcpProfiles(location.search, res.data.settings));
+            })
+        else {
+            const { lastAppliedFilters, lastAppliedLogic } = hcpFilterRef.current.multiFilterProps.values || {};
+            const filterSetting = lastAppliedFilters && lastAppliedFilters.length
+                ? {
+                    filters: lastAppliedFilters,
+                    logic: lastAppliedLogic
+                }
+                : null;
+            dispatch(getCrdlpHcpProfiles(location.search, filterSetting));
+        };
     }, [location]);
 
     const urlChange = (pageNo, country_codbase, orderColumn, pageChange = false) => {
@@ -75,6 +97,50 @@ export default function CrdlpHcpProfiles() {
         return country && country.countryname;
     };
 
+    const handleFilterExecute = async (multiFilterSetting) => {
+        const filterID = multiFilterSetting.selectedSettingID;
+        const shouldUpdateFilter = multiFilterSetting.saveType === 'save_existing';
+
+        const filterSetting = {
+            title: multiFilterSetting.filterSettingName,
+            table: "crdlp-hcp-profiles",
+            settings: {
+                filters: multiFilterSetting.filters,
+                logic: multiFilterSetting.logic
+            }
+        }
+
+        if(multiFilterSetting.shouldSaveFilter) {
+            if(filterID && shouldUpdateFilter) {
+                try{
+                    await axios.put(`/api/filter/${filterID}`, filterSetting);
+                    history.push(`/information/list/crdlp?filter=${filterID}`);
+                }catch(err){
+                    console.log(err)
+                    addToast('There was an error updating the filter setting.', {
+                        appearance: 'error',
+                        autoDismiss: true
+                    });
+                }
+            }else {
+                try{
+                    const { data } = await axios.post('/api/filter', filterSetting);
+                    history.push(`/information/list/crdlp?filter=${data.id}`);
+                }catch(err){
+                    console.log(err)
+                    addToast('There was an error creating the filter setting.', {
+                        appearance: 'error',
+                        autoDismiss: true
+                    });
+                }
+            }
+        }
+        else {
+            history.push(`/information/list/crdlp`);
+        };
+        setIsFilterEnabled(true);
+    }
+    // console.log(hcpFilterRef && hcpFilterRef.current.multiFilterProps.values);
     return (
         <main className="app__content cdp-light-bg">
             <div className="container-fluid">
@@ -288,7 +354,7 @@ export default function CrdlpHcpProfiles() {
                     show={showFilterSidebar}
                     selectedFilterSetting={selectedFilterSetting}
                     onHide={() => setShowFilterSidebar(false)}
-                    // onExecute={handleFilterExecute}
+                    onExecute={handleFilterExecute}
                     tableName="crdlp-hcp-profiles"
                 />
             </div>

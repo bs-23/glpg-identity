@@ -153,7 +153,7 @@ export default function hcpUsers() {
                     history.push(`/information/list/cdp?filter=${filterID}`);
                 }catch(err){
                     addToast('There was an error updating the filter setting.', {
-                        appearance: 'success',
+                        appearance: 'error',
                         autoDismiss: true
                     });
                 }
@@ -163,7 +163,7 @@ export default function hcpUsers() {
                     history.push(`/information/list/cdp?filter=${data.id}`);
                 }catch(err){
                     addToast('There was an error creating the filter setting.', {
-                        appearance: 'success',
+                        appearance: 'error',
                         autoDismiss: true
                     });
                 }

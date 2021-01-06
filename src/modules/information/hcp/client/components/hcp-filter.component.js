@@ -4,12 +4,16 @@ import { MultiFilter } from "../../../../core/client/components/MultiFilter";
 import { useSelector, useDispatch } from 'react-redux';
 import { getHcpFilterSettings } from '../hcp.actions';
 
+const tablePresetPathMap = {
+    'hcp-profiles': 'filterPresetsCdp',
+    'crdlp-hcp-profiles': 'filterPresetsCrdlp'
+}
+
 const HCPFilter = ({ selectedFilterSetting, onHide, onExecute, show, tableName }, ref) => {
     const allCountries = useSelector(state => state.countryReducer.allCountries);
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
-    const userFilters = tableName === 'hcp-profiles'
-        ? useSelector(state => state.hcpReducer.filterPresetsCdp)
-        : useSelector(state => state.hcpReducer.filterPresetsCrdlp);
+    const userFilters = useSelector(state => state.hcpReducer[tablePresetPathMap[tableName]]);
+
     const dispatch = useDispatch();
 
     const multiFilterRef = useRef();
