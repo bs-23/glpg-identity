@@ -305,6 +305,7 @@ const MultiFilter = (props, ref) => {
                                                 {scopeOptions.map((scope, idx) => (
                                                     <Dropdown.Item
                                                         key={'scope-' + idx}
+                                                        disabled={!scope.enabled}
                                                         onClick={() => { setSelectedScopre(scope); }}>
                                                         <i className={`${scope.icon} mr-2 cdp-text-primary`}></i> {scope.text}
                                                     </Dropdown.Item>
