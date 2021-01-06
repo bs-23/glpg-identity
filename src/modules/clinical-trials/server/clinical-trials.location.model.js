@@ -10,7 +10,7 @@ const makeCustomSlug = (title) => {
     return convertToSlug(`${title} ${code}`);
 };
 
-const Location = sequelize.clinitalTrialsStageConnectior.define('locatioin', {
+const Location = sequelize.clinitalTrialsStageConnectior.define('location', {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -24,7 +24,7 @@ const Location = sequelize.clinitalTrialsStageConnectior.define('locatioin', {
     },
     LocationCity: {
         unique: false,
-        allowNull: false,
+        allowNull: true,
         type: DataTypes.STRING(1024)
     },
     LocationZip: {
@@ -46,12 +46,6 @@ const Location = sequelize.clinitalTrialsStageConnectior.define('locatioin', {
         unique: false,
         allowNull: true,
         type: DataTypes.FLOAT()
-    },
-    created_by: {
-        type: DataTypes.UUID
-    },
-    updated_by: {
-        type: DataTypes.UUID
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CLINICAL_TRIALS_SCHEMA')}`,

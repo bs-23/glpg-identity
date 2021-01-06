@@ -11,8 +11,8 @@ const makeCustomSlug = (title) => {
     return convertToSlug(`${title} ${code}`);
 };
 
-var trialsModel = {
-    name: 'clinical_trials',
+let trialModel = {
+    name: 'clinical_trial',
     db_properties: {
         id: {
             allowNull: false,
@@ -38,59 +38,49 @@ var trialsModel = {
         clinicalTrialPurpose: {
             unique: false,
             allowNull: true,
-            type: DataTypes.STRING(256)
+            type: DataTypes.STRING(10485760)
         },
         clinicalTrialSummary: {
             unique: false,
-            allowNull: false,
-            type: DataTypes.STRING(256)
+            allowNull: true,
+            type: DataTypes.STRING(10485760)
         },
         gender: {
             unique: false,
-            allowNull: false,
+            allowNull: true,
             type: DataTypes.STRING(60)
         },
         minAge: {
             unique: false,
-            allowNull: false,
+            allowNull: true,
             type: DataTypes.STRING(60)
         },
         maxAge: {
             unique: false,
-            allowNull: false,
+            allowNull: true,
             type: DataTypes.STRING(60)
         },
         stdAge: {
             unique: false,
-            allowNull: false,
+            allowNull: true,
             type: DataTypes.ARRAY(DataTypes.STRING)
         },
         phase: {
             unique: false,
-            allowNull: false,
+            allowNull: true,
             type: DataTypes.ARRAY(DataTypes.STRING)
         },
         trialStatus: {
             unique: false,
-            allowNull: false,
+            allowNull: true,
             type: DataTypes.STRING(60)
-        },
-        clinicalTrialSummary: {
-            unique: false,
-            allowNull: false,
-            type: DataTypes.STRING(256)
         },
         inclusionExclusionCriteria: {
             unique: false,
-            allowNull: false,
-            type: DataTypes.STRING(256)
+            allowNull: true,
+            type: DataTypes.STRING(10485760)
         },
         typeOfDrug: {
-            unique: false,
-            allowNull: false,
-            type: DataTypes.STRING(60)
-        },
-        location: {
             unique: false,
             allowNull: true,
             type: DataTypes.STRING(60)
@@ -111,16 +101,10 @@ var trialsModel = {
     }
 }
 
-const Trials = sequelize.clinitalTrialsStageConnectior.define(trialsModel.name, trialsModel.db_properties , trialsModel.db_schema);
+const Trial = sequelize.clinitalTrialsStageConnectior.define(trialModel.name, trialModel.db_properties , trialModel.db_schema);
 
-Location.hasMany(Trials, {
+Location.hasMany(Trial, {
     foreignKey: 'location_id'
 });
 
-Trials.belongsTo(Location, {
-    foreignKey: 'location_id'
-});
-
-
-
-module.exports = Trials;
+module.exports = Trial;

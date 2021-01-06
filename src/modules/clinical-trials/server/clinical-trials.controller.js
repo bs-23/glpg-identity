@@ -4,8 +4,9 @@ const validator = require('validator');
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const history = require('./clinical-trials.history.model');
 const https = require('https');
-const Trials = require('./clinical-trials.trials.model');
+const Trial = require('./clinical-trials.trial.model');
 const Location = require('./clinical-trials.location.model');
+const { request } = require('http');
 
 async function dumpAllData(req, res) {
     const response = new Response({}, []);
@@ -33,7 +34,6 @@ async function dumpAllData(req, res) {
             }
 
             response.data = result;
-
             res.json(response);
         });
 
@@ -103,23 +103,23 @@ async function mergeProcessData(req, res) {
              }));
             
         });
-
-        // data.forEach(entry => {
-        //     Location.bulkCreate(entry.Location, {
-        //         returning: true,
-        //         ignoreDuplicates: false
-        //     }).then(function () {
-        //         callback();
-        //     });
-        // });
-
+        Trial.bulkCreate(data, 
+                    {
+                    returning: true,
+                    ignoreDuplicates: false
+                }).then(trial=>{
+                    data = trial
+                });
 
         if (!result) {
             response.data = [];
             return res.status(204).send(response);
         }
 
-        response.data = data;
+        response.data = {
+            count: data.length,
+            stitch: data[0]
+        };
         res.json(response);
     } catch (err) {
         console.error(err);
@@ -127,6 +127,8 @@ async function mergeProcessData(req, res) {
         res.status(500).send(response);
     }
 }
+
+
 
 exports.dumpAllData = dumpAllData;
 exports.showAllVersions = showAllVersions;

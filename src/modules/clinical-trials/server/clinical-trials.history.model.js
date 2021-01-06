@@ -29,7 +29,7 @@ const history = sequelize.clinitalTrialsDevConnectior.define('history', {
     },
     log: {
         unique: false,
-        allowNull: false,
+        allowNull: true,
         type: DataTypes.STRING(1024)
     },
     created_by: {
