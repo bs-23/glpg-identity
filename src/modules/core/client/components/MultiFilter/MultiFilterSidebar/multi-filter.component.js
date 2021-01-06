@@ -305,6 +305,7 @@ const MultiFilter = (props, ref) => {
                                                 {scopeOptions.map((scope, idx) => (
                                                     <Dropdown.Item
                                                         key={'scope-' + idx}
+                                                        disabled={!scope.enabled}
                                                         onClick={() => { setSelectedScopre(scope); }}>
                                                         <i className={`${scope.icon} mr-2 cdp-text-primary`}></i> {scope.text}
                                                     </Dropdown.Item>
@@ -357,7 +358,7 @@ const MultiFilter = (props, ref) => {
                                     {formikProps.values.filters.length > 0 &&
                                         <span className="small" type="button" onClick={() => handleRemoveAll(formikProps)}>Remove All</span>
                                     }
-                                    
+
                                 </div>
                                 {(formikProps.values.filters.length > 1) &&
                                     <div className="d-flex flex-column">
@@ -425,7 +426,7 @@ const MultiFilter = (props, ref) => {
                                 }
                             </React.Fragment>
                         }
-                       
+
                             </div>
                     <div className="p-3 d-flex filter__section-btn">
                         <Button
