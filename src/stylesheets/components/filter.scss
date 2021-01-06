@@ -9,7 +9,7 @@
 
     &__panel {
         background: white;
-        width: 302px;
+        width: 350px;
         box-shadow: -9px 13px 30px -10px #C5C5C5;
         display: flex;
         flex-direction: column;
@@ -27,11 +27,11 @@
 
     &__sub-panel {
         position: absolute;
-        right: 302px;
+        right: 350px;
         background: white;
         border: 1px solid darkgreen;
         border-radius: 5px;
-        width: 302px;
+        width: 350px;
         max-height: 500px;
         margin-top: 50px;
 
@@ -162,5 +162,18 @@
     }
 
     &__add-filter {
+    }
+
+    &__logic {
+        &-wrap {
+        }
+
+        &-item {
+        }
+
+        &-field {
+            height: 24px;
+            padding: 0px;
+        }
     }
 }

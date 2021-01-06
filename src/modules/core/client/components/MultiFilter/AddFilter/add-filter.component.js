@@ -81,7 +81,7 @@ const AddFilter = (props) => {
     }
 
     const scrollBarStyle = {
-        maxHeight: '500px'
+        maxHeight: '498px'
     };
     
     // useEffect(() => {

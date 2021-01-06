@@ -365,19 +365,19 @@ const MultiFilter = (props, ref) => {
                                             <span type="button" className="cdp-text-primary mb-2 pt-2" onClick={() => null}>
                                                 Add Filter Logic
                                             </span>
-                                </div>
-                                <FilterLogic
-                                    className=""
-                                    logic={formikProps.values.logic}
-                                    numberOfFilters={formikProps.values.filters.length}
-                                    onLogicChange={(logic) => formikProps.setFieldValue('logic', logic)}
-                                />
-                                <div className="invalid-feedback">
-                                    <ErrorMessage name="logic" />
-                                </div>
-                            </div>
-                        }
-                        {formikProps.values.filters.length > 0 &&
+                                        </div>
+                                        <FilterLogic
+                                            className=""
+                                            logic={formikProps.values.logic}
+                                            numberOfFilters={formikProps.values.filters.length}
+                                            onLogicChange={(logic) => formikProps.setFieldValue('logic', logic)}
+                                        />
+                                        <div className="invalid-feedback">
+                                            <ErrorMessage name="logic" />
+                                        </div>
+                                    </div>
+                                }
+                                {formikProps.values.filters.length > 0 &&
                             <React.Fragment>
                                 <label className="d-flex  align-items-center border-top mt-3 pt-2">
                                     <span className="switch-label text-left pr-3">Save Filter</span>

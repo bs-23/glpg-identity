@@ -41,12 +41,12 @@ const FilterLogic = (props) => {
         onLogicChange(logic);
     }
 
-    return <div className="d-flex flex-wrp align-items-center shadow-sm border p-2 rounded small">
+    return <div className="d-flex flex-wrap align-items-center shadow-sm border p-2 rounded small filter__logic-wrap">
         {filterNodes.map((e, ind) => {
-            return <div key={ind}>
+            return <div key={ind} className="d-flex align-items-center mb-2 filter__logic-item">
                 <span className="mr-1">Filter {e}</span>
                 {ind < filterNodes.length-1 &&
-                    <select className="mx-1 form-control form-control-sm d-inline-block w-auto px-1" name={ind} value={logicNodes[ind]} onChange={handleLogicChange}>
+                    <select className="mx-1 form-control form-control-sm d-inline-block w-auto px-1 filter__logic-field" name={ind} value={logicNodes[ind]} onChange={handleLogicChange}>
                         <option value='null'></option>
                         <option value='and'>AND</option>
                         <option value='or'>OR</option>
