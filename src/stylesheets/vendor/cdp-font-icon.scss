@@ -285,6 +285,11 @@ $font-path: "../../../../wwwroot/assets/fonts";
     content: "\39";
 }
 
+.icon-bpm:before {
+    content: "\21";
+}
+
+
 //custome css
 $class-slug: icon- !default;
 

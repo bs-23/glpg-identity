@@ -27,7 +27,7 @@ const BusinessPartnerManagement = () => {
                                 <div className="col-12">
                                     <div className="list-group cdp-list-group">
                                         <NavLink to="#" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link disabled">
-                                            <i className="icon icon-supplier icon-3x icon-3x cdp-list-group__icon"></i>
+                                            <i className="icon icon-bpm icon-3x icon-3x cdp-list-group__icon"></i>
                                             <span>
                                                 <strong className="mb-2 h4 d-block cdp-list-group__link-title">Manage New Business Partner Request</strong>
                                                 <span className="d-block cdp-list-group__link-description">Manage Request with all initial required Master Data Information objects such as Company Code, Procurement contact person etc.</span>
@@ -35,7 +35,7 @@ const BusinessPartnerManagement = () => {
                                             </span>
                                         </NavLink>
                                         <NavLink to="#" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link disabled">
-                                            <i className="icon icon-information-management icon-3x icon-3x cdp-list-group__icon"></i>
+                                            <i className="icon icon-supplier icon-3x icon-3x cdp-list-group__icon"></i>
                                             <span>
                                                 <strong className="mb-2 h4 d-block cdp-list-group__link-title">Customer who also acts as Supplier</strong>
                                                 <span className="d-block cdp-list-group__link-description">Create SAP Business Partner Request for customers who are either HCPs or HCOs.</span>
@@ -43,7 +43,7 @@ const BusinessPartnerManagement = () => {
                                             </span>
                                         </NavLink>
                                         <NavLink to="#" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link disabled">
-                                            <i className="icon icon-list-edit icon-3x icon-3x cdp-list-group__icon"></i>
+                                            <i className="icon icon-information-management icon-3x icon-3x cdp-list-group__icon"></i>
                                             <span>
                                                 <strong className="mb-2 h4 d-block cdp-list-group__link-title">Vendor Management to submit to ERP System(x)</strong>
                                                 <span className="d-block cdp-list-group__link-description">Review request to create Business Partners in SAP.</span>
