@@ -109,9 +109,9 @@ const AddFilter = (props) => {
 
     return <div className="filter__sub-panel">
         <ScrollBars className="custom-scroll" autoHide={true} smoothScrolling={true} style={scrollBarStyle}>
-            <div className="bg-light p-2 rounded-top d-flex justify-content-between">
-                <span>Add Filter</span>
-                <i className="fas fa-times mr-2 text-secondary" type="button" onClick={handleHide} />
+            <div className="bg-light p-2 rounded-top d-flex justify-content-between border-bottom">
+                <span className="font-weight-bold">Add Filter</span>
+                <i className="fas fa-times mr-2 text-secondary font-weight-bold h4 mb-0" type="button" onClick={handleHide} />
             </div>
             <div className="px-3 pb-3 pt-2">
                 {
