@@ -32,7 +32,7 @@ async function createUserFilter(req, res) {
         if (!title) return res.status(400).send('Filter title cannot be null');
 
         const filter = await FilterSettings.create({
-            title,
+            title: title.trim(),
             user_id: req.user.id,
             table_name: table,
             settings
@@ -57,7 +57,7 @@ async function updateUserFilter(req, res) {
         if (!filterSettings) return res.status(404).send('Filter not found');
 
         await filterSettings.update({
-            title,
+            title: title.trim(),
             settings
         });
 

@@ -7,10 +7,6 @@ export default function Input (props) {
         selectOptions,
         value,
         ...rest
-        // value,
-        // className,
-        // name,
-        // onChange
     } = props;
 
     if(type === 'text') return <Field
@@ -29,7 +25,12 @@ export default function Input (props) {
     </Field>
 
     if(type === 'date') {
-        const dateValue = typeof value === 'string' ? value : value[value.length-1];
+        const dateValue = typeof value === 'string'
+            ? value
+            : value.length > 0
+                ? value[value.length-1]
+                : '';
+
         return <Field
             type={type}
             value={dateValue}
