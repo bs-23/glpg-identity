@@ -152,7 +152,8 @@ export default function hcpUsers() {
                     await axios.put(`/api/filter/${filterID}`, filterSetting);
                     history.push(`/information/list/cdp?filter=${filterID}`);
                 }catch(err){
-                    addToast('There was an error updating the filter setting.', {
+                    const errorMessage = err.response.data && err.response.data || 'There was an error updating the filter setting.';
+                    addToast(errorMessage, {
                         appearance: 'error',
                         autoDismiss: true
                     });
@@ -162,7 +163,8 @@ export default function hcpUsers() {
                     const { data } = await axios.post('/api/filter', filterSetting);
                     history.push(`/information/list/cdp?filter=${data.id}`);
                 }catch(err){
-                    addToast('There was an error creating the filter setting.', {
+                    const errorMessage = err.response.data && err.response.data || 'There was an error updating the filter setting.';
+                    addToast(errorMessage, {
                         appearance: 'error',
                         autoDismiss: true
                     });
@@ -170,9 +172,6 @@ export default function hcpUsers() {
             }
         }
         else {
-            // const { settings } = filterSetting;
-            // if(multiFilterSetting.selectedSettingID) history.push(`/information/list/cdp?filter=${multiFilterSetting.selectedSettingID}`)
-            // else history.push(`/information/list/cdp`);
             history.push(`/information/list/cdp`);
         };
         setIsFilterEnabled(true);
