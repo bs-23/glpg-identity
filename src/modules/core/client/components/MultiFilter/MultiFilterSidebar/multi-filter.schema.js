@@ -1,12 +1,28 @@
 import { string, object, array } from 'yup';
 
 export const multiFilterSchema = object().shape({
-    filterSettingName: string().when('shouldSaveFilter', {
+    selectedFilterSettingName: string().when('shouldSaveFilter', {
         is: true,
-        then: string()
-            .transform(value => value.trim())
-            .max(50, 'This field must be at most 50 characters long')
-            .required('This field must not be empty'),
+        then: string().when('saveType', {
+            is: 'save_existing',
+            then: string()
+                .transform(value => value.trim())
+                .max(50, 'This field must be at most 50 characters long')
+                .required('This field must not be empty'),
+            otherwise: string()
+        }),
+        otherwise: string()
+    }),
+    newFilterSettingName: string().when('shouldSaveFilter', {
+        is: true,
+        then: string().when('saveType', {
+            is: 'save_as_new',
+            then: string()
+                .transform(value => value.trim())
+                .max(50, 'This field must be at most 50 characters long')
+                .required('This field must not be empty'),
+            otherwise: string()
+        }),
         otherwise: string()
     }),
     filters: array()

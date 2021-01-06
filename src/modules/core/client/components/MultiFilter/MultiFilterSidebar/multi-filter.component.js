@@ -34,7 +34,7 @@ const MultiFilter = (props, ref) => {
     const formikBag = formikRef.current;
 
     const resetFilter = (formikProps) => {
-        const {setFieldValue, setFieldTouched} = formikProps || formikBag;
+        const {setFieldValue, setTouched} = formikProps || formikBag;
 
         setFieldValue('isChosenFromExisting', '');
         setFieldValue('filters', []);
@@ -42,12 +42,13 @@ const MultiFilter = (props, ref) => {
         setFieldValue('selectedSettingID', '');
         setFieldValue('selectedSettingFilters', []);
         setFieldValue('selectedSettingLogic', '');
-        setFieldValue('filterSettingName', '');
+        setFieldValue('selectedFilterSettingName', '');
+        setFieldValue('newFilterSettingName', '');
         setFieldValue('scope', '');
         setFieldValue('lastAppliedFilters', []);
         setFieldValue('lastAppliedLogic', []);
         setFieldValue('saveType', 'save_as_new');
-        setFieldTouched({});
+        setTouched({});
     }
 
     const removeSelectedFilter = (formikProps) => {
@@ -55,7 +56,7 @@ const MultiFilter = (props, ref) => {
         setFieldValue('selectedSettingID', '');
         setFieldValue('selectedSettingFilters', []);
         setFieldValue('selectedSettingLogic', '');
-        setFieldValue('filterSettingName', '');
+        setFieldValue('selectedFilterSettingName', '');
         setFieldValue('saveType', 'save_as_new');
     }
 
@@ -157,7 +158,7 @@ const MultiFilter = (props, ref) => {
             removeSelectedFilter(actions);
             actions.setFieldValue('isChosenFromExisting', 'false');
             values.selectedSettingID = '';
-            values.filterSettingName = '';
+            values.selectedFilterSettingName = '';
         }
         onExecute(values, actions);
         onHide();
@@ -191,7 +192,7 @@ const MultiFilter = (props, ref) => {
         formikBag.setFieldValue('selectedSettingID', selectedPresetID);
         formikBag.setFieldValue('selectedSettingFilters', filters);
         formikBag.setFieldValue('selectedSettingLogic', logic);
-        formikBag.setFieldValue('filterSettingName', filterPreset.title);
+        formikBag.setFieldValue('selectedFilterSettingName', filterPreset.title);
         formikBag.setFieldValue('filters', filters);
         formikBag.setFieldValue('logic', logic);
         formikBag.setFieldValue('shouldSaveFilter', true);
@@ -200,12 +201,25 @@ const MultiFilter = (props, ref) => {
     }
 
     const handleChooseFromExisting = (e, formikProps) => {
-        const value = e.target.value;
         resetFilter(formikProps);
+
+        const value = e.target.value;
+
         formikProps.setFieldValue('isChosenFromExisting', value);
-        formikProps.setTouched({ 'filterSettingName': false });
+        formikProps.setTouched({ 'selectedFilterSettingName': false });
+
         if(value === 'true') formikProps.setFieldValue('shouldSaveFilter', true);
         if(value === 'false') formikProps.setFieldValue('shouldSaveFilter', false);
+    }
+
+    const handleSaveOptionChange = (e, formikProps) => {
+        const saveType = e.target.value;
+        if(saveType === 'save_as_new') {
+            formikProps.setFieldValue('newFilterSettingName', '');
+        }
+        formikProps.handleChange(e);
+        formikProps.setFieldTouched('selectedFilterSettingName', false, true);
+        formikProps.setFieldTouched('newFilterSettingName', false, true);
     }
 
     const handleClose = () => {
@@ -221,10 +235,13 @@ const MultiFilter = (props, ref) => {
             formikBag.setFieldValue('selectedSettingID', selectedSettingID);
             formikBag.setFieldValue('selectedSettingFilters', selectedSetting.filters);
             formikBag.setFieldValue('selectedSettingLogic', selectedSetting.logic);
-            formikBag.setFieldValue('filterSettingName', selectedSettingTitle);
+            formikBag.setFieldValue('selectedFilterSettingName', selectedSettingTitle);
+            formikBag.setFieldValue('newFilterSettingName', '');
             formikBag.setFieldValue('lastAppliedFilters', selectedSetting.filters);
             formikBag.setFieldValue('lastAppliedLogic', selectedSetting.logic);
             formikBag.setFieldValue('saveType', 'save_existing');
+            formikBag.setFieldTouched('selectedFilterSettingName', false, true);
+            formikBag.setFieldTouched('newFilterSettingName', false, true);
             if(!formikBag.touched.shouldSaveFilter) formikBag.setFieldValue('shouldSaveFilter', true);
         }
     }, [selectedSetting, selectedSettingTitle, selectedSettingID])
@@ -246,7 +263,8 @@ const MultiFilter = (props, ref) => {
                         ? selectedSetting.logic
                         : '',
                     shouldSaveFilter: selectedSettingID ? true : false,
-                    filterSettingName: selectedSettingTitle || '',
+                    selectedFilterSettingName: selectedSettingTitle || '',
+                    newFilterSettingName: '',
                     selectedSettingID: selectedSettingID || '',
                     selectedSettingFilters: selectedSetting
                         ? selectedSetting.filters
@@ -401,25 +419,40 @@ const MultiFilter = (props, ref) => {
                                     <React.Fragment>
                                         {formikProps.values.selectedSettingID && hasFilterBeenModified(formikProps.values) && <div role="group" aria-labelledby="my-radio-group">
                                             <div class="custom-control custom-radio">
-                                                <input type="radio" class="custom-control-input mr-2" id="save_existing" name="saveType" value="save_existing" onChange={(e) => formikProps.handleChange(e)} checked={formikProps.values.saveType === 'save_existing'} />
+                                                <input
+                                                    type="radio"
+                                                    class="custom-control-input mr-2"
+                                                    id="save_existing"
+                                                    name="saveType"
+                                                    value="save_existing"
+                                                    onChange={(e) => handleSaveOptionChange(e, formikProps)}
+                                                    checked={formikProps.values.saveType === 'save_existing'}
+                                                />
                                                 <label class="custom-control-label" type="button" for="save_existing">Save existing</label>
                                             </div>
                                             <div class="custom-control custom-radio my-2">
-                                                <input type="radio" class="custom-control-input mr-2" id="save_as_new" name="saveType" value="save_as_new" onChange={(e) => formikProps.handleChange(e)} checked={formikProps.values.saveType === 'save_as_new'} />
+                                                <input
+                                                    type="radio"
+                                                    class="custom-control-input mr-2"
+                                                    id="save_as_new"
+                                                    name="saveType"
+                                                    value="save_as_new"
+                                                    onChange={(e) => handleSaveOptionChange(e, formikProps)}
+                                                    checked={formikProps.values.saveType === 'save_as_new'}
+                                                />
                                                 <label class="custom-control-label" type="button" for="save_as_new">Save as new</label>
                                             </div>
                                         </div>}
                                         <div className="">
                                             <Field
                                                 className="form-control form-control-sm"
-                                                name="filterSettingName"
+                                                name={formikProps.values.saveType === 'save_existing' ? "selectedFilterSettingName" : "newFilterSettingName"}
                                                 placeholder="Add filter setting name"
                                             />
-                                            {/* {formikProps.touched.filterSettingName && formikProps.values.filterSettingName.length === 0 &&
-                                                <div className="invalid-feedback">This field cannot be empty.</div>
-                                            } */}
                                             <div className="invalid-feedback">
-                                                <ErrorMessage name="filterSettingName" />
+                                                <ErrorMessage
+                                                    name={formikProps.values.saveType === 'save_existing' ? "selectedFilterSettingName" : "newFilterSettingName"}
+                                                />
                                             </div>
                                         </div>
                                     </React.Fragment>

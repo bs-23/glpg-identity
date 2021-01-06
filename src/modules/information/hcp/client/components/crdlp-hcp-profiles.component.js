@@ -102,7 +102,7 @@ export default function CrdlpHcpProfiles() {
         const shouldUpdateFilter = multiFilterSetting.saveType === 'save_existing';
 
         const filterSetting = {
-            title: multiFilterSetting.filterSettingName,
+            title: multiFilterSetting.selectedFilterSettingName,
             table: "crdlp-hcp-profiles",
             settings: {
                 filters: multiFilterSetting.filters,

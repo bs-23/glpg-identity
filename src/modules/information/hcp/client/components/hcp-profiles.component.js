@@ -137,16 +137,20 @@ export default function hcpUsers() {
         const filterID = multiFilterSetting.selectedSettingID;
         const shouldUpdateFilter = multiFilterSetting.saveType === 'save_existing';
 
-        const filterSetting = {
-            title: multiFilterSetting.filterSettingName,
-            table: "hcp-profiles",
-            settings: {
-                filters: multiFilterSetting.filters,
-                logic: multiFilterSetting.logic
-            }
-        }
-
         if(multiFilterSetting.shouldSaveFilter) {
+            const settingName = multiFilterSetting.saveType === 'save_existing'
+                ? multiFilterSetting.selectedFilterSettingName
+                : multiFilterSetting.newFilterSettingName;
+
+            const filterSetting = {
+                title: settingName,
+                table: "hcp-profiles",
+                settings: {
+                    filters: multiFilterSetting.filters,
+                    logic: multiFilterSetting.logic
+                }
+            }
+
             if(filterID && shouldUpdateFilter) {
                 try{
                     await axios.put(`/api/filter/${filterID}`, filterSetting);
