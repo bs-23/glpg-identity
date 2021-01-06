@@ -73,8 +73,8 @@ export function getFilterOptions(userCountries) {
 
 export function getDatasyncFilterOptions(userCountries) {
     const statusOptions = [
-        { value: 'Valid', displayText: 'Valid' },
-        { value: 'Invalid', displayText: 'Invalid' }
+        { value: 'STA.3', displayText: 'Valid' },
+        { value: 'STA.9', displayText: 'Invalid' }
     ];
 
     const filterOptions = [
@@ -104,7 +104,7 @@ export function getDatasyncFilterOptions(userCountries) {
             options: userCountries
         },
         {
-            fieldName: 'status',
+            fieldName: 'status_code',
             valueType: 'select',
             displayText: 'Status',
             operators: operators.getSelectOperators(),

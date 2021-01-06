@@ -34,9 +34,7 @@ const MultiFilter = (props, ref) => {
     const formikBag = formikRef.current;
 
     const resetFilter = (formikProps) => {
-        const setFieldValue = formikProps
-            ? formikProps.setFieldValue
-            : formikBag.setFieldValue;
+        const {setFieldValue, setFieldTouched} = formikProps || formikBag;
 
         setFieldValue('isChosenFromExisting', '');
         setFieldValue('filters', []);
@@ -49,6 +47,7 @@ const MultiFilter = (props, ref) => {
         setFieldValue('lastAppliedFilters', []);
         setFieldValue('lastAppliedLogic', []);
         setFieldValue('saveType', 'save_as_new');
+        setFieldTouched({});
     }
 
     const removeSelectedFilter = (formikProps) => {
