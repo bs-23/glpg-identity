@@ -1,6 +1,7 @@
 const path = require('path');
 const FilterSettings = require(path.join(process.cwd(), "src/modules/core/server/filter/filter.model.js"));
 const filterService = require(path.join(process.cwd(), 'src/modules/platform/user/server/filter.js'));
+const { Op } = require('sequelize');
 
 const tables = ['hcp-profiles', 'crdlp-hcp-profiles', 'cdp-users']
 
@@ -31,6 +32,16 @@ async function createUserFilter(req, res) {
         if (!settings) return res.status(400).send('Filter settings cannot be null');
         if (!title) return res.status(400).send('Filter title cannot be null');
 
+        const filterWithSameName = await FilterSettings.findOne({
+            where: {
+                user_id: req.user.id,
+                table_name: table,
+                title: title.trim()
+            }
+        })
+
+        if (filterWithSameName) return res.status(400).send('Filter with same name already exists.');
+
         const filter = await FilterSettings.create({
             title: title.trim(),
             user_id: req.user.id,
@@ -55,6 +66,17 @@ async function updateUserFilter(req, res) {
         const filterSettings = await FilterSettings.findOne({ where: { id } });
 
         if (!filterSettings) return res.status(404).send('Filter not found');
+
+        const filterWithSameName = await FilterSettings.findOne({
+            where: {
+                id: { [Op.ne]: id },
+                user_id: req.user.id,
+                table_name: filterSettings.table_name,
+                title: title.trim()
+            }
+        })
+
+        if (filterWithSameName) return res.status(400).send('Filter with same name already exists.');
 
         await filterSettings.update({
             title: title.trim(),
