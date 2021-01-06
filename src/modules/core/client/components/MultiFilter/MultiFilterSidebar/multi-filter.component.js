@@ -427,24 +427,23 @@ const MultiFilter = (props, ref) => {
                         }
                        
                             </div>
-
-                            <div className="p-3 d-flex filter__section-btn">
-                                <Button
-                                    className="btn cdp-btn-secondary mr-1 btn-block text-white"
-                                    label={formikProps.values.shouldSaveFilter ? "Save & Execute" : "Execute"}
-                                    onClick={formikProps.submitForm}
-                                    disabled={formikProps.values.filters.length === 0 || !onExecute}
-                                />
-                                <Button
-                                    className="btn cdp-btn-outline-primary ml-1 btn-block mt-0 w-auto"
-                                    label="Close"
-                                    onClick={handleClose}
-                                />
-                            </div>
-                            </div>
+                    <div className="p-3 d-flex filter__section-btn">
+                        <Button
+                            className="btn cdp-btn-secondary mr-1 btn-block text-white"
+                            label={formikProps.values.shouldSaveFilter ? "Save & Execute" : "Execute"}
+                            onClick={formikProps.submitForm}
+                            disabled={formikProps.values.filters.length === 0 || !onExecute}
+                        />
+                        <Button
+                            className="btn cdp-btn-outline-primary ml-1 btn-block mt-0 w-auto"
+                            label="Close"
+                            onClick={handleClose}
+                        />
                     </div>
-                }
-            </Formik>
+                </div>
+            </div>
+            }
+        </Formik>
 }
 
 export default React.forwardRef(MultiFilter);

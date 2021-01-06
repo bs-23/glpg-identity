@@ -113,7 +113,7 @@ const AddFilter = (props) => {
     }, [filters])
 
     return <div className="filter__sub-panel">
-        <ScrollBars autoHide={false} smoothScrolling={true} style={scrollBarStyle}>
+        <ScrollBars className="custom-scroll" autoHide={true} smoothScrolling={true} style={scrollBarStyle}>
             <div className="bg-light p-2 rounded-top">Add Filter</div>
             <div className="px-3 pb-3 pt-2">
                 {
