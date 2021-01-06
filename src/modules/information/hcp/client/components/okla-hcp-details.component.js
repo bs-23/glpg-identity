@@ -36,7 +36,11 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
                 }
             });
         }
-        if (hcpDetails && selectedTab === 'Workplace') setSelectedWorkplace(hcpDetails.workplaces[0]);
+
+        if (hcpDetails && selectedTab === 'Workplace') {
+            const mainWorkplace = hcpDetails.workplaces.find(w => w.isMainActivity);
+            setSelectedWorkplace(mainWorkplace || hcpDetails.workplaces[0]);
+        }
     }, [hcpDetails, selectedTab]);
 
     return <Modal
