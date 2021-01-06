@@ -8,7 +8,8 @@ const AddFilter = (props) => {
     const {
         currentNumberOfFilters,
         filterOptions,
-        onDone
+        onDone,
+        onHide
     } = props;
 
     const emptyFilter = {
@@ -33,16 +34,6 @@ const AddFilter = (props) => {
         setFilters([...filters, emptyFilter]);
         setValidationErrors([...validationErrors, {}]);
     }
-
-    // const areFiltersValid = () => {
-    //     let isValid = true;
-    //     filters.forEach(f => {
-    //         if(!f.fieldName.length || !f.operator.length || !f.value.length) {
-    //             isValid = false;
-    //         }
-    //     })
-    //     return isValid;
-    // }
 
     const getFilterValidationError = async (filter) => {
         const validationError = {};
@@ -94,6 +85,10 @@ const AddFilter = (props) => {
         maxHeight: '498px'
     };
 
+    const handleHide = () => {
+        onHide && onHide();
+    }
+
     const validateForm = async () => {
         let isValid = true;
         const updatedValidationErrors = [...validationErrors];
@@ -114,7 +109,10 @@ const AddFilter = (props) => {
 
     return <div className="filter__sub-panel">
         <ScrollBars className="custom-scroll" autoHide={true} smoothScrolling={true} style={scrollBarStyle}>
-            <div className="bg-light p-2 rounded-top">Add Filter</div>
+            <div className="bg-light p-2 rounded-top d-flex justify-content-between">
+                <span>Add Filter</span>
+                <i className="fas fa-times mr-2 text-secondary" type="button" onClick={handleHide} />
+            </div>
             <div className="px-3 pb-3 pt-2">
                 {
                     filters && filters.map((filter, index) =>

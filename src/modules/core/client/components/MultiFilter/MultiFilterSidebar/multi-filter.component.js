@@ -349,6 +349,7 @@ const MultiFilter = (props, ref) => {
                                             filterOptions={options}
                                             currentNumberOfFilters={formikProps.values.filters.length}
                                             onDone={(filters, selectedFilter) => handleAddFilterDone(filters, formikProps, selectedFilter)}
+                                            onHide={() => setShow({ ...show, addFilter: false })}
                                         />
                                     }
                                     <span type="button" className="cdp-text-primary filter__add-filter" onClick={() => setShow({ ...show, addFilter: true })}>
@@ -357,7 +358,7 @@ const MultiFilter = (props, ref) => {
                                     {formikProps.values.filters.length > 0 &&
                                         <span className="small" type="button" onClick={() => handleRemoveAll(formikProps)}>Remove All</span>
                                     }
-                                    
+
                                 </div>
                                 {(formikProps.values.filters.length > 1) &&
                                     <div className="d-flex flex-column">
@@ -425,7 +426,7 @@ const MultiFilter = (props, ref) => {
                                 }
                             </React.Fragment>
                         }
-                       
+
                             </div>
                     <div className="p-3 d-flex filter__section-btn">
                         <Button
