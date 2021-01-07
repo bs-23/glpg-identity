@@ -5,9 +5,8 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import { useSelector, useDispatch } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
-import Faq from '../../../platform/faq/client/faq.component';
-import { partnerRequestSchema } from '../business-partner.schema'
-import { getPartnerRequests, createPartnerRequest } from '../business-partner.actions';
+import { partnerRequestSchema } from '../manage-partners.schema'
+import { getPartnerRequests, createPartnerRequest } from '../manage-partners.actions';
 
 const BusinessPartnerManagement = () => {
     const dispatch = useDispatch();
@@ -67,6 +66,12 @@ const BusinessPartnerManagement = () => {
     useEffect(() => {
         loadRequests();
     }, []);
+
+    useEffect(() => {
+        if (partnerRequestId) {
+            dispatch(getPartnerRequests());
+        }
+    }, [partnerRequestId]);
 
     return (
         <main className="app__content cdp-light-bg h-100">

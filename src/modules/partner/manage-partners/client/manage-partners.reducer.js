@@ -1,4 +1,4 @@
-import Types from "./business-partner.types";
+import Types from "./manage-partners.types";
 
 const initialState = {
     partnerRequests: [],
