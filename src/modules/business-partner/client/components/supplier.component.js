@@ -8,6 +8,7 @@ import { Form, Formik, Field, ErrorMessage } from 'formik';
 import Faq from '../../../platform/faq/client/faq.component';
 import { partnerRequestSchema } from '../business-partner.schema'
 import { getPartnerRequests, createPartnerRequest } from '../business-partner.actions';
+import { getPartnerRequests } from '../business-partner.actions';
 
 const BusinessPartnerManagement = () => {
     const dispatch = useDispatch();
@@ -137,10 +138,6 @@ const BusinessPartnerManagement = () => {
                         }
                     </div>
                 </div>
-
-            </div>
-            <div className="col-12 col-lg-4 col-xl-3 py-3 app__content-panel-right">
-                <Faq />
             </div>
 
             <Modal dialogClassName="modal-90w modal-customize" centered show={showForm}  onHide={toggleForm}>
