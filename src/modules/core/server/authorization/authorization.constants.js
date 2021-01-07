@@ -10,6 +10,10 @@ const Modules = {
     PRIVACY: {
         value: 'privacy',
         title: 'Data Privacy & Consent Management'
+    },
+    BUSINESS_PARTNER: {
+        value: 'business-partner',
+        title: 'Business Partner Management'
     }
 }
 
