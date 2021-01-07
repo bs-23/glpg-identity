@@ -180,7 +180,7 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
 
         const ignorecase_of_country_iso2_list = [].concat.apply([], user_country_iso2_list.map(i => ignoreCaseArray(i)));
 
-        const defaultFilter = {
+        defaultFilter = {
             application_id: userPermittedApplications.length
                 ? userPermittedApplications.map(app => app.id)
                 : null,
@@ -210,7 +210,6 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
             };
         }
     }
-
 
     if (!currentFilterSettings || !currentFilterSettings.filters || currentFilterSettings.filter === 0)
         return defaultFilter;
