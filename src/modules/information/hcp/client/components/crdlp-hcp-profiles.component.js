@@ -121,6 +121,7 @@ export default function CrdlpHcpProfiles() {
                         appearance: 'error',
                         autoDismiss: true
                     });
+                    return Promise.reject();
                 }
             }else {
                 try{
@@ -132,6 +133,7 @@ export default function CrdlpHcpProfiles() {
                         appearance: 'error',
                         autoDismiss: true
                     });
+                    return Promise.reject();
                 }
             }
         }
