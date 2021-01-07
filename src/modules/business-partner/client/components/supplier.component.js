@@ -8,7 +8,6 @@ import { Form, Formik, Field, ErrorMessage } from 'formik';
 import Faq from '../../../platform/faq/client/faq.component';
 import { partnerRequestSchema } from '../business-partner.schema'
 import { getPartnerRequests, createPartnerRequest } from '../business-partner.actions';
-import { getPartnerRequests } from '../business-partner.actions';
 
 const BusinessPartnerManagement = () => {
     const dispatch = useDispatch();
