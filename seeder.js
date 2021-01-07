@@ -1,16 +1,11 @@
 const path = require('path');
 const async = require('async');
-const util = require('util');
-const pg = require('pg');
 
 async function init() {
     const config = require(path.join(process.cwd(), 'src/config/server/config'));
 
     await config.initEnvironmentVariables();
     const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
-
-    const asyncCreateCDPDevDB = util.promisify(createCDPDevDB)
-    await asyncCreateCDPDevDB()
 
     const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 
@@ -39,13 +34,10 @@ async function init() {
     const PermissionSet_ServiceCategory = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-serviceCategory.model.js"));
     const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-application.model.js"));
     const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/userProfile-permissionSet.model.js"));
-    const Role = require(path.join(process.cwd(), "src/modules/platform/role/server/role.model.js"));
-    const UserRole = require(path.join(process.cwd(), "src/modules/platform/role/server/user-role.model.js"));
-    const { Modules } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
+    require(path.join(process.cwd(), "src/modules/platform/role/server/role.model.js"));
+    require(path.join(process.cwd(), "src/modules/platform/role/server/user-role.model.js"));
+    require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
     const Faq = require(path.join(process.cwd(), 'src/modules/platform/faq/server/faq.model.js'));
-    const ClinicalTrialHistoryModel = require(path.join(process.cwd(), 'src/modules/clinical-trials/server/clinical-trials.history.model.js'));
-    const ClinicalTrialTrialModel = require(path.join(process.cwd(), 'src/modules/clinical-trials/server/clinical-trials.trial.model.js'));
-    const ClinicalTrialLocationModel = require(path.join(process.cwd(), 'src/modules/clinical-trials/server/clinical-trials.location.model.js'));
     require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model'));
     require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-profile.model'));
     require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-consents.model'));
@@ -54,12 +46,9 @@ async function init() {
     require(path.join(process.cwd(), 'src/modules/core/server/password/password-history.model.js'));
     require(path.join(process.cwd(), 'src/modules/platform/application/server/data.model.js'));
 
-
     await sequelize.cdpConnector.sync();
 
     const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
-
-
 
     function userSeeder(callback) {
         User.findOrCreate({
@@ -73,8 +62,6 @@ async function init() {
             callback();
         });
     }
-
-
 
     function userProfileSeeder(callback) {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
@@ -98,15 +85,13 @@ async function init() {
         });
     }
 
-
     function userUpdateSeeder(callback) {
         User.findOne({
             where: { email: 'glpg@brainstation-23.com' }
         }).then(admin => {
             UserProfile.findOne({ where: { slug: 'system_admin' } }).then(sysAdminProfile => {
                 admin.update({ profileId: sysAdminProfile.id });
-            })
-
+            });
         }).then(function () {
             callback();
         });
@@ -114,7 +99,6 @@ async function init() {
 
     function serviceCategorySeeder(callback) {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
-
             const serviceCategories = [
                 { title: "Management of Customer Data Platform", slug: "platform", created_by: admin.id, updated_by: admin.id },
                 { title: "Information Management", slug: "information", created_by: admin.id, updated_by: admin.id },
@@ -135,7 +119,6 @@ async function init() {
 
     function faqSeeder(callback) {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
-
             const faqCategories = [
                 { question: "Key Benefits of a CDP", answer: "<p>CDPs improve your organization, better your customer relationships, and complement your current software and marketing efforts. Here are a handful of key benefits of having a CDP.</p>", topics: ["general-information"], created_by: admin.id, updated_by: admin.id },
                 { question: "What is customer data?", answer: "<p>CDPs exist because customer data has become crucial to both business and marketing operations. So, what is customer data exactly? Customer data is information consumers leave behind as they use the internet and interact with companies online and offline: through websites, blogs, e-commerce portals, and in-store interactions. (We dive into some examples below.) It’s highly valuable to businesses, although recent legal dialogue (such as the GDPR) has changed how organizations collect and manage this data.</p>", topics: ["general-information"], created_by: admin.id, updated_by: admin.id },
@@ -155,9 +138,7 @@ async function init() {
     }
 
     function permissionSetSeeder(callback) {
-
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
-
             const permissionSet = [
                 { title: "System Admin Permission Set", slug: "system_admin", type: 'standard', countries: ["BE", "FR", "DE", "IT", "NL", "ES", "GB"], description: "This is the default permission set for System Admin", created_by: admin.id, updated_by: admin.id },
                 { title: "Site Admin Permission Set", slug: "site_admin", type: 'standard', description: "This is the default permission set for Site Admin", countries: ["BE", "FR", "DE", "IT", "NL", "ES", "GB"], created_by: admin.id, updated_by: admin.id },
@@ -215,12 +196,10 @@ async function init() {
                     });
                 });
             });
-
         });
     }
 
     function userProfilePermissionSetSeeder(callback) {
-
         const systemAdminProfile = UserProfile.findOne({ where: { slug: 'system_admin' } });
         const systemAdminPermissionSet = PermissionSet.findOne({ where: { slug: 'system_admin' } });
         const sitedminProfile = UserProfile.findOne({ where: { slug: 'site_admin' } });
@@ -250,7 +229,6 @@ async function init() {
                 });
             });
         });
-
     }
 
     function applicationSeeder(callback) {
@@ -326,7 +304,6 @@ async function init() {
                     });
                 });
             });
-
         });
     }
 
@@ -480,109 +457,19 @@ async function init() {
             });
         });
     }
-    function createDB(callback, connection, dbname){
-        let cs = `${connection}/postgres`;
-        const client = new pg.Client(cs);
-        client.connect();
-        client.query(`CREATE DATABASE "${dbname}"`).then(res => {
-            client.end();
-            callback();
-        });
-    }
-
-    function createCDPDevDB(callback){
-        createDB(callback, nodecache.getValue('POSTGRES_CLINICAL_TRIALS_URL'), nodecache.getValue('POSTGRES_CDP_DATABASE'))
-    }
-
-    function createClinicalTrialsDevDB(callback){
-        createDB(callback, nodecache.getValue('POSTGRES_CLINICAL_TRIALS_URL'), nodecache.getValue('POSTGRES_CLINICAL_TRIALS_DATABASE'))
-    }
-    async function clinicalTrilalsDbStructureSeeder(callback){
-        let clinicalTrialsDBCreated = x => {
-            console.log("Clinical Trials DB Created");
-        }
-        let asyncCreateClinicalTrialsDevDB = util.promisify(createClinicalTrialsDevDB);
-        await asyncCreateClinicalTrialsDevDB();
-        await sequelize.clinitalTrialsConnector.query(`CREATE SCHEMA IF NOT EXISTS "${nodecache.getValue('POSTGRES_CLINICAL_TRIALS_SCHEMA')}"`);
-        await sequelize.clinitalTrialsConnector.sync();
-    }
-
-
-    function clinicalTrialsDbDummyDataSeeder(callback){
-        User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
-
-            ClinicalTrialHistoryModel.bulkCreate([
-                {
-                    description: "initial history entry",
-                    value: `{"FullStudiesResponse":{"APIVrs":"1.01.02","DataVrs":"2020:12:29 22:25:29.063","Expression":"SEARCH[Study](AREA[OrgFullName]Gilead)","NStudiesAvail":362413,"NStudiesFound":523,"MinRank":501,"MaxRank":501,"NStudiesReturned":1,"FullStudies":[{"Rank":501,"Study":{"ProtocolSection":{"IdentificationModule":{"NCTId":"NCT00208312","OrgStudyIdInfo":{"OrgStudyId":"CVT 5132"},"Organization":{"OrgFullName":"Gilead Sciences","OrgClass":"INDUSTRY"},"BriefTitle":"ADVANCE MPI 2: Study of Regadenoson Versus Adenoscan® in Patients Undergoing Myocardial Perfusion Imaging (MPI)","OfficialTitle":"A Phase III, Randomized, Double-Blind Study of Intravenous CVT-3146 Versus Adenoscan® in Patients Undergoing Stress Myocardial Perfusion Imaging"},"StatusModule":{"StatusVerifiedDate":"November 2009","OverallStatus":"Completed","ExpandedAccessInfo":{"HasExpandedAccess":"No"},"StartDateStruct":{"StartDate":"April 2004"},"PrimaryCompletionDateStruct":{"PrimaryCompletionDate":"June 2005","PrimaryCompletionDateType":"Actual"},"CompletionDateStruct":{"CompletionDate":"June 2005","CompletionDateType":"Actual"},"StudyFirstSubmitDate":"September 13, 2005","StudyFirstSubmitQCDate":"September 13, 2005","StudyFirstPostDateStruct":{"StudyFirstPostDate":"September 21, 2005","StudyFirstPostDateType":"Estimate"},"LastUpdateSubmitDate":"November 24, 2009","LastUpdatePostDateStruct":{"LastUpdatePostDate":"November 26, 2009","LastUpdatePostDateType":"Estimate"}},"SponsorCollaboratorsModule":{"ResponsibleParty":{"ResponsiblePartyOldNameTitle":"Philip Sager, Vice President, Clinical Research","ResponsiblePartyOldOrganization":"Gilead Sciences"},"LeadSponsor":{"LeadSponsorName":"Gilead Sciences","LeadSponsorClass":"INDUSTRY"},"CollaboratorList":{"Collaborator":[{"CollaboratorName":"Astellas Pharma US, Inc.","CollaboratorClass":"INDUSTRY"}]}},"OversightModule":{"OversightHasDMC":"No"},"DescriptionModule":{"BriefSummary":"Adenoscan® (adenosine) is an approved pharmacological stress agent indicated as an adjunct to thallium-201 myocardial perfusion scintigraphy in patients unable to exercise adequately. The investigational drug, regadenoson (CVT-3146) is a selective A2A adenosine receptor agonist, the receptor responsible for coronary vasodilation, and is being studied for potential use as a pharmacologic stress agent in myocardial perfusion imaging (MPI) studies. This study will compare the safety and efficacy of regadenoson to that of Adenoscan in detecting reversible myocardial perfusion defects.","DetailedDescription":"ADVANCE MPI 2 is a multi-national, double-blind, randomized, active-controlled, parallel group clinical trial to evaluate the safety and efficacy of regadenoson in SPECT MPI compared to that of the approved pharmacological stress agent, Adenoscan. Patients referred for a clinically indicated pharmacological stress MPI study will be eligible for enrollment. The trial is designed: (1) to compare the pharmacological stress SPECT images obtained with regadenoson to those obtained with Adenoscan, and (2) to compare the safety and tolerability of the two stress agents."},"ConditionsModule":{"ConditionList":{"Condition":["Coronary Artery Disease"]},"KeywordList":{"Keyword":["Lexiscan","Regadenoson","Adenoscan®","Adenosine","SPECT Myocardial Perfusion Imaging","Reversible Perfusion Defect"]}},"DesignModule":{"StudyType":"Interventional","PhaseList":{"Phase":["Phase 3"]},"DesignInfo":{"DesignAllocation":"Randomized","DesignInterventionModel":"Parallel Assignment","DesignPrimaryPurpose":"Diagnostic","DesignMaskingInfo":{"DesignMasking":"Quadruple","DesignWhoMaskedList":{"DesignWhoMasked":["Participant","Care Provider","Investigator","Outcomes Assessor"]}}},"EnrollmentInfo":{"EnrollmentCount":"787","EnrollmentType":"Actual"}},"ArmsInterventionsModule":{"ArmGroupList":{"ArmGroup":[{"ArmGroupLabel":"1","ArmGroupType":"Experimental","ArmGroupDescription":"Regadenoson","ArmGroupInterventionList":{"ArmGroupInterventionName":["Drug: Regadenoson"]}},{"ArmGroupLabel":"2","ArmGroupType":"Active Comparator","ArmGroupDescription":"Adenoscan","ArmGroupInterventionList":{"ArmGroupInterventionName":["Drug: Adenosine"]}}]},"InterventionList":{"Intervention":[{"InterventionType":"Drug","InterventionName":"Regadenoson","InterventionDescription":"0.4 mg, bolus intravenous injection","InterventionArmGroupLabelList":{"InterventionArmGroupLabel":["1"]},"InterventionOtherNameList":{"InterventionOtherName":["Lexiscan","CVT-3146"]}},{"InterventionType":"Drug","InterventionName":"Adenosine","InterventionDescription":"0.14 mg/kg/min for 6 minutes, intravenous infusion","InterventionArmGroupLabelList":{"InterventionArmGroupLabel":["2"]},"InterventionOtherNameList":{"InterventionOtherName":["Adenoscan"]}}]}},"OutcomesModule":{"PrimaryOutcomeList":{"PrimaryOutcome":[{"PrimaryOutcomeMeasure":"Non-inferiority of regadenoson to Adenoscan for use in SPECT myocardial perfusion imaging in assessing reversible perfusion defects","PrimaryOutcomeTimeFrame":"After radiopharmaceutical administration"}]},"SecondaryOutcomeList":{"SecondaryOutcome":[{"SecondaryOutcomeMeasure":"Safety and tolerability comparison of regadenoson to Adenoscan","SecondaryOutcomeTimeFrame":"Up to two weeks"},{"SecondaryOutcomeMeasure":"Additional comparisons of images obtained with regadenoson to those obtained with Adenoscan","SecondaryOutcomeTimeFrame":"After radiopharmaceutical administration"}]}},"EligibilityModule":{"EligibilityCriteria":"Inclusion Criteria:\n\nReferred for a clinically indicated pharmacological stress SPECT myocardial perfusion imaging study\n\nExclusion Criteria:\n\nAny condition precluding the safe administration of Adenoscan for a SPECT myocardial perfusion imaging study\nPregnant or breast-feeding, or (if pre-menopausal), not practicing acceptable method of birth control","HealthyVolunteers":"No","Gender":"All","MinimumAge":"18 Years","StdAgeList":{"StdAge":["Adult","Older Adult"]}},"ContactsLocationsModule":{"LocationList":{"Location":[{"LocationFacility":"Multiple study locations (see Central Contact); CV Therapeutics, Inc.","LocationCity":"Palo Alto","LocationState":"California","LocationZip":"94304","LocationCountry":"United States"}]}},"ReferencesModule":{"ReferenceList":{"Reference":[{"ReferencePMID":"17826318","ReferenceType":"result","ReferenceCitation":"Iskandrian AE, Bateman TM, Belardinelli L, Blackburn B, Cerqueira MD, Hendel RC, Lieu H, Mahmarian JJ, Olmsted A, Underwood SR, Vitola J, Wang W; ADVANCE MPI Investigators. Adenosine versus regadenoson comparative evaluation in myocardial perfusion imaging: results of the ADVANCE phase 3 multicenter international trial. J Nucl Cardiol. 2007 Sep-Oct;14(5):645-58."}]},"SeeAlsoLinkList":{"SeeAlsoLink":[{"SeeAlsoLinkLabel":"Adenoscan®","SeeAlsoLinkURL":"http://www.adenoscan.com"}]}}},"DerivedSection":{"MiscInfoModule":{"VersionHolder":"December 30, 2020"},"ConditionBrowseModule":{"ConditionMeshList":{"ConditionMesh":[{"ConditionMeshId":"D000003324","ConditionMeshTerm":"Coronary Artery Disease"}]},"ConditionAncestorList":{"ConditionAncestor":[{"ConditionAncestorId":"D000003327","ConditionAncestorTerm":"Coronary Disease"},{"ConditionAncestorId":"D000017202","ConditionAncestorTerm":"Myocardial Ischemia"},{"ConditionAncestorId":"D000006331","ConditionAncestorTerm":"Heart Diseases"},{"ConditionAncestorId":"D000002318","ConditionAncestorTerm":"Cardiovascular Diseases"},{"ConditionAncestorId":"D000001161","ConditionAncestorTerm":"Arteriosclerosis"},{"ConditionAncestorId":"D000001157","ConditionAncestorTerm":"Arterial Occlusive Diseases"},{"ConditionAncestorId":"D000014652","ConditionAncestorTerm":"Vascular Diseases"}]},"ConditionBrowseLeafList":{"ConditionBrowseLeaf":[{"ConditionBrowseLeafId":"M5129","ConditionBrowseLeafName":"Coronary Artery Disease","ConditionBrowseLeafAsFound":"Coronary Artery Disease","ConditionBrowseLeafRelevance":"high"},{"ConditionBrowseLeafId":"M18089","ConditionBrowseLeafName":"Myocardial Ischemia","ConditionBrowseLeafRelevance":"low"},{"ConditionBrowseLeafId":"M5132","ConditionBrowseLeafName":"Coronary Disease","ConditionBrowseLeafRelevance":"low"},{"ConditionBrowseLeafId":"M9126","ConditionBrowseLeafName":"Ischemia","ConditionBrowseLeafRelevance":"low"},{"ConditionBrowseLeafId":"M8002","ConditionBrowseLeafName":"Heart Diseases","ConditionBrowseLeafRelevance":"low"},{"ConditionBrowseLeafId":"M3050","ConditionBrowseLeafName":"Arteriosclerosis","ConditionBrowseLeafRelevance":"low"},{"ConditionBrowseLeafId":"M3046","ConditionBrowseLeafName":"Arterial Occlusive Diseases","ConditionBrowseLeafRelevance":"low"},{"ConditionBrowseLeafId":"M15983","ConditionBrowseLeafName":"Vascular Diseases","ConditionBrowseLeafRelevance":"low"}]},"ConditionBrowseBranchList":{"ConditionBrowseBranch":[{"ConditionBrowseBranchAbbrev":"BC14","ConditionBrowseBranchName":"Heart and Blood Diseases"},{"ConditionBrowseBranchAbbrev":"All","ConditionBrowseBranchName":"All Conditions"},{"ConditionBrowseBranchAbbrev":"BC23","ConditionBrowseBranchName":"Symptoms and General Pathology"}]}},"InterventionBrowseModule":{"InterventionMeshList":{"InterventionMesh":[{"InterventionMeshId":"D000000241","InterventionMeshTerm":"Adenosine"},{"InterventionMeshId":"C000430916","InterventionMeshTerm":"Regadenoson"}]},"InterventionAncestorList":{"InterventionAncestor":[{"InterventionAncestorId":"D000000700","InterventionAncestorTerm":"Analgesics"},{"InterventionAncestorId":"D000018689","InterventionAncestorTerm":"Sensory System Agents"},{"InterventionAncestorId":"D000018373","InterventionAncestorTerm":"Peripheral Nervous System Agents"},{"InterventionAncestorId":"D000045505","InterventionAncestorTerm":"Physiological Effects of Drugs"},{"InterventionAncestorId":"D000000889","InterventionAncestorTerm":"Anti-Arrhythmia Agents"},{"InterventionAncestorId":"D000014665","InterventionAncestorTerm":"Vasodilator Agents"},{"InterventionAncestorId":"D000058906","InterventionAncestorTerm":"Purinergic P1 Receptor Agonists"},{"InterventionAncestorId":"D000058913","InterventionAncestorTerm":"Purinergic Agonists"},{"InterventionAncestorId":"D000058905","InterventionAncestorTerm":"Purinergic Agents"},{"InterventionAncestorId":"D000018377","InterventionAncestorTerm":"Neurotransmitter Agents"},{"InterventionAncestorId":"D000045504","InterventionAncestorTerm":"Molecular Mechanisms of Pharmacological Action"},{"InterventionAncestorId":"D000058908","InterventionAncestorTerm":"Adenosine A2 Receptor Agonists"}]},"InterventionBrowseLeafList":{"InterventionBrowseLeaf":[{"InterventionBrowseLeafId":"M2176","InterventionBrowseLeafName":"Adenosine","InterventionBrowseLeafAsFound":"Anti-inflammatory","InterventionBrowseLeafRelevance":"high"},{"InterventionBrowseLeafId":"M235125","InterventionBrowseLeafName":"Regadenoson","InterventionBrowseLeafAsFound":"Myopia","InterventionBrowseLeafRelevance":"high"},{"InterventionBrowseLeafId":"M2613","InterventionBrowseLeafName":"Analgesics","InterventionBrowseLeafRelevance":"low"},{"InterventionBrowseLeafId":"M2794","InterventionBrowseLeafName":"Anti-Arrhythmia Agents","InterventionBrowseLeafRelevance":"low"},{"InterventionBrowseLeafId":"M15995","InterventionBrowseLeafName":"Vasodilator Agents","InterventionBrowseLeafRelevance":"low"},{"InterventionBrowseLeafId":"M19088","InterventionBrowseLeafName":"Neurotransmitter Agents","InterventionBrowseLeafRelevance":"low"}]},"InterventionBrowseBranchList":{"InterventionBrowseBranch":[{"InterventionBrowseBranchAbbrev":"AnArAg","InterventionBrowseBranchName":"Anti-Arrhythmia Agents"},{"InterventionBrowseBranchAbbrev":"VaDiAg","InterventionBrowseBranchName":"Vasodilator Agents"},{"InterventionBrowseBranchAbbrev":"Analg","InterventionBrowseBranchName":"Analgesics"},{"InterventionBrowseBranchAbbrev":"All","InterventionBrowseBranchName":"All Drugs and Chemicals"}]}}}}}]}}`,
-                    created_by: admin.id,
-                    updated_by: admin.id
-                }
-            ], {
-                returning: true,
-                ignoreDuplicates: false
-            });
-
-            ClinicalTrialLocationModel.bulkCreate([
-                {
-                    LocationFacility: "facility",
-                    LocationCity: 'test city',
-                    LocationZip: '12721',
-                    LocationCountry: 'TestCountry',
-                    lat: 17.669,
-                    long: 23.000
-                }
-            ], {
-                returning: true,
-                ignoreDuplicates: false
-            }).then(location=>{
-                // ClinicalTrialTrialModel.bulkCreate([
-                //     {
-                //     rank: 1,
-                //     protocolNumber: 'test city',
-                //     govIdentifier: '12721',
-                //     clinicalTrialPurpose: 'test country',
-                //     clinicalTrialSummary: 'test summary',
-                //     gender: 'Male',
-                //     minAge: "17 years",
-                //     maxAge: "50 years",
-                //     stdAge: ["Adult"],
-                //     phase: ["phase 1"],
-                //     trialStatus: "recruiting",
-                //     clinicalTrialSummary: "trial summary",
-                //     created_by: req.user.id,
-                //     updated_by: req.user.id,
-                //     dummy: "dum dum dymmt"
-                // }
-                // ], {
-                //     returning: true,
-                //     ignoreDuplicates: false
-                // }).then(location=>{
-    
-                // });
-            });
-        }).then(function(){
-            
-        });
-
-        
-
-    }
 
     async.waterfall([
-        userSeeder, 
-        userProfileSeeder, 
-        faqSeeder, 
-        userUpdateSeeder, 
-        serviceCategorySeeder, 
-        permissionSetSeeder, 
-        permissionSetServiceCategorySeeder, 
-        userProfilePermissionSetSeeder, 
-        applicationSeeder, 
-        permissionSetApplicationsSeeder, 
-        consentSeeder, 
-        clinicalTrilalsDbStructureSeeder,
-        clinicalTrialsDbDummyDataSeeder], function (err) {
+        userSeeder,
+        userProfileSeeder,
+        faqSeeder,
+        userUpdateSeeder,
+        serviceCategorySeeder,
+        permissionSetSeeder,
+        permissionSetServiceCategorySeeder,
+        userProfilePermissionSetSeeder,
+        applicationSeeder,
+        permissionSetApplicationsSeeder,
+        consentSeeder], function (err) {
         if (err) console.error(err);
         else console.info('DB seed completed!');
         process.exit();

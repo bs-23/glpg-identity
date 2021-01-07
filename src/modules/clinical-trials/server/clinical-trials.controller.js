@@ -1,45 +1,41 @@
 const path = require('path');
 const _ = require('lodash');
-const validator = require('validator');
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const History = require('./clinical-trials.history.model');
 const https = require('https');
 const Trial = require('./clinical-trials.trial.model');
 const Location = require('./clinical-trials.location.model');
-const { request } = require('http');
 
 async function dumpAllData(req, res) {
     const response = new Response({}, []);
     const { urlToGetData, description } = req.body;
-    try{
+
+    try {
         https.get(urlToGetData, (resp) => {
         let data = '';
-
-        resp.on('data', (chunk) => {
-            data += chunk;
-        });
-
-        resp.on('end', async () => {
-            let result = await History.create({
-                description: description,
-                value: data,
-                log: urlToGetData,
-                created_by: req.user.id,
-                updated_by: req.user.id
+            resp.on('data', (chunk) => {
+                data += chunk;
             });
 
-            if (!result) {
-                response.data = [];
-                return res.status(204).send(response);
-            }
+            resp.on('end', async () => {
+                let result = await History.create({
+                    description: description,
+                    value: data,
+                    log: urlToGetData
+                });
 
-            response.data = result;
-            res.json(response);
-        });
+                if (!result) {
+                    response.data = [];
+                    return res.status(204).send(response);
+                }
+
+                response.data = result;
+                res.json(response);
+            });
 
         }).on("error", (err) => {
-        console.log("Error: " + err.message);
-        });        
+            console.log("Error: " + err.message);
+        });
     } catch (err) {
         console.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
@@ -74,8 +70,8 @@ async function showAllVersions(req, res) {
 async function mergeProcessData(req, res) {
     const response = new Response({}, []);
     const { ids } = req.body;
-    
-    try{
+
+    try {
         let result = await History.findAll({
             where: {
                 id: ids.includes(',')? ids.split(',') : [ids],
@@ -102,9 +98,9 @@ async function mergeProcessData(req, res) {
                     "location": element.Study.ProtocolSection.ContactsLocationsModule.LocationList.Location
                 }
              }));
-            
         });
-        Trial.bulkCreate(data, 
+
+        Trial.bulkCreate(data,
                     {
                     returning: true,
                     ignoreDuplicates: false
@@ -136,9 +132,9 @@ async function getTrials(req, res) {
     page_no = page_no ? Number(page_no) : 1;
     items_per_page = items_per_page? Number(items_per_page) : 100;
 
-    try{
+    try {
         let result = await Trial.findAll({
-            offset: items_per_page*page_no, 
+            offset: items_per_page*page_no,
             limit: items_per_page});
 
         let total_item_count = await Trial.count();
@@ -162,8 +158,8 @@ async function getTrials(req, res) {
 
 async function getTrialDetails(req, res) {
     const response = new Response({}, []);
-    
-    try{
+
+    try {
         if (!req.params.id) {
             return res.status(400).send('Invalid request.');
         }
@@ -188,8 +184,6 @@ async function getTrialDetails(req, res) {
         res.status(500).send(response);
     }
 }
-
-
 
 exports.dumpAllData = dumpAllData;
 exports.showAllVersions = showAllVersions;
