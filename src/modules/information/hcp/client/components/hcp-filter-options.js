@@ -1,7 +1,7 @@
 import { string, array } from 'yup';
 import { operators } from '../../../../core/client/components/MultiFilter';
 
-export function getFilterOptions(userCountries) {
+export function getFilterOptions(userCountries, userApplications) {
     const statusOptions = [
         { value: 'self_verified', displayText: 'Self Verified' },
         { value: 'manually_verified', displayText: 'Manually Verified' },
@@ -55,16 +55,11 @@ export function getFilterOptions(userCountries) {
             operators: operators.getDateOperators()
         },
         {
-            fieldName: 'expiry_date',
-            valueType: 'date',
-            displayText: 'Expiry Date',
-            operators: operators.getDateOperators()
-        },
-        {
             fieldName: 'created_by',
-            valueType: 'text',
-            displayText: 'Created By',
-            operators: operators.getStringOperators()
+            valueType: 'select',
+            displayText: 'Application Name',
+            operators: operators.getSelectOperators(),
+            options: userApplications
         }
     ];
 

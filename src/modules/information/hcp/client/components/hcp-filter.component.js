@@ -30,9 +30,12 @@ const HCPFilter = ({ selectedFilterSetting, onHide, onExecute, show, tableName, 
         country &&  acc.push({ value: country.codbase, displayText: country.codbase_desc });
         return acc;
     }, []);
+
+    const userApplicationsFilterOption = loggedInUser.applications.map(app => ({ value: app.id, displayText: app.name }))
+
     const filterOptions = tableName === 'crdlp-hcp-profiles'
         ? getDatasyncFilterOptions(userCountryFilterOption)
-        : getFilterOptions(userCountryFilterOption);
+        : getFilterOptions(userCountryFilterOption, userApplicationsFilterOption);
 
     useEffect(() => {
         if(show) dispatch(getHcpFilterSettings(tableName));
