@@ -362,6 +362,7 @@ export default function CrdlpHcpProfiles() {
                     onHide={() => setShowFilterSidebar(false)}
                     onExecute={handleFilterExecute}
                     tableName="crdlp-hcp-profiles"
+                    selectedScopeKey={'scope-hcp'}
                 />
             </div>
         </main>

@@ -22,6 +22,7 @@ const MultiFilter = (props, ref) => {
         selectedSettingTitle,
         selectedSettingID,
         scopeOptions,
+        selectedScopeKey,
         onFilterSelect
     } = props;
 
@@ -291,6 +292,13 @@ const MultiFilter = (props, ref) => {
             if(!formikBag.touched.shouldSaveFilter) formikBag.setFieldValue('shouldSaveFilter', true);
         }
     }, [selectedSetting, selectedSettingTitle, selectedSettingID])
+
+    useEffect(() => {
+        if(selectedScopeKey && scopeOptions) {
+            const scope = scopeOptions.find(sc => sc.key === selectedScopeKey);
+            setSelectedScopre(scope);
+        }
+    }, [selectedScopeKey])
 
     useImperativeHandle(ref, () => ({
         resetFilter,

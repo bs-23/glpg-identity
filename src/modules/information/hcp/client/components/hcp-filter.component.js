@@ -9,7 +9,7 @@ const tablePresetPathMap = {
     'crdlp-hcp-profiles': 'filterPresetsCrdlp'
 }
 
-const HCPFilter = ({ selectedFilterSetting, onHide, onExecute, show, tableName }, ref) => {
+const HCPFilter = ({ selectedFilterSetting, onHide, onExecute, show, tableName, selectedScopeKey }, ref) => {
     const allCountries = useSelector(state => state.countryReducer.allCountries);
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
     const userFilters = useSelector(state => state.hcpReducer[tablePresetPathMap[tableName]]);
@@ -53,6 +53,7 @@ const HCPFilter = ({ selectedFilterSetting, onHide, onExecute, show, tableName }
         onExecute={onExecute}
         ref={multiFilterRef}
         scopeOptions={scopeOptions}
+        selectedScopeKey={selectedScopeKey}
     />
 }
 
