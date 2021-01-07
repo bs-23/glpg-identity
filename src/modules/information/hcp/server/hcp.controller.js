@@ -6,6 +6,7 @@ const axios = require('axios');
 const validator = require('validator');
 const { QueryTypes, Op, where, col, fn } = require('sequelize');
 const Hcp = require('./hcp-profile.model');
+const DatasyncHcp = require('./datasync-hcp-profile.model');
 const HcpArchives = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-archives.model'));
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-consents.model'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
@@ -19,7 +20,10 @@ const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodeca
 const PasswordPolicies = require(path.join(process.cwd(), 'src/modules/core/server/password/password-policies.js'));
 const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/platform/user/server/permission/permissions.js'));
 const XRegExp = require('xregexp');
-const { string }  = require('yup');
+const { string } = require('yup');
+const { filter } = require('lodash');
+const Filter = require(path.join(process.cwd(), "src/modules/core/server/filter/filter.model.js"));
+const filterService = require(path.join(process.cwd(), 'src/modules/platform/user/server/filter.js'));
 
 const hcpValidation = () => {
     const schema = {
@@ -45,18 +49,18 @@ const hcpValidation = () => {
         telephone: string()
             .matches(/^(?:[+]?[0-9]*|[0-9]{2,3}[\/]?[0-9]*)$/, 'Must be a valid phone number')
             .transform(value => value === '' ? undefined : value)
-            .max(25,'This field must be at most 25 characters long')
+            .max(25, 'This field must be at most 25 characters long')
             .nullable()
     }
 
     return {
         validate: async (value, schemaName) => {
-            try{
+            try {
                 await schema[schemaName].validate(value);
                 return {
                     valid: true
                 };
-            }catch(err){
+            } catch (err) {
                 return {
                     valid: false,
                     errors: err.errors
@@ -141,9 +145,9 @@ async function addPasswordResetTokenToUser(user) {
     await user.save();
 }
 
-var trimRequestBody = function(reqBody){
+var trimRequestBody = function (reqBody) {
     Object.keys(reqBody).forEach(key => {
-        if(typeof reqBody[key] === 'string')
+        if (typeof reqBody[key] === 'string')
             reqBody[key] = reqBody[key].trim();
     });
     return reqBody;
@@ -153,73 +157,171 @@ function ignoreCaseArray(str) {
     return [str.toLowerCase(), str.toUpperCase(), str.charAt(0).toLowerCase() + str.charAt(1).toUpperCase(), str.charAt(0).toUpperCase() + str.charAt(1).toLowerCase()];
 }
 
+async function generateFilterOptions(currentFilterSettings, userPermittedApplications, userPermittedCountries, status, table) {
+    const getAllCountries = async () => {
+        return await sequelize.datasyncConnector.query(
+            `SELECT * FROM ciam.vwcountry`,
+            { type: QueryTypes.SELECT }
+        );
+    };
+
+    let allCountries = [];
+    let defaultFilter = {};
+    let user_country_iso2_list = [];
+
+    if (table === 'hcp_profiles') {
+        allCountries = await getAllCountries();
+
+        const user_codbase_list_for_iso2 = allCountries.filter(c => userPermittedCountries.includes(c.country_iso2))
+            .map(i => i.codbase);
+
+        user_country_iso2_list = allCountries.filter(c => user_codbase_list_for_iso2.includes(c.codbase))
+            .map(i => i.country_iso2);
+
+        const ignorecase_of_country_iso2_list = [].concat.apply([], user_country_iso2_list.map(i => ignoreCaseArray(i)));
+
+        defaultFilter = {
+            application_id: userPermittedApplications.length
+                ? userPermittedApplications.map(app => app.id)
+                : null,
+            country_iso2: ignorecase_of_country_iso2_list.length
+                ? ignorecase_of_country_iso2_list
+                : null
+        };
+
+        if (status) {
+            defaultFilter.status = status;
+        }
+    }
+
+    if (table === 'datasync_hcp_profiles') {
+        const getUserPermittedCodbases = async () => {
+            const allCountries = await getAllCountries();
+
+            const userCodBases = allCountries.filter(c => userPermittedCountries.includes(c.country_iso2)).map(c => c.codbase.toLowerCase());
+            return userCodBases;
+        };
+
+        const countryFilter = (currentFilterSettings.filters || []).find(f => f.fieldName === 'codbase');
+        if (!countryFilter) {
+            const codbases = await getUserPermittedCodbases();
+            defaultFilter = {
+                [Op.or]: codbases.map(codbase => { return where(col('codbase'), 'iLIKE', codbase); })
+            };
+        }
+    }
+
+    if (!currentFilterSettings || !currentFilterSettings.filters || currentFilterSettings.filter === 0)
+        return defaultFilter;
+
+    // if (currentFilter.option.filters.length === 1 || !currentFilter.option.logic) {
+    //     const filter = currentFilter.option.filters[0];
+    //     defaultFilter[filter.fieldName] = filterService.getQueryValue(filter);
+
+    //     return defaultFilter;
+    // }
+
+    let customFilter = { ...defaultFilter };
+
+    const nodes = currentFilterSettings.logic && currentFilterSettings.filters.length > 1
+        ? currentFilterSettings.logic.split(" ")
+        : ['1'];
+
+    let prevOperator;
+    const groupedQueries = [];
+    const findFilter = (name) => {
+        return currentFilterSettings.filters.find(f => f.name === name);
+    };
+
+    const generateQueryObject = (filterObj) => {
+        /** Country filter is specially handled as
+         *  there can be multiple country under a Codbase and
+         *  hcp_profiles table saves country_iso2, not codbase
+         */
+        if (filterObj.fieldName === 'country') {
+            const country_iso2_list_for_codbase = allCountries.filter(ac => filterObj.value.some(v => ac.codbase.toLowerCase() === v.toLowerCase())).map(i => i.country_iso2);
+
+            const selected_iso2_list_for_codbase = country_iso2_list_for_codbase.filter(i => user_country_iso2_list.includes(i));
+            const ignorecase_of_selected_iso2_list_for_codbase = [].concat.apply([], selected_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
+            queryValue = ignorecase_of_selected_iso2_list_for_codbase.length
+                ? ignorecase_of_selected_iso2_list_for_codbase
+                : null;
+
+            delete customFilter.country_iso2;
+            return {
+                ['country_iso2']: ignorecase_of_selected_iso2_list_for_codbase.length
+                    ? ignorecase_of_selected_iso2_list_for_codbase
+                    : null
+            };
+        }
+
+        return filterService.getFilterQuery(filterObj);
+    };
+
+    for (let index = 0; index < nodes.length; index++) {
+        const node = nodes[index];
+        const prev = index > 0 ? nodes[index - 1] : null;
+        const next = index < nodes.length - 1 ? nodes[index + 1] : null;
+
+        if (node === "and" && prevOperator === "and") {
+            const filter = findFilter(next);
+            const query = generateQueryObject(filter);
+            const currentParent = groupedQueries[groupedQueries.length - 1];
+            currentParent.values.push(query);
+        } else if (node === "and") {
+            const leftFilter = findFilter(prev);
+            const rightFilter = findFilter(next);
+            const group = {
+                operator: "and",
+                values: [
+                    generateQueryObject(leftFilter),
+                    generateQueryObject(rightFilter)
+                ]
+            };
+            groupedQueries.push(group);
+        } else if (node !== "or" && prev !== "and" && next !== "and") {
+            const filter = findFilter(node);
+            const query = generateQueryObject(filter);
+            groupedQueries.push(query);
+        }
+
+        prevOperator = node === "and" || node === "or" ? node : prevOperator;
+    }
+
+    if (groupedQueries.length > 1) {
+        customFilter[Op.or] = groupedQueries.map(q => {
+            if (q.operator === 'and') {
+                return { [Op.and]: q.values };
+            }
+            return q;
+        });
+    } else {
+        const query = groupedQueries[0];
+        if (query.operator === 'and') {
+            customFilter[Op.and] = query.values;
+        } else {
+            customFilter = { ...customFilter, ...query };
+        }
+    }
+
+    return customFilter;
+}
+
 async function getHcps(req, res) {
     const response = new Response({}, []);
+
     try {
         const page = req.query.page ? +req.query.page - 1 : 0;
         const limit = req.query.limit ? +req.query.limit : 15;
         let status = req.query.status === undefined ? null : req.query.status;
         if (status && status.indexOf(',') !== -1) status = status.split(',');
-        const codbase = req.query.codbase === 'undefined' ? null : req.query.codbase;
         const offset = page * limit;
+
+        const currentFilter = req.body;
 
         const [userPermittedApplications, userPermittedCountries] = await getUserPermissions(req.user.id);
 
-        async function getCountryIso2() {
-            const user_codbase_list_for_iso2 = (await sequelize.datasyncConnector.query(
-                `SELECT * FROM ciam.vwcountry where ciam.vwcountry.country_iso2 = ANY($countries);`, {
-                bind: {
-                    countries: userPermittedCountries
-                },
-                type: QueryTypes.SELECT
-            }
-            )).map(i => i.codbase);
-
-            const user_country_iso2_list = (await sequelize.datasyncConnector.query(
-                `SELECT * FROM ciam.vwcountry where ciam.vwcountry.codbase = ANY($codbases);`,
-                {
-                    bind: {
-                        codbases: user_codbase_list_for_iso2
-                    },
-                    type: QueryTypes.SELECT
-                }
-            )).map(i => i.country_iso2);
-
-            return user_country_iso2_list;
-        }
-
-        const country_iso2_list = await getCountryIso2();
-        const ignorecase_of_country_iso2_list = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
-
-        const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(
-            `SELECT * FROM ciam.vwcountry WHERE ciam.vwcountry.codbase = $codbase;`, {
-            bind: {
-                codbase: codbase || ''
-            },
-            type: QueryTypes.SELECT
-        }
-        )).map(i => i.country_iso2);
-
-        const selected_iso2_list_for_codbase = country_iso2_list_for_codbase.filter(i => country_iso2_list.includes(i));
-        const ignorecase_of_selected_iso2_list_for_codbase = [].concat.apply([], selected_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
-
-        const specialty_list = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwspecialtymaster", { type: QueryTypes.SELECT });
-
-        const hcp_filter = {
-            status: status === null
-                ? { [Op.or]: ['self_verified', 'manually_verified', 'consent_pending', 'not_verified', null] }
-                : status,
-            application_id: userPermittedApplications.length
-                ? userPermittedApplications.map(app => app.id)
-                : null,
-            country_iso2: codbase
-                ? ignorecase_of_selected_iso2_list_for_codbase.length
-                    ? ignorecase_of_selected_iso2_list_for_codbase
-                    : null
-                : ignorecase_of_country_iso2_list.length
-                    ? ignorecase_of_country_iso2_list
-                    : null,
-        };
+        const specialty_list = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwspecialtymaster', { type: QueryTypes.SELECT });
 
         const orderBy = req.query.orderBy === 'null'
             ? null
@@ -238,8 +340,10 @@ async function getHcps(req, res) {
         order.push(['created_at', 'DESC']);
         order.push(['id', 'DESC']);
 
+        const filterOptions = await generateFilterOptions(currentFilter, userPermittedApplications, userPermittedCountries, status, 'hcp_profiles');
+
         const hcps = await Hcp.findAll({
-            where: hcp_filter,
+            where: filterOptions,
             include: [{
                 model: HcpConsents,
                 as: 'hcpConsents',
@@ -248,7 +352,7 @@ async function getHcps(req, res) {
             attributes: { exclude: ['password', 'created_by', 'updated_by'] },
             offset,
             limit,
-            order: order
+            order
         });
 
         // await Promise.all(hcps.map(async hcp => {
@@ -277,7 +381,7 @@ async function getHcps(req, res) {
             const opt_types = new Set();
 
             hcp['hcpConsents'].map(hcpConsent => {
-                if(hcpConsent.consent_confirmed || hcpConsent.opt_type === 'opt-out') {
+                if (hcpConsent.consent_confirmed || hcpConsent.opt_type === 'opt-out') {
                     opt_types.add(hcpConsent.opt_type);
                 }
             });
@@ -287,7 +391,7 @@ async function getHcps(req, res) {
         });
 
         const totalUser = await Hcp.count({//counting total data for pagintaion
-            where: hcp_filter
+            where: filterOptions
         });
 
         const hcp_users = [];
@@ -310,7 +414,7 @@ async function getHcps(req, res) {
             start: limit * page + 1,
             end: offset + limit > totalUser ? totalUser : offset + limit,
             status: status ? status : null,
-            codbase: codbase ? codbase : null,
+            // codbase: codbase ? codbase : null,
             countries: userPermittedCountries
         };
 
@@ -400,7 +504,7 @@ async function updateHcps(req, res) {
     }
 
     try {
-        if(!Array.isArray(Hcps)) {
+        if (!Array.isArray(Hcps)) {
             response.error.push(new CustomError('Must be an array', 400));
             return res.status(400).send(response);
         }
@@ -408,7 +512,7 @@ async function updateHcps(req, res) {
         await Promise.all(Hcps.map(async hcp => {
             const { id, email, first_name, last_name, uuid, specialty_onekey, country_iso2, telephone, _rowIndex } = trimRequestBody(hcp);
 
-            if(!id) {
+            if (!id) {
                 response.errors.push(new Error(_rowIndex, 'id', 'ID is missing.'));
             }
 
@@ -418,24 +522,25 @@ async function updateHcps(req, res) {
                 response.errors.push(new Error(_rowIndex, 'id', 'User not found.'));
             }
 
-            if(email) {
-                if(!validator.isEmail(email)) {
+            if (email) {
+                if (!validator.isEmail(email)) {
                     response.errors.push(new Error(_rowIndex, 'email', 'Invalid email'));
-                }else{
+                } else {
                     const doesEmailExist = await Hcp.findOne({
                         where: {
                             id: { [Op.ne]: id },
-                            email: { [Op.iLike]: `${email}` } }
+                            email: { [Op.iLike]: `${email}` }
                         }
+                    }
                     );
 
-                    if(doesEmailExist) {
+                    if (doesEmailExist) {
                         response.errors.push(new Error(_rowIndex, 'email', 'Email already exists'));
                     }
 
-                    if(emailsToUpdate.has(email)) {
+                    if (emailsToUpdate.has(email)) {
                         emailsToUpdate.get(email).push(_rowIndex);
-                    }else{
+                    } else {
                         emailsToUpdate.set(email, [_rowIndex]);
                     }
                 }
@@ -443,7 +548,7 @@ async function updateHcps(req, res) {
 
             let uuid_from_master_data;
 
-            if(uuid) {
+            if (uuid) {
                 let master_data = {};
 
                 const uuidWithoutSpecialCharacter = uuid.replace(/[-]/gi, '');
@@ -475,9 +580,9 @@ async function updateHcps(req, res) {
                     response.errors.push(new Error(_rowIndex, 'uuid', 'UUID already exists.'));
                 }
 
-                if(uuidsToUpdate.has(uuid_from_master_data || uuid)) {
+                if (uuidsToUpdate.has(uuid_from_master_data || uuid)) {
                     uuidsToUpdate.get(uuid_from_master_data || uuid).push(_rowIndex);
-                }else{
+                } else {
                     uuidsToUpdate.set(uuid_from_master_data || uuid, [_rowIndex]);
                 }
             }
@@ -497,18 +602,18 @@ async function updateHcps(req, res) {
         }));
 
         emailsToUpdate.forEach((listOfIndex) => {
-            if(listOfIndex.length > 1) {
+            if (listOfIndex.length > 1) {
                 listOfIndex.map(ind => response.errors.push(new Error(ind, 'email', 'Email matches with another row.')))
             }
         })
 
         uuidsToUpdate.forEach((listOfIndex) => {
-            if(listOfIndex.length > 1) {
+            if (listOfIndex.length > 1) {
                 listOfIndex.map(ind => response.errors.push(new Error(ind, 'uuid', 'UUID matches with another row.')))
             }
         })
 
-        if(response.errors && response.errors.length) {
+        if (response.errors && response.errors.length) {
             return res.status(400).send(response);
         }
 
@@ -516,7 +621,7 @@ async function updateHcps(req, res) {
             const updatedPropertiesLog = [];
 
             Object.keys(hcpsToUpdate[index]).forEach(key => {
-                if(hcpsToUpdate[index][key]) {
+                if (hcpsToUpdate[index][key]) {
                     const updatedPropertyLogObject = {
                         field: key,
                         old_value: hcp.dataValues[key],
@@ -544,7 +649,7 @@ async function updateHcps(req, res) {
         hcpModelInstances.map((hcpModelIns, idx) => {
             const { _rowIndex } = hcpModelIns.dataValues;
             Object.keys(hcpsToUpdate[idx]).forEach(key => {
-                if(hcpsToUpdate[idx][key]) response.data.push(new Data(_rowIndex, key, hcpModelIns.dataValues[key]));
+                if (hcpsToUpdate[idx][key]) response.data.push(new Data(_rowIndex, key, hcpModelIns.dataValues[key]));
             })
         });
 
@@ -641,7 +746,7 @@ async function createHcpProfile(req, res) {
         response.errors.push(new CustomError('Email address is missing or invalid.', 400, 'email'));
     } else if (email.length > 100) {
         response.errors.push(new CustomError('Email should be at most 100 characters', 400, 'email'));
-    } else if(!emailValidationStatus.valid) {
+    } else if (!emailValidationStatus.valid) {
         response.errors.push(new CustomError(emailValidationStatus.errors[0], 400, 'email'));
     }
 
@@ -661,7 +766,7 @@ async function createHcpProfile(req, res) {
         response.errors.push(new CustomError('First name is missing.', 400, 'first_name'));
     } else if (first_name.length > 50) {
         response.errors.push(new CustomError('First name should be at most 50 characters', 400, 'first_name'));
-    } else if(!firstNameValidationStatus.valid) {
+    } else if (!firstNameValidationStatus.valid) {
         response.errors.push(new CustomError(firstNameValidationStatus.errors[0], 400, 'first_name'));
     }
 
@@ -669,7 +774,7 @@ async function createHcpProfile(req, res) {
         response.errors.push(new CustomError('Last name is missing.', 400, 'last_name'));
     } else if (last_name.length > 50) {
         response.errors.push(new CustomError('Last name should be at most 50 characters', 400, 'last_name'));
-    } else if(!lastNameValidationStatus.valid) {
+    } else if (!lastNameValidationStatus.valid) {
         response.errors.push(new CustomError(lastNameValidationStatus.errors[0], 400, 'last_name'));
     }
 
@@ -695,7 +800,7 @@ async function createHcpProfile(req, res) {
 
     if (telephone && telephone.length > 25) {
         response.errors.push(new CustomError('Telephone number should be at most 25 digits including country code', 400, 'telephone'));
-    } else if(!telephoneValidationStatus.valid) {
+    } else if (!telephoneValidationStatus.valid) {
         response.errors.push(new CustomError(telephoneValidationStatus.errors[0], 400, 'telephone'));
     }
 
@@ -1103,7 +1208,7 @@ async function getHCPUserConsents(req, res) {
             }, attributes: ['consent_id', 'rich_text']
         });
 
-        if(userConsentDetails) {
+        if (userConsentDetails) {
             const codbaseCountry = await sequelize.datasyncConnector.query(`
                 SELECT * FROM ciam.vwcountry
                 WHERE countryname = (SELECT codbase_desc FROM ciam.vwcountry
@@ -1227,7 +1332,7 @@ async function changePassword(req, res) {
 async function resetPassword(req, res) {
     const response = new Response({}, []);
 
-    async function log(object_id, actor, message, event_type="BAD_REQUEST") {
+    async function log(object_id, actor, message, event_type = "BAD_REQUEST") {
         await logService.log({
             event_type,
             object_id,
@@ -1311,7 +1416,7 @@ async function resetPassword(req, res) {
             is_firsttime_setup
         };
 
-        if(wasAccountLocked) await log(doc.id, req.user.id, 'HCP Password reset success. Account unlocked', 'UPDATE');
+        if (wasAccountLocked) await log(doc.id, req.user.id, 'HCP Password reset success. Account unlocked', 'UPDATE');
         else await log(doc.id, req.user.id, 'HCP Password reset success', 'UPDATE');
 
         res.json(response);
@@ -1573,7 +1678,7 @@ async function getAccessToken(req, res) {
                     actor: req.user.id,
                     remarks: 'HCP Login failed. Account locked'
                 });
-            } else if(doc && doc.password && !doc.validPassword(password)) {
+            } else if (doc && doc.password && !doc.validPassword(password)) {
                 await logService.log({
                     event_type: 'LOGIN',
                     object_id: doc.id,
@@ -1693,6 +1798,84 @@ async function getSpecialtiesForCdp(req, res) {
     }
 }
 
+async function getHcpsFromDatasync(req, res) {
+    try {
+        const page = req.query.page ? +req.query.page - 1 : 0;
+        const limit = req.query.limit ? +req.query.limit : 15;
+        const offset = page * limit;
+
+        const orderBy = req.query.orderBy === 'null'
+            ? null
+            : req.query.orderBy;
+        const orderType = req.query.orderType === 'asc' || req.query.orderType === 'desc'
+            ? req.query.orderType
+            : 'asc';
+
+        const sortableColumns = ['firstname', 'lastname', 'individual_id_onekey', 'uuid_1', 'ind_status_desc', 'country_iso2'];
+
+        const order = [];
+        if (orderBy && (sortableColumns || []).includes(orderBy)) {
+            order.push([orderBy, orderType]);
+        }
+
+        if (orderBy !== 'firstname') order.push(['firstname', 'ASC']);
+        if (orderBy !== 'lastname') order.push(['lastname', 'ASC']);
+
+        const currentFilter = req.body;
+
+        const [, userPermittedCountries] = await getUserPermissions(req.user.id);
+
+        const filterOptions = await generateFilterOptions(currentFilter, null, userPermittedCountries, null, 'datasync_hcp_profiles');
+
+        const hcps = await DatasyncHcp.findAll({
+            where: filterOptions,
+            offset,
+            limit,
+            order
+        });
+
+        const totalUsers = await DatasyncHcp.count({ where: filterOptions });
+
+        const individualIdOnekeyList = hcps.map(h => h.individual_id_onekey);
+        const hcpSpecialties = await sequelize.datasyncConnector.query(`
+            SELECT h.*, s.cod_description, s.cod_locale
+            FROM ciam.vwmaphcpspecialty AS h
+            INNER JOIN ciam.vwspecialtymaster AS s
+            ON (h.specialty_code = s.cod_id_onekey)
+            WHERE individual_id_onekey = ANY($individualIdOnekeyList) AND cod_locale='en'`, {
+            bind: {
+                individualIdOnekeyList: individualIdOnekeyList,
+            },
+            type: QueryTypes.SELECT
+        });
+
+        if (hcpSpecialties) {
+            hcps.forEach(hcp => {
+                const specialties = hcpSpecialties.filter(s => s.individual_id_onekey === hcp.individual_id_onekey);
+                hcp.dataValues.specialties = specialties.map(s => ({
+                    description: s.cod_description,
+                    code: s.specialty_code
+                }));
+            });
+        }
+
+        const data = {
+            users: hcps,
+            page: page + 1,
+            limit,
+            total: totalUsers,
+            start: limit * page + 1,
+            end: offset + limit > totalUsers ? totalUsers : offset + limit,
+            countries: userPermittedCountries
+        };
+
+        res.json(data);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 exports.getHcps = getHcps;
 exports.editHcp = editHcp;
 exports.registrationLookup = registrationLookup;
@@ -1711,3 +1894,4 @@ exports.updateHcps = updateHcps;
 exports.getSpecialtiesWithEnglishTranslation = getSpecialtiesWithEnglishTranslation;
 exports.updateHCPUserConsents = updateHCPUserConsents;
 exports.getSpecialtiesForCdp = getSpecialtiesForCdp;
+exports.getHcpsFromDatasync = getHcpsFromDatasync;

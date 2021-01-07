@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Modal from 'react-bootstrap/Modal';
 import { getOklaHcpDetails, setOklaHcpDetails } from '../hcp.actions';
-import MapView from './map-view';
+import MapView from '../../../../core/client/components/map-view';
 import { Tabs, Tab } from 'react-bootstrap';
 import Dropdown from 'react-bootstrap/Dropdown';
 

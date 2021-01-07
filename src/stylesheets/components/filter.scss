@@ -1,0 +1,200 @@
+.filter {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    display: flex;
+    justify-content: flex-end;
+
+    &__panel {
+        background: white;
+        width: 350px;
+        box-shadow: -9px 13px 30px -10px #C5C5C5;
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__section {
+
+        &-btn {
+            box-shadow: 1px -2px 9px 0 rgba(202,200,200,0.5);
+        }
+
+        flex: 0 0 calc(100% - 137px);
+        overflow-y: auto;
+    }
+
+    &__sub-panel {
+        position: absolute;
+        right: 350px;
+        background: white;
+        border: 1px solid darkgreen;
+        border-radius: 5px;
+        width: 350px;
+        max-height: 500px;
+        margin-top: 50px;
+
+        & + .filter__add-filter {
+            position: relative;
+
+            &::before {
+                content: "";
+                width: 0;
+                height: 0;
+                border-top: 8px solid transparent;
+                border-bottom: 8px solid transparent;
+                border-left: 8px solid $primary-color;
+                position: absolute;
+                top: 4px;
+                left: -17px;
+            }
+        }
+    }
+
+    .ReactTags {
+        &__tags {
+        }
+
+        &__selected {
+        }
+
+        &__tag {
+            padding: 0px 5px;
+            background-color: #FDEFE0;
+            color: $primary-color;
+            font-size: 14px;
+            border-radius: 5px;
+            display: inline-flex;
+            align-items: center;
+            margin: 0px 5px 5px 0px;
+        }
+
+        &__remove {
+            border: none !important;
+            background: no-repeat;
+            color: $primary-color;
+            font-size: 16px;
+            padding-right: 0px;
+            line-height: normal;
+
+            &:hover {
+                font-weight: bold;
+            }
+        }
+
+        &__tagInputField {
+            display: block;
+            width: 100%;
+            font-weight: 400;
+            color: #495057;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #ced4da;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            height: calc(1.5em + 0.5rem + 2px);
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            border-radius: 0.2rem;
+
+            &:focus {
+                color: #495057;
+                background-color: #fff;
+                border-color: #80bdff;
+                outline: 0;
+                box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            }
+        }
+    }
+
+    &__sub-icon {
+        font-size: 10px;
+        left: -3px;
+        position: relative;
+        top: 2px;
+    }
+
+    &__scope-dropdown {
+        .dropdown {
+            &-toggle {
+                &:hover,
+                &:active,
+                &:focus {
+                    color: $white-color;
+
+                    i {
+                        color: $white-color;
+                    }
+                }
+            }
+
+            &-menu {
+                padding: 0px;
+            }
+
+            &-item {
+                background: #F1F1F1;
+                width: 96%;
+                margin: 5px auto;
+                border-radius: 3px;
+                padding: 5px 10px;
+
+                &:hover {
+                    color: $primary-color;
+                }
+
+                &:active,
+                &:focus {
+                    background: $secondary-color;
+                    color: $white-color;
+
+                    i {
+                        color: $white-color;
+                    }
+                }
+            }
+        }
+    }
+
+    &__scope-tolltip {
+        border: 1px solid $secondary-color;
+    }
+
+    &__add-filter {
+    }
+
+    &__logic {
+        &-wrap {
+        }
+
+        &-item {
+        }
+
+        &-field {
+            height: 24px;
+            padding: 0px;
+        }
+    }
+
+
+    @media (max-width: $screen-phone) {
+        &__panel {
+            width: 100%;
+        }
+
+        &__sub-panel {
+            left: 5%;
+            width: 90%;
+            z-index: 100;
+            margin: 0px;
+            top: 50%;
+            transform: translateY(-50%);
+            box-shadow: 1px 49px 400px 200px rgba(0,0,0,0.5);
+
+            & + .filter__add-filter::before {
+                display: none;
+            }
+        }
+    }
+}
