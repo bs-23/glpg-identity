@@ -39,6 +39,7 @@
         margin-right: 30px;
         flex-direction: column;
         width: 270px;
+
         @media (min-width: $screen-phone) {
             border-bottom: 0px;
         }
@@ -65,6 +66,15 @@
             & + i {
                 display: none !important;
             }
+        }
+    }
+
+    &__workplace-icons {
+        width: 50px;
+        display: inline-block;
+
+        i + i {
+            padding-left: 6px;
         }
     }
 
