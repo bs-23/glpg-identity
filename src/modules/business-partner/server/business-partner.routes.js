@@ -5,5 +5,6 @@ const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/platfo
 
 module.exports = app => {
     app.route('/api/partner-requests')
-        .get(controller.getPartnerRequests);
+        .get(controller.getPartnerRequests)
+        .post(controller.createPartnerRequest);
 };

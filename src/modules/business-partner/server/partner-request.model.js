@@ -10,11 +10,11 @@ const PartnerRequest = sequelize.cdpConnector.define('partner_requests', {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4
     },
-    last_name: {
+    first_name: {
         allowNull: false,
         type: DataTypes.STRING(50),
     },
-    second_name: {
+    last_name: {
         allowNull: false,
         type: DataTypes.STRING(50),
     },
@@ -35,6 +35,7 @@ const PartnerRequest = sequelize.cdpConnector.define('partner_requests', {
         allowNull: false,
         type: DataTypes.ENUM,
         values: ['new', 'pending'],
+        defaultValue: 'new'
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,

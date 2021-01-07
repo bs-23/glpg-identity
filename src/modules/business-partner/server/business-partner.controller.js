@@ -15,4 +15,30 @@ async function getPartnerRequests(req, res) {
     }
 }
 
+async function createPartnerRequest(req, res) {
+    try {
+        const { first_name, last_name, email, procurement_contact, company_codes } = req.body;
+
+        const [user, created] = await PartnerRequest.findOrCreate({
+            where: { email: email.toLowerCase() },
+            defaults: {
+                first_name,
+                last_name,
+                email,
+                procurement_contact,
+                company_codes
+            }
+        });
+
+        if (!created) {
+            return res.status(400).send('Email already exists.');
+        }
+
+        res.json(user);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
 exports.getPartnerRequests = getPartnerRequests;
+exports.createPartnerRequest = createPartnerRequest;
