@@ -2,10 +2,18 @@ import Types from "./hcp.types";
 
 const initialState = {
     hcps: {},
+    crdlpHcps: {},
     specialties: {},
     oklaHcpDetails: null,
-    oklaHcoDetails: null
+    oklaHcoDetails: null,
+    filterPresetsCdp: null,
+    filterPresetsCrdlp: null
 };
+
+const tablePresetPathMap = {
+    'hcp-profiles': 'filterPresetsCdp',
+    'crdlp-hcp-profiles': 'filterPresetsCrdlp'
+}
 
 function sortItems(itms, val, type) {
     return itms.sort(function (a, b) {
@@ -41,6 +49,13 @@ export default function reducer(state = initialState, action) {
             return {
                 ...state,
                 hcps: action.payload.data.data
+            };
+        }
+
+        case Types.GET_CRDLP_HCPS_FULFILLED: {
+            return {
+                ...state,
+                crdlpHcps: action.payload.data
             };
         }
 
@@ -90,6 +105,16 @@ export default function reducer(state = initialState, action) {
             return {
                 ...state,
                 oklaHcoDetails: action.payload
+            }
+        }
+
+        case Types.GET_HCP_FILTER_SETTINGS_FULFILLED: {
+            const tableName = action.payload.tableName;
+            const path = tablePresetPathMap[tableName];
+
+            return {
+                ...state,
+                [path]: action.payload.data
             }
         }
     }

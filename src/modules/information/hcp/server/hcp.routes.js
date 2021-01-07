@@ -7,7 +7,7 @@ const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/platfo
 
 module.exports = app => {
     app.route('/api/hcps')
-        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getHcps);
+        .post(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getHcps);
 
     app.route('/api/hcps/specialties')
         .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getSpecialtiesForCdp);
@@ -59,4 +59,7 @@ module.exports = app => {
     app.route('/api/hcp-profiles/:id')
         .get(passport.authenticate('application-jwt', { session: false }), controller.getHcpProfile)
         .put(passport.authenticate('application-jwt', { session: false }), controller.editHcp);
+
+    app.route('/api/datasync/hcps')
+        .post(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getHcpsFromDatasync);
 };
