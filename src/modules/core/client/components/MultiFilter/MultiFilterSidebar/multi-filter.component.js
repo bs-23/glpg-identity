@@ -96,7 +96,14 @@ const MultiFilter = (props, ref) => {
         formikProps.setFieldValue('filters', allUniqueFilters);
         formikProps.setFieldValue('logic', updatedLogic);
 
+        const values = { ...formikProps.values };
+        values.filters = allUniqueFilters;
+        values.logic = updatedLogic;
+
+        const updatedFormikProps = { ...formikProps, values: values }
+
         setShow({ ...show, addFilter: false });
+        trackFilterModifications(updatedFormikProps);
     };
 
     const getFieldDisplayText = (fieldName) => {
@@ -131,7 +138,18 @@ const MultiFilter = (props, ref) => {
         return !_.isEqual(selectedSetting, currentSetting);
     }
 
-    const handleRemoveFilter = (index, props) => {
+    const trackFilterModifications = (formikProps) => {
+        if (formikProps && formikProps.values.selectedSettingID) {
+            const { values, setFieldValue } = formikProps;
+            const isFilterModified = hasFilterBeenModified(values);
+            if (!isFilterModified) {
+                console.log('filter was not modified to chaning to save existing', values);
+                setFieldValue('saveType', 'save_existing');
+            }
+        }
+    }
+
+    const handleRemoveFilter = async (index, props) => {
         const allFilters = props.values.filters;
         if(allFilters) {
             const allFiltersAfterRemoval = allFilters.filter((value, ind) => ind !== index).map((filter, index) => {
@@ -141,8 +159,16 @@ const MultiFilter = (props, ref) => {
 
             const updatedLogic = buildLogicAfterRemoval(props.values.logic, index);
 
-            props.setFieldValue('filters', allFiltersAfterRemoval);
-            props.setFieldValue('logic', updatedLogic);
+            await props.setFieldValue('filters', allFiltersAfterRemoval);
+            await props.setFieldValue('logic', updatedLogic);
+
+            const values = { ...props.values };
+            values.filters = allFiltersAfterRemoval;
+            values.logic = updatedLogic;
+
+            const updatedProps = { ...props, values: values }
+
+            trackFilterModifications(updatedProps);
         }
     };
 
@@ -164,6 +190,7 @@ const MultiFilter = (props, ref) => {
             actions.setFieldValue('lastAppliedLogic', values.logic);
         }).catch(err => null);
 
+        setShow({ ...show, addFilter: false });
         onHide();
     };
 
@@ -223,6 +250,14 @@ const MultiFilter = (props, ref) => {
         formikProps.handleChange(e);
         formikProps.setFieldTouched('selectedFilterSettingName', false, true);
         formikProps.setFieldTouched('newFilterSettingName', false, true);
+    }
+
+    const handleLogicChange = async (logic, formikProps) => {
+        await formikProps.setFieldValue('logic', logic);
+        const values = { ...formikProps.values };
+        values.logic = logic;
+        const props = { ...formikProps, values: values };
+        trackFilterModifications(props);
     }
 
     const handleClose = () => {
@@ -392,7 +427,7 @@ const MultiFilter = (props, ref) => {
                                             className=""
                                             logic={formikProps.values.logic}
                                             numberOfFilters={formikProps.values.filters.length}
-                                            onLogicChange={(logic) => formikProps.setFieldValue('logic', logic)}
+                                            onLogicChange={(logic) => handleLogicChange(logic, formikProps)}
                                         />
                                         <div className="invalid-feedback">
                                             <ErrorMessage name="logic" />
