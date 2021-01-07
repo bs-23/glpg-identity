@@ -488,34 +488,20 @@ async function init() {
     }
 
     function createCDPDevDB(callback){
-        createDB(callback, nodecache.getValue('CLINICAL_TRIALS_URL'), nodecache.getValue('POSTGRES_CDP_DATABASE'))
+        createDB(callback, nodecache.getValue('POSTGRES_CLINICAL_TRIALS_URL'), nodecache.getValue('POSTGRES_CDP_DATABASE'))
     }
 
     function createClinicalTrialsDevDB(callback){
-        createDB(callback, nodecache.getValue('CLINICAL_TRIALS_URL'), nodecache.getValue('CLINICAL_TRIALS_DEV_DATABASE'))
-    }
-    function createClinicalTrialsStageDB(callback){
-        createDB(callback, nodecache.getValue('CLINICAL_TRIALS_URL'), nodecache.getValue('CLINICAL_TRIALS_STAGE_DATABASE'))
-    }
-    function createClinicalTrialsProductionDB(callback){
-        createDB(callback, nodecache.getValue('CLINICAL_TRIALS_URL'), nodecache.getValue('CLINICAL_TRIALS_PRODUCTION_DATABASE'))
+        createDB(callback, nodecache.getValue('POSTGRES_CLINICAL_TRIALS_URL'), nodecache.getValue('POSTGRES_CLINICAL_TRIALS_DATABASE'))
     }
     async function clinicalTrilalsDbStructureSeeder(callback){
         let clinicalTrialsDBCreated = x => {
             console.log("Clinical Trials DB Created");
         }
         let asyncCreateClinicalTrialsDevDB = util.promisify(createClinicalTrialsDevDB);
-        let asyncCreateClinicalTrialsStageDB = util.promisify(createClinicalTrialsStageDB);
-        let asyncCreateClinicalTrialsProductionDB = util.promisify(createClinicalTrialsProductionDB);
         await asyncCreateClinicalTrialsDevDB();
-        await asyncCreateClinicalTrialsStageDB();
-        await asyncCreateClinicalTrialsProductionDB();
-        await sequelize.clinitalTrialsDevConnectior.query(`CREATE SCHEMA IF NOT EXISTS "${nodecache.getValue('POSTGRES_CLINICAL_TRIALS_SCHEMA')}"`);
-        await sequelize.clinitalTrialsStageConnectior.query(`CREATE SCHEMA IF NOT EXISTS "${nodecache.getValue('POSTGRES_CLINICAL_TRIALS_SCHEMA')}"`);
-        await sequelize.clinitalTrialsProductionConnectior.query(`CREATE SCHEMA IF NOT EXISTS "${nodecache.getValue('POSTGRES_CLINICAL_TRIALS_SCHEMA')}"`);
-        await sequelize.clinitalTrialsDevConnectior.sync();
-        await sequelize.clinitalTrialsStageConnectior.sync();
-        await sequelize.clinitalTrialsProductionConnectior.sync();
+        await sequelize.clinitalTrialsConnector.query(`CREATE SCHEMA IF NOT EXISTS "${nodecache.getValue('POSTGRES_CLINICAL_TRIALS_SCHEMA')}"`);
+        await sequelize.clinitalTrialsConnector.sync();
     }
 
 

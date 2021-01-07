@@ -10,7 +10,7 @@ const makeCustomSlug = (title) => {
     return convertToSlug(`${title} ${code}`);
 };
 
-const history = sequelize.clinitalTrialsDevConnectior.define('history', {
+const history = sequelize.clinitalTrialsConnector.define('history', {
     id: {
         allowNull: false,
         primaryKey: true,

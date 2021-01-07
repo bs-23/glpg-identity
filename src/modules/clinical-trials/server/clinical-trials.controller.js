@@ -133,17 +133,13 @@ async function getTrials(req, res) {
     const response = new Response({}, []);
     let { items_per_page, page_no } = req.query;
 
-    page_no = page_no ? page_no : 1;
-    items_per_page = items_per_page? items_per_page : 100;
+    page_no = page_no ? Number(page_no) : 1;
+    items_per_page = items_per_page? Number(items_per_page) : 100;
 
     try{
         let result = await Trial.findAll({
             offset: items_per_page*page_no, 
-            limit: items_per_page, 
-            attributes: {
-                exclude: ['value']
-
-            }});
+            limit: items_per_page});
 
         let total_item_count = await Trial.count();
 

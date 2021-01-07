@@ -101,7 +101,7 @@ let trialModel = {
     }
 }
 
-const Trial = sequelize.clinitalTrialsStageConnectior.define(trialModel.name, trialModel.db_properties , trialModel.db_schema);
+const Trial = sequelize.clinitalTrialsConnector.define(trialModel.name, trialModel.db_properties , trialModel.db_schema);
 
 Location.hasMany(Trial, {
     foreignKey: 'location_id'

@@ -10,7 +10,7 @@ const makeCustomSlug = (title) => {
     return convertToSlug(`${title} ${code}`);
 };
 
-const Location = sequelize.clinitalTrialsStageConnectior.define('location', {
+const Location = sequelize.clinitalTrialsConnector.define('location', {
     id: {
         allowNull: false,
         primaryKey: true,
