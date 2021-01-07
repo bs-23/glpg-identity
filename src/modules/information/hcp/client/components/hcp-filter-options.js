@@ -112,13 +112,13 @@ export function getDatasyncFilterOptions(userCountries) {
         },
         {
             fieldName: 'uuid_1',
-            valueType: 'date',
+            valueType: 'text',
             displayText: 'UUID',
             operators: operators.getStringOperators()
         },
         {
             fieldName: 'activity_id_onekey',
-            valueType: 'date',
+            valueType: 'text',
             displayText: 'Activity Onekey ID',
             operators: operators.getStringOperators()
         },

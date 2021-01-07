@@ -101,16 +101,20 @@ export default function CrdlpHcpProfiles() {
         const filterID = multiFilterSetting.selectedSettingID;
         const shouldUpdateFilter = multiFilterSetting.saveType === 'save_existing';
 
-        const filterSetting = {
-            title: multiFilterSetting.selectedFilterSettingName,
-            table: "crdlp-hcp-profiles",
-            settings: {
-                filters: multiFilterSetting.filters,
-                logic: multiFilterSetting.logic
-            }
-        }
-
         if(multiFilterSetting.shouldSaveFilter) {
+            const settingName = multiFilterSetting.saveType === 'save_existing'
+                ? multiFilterSetting.selectedFilterSettingName
+                : multiFilterSetting.newFilterSettingName;
+
+            const filterSetting = {
+                title: settingName,
+                table: "crdlp-hcp-profiles",
+                settings: {
+                    filters: multiFilterSetting.filters,
+                    logic: multiFilterSetting.logic
+                }
+            }
+
             if(filterID && shouldUpdateFilter) {
                 try{
                     await axios.put(`/api/filter/${filterID}`, filterSetting);
