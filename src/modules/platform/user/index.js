@@ -9,7 +9,7 @@ import MyProfile from './client/components/my-profile/my-profile.component';
 import * as userActions from './client/user.actions';
 
 export function UserClientRoutes(props) {
-    return <ClientRoutes path={props.path}/>;
+    return <ClientRoutes path={props.path} />;
 }
 
 export {
@@ -20,4 +20,4 @@ export {
     ForgotPassword,
     ResetPassword,
     MyProfile
- };
+};

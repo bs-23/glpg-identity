@@ -2,12 +2,29 @@ import axios from 'axios';
 import Types from './hcp.types';
 import store from '../../../core/client/store';
 
-export function getHcpProfiles(query = "") {
+export function getHcpProfiles(query = "", data) {
+
+    const url = `/api/hcps${query}`;
+
     return {
         type: Types.GET_HCPS,
         payload: axios({
-            method: 'get',
-            url: `/api/hcps${query}`
+            method: 'post',
+            url,
+            data
+        })
+    };
+}
+
+export function getCrdlpHcpProfiles(query = "", data) {
+    const url = `/api/datasync/hcps${query}`;
+
+    return {
+        type: Types.GET_CRDLP_HCPS,
+        payload: axios({
+            method: 'post',
+            url,
+            data
         })
     };
 }
@@ -115,5 +132,26 @@ export function setOklaHcoDetails(hcoDetails) {
     return {
         type: Types.SET_OKLA_HCO_DETAILS,
         payload: hcoDetails
+    };
+}
+
+export function getHcpFilterSettings(tableName) {
+    return {
+        type: Types.GET_HCP_FILTER_SETTINGS,
+        payload: axios({
+            method: 'get',
+            url: `/api/filter?table=${tableName}`
+        }),
+        payload: new Promise((resolve, reject) => {
+            axios({
+                method: 'get',
+                url: `/api/filter?table=${tableName}`
+            })
+            .then(data => resolve({
+                data: data.data,
+                tableName
+            }))
+            .catch(error => reject(error));
+        })
     };
 }
