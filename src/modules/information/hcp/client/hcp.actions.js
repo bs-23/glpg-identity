@@ -138,10 +138,6 @@ export function setOklaHcoDetails(hcoDetails) {
 export function getHcpFilterSettings(tableName) {
     return {
         type: Types.GET_HCP_FILTER_SETTINGS,
-        payload: axios({
-            method: 'get',
-            url: `/api/filter?table=${tableName}`
-        }),
         payload: new Promise((resolve, reject) => {
             axios({
                 method: 'get',
