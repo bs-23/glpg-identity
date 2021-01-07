@@ -381,6 +381,7 @@ const SearchProfessionalHcp = (props) => {
                                                             onChange={selectedOption => {
                                                                 formikProps.values.countries = selectedOption;
                                                                 setSelectedCountries(selectedOption || []);
+                                                                formikProps.values.specialties = [];
                                                                 setSelectedSpecialties([]);
                                                                 changeUrl();
                                                             }}
