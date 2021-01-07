@@ -381,6 +381,7 @@ const SearchProfessionalHcp = (props) => {
                                                             onChange={selectedOption => {
                                                                 formikProps.values.countries = selectedOption;
                                                                 setSelectedCountries(selectedOption || []);
+                                                                formikProps.values.specialties = [];
                                                                 setSelectedSpecialties([]);
                                                                 changeUrl();
                                                             }}
@@ -580,6 +581,9 @@ const SearchProfessionalHcp = (props) => {
                                                             {
                                                                 user.workplaces.map((item, idxOfWorkPlace) => (
                                                                     <div key={idxOfWorkPlace} className="currentWorkplace">
+                                                                        {
+                                                                            item.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary" title="In my contract"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary" title="Not in my contract"></i>
+                                                                        }
                                                                         {
                                                                             item.isValid ? <i className="fas fa-check mr-1 cdp-text-primary"></i> : <i className="fas fa-times mr-1 cdp-text-secondary"></i>
                                                                         }
