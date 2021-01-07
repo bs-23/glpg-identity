@@ -10,22 +10,22 @@ const Location = sequelize.clinitalTrialsConnector.define('locations', {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4
     },
-    LocationFacility: {
+    location_facility: {
         unique: false,
         allowNull: true,
         type: DataTypes.STRING(1024)
     },
-    LocationCity: {
+    location_city: {
         unique: false,
         allowNull: true,
         type: DataTypes.STRING(1024)
     },
-    LocationZip: {
+    location_zip: {
         unique: false,
         allowNull: false,
         type: DataTypes.STRING(1024)
     },
-    LocationCountry: {
+    location_country: {
         unique: false,
         allowNull: false,
         type: DataTypes.STRING(1024)

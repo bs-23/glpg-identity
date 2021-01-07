@@ -83,18 +83,18 @@ async function mergeProcessData(req, res) {
              data = data.concat(data, jsonValue.FullStudiesResponse.FullStudies.map(element=>{
                  return {
                     "rank": element.Rank,
-                    "protocolNumber": element.Study.ProtocolSection.IdentificationModule.OrgStudyIdInfo.OrgStudyId,
-                    "govIdentifier": element.Study.ProtocolSection.IdentificationModule.NCTId,
-                    "clinicalTrialPurpose": element.Study.ProtocolSection.DescriptionModule.BriefSummary,
-                    "clinicalTrialSummary": element.Study.ProtocolSection.IdentificationModule.BriefTitle,
+                    "protocol_number": element.Study.ProtocolSection.IdentificationModule.OrgStudyIdInfo.OrgStudyId,
+                    "gov_ddentifier": element.Study.ProtocolSection.IdentificationModule.NCTId,
+                    "clinical_trial_purpose": element.Study.ProtocolSection.DescriptionModule.BriefSummary,
+                    "clinical_trial_summary": element.Study.ProtocolSection.IdentificationModule.BriefTitle,
                     "gender": element.Study.ProtocolSection.EligibilityModule.Gender,
-                    "minAge": element.Study.ProtocolSection.EligibilityModule.MinimumAge,
-                    "maxAge": element.Study.ProtocolSection.EligibilityModule.MaximumAge,
-                    "stdAge": element.Study.ProtocolSection.EligibilityModule.StdAgeList.StdAge,
+                    "min_age": element.Study.ProtocolSection.EligibilityModule.MinimumAge,
+                    "max_age": element.Study.ProtocolSection.EligibilityModule.MaximumAge,
+                    "std_age": element.Study.ProtocolSection.EligibilityModule.StdAgeList.StdAge,
                     "phase": element.Study.ProtocolSection.DesignModule.PhaseList.Phase,
-                    "trialStatus": element.Study.ProtocolSection.StatusModule.OverallStatus,
-                    "inclusionExclusionCriteria": element.Study.ProtocolSection.EligibilityModule.EligibilityCriteria,
-                    "typeOfDrug": "Yet to fix",
+                    "trial_status": element.Study.ProtocolSection.StatusModule.OverallStatus,
+                    "inclusion_exclusion_criteria": element.Study.ProtocolSection.EligibilityModule.EligibilityCriteria,
+                    "type_of_drug": "Yet to fix",
                     "location": element.Study.ProtocolSection.ContactsLocationsModule.LocationList.Location
                 }
              }));

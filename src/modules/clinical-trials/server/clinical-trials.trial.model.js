@@ -18,22 +18,22 @@ let trialModel = {
             allowNull: true,
             type: DataTypes.INTEGER
         },
-        protocolNumber: {
+        protocol_number: {
             unique: false,
             allowNull: true,
             type: DataTypes.STRING(60)
         },
-        govIdentifier: {
+        gov_identifier: {
             unique: false,
             allowNull: true,
             type: DataTypes.STRING(60)
         },
-        clinicalTrialPurpose: {
+        clinical_trial_purpose: {
             unique: false,
             allowNull: true,
             type: DataTypes.STRING(10485760)
         },
-        clinicalTrialSummary: {
+        clinical_trial_summary: {
             unique: false,
             allowNull: true,
             type: DataTypes.STRING(10485760)
@@ -43,17 +43,17 @@ let trialModel = {
             allowNull: true,
             type: DataTypes.STRING(60)
         },
-        minAge: {
+        min_age: {
             unique: false,
             allowNull: true,
             type: DataTypes.STRING(60)
         },
-        maxAge: {
+        max_age: {
             unique: false,
             allowNull: true,
             type: DataTypes.STRING(60)
         },
-        stdAge: {
+        std_age: {
             unique: false,
             allowNull: true,
             type: DataTypes.ARRAY(DataTypes.STRING)
@@ -63,17 +63,17 @@ let trialModel = {
             allowNull: true,
             type: DataTypes.ARRAY(DataTypes.STRING)
         },
-        trialStatus: {
+        trial_status: {
             unique: false,
             allowNull: true,
             type: DataTypes.STRING(60)
         },
-        inclusionExclusionCriteria: {
+        inclusion_exclusion_criteria: {
             unique: false,
             allowNull: true,
             type: DataTypes.STRING(10485760)
         },
-        typeOfDrug: {
+        type_of_drug: {
             unique: false,
             allowNull: true,
             type: DataTypes.STRING(60)

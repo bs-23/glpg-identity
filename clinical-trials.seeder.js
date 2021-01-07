@@ -31,10 +31,10 @@ async function init() {
 
         ClinicalTrialLocationModel.bulkCreate([
             {
-                LocationFacility: 'facility',
-                LocationCity: 'test city',
-                LocationZip: '12721',
-                LocationCountry: 'TestCountry',
+                location_facility: 'facility',
+                location_city: 'test city',
+                location_zip: '12721',
+                location_country: 'TestCountry',
                 lat: 17.669,
                 long: 23.000
             }
