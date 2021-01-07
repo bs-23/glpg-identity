@@ -5,12 +5,14 @@ import { useSelector } from 'react-redux';
 import { Form, Formik, Field } from 'formik';
 import Select, { components } from 'react-select';
 import Dropdown from 'react-bootstrap/Dropdown';
-import OklaHcoDetails from './okla-hco-details.component';
-import getUserPermittedCountries from '../../../../core/client/util/user-country';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
 import { useToasts } from 'react-toast-notifications';
+
+import OklaHcoDetails from './okla-hco-details.component';
+import getUserPermittedCountries from '../../../../core/client/util/user-country';
 import Faq from '../../../../platform/faq/client/faq.component';
 import Modal from 'react-bootstrap/Modal';
+import uuidAuthorities from '../uuid-authorities.json';
 
 const SearchOrganizationHcp = () => {
     const { addToast } = useToasts();
@@ -29,6 +31,7 @@ const SearchOrganizationHcp = () => {
     const [showFaq, setShowFaq] = useState(false);
     const handleCloseFaq = () => setShowFaq(false);
     const handleShowFaq = () => setShowFaq(true);
+    const [uuidLabel, setUuidLabel] = useState('UUID');
 
     const resetSearch = (props) => {
         setFormData({});
@@ -37,6 +40,14 @@ const SearchOrganizationHcp = () => {
         setSelectedSpecialties([]);
         setHcos({});
         props.resetForm();
+    };
+
+    const getUuidLabel = (selectedCountries) => {
+        if (!selectedCountries || !selectedCountries.length) return 'UUID';
+
+        const authorityByCountry = uuidAuthorities.filter(a => selectedCountries.some(s => a.codbase.toLowerCase() === s.value.toLowerCase())).map(a => a.name);
+
+        return authorityByCountry.join('/');
     };
 
     const scrollToResult = (isEmpty) => {
@@ -143,6 +154,7 @@ const SearchOrganizationHcp = () => {
             else setSpecialties([]);
         }
         fetchSpecialties();
+        setUuidLabel(getUuidLabel(selectedCountries));
     }, [selectedCountries, countries]);
 
     const getCountries = () => userCountries.map(country => ({ value: country.codbase, label: country.codbase_desc }));
@@ -351,7 +363,7 @@ const SearchOrganizationHcp = () => {
                                                 </div>
                                                 <div className="col-12 col-sm-4">
                                                     <div className="form-group">
-                                                        <label for="workplaceEid">Workplace UUID/Onekey ID</label>
+                                                        <label for="workplaceEid">{uuidLabel}</label>
                                                         <Field className="form-control individual" type='text' name='workplaceEid' id='workplaceEid' />
                                                     </div>
                                                 </div>
