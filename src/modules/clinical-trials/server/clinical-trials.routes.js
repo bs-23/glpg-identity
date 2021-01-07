@@ -7,13 +7,13 @@ const auth = passport.authenticate('application-jwt', { session: false });
 module.exports = app => {
     app.route('/api/clinical-trials')
         .get(auth, controller.getTrials)
-        .post(CDPAuthStrategy, controller.dumpAllData);
+        .post(CDPAuthStrategy, ModuleGuard(Modules.CLINICAL_TRIALS.value), controller.dumpAllData);
 
     app.route('/api/clinical-trials/versions')
-        .get(CDPAuthStrategy, controller.showAllVersions);
+        .get(CDPAuthStrategy, ModuleGuard(Modules.CLINICAL_TRIALS.value), controller.showAllVersions);
 
     app.route('/api/clinical-trials/merge-versions')
-        .post(CDPAuthStrategy, controller.mergeProcessData);
+        .post(CDPAuthStrategy, ModuleGuard(Modules.CLINICAL_TRIALS.value), controller.mergeProcessData);
 
     app.route('/api/clinical-trials/:id')
         .get(auth, controller.getTrialDetails);

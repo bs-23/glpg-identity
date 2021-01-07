@@ -8,7 +8,7 @@ export default function HcpRoutes() {
 
     return (
         <Switch>
-            <PrivateRoute exact path={path} component={Trials} module={'privacy'} />
+            <PrivateRoute exact path={path} component={Trials} module={'clinical-trials'} />
         </Switch>
     );
 }

@@ -104,7 +104,8 @@ async function init() {
                 { title: "Management of Customer Data Platform", slug: "platform", created_by: admin.id, updated_by: admin.id },
                 { title: "Information Management", slug: "information", created_by: admin.id, updated_by: admin.id },
                 { title: "Data Privacy & Consent Management", slug: "privacy", created_by: admin.id, updated_by: admin.id },
-                { title: "Business Partner Management", slug: "business-partner-management", created_by: admin.id, updated_by: admin.id }
+                { title: "Business Partner Management", slug: "business-partner-management", created_by: admin.id, updated_by: admin.id },
+                { title: "Clinical Trials Management", slug: "clinical-trials", created_by: admin.id, updated_by: admin.id }
             ];
 
             ServiceCategory.destroy({ truncate: { cascade: true } }).then(() => {
