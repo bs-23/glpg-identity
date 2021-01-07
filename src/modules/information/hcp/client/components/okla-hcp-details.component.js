@@ -91,6 +91,10 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
                                     <strong className="okla-search__details-title">Specialty</strong>
                                     <span className="okla-search__details-value">{hcpDetails.specialties ? hcpDetails.specialties.join(', ') : '--'}</span>
                                 </li>
+                                <li className="okla-search__details-item">
+                                    <strong className="okla-search__details-title">Contract status</strong>
+                                    <span className="okla-search__details-value">{hcpDetails.isInContract ? 'In my contract' : 'Not in my contract'}</span>
+                                </li>
                             </ul>
                         </Tab>
                         <Tab eventKey="Identifiers" title="Identifiers">
@@ -149,6 +153,10 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
                                         <div className="col-12 col-sm-6 pb-3">
                                             <div className="mt-1 font-weight-bold">Status</div>
                                             <div>{selectedWorkplace.isValid ? 'Valid' : 'Invalid'}</div>
+                                        </div>
+                                        <div className="col-12 col-sm-6 pb-3">
+                                            <div className="mt-1 font-weight-bold">Contract status</div>
+                                            <div>{selectedWorkplace.isInContract ? 'In my contract' : 'Not in my contract'}</div>
                                         </div>
                                         <div className="col-12 col-sm-6 pb-3">
                                             <div className="mt-1 font-weight-bold">Address</div>
