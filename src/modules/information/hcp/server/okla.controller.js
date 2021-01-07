@@ -82,9 +82,11 @@ async function searchOklaHcps(req, res) {
         const results = [];
         Object.keys(groupedByIndividuals).forEach((individualEid) => {
             const activitiesOfIndividual = groupedByIndividuals[individualEid];
+            activitiesOfIndividual.sort( (a,b) => b.activity.isMainActivity - a.activity.isMainActivity)
             const onekeyEidList = activitiesOfIndividual.map(i => i.onekeyEid);
             const individual = activitiesOfIndividual[0].individual;
-            const isIndividualInContract = activitiesOfIndividual[0].isInContract;
+            const activityInContract = activitiesOfIndividual.find(a => a.isInContract);
+            const isIndividualInContract = !!activityInContract;
 
             const workplaces = activitiesOfIndividual.map(g => {
                 const workplace = g.workplace;
@@ -95,7 +97,8 @@ async function searchOklaHcps(req, res) {
                     isValid: workplace.statusCorporateLabel === 'Valid',
                     name,
                     addresss: workplace.workplaceAddresses['P,1'].address.addressLongLabel,
-                    city: workplace.workplaceAddresses['P,1'].address.postalTownReference.villageLabel
+                    city: workplace.workplaceAddresses['P,1'].address.postalTownReference.villageLabel,
+                    isInContract: g.isInContract
                 };
             });
 
@@ -261,7 +264,9 @@ async function getOklaHcpDetails(req, res) {
 
         const onekeyEidList = activitiesOfIndividual.map(i => i.onekeyEid);
         const individual = activitiesOfIndividual[0].individual;
-        const isInContract = activitiesOfIndividual[0].isInContract;
+        const activityInContract = activitiesOfIndividual.find(a => a.isInContract);
+
+        activitiesOfIndividual.sort( (a,b) => b.activity.isMainActivity - a.activity.isMainActivity);
 
         const workplaces = activitiesOfIndividual.map(g => {
             const workplace = g.workplace;
@@ -286,6 +291,7 @@ async function getOklaHcpDetails(req, res) {
                 city: workplace.workplaceAddresses['P,1'].address.postalTownReference.villageLabel,
                 contactNumbers,
                 type: workplace.typeCorporateLabel,
+                isInContract: g.isInContract
             };
         });
 
@@ -295,13 +301,13 @@ async function getOklaHcpDetails(req, res) {
             })
             : [];
 
-        const externalIdentifiers = Object.keys(individual.externalKeys).map(key => {
+        const externalIdentifiers = individual.externalKeys ? Object.keys(individual.externalKeys).map(key => {
             const externalKey = individual.externalKeys[key];
             return {
                 name: externalKey.typeLabel,
                 value: externalKey.value
             };
-        });
+        }) : [];
 
         const data = {
             firstName: individual.firstName,
@@ -317,7 +323,7 @@ async function getOklaHcpDetails(req, res) {
             codbase: activitiesOfIndividual[0].codBase,
             workplaces,
             onekeyEidList,
-            isInContract,
+            isInContract: !!activityInContract,
             isValid: individual.statusCorporateLabel === 'Valid',
             graduationYear: individual.thesisYear,
             birthYear: individual.birthYear,
