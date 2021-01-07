@@ -3,6 +3,8 @@ const path = require("path");
 const controller = require('./clinical-trials.controller');
 const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/platform/user/server/user-authentication.middleware.js'));
 const auth = passport.authenticate('application-jwt', { session: false });
+const { Modules } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants.js'));
+const { ModuleGuard } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.middleware.js'));
 
 module.exports = app => {
     app.route('/api/clinical-trials')
