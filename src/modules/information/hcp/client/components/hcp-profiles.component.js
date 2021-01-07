@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
@@ -16,7 +15,7 @@ import Faq from '../../../../platform/faq/client/faq.component';
 import StatusupdateModal from '../../../../core/client/components/statusUpdateModal.component';
 import { getAllCountries } from '../../../../core/client/country/country.actions';
 import { getHcpProfiles, getHCPSpecialities } from '../hcp.actions';
-import { ApprovalRejectSchema, HcpInlineEditSchema } from '../hcp.schema';
+import { HcpInlineEditSchema } from '../hcp.schema';
 import uuidAuthorities from '../uuid-authorities.json';
 import EditableTable from '../../../../core/client/components/EditableTable/EditableTable';
 import { HCPFilter }  from "../../../../information";
@@ -99,7 +98,6 @@ export default function hcpUsers() {
 
     const hcps = useSelector(state => state.hcpReducer.hcps);
     const specialties = useSelector(state => state.hcpReducer.specialties);
-    const countries = useSelector(state => state.countryReducer.countries);
     const allCountries = useSelector(state => state.countryReducer.allCountries);
 
     const hcpFilterRef = useRef();
@@ -115,22 +113,6 @@ export default function hcpUsers() {
     const onUpdateStatus = (user) => {
         setCurrentUser(user);
         setShow({ ...show, updateStatus: true });
-    }
-
-    const onUpdateStatusSuccess = () => {
-        addToast('Successfully changed user status.', {
-            appearance: 'success',
-            autoDismiss: true
-        })
-        loadHcpProfiles();
-    }
-
-    const onUpdateStatusFailure = (error) => {
-        const errorMessage = error.response.data.errors.length ? error.response.data.errors[0].message : 'Could not change user status.'
-        addToast(errorMessage, {
-            appearance: 'error',
-            autoDismiss: true
-        });
     }
 
     const handleFilterExecute = async (multiFilterSetting) => {
@@ -161,6 +143,7 @@ export default function hcpUsers() {
                         appearance: 'error',
                         autoDismiss: true
                     });
+                    return Promise.reject();
                 }
             }else {
                 try{
@@ -172,6 +155,7 @@ export default function hcpUsers() {
                         appearance: 'error',
                         autoDismiss: true
                     });
+                    return Promise.reject();
                 }
             }
         }
@@ -212,11 +196,6 @@ export default function hcpUsers() {
             return isSubset && (hcps.status.length === 2);
         }
         return false;
-    }
-
-    const getSelectedStatus = () => {
-        if (Array.isArray(hcps.status)) return isAllVerifiedStatus() ? 'All Verified' : hcps.status.map(status => _.startCase(_.toLower(status.replace('_', ' ')))).join(', ');
-        return hcps.status ? _.startCase(_.toLower(hcps.status.replace('_', ' '))) : 'All';
     }
 
     const onManageProfile = (user) => {
@@ -634,13 +613,16 @@ export default function hcpUsers() {
                                             {renderUuidAuthorities()}
                                         </div>
                                     </div>
-                                    <React.Fragment>
-                                        <button className={`btn cdp-btn-outline-primary ${isFilterEnabled ? 'multifilter_enabled' : ''}`} onClick={() => setShow({ ...show, filterSidebar: true })} >
+                                    <div title={tableDirty ? "Save or reset changes to open filter" : null}>
+                                        <button
+                                            className={`btn cdp-btn-outline-primary ${isFilterEnabled ? 'multifilter_enabled' : ''} ${tableDirty ? 'hcp-inline-disable' : null}`}
+                                            onClick={() => setShow({ ...show, filterSidebar: true })}
+                                        >
                                             <i className={`fas fa-filter  ${isFilterEnabled ? '' : 'mr-2'}`}></i>
                                             <i className={`fas fa-database ${isFilterEnabled ? 'd-inline-block filter__sub-icon mr-1' : 'd-none'}`}></i>
                                             Filter
                                         </button>
-                                    </React.Fragment>
+                                    </div>
                                 </div>
                             </div>
 

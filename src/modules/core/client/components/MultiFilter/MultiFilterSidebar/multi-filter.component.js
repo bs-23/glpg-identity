@@ -152,15 +152,18 @@ const MultiFilter = (props, ref) => {
     };
 
     const handleExecute = (values, actions) => {
-        actions.setFieldValue('lastAppliedFilters', values.filters);
-        actions.setFieldValue('lastAppliedLogic', values.logic);
         if(!values.shouldSaveFilter && values.selectedSettingID && hasFilterBeenModified(values)) {
             removeSelectedFilter(actions);
             actions.setFieldValue('isChosenFromExisting', 'false');
             values.selectedSettingID = '';
             values.selectedFilterSettingName = '';
         }
-        onExecute(values, actions);
+
+        Promise.resolve(onExecute(values, actions)).then(res => {
+            actions.setFieldValue('lastAppliedFilters', values.filters);
+            actions.setFieldValue('lastAppliedLogic', values.logic);
+        }).catch(err => null);
+
         onHide();
     };
 
