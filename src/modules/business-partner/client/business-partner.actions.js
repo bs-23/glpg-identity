@@ -10,3 +10,14 @@ export function getPartnerRequests(query = '') {
         })
     };
 }
+
+export function createPartnerRequest(data) {
+    return {
+        type: Types.GET_PARTNER_REQUESTS,
+        payload: axios({
+            method: 'post',
+            url: `/api/partner-requests`,
+            data
+        })
+    };
+}
