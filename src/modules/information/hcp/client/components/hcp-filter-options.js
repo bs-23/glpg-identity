@@ -158,12 +158,6 @@ export function getDatasyncFilterOptions(userCountries) {
             valueType: 'text',
             displayText: 'Post Code',
             operators: operators.getStringOperators()
-        },
-        {
-            fieldName: 'ind_type_desc',
-            valueType: 'text',
-            displayText: 'Professional Type',
-            operators: operators.getStringOperators()
         }
     ];
 
