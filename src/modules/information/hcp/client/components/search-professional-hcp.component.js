@@ -507,7 +507,7 @@ const SearchProfessionalHcp = (props) => {
                                                 </div>
                                             </div>
                                             <h5 className="border-bottom pt-4 pb-2 "><i className="fas fa-key cdp-text-secondary mr-2"></i>Identifiers</h5>
-                                            <div className="row">
+                                            <div className="row align-items-end">
                                                 <div className="col-12 col-sm-4">
                                                     <div className="form-group">
                                                         <label for="OnekeyID">
@@ -527,7 +527,7 @@ const SearchProfessionalHcp = (props) => {
                                                 </div>
                                                 <div className="col-12 col-sm-4">
                                                     <div className="form-group">
-                                                        <label for="Individual ">{uuidLabel}</label>
+                                                        <label for="Individual" className="text-break">{uuidLabel}</label>
                                                         <Field className="form-control externalIdentifier" type='text' name='externalIdentifier' id='externalIdentifier' />
                                                     </div>
                                                 </div>
