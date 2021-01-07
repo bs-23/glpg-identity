@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { useSelector, useDispatch } from 'react-redux';
-import Faq from '../../../platform/faq/client/faq.component';
 import { getPartnerRequests } from '../business-partner.actions';
 
 const BusinessPartnerManagement = () => {
@@ -32,9 +31,6 @@ const BusinessPartnerManagement = () => {
                         </nav>
                     </div>
                 </div>
-
-
-
                 <div className="row">
                     <div className="col-12">
                         <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
@@ -90,10 +86,6 @@ const BusinessPartnerManagement = () => {
                         }
                     </div>
                 </div>
-
-            </div>
-            <div className="col-12 col-lg-4 col-xl-3 py-3 app__content-panel-right">
-                <Faq />
             </div>
         </main>
     );
