@@ -10,7 +10,7 @@ const PartnerRequest = sequelize.cdpConnector.define('partner_requests', {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4
     },
-    first_name: {
+    last_name: {
         allowNull: false,
         type: DataTypes.STRING(50),
     },
@@ -19,6 +19,11 @@ const PartnerRequest = sequelize.cdpConnector.define('partner_requests', {
         type: DataTypes.STRING(50),
     },
     email: {
+        unique: true,
+        allowNull: false,
+        type: DataTypes.STRING(100)
+    },
+    procurement_contact: {
         unique: true,
         allowNull: false,
         type: DataTypes.STRING(100)
