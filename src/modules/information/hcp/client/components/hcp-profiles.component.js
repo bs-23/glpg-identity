@@ -188,16 +188,6 @@ export default function hcpUsers() {
         setCurrentUser({ ...currentUser, consents: data.data });
     }
 
-    const isAllVerifiedStatus = () => {
-        if (Array.isArray(hcps.status)) {
-            const allVerifiedStatus = ["self_verified", "manually_verified"];
-            let isSubset = true;
-            allVerifiedStatus.forEach(status => { if (!hcps.status.includes(status)) isSubset = false });
-            return isSubset && (hcps.status.length === 2);
-        }
-        return false;
-    }
-
     const onManageProfile = (user) => {
         setShow({ ...show, profileManage: true });
         setCurrentUser(user);
@@ -719,7 +709,26 @@ export default function hcpUsers() {
                                 </Modal.Body>
                             </Modal>
 
-                            <StatusupdateModal user={currentUser} show={show.updateStatus} type={'list'} onSort={()=>{ setSort({ type: params.get('orderType'), value: params.get('orderBy') })}} onHide={() => { setShow({ ...show, updateStatus: false })}} />
+                            <StatusupdateModal
+                                user={currentUser}
+                                show={show.updateStatus}
+                                type={'list'}
+                                filterSetting={
+                                    isFilterEnabled && ({
+                                        filters: hcpFilterRef.current.multiFilterProps.values.lastAppliedFilters,
+                                        logic: hcpFilterRef.current.multiFilterProps.values.lastAppliedLogic
+                                    })
+                                }
+                                onSort={() => {
+                                    setSort({
+                                        type: params.get('orderType'),
+                                        value: params.get('orderBy'),
+                                    });
+                                }}
+                                onHide={() => {
+                                    setShow({ ...show, updateStatus: false });
+                                }}
+                            />
 
                             <SaveConfirmation
                                 show={show.saveConfirmation}
