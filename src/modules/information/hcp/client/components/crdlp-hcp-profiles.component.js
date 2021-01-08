@@ -218,16 +218,26 @@ export default function CrdlpHcpProfiles() {
                                         <tbody className="cdp-table__body bg-white">
                                             {hcpUsers.users.map((row, idx) => (
                                                 <tr key={'user-' + idx}>
-                                                    <td className="text-break">{row.firstname}</td>
-                                                    <td className="text-break">{row.lastname}</td>
+                                                    <td className="text-break">{row.firstname || '--'}</td>
+                                                    <td className="text-break">{row.lastname || '--'}</td>
                                                     <td>
-                                                        <i className={`fa fa-xs fa-circle ${(row.ind_status_desc || '').toLowerCase() === 'valid' ? 'text-success' : 'text-danger'} pr-2 hcp-status-icon`}></i>
-                                                        {row.ind_status_desc}
+                                                        {row.ind_status_desc ?
+                                                            <span>
+                                                                <i className={`fa fa-xs fa-circle ${(row.ind_status_desc || '').toLowerCase() === 'valid' ? 'text-success' : 'text-danger'} pr-2 hcp-status-icon`}></i>
+                                                                {row.ind_status_desc}
+                                                            </span>
+                                                            : '--'
+                                                        }
                                                     </td>
                                                     <td className="text-break">{row.uuid_1 || '--'}</td>
                                                     <td className="text-break">{row.individual_id_onekey || '--'}</td>
-                                                    <td>{getCountryName(row.country_iso2)}</td>
-                                                    <td>{(row.specialties || []).map(s => s.description).join(', ')}</td>
+                                                    <td>{getCountryName(row.country_iso2) || '--'}</td>
+                                                    <td>
+                                                        {row.specialties && row.specialties.length ?
+                                                            (row.specialties || []).map(s => s.description).join(', ')
+                                                            : '--'
+                                                        }
+                                                    </td>
                                                     <td className="text-break">{row.telephone || '--'}</td>
                                                     <td>
                                                         <button className="btn cdp-btn-outline-primary btn-sm" onClick={() => setProfileDetails(row)}><i class="icon icon-user mr-2" ></i>Profile</button>
@@ -344,8 +354,13 @@ export default function CrdlpHcpProfiles() {
                                             <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">Status</div>
                                                 <div className="text-capitalize">
-                                                    <i className={`fa fa-xs fa-circle ${(profileDetails.ind_status_desc || '').toLowerCase() === 'valid' ? 'text-success' : 'text-danger'} pr-2 hcp-status-icon`}></i>
-                                                    {profileDetails.ind_status_desc || '--'}
+                                                    {profileDetails.ind_status_desc ?
+                                                        <span>
+                                                            <i className={`fa fa-xs fa-circle ${(profileDetails.ind_status_desc || '').toLowerCase() === 'valid' ? 'text-success' : 'text-danger'} pr-2 hcp-status-icon`}></i>
+                                                            {profileDetails.ind_status_desc}
+                                                        </span>
+                                                        : '--'
+                                                    }
                                                 </div>
                                             </div>
                                         </div>
