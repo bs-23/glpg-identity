@@ -276,13 +276,16 @@ $font-path: "../../../../wwwroot/assets/fonts";
     content: "\37";
 }
 
-
 .icon-minimize:before {
     content: "\38";
 }
 
 .icon-expand:before {
     content: "\39";
+}
+
+.icon-bpm:before {
+    content: "\21";
 }
 
 //custome css
