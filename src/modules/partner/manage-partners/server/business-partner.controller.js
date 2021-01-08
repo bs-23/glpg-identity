@@ -19,6 +19,12 @@ async function createPartnerRequest(req, res) {
     try {
         const { first_name, last_name, email, procurement_contact, company_codes } = req.body;
 
+        const companyCodes = company_codes && Array.isArray(company_codes)
+            ? company_codes.filter(cb => 'string' === typeof cb)
+            : null;
+
+        if (!companyCodes || !companyCodes.length) return res.status(400).send('Invalid Company Codes.');
+
         const [user, created] = await PartnerRequest.findOrCreate({
             where: { email: email.toLowerCase() },
             defaults: {
@@ -26,7 +32,7 @@ async function createPartnerRequest(req, res) {
                 last_name,
                 email,
                 procurement_contact,
-                company_codes
+                company_codes: companyCodes
             }
         });
 
@@ -52,7 +58,29 @@ async function getPartnerRequest(req, res) {
 
 async function updatePartnerRequest(req, res) {
     try {
+        const { first_name, last_name, email, procurement_contact, company_codes } = req.body;
 
+        const companyCodes = company_codes && Array.isArray(company_codes)
+            ? company_codes.filter(cb => 'string' === typeof cb)
+            : null;
+
+        if (!companyCodes || !companyCodes.length) return res.status(400).send('Invalid Company Codes.');
+
+        const partnerRequest = await PartnerRequest.findOne({ where: { id: req.params.id } });
+        if (!partnerRequest) return res.status(404).send('The partner request does not exist');
+
+        const isEmailExists = await PartnerRequest.findOne({
+            where: {
+                id: { [Op.not]: req.params.id },
+                email: email.toLowerCase()
+            }
+        });
+
+        if (isEmailExists) return res.status(400).send('The Email already exists.');
+
+        const data = await partnerRequest.update({ first_name, last_name, email, procurement_contact, company_codes: companyCodes });
+
+        res.json(data);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
