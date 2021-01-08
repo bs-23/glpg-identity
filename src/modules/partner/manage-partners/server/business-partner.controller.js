@@ -49,7 +49,8 @@ async function createPartnerRequest(req, res) {
 
 async function getPartnerRequest(req, res) {
     try {
-
+        const data = await PartnerRequest.findOne({ where: { id: req.params.id } });
+        res.json(data);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
