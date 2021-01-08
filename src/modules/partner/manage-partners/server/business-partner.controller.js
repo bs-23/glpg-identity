@@ -40,5 +40,47 @@ async function createPartnerRequest(req, res) {
         res.status(500).send('Internal server error');
     }
 }
+
+async function getPartnerRequest(req, res) {
+    try {
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function updatePartnerRequest(req, res) {
+    try {
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function deletePartnerRequest(req, res) {
+    try {
+        const id = req.params.id;
+
+        if (!id) return res.status(400).send('Invalid request.');
+
+        const partnerRequest = await PartnerRequest.findOne({ where: { id } });
+        if (!partnerRequest) return res.status(404).send('The partner request does not exist.');
+
+        const deleted = await PartnerRequest.destroy({ where: { id } });
+
+        if (!deleted) return res.status(400).send('Delete failed.');
+
+        res.sendStatus(200);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 exports.getPartnerRequests = getPartnerRequests;
 exports.createPartnerRequest = createPartnerRequest;
+exports.getPartnerRequest = getPartnerRequest;
+exports.updatePartnerRequest = updatePartnerRequest;
+exports.deletePartnerRequest = deletePartnerRequest;
