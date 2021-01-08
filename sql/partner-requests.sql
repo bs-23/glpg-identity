@@ -10,6 +10,5 @@ CREATE TABLE cdp.partner_requests
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
     CONSTRAINT partner_requests_pkey PRIMARY KEY (id),
-    CONSTRAINT partner_requests_email_key UNIQUE (email),
-    CONSTRAINT partner_requests_procurement_contact_key UNIQUE (procurement_contact)
+    CONSTRAINT partner_requests_email_key UNIQUE (email)
 )

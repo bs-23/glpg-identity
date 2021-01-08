@@ -24,7 +24,6 @@ const PartnerRequest = sequelize.cdpConnector.define('partner_requests', {
         type: DataTypes.STRING(100)
     },
     procurement_contact: {
-        unique: true,
         allowNull: false,
         type: DataTypes.STRING(100)
     },
