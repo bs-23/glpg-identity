@@ -15,10 +15,12 @@ const BusinessPartnerManagement = () => {
     const [companyCodes, setCompanyCodes] = useState([{ id: Math.random(), company_code: '' }]);
     const [showError, setShowError] = useState(false);
     const [partnerRequestId, setPartnerRequestId] = useState(undefined);
+    const [showNewData, setShowNewData] = useState(false);
 
     const requests = useSelector(state => state.businessPartnerReducer.partnerRequests)
 
     const toggleForm = (id) => {
+        setShowNewData(!showNewData);
         setPartnerRequestId(id);
         setShowForm(!!id);
     };
@@ -68,10 +70,9 @@ const BusinessPartnerManagement = () => {
     }, []);
 
     useEffect(() => {
-        if (partnerRequestId) {
-            dispatch(getPartnerRequests());
-        }
-    }, [partnerRequestId]);
+        loadRequests();
+
+    }, [partnerRequestId, showNewData]);
 
     return (
         <main className="app__content cdp-light-bg h-100">
@@ -171,8 +172,7 @@ const BusinessPartnerManagement = () => {
                                 return;
                             }
 
-                            console.log(values)
-                            dispatch(createPartnerRequest(values)).then(function () {
+                            dispatch(createPartnerRequest(values)).then(() => {
                                 toggleForm(null);
                                 actions.resetForm();
                                 addToast('New Request Added', {
