@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import Faq from '../../../platform/faq/client/faq.component';
+import { Faq } from '../../../../platform';
 
 const BusinessPartnerManagement = () => {
     return (
@@ -34,7 +34,7 @@ const BusinessPartnerManagement = () => {
                                                 <span className="d-block cdp-list-group__link-activity">withing 5 - 10 minutes</span>
                                             </span>
                                         </NavLink>
-                                        <NavLink to="#" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link disabled">
+                                        <NavLink to="/business-partner/requests" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
                                             <i className="icon icon-supplier icon-3x icon-3x cdp-list-group__icon"></i>
                                             <span>
                                                 <strong className="mb-2 h4 d-block cdp-list-group__link-title">Customer who also acts as Supplier</strong>
