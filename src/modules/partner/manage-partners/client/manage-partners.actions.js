@@ -13,7 +13,7 @@ export function getPartnerRequests(query = '') {
 
 export function createPartnerRequest(data) {
     return {
-        type: Types.GET_PARTNER_REQUESTS,
+        type: Types.POST_PARTNER_REQUEST,
         payload: axios({
             method: 'post',
             url: `/api/partner-requests`,

@@ -15,12 +15,10 @@ const BusinessPartnerManagement = () => {
     const [companyCodes, setCompanyCodes] = useState([{ id: Math.random(), company_code: '' }]);
     const [showError, setShowError] = useState(false);
     const [partnerRequestId, setPartnerRequestId] = useState(undefined);
-    const [showNewData, setShowNewData] = useState(false);
 
     const requests = useSelector(state => state.businessPartnerReducer.partnerRequests)
 
     const toggleForm = (id) => {
-        setShowNewData(!showNewData);
         setPartnerRequestId(id);
         setShowForm(!!id);
     };
@@ -70,9 +68,10 @@ const BusinessPartnerManagement = () => {
     }, []);
 
     useEffect(() => {
-        loadRequests();
-
-    }, [partnerRequestId, showNewData]);
+        if (partnerRequestId) {
+            loadRequests();
+        }
+    }, [partnerRequestId]);
 
     return (
         <main className="app__content cdp-light-bg h-100">
