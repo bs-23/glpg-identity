@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { partnerRequestSchema } from '../manage-partners.schema'
-import { getPartnerRequests, createPartnerRequest } from '../manage-partners.actions';
+import { getPartnerRequests, createPartnerRequest, deletePartnerRequest } from '../manage-partners.actions';
 
 const BusinessPartnerManagement = () => {
     const dispatch = useDispatch();
@@ -16,7 +16,21 @@ const BusinessPartnerManagement = () => {
     const [showError, setShowError] = useState(false);
     const [partnerRequestId, setPartnerRequestId] = useState(undefined);
 
-    const requests = useSelector(state => state.businessPartnerReducer.partnerRequests)
+    const requests = useSelector(state => state.businessPartnerReducer.partnerRequests);
+
+    const deleteRequest = (id) => {
+        dispatch(deletePartnerRequest(id)).then(() => {
+            addToast('Request Deleted', {
+                appearance: 'success',
+                autoDismiss: true
+            });
+        }).catch(error => {
+            addToast(error.response.data, {
+                appearance: 'error',
+                autoDismiss: true
+            });
+        });
+    }
 
     const toggleForm = (id) => {
         setPartnerRequestId(id);
@@ -131,7 +145,7 @@ const BusinessPartnerManagement = () => {
                                                     <Dropdown.Menu>
                                                         <Dropdown.Item> Send Form </Dropdown.Item>
                                                         <Dropdown.Item> Edit Request </Dropdown.Item>
-                                                        <Dropdown.Item> Delete </Dropdown.Item>
+                                                        <Dropdown.Item onClick={() => deleteRequest(row.id) }> Delete </Dropdown.Item>
                                                     </Dropdown.Menu>
                                                 </Dropdown></td>
                                             </tr>

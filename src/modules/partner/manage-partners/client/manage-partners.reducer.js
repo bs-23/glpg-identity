@@ -19,6 +19,13 @@ export default function reducer(state = initialState, action) {
                 partnerRequests: state.partnerRequests.concat(action.payload.data)
             };
         }
+        case Types.DELETE_PARTNER_REQUEST_FULFILLED: {
+            const requests = [...state.partnerRequests];
+            const idx = requests.findIndex(request => request.id === action.payload.data.id);
+            requests.splice(idx, 1);
+
+            return idx === -1 ? { ...state } : { ...state, partnerRequests: requests };
+        }
     }
     return state;
 }

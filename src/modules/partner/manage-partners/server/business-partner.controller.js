@@ -101,7 +101,7 @@ async function deletePartnerRequest(req, res) {
 
         if (!deleted) return res.status(400).send('Delete failed.');
 
-        res.sendStatus(200);
+        res.json(partnerRequest);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');

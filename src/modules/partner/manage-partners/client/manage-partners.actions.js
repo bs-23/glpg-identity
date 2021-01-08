@@ -21,3 +21,13 @@ export function createPartnerRequest(data) {
         })
     };
 }
+
+export function deletePartnerRequest(id) {
+    return {
+        type: Types.DELETE_PARTNER_REQUEST,
+        payload: axios({
+            method: 'delete',
+            url: `/api/partner-requests/${id}`,
+        })
+    };
+}
