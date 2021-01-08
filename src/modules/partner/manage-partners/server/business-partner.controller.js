@@ -1,5 +1,6 @@
 const path = require('path');
 const PartnerRequest = require('./partner-request.model');
+const { QueryTypes, Op } = require('sequelize');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 

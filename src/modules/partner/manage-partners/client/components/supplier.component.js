@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { partnerRequestSchema } from '../manage-partners.schema'
-import { getPartnerRequests, createPartnerRequest, deletePartnerRequest } from '../manage-partners.actions';
+import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest } from '../manage-partners.actions';
 
 const BusinessPartnerManagement = () => {
     const dispatch = useDispatch();
@@ -17,6 +17,7 @@ const BusinessPartnerManagement = () => {
     const [partnerRequestId, setPartnerRequestId] = useState(undefined);
 
     const requests = useSelector(state => state.businessPartnerReducer.partnerRequests);
+    const request = useSelector(state => state.businessPartnerReducer.partnerRequest);
 
     const deleteRequest = (id) => {
         dispatch(deletePartnerRequest(id)).then(() => {
@@ -56,7 +57,8 @@ const BusinessPartnerManagement = () => {
         }, 50);
     }
 
-    const getCompanyCodeFields = (formikProps) => {
+    const getCompanyCodeFields = () => {
+        console.log(companyCodes);
         return companyCodes.map((item, idx) => {
             const companyCodeId = `company-code-${idx + 1}`;
 
@@ -83,9 +85,16 @@ const BusinessPartnerManagement = () => {
 
     useEffect(() => {
         if (partnerRequestId) {
-            loadRequests();
+            dispatch(getPartnerRequest(partnerRequestId));
         }
     }, [partnerRequestId]);
+
+    useEffect(() => {
+        if(request.company_codes) {
+            const codes = request.company_codes.map(company_code => ({ id: Math.random(), company_code }));
+            setCompanyCodes(codes);
+        }
+    }, [request.company_codes])
 
     return (
         <main className="app__content cdp-light-bg h-100">
@@ -144,7 +153,7 @@ const BusinessPartnerManagement = () => {
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu>
                                                         <Dropdown.Item> Send Form </Dropdown.Item>
-                                                        <Dropdown.Item> Edit Request </Dropdown.Item>
+                                                        <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
                                                         <Dropdown.Item onClick={() => deleteRequest(row.id) }> Delete </Dropdown.Item>
                                                     </Dropdown.Menu>
                                                 </Dropdown></td>
@@ -167,10 +176,10 @@ const BusinessPartnerManagement = () => {
                 <Modal.Body>
                     <Formik
                         initialValues={{
-                            first_name: '',
-                            last_name: '',
-                            email: '',
-                            procurement_contact: '',
+                            first_name: partnerRequestId && request ? request.first_name : '',
+                            last_name: partnerRequestId && request ? request.last_name : '',
+                            email: partnerRequestId && request ? request.email : '',
+                            procurement_contact: partnerRequestId && request ? request.procurement_contact : '',
                             company_codes: [],
                         }}
                         displayName="PartnerRequestsForm"
@@ -185,19 +194,34 @@ const BusinessPartnerManagement = () => {
                                 return;
                             }
 
-                            dispatch(createPartnerRequest(values)).then(() => {
-                                toggleForm(null);
-                                actions.resetForm();
-                                addToast('New Request Added', {
-                                    appearance: 'success',
-                                    autoDismiss: true
+                            if (partnerRequestId) {
+                                dispatch(updatePartnerRequest(partnerRequestId, values)).then(function () {
+                                    toggleForm(null);
+                                    addToast('Request updated successfully', {
+                                        appearance: 'success',
+                                        autoDismiss: true
+                                    });
+                                }).catch(error => {
+                                    addToast(error.response.data, {
+                                        appearance: 'error',
+                                        autoDismiss: true
+                                    });
                                 });
-                            }).catch(error => {
-                                addToast(error.response.data, {
-                                    appearance: 'error',
-                                    autoDismiss: true
+                            } else {
+                                dispatch(createPartnerRequest(values)).then(() => {
+                                    toggleForm(null);
+                                    actions.resetForm();
+                                    addToast('New Request Added', {
+                                        appearance: 'success',
+                                        autoDismiss: true
+                                    });
+                                }).catch(error => {
+                                    addToast(error.response.data, {
+                                        appearance: 'error',
+                                        autoDismiss: true
+                                    });
                                 });
-                            });
+                            }
 
                             actions.setSubmitting(false);
                         }}

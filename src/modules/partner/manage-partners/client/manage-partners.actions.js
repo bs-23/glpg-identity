@@ -11,12 +11,33 @@ export function getPartnerRequests(query = '') {
     };
 }
 
+export function getPartnerRequest(id) {
+    return {
+        type: Types.GET_PARTNER_REQUEST,
+        payload: axios({
+            method: 'get',
+            url: `/api/partner-requests/${id}`,
+        })
+    };
+}
+
 export function createPartnerRequest(data) {
     return {
         type: Types.POST_PARTNER_REQUEST,
         payload: axios({
             method: 'post',
             url: `/api/partner-requests`,
+            data
+        })
+    };
+}
+
+export function updatePartnerRequest(id, data) {
+    return {
+        type: Types.UPDATE_PARTNER_REQUEST,
+        payload: axios({
+            method: 'put',
+            url: `/api/partner-requests/${id}`,
             data
         })
     };

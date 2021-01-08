@@ -13,10 +13,26 @@ export default function reducer(state = initialState, action) {
                 partnerRequests: action.payload.data
             };
         }
+        case Types.GET_PARTNER_REQUEST_FULFILLED: {
+            return {
+                ...state,
+                partnerRequest: action.payload.data
+            };
+        }
         case Types.POST_PARTNER_REQUEST_FULFILLED: {
             return {
                 ...state,
                 partnerRequests: state.partnerRequests.concat(action.payload.data)
+            };
+        }
+        case Types.UPDATE_PARTNER_REQUEST_FULFILLED: {
+            const requests = [...state.partnerRequests];
+            const idx = requests.findIndex(request => request.id === action.payload.data.id);
+            requests.splice(idx, 1, action.payload.data);
+
+            return {
+                ...state,
+                partnerRequests: requests
             };
         }
         case Types.DELETE_PARTNER_REQUEST_FULFILLED: {
