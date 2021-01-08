@@ -1,11 +1,13 @@
 import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import Dropdown from 'react-bootstrap/Dropdown';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useToasts } from 'react-toast-notifications';
 import { getUsers } from '../user.actions';
 import axios from 'axios';
 import Modal from 'react-bootstrap/Modal';
 import Faq from '../../../faq/client/faq.component';
+import UsersFilter from './users-filter.component';
 
 const safeGet = (object, property) => {
     const propData = (object || {})[property];
@@ -27,6 +29,9 @@ export default function Users() {
     const [userCountries, setUserCountries] = useState([]);
     const [sort, setSort] = useState({ type: 'asc', value: null });
 
+    const [showFilter, setShowFilter] = useState(false);
+    const [isFilterEnabled, setIsFilterEnabled] = useState(false);
+
     const [showFaq, setShowFaq] = useState(false);
     const handleCloseFaq = () => setShowFaq(false);
     const handleShowFaq = () => setShowFaq(true);
@@ -34,6 +39,10 @@ export default function Users() {
     const userdata = useSelector(state => state.userReducer.users);
     const countries = useSelector(state => state.countryReducer.countries);
     const params = new URLSearchParams(window.location.search);
+
+    const { addToast } = useToasts();
+
+    const filterRef = useRef();
 
     const extractUserCountries = (data) => {
         const profile_permission_sets = safeGet(data, 'userProfile')('up_ps')();
@@ -99,7 +108,14 @@ export default function Users() {
         searchParams.forEach(element => {
             searchObj[element.split("=")[0]] = element.split("=")[1];
         });
-        dispatch(getUsers(searchObj.page, searchObj.codbase, searchObj.orderBy, searchObj.orderType));
+        const { lastAppliedFilters, lastAppliedLogic } = filterRef.current.multiFilterProps.values || {};
+        const filterSetting = lastAppliedFilters && lastAppliedFilters.length
+            ? {
+                filters: lastAppliedFilters,
+                logic: lastAppliedLogic
+            }
+            : null;
+        dispatch(getUsers(searchObj.page, searchObj.codbase, searchObj.orderBy, searchObj.orderType, filterSetting));
         setSort({ type: params.get('orderType') || 'asc', value: params.get('orderBy') });
     }, [location]);
 
@@ -147,6 +163,60 @@ export default function Users() {
         if (userdata.end !== userdata.total) urlChange(userdata.page + 1, userdata.codBase, params.get('orderBy'), true);
     };
 
+    // const handleFilterExecute = (a, b,c) => {
+    //     console.log(a, b, c);
+    // }
+
+    const handleFilterExecute = async (multiFilterSetting) => {
+        const filterID = multiFilterSetting.selectedSettingID;
+        const shouldUpdateFilter = multiFilterSetting.saveType === 'save_existing';
+
+        if(multiFilterSetting.shouldSaveFilter) {
+            const settingName = multiFilterSetting.saveType === 'save_existing'
+                ? multiFilterSetting.selectedFilterSettingName
+                : multiFilterSetting.newFilterSettingName;
+
+            const filterSetting = {
+                title: settingName,
+                table: "cdp-users",
+                settings: {
+                    filters: multiFilterSetting.filters,
+                    logic: multiFilterSetting.logic
+                }
+            }
+
+            if(filterID && shouldUpdateFilter) {
+                try{
+                    await axios.put(`/api/filter/${filterID}`, filterSetting);
+                    history.push(`/information/list/cdp?filter=${filterID}`);
+                }catch(err){
+                    const errorMessage = err.response.data && err.response.data || 'There was an error updating the filter setting.';
+                    addToast(errorMessage, {
+                        appearance: 'error',
+                        autoDismiss: true
+                    });
+                    return Promise.reject();
+                }
+            }else {
+                try{
+                    const { data } = await axios.post('/api/filter', filterSetting);
+                    history.push(`/platform/users?filter=${data.id}`);
+                }catch(err){
+                    const errorMessage = err.response.data && err.response.data || 'There was an error updating the filter setting.';
+                    addToast(errorMessage, {
+                        appearance: 'error',
+                        autoDismiss: true
+                    });
+                    return Promise.reject();
+                }
+            }
+        }
+        else {
+            history.push(`/platform/users`);
+        };
+        setIsFilterEnabled(true);
+    }
+    console.log(isFilterEnabled);
     return (
         <main className="app__content cdp-light-bg">
             <div className="container-fluid">
@@ -188,7 +258,7 @@ export default function Users() {
                                         }
                                     </Dropdown.Menu>
                                 </Dropdown>
-
+                                <button onClick={() => setShowFilter(true)}>Filter</button>
                                 <NavLink to="/platform/create-user" className="btn cdp-btn-secondary text-white ml-2">
                                     <i className="icon icon-plus pr-1"></i> Create new user
                                 </NavLink>
@@ -261,6 +331,13 @@ export default function Users() {
                     </div>
                 </div>
             </div>
+            <UsersFilter
+                ref={filterRef}
+                tableName='cdp-users'
+                show={showFilter}
+                onHide={() => setShowFilter(false)}
+                onExecute={handleFilterExecute}
+            />
         </main>
     );
 }

@@ -6,6 +6,10 @@ const initialState = {
     users: {}
 };
 
+const tablePresetPathMap = {
+    'cdp-users': 'cdpUsersFilters'
+}
+
 const getPermissionsFromPermissionSet = (permissionSets) => {
     if(!permissionSets) return [];
 
@@ -139,6 +143,15 @@ export default function reducer(state = initialState, action) {
                 ...state,
                 users: (action.payload.type === 'ASC') ? { ...state.users, users: sortItems(state.users['users'], action.payload.val, 1) } :
                     { ...state.users, users: sortItems(state.users['users'], action.payload.val, -1) }
+            }
+        }
+        case Types.GET_USER_FILTER_SETTINGS_FULFILLED: {
+            const tableName = action.payload.tableName;
+            const path = tablePresetPathMap[tableName];
+
+            return {
+                ...state,
+                [path]: action.payload.data
             }
         }
     }
