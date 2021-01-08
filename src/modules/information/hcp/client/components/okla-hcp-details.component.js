@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Modal from 'react-bootstrap/Modal';
 import { getOklaHcpDetails, setOklaHcpDetails } from '../hcp.actions';
-import MapView from './map-view';
+import MapView from '../../../../core/client/components/map-view';
 import { Tabs, Tab } from 'react-bootstrap';
 import Dropdown from 'react-bootstrap/Dropdown';
 
@@ -36,7 +36,11 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
                 }
             });
         }
-        if (hcpDetails && selectedTab === 'Workplace') setSelectedWorkplace(hcpDetails.workplaces[0]);
+
+        if (hcpDetails && selectedTab === 'Workplace') {
+            const mainWorkplace = hcpDetails.workplaces.find(w => w.isMainActivity);
+            setSelectedWorkplace(mainWorkplace || hcpDetails.workplaces[0]);
+        }
     }, [hcpDetails, selectedTab]);
 
     return <Modal
@@ -86,6 +90,10 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
                                 <li className="okla-search__details-item">
                                     <strong className="okla-search__details-title">Specialty</strong>
                                     <span className="okla-search__details-value">{hcpDetails.specialties ? hcpDetails.specialties.join(', ') : '--'}</span>
+                                </li>
+                                <li className="okla-search__details-item">
+                                    <strong className="okla-search__details-title">Contract status</strong>
+                                    <span className="okla-search__details-value">{hcpDetails.isInContract ? 'In my contract' : 'Not in my contract'}</span>
                                 </li>
                             </ul>
                         </Tab>
@@ -145,6 +153,10 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
                                         <div className="col-12 col-sm-6 pb-3">
                                             <div className="mt-1 font-weight-bold">Status</div>
                                             <div>{selectedWorkplace.isValid ? 'Valid' : 'Invalid'}</div>
+                                        </div>
+                                        <div className="col-12 col-sm-6 pb-3">
+                                            <div className="mt-1 font-weight-bold">Contract status</div>
+                                            <div>{selectedWorkplace.isInContract ? 'In my contract' : 'Not in my contract'}</div>
                                         </div>
                                         <div className="col-12 col-sm-6 pb-3">
                                             <div className="mt-1 font-weight-bold">Address</div>

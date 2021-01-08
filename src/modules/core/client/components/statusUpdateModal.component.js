@@ -9,7 +9,7 @@ import { ApprovalRejectSchema } from '../../../information/hcp/client/hcp.schema
 
 export default function statusupdateModal(props) {
   const dispatch = useDispatch();
-    const { user, show, onHide, type , onSort} = props;
+    const { user, show, onHide, type , onSort, filterSetting} = props;
   const [consentForUser, setConsentForUser] = useState({user});
   const { addToast } = useToasts();
 
@@ -25,7 +25,7 @@ export default function statusupdateModal(props) {
     })
     if(type == 'list'){
         onSort();
-        dispatch(getHcpProfiles(location.search));
+        dispatch(getHcpProfiles(location.search, filterSetting));
     }
     else if (type == 'inbox'){
         dispatch(getHcpProfiles('?page=1&status=not_verified&limit=5'));
@@ -102,7 +102,6 @@ return(
           }
           actions.setSubmitting(false);
           actions.resetForm();
-          setShow({ ...show, updateStatus: false });
         }}
       >
         {formikProps => (

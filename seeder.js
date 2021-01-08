@@ -5,7 +5,6 @@ async function init() {
     const config = require(path.join(process.cwd(), 'src/config/server/config'));
 
     await config.initEnvironmentVariables();
-
     const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
     const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
@@ -35,9 +34,9 @@ async function init() {
     const PermissionSet_ServiceCategory = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-serviceCategory.model.js"));
     const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-application.model.js"));
     const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/userProfile-permissionSet.model.js"));
-    const Role = require(path.join(process.cwd(), "src/modules/platform/role/server/role.model.js"));
-    const UserRole = require(path.join(process.cwd(), "src/modules/platform/role/server/user-role.model.js"));
-    const { Modules } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
+    require(path.join(process.cwd(), "src/modules/platform/role/server/role.model.js"));
+    require(path.join(process.cwd(), "src/modules/platform/role/server/user-role.model.js"));
+    require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
     const Faq = require(path.join(process.cwd(), 'src/modules/platform/faq/server/faq.model.js'));
     require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model'));
     require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-profile.model'));
@@ -45,14 +44,12 @@ async function init() {
     require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-archives.model'));
     require(path.join(process.cwd(), 'src/modules/platform/user/server/reset-password.model.js'));
     require(path.join(process.cwd(), 'src/modules/core/server/password/password-history.model.js'));
+    require(path.join(process.cwd(), 'src/modules/core/server/filter/filter.model.js'));
     require(path.join(process.cwd(), 'src/modules/platform/application/server/data.model.js'));
-
 
     await sequelize.cdpConnector.sync();
 
     const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
-
-
 
     function userSeeder(callback) {
         User.findOrCreate({
@@ -66,8 +63,6 @@ async function init() {
             callback();
         });
     }
-
-
 
     function userProfileSeeder(callback) {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
@@ -91,15 +86,13 @@ async function init() {
         });
     }
 
-
     function userUpdateSeeder(callback) {
         User.findOne({
             where: { email: 'glpg@brainstation-23.com' }
         }).then(admin => {
             UserProfile.findOne({ where: { slug: 'system_admin' } }).then(sysAdminProfile => {
                 admin.update({ profileId: sysAdminProfile.id });
-            })
-
+            });
         }).then(function () {
             callback();
         });
@@ -107,12 +100,12 @@ async function init() {
 
     function serviceCategorySeeder(callback) {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
-
             const serviceCategories = [
                 { title: "Management of Customer Data Platform", slug: "platform", created_by: admin.id, updated_by: admin.id },
                 { title: "Information Management", slug: "information", created_by: admin.id, updated_by: admin.id },
                 { title: "Data Privacy & Consent Management", slug: "privacy", created_by: admin.id, updated_by: admin.id },
-                { title: "Business Partner Management", slug: "business-partner-management", created_by: admin.id, updated_by: admin.id }
+                { title: "Business Partner Management", slug: "business-partner", created_by: admin.id, updated_by: admin.id },
+                { title: "Clinical Trials Management", slug: "clinical-trials", created_by: admin.id, updated_by: admin.id }
             ];
 
             ServiceCategory.destroy({ truncate: { cascade: true } }).then(() => {
@@ -128,7 +121,6 @@ async function init() {
 
     function faqSeeder(callback) {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
-
             const faqCategories = [
                 { question: "Key Benefits of a CDP", answer: "<p>CDPs improve your organization, better your customer relationships, and complement your current software and marketing efforts. Here are a handful of key benefits of having a CDP.</p>", topics: ["general-information"], created_by: admin.id, updated_by: admin.id },
                 { question: "What is customer data?", answer: "<p>CDPs exist because customer data has become crucial to both business and marketing operations. So, what is customer data exactly? Customer data is information consumers leave behind as they use the internet and interact with companies online and offline: through websites, blogs, e-commerce portals, and in-store interactions. (We dive into some examples below.) It’s highly valuable to businesses, although recent legal dialogue (such as the GDPR) has changed how organizations collect and manage this data.</p>", topics: ["general-information"], created_by: admin.id, updated_by: admin.id },
@@ -148,9 +140,7 @@ async function init() {
     }
 
     function permissionSetSeeder(callback) {
-
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
-
             const permissionSet = [
                 { title: "System Admin Permission Set", slug: "system_admin", type: 'standard', countries: ["BE", "FR", "DE", "IT", "NL", "ES", "GB"], description: "This is the default permission set for System Admin", created_by: admin.id, updated_by: admin.id },
                 { title: "Site Admin Permission Set", slug: "site_admin", type: 'standard', description: "This is the default permission set for Site Admin", countries: ["BE", "FR", "DE", "IT", "NL", "ES", "GB"], created_by: admin.id, updated_by: admin.id },
@@ -208,12 +198,10 @@ async function init() {
                     });
                 });
             });
-
         });
     }
 
     function userProfilePermissionSetSeeder(callback) {
-
         const systemAdminProfile = UserProfile.findOne({ where: { slug: 'system_admin' } });
         const systemAdminPermissionSet = PermissionSet.findOne({ where: { slug: 'system_admin' } });
         const sitedminProfile = UserProfile.findOne({ where: { slug: 'site_admin' } });
@@ -243,8 +231,6 @@ async function init() {
                 });
             });
         });
-
-
     }
 
     function applicationSeeder(callback) {
@@ -271,6 +257,18 @@ async function init() {
                     approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
                     auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6a',
                     logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/jyseleca/logo.png`,
+                    created_by: admin.id,
+                    updated_by: admin.id
+                },
+                {
+                    id: '0da54f98-6ec0-4055-8ce7-4ab2aa1fe921',
+                    name: 'Clinical Trials',
+                    slug: convertToSlug('Clinical Trials'),
+                    email: 'clinical-trial-portal@glpg.com',
+                    password: 'P@ssword123',
+                    approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
+                    auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6a',
+                    logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
                     created_by: admin.id,
                     updated_by: admin.id
                 }
@@ -308,7 +306,6 @@ async function init() {
                     });
                 });
             });
-
         });
     }
 
@@ -463,7 +460,18 @@ async function init() {
         });
     }
 
-    async.waterfall([userSeeder, userProfileSeeder, faqSeeder, userUpdateSeeder, serviceCategorySeeder, permissionSetSeeder, permissionSetServiceCategorySeeder, userProfilePermissionSetSeeder, applicationSeeder, permissionSetApplicationsSeeder, consentSeeder], function (err) {
+    async.waterfall([
+        userSeeder,
+        userProfileSeeder,
+        faqSeeder,
+        userUpdateSeeder,
+        serviceCategorySeeder,
+        permissionSetSeeder,
+        permissionSetServiceCategorySeeder,
+        userProfilePermissionSetSeeder,
+        applicationSeeder,
+        permissionSetApplicationsSeeder,
+        consentSeeder], function (err) {
         if (err) console.error(err);
         else console.info('DB seed completed!');
         process.exit();

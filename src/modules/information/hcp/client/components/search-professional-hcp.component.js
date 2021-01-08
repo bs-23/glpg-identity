@@ -7,12 +7,14 @@ import { useSelector } from 'react-redux';
 import { Form, Formik, Field } from 'formik';
 import Select, { components } from 'react-select';
 import Dropdown from 'react-bootstrap/Dropdown';
-import OklaHcpDetails from './okla-hcp-details.component';
-import getUserPermittedCountries from '../../../../core/client/util/user-country';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
 import { useToasts } from 'react-toast-notifications';
-import Faq from '../../../../platform/faq/client/faq.component';
 import Modal from 'react-bootstrap/Modal';
+
+import OklaHcpDetails from './okla-hcp-details.component';
+import getUserPermittedCountries from '../../../../core/client/util/user-country';
+import Faq from '../../../../platform/faq/client/faq.component';
+import uuidAuthorities from '../uuid-authorities.json';
 
 const SearchProfessionalHcp = (props) => {
     const formikRef = useRef();
@@ -41,6 +43,7 @@ const SearchProfessionalHcp = (props) => {
     const [hcpProfile, setHcpProfile] = useState(null);
     const [isAssigned, setIsAssigned] = useState(false);
     const [hcpSpecialty, setHcpSpecialty] = useState();
+    const [uuidLabel, setUuidLabel] = useState('UUID');
 
     const params = new URLSearchParams(props.location.search);
 
@@ -59,6 +62,14 @@ const SearchProfessionalHcp = (props) => {
         setHcpSpecialty(null);
 
         if (params.get('id')) history.push('/information/discover-professionals');
+    };
+
+    const getUuidLabel = (selectedCountries) => {
+        if (!selectedCountries || !selectedCountries.length) return 'UUID';
+
+        const authorityByCountry = uuidAuthorities.filter(a => selectedCountries.some(s => a.codbase.toLowerCase() === s.value.toLowerCase())).map(a => a.name);
+
+        return authorityByCountry.join('/');
     };
 
     const scrollToResult = (isEmpty) => {
@@ -146,6 +157,7 @@ const SearchProfessionalHcp = (props) => {
             else setSpecialties([]);
         }
         fetchSpecialties();
+        setUuidLabel(getUuidLabel(selectedCountries));
     }, [selectedCountries, hcpSpecialty]);
 
     useEffect(() => {
@@ -381,6 +393,7 @@ const SearchProfessionalHcp = (props) => {
                                                             onChange={selectedOption => {
                                                                 formikProps.values.countries = selectedOption;
                                                                 setSelectedCountries(selectedOption || []);
+                                                                formikProps.values.specialties = [];
                                                                 setSelectedSpecialties([]);
                                                                 changeUrl();
                                                             }}
@@ -494,7 +507,7 @@ const SearchProfessionalHcp = (props) => {
                                                 </div>
                                             </div>
                                             <h5 className="border-bottom pt-4 pb-2 "><i className="fas fa-key cdp-text-secondary mr-2"></i>Identifiers</h5>
-                                            <div className="row">
+                                            <div className="row align-items-end">
                                                 <div className="col-12 col-sm-4">
                                                     <div className="form-group">
                                                         <label for="OnekeyID">
@@ -514,7 +527,7 @@ const SearchProfessionalHcp = (props) => {
                                                 </div>
                                                 <div className="col-12 col-sm-4">
                                                     <div className="form-group">
-                                                        <label for="Individual ">UUID</label>
+                                                        <label for="Individual" className="text-break">{uuidLabel}</label>
                                                         <Field className="form-control externalIdentifier" type='text' name='externalIdentifier' id='externalIdentifier' />
                                                     </div>
                                                 </div>
@@ -580,9 +593,14 @@ const SearchProfessionalHcp = (props) => {
                                                             {
                                                                 user.workplaces.map((item, idxOfWorkPlace) => (
                                                                     <div key={idxOfWorkPlace} className="currentWorkplace">
-                                                                        {
-                                                                            item.isValid ? <i className="fas fa-check mr-1 cdp-text-primary"></i> : <i className="fas fa-times mr-1 cdp-text-secondary"></i>
-                                                                        }
+                                                                        <span className="okla-search__workplace-icons position-relative">
+                                                                            {
+                                                                            item.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary" title="In my contract"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary" title="Not in my contract"></i>
+                                                                            }
+                                                                            {
+                                                                                item.isValid ? <i className="fas fa-check cdp-text-primary border-left"></i> : <i className="fas fa-times cdp-text-secondary border-left"></i>
+                                                                            }
+                                                                        </span>
                                                                         {[item.name, item.address, item.city].filter(i => i).join(', ')}
                                                                     </div>
                                                                 ))

@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { Form, Formik, Field, ErrorMessage } from 'formik';
+import React, { useEffect, useState, useRef } from "react";
 import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
@@ -16,9 +15,10 @@ import Faq from '../../../../platform/faq/client/faq.component';
 import StatusupdateModal from '../../../../core/client/components/statusUpdateModal.component';
 import { getAllCountries } from '../../../../core/client/country/country.actions';
 import { getHcpProfiles, getHCPSpecialities } from '../hcp.actions';
-import { ApprovalRejectSchema, HcpInlineEditSchema } from '../hcp.schema';
+import { HcpInlineEditSchema } from '../hcp.schema';
 import uuidAuthorities from '../uuid-authorities.json';
 import EditableTable from '../../../../core/client/components/EditableTable/EditableTable';
+import { HCPFilter }  from "../../../../information";
 
 const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
     const [comment, setComment] = useState("");
@@ -86,18 +86,21 @@ export default function hcpUsers() {
     const handleCloseFaq = () => setShowFaq(false);
     const handleShowFaq = () => setShowFaq(true);
 
-    const [show, setShow] = useState({ profileManage: false, updateStatus: false, saveConfirmation: false });
+    const [show, setShow] = useState({ profileManage: false, updateStatus: false, saveConfirmation: false, filterSidebar: false });
     const [currentUser, setCurrentUser] = useState({});
     const { addToast } = useToasts();
     const [sort, setSort] = useState({ type: 'ASC', value: null });
     const [tableDirty, setTableDirty] = useState(false);
     const [editableTableProps, setEditableTableProps] = useState({});
     const [selectedRow, setSelectedRow] = useState(null);
+    const [selectedFilterSetting, setSelectedFilterSetting] = useState(null);
+    const [isFilterEnabled, setIsFilterEnabled] = useState(false);
 
     const hcps = useSelector(state => state.hcpReducer.hcps);
     const specialties = useSelector(state => state.hcpReducer.specialties);
-    const countries = useSelector(state => state.countryReducer.countries);
     const allCountries = useSelector(state => state.countryReducer.allCountries);
+
+    const hcpFilterRef = useRef();
 
     const pageLeft = () => {
         if (hcps.page > 1) urlChange(hcps.page - 1, hcps.codbase, hcps.status, params.get('orderBy'), true);
@@ -112,29 +115,77 @@ export default function hcpUsers() {
         setShow({ ...show, updateStatus: true });
     }
 
-   const loadHcpProfiles = () => {
-        dispatch(getHcpProfiles(location.search));
+    const handleFilterExecute = async (multiFilterSetting) => {
+        const filterID = multiFilterSetting.selectedSettingID;
+        const shouldUpdateFilter = multiFilterSetting.saveType === 'save_existing';
+
+        if(multiFilterSetting.shouldSaveFilter) {
+            const settingName = multiFilterSetting.saveType === 'save_existing'
+                ? multiFilterSetting.selectedFilterSettingName
+                : multiFilterSetting.newFilterSettingName;
+
+            const filterSetting = {
+                title: settingName,
+                table: "hcp-profiles",
+                settings: {
+                    filters: multiFilterSetting.filters,
+                    logic: multiFilterSetting.logic
+                }
+            }
+
+            if(filterID && shouldUpdateFilter) {
+                try{
+                    await axios.put(`/api/filter/${filterID}`, filterSetting);
+                    history.push(`/information/list/cdp?filter=${filterID}`);
+                }catch(err){
+                    const errorMessage = err.response.data && err.response.data || 'There was an error updating the filter setting.';
+                    addToast(errorMessage, {
+                        appearance: 'error',
+                        autoDismiss: true
+                    });
+                    return Promise.reject();
+                }
+            }else {
+                try{
+                    const { data } = await axios.post('/api/filter', filterSetting);
+                    history.push(`/information/list/cdp?filter=${data.id}`);
+                }catch(err){
+                    const errorMessage = err.response.data && err.response.data || 'There was an error updating the filter setting.';
+                    addToast(errorMessage, {
+                        appearance: 'error',
+                        autoDismiss: true
+                    });
+                    return Promise.reject();
+                }
+            }
+        }
+        else {
+            history.push(`/information/list/cdp`);
+        };
+        setIsFilterEnabled(true);
+    }
+
+    const loadHcpProfiles = (filterSetting) => {
+        const searchObj = {};
+        const searchParams = location.search.slice(1).split("&");
+        searchParams.forEach(element => {
+            searchObj[element.split("=")[0]] = element.split("=")[1];
+        });
+
+        const requestBody = filterSetting && filterSetting.filters.length
+            ? {
+                filters: filterSetting.filters,
+                logic: filterSetting.logic
+            }
+            : null;
+
+        dispatch(getHcpProfiles(location.search, requestBody));
         setSort({ type: params.get('orderType'), value: params.get('orderBy') });
     };
 
     const getConsentsForCurrentUser = async () => {
         const { data } = await axios.get(`/api/hcp-profiles/${currentUser.id}/consents`);
         setCurrentUser({ ...currentUser, consents: data.data });
-    }
-
-    const isAllVerifiedStatus = () => {
-        if (Array.isArray(hcps.status)) {
-            const allVerifiedStatus = ["self_verified", "manually_verified"];
-            let isSubset = true;
-            allVerifiedStatus.forEach(status => { if (!hcps.status.includes(status)) isSubset = false });
-            return isSubset && (hcps.status.length === 2);
-        }
-        return false;
-    }
-
-    const getSelectedStatus = () => {
-        if (Array.isArray(hcps.status)) return isAllVerifiedStatus() ? 'All Verified' : hcps.status.map(status => _.startCase(_.toLower(status.replace('_', ' ')))).join(', ');
-        return hcps.status ? _.startCase(_.toLower(hcps.status.replace('_', ' '))) : 'All';
     }
 
     const onManageProfile = (user) => {
@@ -154,26 +205,65 @@ export default function hcpUsers() {
         return country && country.countryname;
     }
 
-    const getUuidAuthorities = (codbase) => {
-        if (codbase) {
-            const authorityByCountry = uuidAuthorities.filter(a => a.codbase.toLowerCase() === codbase.toLowerCase());
-            return authorityByCountry;
+    const renderUuidAuthorities = () => {
+        const authorityDropdown = (authorities) => {
+            return (<Dropdown>
+                <Dropdown.Toggle variant="" id="dropdown-basic" className="cdp-btn-outline-primary px-sm-3 px-2">
+                    UUID Authorities
+                </Dropdown.Toggle>
+                <Dropdown.Menu className="dropdown-menu__no-hover py-0">
+                    {
+                        authorities.map(authority =>
+                        (
+                            <Dropdown.Item
+                                key={authority.link} className="border-bottom py-2 px-3"
+                                onClick={() => openAuthorityLink(authority.link)}
+                                role="button"
+                            >
+                                <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height={authority.height} />
+                            </Dropdown.Item>
+                        )
+                        )
+                    }
+                </Dropdown.Menu>
+            </Dropdown>);
+        };
+
+        const { lastAppliedFilters } = isFilterEnabled ? hcpFilterRef.current.multiFilterProps.values || {} : {};
+
+        const countryFilter = (lastAppliedFilters || []).find(f => f.fieldName === 'country');
+
+        if (countryFilter) {
+            const authorityByCountry = uuidAuthorities.filter(a => countryFilter.value.some(v => a.codbase.toLowerCase() === v.toLowerCase()));
+
+            if (countryFilter.value.length > 1) {
+                return authorityDropdown(authorityByCountry);
+            }
+
+            return authorityByCountry.map(authority =>
+            (
+                <a key={authority.link} className="mr-3" role="button" onClick={() => openAuthorityLink(authority.link)}>
+                    <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height={authority.heightSingle} />
+                </a>
+            )
+            );
         }
 
-        return uuidAuthorities;
+        return authorityDropdown(uuidAuthorities);
     };
 
     const urlChange = (pageNo, codBase, status, orderColumn, pageChange = false) => {
         if (Array.isArray(status)) status = 'self_verified,manually_verified';
         let orderType = params.get('orderType');
         const orderBy = params.get('orderBy');
+        const filterID = params.get('filter');
         const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
         const codbase = (codBase) ? codBase : params.get('codbase');
         if (!pageChange) {
             (orderBy === orderColumn) ? (orderType === 'asc' ? orderType = 'desc' : orderType = 'asc') : orderType = 'asc';
         }
         const url = `?page=${page}` + (codbase && codbase !== 'null' ? `&codbase=${codbase}` : ``) + (status && status !== 'null' ? `&status=${status}` : '') + (orderType !== 'null' && orderColumn !== 'null' && orderColumn !== null ? `&orderType=${orderType}&orderBy=${orderColumn}` : ``);
-        history.push(location.pathname + url);
+        history.push(location.pathname + url.concat(filterID ? `&filter=${filterID}` : ''));
     };
 
     const openAuthorityLink = (link) => {
@@ -422,6 +512,13 @@ export default function hcpUsers() {
         }
     ];
 
+    const resetFilter = () => {
+        setSelectedFilterSetting();
+        setIsFilterEnabled(false);
+        hcpFilterRef.current.multiFilterProps.resetFilter();
+        history.push('/information/list/cdp');
+    }
+
     const handleTableDirtyStatusChange = (dirty) => {
         setTableDirty(dirty);
         window.tableDirty = dirty;
@@ -445,7 +542,24 @@ export default function hcpUsers() {
     }, []);
 
     useEffect(() => {
-        loadHcpProfiles();
+        const params = new URLSearchParams(location.search);
+        const filterID = params.get('filter');
+        if(filterID) axios.get(`/api/filter/${filterID}`)
+            .then(res => {
+                setSelectedFilterSetting(res.data);
+                setIsFilterEnabled(true);
+                loadHcpProfiles(res.data.settings);
+            })
+        else {
+            const { lastAppliedFilters, lastAppliedLogic } = hcpFilterRef.current.multiFilterProps.values || {};
+            const filterSetting = lastAppliedFilters && lastAppliedFilters.length
+                ? {
+                    filters: lastAppliedFilters,
+                    logic: lastAppliedLogic
+                }
+                : null;
+            loadHcpProfiles(filterSetting);
+        };
     }, [location]);
 
     return (
@@ -473,89 +587,35 @@ export default function hcpUsers() {
                 <div className="row">
                     <div className="col-12">
                         <div>
-                            <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
-                                <div className="d-flex align-items-center justify-content-between">
-                                    <h4 className="cdp-text-primary font-weight-bold mb-0 mr-sm-4 mr-1">List of HCP User</h4>
-                                    <div className="">
-                                        <div>
-                                            {hcps.codbase ?
-                                                getUuidAuthorities(hcps.codbase).map(authority =>
-                                                (
-                                                    <a key={authority.link} className="mr-3" role="button" onClick={() => openAuthorityLink(authority.link)}>
-                                                        <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height={authority.heightSingle} />
-                                                    </a>
-                                                )
-                                                )
-                                                :
-                                                <Dropdown>
-                                                    <Dropdown.Toggle variant="" id="dropdown-basic" className="cdp-btn-outline-primary px-sm-3 px-2">
-                                                        UUID Authorities
-                                                    </Dropdown.Toggle>
-                                                    <Dropdown.Menu className="dropdown-menu__no-hover py-0">
-                                                        {
-                                                            getUuidAuthorities().map(authority =>
-                                                            (
-                                                                <Dropdown.Item
-                                                                    key={authority.link} className="border-bottom py-2 px-3"
-                                                                    onClick={() => openAuthorityLink(authority.link)}
-                                                                    role="button"
-                                                                >
-                                                                    <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height={authority.height} />
-                                                                </Dropdown.Item>
-                                                            )
-                                                            )
-                                                        }
-                                                    </Dropdown.Menu>
-                                                </Dropdown>
-                                            }
-                                        </div>
+                            <div className="d-sm-flex justify-content-between align-items-end mt-1">
+                                <div>
+                                    <h4 className="cdp-text-primary font-weight-bold mb-0 mr-sm-4 mr-1 d-flex pb-2">
+                                        List of HCP User
+                                    </h4>
+                                    <div>
+                                        <div className="custom-tab px-3 py-3 cdp-border-primary active">Customer Data Platform</div>
+                                        <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/crdlp">CRDLP</NavLink>
                                     </div>
                                 </div>
-                                <div className="d-flex pt-3 pt-sm-0">
-                                    {countries && hcps['countries'] &&
-                                        <React.Fragment>
-                                            <div title={tableDirty ? "Save or reset changes to use filter options" : null}>
-                                                <Dropdown className={`ml-auto dropdown-customize mr-2 ${tableDirty ? 'hcp-inline-disable' : ''}`}>
-                                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center">
-                                                        <i className="icon icon-filter mr-2 mb-n1"></i> {hcps.codbase && (countries.find(i => i.codbase === hcps.codbase)) ? (countries.find(i => i.codbase === hcps.codbase)).codbase_desc : 'Filter by Country'}
-                                                    </Dropdown.Toggle>
-                                                    <Dropdown.Menu>
-                                                        <Dropdown.Item className={hcps.codbase === null ? 'd-none' : ''} onClick={() => urlChange(1, 'null', hcps.status, params.get('orderBy'), params.get('orderType'))}>All</Dropdown.Item>
-                                                        {
-                                                            countries.map((item, index) => (
-                                                                hcps.countries.includes(item.country_iso2) &&
-                                                                <Dropdown.Item key={index} className={hcps.countries.includes(item.country_iso2) && hcps.codbase === item.codbase ? 'd-none' : ''} onClick={() => urlChange(1, item.codbase, hcps.status, params.get('orderBy'), params.get('orderType'))}>
-                                                                    {
-                                                                        hcps.countries.includes(item.country_iso2) ? item.codbase_desc : null
-                                                                    }
-                                                                </Dropdown.Item>
-                                                            ))
-
-                                                        }
-                                                    </Dropdown.Menu>
-                                                </Dropdown>
-                                            </div>
-                                            <div title={tableDirty ? "Save or reset changes to use filter options" : null}>
-                                                <Dropdown className={`d-flex align-items-center show dropdown rounded pl-2 pr-1 dropdown cdp-bg-secondary text-white dropdown shadow-sm ${tableDirty ? 'hcp-inline-disable' : ''}`}>
-                                                    Status
-                                                    <Dropdown.Toggle variant="" className="ml-2 cdp-bg-secondary rounded-0 border-left text-white">
-                                                        {getSelectedStatus()}
-                                                    </Dropdown.Toggle>
-                                                    <Dropdown.Menu>
-                                                        <Dropdown.Item className={hcps.status === null ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, null, params.get('orderBy'), params.get('orderType'))}>All</Dropdown.Item>
-                                                        <Dropdown.Item className={isAllVerifiedStatus() ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, 'self_verified,manually_verified', params.get('orderBy'), params.get('orderType'))}>All Verified</Dropdown.Item>
-                                                        <Dropdown.Item className={hcps.status === 'self_verified' ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, 'self_verified', params.get('orderBy'), params.get('orderType'))}>Self Verified</Dropdown.Item>
-                                                        <Dropdown.Item className={hcps.status === 'manually_verified' ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, 'manually_verified', params.get('orderBy'), params.get('orderType'))}>Manually Verified</Dropdown.Item>
-                                                        <Dropdown.Item className={hcps.status === 'consent_pending' ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, 'consent_pending', params.get('orderBy'), params.get('orderType'))}>Consent Pending</Dropdown.Item>
-                                                        <Dropdown.Item className={hcps.status === 'not_verified' ? 'd-none' : ''} onClick={() => urlChange(1, hcps.codbase, 'not_verified', params.get('orderBy'), params.get('orderType'))}>Not Verified</Dropdown.Item>
-                                                    </Dropdown.Menu>
-                                                </Dropdown>
-                                            </div>
-                                        </React.Fragment>
-                                    }
+                                <div className="d-flex pt-3 pt-sm-0 mb-2">
+                                    <div className="mr-2">
+                                        <div>
+                                            {renderUuidAuthorities()}
+                                        </div>
+                                    </div>
+                                    <div title={tableDirty ? "Save or reset changes to open filter" : null}>
+                                        <button
+                                            className={`btn cdp-btn-outline-primary ${isFilterEnabled ? 'multifilter_enabled' : ''} ${tableDirty ? 'hcp-inline-disable' : null}`}
+                                            onClick={() => setShow({ ...show, filterSidebar: true })}
+                                        >
+                                            <i className={`fas fa-filter  ${isFilterEnabled ? '' : 'mr-2'}`}></i>
+                                            <i className={`fas fa-database ${isFilterEnabled ? 'd-inline-block filter__sub-icon mr-1' : 'd-none'}`}></i>
+                                            Filter
+                                        </button>
+                                    </div>
                                 </div>
-
                             </div>
+
                             <Modal
                                 size="lg"
                                 show={show.profileManage}
@@ -649,7 +709,26 @@ export default function hcpUsers() {
                                 </Modal.Body>
                             </Modal>
 
-                            <StatusupdateModal user={currentUser} show={show.updateStatus} type={'list'} onSort={()=>{ setSort({ type: params.get('orderType'), value: params.get('orderBy') })}} onHide={() => { setShow({ ...show, updateStatus: false })}} />
+                            <StatusupdateModal
+                                user={currentUser}
+                                show={show.updateStatus}
+                                type={'list'}
+                                filterSetting={
+                                    isFilterEnabled && ({
+                                        filters: hcpFilterRef.current.multiFilterProps.values.lastAppliedFilters,
+                                        logic: hcpFilterRef.current.multiFilterProps.values.lastAppliedLogic
+                                    })
+                                }
+                                onSort={() => {
+                                    setSort({
+                                        type: params.get('orderType'),
+                                        value: params.get('orderBy'),
+                                    });
+                                }}
+                                onHide={() => {
+                                    setShow({ ...show, updateStatus: false });
+                                }}
+                            />
 
                             <SaveConfirmation
                                 show={show.saveConfirmation}
@@ -697,6 +776,14 @@ export default function hcpUsers() {
                         </div>
                     </div>
                 </div>
+                <HCPFilter
+                    ref={hcpFilterRef}
+                    show={show.filterSidebar}
+                    selectedFilterSetting={selectedFilterSetting}
+                    onHide={() => setShow({ ...show, filterSidebar: false })}
+                    onExecute={handleFilterExecute}
+                    tableName="hcp-profiles"
+                />
             </div>
         </main >
     );
