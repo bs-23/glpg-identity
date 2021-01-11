@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { MultiFilter } from '../../../../core/client/components/MultiFilter/';
 import { getFilterOptions } from './users-filter-options';
 import { getUserFilterSettings } from '../user.actions';
+import { profileActions } from '../../../../platform';
 
 const tablePresetPathMap = {
     'cdp-users': 'cdpUsersFilters'
@@ -12,7 +13,8 @@ const tablePresetPathMap = {
 const UsersFilter = ({ selectedFilterSetting, onHide, onExecute, show, tableName, selectedScopeKey }, ref) => {
     const allCountries = useSelector(state => state.countryReducer.allCountries);
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
-    const userFilters = useSelector(state => state.hcpReducer[tablePresetPathMap[tableName]]);
+    const userFilters = useSelector(state => state.userReducer[tablePresetPathMap[tableName]]);
+    const allProfiles = useSelector(state => state.profileReducer.profiles);
 
     const dispatch = useDispatch();
 
@@ -24,10 +26,19 @@ const UsersFilter = ({ selectedFilterSetting, onHide, onExecute, show, tableName
         return acc;
     }, []);
 
-    const filterOptions = getFilterOptions(userCountryFilterOption);
+    let profileOptions;
+
+    if(allProfiles) {
+        profileOptions = allProfiles.map(p => ({ value: p.id, displayText: p.title }));
+    }
+
+    const filterOptions = getFilterOptions(userCountryFilterOption, profileOptions);
 
     useEffect(() => {
-        if(show) dispatch(getUserFilterSettings(tableName));
+        if(show) {
+            dispatch(getUserFilterSettings(tableName));
+            dispatch(profileActions.getProfiles());
+        }
     }, [show]);
 
     useImperativeHandle(ref, () => ({
@@ -44,7 +55,6 @@ const UsersFilter = ({ selectedFilterSetting, onHide, onExecute, show, tableName
         onHide={onHide}
         onExecute={onExecute}
         ref={multiFilterRef}
-        // scopeOptions={scopeOptions}
         selectedScopeKey={selectedScopeKey}
     />
 }

@@ -1,12 +1,10 @@
 import { string, array } from 'yup';
 import { operators } from '../../../../core/client/components/MultiFilter';
 
-export function getFilterOptions(userCountries, userApplications) {
+export function getFilterOptions(userCountries, allProfiles) {
     const statusOptions = [
-        { value: 'self_verified', displayText: 'Self Verified' },
-        { value: 'manually_verified', displayText: 'Manually Verified' },
-        { value: 'consent_pending', displayText: 'Consent Pending' },
-        { value: 'not_verified', displayText: 'Not Verified' },
+        { value: 'active', displayText: 'Active' },
+        { value: 'inactive', displayText: 'Inactive' }
     ];
 
     const filterOptions = [
@@ -49,17 +47,23 @@ export function getFilterOptions(userCountries, userApplications) {
             options: statusOptions
         },
         {
+            fieldName: 'phone',
+            valueType: 'text',
+            displayText: 'Phone',
+            operators: operators.getStringOperators()
+        },
+        {
+            fieldName: 'profileId',
+            valueType: 'select',
+            displayText: 'Profile',
+            operators: operators.getSelectOperators(),
+            options: allProfiles
+        },
+        {
             fieldName: 'created_at',
             valueType: 'date',
             displayText: 'Creation Date',
             operators: operators.getDateOperators()
-        },
-        {
-            fieldName: 'created_by',
-            valueType: 'select',
-            displayText: 'Application Name',
-            operators: operators.getSelectOperators(),
-            options: userApplications
         }
     ];
 

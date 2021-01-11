@@ -56,7 +56,7 @@ export function changePassword(data) {
 }
 
 export function getUsers(page = 1, codbase, orderBy, orderType, data) {
-    const url = `/api/users?page=${page}`
+    const url = `/api/cdp-users?page=${page}`
         + (codbase ? `&codbase=${codbase}` : '')
         + (orderBy && orderBy !== 'null' ? `&orderBy=${orderBy}` : '')
         + (orderType && orderType !== 'null' ? `&orderType=${orderType}` : '');
@@ -64,7 +64,7 @@ export function getUsers(page = 1, codbase, orderBy, orderType, data) {
     return {
         type: Types.GET_USERS,
         payload: axios({
-            method: 'get',
+            method: 'post',
             url: url,
             data
         })
