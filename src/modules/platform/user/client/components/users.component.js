@@ -31,6 +31,7 @@ export default function Users() {
 
     const [showFilter, setShowFilter] = useState(false);
     const [isFilterEnabled, setIsFilterEnabled] = useState(false);
+    const [selectedFilterSetting, setSelectedFilterSetting] = useState(null);
 
     const [showFaq, setShowFaq] = useState(false);
     const handleCloseFaq = () => setShowFaq(false);
@@ -105,17 +106,31 @@ export default function Users() {
         setCodBase(params.get('codbase') ? params.get('codbase') : null);
         const searchObj = {};
         const searchParams = location.search.slice(1).split("&");
+
         searchParams.forEach(element => {
             searchObj[element.split("=")[0]] = element.split("=")[1];
         });
-        const { lastAppliedFilters, lastAppliedLogic } = filterRef.current.multiFilterProps.values || {};
-        const filterSetting = lastAppliedFilters && lastAppliedFilters.length
-            ? {
-                filters: lastAppliedFilters,
-                logic: lastAppliedLogic
-            }
-            : null;
-        dispatch(getUsers(searchObj.page, searchObj.codbase, searchObj.orderBy, searchObj.orderType, filterSetting));
+
+        const filterID = params.get('filter');
+
+        if(filterID) axios.get(`/api/filter/${filterID}`)
+            .then(res => {
+                setSelectedFilterSetting(res.data);
+                setIsFilterEnabled(true);
+                const filterSetting = res.data.settings;
+                dispatch(getUsers(searchObj.page, searchObj.codbase, searchObj.orderBy, searchObj.orderType, filterSetting));
+            })
+        else {
+            const { lastAppliedFilters, lastAppliedLogic } = filterRef.current.multiFilterProps.values || {};
+            const filterSetting = lastAppliedFilters && lastAppliedFilters.length
+                ? {
+                    filters: lastAppliedFilters,
+                    logic: lastAppliedLogic
+                }
+                : null;
+            dispatch(getUsers(searchObj.page, searchObj.codbase, searchObj.orderBy, searchObj.orderType, filterSetting));
+        };
+
         setSort({ type: params.get('orderType') || 'asc', value: params.get('orderBy') });
     }, [location]);
 
@@ -163,10 +178,6 @@ export default function Users() {
         if (userdata.end !== userdata.total) urlChange(userdata.page + 1, userdata.codBase, params.get('orderBy'), true);
     };
 
-    // const handleFilterExecute = (a, b,c) => {
-    //     console.log(a, b, c);
-    // }
-
     const handleFilterExecute = async (multiFilterSetting) => {
         const filterID = multiFilterSetting.selectedSettingID;
         const shouldUpdateFilter = multiFilterSetting.saveType === 'save_existing';
@@ -188,7 +199,7 @@ export default function Users() {
             if(filterID && shouldUpdateFilter) {
                 try{
                     await axios.put(`/api/filter/${filterID}`, filterSetting);
-                    history.push(`/information/list/cdp?filter=${filterID}`);
+                    history.push(`${location.pathname}?filter=${filterID}`);
                 }catch(err){
                     const errorMessage = err.response.data && err.response.data || 'There was an error updating the filter setting.';
                     addToast(errorMessage, {
@@ -200,7 +211,7 @@ export default function Users() {
             }else {
                 try{
                     const { data } = await axios.post('/api/filter', filterSetting);
-                    history.push(`/platform/users?filter=${data.id}`);
+                    history.push(`${location.pathname}?filter=${data.id}`);
                 }catch(err){
                     const errorMessage = err.response.data && err.response.data || 'There was an error updating the filter setting.';
                     addToast(errorMessage, {
@@ -212,11 +223,11 @@ export default function Users() {
             }
         }
         else {
-            history.push(`/platform/users`);
+            history.push(location.pathname);
         };
         setIsFilterEnabled(true);
     }
-    console.log(isFilterEnabled);
+
     return (
         <main className="app__content cdp-light-bg">
             <div className="container-fluid">
@@ -342,6 +353,7 @@ export default function Users() {
                 ref={filterRef}
                 tableName='cdp-users'
                 show={showFilter}
+                selectedFilterSetting={selectedFilterSetting}
                 onHide={() => setShowFilter(false)}
                 onExecute={handleFilterExecute}
             />
