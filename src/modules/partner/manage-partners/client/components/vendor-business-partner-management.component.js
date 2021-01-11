@@ -182,6 +182,7 @@ const VendorBusinessPartnerManagement = () => {
                             last_name: partnerRequestId && request ? request.last_name : '',
                             email: partnerRequestId && request ? request.email : '',
                             procurement_contact: partnerRequestId && request ? request.procurement_contact : '',
+                            purchasing_organization: partnerRequestId && request ? request.purchasing_organization : '',
                             company_codes: [],
                         }}
                         displayName="PartnerRequestsForm"
@@ -251,6 +252,12 @@ const VendorBusinessPartnerManagement = () => {
                                             <label className="font-weight-bold" htmlFor="procurement_contact">Procurement Contact <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="procurement_contact" />
                                             <div className="invalid-feedback"><ErrorMessage name="procurement_contact" /></div>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="purchasing_organization">Purchasing Organization <span className="text-danger">*</span></label>
+                                            <Field className="form-control" type="text" name="purchasing_organization" />
+                                            <div className="invalid-feedback"><ErrorMessage name="purchasing_organization" /></div>
                                         </div>
 
                                         {getCompanyCodeFields()}
