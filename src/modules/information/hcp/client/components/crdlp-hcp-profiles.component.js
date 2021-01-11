@@ -46,11 +46,11 @@ export default function CrdlpHcpProfiles() {
                 dispatch(getCrdlpHcpProfiles(location.search, res.data.settings));
             })
         else {
-            const { lastAppliedFilters, lastAppliedLogic } = hcpFilterRef.current.multiFilterProps.values || {};
-            const filterSetting = lastAppliedFilters && lastAppliedFilters.length
+            const { filters, logic } = hcpFilterRef.current.multiFilterProps.values || {};
+            const filterSetting = filters && filters.length
                 ? {
-                    filters: lastAppliedFilters,
-                    logic: lastAppliedLogic
+                    filters: filters,
+                    logic: logic
                 }
                 : null;
             dispatch(getCrdlpHcpProfiles(location.search, filterSetting));
