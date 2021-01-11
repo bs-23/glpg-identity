@@ -37,7 +37,7 @@ const MultiFilter = (props, ref) => {
     const resetFilter = async (formikProps) => {
         const {setFieldValue, setTouched} = formikProps || formikBag;
 
-        await setFieldValue('isChosenFromExisting', 'true');
+        await setFieldValue('isChosenFromExisting', 'false');
         await setFieldValue('filters', []);
         await setFieldValue('logic', '');
         await setFieldValue('selectedSettingID', '');
@@ -47,8 +47,9 @@ const MultiFilter = (props, ref) => {
         await setFieldValue('newFilterSettingName', '');
         await setFieldValue('scope', '');
         await setFieldValue('lastAppliedFilters', []);
-        await setFieldValue('lastAppliedLogic', []);
+        await setFieldValue('lastAppliedLogic', '');
         await setFieldValue('saveType', 'save_as_new');
+        await setFieldValue('shouldSaveFilter', false);
         await setTouched({});
     }
 
