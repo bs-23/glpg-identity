@@ -605,7 +605,7 @@ export default function hcpUsers() {
                                     </div>
                                     <div title={tableDirty ? "Save or reset changes to open filter" : null}>
                                         <button
-                                            className={`btn cdp-btn-outline-primary ${isFilterEnabled ? 'multifilter_enabled' : ''} ${tableDirty ? 'hcp-inline-disable' : null}`}
+                                            className={`btn ${isFilterEnabled ? 'multifilter_enabled cdp-btn-primary text-white' : 'cdp-btn-outline-primary'} ${tableDirty ? 'hcp-inline-disable' : null}`}
                                             onClick={() => setShow({ ...show, filterSidebar: true })}
                                         >
                                             <i className={`fas fa-filter  ${isFilterEnabled ? '' : 'mr-2'}`}></i>
@@ -617,11 +617,11 @@ export default function hcpUsers() {
                                         isFilterEnabled &&
                                         <div title={tableDirty ? "Save or reset changes to open filter" : null}>
                                             <button
-                                                className={`btn cdp-btn-outline-primary ml-2 ${isFilterEnabled ? 'multifilter_enabled' : ''} ${tableDirty ? 'hcp-inline-disable' : null}`}
+                                                className={`btn cdp-btn-outline-secondary ml-2 ${isFilterEnabled ? 'multifilter_enabled' : ''} ${tableDirty ? 'hcp-inline-disable' : null}`}
                                                 onClick={resetFilter}
                                             >
                                                 <i className={`fas fa-filter  ${isFilterEnabled ? '' : 'mr-2'}`}></i>
-                                                <i className={`fas fa-database ${isFilterEnabled ? 'd-inline-block filter__sub-icon mr-1' : 'd-none'}`}></i>
+                                                <i className={`fas fa-times ${isFilterEnabled ? 'd-inline-block filter__sub-icon mr-1' : 'd-none'}`}></i>
                                                 Reset
                                             </button>
                                         </div>

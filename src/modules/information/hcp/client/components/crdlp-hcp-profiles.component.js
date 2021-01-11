@@ -187,7 +187,7 @@ export default function CrdlpHcpProfiles() {
                                 </div>
                             </div>
                             <div className="d-flex pt-3 pt-sm-0 mb-2">
-                                <button className={`btn cdp-btn-outline-primary ${isFilterEnabled ? 'multifilter_enabled' : ''}`} onClick={() => setShowFilterSidebar(true)} >
+                                <button className={`btn  ${isFilterEnabled ? 'multifilter_enabled cdp-btn-primary text-white' : 'cdp-btn-outline-primary'}`} onClick={() => setShowFilterSidebar(true)} >
                                     <i className={`fas fa-filter  ${isFilterEnabled ? '' : 'mr-2'}`}></i>
                                     <i className={`fas fa-database ${isFilterEnabled ? 'd-inline-block filter__sub-icon mr-1' : 'd-none'}`}></i>
                                     Filter
@@ -195,11 +195,11 @@ export default function CrdlpHcpProfiles() {
                                 {
                                     isFilterEnabled &&
                                     <button
-                                        className={`btn cdp-btn-outline-primary ml-2 ${isFilterEnabled ? 'multifilter_enabled' : ''}`}
+                                        className={`btn cdp-btn-outline-secondary ml-2 ${isFilterEnabled ? 'multifilter_enabled' : ''}`}
                                         onClick={resetFilter}
                                     >
                                         <i className={`fas fa-filter  ${isFilterEnabled ? '' : 'mr-2'}`}></i>
-                                        <i className={`fas fa-database ${isFilterEnabled ? 'd-inline-block filter__sub-icon mr-1' : 'd-none'}`}></i>
+                                        <i className={`fas fa-times ${isFilterEnabled ? 'd-inline-block filter__sub-icon mr-1' : 'd-none'}`}></i>
                                         Reset
                                     </button>
                                 }
