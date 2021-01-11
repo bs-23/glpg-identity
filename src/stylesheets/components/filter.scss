@@ -188,13 +188,17 @@
             width: 90%;
             z-index: 100;
             margin: 0px;
-            top: 50%;
-            transform: translateY(-50%);
             box-shadow: 1px 49px 400px 200px rgba(0,0,0,0.5);
 
             & + .filter__add-filter::before {
                 display: none;
             }
         }
+    }
+
+    .multiselect__menu {
+        position: fixed;
+        top: inherit;
+        width: 315px;
     }
 }
