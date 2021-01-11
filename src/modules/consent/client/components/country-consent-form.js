@@ -3,9 +3,10 @@ import Modal from 'react-bootstrap/Modal'
 import { Form, Formik, Field, ErrorMessage } from "formik";
 import { useToasts } from 'react-toast-notifications';
 import optTypes from '../opt-types.json';
-import { updateCountryConsent, createCountryConsent } from '../consent.actions';
+import { updateCountryConsent, createCountryConsent} from '../consent.actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { countryConsentSchema } from '../consent.schema';
+
 
 const CountryConsentForm = (props) => {
     const [, setShow] = useState(false);
@@ -40,6 +41,7 @@ const CountryConsentForm = (props) => {
                 <div className="consent-manage">
                     <Formik
                         initialValues={{
+                            consent_category: props.editable ? props.options.category_id: "",
                             consent_id: props.editable ? props.options.country_consent_id : "",
                             country_iso2: props.editable ? props.options.country_iso2 : "",
                             opt_type: props.editable && props.options.optType ? props.options.optType.value : ""
@@ -75,17 +77,19 @@ const CountryConsentForm = (props) => {
                             <Form onSubmit={formikProps.handleSubmit}>
                                 <Modal.Body className="p-4">
                                     <div className="row">
-                                        <div className="col-12">
-                                            <div className="form-group">
-                                                <label className="font-weight-bold" htmlFor="country_iso2">Select Country <span className="text-danger">*</span></label>
-                                                <Field disabled={props.editable ? true : false} data-testid="country_iso2" as="select" name="country_iso2" className="form-control">
-                                                    <option key="select-country" value="" disabled>--Select Country--</option>
-                                                    {props.editable && props.countries.length === 0 && <option value={country.country_iso2}>{country.codbase_desc}</option>}
-                                                    {props.countries.map(item => <option key={item.countryid} value={item.country_iso2}>{props.editable ? country.codbase_desc : item.codbase_desc}</option>)}
-                                                </Field>
-                                                <div className="invalid-feedback"><ErrorMessage name="country_iso2" /></div>
-                                            </div>
+                                    <div className="col-12">
+                                        <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="consent_category">Select Consent Category <span className="text-danger">*</span></label>
+                                            <Field disabled={props.editable ? true : false} data-testid="consent_category" as="select" name="consent_category" className="form-control">
+                                                <option key="select-consent-category" value="" disabled>--Select Consent Category--</option>
+                                                {props.consentCategories.map(category=>{
+                                                   return <option key={category.id} value={category.id}>{category.title}</option>
+                                                })
+                                                }
+                                            </Field>
+                                            <div className="invalid-feedback"><ErrorMessage name="consent_category" /></div>
                                         </div>
+                                    </div>
                                         <div className="col-12">
                                             <div className="form-group">
                                                 <label className="font-weight-bold" htmlFor="consent_id">Select Consent <span className="text-danger">*</span></label>
@@ -96,6 +100,17 @@ const CountryConsentForm = (props) => {
                                                 <div className="invalid-feedback"><ErrorMessage name="consent_id" /></div>
                                             </div>
                                         </div>
+                                    <div className="col-12">
+                                        <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="country_iso2">Select Country <span className="text-danger">*</span></label>
+                                            <Field disabled={props.editable ? true : false} data-testid="country_iso2" as="select" name="country_iso2" className="form-control">
+                                                <option key="select-country" value="" disabled>--Select Country--</option>
+                                                {props.editable && props.countries.length === 0 && <option value={country.country_iso2}>{country.codbase_desc}</option>}
+                                                {props.countries.map(item => <option key={item.countryid} value={item.country_iso2}>{props.editable ? country.codbase_desc : item.codbase_desc}</option>)}
+                                            </Field>
+                                            <div className="invalid-feedback"><ErrorMessage name="country_iso2" /></div>
+                                        </div>
+                                    </div>
                                         <div className="col-12">
                                             <div className="form-group">
                                                 <label className="font-weight-bold" htmlFor="opt_type">Select Opt Type <span className="text-danger">*</span></label>
