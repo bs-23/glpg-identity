@@ -34,22 +34,22 @@ const MultiFilter = (props, ref) => {
     const formikRef = useRef();
     const formikBag = formikRef.current;
 
-    const resetFilter = (formikProps) => {
+    const resetFilter = async (formikProps) => {
         const {setFieldValue, setTouched} = formikProps || formikBag;
 
-        setFieldValue('isChosenFromExisting', '');
-        setFieldValue('filters', []);
-        setFieldValue('logic', '');
-        setFieldValue('selectedSettingID', '');
-        setFieldValue('selectedSettingFilters', []);
-        setFieldValue('selectedSettingLogic', '');
-        setFieldValue('selectedFilterSettingName', '');
-        setFieldValue('newFilterSettingName', '');
-        setFieldValue('scope', '');
-        setFieldValue('lastAppliedFilters', []);
-        setFieldValue('lastAppliedLogic', []);
-        setFieldValue('saveType', 'save_as_new');
-        setTouched({});
+        await setFieldValue('isChosenFromExisting', 'true');
+        await setFieldValue('filters', []);
+        await setFieldValue('logic', '');
+        await setFieldValue('selectedSettingID', '');
+        await setFieldValue('selectedSettingFilters', []);
+        await setFieldValue('selectedSettingLogic', '');
+        await setFieldValue('selectedFilterSettingName', '');
+        await setFieldValue('newFilterSettingName', '');
+        await setFieldValue('scope', '');
+        await setFieldValue('lastAppliedFilters', []);
+        await setFieldValue('lastAppliedLogic', []);
+        await setFieldValue('saveType', 'save_as_new');
+        await setTouched({});
     }
 
     const removeSelectedFilter = (formikProps) => {
@@ -275,7 +275,7 @@ const MultiFilter = (props, ref) => {
     }
 
     useEffect(() => {
-        if(formikBag) {
+        if(formikBag && selectedSetting && selectedSettingTitle && selectedSettingID) {
             formikBag.setFieldValue('isChosenFromExisting', 'true');
             formikBag.setFieldValue('filters', selectedSetting.filters);
             formikBag.setFieldValue('logic', selectedSetting.logic);

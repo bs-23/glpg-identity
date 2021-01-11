@@ -57,6 +57,13 @@ export default function CrdlpHcpProfiles() {
         };
     }, [location]);
 
+    const resetFilter = async () => {
+        setSelectedFilterSetting(null);
+        setIsFilterEnabled(false);
+        await hcpFilterRef.current.multiFilterProps.resetFilter();
+        history.push(location.pathname);
+    }
+
     const urlChange = (pageNo, country_codbase, orderColumn, pageChange = false) => {
         let orderType = params.get('orderType');
         const orderBy = params.get('orderBy');
@@ -185,8 +192,17 @@ export default function CrdlpHcpProfiles() {
                                     <i className={`fas fa-database ${isFilterEnabled ? 'd-inline-block filter__sub-icon mr-1' : 'd-none'}`}></i>
                                     Filter
                                 </button>
-                                {/*<button className={`btn cdp-btn-outline-primary ${isFilterEnabled ? 'multifilter_enabled' : ''}`} onClick={() => setShowFilterSidebar(true)} ><i class="fas fa-filter mr-2"></i> Filter</button>
-                                 {isFilterEnabled && <button className="btn cdp-btn-outline-primary mr-3" onClick={resetFilter} ><i class="fas fa-filter mr-2"></i> Reset Filter </button>} */}
+                                {
+                                    isFilterEnabled &&
+                                    <button
+                                        className={`btn cdp-btn-outline-primary ml-2 ${isFilterEnabled ? 'multifilter_enabled' : ''}`}
+                                        onClick={resetFilter}
+                                    >
+                                        <i className={`fas fa-filter  ${isFilterEnabled ? '' : 'mr-2'}`}></i>
+                                        <i className={`fas fa-database ${isFilterEnabled ? 'd-inline-block filter__sub-icon mr-1' : 'd-none'}`}></i>
+                                        Reset
+                                    </button>
+                                }
                             </div>
                         </div>
 

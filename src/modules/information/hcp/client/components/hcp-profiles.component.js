@@ -512,11 +512,11 @@ export default function hcpUsers() {
         }
     ];
 
-    const resetFilter = () => {
-        setSelectedFilterSetting();
+    const resetFilter = async () => {
+        setSelectedFilterSetting(null);
         setIsFilterEnabled(false);
-        hcpFilterRef.current.multiFilterProps.resetFilter();
-        history.push('/information/list/cdp');
+        await hcpFilterRef.current.multiFilterProps.resetFilter();
+        history.push(location.pathname);
     }
 
     const handleTableDirtyStatusChange = (dirty) => {
@@ -613,6 +613,19 @@ export default function hcpUsers() {
                                             Filter
                                         </button>
                                     </div>
+                                    {
+                                        isFilterEnabled &&
+                                        <div title={tableDirty ? "Save or reset changes to open filter" : null}>
+                                            <button
+                                                className={`btn cdp-btn-outline-primary ml-2 ${isFilterEnabled ? 'multifilter_enabled' : ''} ${tableDirty ? 'hcp-inline-disable' : null}`}
+                                                onClick={resetFilter}
+                                            >
+                                                <i className={`fas fa-filter  ${isFilterEnabled ? '' : 'mr-2'}`}></i>
+                                                <i className={`fas fa-database ${isFilterEnabled ? 'd-inline-block filter__sub-icon mr-1' : 'd-none'}`}></i>
+                                                Reset
+                                            </button>
+                                        </div>
+                                    }
                                 </div>
                             </div>
 
