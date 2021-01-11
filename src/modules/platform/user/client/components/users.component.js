@@ -243,7 +243,7 @@ export default function Users() {
                         <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
                             <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">CDP User List</h4>
                             <div className="d-flex justify-content-between align-items-center">
-                                <Dropdown className="ml-auto dropdown-customize">
+                                {/* <Dropdown className="ml-auto dropdown-customize">
                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center">
                                         <i className="icon icon-filter mr-2 mb-n1"></i> {userdata.codbase && (countries.find(i => i.codbase === userdata.codbase)) ? (countries.find(i => i.codbase === userdata.codbase)).codbase_desc : 'Filter by Country'}
                                     </Dropdown.Toggle>
@@ -257,8 +257,15 @@ export default function Users() {
                                             ))
                                         }
                                     </Dropdown.Menu>
-                                </Dropdown>
-                                <button onClick={() => setShowFilter(true)}>Filter</button>
+                                </Dropdown> */}
+                                <button
+                                    className={`btn cdp-btn-outline-primary ${isFilterEnabled ? 'multifilter_enabled' : ''}`}
+                                    onClick={() => setShowFilter(true)}
+                                >
+                                    <i className={`fas fa-filter  ${isFilterEnabled ? '' : 'mr-2'}`}></i>
+                                    <i className={`fas fa-database ${isFilterEnabled ? 'd-inline-block filter__sub-icon mr-1' : 'd-none'}`}></i>
+                                    Filter
+                                </button>
                                 <NavLink to="/platform/create-user" className="btn cdp-btn-secondary text-white ml-2">
                                     <i className="icon icon-plus pr-1"></i> Create new user
                                 </NavLink>
