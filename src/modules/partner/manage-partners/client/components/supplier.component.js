@@ -104,7 +104,8 @@ const BusinessPartnerManagement = () => {
                         <nav aria-label="breadcrumb">
                             <ol className="breadcrumb rounded-0">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
-                                <li className="breadcrumb-item active"><span>Business Partner Management</span></li>
+                                <li className="breadcrumb-item"><NavLink to="/business-partner">Business Partner Management</NavLink></li>
+                                <li className="breadcrumb-item active"><span>Business Partner Requests</span></li>
                             </ol>
                         </nav>
                     </div>
