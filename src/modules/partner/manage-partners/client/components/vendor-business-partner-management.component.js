@@ -28,7 +28,7 @@ const VendorBusinessPartnerManagement = () => {
                             <ol className="breadcrumb rounded-0">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/business-partner">Business Partner Management</NavLink></li>
-                                <li className="breadcrumb-item active"><span>Business Partner lists</span></li>
+                                <li className="breadcrumb-item active"><span>Business Partner Requests</span></li>
                                 <li className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help icon-2x cdp-text-secondary"></i></li>
                             </ol>
                         </nav>
@@ -44,7 +44,7 @@ const VendorBusinessPartnerManagement = () => {
                 <div className="row">
                     <div className="col-12">
                         <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
-                            <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Business Partner Lists</h4>
+                            <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Overview of Business Partner Requests</h4>
                             <div class="d-flex justify-content-between align-items-center">
                                 <button onClick={() => setShowForm(true)} className="btn cdp-btn-secondary text-white ml-2">
                                     <i className="icon icon-plus pr-1"></i> Add New Request
