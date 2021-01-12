@@ -7,7 +7,7 @@ import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { NavLink } from 'react-router-dom';
 import { Faq } from '../../../../platform';
 
-const WholesellerBusinessPartnerManagement = () => {
+const WholesalerBusinessPartnerManagement = () => {
     const dispatch = useDispatch();
     const { addToast } = useToasts();
     const [showForm, setShowForm] = useState(false);
@@ -120,7 +120,7 @@ const WholesellerBusinessPartnerManagement = () => {
 
                         <div>
                             <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/vendors">General Vendors</NavLink>
-                            <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/wholesellers">Wholesellers</NavLink>
+                            <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/wholesellers">Wholesalers</NavLink>
                         </div>
 
                         <div className="table-responsive shadow-sm mb-3">
@@ -281,4 +281,4 @@ const WholesellerBusinessPartnerManagement = () => {
     );
 };
 
-export default WholesellerBusinessPartnerManagement;
+export default WholesalerBusinessPartnerManagement;
