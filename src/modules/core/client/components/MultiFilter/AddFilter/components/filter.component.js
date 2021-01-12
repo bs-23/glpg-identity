@@ -6,13 +6,12 @@ import { WithContext as ReactTags } from 'react-tag-input';
 
 const Filter = (props) => {
     const {
-        name,
+        title,
         index,
         value,
         fieldValue,
         operatorValue,
         filterOptions,
-        currentNumberOfFilters,
         isTouched,
         validationError,
         onChange,
@@ -63,7 +62,7 @@ const Filter = (props) => {
 
     return <div className="pb-3 mb-3 border-bottom">
         <div className="d-flex justify-content-between align-items-center">
-            <div className="mr-2 cdp-text-secondary">Filter {currentNumberOfFilters+index+1}</div>
+            <div className="mr-2 cdp-text-secondary">Filter {title}</div>
             <i className="fas fa-times mr-2 cdp-text-secondary-lighter" type="button" onClick={() => onRemove(index)} />
         </div>
         <div>

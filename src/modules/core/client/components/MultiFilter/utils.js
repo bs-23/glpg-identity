@@ -1,4 +1,5 @@
 export const buildLogicAfterAddition = (filters, logic) => {
+    if(!filters || !filters.length) return logic;
     if (!logic) return filters.join(' null ');
     return logic + ' null ' + filters.join(' null ');
 }
@@ -18,7 +19,7 @@ export const buildLogicAfterRemoval = (logic, filterIndex) => {
     if (filterIndex === 0) {
         filters.shift();
         operators.shift();
-    } else if (filterIndex === filtersLength) {
+    } else if (filterIndex === (filtersLength-1)) {
         filters.pop();
         operators.pop();
     } else {

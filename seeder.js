@@ -170,17 +170,19 @@ async function init() {
             const hcpServiceCategory = ServiceCategory.findOne({ where: { slug: 'information' } });
             const userServiceCategory = ServiceCategory.findOne({ where: { slug: 'platform' } });
             const consentServiceCategory = ServiceCategory.findOne({ where: { slug: 'privacy' } });
-            // const businessPartnerServiceCategory = ServiceCategory.findOne({ where: { slug: 'business-partner-management' } });
+            const businessPartnerServiceCategory = ServiceCategory.findOne({ where: { slug: 'business-partner-management' } });
+            const clinicalTrialServiceCategory = ServiceCategory.findOne({ where: { slug: 'clinical-trials' } });
             const dpo_permissionSet = PermissionSet.findOne({ where: { slug: 'data_privacy_officer' } });
             const gds_permissionSet = PermissionSet.findOne({ where: { slug: 'gds' } });
             const lds_permissionSet = PermissionSet.findOne({ where: { slug: 'lds' } });
 
-            Promise.all([systemAdmin_permissionSet, siteAdmin_permissionSet, hcpServiceCategory, userServiceCategory, consentServiceCategory, dpo_permissionSet, gds_permissionSet, lds_permissionSet, businessPartnerServiceCategory]).then((values) => {
+            Promise.all([systemAdmin_permissionSet, siteAdmin_permissionSet, hcpServiceCategory, userServiceCategory, consentServiceCategory, dpo_permissionSet, gds_permissionSet, lds_permissionSet, businessPartnerServiceCategory, clinicalTrialServiceCategory]).then((values) => {
                 const permissionSet_serviceCategory = [
                     { permissionSetId: values[0].id, serviceCategoryId: values[2].id },
                     { permissionSetId: values[0].id, serviceCategoryId: values[3].id },
                     { permissionSetId: values[0].id, serviceCategoryId: values[4].id },
                     { permissionSetId: values[0].id, serviceCategoryId: values[8].id },
+                    { permissionSetId: values[0].id, serviceCategoryId: values[9].id },
 
                     { permissionSetId: values[1].id, serviceCategoryId: values[2].id },
                     { permissionSetId: values[1].id, serviceCategoryId: values[3].id },
