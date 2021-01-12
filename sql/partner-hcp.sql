@@ -1,3 +1,9 @@
+CREATE TYPE cdp.enum_partner_hcp_type AS ENUM
+    ('individual', 'legal_entity');
+
+CREATE TYPE cdp.enum_beneficiary_category AS ENUM
+    ('beneficiary_category_1', 'beneficiary_category_2');
+
 CREATE TABLE cdp.partner_hcps
 (
     id uuid NOT NULL,

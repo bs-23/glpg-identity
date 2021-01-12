@@ -1,3 +1,6 @@
+CREATE TYPE cdp.enum_partner_hco_type AS ENUM
+    ('healthcare_org', 'patient_org');
+
 CREATE TABLE cdp.partner_hcos
 (
     id uuid NOT NULL,
