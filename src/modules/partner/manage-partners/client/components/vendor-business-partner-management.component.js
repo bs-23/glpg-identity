@@ -121,7 +121,7 @@ const VendorBusinessPartnerManagement = () => {
 
                         <div>
                             <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/vendors">General Vendors</NavLink>
-                            <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/wholesellers">Wholesellers</NavLink>
+                            <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/Wholesalers">Wholesalers</NavLink>
                         </div>
 
                         <div className="table-responsive shadow-sm mb-3">
