@@ -6,6 +6,7 @@ import { useToasts } from 'react-toast-notifications';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { NavLink } from 'react-router-dom';
 import { Faq } from '../../../../platform';
+import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest } from '../manage-partners.actions';
 
 const WholesalerBusinessPartnerManagement = () => {
     const dispatch = useDispatch();
@@ -18,16 +19,10 @@ const WholesalerBusinessPartnerManagement = () => {
     const [showFaq, setShowFaq] = useState(false);
     const handleCloseFaq = () => setShowFaq(false);
     const handleShowFaq = () => setShowFaq(true);
-    const requests = [
-        {
-            first_name: "Daniel",
-            last_name: "Martin",
-            purchasing_organization: "UAS",
-            company_code: "0932",
-            email: "daniel@gmail.com",
-            procurement_contact: "daniel@gmail.com"
-        }
-    ];
+
+    const total_requests = useSelector(state => state.businessPartnerReducer.partnerRequests);
+    const requests = total_requests.filter(i => i.type === 'wholesaler');
+    const request = useSelector(state => state.businessPartnerReducer.partnerRequest);
 
     const deleteRequest = (id) => {
         dispatch(deletePartnerRequest(id)).then(() => {
@@ -85,6 +80,27 @@ const WholesalerBusinessPartnerManagement = () => {
         });
     };
 
+    async function loadRequests() {
+        dispatch(getPartnerRequests());
+    }
+
+    useEffect(() => {
+        loadRequests();
+    }, []);
+
+    useEffect(() => {
+        if (partnerRequestId) {
+            dispatch(getPartnerRequest(partnerRequestId));
+        }
+    }, [partnerRequestId]);
+
+    useEffect(() => {
+        if(request.company_codes) {
+            const codes = request.company_codes.map(company_code => ({ id: Math.random(), company_code }));
+            setCompanyCodes(codes);
+        }
+    }, [request.company_codes])
+
     return (
         <main className="app__content cdp-light-bg">
             <div className="container-fluid">
@@ -120,7 +136,7 @@ const WholesalerBusinessPartnerManagement = () => {
 
                         <div>
                             <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/vendors">General Vendors</NavLink>
-                            <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/wholesellers">Wholesalers</NavLink>
+                            <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/wholesalers">Wholesalers</NavLink>
                         </div>
 
                         <div className="table-responsive shadow-sm mb-3">
@@ -138,22 +154,28 @@ const WholesalerBusinessPartnerManagement = () => {
                                 </thead>
                                 <tbody>
                                     {
-                                        requests.map((item, index) =>
+                                        requests.map((row, index) =>
                                         (
                                             <tr key={index}>
-                                                <td>{item.first_name}</td>
-                                                <td>{item.last_name}</td>
-                                                <td>{item.purchasing_organization}</td>
-                                                <td>{item.company_code}</td>
-                                                <td>{item.email}</td>
-                                                <td>{item.procurement_contact}</td>
+                                                <td>{row.first_name}</td>
+                                                <td>{row.last_name}</td>
+                                                <td>{row.purchasing_organization}</td>
+                                                <td>
+                                                    {
+                                                        row.company_codes.map((companyCode, idx) => (
+                                                            <p key={idx}>{companyCode}</p>
+                                                        ))
+                                                    }
+                                                </td>
+                                                <td>{row.email}</td>
+                                                <td>{row.procurement_contact}</td>
                                                 <td><Dropdown className="ml-auto dropdown-customize">
                                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu>
                                                         <Dropdown.Item> Send Form </Dropdown.Item>
-                                                        <Dropdown.Item > Edit Request </Dropdown.Item>
-                                                        <Dropdown.Item > Delete </Dropdown.Item>
+                                                        <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
+                                                        <Dropdown.Item onClick={() => deleteRequest(row.id) }> Delete </Dropdown.Item>
                                                     </Dropdown.Menu>
                                                 </Dropdown></td>
                                             </tr>
@@ -196,34 +218,36 @@ const WholesalerBusinessPartnerManagement = () => {
                                 return;
                             }
 
-                            // if (partnerRequestId) {
-                            //     dispatch(updatePartnerRequest(partnerRequestId, values)).then(function () {
-                            //         toggleForm(null);
-                            //         addToast('Request updated successfully', {
-                            //             appearance: 'success',
-                            //             autoDismiss: true
-                            //         });
-                            //     }).catch(error => {
-                            //         addToast(error.response.data, {
-                            //             appearance: 'error',
-                            //             autoDismiss: true
-                            //         });
-                            //     });
-                            // } else {
-                            //     dispatch(createPartnerRequest(values)).then(() => {
-                            //         toggleForm(null);
-                            //         actions.resetForm();
-                            //         addToast('New Request Added', {
-                            //             appearance: 'success',
-                            //             autoDismiss: true
-                            //         });
-                            //     }).catch(error => {
-                            //         addToast(error.response.data, {
-                            //             appearance: 'error',
-                            //             autoDismiss: true
-                            //         });
-                            //     });
-                            // }
+                            values.type = 'wholesaler';
+
+                            if (partnerRequestId) {
+                                dispatch(updatePartnerRequest(partnerRequestId, values)).then(function () {
+                                    toggleForm(null);
+                                    addToast('Request updated successfully', {
+                                        appearance: 'success',
+                                        autoDismiss: true
+                                    });
+                                }).catch(error => {
+                                    addToast(error.response.data, {
+                                        appearance: 'error',
+                                        autoDismiss: true
+                                    });
+                                });
+                            } else {
+                                dispatch(createPartnerRequest(values)).then(() => {
+                                    toggleForm(null);
+                                    actions.resetForm();
+                                    addToast('New Request Added', {
+                                        appearance: 'success',
+                                        autoDismiss: true
+                                    });
+                                }).catch(error => {
+                                    addToast(error.response.data, {
+                                        appearance: 'error',
+                                        autoDismiss: true
+                                    });
+                                });
+                            }
 
                             actions.setSubmitting(false);
                         }}

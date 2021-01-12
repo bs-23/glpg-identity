@@ -16,7 +16,8 @@ const BusinessPartnerManagement = () => {
     const [showError, setShowError] = useState(false);
     const [partnerRequestId, setPartnerRequestId] = useState(undefined);
 
-    const requests = useSelector(state => state.businessPartnerReducer.partnerRequests);
+    const total_requests = useSelector(state => state.businessPartnerReducer.partnerRequests);
+    const requests = total_requests.filter(i => i.type === 'hcp');
     const request = useSelector(state => state.businessPartnerReducer.partnerRequest);
 
     const deleteRequest = (id) => {
@@ -58,7 +59,6 @@ const BusinessPartnerManagement = () => {
     }
 
     const getCompanyCodeFields = () => {
-        console.log(companyCodes);
         return companyCodes.map((item, idx) => {
             const companyCodeId = `company-code-${idx + 1}`;
 
@@ -194,6 +194,8 @@ const BusinessPartnerManagement = () => {
                                 setShowError(true);
                                 return;
                             }
+
+                            values.type = 'hcp';
 
                             if (partnerRequestId) {
                                 dispatch(updatePartnerRequest(partnerRequestId, values)).then(function () {
