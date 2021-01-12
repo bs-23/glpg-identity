@@ -202,13 +202,13 @@ async function getHcoPartners(req, res) {
 
 async function createHcoPartner(req, res) {
     try {
-        const { first_name, last_name, address_line_1, address_line_2, email, telephone,
-            type, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
+        const { contact_first_name, contact_last_name, name, address_line_1,
+            address_line_2, email, telephone, type, registration_number,
             iban, bank_name, bank_account_no, currency, document_urls } = req.body;
 
         const data = {
-            first_name, last_name, address_line_1, address_line_2, email, telephone,
-            type, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
+            contact_first_name, contact_last_name, name, address_line_1,
+            address_line_2, email, telephone, type, registration_number,
             iban, bank_name, bank_account_no, currency, document_urls
         };
 
@@ -228,18 +228,18 @@ async function createHcoPartner(req, res) {
     }
 }
 
-async function updateHcpPartner(req, res) {
+async function updateHcoPartner(req, res) {
     try {
-        const { first_name, last_name, address_line_1, address_line_2, email, telephone,
-            type, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
+        const { contact_first_name, contact_last_name, name, address_line_1,
+            address_line_2, email, telephone, type, registration_number,
             iban, bank_name, bank_account_no, currency, document_urls } = req.body;
 
         const hcpPartner = await HcoPartner.findOne({ where: { id: req.params.id } });
         if (!hcpPartner) return res.status(404).send('The partner request does not exist');
 
         const data = {
-            first_name, last_name, address_line_1, address_line_2, email, telephone,
-            type, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
+            contact_first_name, contact_last_name, name, address_line_1,
+            address_line_2, email, telephone, type, registration_number,
             iban, bank_name, bank_account_no, currency, document_urls
         }
         const updated_data = await HcpPartner.update(data);
@@ -256,3 +256,9 @@ exports.createPartnerRequest = createPartnerRequest;
 exports.getPartnerRequest = getPartnerRequest;
 exports.updatePartnerRequest = updatePartnerRequest;
 exports.deletePartnerRequest = deletePartnerRequest;
+exports.getHcpPartners = getHcpPartners;
+exports.createHcpPartner = createHcpPartner;
+exports.updateHcpPartner = updateHcpPartner;
+exports.getHcoPartners = getHcoPartners;
+exports.createHcoPartner = createHcoPartner;
+exports.updateHcoPartner = updateHcoPartner;
