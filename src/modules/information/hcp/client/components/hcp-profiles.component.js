@@ -229,9 +229,9 @@ export default function hcpUsers() {
             </Dropdown>);
         };
 
-        const { lastAppliedFilters } = isFilterEnabled ? hcpFilterRef.current.multiFilterProps.values || {} : {};
+        const { filters } = isFilterEnabled ? hcpFilterRef.current.multiFilterProps.values || {} : {};
 
-        const countryFilter = (lastAppliedFilters || []).find(f => f.fieldName === 'country');
+        const countryFilter = (filters || []).find(f => f.fieldName === 'country');
 
         if (countryFilter) {
             const authorityByCountry = uuidAuthorities.filter(a => countryFilter.value.some(v => a.codbase.toLowerCase() === v.toLowerCase()));
@@ -551,11 +551,11 @@ export default function hcpUsers() {
                 loadHcpProfiles(res.data.settings);
             })
         else {
-            const { lastAppliedFilters, lastAppliedLogic } = hcpFilterRef.current.multiFilterProps.values || {};
-            const filterSetting = lastAppliedFilters && lastAppliedFilters.length
+            const { filters, logic } = hcpFilterRef.current.multiFilterProps.values || {};
+            const filterSetting = filters && filters.length
                 ? {
-                    filters: lastAppliedFilters,
-                    logic: lastAppliedLogic
+                    filters,
+                    logic
                 }
                 : null;
             loadHcpProfiles(filterSetting);
@@ -728,8 +728,8 @@ export default function hcpUsers() {
                                 type={'list'}
                                 filterSetting={
                                     isFilterEnabled && ({
-                                        filters: hcpFilterRef.current.multiFilterProps.values.lastAppliedFilters,
-                                        logic: hcpFilterRef.current.multiFilterProps.values.lastAppliedLogic
+                                        filters: hcpFilterRef.current.multiFilterProps.values.filters,
+                                        logic: hcpFilterRef.current.multiFilterProps.values.logic
                                     })
                                 }
                                 onSort={() => {

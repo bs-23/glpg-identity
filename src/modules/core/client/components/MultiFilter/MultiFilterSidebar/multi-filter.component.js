@@ -22,8 +22,7 @@ const MultiFilter = (props, ref) => {
         selectedSettingTitle,
         selectedSettingID,
         scopeOptions,
-        selectedScopeKey,
-        onFilterSelect
+        selectedScopeKey
     } = props;
 
     const [show, setShow] = useState({
@@ -35,6 +34,26 @@ const MultiFilter = (props, ref) => {
     const formikBag = formikRef.current;
 
     const resetFilter = async (formikProps) => {
+        const { resetForm } = formikProps || formikBag;
+
+        resetForm({
+            values: {
+                scope: '',
+                filters: [],
+                logic: '',
+                newFilterSettingName: '',
+                selectedFilterSettingName: '',
+                selectedSettingID: '',
+                selectedSettingFilters: [],
+                selectedSettingLogic: '',
+                isChosenFromExisting: 'false',
+                shouldSaveFilter: false,
+                saveType: 'save_as_new'
+            }
+        })
+    }
+
+    const tempResetFilter = async (formikProps) => {
         const {setFieldValue, setTouched} = formikProps || formikBag;
 
         await setFieldValue('isChosenFromExisting', 'false');
@@ -50,6 +69,7 @@ const MultiFilter = (props, ref) => {
         await setFieldValue('lastAppliedLogic', '');
         await setFieldValue('saveType', 'save_as_new');
         await setFieldValue('shouldSaveFilter', false);
+
         await setTouched({});
     }
 
@@ -66,43 +86,20 @@ const MultiFilter = (props, ref) => {
         if(e.target === e.currentTarget) if(hideOnClickAway === true) onHide();
     };
 
-    const handleAddFilterDone = (filters, formikProps) => {
-        if(filters.length === 0) {
-            setShow({ ...show, addFilter: false });
-            return;
-        };
+    const handleAddFilterDone = (filters, logic, formikProps) => {
+        // if(filters.length === 0) {
+        //     setShow({ ...show, addFilter: false });
+        //     return;
+        // };
 
-        const allFiltersMerged = [...formikProps.values.filters, ...filters];
-        let uniqueFilters = [];
-
-        allFiltersMerged.forEach((f1) => {
-            if(!uniqueFilters.some(uf => {
-                delete f1.name;
-                delete uf.name;
-                return _.isEqual(f1, uf);
-            })) uniqueFilters.push(f1);
-        })
-
-        const allUniqueFilters = uniqueFilters.map((filter, ind) => {
-            filter.name = String(ind+1);
-            return filter;
-        });
-
-        const lengthOfNewFiltersAdded = allUniqueFilters.length - formikProps.values.filters.length;
-
-        const newFilterIndices = [];
-        for(let i = 0; i < lengthOfNewFiltersAdded; ++i) newFilterIndices.push(String(formikProps.values.filters.length + i + 1));
-
-        const updatedLogic = buildLogicAfterAddition(newFilterIndices, formikProps.values.logic);
-
-        formikProps.setFieldValue('filters', allUniqueFilters);
-        formikProps.setFieldValue('logic', updatedLogic);
+        formikProps.setFieldValue('filters', filters);
+        formikProps.setFieldValue('logic', logic);
 
         const values = { ...formikProps.values };
-        values.filters = allUniqueFilters;
-        values.logic = updatedLogic;
+        values.filters = filters;
+        values.logic = logic;
 
-        const updatedFormikProps = { ...formikProps, values: values }
+        const updatedFormikProps = { ...formikProps, values }
 
         setShow({ ...show, addFilter: false });
         trackFilterModifications(updatedFormikProps);
@@ -145,7 +142,6 @@ const MultiFilter = (props, ref) => {
             const { values, setFieldValue } = formikProps;
             const isFilterModified = hasFilterBeenModified(values);
             if (!isFilterModified) {
-                console.log('filter was not modified to chaning to save existing', values);
                 setFieldValue('saveType', 'save_existing');
             }
         }
@@ -180,25 +176,22 @@ const MultiFilter = (props, ref) => {
     };
 
     const handleExecute = (values, actions) => {
-        const lastAppliedSetting = {
-            filters: values.lastAppliedFilters,
-            logic: values.lastAppliedLogic
-        }
-
-        actions.setFieldValue('lastAppliedFilters', values.filters);
-        actions.setFieldValue('lastAppliedLogic', values.logic);
-
         if(!values.shouldSaveFilter && values.selectedSettingID && hasFilterBeenModified(values)) {
-            removeSelectedFilter(actions);
-            actions.setFieldValue('isChosenFromExisting', 'false');
             values.selectedSettingID = '';
+            values.selectedSettingFilters = []
+            values.selectedSettingLogic = '';
             values.selectedFilterSettingName = '';
+            values.saveType = 'save_as_new';
+            values.isChosenFromExisting = 'false';
         }
 
-        Promise.resolve(onExecute(values, actions)).catch(err => {
-            actions.setFieldValue('lastAppliedFilters', lastAppliedSetting.filters);
-            actions.setFieldValue('lastAppliedLogic', lastAppliedSetting.logic);
-        });
+        Promise.resolve(onExecute(values, actions))
+            .then(res => {
+                actions.resetForm({ values });
+            })
+            .catch(err => {
+                actions.resetForm();
+            });
 
         setShow({ ...show, addFilter: false });
         onHide();
@@ -240,8 +233,8 @@ const MultiFilter = (props, ref) => {
         formikBag.validateForm();
     }
 
-    const handleChooseFromExisting = (e, formikProps) => {
-        resetFilter(formikProps);
+    const handleChooseFromExisting = async (e, formikProps) => {
+        await tempResetFilter(formikProps);
 
         const value = e.target.value;
 
@@ -270,27 +263,28 @@ const MultiFilter = (props, ref) => {
         trackFilterModifications(props);
     }
 
-    const handleClose = () => {
+    const handleClose = (formikProps) => {
+        formikProps.resetForm();
         setShow({ ...show, addFilter: false });
         onHide && onHide();
     }
 
     useEffect(() => {
         if(formikBag && selectedSetting && selectedSettingTitle && selectedSettingID) {
-            formikBag.setFieldValue('isChosenFromExisting', 'true');
-            formikBag.setFieldValue('filters', selectedSetting.filters);
-            formikBag.setFieldValue('logic', selectedSetting.logic);
-            formikBag.setFieldValue('selectedSettingID', selectedSettingID);
-            formikBag.setFieldValue('selectedSettingFilters', selectedSetting.filters);
-            formikBag.setFieldValue('selectedSettingLogic', selectedSetting.logic);
-            formikBag.setFieldValue('selectedFilterSettingName', selectedSettingTitle);
-            formikBag.setFieldValue('newFilterSettingName', '');
-            formikBag.setFieldValue('lastAppliedFilters', selectedSetting.filters);
-            formikBag.setFieldValue('lastAppliedLogic', selectedSetting.logic);
-            formikBag.setFieldValue('saveType', 'save_existing');
-            formikBag.setFieldTouched('selectedFilterSettingName', false, true);
-            formikBag.setFieldTouched('newFilterSettingName', false, true);
-            if(!formikBag.touched.shouldSaveFilter) formikBag.setFieldValue('shouldSaveFilter', true);
+            const { values, touched, resetForm } = formikBag;
+
+            values.isChosenFromExisting = 'true';
+            values.filters = selectedSetting.filters;
+            values.logic = selectedSetting.logic;
+            values.selectedSettingID = selectedSettingID;
+            values.selectedSettingFilters = selectedSetting.filters;
+            values.selectedSettingLogic = selectedSetting.logic;
+            values.selectedFilterSettingName = selectedSettingTitle;
+            values.newFilterSettingName = '';
+            values.saveType = 'save_existing';
+            if(!touched.shouldSaveFilter) values.shouldSaveFilter = true;
+
+            resetForm({ values, touched: {} });
         }
     }, [selectedSetting, selectedSettingTitle, selectedSettingID])
 
@@ -303,7 +297,8 @@ const MultiFilter = (props, ref) => {
 
     useImperativeHandle(ref, () => ({
         resetFilter,
-        values: formikBag && formikBag.values
+        values: formikBag && formikBag.values,
+        initialValues: formikBag && formikBag.initialValues
     }));
 
     return <Formik
@@ -325,12 +320,6 @@ const MultiFilter = (props, ref) => {
                         ? selectedSetting.filters
                         : [],
                     selectedSettingLogic: selectedSetting
-                        ? selectedSetting.logic
-                        : '',
-                    lastAppliedFilters: selectedSetting
-                        ? selectedSetting.filters
-                        : [],
-                    lastAppliedLogic: selectedSetting
                         ? selectedSetting.logic
                         : '',
                     isChosenFromExisting: selectedSettingID ? 'true' : 'false',
@@ -403,7 +392,7 @@ const MultiFilter = (props, ref) => {
                                     </div>
                                 }
                                 {formikProps.values.filters.map((filter, index) =>
-                                    <div className="mb-2" key={filter.name}>
+                                    <div className="mb-2" key={index}>
                                         <FilterSummary
                                             fieldName={getFieldDisplayText(filter.fieldName)}
                                             operatorName={getOperatorDisplayText(filter.fieldName, filter.operator)}
@@ -420,13 +409,13 @@ const MultiFilter = (props, ref) => {
                                             filterPresets={filterPresets}
                                             filters={formikProps.values.filters}
                                             filterOptions={options}
-                                            currentNumberOfFilters={formikProps.values.filters.length}
-                                            onDone={(filters, selectedFilter) => handleAddFilterDone(filters, formikProps, selectedFilter)}
+                                            logic={formikProps.values.logic}
+                                            onDone={(filters, logic) => handleAddFilterDone(filters, logic, formikProps)}
                                             onHide={() => setShow({ ...show, addFilter: false })}
                                         />
                                     }
                                     <span type="button" className="cdp-text-primary filter__add-filter" onClick={() => setShow({ ...show, addFilter: true })}>
-                                        <i class="fas fa-plus"></i> Add Filter
+                                        <i class="fas fa-plus"></i> Manage Filter
                                     </span>
                                     {formikProps.values.filters.length > 0 &&
                                         <span className="small" type="button" onClick={() => handleRemoveAll(formikProps)}>Remove All</span>
@@ -526,7 +515,7 @@ const MultiFilter = (props, ref) => {
                         <Button
                             className="btn cdp-btn-outline-primary ml-1 btn-block mt-0 w-auto"
                             label="Close"
-                            onClick={handleClose}
+                            onClick={() => handleClose(formikProps)}
                         />
                     </div>
                 </div>
