@@ -11,6 +11,7 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Popover from 'react-bootstrap/Popover';
 import parse from 'html-react-parser';
 import Faq from '../../../platform/faq/client/faq.component';
+import { getConsentCategories } from '../consent-category/category.actions';
 
 const CountryConsents = () => {
     const dispatch = useDispatch();
@@ -31,6 +32,10 @@ const CountryConsents = () => {
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
     const country_consents = useSelector(state => state.consentReducer.country_consents);
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
+    const consent_categories = useSelector(state => state.consentCategoryReducer.consent_categories);
+    useEffect(() => {
+        dispatch(getConsentCategories());
+    }, []);
 
     const getGroupedCountryConsents = () => {
         if (!countries || !countries.length) return [];
@@ -68,6 +73,7 @@ const CountryConsents = () => {
     }
 
     const setEdit = (consent) => {
+        console.log("consent: ----", consent);
         setEditOption(consent);
         setEditable(true);
         setShow(true);
@@ -150,6 +156,7 @@ const CountryConsents = () => {
                                         options={editOption}
                                         changeShow={(val) => setShow(val)}
                                         countries={getLoggedInUserCountries()}
+                                        consentCategories={consent_categories}
                                         consents={cdp_consents}
                                         show={show}
                                     />

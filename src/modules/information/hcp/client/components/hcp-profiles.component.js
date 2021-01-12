@@ -229,9 +229,9 @@ export default function hcpUsers() {
             </Dropdown>);
         };
 
-        const { lastAppliedFilters } = isFilterEnabled ? hcpFilterRef.current.multiFilterProps.values || {} : {};
+        const { filters } = isFilterEnabled ? hcpFilterRef.current.multiFilterProps.values || {} : {};
 
-        const countryFilter = (lastAppliedFilters || []).find(f => f.fieldName === 'country');
+        const countryFilter = (filters || []).find(f => f.fieldName === 'country');
 
         if (countryFilter) {
             const authorityByCountry = uuidAuthorities.filter(a => countryFilter.value.some(v => a.codbase.toLowerCase() === v.toLowerCase()));
@@ -512,11 +512,11 @@ export default function hcpUsers() {
         }
     ];
 
-    const resetFilter = () => {
-        setSelectedFilterSetting();
+    const resetFilter = async () => {
+        setSelectedFilterSetting(null);
         setIsFilterEnabled(false);
-        hcpFilterRef.current.multiFilterProps.resetFilter();
-        history.push('/information/list/cdp');
+        await hcpFilterRef.current.multiFilterProps.resetFilter();
+        history.push(location.pathname);
     }
 
     const handleTableDirtyStatusChange = (dirty) => {
@@ -551,11 +551,11 @@ export default function hcpUsers() {
                 loadHcpProfiles(res.data.settings);
             })
         else {
-            const { lastAppliedFilters, lastAppliedLogic } = hcpFilterRef.current.multiFilterProps.values || {};
-            const filterSetting = lastAppliedFilters && lastAppliedFilters.length
+            const { filters, logic } = hcpFilterRef.current.multiFilterProps.values || {};
+            const filterSetting = filters && filters.length
                 ? {
-                    filters: lastAppliedFilters,
-                    logic: lastAppliedLogic
+                    filters,
+                    logic
                 }
                 : null;
             loadHcpProfiles(filterSetting);
@@ -605,7 +605,7 @@ export default function hcpUsers() {
                                     </div>
                                     <div title={tableDirty ? "Save or reset changes to open filter" : null}>
                                         <button
-                                            className={`btn cdp-btn-outline-primary ${isFilterEnabled ? 'multifilter_enabled' : ''} ${tableDirty ? 'hcp-inline-disable' : null}`}
+                                            className={`btn ${isFilterEnabled ? 'multifilter_enabled cdp-btn-primary text-white' : 'cdp-btn-outline-primary'} ${tableDirty ? 'hcp-inline-disable' : null}`}
                                             onClick={() => setShow({ ...show, filterSidebar: true })}
                                         >
                                             <i className={`fas fa-filter  ${isFilterEnabled ? '' : 'mr-2'}`}></i>
@@ -613,6 +613,19 @@ export default function hcpUsers() {
                                             Filter
                                         </button>
                                     </div>
+                                    {
+                                        isFilterEnabled &&
+                                        <div title={tableDirty ? "Save or reset changes to open filter" : null}>
+                                            <button
+                                                className={`btn cdp-btn-outline-secondary ml-2 ${isFilterEnabled ? 'multifilter_enabled' : ''} ${tableDirty ? 'hcp-inline-disable' : null}`}
+                                                onClick={resetFilter}
+                                            >
+                                                <i className={`fas fa-filter  ${isFilterEnabled ? '' : 'mr-2'}`}></i>
+                                                <i className={`fas fa-times ${isFilterEnabled ? 'd-inline-block filter__sub-icon mr-1' : 'd-none'}`}></i>
+                                                Reset
+                                            </button>
+                                        </div>
+                                    }
                                 </div>
                             </div>
 
@@ -715,8 +728,8 @@ export default function hcpUsers() {
                                 type={'list'}
                                 filterSetting={
                                     isFilterEnabled && ({
-                                        filters: hcpFilterRef.current.multiFilterProps.values.lastAppliedFilters,
-                                        logic: hcpFilterRef.current.multiFilterProps.values.lastAppliedLogic
+                                        filters: hcpFilterRef.current.multiFilterProps.values.filters,
+                                        logic: hcpFilterRef.current.multiFilterProps.values.logic
                                     })
                                 }
                                 onSort={() => {
