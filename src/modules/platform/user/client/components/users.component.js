@@ -121,11 +121,11 @@ export default function Users() {
                 dispatch(getUsers(searchObj.page, searchObj.codbase, searchObj.orderBy, searchObj.orderType, filterSetting));
             })
         else {
-            const { lastAppliedFilters, lastAppliedLogic } = filterRef.current.multiFilterProps.values || {};
-            const filterSetting = lastAppliedFilters && lastAppliedFilters.length
+            const { filters, logic } = filterRef.current.multiFilterProps.values || {};
+            const filterSetting = filters && filters.length
                 ? {
-                    filters: lastAppliedFilters,
-                    logic: lastAppliedLogic
+                    filters: filters,
+                    logic: logic
                 }
                 : null;
             dispatch(getUsers(searchObj.page, searchObj.codbase, searchObj.orderBy, searchObj.orderType, filterSetting));
