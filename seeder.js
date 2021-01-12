@@ -49,6 +49,7 @@ async function init() {
     require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-request.model.js'));
     require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-hcp.model.js'));
     require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-hco.model.js'));
+    require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-vendor.model.js'));
 
     await sequelize.cdpConnector.sync();
 
@@ -170,7 +171,7 @@ async function init() {
             const hcpServiceCategory = ServiceCategory.findOne({ where: { slug: 'information' } });
             const userServiceCategory = ServiceCategory.findOne({ where: { slug: 'platform' } });
             const consentServiceCategory = ServiceCategory.findOne({ where: { slug: 'privacy' } });
-            const businessPartnerServiceCategory = ServiceCategory.findOne({ where: { slug: 'business-partner-management' } });
+            const businessPartnerServiceCategory = ServiceCategory.findOne({ where: { slug: 'business-partner' } });
             const clinicalTrialServiceCategory = ServiceCategory.findOne({ where: { slug: 'clinical-trials' } });
             const dpo_permissionSet = PermissionSet.findOne({ where: { slug: 'data_privacy_officer' } });
             const gds_permissionSet = PermissionSet.findOne({ where: { slug: 'gds' } });
@@ -477,10 +478,10 @@ async function init() {
         applicationSeeder,
         permissionSetApplicationsSeeder,
         consentSeeder], function (err) {
-        if (err) console.error(err);
-        else console.info('DB seed completed!');
-        process.exit();
-    });
+            if (err) console.error(err);
+            else console.info('DB seed completed!');
+            process.exit();
+        });
 }
 
 init();
