@@ -86,43 +86,20 @@ const MultiFilter = (props, ref) => {
         if(e.target === e.currentTarget) if(hideOnClickAway === true) onHide();
     };
 
-    const handleAddFilterDone = (filters, formikProps) => {
-        if(filters.length === 0) {
-            setShow({ ...show, addFilter: false });
-            return;
-        };
+    const handleAddFilterDone = (filters, logic, formikProps) => {
+        // if(filters.length === 0) {
+        //     setShow({ ...show, addFilter: false });
+        //     return;
+        // };
 
-        const allFiltersMerged = [...formikProps.values.filters, ...filters];
-        let uniqueFilters = [];
-
-        allFiltersMerged.forEach((f1) => {
-            if(!uniqueFilters.some(uf => {
-                delete f1.name;
-                delete uf.name;
-                return _.isEqual(f1, uf);
-            })) uniqueFilters.push(f1);
-        })
-
-        const allUniqueFilters = uniqueFilters.map((filter, ind) => {
-            filter.name = String(ind+1);
-            return filter;
-        });
-
-        const lengthOfNewFiltersAdded = allUniqueFilters.length - formikProps.values.filters.length;
-
-        const newFilterIndices = [];
-        for(let i = 0; i < lengthOfNewFiltersAdded; ++i) newFilterIndices.push(String(formikProps.values.filters.length + i + 1));
-
-        const updatedLogic = buildLogicAfterAddition(newFilterIndices, formikProps.values.logic);
-
-        formikProps.setFieldValue('filters', allUniqueFilters);
-        formikProps.setFieldValue('logic', updatedLogic);
+        formikProps.setFieldValue('filters', filters);
+        formikProps.setFieldValue('logic', logic);
 
         const values = { ...formikProps.values };
-        values.filters = allUniqueFilters;
-        values.logic = updatedLogic;
+        values.filters = filters;
+        values.logic = logic;
 
-        const updatedFormikProps = { ...formikProps, values: values }
+        const updatedFormikProps = { ...formikProps, values }
 
         setShow({ ...show, addFilter: false });
         trackFilterModifications(updatedFormikProps);
@@ -415,7 +392,7 @@ const MultiFilter = (props, ref) => {
                                     </div>
                                 }
                                 {formikProps.values.filters.map((filter, index) =>
-                                    <div className="mb-2" key={filter.name}>
+                                    <div className="mb-2" key={index}>
                                         <FilterSummary
                                             fieldName={getFieldDisplayText(filter.fieldName)}
                                             operatorName={getOperatorDisplayText(filter.fieldName, filter.operator)}
@@ -432,13 +409,13 @@ const MultiFilter = (props, ref) => {
                                             filterPresets={filterPresets}
                                             filters={formikProps.values.filters}
                                             filterOptions={options}
-                                            currentNumberOfFilters={formikProps.values.filters.length}
-                                            onDone={(filters, selectedFilter) => handleAddFilterDone(filters, formikProps, selectedFilter)}
+                                            logic={formikProps.values.logic}
+                                            onDone={(filters, logic) => handleAddFilterDone(filters, logic, formikProps)}
                                             onHide={() => setShow({ ...show, addFilter: false })}
                                         />
                                     }
                                     <span type="button" className="cdp-text-primary filter__add-filter" onClick={() => setShow({ ...show, addFilter: true })}>
-                                        <i class="fas fa-plus"></i> Add Filter
+                                        <i class="fas fa-plus"></i> Manage Filter
                                     </span>
                                     {formikProps.values.filters.length > 0 &&
                                         <span className="small" type="button" onClick={() => handleRemoveAll(formikProps)}>Remove All</span>
