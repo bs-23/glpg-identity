@@ -5,7 +5,7 @@ import BusinessPartnerManagement from "./components/business-partner-management.
 import Supplier from "./components/supplier.component";
 import VendorManagement from "./components/vendor-management.component";
 import VendorBusinessPartnerManagement from "./components/vendor-business-partner-management.component";
-import WholesellerBusinessPartnerManagement from "./components/wholeseller-business-partner-management.component";
+import WholesalerBusinessPartnerManagement from "./components/wholesaler-business-partner-management.component";
 
 
 export default function ManagePartnersRoutes() {
@@ -15,7 +15,7 @@ export default function ManagePartnersRoutes() {
         <Switch>
             <PrivateRoute exact path={path} component={BusinessPartnerManagement} />
             <PrivateRoute path={`${path}/requests/vendors`} component={VendorBusinessPartnerManagement} />
-            <PrivateRoute path={`${path}/requests/wholesellers`} component={WholesellerBusinessPartnerManagement} />
+            <PrivateRoute path={`${path}/requests/wholesalers`} component={WholesalerBusinessPartnerManagement} />
             <PrivateRoute path={`${path}/requests`} component={Supplier} />
             <PrivateRoute path={`${path}/vendor-management/vendors`} component={VendorManagement} />
             <PrivateRoute path={`${path}/vendor-management/hcp`} component={VendorManagement} />

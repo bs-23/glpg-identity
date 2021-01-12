@@ -10,6 +10,11 @@ const PartnerRequest = sequelize.cdpConnector.define('partner_requests', {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4
     },
+    type: {
+        allowNull: false,
+        type: DataTypes.ENUM,
+        values: ['hcp', 'hco', 'vendor', 'wholesaler']
+    },
     first_name: {
         allowNull: false,
         type: DataTypes.STRING(50),
@@ -26,6 +31,9 @@ const PartnerRequest = sequelize.cdpConnector.define('partner_requests', {
     procurement_contact: {
         allowNull: false,
         type: DataTypes.STRING(100)
+    },
+    purchasing_organization: {
+        type: DataTypes.STRING(100),
     },
     company_codes: {
         type: DataTypes.ARRAY(DataTypes.STRING)

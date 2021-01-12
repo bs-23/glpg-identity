@@ -18,7 +18,7 @@ async function getPartnerRequests(req, res) {
 
 async function createPartnerRequest(req, res) {
     try {
-        const { first_name, last_name, email, procurement_contact, company_codes } = req.body;
+        const { first_name, last_name, email, procurement_contact, company_codes, purchasing_organization, type } = req.body;
 
         const companyCodes = company_codes && Array.isArray(company_codes)
             ? company_codes.filter(cb => 'string' === typeof cb)
@@ -26,15 +26,20 @@ async function createPartnerRequest(req, res) {
 
         if (!companyCodes || !companyCodes.length) return res.status(400).send('Invalid Company Codes.');
 
+        const data = {
+            type,
+            first_name,
+            last_name,
+            email,
+            procurement_contact,
+            company_codes: companyCodes
+        };
+
+        if(type === 'vendor' || type === 'wholesaler') data.purchasing_organization = purchasing_organization;
+
         const [user, created] = await PartnerRequest.findOrCreate({
             where: { email: email.toLowerCase() },
-            defaults: {
-                first_name,
-                last_name,
-                email,
-                procurement_contact,
-                company_codes: companyCodes
-            }
+            defaults: data
         });
 
         if (!created) {
@@ -60,7 +65,7 @@ async function getPartnerRequest(req, res) {
 
 async function updatePartnerRequest(req, res) {
     try {
-        const { first_name, last_name, email, procurement_contact, company_codes } = req.body;
+        const { type, first_name, last_name, email, procurement_contact, company_codes, purchasing_organization } = req.body;
 
         const companyCodes = company_codes && Array.isArray(company_codes)
             ? company_codes.filter(cb => 'string' === typeof cb)
@@ -80,9 +85,19 @@ async function updatePartnerRequest(req, res) {
 
         if (isEmailExists) return res.status(400).send('The Email already exists.');
 
-        const data = await partnerRequest.update({ first_name, last_name, email, procurement_contact, company_codes: companyCodes });
+        const data = {
+            first_name,
+            last_name,
+            email,
+            procurement_contact,
+            company_codes: companyCodes
+        };
 
-        res.json(data);
+        if(type === 'vendor' || type === 'wholesaler') data.purchasing_organization = purchasing_organization;
+
+        const updated_data = await partnerRequest.update(data);
+
+        res.json(updated_data);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
