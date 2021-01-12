@@ -45,7 +45,6 @@ const PartnerHcos = sequelize.cdpConnector.define('partner_hcos', {
     registration_number: {
         type: DataTypes.STRING
     },
-
     iban: {
         type: DataTypes.STRING
     },

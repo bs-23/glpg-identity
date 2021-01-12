@@ -66,7 +66,7 @@ const PartnerHcps = sequelize.cdpConnector.define('partner_hcps', {
     },
     document_urls: {
         type: DataTypes.ARRAY(DataTypes.STRING)
-    },
+    }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
     tableName: 'partner_hcps',
