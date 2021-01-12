@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import ScrollBars from 'react-scrollbar';
+import _ from 'lodash';
 
 import { Button } from '../common';
 import { Filter } from './components';
-import ScrollBars from 'react-scrollbar';
+import { buildLogicAfterAddition, buildLogicAfterRemoval } from '../utils';
 
 const AddFilter = (props) => {
     const {
-        currentNumberOfFilters,
+        filters: alreadyAddedFilters,
+        logic: alreadyAddedLogic,
         filterOptions,
         onDone,
         onHide
@@ -19,7 +22,8 @@ const AddFilter = (props) => {
         value: []
     };
 
-    const [filters, setFilters] = useState([emptyFilter]);
+    const [filters, setFilters] = useState([]);
+    const [logic, setLogic] = useState('');
     const [validationErrors, setValidationErrors] = useState([{}]);
     const [isTouched, setIsTouched] = useState(false);
     const [isFormValid, setIsFormValid] = useState(false);
@@ -33,12 +37,26 @@ const AddFilter = (props) => {
         };
         setFilters([...filters, emptyFilter]);
         setValidationErrors([...validationErrors, {}]);
+        const updateLogic = buildLogicAfterAddition([String(filters.length+1)], logic);
+        setLogic(updateLogic);
     }
 
-    const getFilterValidationError = async (filter) => {
+    const getFilterValidationError = async (filter, index) => {
         const validationError = {};
         const options = filterOptions.find(fo => fo.fieldName === filter.fieldName);
         const valueSchema = (options || {}).schema;
+
+        const isIdenticalFilter = filters.some((f, ind) => {
+            const f1 = {...f};
+            const f2 = {...filter};
+
+            delete f1.name;
+            delete f2.name;
+
+            return ind !== index && _.isEqual(f1, f2);
+        })
+
+        if(isIdenticalFilter) validationError.value = 'This filter is identical to another filter in the list.';
 
         if (!filter.fieldName.length) validationError.fieldName = 'Field can not be empty.';
         if (!filter.operator.length) validationError.operator = 'Field can not be empty.';
@@ -58,7 +76,13 @@ const AddFilter = (props) => {
     const handleDone = (e) => {
         setIsTouched(true);
         if(!isFormValid) return;
-        onDone && onDone(filters);
+
+        const filtersWithUpdatedNames = filters.map((filter, ind) => {
+            filter.name = String(ind+1);
+            return filter;
+        });
+
+        onDone && onDone(filtersWithUpdatedNames, logic);
     }
 
     const handleChange = (propertyName, value, index) => {
@@ -77,6 +101,8 @@ const AddFilter = (props) => {
     const handleRemove = (index) => {
         const filtersAfterRemoval = filters.filter((filter, ind) => ind !== index);
         const validationErrorsAfterRemoval = validationErrors.filter((ve, ind) => ind !== index);
+        const updatedLogic = buildLogicAfterRemoval(logic, index);
+        setLogic(updatedLogic);
         setFilters(filtersAfterRemoval);
         setValidationErrors(validationErrorsAfterRemoval);
     }
@@ -94,7 +120,7 @@ const AddFilter = (props) => {
         const updatedValidationErrors = [...validationErrors];
 
         await Promise.all(filters.map(async (filter, index) => {
-            const validationErrorMessage = await getFilterValidationError(filter);
+            const validationErrorMessage = await getFilterValidationError(filter, index);
             updatedValidationErrors[index] = validationErrorMessage;
             if(Object.keys(validationErrorMessage).length) isValid = false;
         }))
@@ -107,6 +133,20 @@ const AddFilter = (props) => {
         validateForm();
     }, [filters])
 
+    useEffect(() => {
+        if(!alreadyAddedFilters.length) {
+            const updatedFilters = [...alreadyAddedFilters, emptyFilter];
+            setFilters(updatedFilters);
+
+            const updateLogic = buildLogicAfterAddition([String(updatedFilters.length)], alreadyAddedLogic);
+            setLogic(updateLogic);
+        }
+        else {
+            setFilters([...alreadyAddedFilters]);
+            setLogic(alreadyAddedLogic);
+        }
+    }, [alreadyAddedFilters, alreadyAddedLogic])
+
     return <div className="filter__sub-panel">
         <ScrollBars className="custom-scroll" autoHide={true} smoothScrolling={true} style={scrollBarStyle}>
             <div className="bg-light p-2 rounded-top d-flex justify-content-between border-bottom">
@@ -117,10 +157,9 @@ const AddFilter = (props) => {
                 {
                     filters && filters.map((filter, index) =>
                         <Filter
-                            key={filter.name}
-                            name={filter.name}
+                            key={`${index}_${Math.random()}`}
+                            title={index+1}
                             index={index}
-                            currentNumberOfFilters={currentNumberOfFilters}
                             fieldValue={filter.fieldName}
                             operatorValue={filter.operator}
                             value={filter.value}
