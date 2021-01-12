@@ -139,53 +139,55 @@ const VendorBusinessPartnerManagement = () => {
                             <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/wholesalers">Wholesalers</NavLink>
                         </div>
 
-                        <div className="table-responsive shadow-sm mb-3">
-                            <table className="table table-hover table-sm mb-0 cdp-table mb-2">
-                                <thead className="cdp-table__header  cdp-bg-primary text-white">
-                                    <tr>
-                                        <th>First Name</th>
-                                        <th>Last Name</th>
-                                        <th>Purchasing Organization</th>
-                                        <th>Company Code</th>
-                                        <th>Email Address</th>
-                                        <th>Procurement Contact</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {
-                                        requests.map((row, index) =>
-                                        (
-                                            <tr key={index}>
-                                                <td>{row.first_name}</td>
-                                                <td>{row.last_name}</td>
-                                                <td>{row.purchasing_organization}</td>
-                                                <td>
-                                                    {
-                                                        row.company_codes.map((companyCode, idx) => (
-                                                            <p key={idx}>{companyCode}</p>
-                                                        ))
-                                                    }
-                                                </td>
-                                                <td>{row.email}</td>
-                                                <td>{row.procurement_contact}</td>
-                                                <td><Dropdown className="ml-auto dropdown-customize">
-                                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
-                                                    </Dropdown.Toggle>
-                                                    <Dropdown.Menu>
-                                                        <Dropdown.Item> Send Form </Dropdown.Item>
-                                                        <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
-                                                        <Dropdown.Item onClick={() => deleteRequest(row.id) }> Delete </Dropdown.Item>
-                                                    </Dropdown.Menu>
-                                                </Dropdown></td>
-                                            </tr>
-                                        ))
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-
-
+                        {requests && requests.length > 0 ?
+                            <div className="table-responsive shadow-sm mb-3">
+                                <table className="table table-hover table-sm mb-0 cdp-table mb-2">
+                                    <thead className="cdp-table__header  cdp-bg-primary text-white">
+                                        <tr>
+                                            <th>First Name</th>
+                                            <th>Last Name</th>
+                                            <th>Purchasing Organization</th>
+                                            <th>Company Code</th>
+                                            <th>Email Address</th>
+                                            <th>Procurement Contact</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {
+                                            requests.map((row, index) =>
+                                            (
+                                                <tr key={index}>
+                                                    <td>{row.first_name}</td>
+                                                    <td>{row.last_name}</td>
+                                                    <td>{row.purchasing_organization}</td>
+                                                    <td>
+                                                        {
+                                                            row.company_codes.map((companyCode, idx) => (
+                                                                <p key={idx}>{companyCode}</p>
+                                                            ))
+                                                        }
+                                                    </td>
+                                                    <td>{row.email}</td>
+                                                    <td>{row.procurement_contact}</td>
+                                                    <td><Dropdown className="ml-auto dropdown-customize">
+                                                        <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
+                                                        </Dropdown.Toggle>
+                                                        <Dropdown.Menu>
+                                                            <Dropdown.Item> Send Form </Dropdown.Item>
+                                                            <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
+                                                            <Dropdown.Item onClick={() => deleteRequest(row.id) }> Delete </Dropdown.Item>
+                                                        </Dropdown.Menu>
+                                                    </Dropdown></td>
+                                                </tr>
+                                            ))
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            :
+                            <div> No Request Found  </div>
+                        }
                     </div>
                 </div>
             </div>
@@ -193,7 +195,9 @@ const VendorBusinessPartnerManagement = () => {
             <Modal dialogClassName="modal-90w modal-customize" centered show={showForm}  onHide={toggleForm}>
                 <Modal.Header closeButton>
                     <Modal.Title>
-                        Add Request
+                        {
+                            partnerRequestId ? 'Edit Request' : 'Add Request'
+                        }
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>

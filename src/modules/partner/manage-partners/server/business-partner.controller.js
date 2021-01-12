@@ -38,7 +38,7 @@ async function createPartnerRequest(req, res) {
         if(type === 'vendor' || type === 'wholesaler') data.purchasing_organization = purchasing_organization;
 
         const [user, created] = await PartnerRequest.findOrCreate({
-            where: { email: email.toLowerCase() },
+            where: { type, email: email.toLowerCase() },
             defaults: data
         });
 
@@ -79,6 +79,7 @@ async function updatePartnerRequest(req, res) {
         const isEmailExists = await PartnerRequest.findOne({
             where: {
                 id: { [Op.not]: req.params.id },
+                type,
                 email: email.toLowerCase()
             }
         });

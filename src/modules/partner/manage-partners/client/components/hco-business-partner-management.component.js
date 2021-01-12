@@ -8,7 +8,7 @@ import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { partnerRequestSchema } from '../manage-partners.schema'
 import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest } from '../manage-partners.actions';
 
-const BusinessPartnerManagement = () => {
+const HcoBusinessPartnerManagement = () => {
     const dispatch = useDispatch();
     const { addToast } = useToasts();
     const [showForm, setShowForm] = useState(false);
@@ -17,7 +17,7 @@ const BusinessPartnerManagement = () => {
     const [partnerRequestId, setPartnerRequestId] = useState(undefined);
 
     const total_requests = useSelector(state => state.businessPartnerReducer.partnerRequests);
-    const requests = total_requests.filter(i => i.type === 'hcp');
+    const requests = total_requests.filter(i => i.type === 'hco');
     const request = useSelector(state => state.businessPartnerReducer.partnerRequest);
 
     const deleteRequest = (id) => {
@@ -122,7 +122,12 @@ const BusinessPartnerManagement = () => {
                             </div>
                         </div>
 
-                        {requests && requests.length > 0 &&
+                        <div>
+                            <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/hcps">HCPs</NavLink>
+                            <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/hcos">HCOs</NavLink>
+                        </div>
+
+                        {requests && requests.length > 0 ?
                             <div className="table-responsive shadow-sm bg-white">
                                 <table className="table table-hover table-sm mb-0 cdp-table">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
@@ -163,6 +168,8 @@ const BusinessPartnerManagement = () => {
                                     </tbody>
                                 </table>
                             </div>
+                            :
+                            <div> No Request Found  </div>
                         }
                     </div>
                 </div>
@@ -171,7 +178,9 @@ const BusinessPartnerManagement = () => {
             <Modal dialogClassName="modal-90w modal-customize" centered show={showForm}  onHide={toggleForm}>
                 <Modal.Header closeButton>
                     <Modal.Title>
-                        Add Request
+                        {
+                            partnerRequestId ? 'Edit Request' : 'Add Request'
+                        }
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
@@ -195,7 +204,7 @@ const BusinessPartnerManagement = () => {
                                 return;
                             }
 
-                            values.type = 'hcp';
+                            values.type = 'hco';
 
                             if (partnerRequestId) {
                                 dispatch(updatePartnerRequest(partnerRequestId, values)).then(function () {
@@ -276,4 +285,4 @@ const BusinessPartnerManagement = () => {
     );
 };
 
-export default BusinessPartnerManagement;
+export default HcoBusinessPartnerManagement;
