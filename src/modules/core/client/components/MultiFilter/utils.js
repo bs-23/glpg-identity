@@ -1,4 +1,5 @@
 export const buildLogicAfterAddition = (filters, logic) => {
+    if(!filters || !filters.length) return logic;
     if (!logic) return filters.join(' null ');
     return logic + ' null ' + filters.join(' null ');
 }
