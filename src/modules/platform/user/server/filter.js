@@ -123,24 +123,25 @@ async function getFilterOptions(user) {
 function getFilterQuery(filter) {
     let queryValue;
 
-    if (filter.operator === 'equal') {
-        queryValue = Array.isArray(filter.value)
-            ? { [Op.or]: filter.value }
-            : { [Op.eq]: filter.value };
-    }
+    // if (filter.operator === 'equal') {
+    //     queryValue = Array.isArray(filter.value)
+    //         ? { [Op.or]: filter.value }
+    //         : { [Op.eq]: filter.value };
+    // }
 
-    if (filter.operator === 'ci-equal') {
+    // Case Insensitive Equal
+    if (filter.operator === 'equal') {
         queryValue = Array.isArray(filter.value)
             ? { [Op.or]: filter.value.map(v => { return where(col(filter.fieldName), 'iLIKE', v); }) }
             : { [Op.iLike]: filter.value };
     }
 
     if (filter.operator === 'contains') {
-        queryValue = { [Op.like]: `%${filter.value}%` };
+        queryValue = { [Op.iLike]: `%${filter.value}%` };
     }
 
     if (filter.operator === 'starts-with') {
-        queryValue = { [Op.like]: `${filter.value}%` }
+        queryValue = { [Op.iLike]: `${filter.value}%` }
     }
 
     if (filter.operator === 'less-than') {
