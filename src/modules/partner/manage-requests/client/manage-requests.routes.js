@@ -6,7 +6,6 @@ import HcpPartnerRequests from "./components/hcp-partner-requests.component";
 import HcoPartnerRequests from "./components/hco-partner-requests.component";
 import VendorPartnerRequests from "./components/vendor-partner-requests.component";
 import WholesalerPartnerRequests from "./components/wholesaler-partner-requests.component";
-import VendorManagement from "../../manage-partners/client/components/vendor-management.component";
 
 
 export default function ManageRequestsRoutes() {
@@ -19,9 +18,6 @@ export default function ManageRequestsRoutes() {
             <PrivateRoute path={`${path}/requests/hcps`} component={HcpPartnerRequests} />
             <PrivateRoute path={`${path}/requests/vendors`} component={VendorPartnerRequests} />
             <PrivateRoute path={`${path}/requests/wholesalers`} component={WholesalerPartnerRequests} />
-            <PrivateRoute path={`${path}/vendor-management/vendors`} component={VendorManagement} />
-            <PrivateRoute path={`${path}/vendor-management/hcp`} component={VendorManagement} />
-            <PrivateRoute path={`${path}/vendor-management/hco`} component={VendorManagement} />
         </Switch>
     );
 }

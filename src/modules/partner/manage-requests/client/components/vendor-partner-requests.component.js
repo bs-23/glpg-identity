@@ -6,6 +6,7 @@ import { useToasts } from 'react-toast-notifications';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { NavLink } from 'react-router-dom';
 import { Faq } from '../../../../platform';
+import { partnerRequestSchemaForVendors } from './../manage-requests.schema';
 import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest } from '../manage-requests.actions';
 
 const VendorPartnerRequests = () => {
@@ -216,7 +217,7 @@ const VendorPartnerRequests = () => {
                             company_codes: [],
                         }}
                         displayName="PartnerRequestsForm"
-                        // validationSchema={partnerRequestSchema}
+                        validationSchema={partnerRequestSchemaForVendors}
                         enableReinitialize={true}
                         onSubmit={(values, actions) => {
                             values.company_codes = companyCodes.map(i => i.company_code);
