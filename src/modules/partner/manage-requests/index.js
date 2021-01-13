@@ -1,13 +1,13 @@
 import React from 'react';
-import ClientRoutes from './client/manage-partners.routes';
-import managePartnersReducer from './client/manage-partners.reducer';
-import * as managePartnersActions from './client/manage-partners.actions';
+import ClientRoutes from './client/manage-requests.routes';
+import manageRequestsReducer from './client/manage-requests.reducer';
+import * as manageRequestsActions from './client/manage-requests.actions';
 
 export function ManagePartnersClientRoutes(props) {
-    return <ClientRoutes path={props.path}/>;
+    return <ClientRoutes path={props.path} />;
 }
 
 export {
-    managePartnersReducer,
-    managePartnersActions,
- };
+    manageRequestsReducer,
+    manageRequestsActions
+};

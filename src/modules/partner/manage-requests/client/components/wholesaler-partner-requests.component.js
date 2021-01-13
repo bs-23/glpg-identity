@@ -6,9 +6,9 @@ import { useToasts } from 'react-toast-notifications';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { NavLink } from 'react-router-dom';
 import { Faq } from '../../../../platform';
-import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest } from '../manage-partners.actions';
+import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest } from '../manage-requests.actions';
 
-const VendorBusinessPartnerManagement = () => {
+const WholesalerPartnerRequests = () => {
     const dispatch = useDispatch();
     const { addToast } = useToasts();
     const [showForm, setShowForm] = useState(false);
@@ -20,9 +20,9 @@ const VendorBusinessPartnerManagement = () => {
     const handleCloseFaq = () => setShowFaq(false);
     const handleShowFaq = () => setShowFaq(true);
 
-    const total_requests = useSelector(state => state.businessPartnerReducer.partnerRequests);
-    const requests = total_requests.filter(i => i.type === 'vendor');
-    const request = useSelector(state => state.businessPartnerReducer.partnerRequest);
+    const total_requests = useSelector(state => state.manageRequestsReducer.partnerRequests);
+    const requests = total_requests.filter(i => i.type === 'wholesaler');
+    const request = useSelector(state => state.manageRequestsReducer.partnerRequest);
 
     const deleteRequest = (id) => {
         dispatch(deletePartnerRequest(id)).then(() => {
@@ -138,7 +138,6 @@ const VendorBusinessPartnerManagement = () => {
                             <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/vendors">General Vendors</NavLink>
                             <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/wholesalers">Wholesalers</NavLink>
                         </div>
-
                         {requests && requests.length > 0 ?
                             <div className="table-responsive shadow-sm mb-3">
                                 <table className="table table-hover table-sm mb-0 cdp-table mb-2">
@@ -222,7 +221,7 @@ const VendorBusinessPartnerManagement = () => {
                                 return;
                             }
 
-                            values.type = 'vendor';
+                            values.type = 'wholesaler';
 
                             if (partnerRequestId) {
                                 dispatch(updatePartnerRequest(partnerRequestId, values)).then(function () {
@@ -280,7 +279,6 @@ const VendorBusinessPartnerManagement = () => {
                                             <Field className="form-control" type="text" name="procurement_contact" />
                                             <div className="invalid-feedback"><ErrorMessage name="procurement_contact" /></div>
                                         </div>
-
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="purchasing_organization">Purchasing Organization <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="purchasing_organization" />
@@ -310,4 +308,4 @@ const VendorBusinessPartnerManagement = () => {
     );
 };
 
-export default VendorBusinessPartnerManagement;
+export default WholesalerPartnerRequests;

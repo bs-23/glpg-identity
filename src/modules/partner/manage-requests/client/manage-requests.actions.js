@@ -1,5 +1,5 @@
 import axios from 'axios';
-import Types from './manage-partners.types';
+import Types from './manage-requests.types';
 
 export function getPartnerRequests(query = '') {
     return {
