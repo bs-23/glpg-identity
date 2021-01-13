@@ -5,7 +5,7 @@ module.exports = {
     },
     server: {
         routes: [
-            "src/modules/partner/manage-partners/server/business-partner.routes.js",
+            "src/modules/partner/manage-requests/server/business-partner.routes.js",
             "src/modules/!(core)/server/**/*.routes.js",
             "src/modules/core/server/country/country.routes.js",
             "src/modules/core/server/filter/filter.routes.js",
