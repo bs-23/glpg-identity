@@ -167,7 +167,7 @@ async function init() {
             const hcpServiceCategory = ServiceCategory.findOne({ where: { slug: 'information' } });
             const userServiceCategory = ServiceCategory.findOne({ where: { slug: 'platform' } });
             const consentServiceCategory = ServiceCategory.findOne({ where: { slug: 'privacy' } });
-            const businessPartnerServiceCategory = ServiceCategory.findOne({ where: { slug: 'business-partner-management' } });
+            const businessPartnerServiceCategory = ServiceCategory.findOne({ where: { slug: 'clinical-trials' } });
             const dpo_permissionSet = PermissionSet.findOne({ where: { slug: 'data_privacy_officer' } });
             const gds_permissionSet = PermissionSet.findOne({ where: { slug: 'gds' } });
             const lds_permissionSet = PermissionSet.findOne({ where: { slug: 'lds' } });
