@@ -5,8 +5,8 @@ const HcoPartner = require('../../manage-partners/server/partner-hco.model');
 const { QueryTypes, Op } = require('sequelize');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
-
-
+const jwt = require('jsonwebtoken');
+const axios = require('axios');
 async function getPartnerRequests(req, res) {
     try {
         const PartnerRequests = await PartnerRequest.findAll();
@@ -65,6 +65,14 @@ async function getPartnerRequest(req, res) {
     }
 }
 
+async function sendForm(req, res){
+    try {
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
 async function updatePartnerRequest(req, res) {
     try {
         const { type, first_name, last_name, email, procurement_contact, company_codes, purchasing_organization } = req.body;
@@ -132,3 +140,4 @@ exports.createPartnerRequest = createPartnerRequest;
 exports.getPartnerRequest = getPartnerRequest;
 exports.updatePartnerRequest = updatePartnerRequest;
 exports.deletePartnerRequest = deletePartnerRequest;
+exports.sendForm = sendForm;

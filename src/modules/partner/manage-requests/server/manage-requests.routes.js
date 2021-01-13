@@ -11,5 +11,6 @@ module.exports = app => {
     app.route('/api/partner-requests/:id')
         .get(controller.getPartnerRequest)
         .put(controller.updatePartnerRequest)
-        .delete(controller.deletePartnerRequest);
+        .delete(controller.deletePartnerRequest)
+        .post(controller.sendForm);
 };
