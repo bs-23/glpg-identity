@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, useRouteMatch } from 'react-router-dom';
-import { ManagePartnersClientRoutes, managePartnersReducer, managePartnersActions } from './manage-requests';
+import { ManagePartnersClientRoutes, manageRequestsReducer, manageRequestsActions } from './manage-requests';
 
 export function PartnerRoutes() {
     const { path } = useRouteMatch();
@@ -13,6 +13,6 @@ export function PartnerRoutes() {
 }
 
 export {
-    managePartnersReducer,
-    managePartnersActions
+    manageRequestsReducer,
+    manageRequestsActions
 };
