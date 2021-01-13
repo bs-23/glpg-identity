@@ -285,7 +285,7 @@ async function init() {
                     email: 'patients-organization@glpg.com',
                     password: 'P@ssword123',
                     approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
-                    auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6a',
+                    auth_secret: 'b248eaa4-583f-4ecd-9e9c-be8f58ab3c3e',
                     logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
                     created_by: admin.id,
                     updated_by: admin.id,
