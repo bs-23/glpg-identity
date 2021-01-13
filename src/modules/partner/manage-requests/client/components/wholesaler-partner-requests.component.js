@@ -6,6 +6,7 @@ import { useToasts } from 'react-toast-notifications';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { NavLink } from 'react-router-dom';
 import { Faq } from '../../../../platform';
+import { partnerRequestSchemaForVendors } from './../manage-requests.schema';
 import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest } from '../manage-requests.actions';
 
 const WholesalerPartnerRequests = () => {
@@ -185,7 +186,12 @@ const WholesalerPartnerRequests = () => {
                                 </table>
                             </div>
                             :
-                            <div> No Request Found  </div>
+                            <div className="row justify-content-center mt-sm-5 pt-5 mb-3">
+                                <div className="col-12 col-sm-6 py-5 bg-white shadow-sm rounded text-center">
+                                    <i className="fas fa-dolly-flatbed fa-5x cdp-text-secondary"></i>
+                                    <h3 className="font-weight-bold cdp-text-primary pt-4">No  Request Found for Wholesaler</h3>
+                                </div>
+                            </div>
                         }
                     </div>
                 </div>
@@ -210,7 +216,7 @@ const WholesalerPartnerRequests = () => {
                             company_codes: [],
                         }}
                         displayName="PartnerRequestsForm"
-                        // validationSchema={partnerRequestSchema}
+                        validationSchema={partnerRequestSchemaForVendors}
                         enableReinitialize={true}
                         onSubmit={(values, actions) => {
                             values.company_codes = companyCodes.map(i => i.company_code);
