@@ -5,10 +5,10 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import { useSelector, useDispatch } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
-import { partnerRequestSchema } from '../manage-partners.schema'
-import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest } from '../manage-partners.actions';
+import { partnerRequestSchema } from '../manage-requests.schema'
+import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest } from '../manage-requests.actions';
 
-const HcpBusinessPartnerManagement = () => {
+const HcpPartnerRequests = () => {
     const dispatch = useDispatch();
     const { addToast } = useToasts();
     const [showForm, setShowForm] = useState(false);
@@ -16,9 +16,9 @@ const HcpBusinessPartnerManagement = () => {
     const [showError, setShowError] = useState(false);
     const [partnerRequestId, setPartnerRequestId] = useState(undefined);
 
-    const total_requests = useSelector(state => state.businessPartnerReducer.partnerRequests);
+    const total_requests = useSelector(state => state.manageRequestsReducer.partnerRequests);
     const requests = total_requests.filter(i => i.type === 'hcp');
-    const request = useSelector(state => state.businessPartnerReducer.partnerRequest);
+    const request = useSelector(state => state.manageRequestsReducer.partnerRequest);
 
     const deleteRequest = (id) => {
         dispatch(deletePartnerRequest(id)).then(() => {
@@ -285,4 +285,4 @@ const HcpBusinessPartnerManagement = () => {
     );
 };
 
-export default HcpBusinessPartnerManagement;
+export default HcpPartnerRequests;

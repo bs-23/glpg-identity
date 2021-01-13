@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom';
 import Modal from 'react-bootstrap/Modal';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { useSelector, useDispatch } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
-import { partnerRequestSchema } from '../manage-partners.schema'
-import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest } from '../manage-partners.actions';
+import { NavLink } from 'react-router-dom';
+import { Faq } from '../../../../platform';
+import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest } from '../manage-requests.actions';
 
-const HcoBusinessPartnerManagement = () => {
+const VendorPartnerRequests = () => {
     const dispatch = useDispatch();
     const { addToast } = useToasts();
     const [showForm, setShowForm] = useState(false);
@@ -16,9 +16,13 @@ const HcoBusinessPartnerManagement = () => {
     const [showError, setShowError] = useState(false);
     const [partnerRequestId, setPartnerRequestId] = useState(undefined);
 
-    const total_requests = useSelector(state => state.businessPartnerReducer.partnerRequests);
-    const requests = total_requests.filter(i => i.type === 'hco');
-    const request = useSelector(state => state.businessPartnerReducer.partnerRequest);
+    const [showFaq, setShowFaq] = useState(false);
+    const handleCloseFaq = () => setShowFaq(false);
+    const handleShowFaq = () => setShowFaq(true);
+
+    const total_requests = useSelector(state => state.manageRequestsReducer.partnerRequests);
+    const requests = total_requests.filter(i => i.type === 'vendor');
+    const request = useSelector(state => state.manageRequestsReducer.partnerRequest);
 
     const deleteRequest = (id) => {
         dispatch(deletePartnerRequest(id)).then(() => {
@@ -59,6 +63,7 @@ const HcoBusinessPartnerManagement = () => {
     }
 
     const getCompanyCodeFields = () => {
+        console.log(companyCodes);
         return companyCodes.map((item, idx) => {
             const companyCodeId = `company-code-${idx + 1}`;
 
@@ -97,7 +102,7 @@ const HcoBusinessPartnerManagement = () => {
     }, [request.company_codes])
 
     return (
-        <main className="app__content cdp-light-bg h-100">
+        <main className="app__content cdp-light-bg">
             <div className="container-fluid">
                 <div className="row">
                     <div className="col-12 px-0">
@@ -106,8 +111,15 @@ const HcoBusinessPartnerManagement = () => {
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/business-partner">Business Partner Management</NavLink></li>
                                 <li className="breadcrumb-item active"><span>Business Partner Requests</span></li>
+                                <li className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help icon-2x cdp-text-secondary"></i></li>
                             </ol>
                         </nav>
+                        <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Questions You May Have</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body className="faq__in-modal"><Faq topic="consent-performance-report" /></Modal.Body>
+                        </Modal>
                     </div>
                 </div>
 
@@ -123,48 +135,53 @@ const HcoBusinessPartnerManagement = () => {
                         </div>
 
                         <div>
-                            <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/hcps">HCPs</NavLink>
-                            <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/hcos">HCOs</NavLink>
+                            <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/vendors">General Vendors</NavLink>
+                            <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/wholesalers">Wholesalers</NavLink>
                         </div>
 
                         {requests && requests.length > 0 ?
-                            <div className="table-responsive shadow-sm bg-white">
-                                <table className="table table-hover table-sm mb-0 cdp-table">
-                                    <thead className="cdp-bg-primary text-white cdp-table__header">
+                            <div className="table-responsive shadow-sm mb-3">
+                                <table className="table table-hover table-sm mb-0 cdp-table mb-2">
+                                    <thead className="cdp-table__header  cdp-bg-primary text-white">
                                         <tr>
-                                            <th>Name</th>
-                                            <th>Status</th>
+                                            <th>First Name</th>
+                                            <th>Last Name</th>
+                                            <th>Purchasing Organization</th>
                                             <th>Company Code</th>
                                             <th>Email Address</th>
                                             <th>Procurement Contact</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="cdp-table__body bg-white">
-                                        {requests.map((row, index) => (
-                                            <tr key={index}>
-                                                <td>{`${row.first_name} ${row.last_name}`}</td>
-                                                <td>{row.status}</td>
-                                                <td>
-                                                    {
-                                                        row.company_codes.map((companyCode, idx) => (
-                                                            <p key={idx}>{companyCode}</p>
-                                                        ))
-                                                    }
-                                                </td>
-                                                <td>{row.email}</td>
-                                                <td>{row.procurement_contact}</td>
-                                                <td><Dropdown className="ml-auto dropdown-customize">
-                                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
-                                                    </Dropdown.Toggle>
-                                                    <Dropdown.Menu>
-                                                        <Dropdown.Item> Send Form </Dropdown.Item>
-                                                        <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
-                                                        <Dropdown.Item onClick={() => deleteRequest(row.id) }> Delete </Dropdown.Item>
-                                                    </Dropdown.Menu>
-                                                </Dropdown></td>
-                                            </tr>
-                                        ))}
+                                    <tbody>
+                                        {
+                                            requests.map((row, index) =>
+                                            (
+                                                <tr key={index}>
+                                                    <td>{row.first_name}</td>
+                                                    <td>{row.last_name}</td>
+                                                    <td>{row.purchasing_organization}</td>
+                                                    <td>
+                                                        {
+                                                            row.company_codes.map((companyCode, idx) => (
+                                                                <p key={idx}>{companyCode}</p>
+                                                            ))
+                                                        }
+                                                    </td>
+                                                    <td>{row.email}</td>
+                                                    <td>{row.procurement_contact}</td>
+                                                    <td><Dropdown className="ml-auto dropdown-customize">
+                                                        <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
+                                                        </Dropdown.Toggle>
+                                                        <Dropdown.Menu>
+                                                            <Dropdown.Item> Send Form </Dropdown.Item>
+                                                            <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
+                                                            <Dropdown.Item onClick={() => deleteRequest(row.id) }> Delete </Dropdown.Item>
+                                                        </Dropdown.Menu>
+                                                    </Dropdown></td>
+                                                </tr>
+                                            ))
+                                        }
                                     </tbody>
                                 </table>
                             </div>
@@ -190,10 +207,11 @@ const HcoBusinessPartnerManagement = () => {
                             last_name: partnerRequestId && request ? request.last_name : '',
                             email: partnerRequestId && request ? request.email : '',
                             procurement_contact: partnerRequestId && request ? request.procurement_contact : '',
+                            purchasing_organization: partnerRequestId && request ? request.purchasing_organization : '',
                             company_codes: [],
                         }}
                         displayName="PartnerRequestsForm"
-                        validationSchema={partnerRequestSchema}
+                        // validationSchema={partnerRequestSchema}
                         enableReinitialize={true}
                         onSubmit={(values, actions) => {
                             values.company_codes = companyCodes.map(i => i.company_code);
@@ -204,7 +222,7 @@ const HcoBusinessPartnerManagement = () => {
                                 return;
                             }
 
-                            values.type = 'hco';
+                            values.type = 'vendor';
 
                             if (partnerRequestId) {
                                 dispatch(updatePartnerRequest(partnerRequestId, values)).then(function () {
@@ -263,6 +281,12 @@ const HcoBusinessPartnerManagement = () => {
                                             <div className="invalid-feedback"><ErrorMessage name="procurement_contact" /></div>
                                         </div>
 
+                                        <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="purchasing_organization">Purchasing Organization <span className="text-danger">*</span></label>
+                                            <Field className="form-control" type="text" name="purchasing_organization" />
+                                            <div className="invalid-feedback"><ErrorMessage name="purchasing_organization" /></div>
+                                        </div>
+
                                         {getCompanyCodeFields()}
 
                                         <div className="col-12">
@@ -281,8 +305,9 @@ const HcoBusinessPartnerManagement = () => {
                     </Formik>
                 </Modal.Body>
             </Modal>
-        </main>
+        </main >
+
     );
 };
 
-export default HcoBusinessPartnerManagement;
+export default VendorPartnerRequests;
