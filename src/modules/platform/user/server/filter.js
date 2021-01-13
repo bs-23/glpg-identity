@@ -132,7 +132,8 @@ function getFilterQuery(filter) {
     // Case Insensitive Equal
     if (filter.operator === 'equal') {
         queryValue = Array.isArray(filter.value)
-            ? { [Op.or]: filter.value.map(v => { return where(col(filter.fieldName), 'iLIKE', v); }) }
+            // ? { [Op.or]: filter.value.map(v => { return where(col(filter.fieldName), 'iLIKE', v); }) }
+            ? { [Op.or]: filter.value.map(v => ({ [Op.iLike]: v })) }
             : { [Op.iLike]: filter.value };
     }
 

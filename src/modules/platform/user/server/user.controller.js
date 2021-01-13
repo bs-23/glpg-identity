@@ -407,7 +407,7 @@ async function createUser(req, res) {
     }
 }
 
-function generateFilterOptions(currentFilter, defaultFilter) {
+function generateFilterOptions(currentFilter, defaultFilter, countries) {
     console.log(!currentFilter , !currentFilter.filters , currentFilter.filter === 0);
     if (!currentFilter || !currentFilter.filters || currentFilter.filter === 0)
         return defaultFilter;
@@ -418,6 +418,27 @@ function generateFilterOptions(currentFilter, defaultFilter) {
 
     //     return defaultFilter;
     // }
+
+    const getFilterQuery = (filter) => {
+        if(filter.fieldName === 'country') {
+            const country_iso2_list_for_codbase = countries
+                .filter(c => filter.value.some(f => f === c.codbase))
+                .map(c => c.country_iso2);
+
+            const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase
+                .map(i => ignoreCaseArray(i)));
+
+            const countries_ignorecase_for_codbase_formatted = '{' + countries_ignorecase_for_codbase.join(", ") + '}';
+
+            return {
+                [Op.or]: [
+                    { '$userRoles->role->role_ps->ps.countries$': { [Op.overlap]: countries_ignorecase_for_codbase_formatted } },
+                    { '$userProfile->up_ps->ps.countries$': { [Op.overlap]: countries_ignorecase_for_codbase_formatted } }
+                ]
+            }
+        }
+        return filterService.getFilterQuery(filter);
+    }
 
     console.log('Default filter: ', defaultFilter);
     let customFilter = { ...defaultFilter };
@@ -440,7 +461,7 @@ function generateFilterOptions(currentFilter, defaultFilter) {
 
         if (node === "and" && prevOperator === "and") {
             const filter = findFilter(next);
-            const query = filterService.getFilterQuery(filter);
+            const query = getFilterQuery(filter);
             const currentParent = groupedQueries[groupedQueries.length - 1];
             currentParent.values.push(query);
         } else if (node === "and") {
@@ -449,14 +470,14 @@ function generateFilterOptions(currentFilter, defaultFilter) {
             const group = {
                 operator: "and",
                 values: [
-                    filterService.getFilterQuery(leftFilter),
-                    filterService.getFilterQuery(rightFilter)
+                    getFilterQuery(leftFilter),
+                    getFilterQuery(rightFilter)
                 ]
             };
             groupedQueries.push(group);
         } else if (node !== "or" && prev !== "and" && next !== "and") {
             const filter = findFilter(node);
-            const query = filterService.getFilterQuery(filter);
+            const query = getFilterQuery(filter);
             groupedQueries.push(query);
         }
 
@@ -499,15 +520,19 @@ async function getUsers(req, res) {
 
         const [, userCountries,] = await getRequestingUserPermissions(req.user);
 
-        const country_iso2_list_for_codbase = (await sequelize.datasyncConnector.query(`
-            SELECT * FROM ciam.vwcountry
-            WHERE codbase = $codbase
-            `, {
-            bind: {
-                codbase: codbase || ''
-            },
-            type: QueryTypes.SELECT
-        })).map(c => c.country_iso2);
+        // const countries = (await sequelize.datasyncConnector.query(`
+        //     SELECT * FROM ciam.vwcountry
+        //     WHERE codbase = $codbase
+        //     `, {
+        //     bind: {
+        //         codbase: codbase || ''
+        //     },
+        //     type: QueryTypes.SELECT
+        // }))
+
+        const countries = await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT });
+
+        const country_iso2_list_for_codbase = countries.filter(c => c.codbase === codbase).map(c => c.country_iso2);
 
         const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase
             .map(i => ignoreCaseArray(i)));
@@ -544,12 +569,16 @@ async function getUsers(req, res) {
 
         const defaultFilter = {
             id: { [Op.ne]: signedInId },
-            type: 'basic'
+            type: 'basic',
+            // [Op.or]: [
+            //     { '$userRoles->role->role_ps->ps.countries$': { [Op.overlap]: '{be, BE, bE, Be}' } },
+            //     { '$userProfile->up_ps->ps.countries$': { [Op.overlap]: '{be, BE, bE, Be}' } }
+            // ]
         };
 
         const currentFilter = req.body;
 
-        const filterOptions = generateFilterOptions(currentFilter, defaultFilter);
+        const filterOptions = generateFilterOptions(currentFilter, defaultFilter, countries);
 
         const {count: countByUser, rows: users} = await User.findAndCountAll({
             where: filterOptions,
@@ -557,6 +586,7 @@ async function getUsers(req, res) {
             limit,
             order: order,
             subQuery: false,
+            // logging: console.log,
             include: [{
                 model: User,
                 as: 'createdByUser',
