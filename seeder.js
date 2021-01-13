@@ -46,10 +46,10 @@ async function init() {
     require(path.join(process.cwd(), 'src/modules/core/server/password/password-history.model.js'));
     require(path.join(process.cwd(), 'src/modules/core/server/filter/filter.model.js'));
     require(path.join(process.cwd(), 'src/modules/platform/application/server/data.model.js'));
-    require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-request.model.js'));
-    require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-hcp.model.js'));
-    require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-hco.model.js'));
-    require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-vendor.model.js'));
+    require(path.join(process.cwd(), 'src/modules/partner/manage-requests/server/partner-request.model.js'));
+    require(path.join(process.cwd(), 'src/modules/partner/manage-requests/server/partner-hcp.model.js'));
+    require(path.join(process.cwd(), 'src/modules/partner/manage-requests/server/partner-hco.model.js'));
+    require(path.join(process.cwd(), 'src/modules/partner/manage-requests/server/partner-vendor.model.js'));
 
     await sequelize.cdpConnector.sync();
 
@@ -277,6 +277,21 @@ async function init() {
                     logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
                     created_by: admin.id,
                     updated_by: admin.id
+                },
+                {
+                    id: 'addd1e75-cc32-4d16-b88b-38e62dd224c4',
+                    name: 'Patients Organization',
+                    slug: convertToSlug('Patients Organization'),
+                    email: 'patients-organization@glpg.com',
+                    password: 'P@ssword123',
+                    approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
+                    auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6a',
+                    logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
+                    created_by: admin.id,
+                    updated_by: admin.id,
+                    metadata: JSON.stringify({
+                        request_notification_link: 'https://patients-organization-dev.glpg.com/bin/public/glpg-forms/sendForm.invitation.html'
+                    })
                 }
             ];
 

@@ -54,6 +54,9 @@ const Application = sequelize.cdpConnector.define('applications', {
         type: DataTypes.BOOLEAN,
         defaultValue: true
     },
+    metadata: {
+        type: DataTypes.STRING
+    },
     created_by: {
         type: DataTypes.UUID
     },
