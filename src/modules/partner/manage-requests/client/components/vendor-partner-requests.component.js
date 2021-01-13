@@ -186,7 +186,12 @@ const VendorPartnerRequests = () => {
                                 </table>
                             </div>
                             :
-                            <div> No Request Found  </div>
+                            <div className="row justify-content-center mt-sm-5 pt-5 mb-3">
+                                <div className="col-12 col-sm-6 py-5 bg-white shadow-sm rounded text-center">
+                                    <i className="icon icon-partner icon-5x  cdp-text-secondary"></i>
+                                    <h3 className="font-weight-bold cdp-text-primary pt-4">No Request Found for Vendor</h3>
+                                </div>
+                            </div>
                         }
                     </div>
                 </div>

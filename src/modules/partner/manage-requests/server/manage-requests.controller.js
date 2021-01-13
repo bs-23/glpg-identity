@@ -1,5 +1,6 @@
 const path = require('path');
 const PartnerRequest = require('./partner-request.model');
+const Application = require('./../../../platform/application/server/application.model');
 const HcpPartner = require('../../manage-partners/server/partner-hcp.model');
 const HcoPartner = require('../../manage-partners/server/partner-hco.model');
 const { QueryTypes, Op } = require('sequelize');
@@ -28,13 +29,16 @@ async function createPartnerRequest(req, res) {
 
         if (!companyCodes || !companyCodes.length) return res.status(400).send('Invalid Company Codes.');
 
+        const application = await Application.findOne({ where: { email: 'patients-organization@glpg.com'} });
+
         const data = {
             type,
             first_name,
             last_name,
             email,
             procurement_contact,
-            company_codes: companyCodes
+            company_codes: companyCodes,
+            application_id: application.id
         };
 
         if (type === 'vendor' || type === 'wholesaler') data.purchasing_organization = purchasing_organization;

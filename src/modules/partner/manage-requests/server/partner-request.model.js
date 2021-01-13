@@ -10,6 +10,10 @@ const PartnerRequest = sequelize.cdpConnector.define('partner_requests', {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4
     },
+    application_id: {
+        allowNull: false,
+        type: DataTypes.UUID,
+    },
     type: {
         allowNull: false,
         type: DataTypes.ENUM,

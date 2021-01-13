@@ -67,7 +67,7 @@ const HcoPartnerRequests = () => {
                     <div className="form-group">
                         <label className="font-weight-bold" htmlFor={companyCodeId}> {`Company Code ${idx+1}`} <span className="text-danger">*</span></label>
                         <Field className="form-control company_code" type='text' value={item.company_code} onChange={(e) => handleChange(e)} data-id={idx} name={companyCodeId} id={companyCodeId}/>
-                        {showError && !item.company_code && <div class="invalid-feedback">This field must not be empty.</div>}
+                        {showError && !item.company_code && <div className="invalid-feedback">This field must not be empty.</div>}
                     </div>
                 </div>
             </React.Fragment>
@@ -115,7 +115,7 @@ const HcoPartnerRequests = () => {
                     <div className="col-12">
                         <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
                             <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Overview of Business Partner Requests</h4>
-                            <div class="d-flex justify-content-between align-items-center">
+                            <div className="d-flex justify-content-between align-items-center">
                                 <button onClick={() => setShowForm(true)} className="btn cdp-btn-secondary text-white ml-2">
                                     <i className="icon icon-plus pr-1"></i> Add New Request
                                 </button>
@@ -169,7 +169,12 @@ const HcoPartnerRequests = () => {
                                 </table>
                             </div>
                             :
-                            <div> No Request Found  </div>
+                            <div className="row justify-content-center mt-sm-5 pt-5 mb-3">
+                                <div className="col-12 col-sm-6 py-5 bg-white shadow-sm rounded text-center">
+                                    <i className="fas fa-hospital-alt fa-5x cdp-text-secondary"></i>
+                                    <h3 className="font-weight-bold cdp-text-primary pt-4">No  Request Found for HCO</h3>
+                                </div>
+                            </div>
                         }
                     </div>
                 </div>
