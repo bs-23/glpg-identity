@@ -9,7 +9,7 @@ import WholesalerPartnerRequests from "./components/wholesaler-partner-requests.
 import VendorManagement from "../../manage-partners/client/components/vendor-management.component";
 
 
-export default function ManagePartnersRoutes() {
+export default function ManageRequestsRoutes() {
     let { path } = useRouteMatch();
 
     return (
