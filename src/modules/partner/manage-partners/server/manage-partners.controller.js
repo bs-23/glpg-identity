@@ -6,16 +6,13 @@ const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodeca
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 
 async function getHcpPartners(req, res) {
-    const response = new Response({}, []);
     try {
-        const HcpPartners = await HcpPartner.findAll();
-        response.data = HcpPartners;
-        res.json(response);
+        const hcpPartners = await HcpPartner.findAll();
+        res.json(hcpPartners);
 
     } catch (err) {
         console.error(err);
-        response.errors.push(new CustomError('Internal server error', 500));
-        res.status(500).send(response);
+        res.status(500).send('Internal server error');
     }
 }
 
@@ -39,12 +36,12 @@ async function createHcpPartner(req, res) {
             iban, bank_name, bank_account_no, currency, document_urls
         };
 
-        const [user, created] = await HcpPartner.findOrCreate({
+        const [user, existing] = await HcpPartner.findOrCreate({
             where: { type, email: email.toLowerCase() },
             defaults: data
         });
 
-        if (!created) {
+        if (!existing) {
             response.errors.push(new CustomError('Email already exists.', 400, 'email'));
             return res.status(400).send(response);
         }
@@ -60,7 +57,6 @@ async function createHcpPartner(req, res) {
 }
 
 async function updateHcpPartner(req, res) {
-    const response = new Response({}, []);
     try {
         const { first_name, last_name, address_line_1, address_line_2, email, telephone,
             type, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
@@ -75,27 +71,21 @@ async function updateHcpPartner(req, res) {
             iban, bank_name, bank_account_no, currency, document_urls
         }
         const updated_data = await HcpPartner.update(data);
-        response.data = updated_data;
-        res.json(response);
 
+        res.json(updated_data);
     } catch (err) {
         console.error(err);
-        response.errors.push(new CustomError('Internal server error', 500));
-        res.status(500).send(response);
+        res.status(500).send('Internal server error');
     }
 }
 
 async function getHcoPartners(req, res) {
-    const response = new Response({}, []);
     try {
-        const HcoPartners = await HcoPartner.findAll();
-        response.data = HcoPartners;
-        res.json(response);
-
+        const hcoPartners = await HcoPartner.findAll();
+        res.json(hcoPartners);
     } catch (err) {
         console.error(err);
-        response.errors.push(new CustomError('Internal server error', 500));
-        res.status(500).send(response);
+        res.status(500).send('Internal server error');
     }
 }
 
@@ -120,12 +110,12 @@ async function createHcoPartner(req, res) {
             iban, bank_name, bank_account_no, currency, document_urls
         };
 
-        const [user, created] = await HcoPartner.findOrCreate({
+        const [user, existing] = await HcoPartner.findOrCreate({
             where: { type, email: email.toLowerCase() },
             defaults: data
         });
 
-        if (!created) {
+        if (!existing) {
             response.errors.push(new CustomError('Email already exists.', 400, 'email'));
             return res.status(400).send(response);
         }
@@ -141,7 +131,6 @@ async function createHcoPartner(req, res) {
 }
 
 async function updateHcoPartner(req, res) {
-    const response = new Response({}, []);
     try {
         const { contact_first_name, contact_last_name, name, address_line_1,
             address_line_2, email, telephone, type, registration_number,
@@ -156,13 +145,11 @@ async function updateHcoPartner(req, res) {
             iban, bank_name, bank_account_no, currency, document_urls
         }
         const updated_data = await HcpPartner.update(data);
-        response.data = updated_data;
 
-        res.json(response);
+        res.json(updated_data);
     } catch (err) {
         console.error(err);
-        response.errors.push(new CustomError('Internal server error', 500));
-        res.status(500).send(response);
+        res.status(500).send('Internal server error');
     }
 }
 
