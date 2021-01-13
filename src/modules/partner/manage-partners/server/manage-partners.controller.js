@@ -6,21 +6,32 @@ const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodeca
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 
 async function getHcpPartners(req, res) {
+    const response = new Response({}, []);
     try {
         const HcpPartners = await HcpPartner.findAll();
-        res.json(HcpPartners);
+        response.data = HcpPartners;
+        res.json(response);
 
     } catch (err) {
         console.error(err);
-        res.status(500).send('Internal server error');
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
     }
 }
 
 async function createHcpPartner(req, res) {
+    const response = new Response({}, []);
     try {
         const { first_name, last_name, address_line_1, address_line_2, email, telephone,
             type, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
             iban, bank_name, bank_account_no, currency, document_urls } = req.body;
+
+        if (!first_name) response.errors.push(new CustomError('First name is missing.', 400, 'first_name'));
+        if (!last_name) response.errors.push(new CustomError('Last name is missing.', 400, 'last_name'));
+        if (!email) response.errors.push(new CustomError('Last name is missing.', 400, 'email'));
+        if (!type) response.errors.push(new CustomError('Type is missing.', 400, 'type'));
+
+        if (response.errors.length) return res.status(400).send(response);
 
         const data = {
             first_name, last_name, address_line_1, address_line_2, email, telephone,
@@ -34,24 +45,29 @@ async function createHcpPartner(req, res) {
         });
 
         if (!created) {
-            return res.status(400).send('Email already exists.');
+            response.errors.push(new CustomError('Email already exists.', 400, 'email'));
+            return res.status(400).send(response);
         }
 
-        res.json(user);
+        response.data = user;
+        res.json(response);
+
     } catch (err) {
         console.error(err);
-        res.status(500).send('Internal server error');
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
     }
 }
 
 async function updateHcpPartner(req, res) {
+    const response = new Response({}, []);
     try {
         const { first_name, last_name, address_line_1, address_line_2, email, telephone,
             type, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
             iban, bank_name, bank_account_no, currency, document_urls } = req.body;
 
         const hcpPartner = await HcoPartner.findOne({ where: { id: req.params.id } });
-        if (!hcpPartner) return res.status(404).send('The partner request does not exist');
+        if (!hcpPartner) return res.status(404).send('The partner does not exist');
 
         const data = {
             first_name, last_name, address_line_1, address_line_2, email, telephone,
@@ -59,30 +75,44 @@ async function updateHcpPartner(req, res) {
             iban, bank_name, bank_account_no, currency, document_urls
         }
         const updated_data = await HcpPartner.update(data);
+        response.data = updated_data;
+        res.json(response);
 
-        res.json(updated_data);
     } catch (err) {
         console.error(err);
-        res.status(500).send('Internal server error');
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
     }
 }
 
 async function getHcoPartners(req, res) {
+    const response = new Response({}, []);
     try {
         const HcoPartners = await HcoPartner.findAll();
-        res.json(HcoPartners);
+        response.data = HcoPartners;
+        res.json(response);
 
     } catch (err) {
         console.error(err);
-        res.status(500).send('Internal server error');
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
     }
 }
 
 async function createHcoPartner(req, res) {
+    const response = new Response({}, []);
     try {
         const { contact_first_name, contact_last_name, name, address_line_1,
             address_line_2, email, telephone, type, registration_number,
             iban, bank_name, bank_account_no, currency, document_urls } = req.body;
+
+        if (!contact_first_name) response.errors.push(new CustomError('Contact first name is missing.', 400, 'contact_first_name'));
+        if (!contact_last_name) response.errors.push(new CustomError('Contact last name is missing.', 400, 'contact_last_name'));
+        if (!name) response.errors.push(new CustomError('Name is missing.', 400, 'name'));
+        if (!email) response.errors.push(new CustomError('Email is missing.', 400, 'email'));
+        if (!type) response.errors.push(new CustomError('Type is missing.', 400, 'type'));
+
+        if (response.errors.length) return res.status(400).send(response);
 
         const data = {
             contact_first_name, contact_last_name, name, address_line_1,
@@ -96,24 +126,29 @@ async function createHcoPartner(req, res) {
         });
 
         if (!created) {
-            return res.status(400).send('Email already exists.');
+            response.errors.push(new CustomError('Email already exists.', 400, 'email'));
+            return res.status(400).send(response);
         }
 
-        res.json(user);
+        response.data = user;
+        res.json(response);
+
     } catch (err) {
         console.error(err);
-        res.status(500).send('Internal server error');
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
     }
 }
 
 async function updateHcoPartner(req, res) {
+    const response = new Response({}, []);
     try {
         const { contact_first_name, contact_last_name, name, address_line_1,
             address_line_2, email, telephone, type, registration_number,
             iban, bank_name, bank_account_no, currency, document_urls } = req.body;
 
         const hcpPartner = await HcoPartner.findOne({ where: { id: req.params.id } });
-        if (!hcpPartner) return res.status(404).send('The partner request does not exist');
+        if (!hcpPartner) return res.status(404).send('The partner does not exist');
 
         const data = {
             contact_first_name, contact_last_name, name, address_line_1,
@@ -121,11 +156,13 @@ async function updateHcoPartner(req, res) {
             iban, bank_name, bank_account_no, currency, document_urls
         }
         const updated_data = await HcpPartner.update(data);
+        response.data = updated_data;
 
-        res.json(updated_data);
+        res.json(response);
     } catch (err) {
         console.error(err);
-        res.status(500).send('Internal server error');
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
     }
 }
 
