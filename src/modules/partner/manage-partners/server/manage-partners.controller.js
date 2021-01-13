@@ -1,7 +1,6 @@
 const path = require('path');
 const HcpPartner = require('./partner-hcp.model');
 const HcoPartner = require('./partner-hco.model');
-const Application = require('./../../../platform/application/server/application.model');
 const { QueryTypes, Op } = require('sequelize');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
