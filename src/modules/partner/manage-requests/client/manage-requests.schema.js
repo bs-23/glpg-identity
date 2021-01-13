@@ -32,3 +32,31 @@ export const partnerRequestSchema = object().shape({
         .test('is-valid-email-length', 'The part before @ of the email can be maximum 64 characters ',
             email => isEmailLengthValid(email))
 });
+
+export const partnerRequestSchemaForVendors = object().shape({
+    first_name: string()
+        .matches(XRegExp('^[\\pL]+(?:\\s[\\pL]+)*$'), 'This field should contain letters only')
+        .min(2, 'This field must be at least 2 characters long')
+        .max(50, 'This field must be at most 50 characters long')
+        .required('This field must not be empty'),
+    last_name: string()
+        .matches(XRegExp('^[\\pL]+(?:\\s[\\pL]+)*$'), 'This field should contain letters only')
+        .min(2, 'This field must be at least 2 characters long')
+        .max(50, 'This field must be at most 50 characters long')
+        .required('This field must not be empty'),
+    email: string()
+        .email('This field should be a valid email address')
+        .max(100, 'This field must be at most 100 characters long')
+        .required('This field must not be empty')
+        .test('is-valid-email-length', 'The part before @ of the email can be maximum 64 characters ',
+            email => isEmailLengthValid(email)),
+    purchasing_organization: string()
+        .max(30, 'This field must be at most 30 characters long')
+        .required('This field must not be empty'),
+    procurement_contact: string()
+        .email('This field should be a valid email address')
+        .max(100, 'This field must be at most 100 characters long')
+        .required('This field must not be empty')
+        .test('is-valid-email-length', 'The part before @ of the email can be maximum 64 characters ',
+            email => isEmailLengthValid(email))
+});

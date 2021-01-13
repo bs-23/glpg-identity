@@ -67,7 +67,7 @@ const HcpPartnerRequests = () => {
                     <div className="form-group">
                         <label className="font-weight-bold" htmlFor={companyCodeId}> {`Company Code ${idx+1}`} <span className="text-danger">*</span></label>
                         <Field className="form-control company_code" type='text' value={item.company_code} onChange={(e) => handleChange(e)} data-id={idx} name={companyCodeId} id={companyCodeId}/>
-                        {showError && !item.company_code && <div class="invalid-feedback">This field must not be empty.</div>}
+                        {showError && !item.company_code && <div className="invalid-feedback">This field must not be empty.</div>}
                     </div>
                 </div>
             </React.Fragment>
@@ -113,19 +113,22 @@ const HcpPartnerRequests = () => {
 
                 <div className="row">
                     <div className="col-12">
-                        <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
-                            <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Overview of Business Partner Requests</h4>
-                            <div class="d-flex justify-content-between align-items-center">
+                        <div className="d-sm-flex justify-content-between align-items-end mb-0 mt-3">
+                            <div>
+                                <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Overview of Business Partner Requests</h4>
+                                <div className="pt-3">
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/hcps">HCPs</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/hcos">HCOs</NavLink>
+                                </div>
+                            </div>
+                            <div className="d-flex justify-content-between align-items-center mb-2">
                                 <button onClick={() => setShowForm(true)} className="btn cdp-btn-secondary text-white ml-2">
                                     <i className="icon icon-plus pr-1"></i> Add New Request
                                 </button>
                             </div>
                         </div>
 
-                        <div>
-                            <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/hcps">HCPs</NavLink>
-                            <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/hcos">HCOs</NavLink>
-                        </div>
+                        
 
                         {requests && requests.length > 0 ?
                             <div className="table-responsive shadow-sm bg-white">
@@ -169,7 +172,12 @@ const HcpPartnerRequests = () => {
                                 </table>
                             </div>
                             :
-                            <div> No Request Found  </div>
+                            <div className="row justify-content-center mt-sm-5 pt-5 mb-3">
+                                <div className="col-12 col-sm-6 py-5 bg-white shadow-sm rounded text-center">
+                                    <i className="fas fa-hospital-user fa-5x cdp-text-secondary"></i>
+                                    <h3 className="font-weight-bold cdp-text-primary pt-4">No  Request Found  for HCP</h3>
+                                </div>
+                            </div>
                         }
                     </div>
                 </div>

@@ -6,6 +6,7 @@ import { useToasts } from 'react-toast-notifications';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { NavLink } from 'react-router-dom';
 import { Faq } from '../../../../platform';
+import { partnerRequestSchemaForVendors } from './../manage-requests.schema';
 import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest } from '../manage-requests.actions';
 
 const WholesalerPartnerRequests = () => {
@@ -125,19 +126,22 @@ const WholesalerPartnerRequests = () => {
 
                 <div className="row">
                     <div className="col-12">
-                        <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
-                            <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Overview of Business Partner Requests</h4>
-                            <div class="d-flex justify-content-between align-items-center">
+                        <div className="d-sm-flex justify-content-between align-items-end mb-0 mt-3">
+                            <div>
+                                <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Overview of Business Partner Requests</h4>
+                                <div className="pt-3">
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/vendors">General Vendors</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/wholesalers">Wholesalers</NavLink>
+                                </div>
+                            </div>
+                            <div className="d-flex justify-content-between align-items-center mb-2">
                                 <button onClick={() => setShowForm(true)} className="btn cdp-btn-secondary text-white ml-2">
                                     <i className="icon icon-plus pr-1"></i> Add New Request
                                 </button>
                             </div>
                         </div>
 
-                        <div>
-                            <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/vendors">General Vendors</NavLink>
-                            <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/wholesalers">Wholesalers</NavLink>
-                        </div>
+                       
                         {requests && requests.length > 0 ?
                             <div className="table-responsive shadow-sm mb-3">
                                 <table className="table table-hover table-sm mb-0 cdp-table mb-2">
@@ -185,7 +189,12 @@ const WholesalerPartnerRequests = () => {
                                 </table>
                             </div>
                             :
-                            <div> No Request Found  </div>
+                            <div className="row justify-content-center mt-sm-5 pt-5 mb-3">
+                                <div className="col-12 col-sm-6 py-5 bg-white shadow-sm rounded text-center">
+                                    <i className="fas fa-dolly-flatbed fa-5x cdp-text-secondary"></i>
+                                    <h3 className="font-weight-bold cdp-text-primary pt-4">No  Request Found for Wholesaler</h3>
+                                </div>
+                            </div>
                         }
                     </div>
                 </div>
@@ -210,7 +219,7 @@ const WholesalerPartnerRequests = () => {
                             company_codes: [],
                         }}
                         displayName="PartnerRequestsForm"
-                        // validationSchema={partnerRequestSchema}
+                        validationSchema={partnerRequestSchemaForVendors}
                         enableReinitialize={true}
                         onSubmit={(values, actions) => {
                             values.company_codes = companyCodes.map(i => i.company_code);

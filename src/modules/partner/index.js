@@ -1,13 +1,17 @@
 import React from 'react';
 import { Route, useRouteMatch } from 'react-router-dom';
-import { ManagePartnersClientRoutes, manageRequestsReducer, manageRequestsActions } from './manage-requests';
+import { BusinessPartnerManagementClientRoutes } from './common';
+import { ManageRequestsClientRoutes, manageRequestsReducer, manageRequestsActions } from './manage-requests';
+import { ManagePartnersClientRoutes } from './manage-partners'
 
 export function PartnerRoutes() {
     const { path } = useRouteMatch();
 
     return (
         <Route>
-            <ManagePartnersClientRoutes path={path}/>
+            <BusinessPartnerManagementClientRoutes path={path} />
+            <ManageRequestsClientRoutes path={path} />
+            <ManagePartnersClientRoutes path={path} />
         </Route>
     );
 }
