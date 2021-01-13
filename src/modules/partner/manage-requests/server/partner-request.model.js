@@ -41,6 +41,14 @@ const PartnerRequest = sequelize.cdpConnector.define('partner_requests', {
     company_codes: {
         type: DataTypes.ARRAY(DataTypes.STRING)
     },
+    country_iso2: {
+        allowNull: false,
+        type: DataTypes.STRING
+    },
+    language: {
+        allowNull: false,
+        type: DataTypes.STRING
+    },
     status: {
         allowNull: false,
         type: DataTypes.ENUM,
