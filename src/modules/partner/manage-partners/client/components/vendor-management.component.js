@@ -1,10 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import React, { useEffect, useState, useRef } from "react";
+import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import { Faq } from '../../../../platform';
 import Modal from 'react-bootstrap/Modal';
 import Dropdown from 'react-bootstrap/Dropdown';
+import { useSelector, useDispatch } from 'react-redux';
+import { getHcpPartners } from '../manage-partners.actions';
 
 const VendorManagement = () => {
+
+    const location = useLocation();
+    const history = useHistory();
+    const params = new URLSearchParams(window.location.search);
+    const dispatch = useDispatch();
+
+
     const [showFaq, setShowFaq] = useState(false);
     const handleCloseFaq = () => setShowFaq(false);
     const handleShowFaq = () => setShowFaq(true);
@@ -22,6 +31,11 @@ const VendorManagement = () => {
             country: "Belgium"
         }
     ];
+
+    useEffect(() => {
+        const partnerType = window.location.pathname.split("/").pop();
+        dispatch(getHcpPartners());
+    }, [location]);
 
     return (
         <main className="app__content cdp-light-bg">
