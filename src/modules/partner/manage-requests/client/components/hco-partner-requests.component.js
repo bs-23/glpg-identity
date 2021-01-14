@@ -4,7 +4,6 @@ import Modal from 'react-bootstrap/Modal';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { useSelector, useDispatch } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
-import CountryCodes from 'country-codes-list';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { partnerRequestSchema } from '../manage-requests.schema'
 import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest } from '../manage-requests.actions';
@@ -12,14 +11,17 @@ import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPart
 const HcoPartnerRequests = () => {
     const dispatch = useDispatch();
     const { addToast } = useToasts();
-
-    const CountryCodesObject = Object.values(CountryCodes.customList('countryCode', '{countryCode} {officialLanguageCode} {officialLanguageNameEn}'));
     const [showForm, setShowForm] = useState(false);
     const [companyCodes, setCompanyCodes] = useState([{ id: Math.random(), company_code: '' }]);
     const [showError, setShowError] = useState(false);
     const [partnerRequestId, setPartnerRequestId] = useState(undefined);
 
-    const [countryLanguages, setCountryLanguages] = useState([]);
+    const countryLanguages = [
+        { language_name: 'English', language_code: 'en' },
+        { language_name: 'French', language_code: 'fr' },
+        { language_name: 'Germany', language_code: 'de' },
+        { language_name: 'Netherlands', language_code: 'nl' }
+    ];
     const [requestToDelete, setRequestToDelete] = useState(null);
 
     const total_requests = useSelector(state => state.manageRequestsReducer.partnerRequests);
@@ -105,28 +107,7 @@ const HcoPartnerRequests = () => {
     }
 
     useEffect(() => {
-        function getLanguages() {
-            const mapped_languages = {};
-
-            const country_languages = CountryCodesObject.filter(item => {
-                const [, , language_name] = item.split(' ');
-                if (language_name && !mapped_languages[language_name]) {
-                    mapped_languages[language_name] = true;
-                    return true;
-                }
-                return false;
-            });
-            country_languages.sort((a, b) => {
-                const [, , language_name1] = a.split(' ');
-                const [, , language_name2] = b.split(' ');
-                if (language_name1.replace(/,/g, '') < language_name2.replace(/,/g, '')) return -1;
-                return 1;
-            });
-            setCountryLanguages(country_languages);
-        }
-
         loadRequests();
-        getLanguages();
     }, []);
 
     useEffect(() => {
@@ -345,9 +326,9 @@ const HcoPartnerRequests = () => {
                                                 <label className="font-weight-bold" htmlFor="language">ISO Code Language (ISO 639-1) <span className="text-danger">*</span></label>
                                                 <Field className="form-control lang_code" as="select" name="language" className="form-control" id="language">
                                                     <option key="select-language" value="" disabled>--Select Language--</option>
-                                                    {countryLanguages.map(element => {
-                                                        const [country_iso2, language_code, language_name] = element.split(' ');
-                                                        return language_name && <option key={country_iso2} value={language_code}>{`${language_name.replace(/,/g, '')}(${language_code})`}</option>
+                                                    {countryLanguages.map( (element, lang_idx) => {
+                                                        const { language_name, language_code } = element;
+                                                        return language_name && <option key={lang_idx} value={language_code}>{language_name}</option>
                                                     })}
                                                 </Field>
                                                 <div className="invalid-feedback"><ErrorMessage name="language" /></div>
