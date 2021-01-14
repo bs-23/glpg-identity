@@ -228,6 +228,13 @@ export default function Users() {
         setIsFilterEnabled(true);
     }
 
+    const resetFilter = async () => {
+        setSelectedFilterSetting(null);
+        setIsFilterEnabled(false);
+        await filterRef.current.multiFilterProps.resetFilter();
+        history.push(location.pathname);
+    }
+
     return (
         <main className="app__content cdp-light-bg">
             <div className="container-fluid">
@@ -277,6 +284,17 @@ export default function Users() {
                                     <i className={`fas fa-database ${isFilterEnabled ? 'd-inline-block filter__sub-icon mr-1' : 'd-none'}`}></i>
                                     Filter
                                 </button>
+                                {
+                                    isFilterEnabled &&
+                                    <button
+                                        className={`btn cdp-btn-outline-secondary ml-2 ${isFilterEnabled ? 'multifilter_enabled' : ''}`}
+                                        onClick={resetFilter}
+                                    >
+                                        <i className={`fas fa-filter  ${isFilterEnabled ? '' : 'mr-2'}`}></i>
+                                        <i className={`fas fa-times ${isFilterEnabled ? 'd-inline-block filter__sub-icon mr-1' : 'd-none'}`}></i>
+                                        Reset
+                                    </button>
+                                }
                                 <NavLink to="/platform/create-user" className="btn cdp-btn-secondary text-white ml-2">
                                     <i className="icon icon-plus pr-1"></i> Create new user
                                 </NavLink>

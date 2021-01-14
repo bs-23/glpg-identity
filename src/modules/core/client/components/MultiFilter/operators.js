@@ -1,6 +1,6 @@
 export function getStringOperators() {
     return [
-        { key: 'equal', displayText: 'Equals to' },
+        { key: 'ci-equal', displayText: 'Equals to' },
         { key: 'contains', displayText: 'Contains' },
         { key: 'starts-with', displayText: 'Starts With' }
     ];
