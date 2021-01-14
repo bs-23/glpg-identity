@@ -30,7 +30,7 @@ const WholesalerPartnerRequests = () => {
     const handleShowFaq = () => setShowFaq(true);
 
     const total_requests = useSelector(state => state.manageRequestsReducer.partnerRequests);
-    const requests = total_requests.filter(i => i.type === 'wholesaler');
+    const requests = total_requests.filter(i => i.entity_type === 'wholesaler');
     const request = useSelector(state => state.manageRequestsReducer.partnerRequest);
 
     const countries = useSelector(state => state.countryReducer.countries);
@@ -95,7 +95,7 @@ const WholesalerPartnerRequests = () => {
 
             return (<React.Fragment key={item.id}>
                 <div className="col-12 col-sm-6 col-lg-4">
-                   
+
 
                     <div className="form-group">
                         <label className="font-weight-bold d-flex align-items-center justify-content-between" htmlFor={companyCodeId}>
@@ -255,6 +255,7 @@ const WholesalerPartnerRequests = () => {
                             company_codes: [],
                             country_iso2: partnerRequestId && request ? request.country_iso2 : '',
                             language: partnerRequestId && request ? request.language : '',
+                            partner_type: partnerRequestId && request ? request.partner_type : '',
                         }}
                         displayName="PartnerRequestsForm"
                         validationSchema={partnerRequestSchemaForVendors}
@@ -268,7 +269,7 @@ const WholesalerPartnerRequests = () => {
                                 return;
                             }
 
-                            values.type = 'wholesaler';
+                            values.entity_type = 'wholesaler';
 
                             if (partnerRequestId) {
                                 dispatch(updatePartnerRequest(partnerRequestId, values)).then(function () {
@@ -331,6 +332,11 @@ const WholesalerPartnerRequests = () => {
                                     </div>
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="partner_type"> Business Partner Type <span className="text-danger">*</span></label>
+                                            <Field className="form-control" type="text" name="partner_type" />
+                                            <div className="invalid-feedback"><ErrorMessage name="partner_type" /></div>
+                                        </div>
+                                        <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="email">Email Address <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="email" />
                                             <div className="invalid-feedback"><ErrorMessage name="email" /></div>
@@ -342,27 +348,15 @@ const WholesalerPartnerRequests = () => {
                                             <Field className="form-control" type="text" name="procurement_contact" />
                                             <div className="invalid-feedback"><ErrorMessage name="procurement_contact" /></div>
                                         </div>
-                                    </div>
-                                    <div className="col-12 col-sm-6 col-lg-4">
-                                        <div className="form-group">
-                                            <label className="font-weight-bold" htmlFor="purchasing_organization">Purchasing Organization <span className="text-danger">*</span></label>
-                                            <Field className="form-control" type="text" name="purchasing_organization" />
-                                            <div className="invalid-feedback"><ErrorMessage name="purchasing_organization" /></div>
-                                        </div>
-                                    </div>
-                                    <div className="col-12">
-                                        <div className="row py-3">
-                                            {getCompanyCodeFields()}
-                                            <div className="col-12 col-sm-6 col-lg-4">
-                                                <div className="form-group">
-                                                    <label>
-                                                        &#160;
-                                                    </label>
-                                                    <div className="d-flex align-items-center hover-opacity" type="button" onClick={addNewCompanyCode}>
-                                                        <i className="fas fa-plus cdp-text-secondary mr-2" ></i>
-                                                        <span className=" cdp-text-secondary mb-0">Add Company Code</span>
-                                                    </div>
-                                                </div>
+
+                                        {getCompanyCodeFields()}
+
+                                        <div className="col-12">
+                                            <div className="form-group">
+                                                <label className="d-flex align-items-center cdp-text-primary hover-opacity" type="button" onClick={addNewCompanyCode}>
+                                                    <i className="fas fa-plus  fa-2x mr-3" ></i>
+                                                    <span className="h4 mb-0">Add Company Code</span>
+                                                </label>
                                             </div>
 
                                         </div>
@@ -380,7 +374,7 @@ const WholesalerPartnerRequests = () => {
                                             <div className="invalid-feedback"><ErrorMessage name="language" /></div>
                                         </div>
                                     </div>
-                                    
+
                                 </div>
                                 <button type="submit" disabled={showError} className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" >Submit</button>
                             </Form>

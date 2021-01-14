@@ -14,7 +14,7 @@ const PartnerRequest = sequelize.cdpConnector.define('partner_requests', {
         allowNull: false,
         type: DataTypes.UUID,
     },
-    type: {
+    entity_type: {
         allowNull: false,
         type: DataTypes.ENUM,
         values: ['hcp', 'hco', 'vendor', 'wholesaler']
@@ -35,8 +35,12 @@ const PartnerRequest = sequelize.cdpConnector.define('partner_requests', {
         allowNull: false,
         type: DataTypes.STRING(100)
     },
-    purchasing_organization: {
-        type: DataTypes.STRING(100),
+    partner_type: {
+        allowNull: false,
+        type: DataTypes.STRING
+    },
+    uuid: {
+        type: DataTypes.STRING,
     },
     company_codes: {
         type: DataTypes.ARRAY(DataTypes.STRING)
@@ -52,7 +56,7 @@ const PartnerRequest = sequelize.cdpConnector.define('partner_requests', {
     status: {
         allowNull: false,
         type: DataTypes.ENUM,
-        values: ['new', 'pending'],
+        values: ['new', 'pending', 'submitted'],
         defaultValue: 'new'
     }
 }, {

@@ -4,9 +4,13 @@ CREATE TYPE cdp.enum_partner_hcp_type AS ENUM
 CREATE TYPE cdp.enum_beneficiary_category AS ENUM
     ('beneficiary_category_1', 'beneficiary_category_2');
 
+CREATE TYPE cdp.enum_partner_status AS ENUM
+    ('pending', 'approved', 'rejected');
+
 CREATE TABLE cdp.partner_hcps
 (
     id uuid NOT NULL,
+    request_id uuid NOT NULL,
     first_name character varying(50) COLLATE pg_catalog."default" NOT NULL,
     last_name character varying(50) COLLATE pg_catalog."default" NOT NULL,
     address character varying(255) COLLATE pg_catalog."default",
@@ -24,6 +28,7 @@ CREATE TABLE cdp.partner_hcps
     bank_account_no character varying(255) COLLATE pg_catalog."default",
     currency character varying(5) COLLATE pg_catalog."default",
     document_urls character varying(255)[] COLLATE pg_catalog."default",
+    status cdp.enum_partner_status NOT NULL DEFAULT 'pending'::cdp.enum_partner_status,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
     CONSTRAINT partner_hcps_pkey PRIMARY KEY (id)

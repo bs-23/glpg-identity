@@ -25,7 +25,7 @@ const HcpPartnerRequests = () => {
     const [requestToDelete, setRequestToDelete] = useState(null);
 
     const total_requests = useSelector(state => state.manageRequestsReducer.partnerRequests);
-    const requests = total_requests.filter(i => i.type === 'hcp');
+    const requests = total_requests.filter(i => i.entity_type === 'hcp');
     const request = useSelector(state => state.manageRequestsReducer.partnerRequest);
 
     const countries = useSelector(state => state.countryReducer.countries);
@@ -233,6 +233,8 @@ const HcpPartnerRequests = () => {
                             company_codes: [],
                             country_iso2: partnerRequestId && request ? request.country_iso2 : '',
                             language: partnerRequestId && request ? request.language : '',
+                            uuid: partnerRequestId && request ? request.uuid : '',
+                            partner_type: partnerRequestId && request ? request.partner_type : '',
                         }}
                         displayName="PartnerRequestsForm"
                         validationSchema={partnerRequestSchema}
@@ -246,7 +248,7 @@ const HcpPartnerRequests = () => {
                                 return;
                             }
 
-                            values.type = 'hcp';
+                            values.entity_type = 'hcp';
 
                             if (partnerRequestId) {
                                 dispatch(updatePartnerRequest(partnerRequestId, values)).then(function () {
@@ -295,6 +297,11 @@ const HcpPartnerRequests = () => {
                                     </div>
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="uuid">UUID <span className="text-danger">*</span></label>
+                                            <Field className="form-control" type="text" name="uuid" />
+                                            <div className="invalid-feedback"><ErrorMessage name="uuid" /></div>
+                                        </div>
+                                        <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="first_name">First Name <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="first_name" />
                                             <div className="invalid-feedback"><ErrorMessage name="first_name" /></div>
@@ -308,6 +315,11 @@ const HcpPartnerRequests = () => {
                                         </div>
                                     </div>
                                     <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="partner_type"> Business Partner Type <span className="text-danger">*</span></label>
+                                            <Field className="form-control" type="text" name="partner_type" />
+                                            <div className="invalid-feedback"><ErrorMessage name="partner_type" /></div>
+                                        </div>
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="email">Email Address <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="email" />

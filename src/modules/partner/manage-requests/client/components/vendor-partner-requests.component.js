@@ -30,7 +30,7 @@ const VendorPartnerRequests = () => {
     const handleShowFaq = () => setShowFaq(true);
 
     const total_requests = useSelector(state => state.manageRequestsReducer.partnerRequests);
-    const requests = total_requests.filter(i => i.type === 'vendor');
+    const requests = total_requests.filter(i => i.entity_type === 'vendor');
     const request = useSelector(state => state.manageRequestsReducer.partnerRequest);
 
     const countries = useSelector(state => state.countryReducer.countries);
@@ -255,6 +255,7 @@ const VendorPartnerRequests = () => {
                             company_codes: [],
                             country_iso2: partnerRequestId && request ? request.country_iso2 : '',
                             language: partnerRequestId && request ? request.language : '',
+                            partner_type: partnerRequestId && request ? request.partner_type : '',
                         }}
                         displayName="PartnerRequestsForm"
                         validationSchema={partnerRequestSchemaForVendors}
@@ -268,7 +269,7 @@ const VendorPartnerRequests = () => {
                                 return;
                             }
 
-                            values.type = 'vendor';
+                            values.entity_type = 'vendor';
 
                             if (partnerRequestId) {
                                 dispatch(updatePartnerRequest(partnerRequestId, values)).then(function () {
@@ -331,6 +332,11 @@ const VendorPartnerRequests = () => {
                                     </div>
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="partner_type"> Business Partner Type <span className="text-danger">*</span></label>
+                                            <Field className="form-control" type="text" name="partner_type" />
+                                            <div className="invalid-feedback"><ErrorMessage name="partner_type" /></div>
+                                        </div>
+                                        <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="email">Email Address <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="email" />
                                             <div className="invalid-feedback"><ErrorMessage name="email" /></div>
@@ -342,27 +348,15 @@ const VendorPartnerRequests = () => {
                                             <Field className="form-control" type="text" name="procurement_contact" />
                                             <div className="invalid-feedback"><ErrorMessage name="procurement_contact" /></div>
                                         </div>
-                                    </div>
-                                    <div className="col-12 col-sm-6 col-lg-4">
-                                        <div className="form-group">
-                                            <label className="font-weight-bold" htmlFor="purchasing_organization">Purchasing Organization <span className="text-danger">*</span></label>
-                                            <Field className="form-control" type="text" name="purchasing_organization" />
-                                            <div className="invalid-feedback"><ErrorMessage name="purchasing_organization" /></div>
-                                        </div>
-                                    </div>
-                                    <div className="col-12">
-                                        <div className="row py-3">
-                                            {getCompanyCodeFields()}
-                                            <div className="col-12 col-sm-6 col-lg-4">
-                                                <div className="form-group">
-                                                    <label>
-                                                      &#160;
-                                                    </label>
-                                                    <div className="d-flex align-items-center hover-opacity" type="button" onClick={addNewCompanyCode}>
-                                                        <i className="fas fa-plus cdp-text-secondary mr-2" ></i>
-                                                        <span className="mb-0 cdp-text-secondary ">Add Company Code</span>
-                                                    </div>
-                                                </div>
+
+                                        {getCompanyCodeFields()}
+
+                                        <div className="col-12">
+                                            <div className="form-group">
+                                                <label className="d-flex align-items-center cdp-text-primary hover-opacity" type="button" onClick={addNewCompanyCode}>
+                                                    <i className="fas fa-plus  fa-2x mr-3" ></i>
+                                                    <span className="h4 mb-0">Add Company Code</span>
+                                                </label>
                                             </div>
                                         </div>
                                     </div>
