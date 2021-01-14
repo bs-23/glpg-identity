@@ -90,6 +90,7 @@ const PartnerVendors = sequelize.cdpConnector.define('partner_vendors', {
         type: DataTypes.STRING
     },
     ordering_email: {
+        allowNull: false,
         type: DataTypes.STRING(100)
     },
     ordering_telephone: {
