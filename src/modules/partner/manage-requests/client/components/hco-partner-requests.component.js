@@ -347,7 +347,7 @@ const HcoPartnerRequests = () => {
                                                     <option key="select-language" value="" disabled>--Select Language--</option>
                                                     {countryLanguages.map(element => {
                                                         const [country_iso2, language_code, language_name] = element.split(' ');
-                                                        return language_name && <option key={country_iso2} value={language_code}>{language_name.replace(/,/g, '')}</option>
+                                                        return language_name && <option key={country_iso2} value={language_code}>{`${language_name.replace(/,/g, '')}(${language_code})`}</option>
                                                     })}
                                                 </Field>
                                                 <div className="invalid-feedback"><ErrorMessage name="language" /></div>
