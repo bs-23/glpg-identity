@@ -264,15 +264,15 @@ const VendorPartnerRequests = () => {
                 <Modal.Body>
                     <Formik
                         initialValues={{
-                            first_name: partnerRequestId && request ? request.first_name : '',
-                            last_name: partnerRequestId && request ? request.last_name : '',
-                            email: partnerRequestId && request ? request.email : '',
-                            procurement_contact: partnerRequestId && request ? request.procurement_contact : '',
-                            purchasing_organization: partnerRequestId && request ? request.purchasing_organization : '',
+                            first_name: partnerRequestId && Object.keys(request).length ? request.first_name : '',
+                            last_name: partnerRequestId && Object.keys(request).length ? request.last_name : '',
+                            email: partnerRequestId && Object.keys(request).length ? request.email : '',
+                            procurement_contact: partnerRequestId && Object.keys(request).length ? request.procurement_contact : '',
+                            purchasing_organization: partnerRequestId && Object.keys(request).length ? request.purchasing_organization : '',
                             company_codes: [],
-                            country_iso2: partnerRequestId && request ? request.country_iso2 : '',
-                            language: partnerRequestId && request ? request.language : '',
-                            partner_type: partnerRequestId && request ? request.partner_type : '',
+                            country_iso2: partnerRequestId && Object.keys(request).length ? request.country_iso2 : '',
+                            language: partnerRequestId && Object.keys(request).length ? request.language : '',
+                            partner_type: partnerRequestId && Object.keys(request).length ? request.partner_type : '',
                         }}
                         displayName="PartnerRequestsForm"
                         validationSchema={partnerRequestSchemaForVendors}
