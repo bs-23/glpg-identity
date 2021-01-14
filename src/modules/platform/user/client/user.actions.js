@@ -55,8 +55,8 @@ export function changePassword(data) {
     };
 }
 
-export function getUsers(page = 1, codbase, orderBy, orderType) {
-    const url = `/api/users?page=${page}`
+export function getUsers(page = 1, codbase, orderBy, orderType, data) {
+    const url = `/api/cdp-users?page=${page}`
         + (codbase ? `&codbase=${codbase}` : '')
         + (orderBy && orderBy !== 'null' ? `&orderBy=${orderBy}` : '')
         + (orderType && orderType !== 'null' ? `&orderType=${orderType}` : '');
@@ -64,8 +64,9 @@ export function getUsers(page = 1, codbase, orderBy, orderType) {
     return {
         type: Types.GET_USERS,
         payload: axios({
-            method: 'get',
+            method: 'post',
             url: url,
+            data
         })
     };
 }
@@ -101,3 +102,21 @@ export function cdpSort(type, val) {
         }
     };
 }
+
+export function getUserFilterSettings(tableName) {
+    return {
+        type: Types.GET_USER_FILTER_SETTINGS,
+        payload: new Promise((resolve, reject) => {
+            axios({
+                method: 'get',
+                url: `/api/filter?table=${tableName}`
+            })
+            .then(data => resolve({
+                data: data.data,
+                tableName
+            }))
+            .catch(error => reject(error));
+        })
+    };
+}
+

@@ -11,6 +11,7 @@ module.exports = app => {
         .post(passport.authenticate('application-jwt', { session: false }), controller.createPartnerHcp);
 
     app.route('/api/partner/hcp/:id')
+        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getPartnerHcp)
         .put(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.updatePartnerHcp);
 
     app.route('/api/partner/hco')
@@ -18,9 +19,13 @@ module.exports = app => {
         .post(passport.authenticate('application-jwt', { session: false }), controller.createPartnerHco);
 
     app.route('/api/partner/hco/:id')
+        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getPartnerHco)
         .put(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.updatePartnerHco);
 
     app.route('/api/partner/vendor')
         .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getPartnerVendors)
         .post(passport.authenticate('application-jwt', { session: false }), controller.createPartnerVendor);
+
+    app.route('/api/partner/vendor/:id')
+        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getPartnerVendor);
 };

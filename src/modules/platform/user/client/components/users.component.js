@@ -1,11 +1,13 @@
 import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import Dropdown from 'react-bootstrap/Dropdown';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useToasts } from 'react-toast-notifications';
 import { getUsers } from '../user.actions';
 import axios from 'axios';
 import Modal from 'react-bootstrap/Modal';
 import Faq from '../../../faq/client/faq.component';
+import UsersFilter from './users-filter.component';
 
 const safeGet = (object, property) => {
     const propData = (object || {})[property];
@@ -27,6 +29,10 @@ export default function Users() {
     const [userCountries, setUserCountries] = useState([]);
     const [sort, setSort] = useState({ type: 'asc', value: null });
 
+    const [showFilter, setShowFilter] = useState(false);
+    const [isFilterEnabled, setIsFilterEnabled] = useState(false);
+    const [selectedFilterSetting, setSelectedFilterSetting] = useState(null);
+
     const [showFaq, setShowFaq] = useState(false);
     const handleCloseFaq = () => setShowFaq(false);
     const handleShowFaq = () => setShowFaq(true);
@@ -34,6 +40,10 @@ export default function Users() {
     const userdata = useSelector(state => state.userReducer.users);
     const countries = useSelector(state => state.countryReducer.countries);
     const params = new URLSearchParams(window.location.search);
+
+    const { addToast } = useToasts();
+
+    const filterRef = useRef();
 
     const extractUserCountries = (data) => {
         const profile_permission_sets = safeGet(data, 'userProfile')('up_ps')();
@@ -96,10 +106,31 @@ export default function Users() {
         setCodBase(params.get('codbase') ? params.get('codbase') : null);
         const searchObj = {};
         const searchParams = location.search.slice(1).split("&");
+
         searchParams.forEach(element => {
             searchObj[element.split("=")[0]] = element.split("=")[1];
         });
-        dispatch(getUsers(searchObj.page, searchObj.codbase, searchObj.orderBy, searchObj.orderType));
+
+        const filterID = params.get('filter');
+
+        if(filterID) axios.get(`/api/filter/${filterID}`)
+            .then(res => {
+                setSelectedFilterSetting(res.data);
+                setIsFilterEnabled(true);
+                const filterSetting = res.data.settings;
+                dispatch(getUsers(searchObj.page, searchObj.codbase, searchObj.orderBy, searchObj.orderType, filterSetting));
+            })
+        else {
+            const { filters, logic } = filterRef.current.multiFilterProps.values || {};
+            const filterSetting = filters && filters.length
+                ? {
+                    filters: filters,
+                    logic: logic
+                }
+                : null;
+            dispatch(getUsers(searchObj.page, searchObj.codbase, searchObj.orderBy, searchObj.orderType, filterSetting));
+        };
+
         setSort({ type: params.get('orderType') || 'asc', value: params.get('orderBy') });
     }, [location]);
 
@@ -147,6 +178,63 @@ export default function Users() {
         if (userdata.end !== userdata.total) urlChange(userdata.page + 1, userdata.codBase, params.get('orderBy'), true);
     };
 
+    const handleFilterExecute = async (multiFilterSetting) => {
+        const filterID = multiFilterSetting.selectedSettingID;
+        const shouldUpdateFilter = multiFilterSetting.saveType === 'save_existing';
+
+        if(multiFilterSetting.shouldSaveFilter) {
+            const settingName = multiFilterSetting.saveType === 'save_existing'
+                ? multiFilterSetting.selectedFilterSettingName
+                : multiFilterSetting.newFilterSettingName;
+
+            const filterSetting = {
+                title: settingName,
+                table: "cdp-users",
+                settings: {
+                    filters: multiFilterSetting.filters,
+                    logic: multiFilterSetting.logic
+                }
+            }
+
+            if(filterID && shouldUpdateFilter) {
+                try{
+                    await axios.put(`/api/filter/${filterID}`, filterSetting);
+                    history.push(`${location.pathname}?filter=${filterID}`);
+                }catch(err){
+                    const errorMessage = err.response.data && err.response.data || 'There was an error updating the filter setting.';
+                    addToast(errorMessage, {
+                        appearance: 'error',
+                        autoDismiss: true
+                    });
+                    return Promise.reject();
+                }
+            }else {
+                try{
+                    const { data } = await axios.post('/api/filter', filterSetting);
+                    history.push(`${location.pathname}?filter=${data.id}`);
+                }catch(err){
+                    const errorMessage = err.response.data && err.response.data || 'There was an error updating the filter setting.';
+                    addToast(errorMessage, {
+                        appearance: 'error',
+                        autoDismiss: true
+                    });
+                    return Promise.reject();
+                }
+            }
+        }
+        else {
+            history.push(location.pathname);
+        };
+        setIsFilterEnabled(true);
+    }
+
+    const resetFilter = async () => {
+        setSelectedFilterSetting(null);
+        setIsFilterEnabled(false);
+        await filterRef.current.multiFilterProps.resetFilter();
+        history.push(location.pathname);
+    }
+
     return (
         <main className="app__content cdp-light-bg">
             <div className="container-fluid">
@@ -173,7 +261,7 @@ export default function Users() {
                         <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
                             <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">CDP User List</h4>
                             <div className="d-flex justify-content-between align-items-center">
-                                <Dropdown className="ml-auto dropdown-customize">
+                                {/* <Dropdown className="ml-auto dropdown-customize">
                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center">
                                         <i className="icon icon-filter mr-2 mb-n1"></i> {userdata.codbase && (countries.find(i => i.codbase === userdata.codbase)) ? (countries.find(i => i.codbase === userdata.codbase)).codbase_desc : 'Filter by Country'}
                                     </Dropdown.Toggle>
@@ -187,8 +275,26 @@ export default function Users() {
                                             ))
                                         }
                                     </Dropdown.Menu>
-                                </Dropdown>
-
+                                </Dropdown> */}
+                                <button
+                                    className={`btn cdp-btn-outline-primary ${isFilterEnabled ? 'multifilter_enabled' : ''}`}
+                                    onClick={() => setShowFilter(true)}
+                                >
+                                    <i className={`fas fa-filter  ${isFilterEnabled ? '' : 'mr-2'}`}></i>
+                                    <i className={`fas fa-database ${isFilterEnabled ? 'd-inline-block filter__sub-icon mr-1' : 'd-none'}`}></i>
+                                    Filter
+                                </button>
+                                {
+                                    isFilterEnabled &&
+                                    <button
+                                        className={`btn cdp-btn-outline-secondary ml-2 ${isFilterEnabled ? 'multifilter_enabled' : ''}`}
+                                        onClick={resetFilter}
+                                    >
+                                        <i className={`fas fa-filter  ${isFilterEnabled ? '' : 'mr-2'}`}></i>
+                                        <i className={`fas fa-times ${isFilterEnabled ? 'd-inline-block filter__sub-icon mr-1' : 'd-none'}`}></i>
+                                        Reset
+                                    </button>
+                                }
                                 <NavLink to="/platform/create-user" className="btn cdp-btn-secondary text-white ml-2">
                                     <i className="icon icon-plus pr-1"></i> Create new user
                                 </NavLink>
@@ -261,6 +367,14 @@ export default function Users() {
                     </div>
                 </div>
             </div>
+            <UsersFilter
+                ref={filterRef}
+                tableName='cdp-users'
+                show={showFilter}
+                selectedFilterSetting={selectedFilterSetting}
+                onHide={() => setShowFilter(false)}
+                onExecute={handleFilterExecute}
+            />
         </main>
     );
 }

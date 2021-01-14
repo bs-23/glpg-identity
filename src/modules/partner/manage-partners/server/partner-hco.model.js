@@ -10,6 +10,11 @@ const PartnerHcos = sequelize.cdpConnector.define('partner_hcos', {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4
     },
+    request_id: {
+        unique: true,
+        allowNull: false,
+        type: DataTypes.UUID
+    },
     contact_first_name: {
         allowNull: false,
         type: DataTypes.STRING(50),
@@ -32,7 +37,6 @@ const PartnerHcos = sequelize.cdpConnector.define('partner_hcos', {
         type: DataTypes.STRING
     },
     email: {
-        unique: true,
         allowNull: false,
         type: DataTypes.STRING(100)
     },
@@ -46,6 +50,7 @@ const PartnerHcos = sequelize.cdpConnector.define('partner_hcos', {
         defaultValue: 'healthcare_org'
     },
     registration_number: {
+        allowNull: false,
         type: DataTypes.STRING
     },
     iban: {

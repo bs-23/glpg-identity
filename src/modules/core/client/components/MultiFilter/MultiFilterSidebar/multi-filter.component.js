@@ -8,7 +8,7 @@ import AddFilter from '../AddFilter/add-filter.component';
 import { FilterSummary, FilterLogic } from './components';
 import { multiFilterSchema } from './multi-filter.schema';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
-import { buildLogicAfterAddition, buildLogicAfterRemoval } from '../utils';
+import { buildLogicAfterRemoval } from '../utils';
 
 const MultiFilter = (props, ref) => {
     const {
@@ -270,19 +270,19 @@ const MultiFilter = (props, ref) => {
     }
 
     useEffect(() => {
-        if(formikBag && selectedSetting && selectedSettingTitle && selectedSettingID) {
+        if(formikBag && selectedSetting) {
             const { values, touched, resetForm } = formikBag;
 
-            values.isChosenFromExisting = 'true';
+            values.isChosenFromExisting = selectedSettingID ? 'true' : 'false';
             values.filters = selectedSetting.filters;
             values.logic = selectedSetting.logic;
             values.selectedSettingID = selectedSettingID;
             values.selectedSettingFilters = selectedSetting.filters;
             values.selectedSettingLogic = selectedSetting.logic;
-            values.selectedFilterSettingName = selectedSettingTitle;
+            values.selectedFilterSettingName = selectedSettingTitle || '';
             values.newFilterSettingName = '';
-            values.saveType = 'save_existing';
-            if(!touched.shouldSaveFilter) values.shouldSaveFilter = true;
+            values.saveType = selectedSettingID ? 'save_existing' : 'save_as_new';
+            if(!touched.shouldSaveFilter) values.shouldSaveFilter = selectedSettingID ? true : false;
 
             resetForm({ values, touched: {} });
         }
@@ -380,14 +380,12 @@ const MultiFilter = (props, ref) => {
                                     <div className="mb-3">
                                         <label className="pt-2 mb-1">Select From Existing Filters</label>
                                         <Field as="select" className="form-control form-control-sm" name="selectedSettingID" onChange={handlePresetChange}>
-                                            {/* <React.Fragment> */}
-                                                <option value="">Select an option</option>
-                                                {
-                                                    filterPresets.map((filter, index) =>
-                                                        <option key={filter.id} value={filter.id}>{filter.title}</option>
-                                                    )
-                                                }
-                                            {/* </React.Fragment> */}
+                                            <option value="">Select an option</option>
+                                            {
+                                                filterPresets.map((filter, index) =>
+                                                    <option key={filter.id} value={filter.id}>{filter.title}</option>
+                                                )
+                                            }
                                         </Field>
                                     </div>
                                 }

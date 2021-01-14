@@ -2,7 +2,7 @@ import React from 'react';
 import { Route, useRouteMatch } from 'react-router-dom';
 import { FaqClientRoutes, faqReducer, Faq, ManageFaq } from './faq';
 import { UserClientRoutes, userReducer, userActions, Login, Dashboard, ForgotPassword, ResetPassword, MyProfile } from './user';
-import { ProfileClientRoutes, profileReducer, ManageProfiles } from './profile';
+import { ProfileClientRoutes, profileReducer, ManageProfiles, profileActions } from './profile';
 import { RoleClientRoutes, roleReducer, ManageRoles } from './role';
 import { PermissionSetClientRoutes, permissionSetReducer, PermissionSetDetailsModal, ManagePermissionSets } from './permission-set';
 
@@ -37,5 +37,6 @@ export {
     ManageFaq,
     ManagePermissionSets,
     ManageProfiles,
-    ManageRoles
+    ManageRoles,
+    profileActions
 };

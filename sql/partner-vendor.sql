@@ -1,6 +1,7 @@
 CREATE TABLE cdp.partner_vendors
 (
     id uuid NOT NULL,
+    request_id uuid NOT NULL,
     requestor_first_name character varying(50) COLLATE pg_catalog."default",
     requestor_last_name character varying(50) COLLATE pg_catalog."default",
     purchasing_org character varying(255) COLLATE pg_catalog."default",

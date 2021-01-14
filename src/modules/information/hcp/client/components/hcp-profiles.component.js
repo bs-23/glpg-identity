@@ -103,11 +103,11 @@ export default function hcpUsers() {
     const hcpFilterRef = useRef();
 
     const pageLeft = () => {
-        if (hcps.page > 1) urlChange(hcps.page - 1, hcps.codbase, hcps.status, params.get('orderBy'), true);
+        if (hcps.page > 1) urlChange(hcps.page - 1, hcps.codbase, params.get('status'), params.get('orderBy'), true);
     };
 
     const pageRight = () => {
-        if (hcps.end !== hcps.total) urlChange(hcps.page + 1, hcps.codbase, hcps.status, params.get('orderBy'), true);
+        if (hcps.end !== hcps.total) urlChange(hcps.page + 1, hcps.codbase, params.get('status'), params.get('orderBy'), true);
     };
 
     const onUpdateStatus = (user) => {
@@ -166,12 +166,6 @@ export default function hcpUsers() {
     }
 
     const loadHcpProfiles = (filterSetting) => {
-        const searchObj = {};
-        const searchParams = location.search.slice(1).split("&");
-        searchParams.forEach(element => {
-            searchObj[element.split("=")[0]] = element.split("=")[1];
-        });
-
         const requestBody = filterSetting && filterSetting.filters.length
             ? {
                 filters: filterSetting.filters,
@@ -179,7 +173,7 @@ export default function hcpUsers() {
             }
             : null;
 
-        dispatch(getHcpProfiles(location.search, requestBody));
+        dispatch(getHcpProfiles(getQueryString(), requestBody));
         setSort({ type: params.get('orderType'), value: params.get('orderBy') });
     };
 
@@ -341,7 +335,7 @@ export default function hcpUsers() {
             });
     }
 
-    const generateSortHandler = (columnName) => () => urlChange(1, hcps.codBase, hcps.status, columnName);
+    const generateSortHandler = (columnName) => () => urlChange(1, hcps.codBase, params.get('status'), columnName);
 
     const renderStatus = ({ value: status, row }) => {
         return status === 'self_verified'
@@ -519,6 +513,13 @@ export default function hcpUsers() {
         history.push(location.pathname);
     }
 
+    const getQueryString = () => {
+        const params = new URLSearchParams(location.search);
+        params.delete('status');
+        const queryString = params.toString();
+        return '?' + queryString;
+    }
+
     const handleTableDirtyStatusChange = (dirty) => {
         setTableDirty(dirty);
         window.tableDirty = dirty;
@@ -551,13 +552,34 @@ export default function hcpUsers() {
                 loadHcpProfiles(res.data.settings);
             })
         else {
-            const { filters, logic } = hcpFilterRef.current.multiFilterProps.values || {};
-            const filterSetting = filters && filters.length
-                ? {
-                    filters,
-                    logic
+            let filterSetting;
+
+            if(params.get('status')) {
+                filterSetting = {
+                    filters: [
+                        {
+                            name: '1',
+                            fieldName: 'status',
+                            operator: 'equal',
+                            value: [`${params.get('status')}`]
+                        }
+                    ],
+                    logic: '1'
                 }
-                : null;
+                setIsFilterEnabled(true);
+                setSelectedFilterSetting({ settings: filterSetting });
+            }
+            else{
+                const { filters, logic } = hcpFilterRef.current.multiFilterProps.values || {};
+
+                filterSetting = filters && filters.length
+                    ? {
+                        filters,
+                        logic
+                    }
+                    : null;
+            }
+
             loadHcpProfiles(filterSetting);
         };
     }, [location]);
@@ -726,17 +748,16 @@ export default function hcpUsers() {
                                 user={currentUser}
                                 show={show.updateStatus}
                                 type={'list'}
-                                filterSetting={
-                                    isFilterEnabled && ({
-                                        filters: hcpFilterRef.current.multiFilterProps.values.filters,
-                                        logic: hcpFilterRef.current.multiFilterProps.values.logic
-                                    })
-                                }
-                                onSort={() => {
-                                    setSort({
-                                        type: params.get('orderType'),
-                                        value: params.get('orderBy'),
-                                    });
+                                onStatusUpdate={() => {
+                                    dispatch(getHcpProfiles(getQueryString(), isFilterEnabled
+                                        ? (
+                                            {
+                                                filters: hcpFilterRef.current.multiFilterProps.values.filters,
+                                                logic: hcpFilterRef.current.multiFilterProps.values.logic
+                                            }
+                                        )
+                                        : null
+                                    ));
                                 }}
                                 onHide={() => {
                                     setShow({ ...show, updateStatus: false });

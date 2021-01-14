@@ -135,14 +135,14 @@ const AddFilter = (props) => {
 
     useEffect(() => {
         if(!alreadyAddedFilters.length) {
-            const updatedFilters = [...alreadyAddedFilters, emptyFilter];
+            const updatedFilters = [..._.cloneDeep(alreadyAddedFilters), emptyFilter];
             setFilters(updatedFilters);
 
             const updateLogic = buildLogicAfterAddition([String(updatedFilters.length)], alreadyAddedLogic);
             setLogic(updateLogic);
         }
         else {
-            setFilters([...alreadyAddedFilters]);
+            setFilters(_.cloneDeep(alreadyAddedFilters));
             setLogic(alreadyAddedLogic);
         }
     }, [alreadyAddedFilters, alreadyAddedLogic])
