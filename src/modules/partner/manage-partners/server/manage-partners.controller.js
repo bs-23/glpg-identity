@@ -16,7 +16,8 @@ async function getPartnerHcps(req, res) {
         const hcpPartners = await PartnerHcps.findAll({
             offset,
             limit,
-            order: [['created_at', 'DESC']]
+            order: [['created_at', 'DESC']],
+            attributes: { exclude: ['created_at', 'updated_at'] }
         });
 
         const total = await PartnerHcps.count();
@@ -33,6 +34,22 @@ async function getPartnerHcps(req, res) {
         };
 
         res.json(responseData);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function getPartnerHcp(req, res) {
+    try {
+        const partnerHcp = await PartnerHcps.findOne({
+            where: { id: req.params.id },
+            attributes: { exclude: ['created_at', 'updated_at'] }
+        });
+
+        if (!partnerHcp) return res.status(404).send('The partner does not exist');
+
+        res.json(partnerHcp);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -94,6 +111,9 @@ async function createPartnerHcp(req, res) {
 
         await partnerRequest.update({ status: 'submitted' });
 
+        delete partnerHcp.created_at;
+        delete partnerHcp.updated_at;
+
         response.data = partnerHcp;
         res.json(response);
 
@@ -136,7 +156,8 @@ async function getPartnerHcos(req, res) {
         const hcoPartners = await PartnerHcos.findAll({
             offset,
             limit,
-            order: [['created_at', 'DESC']]
+            order: [['created_at', 'DESC']],
+            attributes: { exclude: ['created_at', 'updated_at'] }
         });
 
         const total = await PartnerHcos.count();
@@ -153,6 +174,22 @@ async function getPartnerHcos(req, res) {
         };
 
         res.json(responseData);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function getPartnerHco(req, res) {
+    try {
+        const partnerHco = await PartnerHcos.findOne({
+            where: { id: req.params.id },
+            attributes: { exclude: ['created_at', 'updated_at'] }
+        });
+
+        if (!partnerHco) return res.status(404).send('The partner does not exist');
+
+        res.json(partnerHco);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -211,6 +248,9 @@ async function createPartnerHco(req, res) {
 
         await partnerRequest.update({ status: 'submitted' });
 
+        delete partnerHco.created_at;
+        delete partnerHco.updated_at;
+
         response.data = partnerHco;
         res.json(response);
 
@@ -234,6 +274,55 @@ async function updatePartnerHco(req, res) {
         const updated_data = await PartnerHcps.update(data);
 
         res.json(updated_data);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function getPartnerVendors(req, res) {
+    try {
+        const page = req.query.page ? +req.query.page - 1 : 0;
+        const limit = req.query.limit ? +req.query.limit : 15;
+        const offset = page * limit;
+
+        const partnerVendors = await PartnerVendors.findAll({
+            offset,
+            limit,
+            order: [['created_at', 'DESC']],
+            attributes: { exclude: ['created_at', 'updated_at'] }
+        });
+
+        const total = await PartnerVendors.count();
+
+        const responseData = {
+            partnerVendors,
+            metadata: {
+                page: page + 1,
+                limit,
+                total,
+                start: limit * page + 1,
+                end: offset + limit > total ? parseInt(total) : parseInt(offset + limit)
+            }
+        };
+
+        res.json(responseData);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function getPartnerVendor(req, res) {
+    try {
+        const partnerVendor = await PartnerVendors.findOne({
+            where: { id: req.params.id },
+            attributes: { exclude: ['created_at', 'updated_at'] }
+        });
+
+        if (!partnerVendor) return res.status(404).send('The partner does not exist');
+
+        res.json(partnerVendor);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -292,6 +381,9 @@ async function createPartnerVendor(req, res) {
 
         await partnerRequest.update({ status: 'submitted' });
 
+        delete partnerVendor.created_at;
+        delete partnerVendor.updated_at;
+
         response.data = partnerVendor;
         res.json(response);
 
@@ -302,43 +394,14 @@ async function createPartnerVendor(req, res) {
     }
 }
 
-async function getPartnerVendors(req, res) {
-    try {
-        const page = req.query.page ? +req.query.page - 1 : 0;
-        const limit = req.query.limit ? +req.query.limit : 15;
-        const offset = page * limit;
-
-        const partnerVendors = await PartnerVendors.findAll({
-            offset,
-            limit,
-            order: [['created_at', 'DESC']]
-        });
-
-        const total = await PartnerVendors.count();
-
-        const responseData = {
-            partnerVendors,
-            metadata: {
-                page: page + 1,
-                limit,
-                total,
-                start: limit * page + 1,
-                end: offset + limit > total ? parseInt(total) : parseInt(offset + limit)
-            }
-        };
-
-        res.json(responseData);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Internal server error');
-    }
-}
-
 exports.getPartnerHcps = getPartnerHcps;
+exports.getPartnerHcp = getPartnerHcp;
 exports.createPartnerHcp = createPartnerHcp;
 exports.updatePartnerHcp = updatePartnerHcp;
 exports.getPartnerHcos = getPartnerHcos;
+exports.getPartnerHco = getPartnerHco;
 exports.createPartnerHco = createPartnerHco;
 exports.updatePartnerHco = updatePartnerHco;
-exports.createPartnerVendor = createPartnerVendor;
 exports.getPartnerVendors = getPartnerVendors;
+exports.getPartnerVendor = getPartnerVendor;
+exports.createPartnerVendor = createPartnerVendor;
