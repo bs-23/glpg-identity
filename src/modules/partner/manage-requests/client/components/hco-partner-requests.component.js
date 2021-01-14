@@ -4,6 +4,7 @@ import Modal from 'react-bootstrap/Modal';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { useSelector, useDispatch } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
+import CountryCodes from 'country-codes-list';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { partnerRequestSchema } from '../manage-requests.schema'
 import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest } from '../manage-requests.actions';
@@ -11,14 +12,20 @@ import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPart
 const HcoPartnerRequests = () => {
     const dispatch = useDispatch();
     const { addToast } = useToasts();
+
+    const CountryCodesObject = Object.values(CountryCodes.customList('countryCode', '{countryCode} {officialLanguageCode} {officialLanguageNameEn}'));
     const [showForm, setShowForm] = useState(false);
     const [companyCodes, setCompanyCodes] = useState([{ id: Math.random(), company_code: '' }]);
     const [showError, setShowError] = useState(false);
     const [partnerRequestId, setPartnerRequestId] = useState(undefined);
 
+    const [countryLanguages, setCountryLanguages] = useState([]);
+
     const total_requests = useSelector(state => state.manageRequestsReducer.partnerRequests);
     const requests = total_requests.filter(i => i.type === 'hco');
     const request = useSelector(state => state.manageRequestsReducer.partnerRequest);
+
+    const countries = useSelector(state => state.countryReducer.countries);
 
     const deleteRequest = (id) => {
         dispatch(deletePartnerRequest(id)).then(() => {
@@ -80,7 +87,28 @@ const HcoPartnerRequests = () => {
     }
 
     useEffect(() => {
+        function getLanguages() {
+            const mapped_languages = {};
+
+            const country_languages = CountryCodesObject.filter(item => {
+                const [, , language_name] = item.split(' ');
+                if (language_name && !mapped_languages[language_name]) {
+                    mapped_languages[language_name] = true;
+                    return true;
+                }
+                return false;
+            });
+            country_languages.sort((a, b) => {
+                const [, , language_name1] = a.split(' ');
+                const [, , language_name2] = b.split(' ');
+                if (language_name1.replace(/,/g, '') < language_name2.replace(/,/g, '')) return -1;
+                return 1;
+            });
+            setCountryLanguages(country_languages);
+        }
+
         loadRequests();
+        getLanguages();
     }, []);
 
     useEffect(() => {
@@ -128,7 +156,7 @@ const HcoPartnerRequests = () => {
                             </div>
                         </div>
 
-                        
+
 
                         {requests && requests.length > 0 ?
                             <div className="table-responsive shadow-sm bg-white">
@@ -199,6 +227,8 @@ const HcoPartnerRequests = () => {
                             email: partnerRequestId && request ? request.email : '',
                             procurement_contact: partnerRequestId && request ? request.procurement_contact : '',
                             company_codes: [],
+                            country_iso2: partnerRequestId && request ? request.country_iso2 : '',
+                            language: partnerRequestId && request ? request.language : '',
                         }}
                         displayName="PartnerRequestsForm"
                         validationSchema={partnerRequestSchema}
@@ -251,6 +281,14 @@ const HcoPartnerRequests = () => {
                                 <div className="row">
                                     <div className="col-12 col-sm-12">
                                         <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="country_iso2">Country <span className="text-danger">*</span></label>
+                                            <Field data-testid="country_iso2" as="select" name="country_iso2" className="form-control">
+                                                <option key="select-country" value="" disabled>--Select Country--</option>
+                                                {countries.map(item => <option key={item.countryid} value={item.country_iso2}>{item.codbase_desc}</option>)}
+                                            </Field>
+                                            <div className="invalid-feedback"><ErrorMessage name="country_iso2" /></div>
+                                        </div>
+                                        <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="first_name">First Name <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="first_name" />
                                             <div className="invalid-feedback"><ErrorMessage name="first_name" /></div>
@@ -279,6 +317,20 @@ const HcoPartnerRequests = () => {
                                                     <i className="fas fa-plus  fa-2x mr-3" ></i>
                                                     <span className="h4 mb-0">Add Company Code</span>
                                                 </label>
+                                            </div>
+                                        </div>
+
+                                        <div className="col-12 col-sm-6">
+                                            <div className="form-group">
+                                                <label className="font-weight-bold" htmlFor="language">ISO Code Language (ISO 639-1) <span className="text-danger">*</span></label>
+                                                <Field className="form-control lang_code" as="select" name="language" className="form-control" id="language">
+                                                    <option key="select-language" value="" disabled>--Select Language--</option>
+                                                    {countryLanguages.map(element => {
+                                                        const [country_iso2, language_code, language_name] = element.split(' ');
+                                                        return language_name && <option key={country_iso2} value={language_code}>{language_name.replace(/,/g, '')}</option>
+                                                    })}
+                                                </Field>
+                                                <div className="invalid-feedback"><ErrorMessage name="language" /></div>
                                             </div>
                                         </div>
                                     </div>
