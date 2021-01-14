@@ -1,6 +1,6 @@
 export function getStringOperators() {
     return [
-        { key: 'equal', displayText: 'Equals to' },
+        { key: 'ci-equal', displayText: 'Equals to' },
         { key: 'contains', displayText: 'Contains' },
         { key: 'starts-with', displayText: 'Starts With' }
     ];
@@ -14,7 +14,7 @@ export function getSelectOperators() {
 
 export function getDateOperators() {
     return [
-        { key: 'equal', displayText: 'Equals to' },
+        { key: 'date-equal', displayText: 'Equals to' },
         { key: 'less-than', displayText: 'Before' },
         { key: 'greater-than', displayText: 'After' }
     ]

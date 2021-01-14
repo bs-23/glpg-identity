@@ -120,28 +120,38 @@ async function getFilterOptions(user) {
     return filterOptions;
 }
 
-function getFilterQuery(filter) {
+function getFilterQuery(filter, tableName) {
     let queryValue;
 
-    // if (filter.operator === 'equal') {
-    //     queryValue = Array.isArray(filter.value)
-    //         ? { [Op.or]: filter.value }
-    //         : { [Op.eq]: filter.value };
-    // }
-
-    // Case Insensitive Equal
+    // Case Sensitive Equal
     if (filter.operator === 'equal') {
         queryValue = Array.isArray(filter.value)
-            ? { [Op.or]: filter.value.map(v => { return where(col(filter.fieldName), 'iLIKE', v); }) }
+            ? { [Op.or]: filter.value }
+            : { [Op.eq]: filter.value };
+    }
+
+    // Case Insensitive Equal
+    if (filter.operator === 'ci-equal') {
+        queryValue = Array.isArray(filter.value)
+            // ? { [Op.or]: filter.value.map(v => { return where(col(filter.fieldName), 'iLIKE', v); }) }
+            ? { [Op.or]: filter.value.map(v => ({ [Op.iLike]: v })) }
             : { [Op.iLike]: filter.value };
     }
 
+    if (filter.operator === 'date-equal') {
+        queryValue = where(fn('date', col(tableName ? `${tableName}.${filter.fieldName}` : filter.fieldName)), '=', filter.value);
+    }
+
     if (filter.operator === 'contains') {
-        queryValue = { [Op.iLike]: `%${filter.value}%` };
+        queryValue = Array.isArray(filter.value)
+            ? { [Op.or]: filter.value.map(v => ({ [Op.iLike]: `%${v}%` }))}
+            : { [Op.iLike]: `%${filter.value}%` };
     }
 
     if (filter.operator === 'starts-with') {
-        queryValue = { [Op.iLike]: `${filter.value}%` }
+        queryValue = Array.isArray(filter.value)
+            ? { [Op.or]: filter.value.map(v => ({ [Op.iLike]: `${v}%` }))}
+            : { [Op.iLike]: `${filter.value}%` };
     }
 
     if (filter.operator === 'less-than') {
