@@ -120,10 +120,10 @@ async function getFilterOptions(user) {
     return filterOptions;
 }
 
-function getFilterQuery(filter) {
+function getFilterQuery(filter, tableName) {
     let queryValue;
 
-    // Equal for select operator
+    // Case Sensitive Equal
     if (filter.operator === 'equal') {
         queryValue = Array.isArray(filter.value)
             ? { [Op.or]: filter.value }
@@ -136,6 +136,10 @@ function getFilterQuery(filter) {
             // ? { [Op.or]: filter.value.map(v => { return where(col(filter.fieldName), 'iLIKE', v); }) }
             ? { [Op.or]: filter.value.map(v => ({ [Op.iLike]: v })) }
             : { [Op.iLike]: filter.value };
+    }
+
+    if (filter.operator === 'date-equal') {
+        queryValue = where(fn('date', col(tableName ? `${tableName}.${filter.fieldName}` : filter.fieldName)), '=', filter.value);
     }
 
     if (filter.operator === 'contains') {

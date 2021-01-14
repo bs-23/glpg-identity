@@ -408,7 +408,6 @@ async function createUser(req, res) {
 }
 
 function generateFilterOptions(currentFilter, defaultFilter, countries) {
-    console.log(!currentFilter , !currentFilter.filters , currentFilter.filter === 0);
     if (!currentFilter || !currentFilter.filters || currentFilter.filter === 0)
         return defaultFilter;
 
@@ -430,7 +429,7 @@ function generateFilterOptions(currentFilter, defaultFilter, countries) {
                 ]
             }
         }
-        return filterService.getFilterQuery(filter);
+        return filterService.getFilterQuery(filter, "users");
     }
 
     let customFilter = { ...defaultFilter };
