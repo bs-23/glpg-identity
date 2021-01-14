@@ -21,6 +21,7 @@ const WholesalerPartnerRequests = () => {
     const [partnerRequestId, setPartnerRequestId] = useState(undefined);
 
     const [countryLanguages, setCountryLanguages] = useState([]);
+    const [requestToDelete, setRequestToDelete] = useState(null);
 
     const [showFaq, setShowFaq] = useState(false);
     const handleCloseFaq = () => setShowFaq(false);
@@ -50,6 +51,7 @@ const WholesalerPartnerRequests = () => {
                 autoDismiss: true
             });
         });
+        setRequestToDelete(null);
     }
 
     const toggleForm = (id) => {
@@ -224,7 +226,7 @@ const WholesalerPartnerRequests = () => {
                                                         <Dropdown.Menu>
                                                             <Dropdown.Item> Send Form </Dropdown.Item>
                                                             <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
-                                                            <Dropdown.Item onClick={() => deleteRequest(row.id) }> Delete </Dropdown.Item>
+                                                            <Dropdown.Item onClick={() => setRequestToDelete(row.id) }> Delete </Dropdown.Item>
                                                         </Dropdown.Menu>
                                                     </Dropdown></td>
                                                 </tr>
@@ -381,8 +383,24 @@ const WholesalerPartnerRequests = () => {
                     </Formik>
                 </Modal.Body>
             </Modal>
-        </main >
 
+            <Modal centered show={requestToDelete !== null} onHide={() => setRequestToDelete(null)}>
+                <Modal.Header closeButton>
+                    <Modal.Title className="modal-title_small">Remove Request</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {requestToDelete !== null ? (
+                        <div>
+                            Are you sure you want to remove the following request?
+                        </div>
+                    ) : null}
+                </Modal.Body>
+                <Modal.Footer>
+                    <button className="btn cdp-btn-outline-primary" onClick={() => setRequestToDelete(null)}>Cancel</button>
+                    <button className="ml-2 btn cdp-btn-secondary text-white" onClick={() => deleteRequest(requestToDelete)}>Confirm</button>
+                </Modal.Footer>
+            </Modal>
+        </main >
     );
 };
 
