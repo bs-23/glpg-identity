@@ -244,8 +244,6 @@ const HcpPartnerRequests = () => {
 
                             values.type = 'hcp';
 
-                            console.log('============> ', values);
-
                             if (partnerRequestId) {
                                 dispatch(updatePartnerRequest(partnerRequestId, values)).then(function () {
                                     toggleForm(null);
@@ -286,7 +284,7 @@ const HcpPartnerRequests = () => {
                                             <label className="font-weight-bold" htmlFor="country_iso2">Country <span className="text-danger">*</span></label>
                                             <Field data-testid="country_iso2" as="select" name="country_iso2" className="form-control">
                                                 <option key="select-country" value="" disabled>--Select Country--</option>
-                                                {countries.map(item => <option key={item.id} value={item.country_iso2}>{item.codbase_desc}</option>)}
+                                                {countries.map(item => <option key={item.countryid} value={item.country_iso2}>{item.codbase_desc}</option>)}
                                             </Field>
                                             <div className="invalid-feedback"><ErrorMessage name="country_iso2" /></div>
                                         </div>
@@ -332,7 +330,7 @@ const HcpPartnerRequests = () => {
                                                         return language_name && <option key={country_iso2} value={language_code}>{language_name.replace(/,/g, '')}</option>
                                                     })}
                                                 </Field>
-                                                {/* {showError && !item.lang_code && <div class="invalid-feedback">This field must not be empty.</div>} */}
+                                                <div className="invalid-feedback"><ErrorMessage name="language" /></div>
                                             </div>
                                         </div>
                                     </div>
