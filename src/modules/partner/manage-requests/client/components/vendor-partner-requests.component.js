@@ -8,7 +8,7 @@ import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { NavLink } from 'react-router-dom';
 import { Faq } from '../../../../platform';
 import { partnerRequestSchemaForVendors } from './../manage-requests.schema';
-import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest } from '../manage-requests.actions';
+import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm } from '../manage-requests.actions';
 
 const VendorPartnerRequests = () => {
     const dispatch = useDispatch();
@@ -19,7 +19,7 @@ const VendorPartnerRequests = () => {
     const [companyCodes, setCompanyCodes] = useState([{ id: Math.random(), company_code: '' }]);
     const [showError, setShowError] = useState(false);
     const [partnerRequestId, setPartnerRequestId] = useState(undefined);
-
+    const [formData, setFormData] = useState(undefined);
     const [countryLanguages, setCountryLanguages] = useState([]);
 
     const [showFaq, setShowFaq] = useState(false);
@@ -57,6 +57,10 @@ const VendorPartnerRequests = () => {
         setShowForm(!!id);
     };
 
+    const sendFormHandler = (data) => {
+        setFormData(data);
+    };
+
     const handleChange = (e) => {
         const newCompanyCodes = [...companyCodes];
         const field = e.target.className.split(' ');
@@ -64,7 +68,7 @@ const VendorPartnerRequests = () => {
         companyCode[field[1]] = e.target.value;
         setCompanyCodes(newCompanyCodes);
         setShowError(false);
-    }
+    };
 
     const addNewCompanyCode = () => {
         const newCompanyCodes = [...companyCodes, { id: Math.random(), company_code: '' }];
@@ -137,6 +141,19 @@ const VendorPartnerRequests = () => {
             dispatch(getPartnerRequest(partnerRequestId));
         }
     }, [partnerRequestId]);
+
+    useEffect(() => {
+        if (formData) {
+            dispatch(sendForm(formData)).then(() => {
+                dispatch(updatePartnerRequest(formData.id, { ...formData, status: "pending" }));
+            }).catch(() => {
+                addToast('An error occured. Please try again.', {
+                    appearance: 'error',
+                    autoDismiss: true
+                });
+            });
+        }
+    }, [formData]);
 
     useEffect(() => {
         if(request.company_codes) {
@@ -223,7 +240,7 @@ const VendorPartnerRequests = () => {
                                                         <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
-                                                            <Dropdown.Item> Send Form </Dropdown.Item>
+                                                            <Dropdown.Item onClick={() => sendFormHandler(row)}> Send Form </Dropdown.Item>
                                                             <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
                                                             <Dropdown.Item onClick={() => deleteRequest(row.id) }> Delete </Dropdown.Item>
                                                         </Dropdown.Menu>

@@ -81,15 +81,52 @@ async function getPartnerRequest(req, res) {
     }
 }
 
-async function sendForm(req, res){
+async function sendForm(req, res) {
     try {
-        const sendFormLink = await Application.findOne({ where: { email: 'patients-organization@glpg.com' } });
+        const {
+            id,
+            application_id,
+            first_name,
+            last_name,
+            email,
+            partner_type,
+            country_iso2,
+            language
+        } = req.body;
+
+        const userApplication = await Application.findOne({ where: { id: application_id } });
+        const jwt_token = jwt.sign({
+            id: id
+        }, userApplication.auth_secret, {
+            expiresIn: '1h'
+        });
+
+        const payload = {
+            jwt_token,
+            first_name,
+            last_name,
+            email,
+            partner_type,
+            country_iso2: country_iso2.toLowerCase(),
+            locale: `${language}_${country_iso2.toUpperCase()}`
+        };
+
+        const metaData = await Application.findAll({
+             where: { id: application_id },
+             attributes: ['metadata']
+        });
+
+        const sendFormLink = JSON.parse(metaData[0].dataValues.metadata).request_notification_link;
+
+        await axios.post(sendFormLink, payload);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
     }
 }
+
 async function updatePartnerRequest(req, res) {
+    console.log("data: ", req.body);
     try {
         const {
             type,
@@ -101,6 +138,7 @@ async function updatePartnerRequest(req, res) {
             purchasing_organization,
             country_iso2,
             language,
+            status
         } = req.body;
 
         const companyCodes = company_codes && Array.isArray(company_codes)
@@ -129,7 +167,8 @@ async function updatePartnerRequest(req, res) {
             procurement_contact,
             company_codes: companyCodes,
             country_iso2,
-            language
+            language,
+            status
         };
 
         if (type === 'vendor' || type === 'wholesaler') data.purchasing_organization = purchasing_organization;

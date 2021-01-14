@@ -20,6 +20,16 @@ export function getPartnerRequest(id) {
         })
     };
 }
+export function sendForm(data) {
+    return {
+        type: Types.SEND_FORM,
+        payload: axios({
+            method: 'post',
+            url: `/api/partner-requests/${data.id}/send-form`,
+            data
+        })
+    };
+};
 
 export function createPartnerRequest(data) {
     return {
@@ -42,16 +52,7 @@ export function updatePartnerRequest(id, data) {
         })
     };
 }
-export function sendForm(data){
-    return {
-        type: Types.SEND_FORM,
-        payload: axios({
-            method: 'post',
-            url: `/api/partner-requests/${id}`,
-            data
-        })
-    };
-};
+
 export function deletePartnerRequest(id) {
     return {
         type: Types.DELETE_PARTNER_REQUEST,
