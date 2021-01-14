@@ -181,10 +181,10 @@ const WholesalerPartnerRequests = () => {
                                 <table className="table table-hover table-sm mb-0 cdp-table mb-2">
                                     <thead className="cdp-table__header  cdp-bg-primary text-white">
                                         <tr>
-                                            <th>First Name</th>
-                                            <th>Last Name</th>
-                                            <th>Purchasing Organization</th>
+                                            <th>Name</th>
+                                            <th>Status</th>
                                             <th>Company Code</th>
+                                            <th>Partner Type</th>
                                             <th>Email Address</th>
                                             <th>Procurement Contact</th>
                                             <th>Country</th>
@@ -196,9 +196,8 @@ const WholesalerPartnerRequests = () => {
                                             requests.map((row, index) =>
                                             (
                                                 <tr key={index}>
-                                                    <td>{row.first_name}</td>
-                                                    <td>{row.last_name}</td>
-                                                    <td>{row.purchasing_organization}</td>
+                                                    <td>{`${row.first_name} ${row.last_name}`}</td>
+                                                    <td>{row.status}</td>
                                                     <td>
                                                         {
                                                             row.company_codes.map((companyCode, idx) => (
@@ -206,6 +205,7 @@ const WholesalerPartnerRequests = () => {
                                                             ))
                                                         }
                                                     </td>
+                                                    <td>{row.partner_type}</td>
                                                     <td>{row.email}</td>
                                                     <td>{row.procurement_contact}</td>
                                                     <td>{getCountryName(row.country_iso2)}</td>

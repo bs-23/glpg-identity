@@ -166,9 +166,11 @@ const HcoPartnerRequests = () => {
                                 <table className="table table-hover table-sm mb-0 cdp-table">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
+                                            <th>UUID</th>
                                             <th>Name</th>
                                             <th>Status</th>
                                             <th>Company Code</th>
+                                            <th>Partner Type</th>
                                             <th>Email Address</th>
                                             <th>Procurement Contact</th>
                                             <th>Country</th>
@@ -178,6 +180,7 @@ const HcoPartnerRequests = () => {
                                     <tbody className="cdp-table__body bg-white">
                                         {requests.map((row, index) => (
                                             <tr key={index}>
+                                                <td>{row.uuid}</td>
                                                 <td>{`${row.first_name} ${row.last_name}`}</td>
                                                 <td>{row.status}</td>
                                                 <td>
@@ -187,6 +190,7 @@ const HcoPartnerRequests = () => {
                                                         ))
                                                     }
                                                 </td>
+                                                <td>{row.partner_type}</td>
                                                 <td>{row.email}</td>
                                                 <td>{row.procurement_contact}</td>
                                                 <td>{getCountryName(row.country_iso2)}</td>
@@ -334,7 +338,7 @@ const HcoPartnerRequests = () => {
                                             <div className="invalid-feedback"><ErrorMessage name="procurement_contact" /></div>
                                         </div>
                                     </div>
-                                    
+
                                     <div className="col-12">
                                         <div className="row py-3">
                                             {getCompanyCodeFields()}
