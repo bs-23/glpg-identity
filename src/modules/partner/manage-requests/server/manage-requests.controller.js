@@ -71,7 +71,7 @@ async function getPartnerRequest(req, res) {
 
 async function sendForm(req, res){
     try {
-
+        const sendFormLink = await Application.findOne({ where: { email: 'patients-organization@glpg.com' } });
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
