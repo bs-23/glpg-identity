@@ -306,6 +306,8 @@ const HcpPartnerRequests = () => {
                                             <Field className="form-control" type="text" name="uuid" />
                                             <div className="invalid-feedback"><ErrorMessage name="uuid" /></div>
                                         </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="first_name">First Name <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="first_name" />
@@ -328,6 +330,8 @@ const HcpPartnerRequests = () => {
                                             </Field>
                                             <div className="invalid-feedback"><ErrorMessage name="partner_type" /></div>
                                         </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="email">Email Address <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="email" />
