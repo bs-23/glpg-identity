@@ -5,6 +5,7 @@ const PartnerVendors = require('./partner-vendor.model');
 const { QueryTypes, Op } = require('sequelize');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
+const PartnerRequest = require(path.join(process.cwd(), 'src/modules/partner/manage-requests/server/partner-request.model'));
 
 async function getPartnerHcps(req, res) {
     try {
@@ -41,32 +42,51 @@ async function getPartnerHcps(req, res) {
 async function createPartnerHcp(req, res) {
     const response = new Response({}, []);
     try {
-        const { first_name, last_name, address, city, post_code, email, telephone,
+        const { request_id, first_name, last_name, address, city, post_code, email, telephone,
             type, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
             iban, bank_name, bank_account_no, currency, document_urls } = req.body;
 
+        if (!request_id) response.errors.push(new CustomError('Request ID is missing.', 400, 'request_id'));
         if (!first_name) response.errors.push(new CustomError('First name is missing.', 400, 'first_name'));
         if (!last_name) response.errors.push(new CustomError('Last name is missing.', 400, 'last_name'));
-        if (!email) response.errors.push(new CustomError('Last name is missing.', 400, 'email'));
+        if (!email) response.errors.push(new CustomError('Email is missing.', 400, 'email'));
         if (!type) response.errors.push(new CustomError('Type is missing.', 400, 'type'));
+
+        const partnerRequest = await PartnerRequest.findOne({
+            where: {
+                id: request_id,
+                type: 'hcp'
+            }
+        });
+
+        if (!partnerRequest) response.errors.push(new CustomError('Partner request not found.', 404));
+
+        if (partnerRequest && partnerRequest.status !== 'pending') response.errors.push(new CustomError('Invalid partner request status.', 400));
 
         if (response.errors.length) return res.status(400).send(response);
 
         const data = {
-            first_name, last_name, address, city, post_code, email, telephone,
+            request_id, first_name, last_name, address, city, post_code, email, telephone,
             type, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
             iban, bank_name, bank_account_no, currency, document_urls
         };
 
-        const [user, existing] = await PartnerHcps.findOrCreate({
-            where: { email: email.toLowerCase() },
+        const [user, created] = await PartnerHcps.findOrCreate({
+            where: {
+                [Op.or]: [
+                    { request_id: request_id },
+                    { email: email.toLowerCase() }
+                ]
+            },
             defaults: data
         });
 
-        if (!existing) {
-            response.errors.push(new CustomError('Partner with email already exists.', 400, 'email'));
+        if (!created) {
+            response.errors.push(new CustomError('Partner HCP with Request ID/Email already exists.', 400));
             return res.status(400).send(response);
         }
+
+        await partnerRequest.update({ status: 'submitted' });
 
         response.data = user;
         res.json(response);
@@ -150,14 +170,14 @@ async function createPartnerHco(req, res) {
             contact_first_name, contact_last_name, name, address, city, post_code, email, telephone, type, registration_number, iban, bank_name, bank_account_no, currency, document_urls
         };
 
-        const [user, existing] = await PartnerHcos.findOrCreate({
+        const [user, created] = await PartnerHcos.findOrCreate({
             where: {
                 registration_number: { [Op.iLike]: registration_number, }
             },
             defaults: data
         });
 
-        if (!existing) {
+        if (!created) {
             response.errors.push(new CustomError('Partner with VAT number/Registration number already exists.', 400, 'registration_number'));
             return res.status(400).send(response);
         }
@@ -208,14 +228,14 @@ async function createPartnerVendor(req, res) {
             requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency, document_urls
         };
 
-        const [user, existing] = await PartnerVendors.findOrCreate({
+        const [user, created] = await PartnerVendors.findOrCreate({
             where: {
                 registration_number: { [Op.iLike]: registration_number, }
             },
             defaults: data
         });
 
-        if (!existing) {
+        if (!created) {
             response.errors.push(new CustomError('Partner with VAT number/Registration number already exists.', 400, 'registration_number'));
             return res.status(400).send(response);
         }
