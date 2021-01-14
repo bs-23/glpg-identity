@@ -353,7 +353,7 @@ const HcpPartnerRequests = () => {
                                     </div>
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
-                                            <label className="font-weight-bold" htmlFor="language">ISO Code Language (ISO 639-1) <span className="text-danger">*</span></label>
+                                            <label className="font-weight-bold" htmlFor="language">Language<span className="text-danger">*</span></label>
                                             <Field className="form-control lang_code" as="select" name="language" className="form-control" id="language">
                                                 <option key="select-language" value="" disabled>--Select Language--</option>
                                                 {countryLanguages.map((element, lang_idx) => {
