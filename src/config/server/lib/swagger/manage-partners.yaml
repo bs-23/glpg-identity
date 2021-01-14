@@ -1,0 +1,235 @@
+paths:
+    /api/partner/hcp:
+        post:
+            tags:
+                - manage-partners
+            summary: Create HCP Business Partner in CDP.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                first_name:
+                                    type: string
+                                last_name:
+                                    type: string
+                                address_line_1:
+                                    type: string
+                                address_line_2:
+                                    type: string
+                                email:
+                                    type: string
+                                telephone:
+                                    type: string
+                                type:
+                                    type: string
+                                    enum:
+                                    - individual
+                                    - legal_entity
+                                uuid:
+                                    type: string
+                                is_italian_hcp:
+                                    type: boolean
+                                should_report_hco:
+                                    type: boolean
+                                beneficiary_category:
+                                    type: string
+                                    enum:
+                                    - beneficiary_category_1
+                                    - beneficiary_category_2
+                                iban:
+                                    type: string
+                                bank_name:
+                                    type: string
+                                bank_account_no:
+                                    type: string
+                                currency:
+                                    type: string
+                                document_urls:
+                                    type: array
+                                    items:
+                                        type: string
+                            required:
+                              - first_name
+                              - last_name
+                              - email
+                              - type
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/hcpPartnerProfile"
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+                400:
+                    description: Bad request.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+
+    /api/partner/hco:
+        post:
+            tags:
+                - manage-partners
+            summary: Create HCO Business Partner in CDP.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+            #                 contact_first_name, contact_last_name, name, address_line_1,
+            # address_line_2, email, telephone, type, registration_number,
+            # iban, bank_name, bank_account_no, currency, document_urls
+                            properties:
+                                contact_first_name:
+                                    type: string
+                                contact_last_name:
+                                    type: string
+                                name:
+                                    type: string
+                                address_line_1:
+                                    type: string
+                                address_line_2:
+                                    type: string
+                                email:
+                                    type: string
+                                telephone:
+                                    type: string
+                                type:
+                                    type: string
+                                    enum:
+                                    - healthcare_org
+                                    - patient_org
+                                registration_number:
+                                    type: string
+                                iban:
+                                    type: string
+                                bank_name:
+                                    type: string
+                                bank_account_no:
+                                    type: string
+                                currency:
+                                    type: string
+                                document_urls:
+                                    type: array
+                                    items:
+                                        type: string
+                            required:
+                              - contact_first_name
+                              - contact_last_name
+                              - name
+                              - email
+                              - type
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/hcoPartnerProfile"
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+                400:
+                    description: Bad request.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+
+components:
+    schemas:
+        hcpPartnerProfile:
+            type: object
+            properties:
+                id:
+                    type: string
+                first_name:
+                    type: string
+                last_name:
+                    type: string
+                address_line_1:
+                    type: string
+                address_line_2:
+                    type: string
+                email:
+                    type: string
+                telephone:
+                    type: string
+                type:
+                    type: string
+                    enum:
+                    - individual
+                    - legal_entity
+                uuid:
+                    type: string
+                is_italian_hcp:
+                    type: boolean
+                should_report_hco:
+                    type: boolean
+                beneficiary_category:
+                    type: string
+                    enum:
+                    - beneficiary_category_1
+                    - beneficiary_category_2
+                iban:
+                    type: string
+                bank_name:
+                    type: string
+                bank_account_no:
+                    type: string
+                currency:
+                    type: string
+                document_urls:
+                    type: array
+                    items:
+                        type: string
+        hcoPartnerProfile:
+            type: object
+            properties:
+                id:
+                    type: string
+                contact_first_name:
+                    type: string
+                contact_last_name:
+                    type: string
+                name:
+                    type: string
+                address_line_1:
+                    type: string
+                address_line_2:
+                    type: string
+                email:
+                    type: string
+                telephone:
+                    type: string
+                type:
+                    type: string
+                    enum:
+                    - healthcare_org
+                    - patient_org
+                registration_number:
+                    type: string
+                iban:
+                    type: string
+                bank_name:
+                    type: string
+                bank_account_no:
+                    type: string
+                currency:
+                    type: string
+                document_urls:
+                    type: array
+                    items:
+                        type: string

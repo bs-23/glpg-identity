@@ -21,7 +21,17 @@ async function getPartnerRequests(req, res) {
 
 async function createPartnerRequest(req, res) {
     try {
-        const { first_name, last_name, email, procurement_contact, company_codes, purchasing_organization, type } = req.body;
+        const {
+            type,
+            first_name,
+            last_name,
+            email,
+            procurement_contact,
+            company_codes,
+            purchasing_organization,
+            country_iso2,
+            language,
+        } = req.body;
 
         const companyCodes = company_codes && Array.isArray(company_codes)
             ? company_codes.filter(cb => 'string' === typeof cb)
@@ -38,7 +48,9 @@ async function createPartnerRequest(req, res) {
             email,
             procurement_contact,
             company_codes: companyCodes,
-            application_id: application.id
+            application_id: application.id,
+            country_iso2,
+            language,
         };
 
         if (type === 'vendor' || type === 'wholesaler') data.purchasing_organization = purchasing_organization;
@@ -79,7 +91,17 @@ async function sendForm(req, res){
 }
 async function updatePartnerRequest(req, res) {
     try {
-        const { type, first_name, last_name, email, procurement_contact, company_codes, purchasing_organization } = req.body;
+        const {
+            type,
+            first_name,
+            last_name,
+            email,
+            procurement_contact,
+            company_codes,
+            purchasing_organization,
+            country_iso2,
+            language,
+        } = req.body;
 
         const companyCodes = company_codes && Array.isArray(company_codes)
             ? company_codes.filter(cb => 'string' === typeof cb)
@@ -105,7 +127,9 @@ async function updatePartnerRequest(req, res) {
             last_name,
             email,
             procurement_contact,
-            company_codes: companyCodes
+            company_codes: companyCodes,
+            country_iso2,
+            language
         };
 
         if (type === 'vendor' || type === 'wholesaler') data.purchasing_organization = purchasing_organization;
