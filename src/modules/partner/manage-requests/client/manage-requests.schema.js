@@ -30,7 +30,13 @@ export const partnerRequestSchema = object().shape({
         .max(100, 'This field must be at most 100 characters long')
         .required('This field must not be empty')
         .test('is-valid-email-length', 'The part before @ of the email can be maximum 64 characters ',
-            email => isEmailLengthValid(email))
+            email => isEmailLengthValid(email)),
+    country_iso2: string()
+        .min(1, 'This field must be selected')
+        .required('This field must be selected'),
+    language: string()
+        .min(1, 'This field must be selected')
+        .required('This field must be selected')
 });
 
 export const partnerRequestSchemaForVendors = object().shape({
@@ -58,5 +64,11 @@ export const partnerRequestSchemaForVendors = object().shape({
         .max(100, 'This field must be at most 100 characters long')
         .required('This field must not be empty')
         .test('is-valid-email-length', 'The part before @ of the email can be maximum 64 characters ',
-            email => isEmailLengthValid(email))
+            email => isEmailLengthValid(email)),
+        country_iso2: string()
+            .min(1, 'This field must be selected')
+            .required('This field must be selected'),
+        language: string()
+            .min(1, 'This field must be selected')
+            .required('This field must be selected'),
 });

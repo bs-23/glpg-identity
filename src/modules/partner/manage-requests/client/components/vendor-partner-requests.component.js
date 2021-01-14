@@ -3,6 +3,7 @@ import Modal from 'react-bootstrap/Modal';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { useSelector, useDispatch } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
+import CountryCodes from 'country-codes-list';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { NavLink } from 'react-router-dom';
 import { Faq } from '../../../../platform';
@@ -12,10 +13,14 @@ import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPart
 const VendorPartnerRequests = () => {
     const dispatch = useDispatch();
     const { addToast } = useToasts();
+
+    const CountryCodesObject = Object.values(CountryCodes.customList('countryCode', '{countryCode} {officialLanguageCode} {officialLanguageNameEn}'));
     const [showForm, setShowForm] = useState(false);
     const [companyCodes, setCompanyCodes] = useState([{ id: Math.random(), company_code: '' }]);
     const [showError, setShowError] = useState(false);
     const [partnerRequestId, setPartnerRequestId] = useState(undefined);
+
+    const [countryLanguages, setCountryLanguages] = useState([]);
 
     const [showFaq, setShowFaq] = useState(false);
     const handleCloseFaq = () => setShowFaq(false);
@@ -24,6 +29,14 @@ const VendorPartnerRequests = () => {
     const total_requests = useSelector(state => state.manageRequestsReducer.partnerRequests);
     const requests = total_requests.filter(i => i.type === 'vendor');
     const request = useSelector(state => state.manageRequestsReducer.partnerRequest);
+
+    const countries = useSelector(state => state.countryReducer.countries);
+
+    const getCountryName = (country_iso2) => {
+        if (!countries || !country_iso2) return null;
+        const country = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+        return country && country.countryname;
+    };
 
     const deleteRequest = (id) => {
         dispatch(deletePartnerRequest(id)).then(() => {
@@ -63,13 +76,22 @@ const VendorPartnerRequests = () => {
         }, 50);
     }
 
+    const removeCompanyCode = (idx) => {
+        if(companyCodes.length === 1) return;
+        const newCompanyCodes = [...companyCodes];
+        newCompanyCodes.splice(idx, 1);
+        setCompanyCodes(newCompanyCodes);
+    }
+
     const getCompanyCodeFields = () => {
-        console.log(companyCodes);
         return companyCodes.map((item, idx) => {
             const companyCodeId = `company-code-${idx + 1}`;
 
             return (<React.Fragment key={item.id}>
                 <div className="col-12 col-sm-6">
+                    <label className="col-12 font-weight-bold d-flex justify-content-between align-items-center bg-light py-2 border-bottom rounded-top">
+                        <i className="fas fa-minus-circle text-danger fa-2x hover-opacity ml-auto" type="button" title="Remove" onClick={() => removeCompanyCode(idx)}></i>
+                    </label>
                     <div className="form-group">
                         <label className="font-weight-bold" htmlFor={companyCodeId}> {`Company Code ${idx+1}`} <span className="text-danger">*</span></label>
                         <Field className="form-control company_code" type='text' value={item.company_code} onChange={(e) => handleChange(e)} data-id={idx} name={companyCodeId} id={companyCodeId}/>
@@ -86,7 +108,28 @@ const VendorPartnerRequests = () => {
     }
 
     useEffect(() => {
+        function getLanguages() {
+            const mapped_languages = {};
+
+            const country_languages = CountryCodesObject.filter(item => {
+                const [, , language_name] = item.split(' ');
+                if (language_name && !mapped_languages[language_name]) {
+                    mapped_languages[language_name] = true;
+                    return true;
+                }
+                return false;
+            });
+            country_languages.sort((a, b) => {
+                const [, , language_name1] = a.split(' ');
+                const [, , language_name2] = b.split(' ');
+                if (language_name1.replace(/,/g, '') < language_name2.replace(/,/g, '')) return -1;
+                return 1;
+            });
+            setCountryLanguages(country_languages);
+        }
+
         loadRequests();
+        getLanguages();
     }, []);
 
     useEffect(() => {
@@ -141,7 +184,7 @@ const VendorPartnerRequests = () => {
                             </div>
                         </div>
 
-                       
+
 
                         {requests && requests.length > 0 ?
                             <div className="table-responsive shadow-sm mb-3">
@@ -154,6 +197,7 @@ const VendorPartnerRequests = () => {
                                             <th>Company Code</th>
                                             <th>Email Address</th>
                                             <th>Procurement Contact</th>
+                                            <th>Country</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -174,6 +218,7 @@ const VendorPartnerRequests = () => {
                                                     </td>
                                                     <td>{row.email}</td>
                                                     <td>{row.procurement_contact}</td>
+                                                    <td>{getCountryName(row.country_iso2)}</td>
                                                     <td><Dropdown className="ml-auto dropdown-customize">
                                                         <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
                                                         </Dropdown.Toggle>
@@ -218,6 +263,8 @@ const VendorPartnerRequests = () => {
                             procurement_contact: partnerRequestId && request ? request.procurement_contact : '',
                             purchasing_organization: partnerRequestId && request ? request.purchasing_organization : '',
                             company_codes: [],
+                            country_iso2: partnerRequestId && request ? request.country_iso2 : '',
+                            language: partnerRequestId && request ? request.language : '',
                         }}
                         displayName="PartnerRequestsForm"
                         validationSchema={partnerRequestSchemaForVendors}
@@ -270,6 +317,14 @@ const VendorPartnerRequests = () => {
                                 <div className="row">
                                     <div className="col-12 col-sm-12">
                                         <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="country_iso2">Country <span className="text-danger">*</span></label>
+                                            <Field data-testid="country_iso2" as="select" name="country_iso2" className="form-control">
+                                                <option key="select-country" value="" disabled>--Select Country--</option>
+                                                {countries.map(item => <option key={item.countryid} value={item.country_iso2}>{item.codbase_desc}</option>)}
+                                            </Field>
+                                            <div className="invalid-feedback"><ErrorMessage name="country_iso2" /></div>
+                                        </div>
+                                        <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="first_name">First Name <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="first_name" />
                                             <div className="invalid-feedback"><ErrorMessage name="first_name" /></div>
@@ -304,6 +359,20 @@ const VendorPartnerRequests = () => {
                                                     <i className="fas fa-plus  fa-2x mr-3" ></i>
                                                     <span className="h4 mb-0">Add Company Code</span>
                                                 </label>
+                                            </div>
+                                        </div>
+
+                                        <div className="col-12 col-sm-6">
+                                            <div className="form-group">
+                                                <label className="font-weight-bold" htmlFor="language">ISO Code Language (ISO 639-1) <span className="text-danger">*</span></label>
+                                                <Field className="form-control lang_code" as="select" name="language" className="form-control" id="language">
+                                                    <option key="select-language" value="" disabled>--Select Language--</option>
+                                                    {countryLanguages.map(element => {
+                                                        const [country_iso2, language_code, language_name] = element.split(' ');
+                                                        return language_name && <option key={country_iso2} value={language_code}>{language_name.replace(/,/g, '')}</option>
+                                                    })}
+                                                </Field>
+                                                <div className="invalid-feedback"><ErrorMessage name="language" /></div>
                                             </div>
                                         </div>
                                     </div>

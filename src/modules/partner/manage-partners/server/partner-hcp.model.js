@@ -18,10 +18,13 @@ const PartnerHcps = sequelize.cdpConnector.define('partner_hcps', {
         allowNull: false,
         type: DataTypes.STRING(50),
     },
-    address_line_1: {
+    address: {
         type: DataTypes.STRING
     },
-    address_line_2: {
+    city: {
+        type: DataTypes.STRING
+    },
+    post_code: {
         type: DataTypes.STRING
     },
     email: {

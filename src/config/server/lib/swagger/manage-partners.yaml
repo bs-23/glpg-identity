@@ -15,9 +15,11 @@ paths:
                                     type: string
                                 last_name:
                                     type: string
-                                address_line_1:
+                                address:
                                     type: string
-                                address_line_2:
+                                city:
+                                    type: string
+                                post_code:
                                     type: string
                                 email:
                                     type: string
@@ -86,9 +88,6 @@ paths:
                     application/json:
                         schema:
                             type: object
-            #                 contact_first_name, contact_last_name, name, address_line_1,
-            # address_line_2, email, telephone, type, registration_number,
-            # iban, bank_name, bank_account_no, currency, document_urls
                             properties:
                                 contact_first_name:
                                     type: string
@@ -96,9 +95,11 @@ paths:
                                     type: string
                                 name:
                                     type: string
-                                address_line_1:
+                                address:
                                     type: string
-                                address_line_2:
+                                city:
+                                    type: string
+                                post_code:
                                     type: string
                                 email:
                                     type: string
