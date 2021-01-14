@@ -353,6 +353,8 @@ const VendorPartnerRequests = () => {
                                             <Field className="form-control" type="text" name="partner_type" />
                                             <div className="invalid-feedback"><ErrorMessage name="partner_type" /></div>
                                         </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="email">Email Address <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="email" />
@@ -365,21 +367,24 @@ const VendorPartnerRequests = () => {
                                             <Field className="form-control" type="text" name="procurement_contact" />
                                             <div className="invalid-feedback"><ErrorMessage name="procurement_contact" /></div>
                                         </div>
-
-                                        {getCompanyCodeFields()}
-
-                                        <div className="col-12">
-                                            <div className="form-group">
-                                                <label className="d-flex align-items-center cdp-text-primary hover-opacity" type="button" onClick={addNewCompanyCode}>
-                                                    <i className="fas fa-plus  fa-2x mr-3" ></i>
-                                                    <span className="h4 mb-0">Add Company Code</span>
-                                                </label>
+                                    </div>
+                                    <div className="col-12">
+                                        <div className="row py-3">
+                                            {getCompanyCodeFields()}
+                                            <div className="col-12 col-sm-6 col-lg-4">
+                                                <div className="form-group">
+                                                    <label>&#160;</label>
+                                                    <div className="d-flex align-items-center hover-opacity" type="button" onClick={addNewCompanyCode}>
+                                                        <i className="fas fa-plus cdp-text-secondary mr-2" ></i>
+                                                        <span className="cdp-text-secondary mb-0">Add Company Code</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
-                                            <label className="font-weight-bold" htmlFor="language">ISO Code Language (ISO 639-1) <span className="text-danger">*</span></label>
+                                            <label className="font-weight-bold" htmlFor="language">Language<span className="text-danger">*</span></label>
                                             <Field className="form-control lang_code" as="select" name="language" className="form-control" id="language">
                                                 <option key="select-language" value="" disabled>--Select Language--</option>
                                                 {countryLanguages.map((element, lang_idx) => {
