@@ -11,6 +11,8 @@ paths:
                         schema:
                             type: object
                             properties:
+                                request_id:
+                                    type: string
                                 first_name:
                                     type: string
                                 last_name:
@@ -67,7 +69,7 @@ paths:
                                 type: object
                                 properties:
                                     data:
-                                        $ref: "#/components/schemas/hcpPartnerProfile"
+                                        $ref: "#/components/schemas/partnerHcpProfile"
                                     errors:
                                         $ref: "#/components/schemas/errorBodyInSuccess"
                 400:
@@ -139,7 +141,110 @@ paths:
                                 type: object
                                 properties:
                                     data:
-                                        $ref: "#/components/schemas/hcoPartnerProfile"
+                                        $ref: "#/components/schemas/partnerHcoProfile"
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+                400:
+                    description: Bad request.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+
+    /api/partner/vendor:
+        post:
+            tags:
+                - manage-partners
+            summary: Create Vendor Business Partner in CDP.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                requestor_first_name:
+                                    type: string
+                                requestor_last_name:
+                                    type: string
+                                purchasing_org:
+                                    type: string
+                                company_code:
+                                    type: string
+                                requestor_email:
+                                    type: string
+                                procurement_contact:
+                                    type: string
+                                name:
+                                    type: string
+                                registration_number:
+                                    type: string
+                                address:
+                                    type: string
+                                city:
+                                    type: string
+                                post_code:
+                                    type: string
+                                email:
+                                    type: string
+                                telephone:
+                                    type: string
+                                invoice_contact_name:
+                                    type: string
+                                invoice_address:
+                                    type: string
+                                invoice_post_code:
+                                    type: string
+                                invoice_email:
+                                    type: string
+                                invoice_telephone:
+                                    type: string
+                                commercial_contact_name:
+                                    type: string
+                                commercial_address:
+                                    type: string
+                                commercial_city:
+                                    type: string
+                                commercial_post_code:
+                                    type: string
+                                commercial_email:
+                                    type: string
+                                commercial_telephone:
+                                    type: string
+                                ordering_contact_name:
+                                    type: string
+                                ordering_email:
+                                    type: string
+                                ordering_telephone:
+                                    type: string
+                                iban:
+                                    type: string
+                                bank_name:
+                                    type: string
+                                bank_account_no:
+                                    type: string
+                                currency:
+                                    type: string
+                                document_urls:
+                                    type: array
+                                    items:
+                                        type: string
+                            required:
+                              - name
+                              - registration_number
+                              - address
+                              - city
+                              - ordering_email
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/partnerVendorProfile"
                                     errors:
                                         $ref: "#/components/schemas/errorBodyInSuccess"
                 400:
@@ -151,10 +256,18 @@ paths:
 
 components:
     schemas:
-        hcpPartnerProfile:
+        partnerHcpProfile:
             type: object
             properties:
                 id:
+                    type: string
+                status:
+                    type: string
+                    enum:
+                    - pending
+                    - approved
+                    - rejected
+                request_id:
                     type: string
                 first_name:
                     type: string
@@ -196,11 +309,17 @@ components:
                     type: array
                     items:
                         type: string
-        hcoPartnerProfile:
+        partnerHcoProfile:
             type: object
             properties:
                 id:
                     type: string
+                status:
+                    type: string
+                    enum:
+                    - pending
+                    - approved
+                    - rejected
                 contact_first_name:
                     type: string
                 contact_last_name:
@@ -221,6 +340,83 @@ components:
                     - healthcare_org
                     - patient_org
                 registration_number:
+                    type: string
+                iban:
+                    type: string
+                bank_name:
+                    type: string
+                bank_account_no:
+                    type: string
+                currency:
+                    type: string
+                document_urls:
+                    type: array
+                    items:
+                        type: string
+        partnerVendorProfile:
+            type: object
+            properties:
+                id:
+                    type: string
+                status:
+                    type: string
+                    enum:
+                    - pending
+                    - approved
+                    - rejected
+                requestor_first_name:
+                    type: string
+                requestor_last_name:
+                    type: string
+                purchasing_org:
+                    type: string
+                company_code:
+                    type: string
+                requestor_email:
+                    type: string
+                procurement_contact:
+                    type: string
+                name:
+                    type: string
+                registration_number:
+                    type: string
+                address:
+                    type: string
+                city:
+                    type: string
+                post_code:
+                    type: string
+                email:
+                    type: string
+                telephone:
+                    type: string
+                invoice_contact_name:
+                    type: string
+                invoice_address:
+                    type: string
+                invoice_post_code:
+                    type: string
+                invoice_email:
+                    type: string
+                invoice_telephone:
+                    type: string
+                commercial_contact_name:
+                    type: string
+                commercial_address:
+                    type: string
+                commercial_city:
+                    type: string
+                commercial_post_code:
+                    type: string
+                commercial_email:
+                    type: string
+                commercial_telephone:
+                    type: string
+                ordering_contact_name:
+                    type: string
+                ordering_email:
+                    type: string
+                ordering_telephone:
                     type: string
                 iban:
                     type: string

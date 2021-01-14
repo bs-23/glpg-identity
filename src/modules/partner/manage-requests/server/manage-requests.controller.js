@@ -22,13 +22,14 @@ async function getPartnerRequests(req, res) {
 async function createPartnerRequest(req, res) {
     try {
         const {
-            type,
+            entity_type,
             first_name,
             last_name,
             email,
             procurement_contact,
             company_codes,
-            purchasing_organization,
+            uuid,
+            partner_type,
             country_iso2,
             language,
         } = req.body;
@@ -42,21 +43,22 @@ async function createPartnerRequest(req, res) {
         const application = await Application.findOne({ where: { email: 'patients-organization@glpg.com'} });
 
         const data = {
-            type,
+            entity_type,
             first_name,
             last_name,
             email,
             procurement_contact,
+            partner_type,
             company_codes: companyCodes,
             application_id: application.id,
             country_iso2,
             language,
         };
 
-        if (type === 'vendor' || type === 'wholesaler') data.purchasing_organization = purchasing_organization;
+        if (entity_type === 'hcp' || entity_type === 'hco') data.uuid = uuid;
 
         const [user, created] = await PartnerRequest.findOrCreate({
-            where: { type, email: email.toLowerCase() },
+            where: { entity_type, email: email.toLowerCase() },
             defaults: data
         });
 
@@ -129,13 +131,14 @@ async function updatePartnerRequest(req, res) {
     console.log("data: ", req.body);
     try {
         const {
-            type,
+            entity_type,
             first_name,
             last_name,
             email,
             procurement_contact,
             company_codes,
-            purchasing_organization,
+            uuid,
+            partner_type,
             country_iso2,
             language,
             status
@@ -153,7 +156,7 @@ async function updatePartnerRequest(req, res) {
         const isEmailExists = await PartnerRequest.findOne({
             where: {
                 id: { [Op.not]: req.params.id },
-                type,
+                entity_type,
                 email: email.toLowerCase()
             }
         });
@@ -165,13 +168,14 @@ async function updatePartnerRequest(req, res) {
             last_name,
             email,
             procurement_contact,
+            partner_type,
             company_codes: companyCodes,
             country_iso2,
             language,
             status
         };
 
-        if (type === 'vendor' || type === 'wholesaler') data.purchasing_organization = purchasing_organization;
+        if (entity_type === 'hcp' || entity_type === 'hco') data.uuid = uuid;
 
         const updated_data = await partnerRequest.update(data);
 

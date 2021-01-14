@@ -3,7 +3,6 @@ import Modal from 'react-bootstrap/Modal';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { useSelector, useDispatch } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
-import CountryCodes from 'country-codes-list';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { NavLink } from 'react-router-dom';
 import { Faq } from '../../../../platform';
@@ -13,22 +12,27 @@ import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPart
 const WholesalerPartnerRequests = () => {
     const dispatch = useDispatch();
     const { addToast } = useToasts();
-
-    const CountryCodesObject = Object.values(CountryCodes.customList('countryCode', '{countryCode} {officialLanguageCode} {officialLanguageNameEn}'));
     const [showForm, setShowForm] = useState(false);
     const [companyCodes, setCompanyCodes] = useState([{ id: Math.random(), company_code: '' }]);
     const [showError, setShowError] = useState(false);
     const [partnerRequestId, setPartnerRequestId] = useState(undefined);
     const [sendFormId, setSendFormId] = useState(undefined);
-    const [sendFormData, setSendFormData] = useState(undefined);
-    const [countryLanguages, setCountryLanguages] = useState([]);
 
+    const countryLanguages = [
+        { language_name: 'English', language_code: 'en' },
+        { language_name: 'French', language_code: 'fr' },
+        { language_name: 'Germany', language_code: 'de' },
+        { language_name: 'Netherlands', language_code: 'nl' }
+    ];
+    const [requestToDelete, setRequestToDelete] = useState(null);
+
+    const [formData, setFormData] = useState(undefined);
     const [showFaq, setShowFaq] = useState(false);
     const handleCloseFaq = () => setShowFaq(false);
     const handleShowFaq = () => setShowFaq(true);
 
     const total_requests = useSelector(state => state.manageRequestsReducer.partnerRequests);
-    const requests = total_requests.filter(i => i.type === 'wholesaler');
+    const requests = total_requests.filter(i => i.entity_type === 'wholesaler');
     const request = useSelector(state => state.manageRequestsReducer.partnerRequest);
 
     const countries = useSelector(state => state.countryReducer.countries);
@@ -51,6 +55,7 @@ const WholesalerPartnerRequests = () => {
                 autoDismiss: true
             });
         });
+        setRequestToDelete(null);
     }
 
     const toggleForm = (id) => {
@@ -85,18 +90,26 @@ const WholesalerPartnerRequests = () => {
     }
 
     const getCompanyCodeFields = () => {
+        const len = companyCodes.length;
+
         return companyCodes.map((item, idx) => {
             const companyCodeId = `company-code-${idx + 1}`;
 
             return (<React.Fragment key={item.id}>
-                <div className="col-12 col-sm-6">
-                    <label className="col-12 font-weight-bold d-flex justify-content-between align-items-center bg-light py-2 border-bottom rounded-top">
-                        <i className="fas fa-minus-circle text-danger fa-2x hover-opacity ml-auto" type="button" title="Remove" onClick={() => removeCompanyCode(idx)}></i>
-                    </label>
+                <div className="col-12 col-sm-6 col-lg-4">
+
+
                     <div className="form-group">
-                        <label className="font-weight-bold" htmlFor={companyCodeId}> {`Company Code ${idx+1}`} <span className="text-danger">*</span></label>
+                        <label className="font-weight-bold d-flex align-items-center justify-content-between" htmlFor={companyCodeId}>
+                            <span className="">
+                                {`Company Code ${idx + 1}`} <span className="text-danger">*</span>
+                            </span>
+                            {
+                                len === 1 ? null :  <i className="fas fa-minus-circle text-danger hover-opacity ml-auto" type="button" title="Remove" onClick={() => removeCompanyCode(idx)}></i>
+                            }
+                        </label>
                         <Field className="form-control company_code" type='text' value={item.company_code} onChange={(e) => handleChange(e)} data-id={idx} name={companyCodeId} id={companyCodeId}/>
-                        {showError && !item.company_code && <div class="invalid-feedback">This field must not be empty.</div>}
+                        {showError && !item.company_code && <div className="invalid-feedback">This field must not be empty.</div>}
                     </div>
                 </div>
             </React.Fragment>
@@ -107,33 +120,11 @@ const WholesalerPartnerRequests = () => {
     async function loadRequests() {
         dispatch(getPartnerRequests());
     }
-    const sendFormHandler = (id, data) => {
-        setSendFormId(id);
-        setSendFormData(data);
+    const sendFormHandler = (data) => {
+        setFormData(data);
     };
     useEffect(() => {
-        function getLanguages() {
-            const mapped_languages = {};
-
-            const country_languages = CountryCodesObject.filter(item => {
-                const [, , language_name] = item.split(' ');
-                if (language_name && !mapped_languages[language_name]) {
-                    mapped_languages[language_name] = true;
-                    return true;
-                }
-                return false;
-            });
-            country_languages.sort((a, b) => {
-                const [, , language_name1] = a.split(' ');
-                const [, , language_name2] = b.split(' ');
-                if (language_name1.replace(/,/g, '') < language_name2.replace(/,/g, '')) return -1;
-                return 1;
-            });
-            setCountryLanguages(country_languages);
-        }
-
         loadRequests();
-        getLanguages();
     }, []);
 
     useEffect(() => {
@@ -143,10 +134,17 @@ const WholesalerPartnerRequests = () => {
     }, [partnerRequestId]);
 
     useEffect(() => {
-        if (sendFormId) {
-            dispatch(sendForm(sendFormId, sendFormData));
+        if (formData) {
+            dispatch(sendForm(formData)).then(() => {
+                dispatch(updatePartnerRequest(formData.id, { ...formData, status: "pending" }));
+            }).catch(() => {
+                addToast('An error occured. Please try again.', {
+                    appearance: 'error',
+                    autoDismiss: true
+                });
+            });
         }
-    }, [sendFormId]);
+    }, [formData]);
     useEffect(() => {
         if(request.company_codes) {
             const codes = request.company_codes.map(company_code => ({ id: Math.random(), company_code }));
@@ -231,9 +229,9 @@ const WholesalerPartnerRequests = () => {
                                                         <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
-                                                            <Dropdown.Item onClick={() => sendFormHandler(row.id, row)}> Send Form </Dropdown.Item>
+                                                            <Dropdown.Item onClick={() => sendFormHandler(row)}> Send Form </Dropdown.Item>
                                                             <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
-                                                            <Dropdown.Item onClick={() => deleteRequest(row.id) }> Delete </Dropdown.Item>
+                                                            <Dropdown.Item onClick={() => setRequestToDelete(row.id) }> Delete </Dropdown.Item>
                                                         </Dropdown.Menu>
                                                     </Dropdown></td>
                                                 </tr>
@@ -254,7 +252,7 @@ const WholesalerPartnerRequests = () => {
                 </div>
             </div>
 
-            <Modal dialogClassName="modal-90w modal-customize" centered show={showForm}  onHide={toggleForm}>
+            <Modal dialogClassName="modal-customize" size="lg" centered show={showForm}  onHide={toggleForm}>
                 <Modal.Header closeButton>
                     <Modal.Title>
                         {
@@ -273,6 +271,7 @@ const WholesalerPartnerRequests = () => {
                             company_codes: [],
                             country_iso2: partnerRequestId && request ? request.country_iso2 : '',
                             language: partnerRequestId && request ? request.language : '',
+                            partner_type: partnerRequestId && request ? request.partner_type : '',
                         }}
                         displayName="PartnerRequestsForm"
                         validationSchema={partnerRequestSchemaForVendors}
@@ -286,7 +285,7 @@ const WholesalerPartnerRequests = () => {
                                 return;
                             }
 
-                            values.type = 'wholesaler';
+                            values.entity_type = 'wholesaler';
 
                             if (partnerRequestId) {
                                 dispatch(updatePartnerRequest(partnerRequestId, values)).then(function () {
@@ -323,7 +322,7 @@ const WholesalerPartnerRequests = () => {
                         {formikProps => (
                             <Form onSubmit={formikProps.handleSubmit}>
                                 <div className="row">
-                                    <div className="col-12 col-sm-12">
+                                    <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="country_iso2">Country <span className="text-danger">*</span></label>
                                             <Field data-testid="country_iso2" as="select" name="country_iso2" className="form-control">
@@ -332,30 +331,38 @@ const WholesalerPartnerRequests = () => {
                                             </Field>
                                             <div className="invalid-feedback"><ErrorMessage name="country_iso2" /></div>
                                         </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="first_name">First Name <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="first_name" />
                                             <div className="invalid-feedback"><ErrorMessage name="first_name" /></div>
                                         </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="last_name">Last Name <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="last_name" />
                                             <div className="invalid-feedback"><ErrorMessage name="last_name" /></div>
+                                        </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="partner_type"> Business Partner Type <span className="text-danger">*</span></label>
+                                            <Field className="form-control" type="text" name="partner_type" />
+                                            <div className="invalid-feedback"><ErrorMessage name="partner_type" /></div>
                                         </div>
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="email">Email Address <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="email" />
                                             <div className="invalid-feedback"><ErrorMessage name="email" /></div>
                                         </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="procurement_contact">Procurement Contact <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="procurement_contact" />
                                             <div className="invalid-feedback"><ErrorMessage name="procurement_contact" /></div>
-                                        </div>
-                                        <div className="form-group">
-                                            <label className="font-weight-bold" htmlFor="purchasing_organization">Purchasing Organization <span className="text-danger">*</span></label>
-                                            <Field className="form-control" type="text" name="purchasing_organization" />
-                                            <div className="invalid-feedback"><ErrorMessage name="purchasing_organization" /></div>
                                         </div>
 
                                         {getCompanyCodeFields()}
@@ -367,22 +374,23 @@ const WholesalerPartnerRequests = () => {
                                                     <span className="h4 mb-0">Add Company Code</span>
                                                 </label>
                                             </div>
-                                        </div>
 
-                                        <div className="col-12 col-sm-6">
-                                            <div className="form-group">
-                                                <label className="font-weight-bold" htmlFor="language">ISO Code Language (ISO 639-1) <span className="text-danger">*</span></label>
-                                                <Field className="form-control lang_code" as="select" name="language" className="form-control" id="language">
-                                                    <option key="select-language" value="" disabled>--Select Language--</option>
-                                                    {countryLanguages.map(element => {
-                                                        const [country_iso2, language_code, language_name] = element.split(' ');
-                                                        return language_name && <option key={country_iso2} value={language_code}>{language_name.replace(/,/g, '')}</option>
-                                                    })}
-                                                </Field>
-                                                <div className="invalid-feedback"><ErrorMessage name="language" /></div>
-                                            </div>
                                         </div>
                                     </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="language">ISO Code Language (ISO 639-1) <span className="text-danger">*</span></label>
+                                            <Field className="form-control lang_code" as="select" name="language" className="form-control" id="language">
+                                                <option key="select-language" value="" disabled>--Select Language--</option>
+                                                {countryLanguages.map((element, lang_idx) => {
+                                                    const { language_name, language_code } = element;
+                                                    return language_name && <option key={lang_idx} value={language_code}>{language_name}</option>
+                                                })}
+                                            </Field>
+                                            <div className="invalid-feedback"><ErrorMessage name="language" /></div>
+                                        </div>
+                                    </div>
+
                                 </div>
                                 <button type="submit" disabled={showError} className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" >Submit</button>
                             </Form>
@@ -390,8 +398,24 @@ const WholesalerPartnerRequests = () => {
                     </Formik>
                 </Modal.Body>
             </Modal>
-        </main >
 
+            <Modal centered show={requestToDelete !== null} onHide={() => setRequestToDelete(null)}>
+                <Modal.Header closeButton>
+                    <Modal.Title className="modal-title_small">Remove Request</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {requestToDelete !== null ? (
+                        <div>
+                            Are you sure you want to remove the following request?
+                        </div>
+                    ) : null}
+                </Modal.Body>
+                <Modal.Footer>
+                    <button className="btn cdp-btn-outline-primary" onClick={() => setRequestToDelete(null)}>Cancel</button>
+                    <button className="ml-2 btn cdp-btn-secondary text-white" onClick={() => deleteRequest(requestToDelete)}>Confirm</button>
+                </Modal.Footer>
+            </Modal>
+        </main >
     );
 };
 

@@ -10,6 +10,11 @@ const PartnerHcps = sequelize.cdpConnector.define('partner_hcps', {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4
     },
+    request_id: {
+        unique: true,
+        allowNull: false,
+        type: DataTypes.UUID
+    },
     first_name: {
         allowNull: false,
         type: DataTypes.STRING(50),
@@ -69,6 +74,12 @@ const PartnerHcps = sequelize.cdpConnector.define('partner_hcps', {
     },
     document_urls: {
         type: DataTypes.ARRAY(DataTypes.STRING)
+    },
+    status: {
+        allowNull: false,
+        type: DataTypes.ENUM,
+        values: ['pending', 'approved', 'rejected'],
+        defaultValue: 'pending'
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
