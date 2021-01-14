@@ -52,18 +52,24 @@ async function createPartnerHcp(req, res) {
         if (!email) response.errors.push(new CustomError('Email is missing.', 400, 'email'));
         if (!type) response.errors.push(new CustomError('Type is missing.', 400, 'type'));
 
+        if (response.errors.length) return res.status(400).send(response);
+
         const partnerRequest = await PartnerRequest.findOne({
             where: {
                 id: request_id,
-                type: 'hcp'
+                entity_type: 'hcp'
             }
         });
 
-        if (!partnerRequest) response.errors.push(new CustomError('Partner request not found.', 404));
+        if (!partnerRequest) {
+            response.errors.push(new CustomError('Partner request not found.', 404));
+            return res.status(404).send(response);
+        }
 
-        if (partnerRequest && partnerRequest.status !== 'pending') response.errors.push(new CustomError('Invalid partner request status.', 400));
-
-        if (response.errors.length) return res.status(400).send(response);
+        if (partnerRequest && partnerRequest.status !== 'pending') {
+            response.errors.push(new CustomError('Invalid partner request status.', 400));
+            return res.status(404).send(response);
+        }
 
         const data = {
             request_id, first_name, last_name, address, city, post_code, email, telephone,
@@ -71,11 +77,11 @@ async function createPartnerHcp(req, res) {
             iban, bank_name, bank_account_no, currency, document_urls
         };
 
-        const [user, created] = await PartnerHcps.findOrCreate({
+        const [partnerHcp, created] = await PartnerHcps.findOrCreate({
             where: {
                 [Op.or]: [
                     { request_id: request_id },
-                    { email: email.toLowerCase() }
+                    { email: { [Op.iLike]: email } }
                 ]
             },
             defaults: data
@@ -88,7 +94,7 @@ async function createPartnerHcp(req, res) {
 
         await partnerRequest.update({ status: 'submitted' });
 
-        response.data = user;
+        response.data = partnerHcp;
         res.json(response);
 
     } catch (err) {
@@ -156,8 +162,9 @@ async function getPartnerHcos(req, res) {
 async function createPartnerHco(req, res) {
     const response = new Response({}, []);
     try {
-        const { contact_first_name, contact_last_name, name, address, city, post_code, email, telephone, type, registration_number, iban, bank_name, bank_account_no, currency, document_urls } = req.body;
+        const { request_id, contact_first_name, contact_last_name, name, address, city, post_code, email, telephone, type, registration_number, iban, bank_name, bank_account_no, currency, document_urls } = req.body;
 
+        if (!request_id) response.errors.push(new CustomError('Request ID is missing.', 400, 'request_id'));
         if (!contact_first_name) response.errors.push(new CustomError('Contact first name is missing.', 400, 'contact_first_name'));
         if (!contact_last_name) response.errors.push(new CustomError('Contact last name is missing.', 400, 'contact_last_name'));
         if (!name) response.errors.push(new CustomError('Name is missing.', 400, 'name'));
@@ -166,13 +173,33 @@ async function createPartnerHco(req, res) {
 
         if (response.errors.length) return res.status(400).send(response);
 
+        const partnerRequest = await PartnerRequest.findOne({
+            where: {
+                id: request_id,
+                entity_type: 'hco'
+            }
+        });
+
+        if (!partnerRequest) {
+            response.errors.push(new CustomError('Partner request not found.', 404));
+            return res.status(404).send(response);
+        }
+
+        if (partnerRequest && partnerRequest.status !== 'pending') {
+            response.errors.push(new CustomError('Invalid partner request status.', 400));
+            return res.status(404).send(response);
+        }
+
         const data = {
-            contact_first_name, contact_last_name, name, address, city, post_code, email, telephone, type, registration_number, iban, bank_name, bank_account_no, currency, document_urls
+            request_id, contact_first_name, contact_last_name, name, address, city, post_code, email, telephone, type, registration_number, iban, bank_name, bank_account_no, currency, document_urls
         };
 
-        const [user, created] = await PartnerHcos.findOrCreate({
+        const [partnerHco, created] = await PartnerHcos.findOrCreate({
             where: {
-                registration_number: { [Op.iLike]: registration_number, }
+                [Op.or]: [
+                    { request_id: request_id },
+                    { registration_number: { [Op.iLike]: registration_number } }
+                ]
             },
             defaults: data
         });
@@ -182,7 +209,9 @@ async function createPartnerHco(req, res) {
             return res.status(400).send(response);
         }
 
-        response.data = user;
+        await partnerRequest.update({ status: 'submitted' });
+
+        response.data = partnerHco;
         res.json(response);
 
     } catch (err) {
@@ -214,8 +243,9 @@ async function updatePartnerHco(req, res) {
 async function createPartnerVendor(req, res) {
     const response = new Response({}, []);
     try {
-        const { requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency, document_urls } = req.body;
+        const { request_id, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency, document_urls } = req.body;
 
+        if (!request_id) response.errors.push(new CustomError('Request ID is missing.', 400, 'request_id'));
         if (!name) response.errors.push(new CustomError('Name is missing.', 400, 'name'));
         if (!registration_number) response.errors.push(new CustomError('VAT number/Company Registration number is missing.', 400, 'registration_number'));
         if (!address) response.errors.push(new CustomError('Address is missing.', 400, 'address'));
@@ -224,13 +254,33 @@ async function createPartnerVendor(req, res) {
 
         if (response.errors.length) return res.status(400).send(response);
 
+        const partnerRequest = await PartnerRequest.findOne({
+            where: {
+                id: request_id,
+                entity_type: 'vendor'
+            }
+        });
+
+        if (!partnerRequest) {
+            response.errors.push(new CustomError('Partner request not found.', 404));
+            return res.status(404).send(response);
+        }
+
+        if (partnerRequest && partnerRequest.status !== 'pending') {
+            response.errors.push(new CustomError('Invalid partner request status.', 400));
+            return res.status(404).send(response);
+        }
+
         const data = {
-            requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency, document_urls
+            request_id, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency, document_urls
         };
 
-        const [user, created] = await PartnerVendors.findOrCreate({
+        const [partnerVendor, created] = await PartnerVendors.findOrCreate({
             where: {
-                registration_number: { [Op.iLike]: registration_number, }
+                [Op.or]: [
+                    { request_id: request_id },
+                    { registration_number: { [Op.iLike]: registration_number } }
+                ]
             },
             defaults: data
         });
@@ -240,7 +290,9 @@ async function createPartnerVendor(req, res) {
             return res.status(400).send(response);
         }
 
-        response.data = user;
+        await partnerRequest.update({ status: 'submitted' });
+
+        response.data = partnerVendor;
         res.json(response);
 
     } catch (err) {

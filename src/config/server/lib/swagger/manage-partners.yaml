@@ -56,6 +56,7 @@ paths:
                                     items:
                                         type: string
                             required:
+                              - request_id
                               - first_name
                               - last_name
                               - email
@@ -91,6 +92,8 @@ paths:
                         schema:
                             type: object
                             properties:
+                                request_id:
+                                    type: string
                                 contact_first_name:
                                     type: string
                                 contact_last_name:
@@ -127,9 +130,11 @@ paths:
                                     items:
                                         type: string
                             required:
+                              - request_id
                               - contact_first_name
                               - contact_last_name
                               - name
+                              - registration_number
                               - email
                               - type
             responses:
@@ -163,6 +168,8 @@ paths:
                         schema:
                             type: object
                             properties:
+                                request_id:
+                                    type: string
                                 requestor_first_name:
                                     type: string
                                 requestor_last_name:
@@ -230,6 +237,7 @@ paths:
                                     items:
                                         type: string
                             required:
+                              - request_id
                               - name
                               - registration_number
                               - address
@@ -320,6 +328,8 @@ components:
                     - pending
                     - approved
                     - rejected
+                request_id:
+                    type: string
                 contact_first_name:
                     type: string
                 contact_last_name:
@@ -364,6 +374,8 @@ components:
                     - pending
                     - approved
                     - rejected
+                request_id:
+                    type: string
                 requestor_first_name:
                     type: string
                 requestor_last_name:

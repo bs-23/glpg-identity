@@ -4,6 +4,7 @@ CREATE TYPE cdp.enum_partner_hco_type AS ENUM
 CREATE TABLE cdp.partner_hcos
 (
     id uuid NOT NULL,
+    request_id uuid NOT NULL,
     contact_first_name character varying(50) COLLATE pg_catalog."default" NOT NULL,
     contact_last_name character varying(50) COLLATE pg_catalog."default" NOT NULL,
     name character varying(50) COLLATE pg_catalog."default" NOT NULL,
