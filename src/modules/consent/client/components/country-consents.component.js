@@ -73,7 +73,6 @@ const CountryConsents = () => {
     }
 
     const setEdit = (consent) => {
-        console.log("consent: ----", consent);
         setEditOption(consent);
         setEditable(true);
         setShow(true);

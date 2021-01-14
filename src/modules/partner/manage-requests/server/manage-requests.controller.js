@@ -128,7 +128,6 @@ async function sendForm(req, res) {
 }
 
 async function updatePartnerRequest(req, res) {
-    console.log("data: ", req.body);
     try {
         const {
             entity_type,
