@@ -56,7 +56,7 @@ const PartnerRequest = sequelize.cdpConnector.define('partner_requests', {
     status: {
         allowNull: false,
         type: DataTypes.ENUM,
-        values: ['new', 'pending'],
+        values: ['new', 'pending', 'submitted'],
         defaultValue: 'new'
     }
 }, {

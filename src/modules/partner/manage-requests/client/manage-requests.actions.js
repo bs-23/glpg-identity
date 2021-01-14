@@ -20,6 +20,16 @@ export function getPartnerRequest(id) {
         })
     };
 }
+export function sendForm(data) {
+    return {
+        type: Types.SEND_FORM,
+        payload: axios({
+            method: 'post',
+            url: `/api/partner-requests/${data.id}/send-form`,
+            data
+        })
+    };
+};
 
 export function createPartnerRequest(data) {
     return {

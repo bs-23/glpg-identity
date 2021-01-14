@@ -11,6 +11,8 @@ paths:
                         schema:
                             type: object
                             properties:
+                                request_id:
+                                    type: string
                                 first_name:
                                     type: string
                                 last_name:
@@ -259,6 +261,14 @@ components:
             properties:
                 id:
                     type: string
+                status:
+                    type: string
+                    enum:
+                    - pending
+                    - approved
+                    - rejected
+                request_id:
+                    type: string
                 first_name:
                     type: string
                 last_name:
@@ -304,6 +314,12 @@ components:
             properties:
                 id:
                     type: string
+                status:
+                    type: string
+                    enum:
+                    - pending
+                    - approved
+                    - rejected
                 contact_first_name:
                     type: string
                 contact_last_name:
@@ -342,6 +358,12 @@ components:
             properties:
                 id:
                     type: string
+                status:
+                    type: string
+                    enum:
+                    - pending
+                    - approved
+                    - rejected
                 requestor_first_name:
                     type: string
                 requestor_last_name:

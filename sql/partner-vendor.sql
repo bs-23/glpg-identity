@@ -33,6 +33,7 @@ CREATE TABLE cdp.partner_vendors
     bank_account_no character varying(255) COLLATE pg_catalog."default" NOT NULL,
     currency character varying(5) COLLATE pg_catalog."default" NOT NULL,
     document_urls character varying(255)[] COLLATE pg_catalog."default",
+    status cdp.enum_partner_status NOT NULL DEFAULT 'pending'::cdp.enum_partner_status,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
     CONSTRAINT partner_vendors_pkey PRIMARY KEY (id)
