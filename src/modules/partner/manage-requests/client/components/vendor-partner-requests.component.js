@@ -90,12 +90,12 @@ const VendorPartnerRequests = () => {
             const companyCodeId = `company-code-${idx + 1}`;
 
             return (<React.Fragment key={item.id}>
-                <div className="col-12 col-sm-6">
-                    <label className="col-12 font-weight-bold d-flex justify-content-between align-items-center bg-light py-2 border-bottom rounded-top">
-                        <i className="fas fa-minus-circle text-danger fa-2x hover-opacity ml-auto" type="button" title="Remove" onClick={() => removeCompanyCode(idx)}></i>
-                    </label>
-                    <div className="form-group">
-                        <label className="font-weight-bold" htmlFor={companyCodeId}> {`Company Code ${idx+1}`} <span className="text-danger">*</span></label>
+                <div className="col-12 col-sm-6 col-lg-4">
+                     <div className="form-group">
+                        <label className="font-weight-bold d-flex align-items-center justfy-content-between" htmlFor={companyCodeId}>
+                            <span> {`Company Code ${idx + 1}`} <span className="text-danger">*</span></span>
+                            <i className="fas fa-minus-circle text-danger hover-opacity ml-auto" type="button" title="Remove" onClick={() => removeCompanyCode(idx)}></i>
+                        </label>
                         <Field className="form-control company_code" type='text' value={item.company_code} onChange={(e) => handleChange(e)} data-id={idx} name={companyCodeId} id={companyCodeId}/>
                         {showError && !item.company_code && <div class="invalid-feedback">This field must not be empty.</div>}
                     </div>
@@ -248,7 +248,7 @@ const VendorPartnerRequests = () => {
                 </div>
             </div>
 
-            <Modal dialogClassName="modal-90w modal-customize" centered show={showForm}  onHide={toggleForm}>
+            <Modal dialogClassName="modal-customize" size="lg" centered show={showForm}  onHide={toggleForm}>
                 <Modal.Header closeButton>
                     <Modal.Title>
                         {
@@ -317,7 +317,7 @@ const VendorPartnerRequests = () => {
                         {formikProps => (
                             <Form onSubmit={formikProps.handleSubmit}>
                                 <div className="row">
-                                    <div className="col-12 col-sm-12">
+                                    <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="country_iso2">Country <span className="text-danger">*</span></label>
                                             <Field data-testid="country_iso2" as="select" name="country_iso2" className="form-control">
@@ -326,58 +326,74 @@ const VendorPartnerRequests = () => {
                                             </Field>
                                             <div className="invalid-feedback"><ErrorMessage name="country_iso2" /></div>
                                         </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="first_name">First Name <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="first_name" />
                                             <div className="invalid-feedback"><ErrorMessage name="first_name" /></div>
                                         </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="last_name">Last Name <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="last_name" />
                                             <div className="invalid-feedback"><ErrorMessage name="last_name" /></div>
                                         </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="email">Email Address <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="email" />
                                             <div className="invalid-feedback"><ErrorMessage name="email" /></div>
                                         </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="procurement_contact">Procurement Contact <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="procurement_contact" />
                                             <div className="invalid-feedback"><ErrorMessage name="procurement_contact" /></div>
                                         </div>
-
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="purchasing_organization">Purchasing Organization <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="purchasing_organization" />
                                             <div className="invalid-feedback"><ErrorMessage name="purchasing_organization" /></div>
                                         </div>
-
-                                        {getCompanyCodeFields()}
-
-                                        <div className="col-12">
-                                            <div className="form-group">
-                                                <label className="d-flex align-items-center cdp-text-primary hover-opacity" type="button" onClick={addNewCompanyCode}>
-                                                    <i className="fas fa-plus  fa-2x mr-3" ></i>
-                                                    <span className="h4 mb-0">Add Company Code</span>
-                                                </label>
+                                    </div>
+                                    <div className="col-12">
+                                        <div className="row py-3">
+                                            {getCompanyCodeFields()}
+                                            <div className="col-12 col-sm-6 col-lg-4">
+                                                <div className="form-group">
+                                                    <label>
+                                                       &#160;
+                                                    </label>
+                                                    <div className="d-flex align-items-center hover-opacity" type="button" onClick={addNewCompanyCode}>
+                                                        <i className="fas fa-plus cdp-text-secondary mr-2" ></i>
+                                                        <span className="cdp-text-secondary mb-0">Add Company Code</span>
+                                                    </div>
+                                                </div>
                                             </div>
+
                                         </div>
-
-                                        <div className="col-12 col-sm-6">
-                                            <div className="form-group">
-                                                <label className="font-weight-bold" htmlFor="language">ISO Code Language (ISO 639-1) <span className="text-danger">*</span></label>
-                                                <Field className="form-control lang_code" as="select" name="language" className="form-control" id="language">
-                                                    <option key="select-language" value="" disabled>--Select Language--</option>
-                                                    {countryLanguages.map(element => {
-                                                        const [country_iso2, language_code, language_name] = element.split(' ');
-                                                        return language_name && <option key={country_iso2} value={language_code}>{`${language_name.replace(/,/g, '')}(${language_code})`}</option>
-                                                    })}
-                                                </Field>
-                                                <div className="invalid-feedback"><ErrorMessage name="language" /></div>
-                                            </div>
+                                       
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="language">ISO Code Language (ISO 639-1) <span className="text-danger">*</span></label>
+                                            <Field className="form-control lang_code" as="select" name="language" className="form-control" id="language">
+                                                <option key="select-language" value="" disabled>--Select Language--</option>
+                                                {countryLanguages.map(element => {
+                                                    const [country_iso2, language_code, language_name] = element.split(' ');
+                                                    return language_name && <option key={country_iso2} value={language_code}>{`${language_name.replace(/,/g, '')}(${language_code})`}</option>
+                                                })}
+                                            </Field>
+                                            <div className="invalid-feedback"><ErrorMessage name="language" /></div>
                                         </div>
                                     </div>
+                                    
                                 </div>
                                 <button type="submit" disabled={showError} className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" >Submit</button>
                             </Form>
