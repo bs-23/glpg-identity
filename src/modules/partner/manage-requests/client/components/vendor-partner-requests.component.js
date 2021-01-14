@@ -30,7 +30,7 @@ const VendorPartnerRequests = () => {
     const handleShowFaq = () => setShowFaq(true);
 
     const total_requests = useSelector(state => state.manageRequestsReducer.partnerRequests);
-    const requests = total_requests.filter(i => i.type === 'vendor');
+    const requests = total_requests.filter(i => i.entity_type === 'vendor');
     const request = useSelector(state => state.manageRequestsReducer.partnerRequest);
 
     const countries = useSelector(state => state.countryReducer.countries);
@@ -253,6 +253,7 @@ const VendorPartnerRequests = () => {
                             company_codes: [],
                             country_iso2: partnerRequestId && request ? request.country_iso2 : '',
                             language: partnerRequestId && request ? request.language : '',
+                            partner_type: partnerRequestId && request ? request.partner_type : '',
                         }}
                         displayName="PartnerRequestsForm"
                         validationSchema={partnerRequestSchemaForVendors}
@@ -266,7 +267,7 @@ const VendorPartnerRequests = () => {
                                 return;
                             }
 
-                            values.type = 'vendor';
+                            values.entity_type = 'vendor';
 
                             if (partnerRequestId) {
                                 dispatch(updatePartnerRequest(partnerRequestId, values)).then(function () {
@@ -323,6 +324,11 @@ const VendorPartnerRequests = () => {
                                             <div className="invalid-feedback"><ErrorMessage name="last_name" /></div>
                                         </div>
                                         <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="partner_type"> Business Partner Type <span className="text-danger">*</span></label>
+                                            <Field className="form-control" type="text" name="partner_type" />
+                                            <div className="invalid-feedback"><ErrorMessage name="partner_type" /></div>
+                                        </div>
+                                        <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="email">Email Address <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="email" />
                                             <div className="invalid-feedback"><ErrorMessage name="email" /></div>
@@ -331,12 +337,6 @@ const VendorPartnerRequests = () => {
                                             <label className="font-weight-bold" htmlFor="procurement_contact">Procurement Contact <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="procurement_contact" />
                                             <div className="invalid-feedback"><ErrorMessage name="procurement_contact" /></div>
-                                        </div>
-
-                                        <div className="form-group">
-                                            <label className="font-weight-bold" htmlFor="purchasing_organization">Purchasing Organization <span className="text-danger">*</span></label>
-                                            <Field className="form-control" type="text" name="purchasing_organization" />
-                                            <div className="invalid-feedback"><ErrorMessage name="purchasing_organization" /></div>
                                         </div>
 
                                         {getCompanyCodeFields()}
