@@ -102,8 +102,30 @@ async function updateHcpPartner(req, res) {
 
 async function getHcoPartners(req, res) {
     try {
-        const hcoPartners = await HcoPartner.findAll();
-        res.json(hcoPartners);
+        const page = req.query.page ? +req.query.page - 1 : 0;
+        const limit = req.query.limit ? +req.query.limit : 15;
+        const offset = page * limit;
+
+        const hcoPartners = await HcoPartner.findAll({
+            offset,
+            limit,
+            order: [['created_at', 'DESC']]
+        });
+
+        const total = await HcoPartner.count();
+
+        const responseData = {
+            hcoPartners,
+            metadata: {
+                page: page + 1,
+                limit,
+                total,
+                start: limit * page + 1,
+                end: offset + limit > total ? parseInt(total) : parseInt(offset + limit)
+            }
+        };
+
+        res.json(responseData);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
