@@ -7,7 +7,7 @@ import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { NavLink } from 'react-router-dom';
 import { Faq } from '../../../../platform';
 import { partnerRequestSchemaForVendors } from './../manage-requests.schema';
-import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest } from '../manage-requests.actions';
+import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm} from '../manage-requests.actions';
 
 const WholesalerPartnerRequests = () => {
     const dispatch = useDispatch();
@@ -16,6 +16,7 @@ const WholesalerPartnerRequests = () => {
     const [companyCodes, setCompanyCodes] = useState([{ id: Math.random(), company_code: '' }]);
     const [showError, setShowError] = useState(false);
     const [partnerRequestId, setPartnerRequestId] = useState(undefined);
+    const [sendFormId, setSendFormId] = useState(undefined);
 
     const countryLanguages = [
         { language_name: 'English', language_code: 'en' },
@@ -25,6 +26,7 @@ const WholesalerPartnerRequests = () => {
     ];
     const [requestToDelete, setRequestToDelete] = useState(null);
 
+    const [formData, setFormData] = useState(undefined);
     const [showFaq, setShowFaq] = useState(false);
     const handleCloseFaq = () => setShowFaq(false);
     const handleShowFaq = () => setShowFaq(true);
@@ -118,7 +120,9 @@ const WholesalerPartnerRequests = () => {
     async function loadRequests() {
         dispatch(getPartnerRequests());
     }
-
+    const sendFormHandler = (data) => {
+        setFormData(data);
+    };
     useEffect(() => {
         loadRequests();
     }, []);
@@ -129,6 +133,18 @@ const WholesalerPartnerRequests = () => {
         }
     }, [partnerRequestId]);
 
+    useEffect(() => {
+        if (formData) {
+            dispatch(sendForm(formData)).then(() => {
+                dispatch(updatePartnerRequest(formData.id, { ...formData, status: "pending" }));
+            }).catch(() => {
+                addToast('An error occured. Please try again.', {
+                    appearance: 'error',
+                    autoDismiss: true
+                });
+            });
+        }
+    }, [formData]);
     useEffect(() => {
         if(request.company_codes) {
             const codes = request.company_codes.map(company_code => ({ id: Math.random(), company_code }));
@@ -181,10 +197,10 @@ const WholesalerPartnerRequests = () => {
                                 <table className="table table-hover table-sm mb-0 cdp-table mb-2">
                                     <thead className="cdp-table__header  cdp-bg-primary text-white">
                                         <tr>
-                                            <th>First Name</th>
-                                            <th>Last Name</th>
-                                            <th>Purchasing Organization</th>
+                                            <th>Name</th>
+                                            <th>Status</th>
                                             <th>Company Code</th>
+                                            <th>Partner Type</th>
                                             <th>Email Address</th>
                                             <th>Procurement Contact</th>
                                             <th>Country</th>
@@ -196,9 +212,8 @@ const WholesalerPartnerRequests = () => {
                                             requests.map((row, index) =>
                                             (
                                                 <tr key={index}>
-                                                    <td>{row.first_name}</td>
-                                                    <td>{row.last_name}</td>
-                                                    <td>{row.purchasing_organization}</td>
+                                                    <td>{`${row.first_name} ${row.last_name}`}</td>
+                                                    <td>{row.status}</td>
                                                     <td>
                                                         {
                                                             row.company_codes.map((companyCode, idx) => (
@@ -206,6 +221,7 @@ const WholesalerPartnerRequests = () => {
                                                             ))
                                                         }
                                                     </td>
+                                                    <td>{row.partner_type}</td>
                                                     <td>{row.email}</td>
                                                     <td>{row.procurement_contact}</td>
                                                     <td>{getCountryName(row.country_iso2)}</td>
@@ -213,7 +229,7 @@ const WholesalerPartnerRequests = () => {
                                                         <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
-                                                            <Dropdown.Item> Send Form </Dropdown.Item>
+                                                            <Dropdown.Item onClick={() => sendFormHandler(row)}> Send Form </Dropdown.Item>
                                                             <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
                                                             <Dropdown.Item onClick={() => setRequestToDelete(row.id) }> Delete </Dropdown.Item>
                                                         </Dropdown.Menu>

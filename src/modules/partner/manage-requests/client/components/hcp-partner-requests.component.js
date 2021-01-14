@@ -163,11 +163,13 @@ const HcpPartnerRequests = () => {
                         {requests && requests.length > 0 ?
                             <div className="table-responsive shadow-sm bg-white">
                                 <table className="table table-hover table-sm mb-0 cdp-table">
-                                    <thead className="cdp-bg-primary text-white cdp-table__header">
+                                <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
+                                            <th>UUID</th>
                                             <th>Name</th>
                                             <th>Status</th>
                                             <th>Company Code</th>
+                                            <th>Partner Type</th>
                                             <th>Email Address</th>
                                             <th>Procurement Contact</th>
                                             <th>Country</th>
@@ -177,6 +179,7 @@ const HcpPartnerRequests = () => {
                                     <tbody className="cdp-table__body bg-white">
                                         {requests.map((row, index) => (
                                             <tr key={index}>
+                                                <td>{row.uuid}</td>
                                                 <td>{`${row.first_name} ${row.last_name}`}</td>
                                                 <td>{row.status}</td>
                                                 <td>
@@ -186,6 +189,7 @@ const HcpPartnerRequests = () => {
                                                         ))
                                                     }
                                                 </td>
+                                                <td>{row.partner_type}</td>
                                                 <td>{row.email}</td>
                                                 <td>{row.procurement_contact}</td>
                                                 <td>{getCountryName(row.country_iso2)}</td>

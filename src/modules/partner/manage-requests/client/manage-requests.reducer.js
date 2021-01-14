@@ -25,6 +25,12 @@ export default function reducer(state = initialState, action) {
                 partnerRequests: state.partnerRequests.concat(action.payload.data)
             };
         }
+        case Types.SEND_FORM_FULFILLED: {
+            return {
+                ...state,
+                sendForm: action.payload.data
+            }
+        }
         case Types.UPDATE_PARTNER_REQUEST_FULFILLED: {
             const requests = [...state.partnerRequests];
             const idx = requests.findIndex(request => request.id === action.payload.data.id);
