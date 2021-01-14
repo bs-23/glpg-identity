@@ -27,6 +27,12 @@ const HcoPartnerRequests = () => {
 
     const countries = useSelector(state => state.countryReducer.countries);
 
+    const getCountryName = (country_iso2) => {
+        if (!countries || !country_iso2) return null;
+        const country = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+        return country && country.countryname;
+    };
+
     const deleteRequest = (id) => {
         dispatch(deletePartnerRequest(id)).then(() => {
             addToast('Request Deleted', {
@@ -168,6 +174,7 @@ const HcoPartnerRequests = () => {
                                             <th>Company Code</th>
                                             <th>Email Address</th>
                                             <th>Procurement Contact</th>
+                                            <th>Country</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -185,6 +192,7 @@ const HcoPartnerRequests = () => {
                                                 </td>
                                                 <td>{row.email}</td>
                                                 <td>{row.procurement_contact}</td>
+                                                <td>{getCountryName(row.country_iso2)}</td>
                                                 <td><Dropdown className="ml-auto dropdown-customize">
                                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
                                                     </Dropdown.Toggle>
