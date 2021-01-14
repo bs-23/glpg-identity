@@ -50,7 +50,8 @@ export function getFilterOptions(userCountries, allProfiles) {
             fieldName: 'phone',
             valueType: 'text',
             displayText: 'Phone',
-            operators: operators.getStringOperators()
+            operators: operators.getStringOperators(),
+            maxLength: 25
         },
         {
             fieldName: 'profileId',
