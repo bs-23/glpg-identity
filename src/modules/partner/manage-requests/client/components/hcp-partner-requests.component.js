@@ -82,14 +82,19 @@ const HcpPartnerRequests = () => {
     }
 
     const getCompanyCodeFields = () => {
+        const len = companyCodes.length;
+
         return companyCodes.map((item, idx) => {
             const companyCodeId = `company-code-${idx + 1}`;
 
             return (<React.Fragment key={item.id}>
                 <div className="col-12 col-sm-6">
-                    <label className="col-12 font-weight-bold d-flex justify-content-between align-items-center bg-light py-2 border-bottom rounded-top">
-                        <i className="fas fa-minus-circle text-danger fa-2x hover-opacity ml-auto" type="button" title="Remove" onClick={() => removeCompanyCode(idx)}></i>
-                    </label>
+                    {
+                        len === 1 ? null : <label className="col-12 font-weight-bold d-flex justify-content-between align-items-center bg-light py-2 border-bottom rounded-top">
+                            <i className="fas fa-minus-circle text-danger fa-2x hover-opacity ml-auto" type="button" title="Remove" onClick={() => removeCompanyCode(idx)}></i>
+                        </label>
+                    }
+
                     <div className="form-group">
                         <label className="font-weight-bold" htmlFor={companyCodeId}> {`Company Code ${idx+1}`} <span className="text-danger">*</span></label>
                         <Field className="form-control company_code" type='text' value={item.company_code} onChange={(e) => handleChange(e)} data-id={idx} name={companyCodeId} id={companyCodeId}/>
