@@ -9,8 +9,10 @@ module.exports = app => {
 
     app.get('/api/logout', CDPAuthStrategy, controller.logout);
 
+    app.route('/api/cdp-users')
+        .post(CDPAuthStrategy, ModuleGuard(Modules.PLATFORM.value), controller.getUsers);
+
     app.route('/api/users')
-        .get(CDPAuthStrategy, ModuleGuard(Modules.PLATFORM.value), controller.getUsers)
         .post(CDPAuthStrategy, ModuleGuard(Modules.PLATFORM.value), controller.createUser);
 
     app.route('/api/users/profile')
