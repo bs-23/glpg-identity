@@ -412,13 +412,6 @@ function generateFilterOptions(currentFilter, defaultFilter, countries) {
     if (!currentFilter || !currentFilter.filters || currentFilter.filter === 0)
         return defaultFilter;
 
-    // if (currentFilter.option.filters.length === 1 || !currentFilter.option.logic) {
-    //     const filter = currentFilter.option.filters[0];
-    //     defaultFilter[filter.fieldName] = filterService.getFilterQuery(filter);
-
-    //     return defaultFilter;
-    // }
-
     const getFilterQuery = (filter) => {
         if(filter.fieldName === 'country') {
             const country_iso2_list_for_codbase = countries
@@ -440,13 +433,11 @@ function generateFilterOptions(currentFilter, defaultFilter, countries) {
         return filterService.getFilterQuery(filter);
     }
 
-    console.log('Default filter: ', defaultFilter);
     let customFilter = { ...defaultFilter };
 
     const nodes = currentFilter.logic
         ? currentFilter.logic.split(" ")
         : ['1'];
-    console.log('Logic nodes: ', nodes.join());
 
     let prevOperator;
     const groupedQueries = [];
@@ -484,8 +475,6 @@ function generateFilterOptions(currentFilter, defaultFilter, countries) {
         prevOperator = node === "and" || node === "or" ? node : prevOperator;
     }
 
-    console.log('Grouped queries: ', groupedQueries.map((a) => JSON.stringify(a)));
-
     if (groupedQueries.length > 1) {
         customFilter[Op.or] = groupedQueries.map(q => {
             if (q.operator === 'and') {
@@ -501,7 +490,6 @@ function generateFilterOptions(currentFilter, defaultFilter, countries) {
             customFilter = { ...customFilter, ...query };
         }
     }
-    console.log('Custom filter: ', customFilter);
 
     return customFilter;
 }
@@ -519,16 +507,6 @@ async function getUsers(req, res) {
         const signedInId = (await formatProfile(req.user)).id;
 
         const [, userCountries,] = await getRequestingUserPermissions(req.user);
-
-        // const countries = (await sequelize.datasyncConnector.query(`
-        //     SELECT * FROM ciam.vwcountry
-        //     WHERE codbase = $codbase
-        //     `, {
-        //     bind: {
-        //         codbase: codbase || ''
-        //     },
-        //     type: QueryTypes.SELECT
-        // }))
 
         const countries = await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT });
 
@@ -569,11 +547,7 @@ async function getUsers(req, res) {
 
         const defaultFilter = {
             id: { [Op.ne]: signedInId },
-            type: 'basic',
-            // [Op.or]: [
-            //     { '$userRoles->role->role_ps->ps.countries$': { [Op.overlap]: '{be, BE, bE, Be}' } },
-            //     { '$userProfile->up_ps->ps.countries$': { [Op.overlap]: '{be, BE, bE, Be}' } }
-            // ]
+            type: 'basic'
         };
 
         const currentFilter = req.body;
@@ -586,7 +560,6 @@ async function getUsers(req, res) {
             limit,
             order: order,
             subQuery: false,
-            // logging: console.log,
             include: [{
                 model: User,
                 as: 'createdByUser',
