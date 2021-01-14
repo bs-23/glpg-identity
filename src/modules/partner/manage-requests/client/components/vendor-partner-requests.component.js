@@ -23,6 +23,7 @@ const VendorPartnerRequests = () => {
         { language_name: 'Germany', language_code: 'de' },
         { language_name: 'Netherlands', language_code: 'nl' }
     ];
+    const partnerTypes = ['SUPL', 'CUST', 'HCP', 'HCO', 'POR', 'ZVST'];
     const [requestToDelete, setRequestToDelete] = useState(null);
 
     const [showFaq, setShowFaq] = useState(false);
@@ -349,8 +350,11 @@ const VendorPartnerRequests = () => {
                                     </div>
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
-                                            <label className="font-weight-bold" htmlFor="partner_type"> Business Partner Type <span className="text-danger">*</span></label>
-                                            <Field className="form-control" type="text" name="partner_type" />
+                                            <label className="font-weight-bold" htmlFor="partner_type">Business Partner Type <span className="text-danger">*</span></label>
+                                            <Field data-testid="partner_type" as="select" name="partner_type" className="form-control">
+                                                <option key="select-country" value="" disabled>--Select Partner Type--</option>
+                                                {partnerTypes.map((item, typeIdx) => <option key={typeIdx} value={item}>{item}</option>)}
+                                            </Field>
                                             <div className="invalid-feedback"><ErrorMessage name="partner_type" /></div>
                                         </div>
                                         <div className="form-group">
