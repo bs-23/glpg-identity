@@ -32,15 +32,15 @@ const PartnerVendors = sequelize.cdpConnector.define('partner_vendors', {
         allowNull: false,
         type: DataTypes.STRING(100)
     },
-    reg_num: {
+    registration_number: {
         allowNull: false,
         type: DataTypes.STRING
     },
-    address_line_1: {
+    address: {
         allowNull: false,
         type: DataTypes.STRING
     },
-    address_line_2: {
+    city: {
         allowNull: false,
         type: DataTypes.STRING
     },
@@ -53,10 +53,10 @@ const PartnerVendors = sequelize.cdpConnector.define('partner_vendors', {
     invoice_contact_name: {
         type: DataTypes.STRING
     },
-    invoice_address_line_1: {
+    invoice_address: {
         type: DataTypes.STRING
     },
-    invoice_address_line_2: {
+    invoice_city: {
         type: DataTypes.STRING
     },
     invoice_post_code: {
@@ -71,10 +71,10 @@ const PartnerVendors = sequelize.cdpConnector.define('partner_vendors', {
     commercial_contact_name: {
         type: DataTypes.STRING
     },
-    commercial_address_line_1: {
+    commercial_address: {
         type: DataTypes.STRING
     },
-    commercial_address_line_2: {
+    commercial_city: {
         type: DataTypes.STRING
     },
     commercial_post_code: {
