@@ -28,7 +28,6 @@ async function createPartnerRequest(req, res) {
             email,
             procurement_contact,
             company_codes,
-            purchasing_organization,
             uuid,
             partner_type,
             country_iso2,
@@ -94,7 +93,6 @@ async function updatePartnerRequest(req, res) {
             procurement_contact,
             company_codes,
             partner_type,
-            purchasing_organization,
             country_iso2,
             language,
         } = req.body;
@@ -129,7 +127,7 @@ async function updatePartnerRequest(req, res) {
             language
         };
 
-        if (type === 'hcp' || type === 'hco') data.uuid = uuid;
+        if (entity_type === 'hcp' || entity_type === 'hco') data.uuid = uuid;
 
         const updated_data = await partnerRequest.update(data);
 
