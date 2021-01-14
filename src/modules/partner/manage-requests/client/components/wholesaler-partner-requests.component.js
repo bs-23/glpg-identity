@@ -21,8 +21,8 @@ const WholesalerPartnerRequests = () => {
     const countryLanguages = [
         { language_name: 'English', language_code: 'en' },
         { language_name: 'French', language_code: 'fr' },
-        { language_name: 'Germany', language_code: 'de' },
-        { language_name: 'Netherlands', language_code: 'nl' }
+        { language_name: 'German', language_code: 'de' },
+        { language_name: 'Dutch', language_code: 'nl' }
     ];
     const partnerTypes = ['SUPL', 'CUST', 'HCP', 'HCO', 'POR', 'ZVST'];
     const [requestToDelete, setRequestToDelete] = useState(null);
