@@ -9,7 +9,7 @@ import { ApprovalRejectSchema } from '../../../information/hcp/client/hcp.schema
 
 export default function statusupdateModal(props) {
   const dispatch = useDispatch();
-    const { user, show, onHide, type , onSort, filterSetting} = props;
+    const { user, show, onHide, type , onStatusUpdate, filterSetting} = props;
   const [consentForUser, setConsentForUser] = useState({user});
   const { addToast } = useToasts();
 
@@ -24,8 +24,7 @@ export default function statusupdateModal(props) {
       autoDismiss: true
     })
     if(type == 'list'){
-        onSort();
-        dispatch(getHcpProfiles(location.search, filterSetting));
+        onStatusUpdate();
     }
     else if (type == 'inbox'){
         dispatch(getHcpProfiles('?page=1&status=not_verified&limit=5'));
