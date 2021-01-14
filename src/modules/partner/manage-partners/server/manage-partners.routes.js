@@ -7,16 +7,20 @@ const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/platfo
 
 module.exports = app => {
     app.route('/api/partner/hcp')
-        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getHcpPartners)
-        .post(passport.authenticate('application-jwt', { session: false }), controller.createHcpPartner);
+        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getPartnerHcps)
+        .post(passport.authenticate('application-jwt', { session: false }), controller.createPartnerHcp);
 
     app.route('/api/partner/hcp/:id')
-        .put(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.updateHcpPartner);
+        .put(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.updatePartnerHcp);
 
     app.route('/api/partner/hco')
-        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getHcoPartners)
-        .post(passport.authenticate('application-jwt', { session: false }), controller.createHcoPartner);
+        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getPartnerHcos)
+        .post(passport.authenticate('application-jwt', { session: false }), controller.createPartnerHco);
 
     app.route('/api/partner/hco/:id')
-        .put(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.updateHcoPartner);
+        .put(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.updatePartnerHco);
+
+    app.route('/api/partner/vendor')
+        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getPartnerVendors)
+        .post(passport.authenticate('application-jwt', { session: false }), controller.createPartnerVendor);
 };
