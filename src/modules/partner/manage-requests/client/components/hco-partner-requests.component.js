@@ -231,15 +231,15 @@ const HcoPartnerRequests = () => {
                 <Modal.Body>
                     <Formik
                         initialValues={{
-                            first_name: partnerRequestId && request ? request.first_name : '',
-                            last_name: partnerRequestId && request ? request.last_name : '',
-                            email: partnerRequestId && request ? request.email : '',
-                            procurement_contact: partnerRequestId && request ? request.procurement_contact : '',
+                            first_name: partnerRequestId && Object.keys(request).length ? request.first_name : '',
+                            last_name: partnerRequestId && Object.keys(request).length ? request.last_name : '',
+                            email: partnerRequestId && Object.keys(request).length ? request.email : '',
+                            procurement_contact: partnerRequestId && Object.keys(request).length ? request.procurement_contact : '',
                             company_codes: [],
-                            country_iso2: partnerRequestId && request ? request.country_iso2 : '',
-                            language: partnerRequestId && request ? request.language : '',
-                            uuid: partnerRequestId && request ? request.uuid : '',
-                            partner_type: partnerRequestId && request ? request.partner_type : '',
+                            country_iso2: partnerRequestId && Object.keys(request).length ? request.country_iso2 : '',
+                            language: partnerRequestId && Object.keys(request).length ? request.language : '',
+                            uuid: partnerRequestId && Object.keys(request).length ? request.uuid : '',
+                            partner_type: partnerRequestId && Object.keys(request).length ? request.partner_type : '',
                         }}
                         displayName="PartnerRequestsForm"
                         validationSchema={partnerRequestSchema}
@@ -357,7 +357,7 @@ const HcoPartnerRequests = () => {
                                     </div>
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
-                                            <label className="font-weight-bold" htmlFor="language">ISO Code Language (ISO 639-1) <span className="text-danger">*</span></label>
+                                            <label className="font-weight-bold" htmlFor="language">Language<span className="text-danger">*</span></label>
                                             <Field className="form-control lang_code" as="select" name="language" className="form-control" id="language">
                                                 <option key="select-language" value="" disabled>--Select Language--</option>
                                                 {countryLanguages.map((element, lang_idx) => {
