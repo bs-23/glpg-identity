@@ -29,8 +29,8 @@ const BusinessPartnerManagement = () => {
                                         <NavLink to="/business-partner/requests/vendors" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
                                             <i className="icon icon-bpm icon-3x icon-3x cdp-list-group__icon"></i>
                                             <span>
-                                                <strong className="mb-2 h4 d-block cdp-list-group__link-title">Manage New Business Partner Request</strong>
-                                                <span className="d-block cdp-list-group__link-description">Manage Request with all initial required Master Data Information objects such as Company Code, Procurement contact person etc.</span>
+                                                <strong className="mb-2 h4 d-block cdp-list-group__link-title">Manage Vendor Request</strong>
+                                                <span className="d-block cdp-list-group__link-description">Manage Wholesalers and vendors with all initial required Master Data Information objects such as Company Code, Procurement contact person etc.</span>
                                                 <span className="d-block cdp-list-group__link-activity">withing 5 - 10 minutes</span>
                                             </span>
                                         </NavLink>
