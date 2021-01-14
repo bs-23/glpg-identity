@@ -233,7 +233,7 @@ const WholesalerPartnerRequests = () => {
                 </div>
             </div>
 
-            <Modal dialogClassName="modal-90w modal-customize" centered show={showForm}  onHide={toggleForm}>
+            <Modal dialogClassName="modal-customize" size="lg" centered show={showForm}  onHide={toggleForm}>
                 <Modal.Header closeButton>
                     <Modal.Title>
                         {
