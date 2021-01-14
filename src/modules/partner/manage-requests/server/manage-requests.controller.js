@@ -92,6 +92,7 @@ async function updatePartnerRequest(req, res) {
             email,
             procurement_contact,
             company_codes,
+            uuid,
             partner_type,
             country_iso2,
             language,
