@@ -9,5 +9,11 @@ exports.config = {
     },
     slow_sql: {
         enabled: true
+    },
+    transaction_tracer: {
+        record_sql: 'raw',
+        attributes: {
+            exclude: ['password']
+        }
     }
 }
