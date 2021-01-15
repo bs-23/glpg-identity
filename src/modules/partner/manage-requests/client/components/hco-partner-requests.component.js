@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { partnerRequestSchema } from '../manage-requests.schema'
-import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest } from '../manage-requests.actions';
+import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm} from '../manage-requests.actions';
 
 const HcoPartnerRequests = () => {
     const dispatch = useDispatch();
@@ -15,7 +15,7 @@ const HcoPartnerRequests = () => {
     const [companyCodes, setCompanyCodes] = useState([{ id: Math.random(), company_code: '' }]);
     const [showError, setShowError] = useState(false);
     const [partnerRequestId, setPartnerRequestId] = useState(undefined);
-
+    const [formData, setFormData] = useState(undefined);
     const countryLanguages = [
         { language_name: 'English', language_code: 'en' },
         { language_name: 'French', language_code: 'fr' },
@@ -55,6 +55,10 @@ const HcoPartnerRequests = () => {
     const toggleForm = (id) => {
         setPartnerRequestId(id);
         setShowForm(!!id);
+    };
+
+    const sendFormHandler = (data) => {
+        setFormData(data);
     };
 
     const handleChange = (e) => {
@@ -126,8 +130,19 @@ const HcoPartnerRequests = () => {
             const codes = request.company_codes.map(company_code => ({ id: Math.random(), company_code }));
             setCompanyCodes(codes);
         }
-    }, [request.company_codes])
-
+    }, [request.company_codes]);
+    useEffect(() => {
+        if (formData) {
+            dispatch(sendForm(formData)).then(() => {
+                dispatch(updatePartnerRequest(formData.id, { ...formData, status: "pending" }));
+            }).catch(() => {
+                addToast('An error occured. Please try again.', {
+                    appearance: 'error',
+                    autoDismiss: true
+                });
+            });
+        }
+    }, [formData]);
     return (
         <main className="app__content cdp-light-bg h-100">
             <div className="container-fluid">
@@ -199,7 +214,7 @@ const HcoPartnerRequests = () => {
                                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu>
-                                                        <Dropdown.Item> Send Form </Dropdown.Item>
+                                                        <Dropdown.Item onClick={() => sendFormHandler(row)}> Send Form </Dropdown.Item>
                                                         <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
                                                         <Dropdown.Item onClick={() => setRequestToDelete(row.id) }> Delete </Dropdown.Item>
                                                     </Dropdown.Menu>

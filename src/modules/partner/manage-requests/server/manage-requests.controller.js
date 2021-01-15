@@ -98,7 +98,7 @@ async function sendForm(req, res) {
 
         const userApplication = await Application.findOne({ where: { id: application_id } });
         const jwt_token = jwt.sign({
-            id: id
+            request_id: id
         }, userApplication.auth_secret, {
             expiresIn: '1h'
         });
@@ -108,7 +108,7 @@ async function sendForm(req, res) {
             first_name,
             last_name,
             email,
-            partner_type,
+            partner_type: partner_type.toLowerCase(),
             country_iso2: country_iso2.toLowerCase(),
             locale: `${language}_${country_iso2.toUpperCase()}`
         };
