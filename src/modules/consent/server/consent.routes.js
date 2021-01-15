@@ -13,9 +13,6 @@ module.exports = app => {
     app.route('/api/veeva-consent-performance-report')
         .get(CDPAuthStrategy, controller.getVeevaConsentsReport);
 
-    app.route('/api/get-all-process-activities')
-        .get(CDPAuthStrategy, controller.getAllProcessActivities);
-
     app.route('/api/consents/:id')
         .get(CDPAuthStrategy, controller.getUserConsents);
 

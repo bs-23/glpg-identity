@@ -51,15 +51,6 @@ describe('Consent Routes', () => {
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
-    it('Should get all process activities', async () => {
-        const response = await request
-            .get(`/api/get-all-process-activities`)
-            .set('Cookie', [`access_token=s:${signCookie(defaultUser.access_token)}`])
-
-        expect(response.statusCode).toBe(200);
-        expect(response.res.headers['content-type']).toMatch('application/json');
-    });
-
     it('Should get one veeva consent details with consent id', async () => {
         const response = await request
             .get(`/api/consents/WNLN01326483`)
