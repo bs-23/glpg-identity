@@ -388,17 +388,6 @@ async function getVeevaConsentsReport(req, res) {
     }
 }
 
-async function getAllProcessActivities(req, res) {
-    try {
-        const process_activities = await ConsentCategory.findAll();
-        res.json(process_activities);
-    }
-    catch (err) {
-        console.error(err);
-        res.status(500).send('Internal server error');
-    }
-}
-
 async function getUserConsents(req, res) {
     const response = new Response({}, []);
     const userOneKeyID = req.params.id;
@@ -982,7 +971,6 @@ async function updateConsentCategory(req, res) {
 exports.getConsents = getConsents;
 exports.getCdpConsentsReport = getCdpConsentsReport;
 exports.getVeevaConsentsReport = getVeevaConsentsReport;
-exports.getAllProcessActivities = getAllProcessActivities;
 exports.getUserConsents = getUserConsents;
 exports.getCdpConsents = getCdpConsents;
 exports.getCdpConsent = getCdpConsent;
