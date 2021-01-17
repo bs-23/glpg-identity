@@ -19,56 +19,8 @@ const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const PasswordPolicies = require(path.join(process.cwd(), 'src/modules/core/server/password/password-policies.js'));
 const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/platform/user/server/permission/permissions.js'));
-const XRegExp = require('xregexp');
-const { string } = require('yup');
-const { filter } = require('lodash');
 const Filter = require(path.join(process.cwd(), "src/modules/core/server/filter/filter.model.js"));
 const filterService = require(path.join(process.cwd(), 'src/modules/platform/user/server/filter.js'));
-
-const hcpValidation = () => {
-    const schema = {
-        first_name: string()
-            .matches(XRegExp('^[\\pL.]+(?:\\s[\\pL.]+)*$'), 'This field only contains letters')
-            .min(2, 'This field must be at least 2 characters long.')
-            .max(50, 'This field must be at most 50 characters long.')
-            .required('This field must not be empty.'),
-        last_name: string()
-            .matches(XRegExp('^[\\pL.]+(?:\\s[\\pL.]+)*$'), 'This field only contains letters')
-            .min(2, 'This field must be at least 2 characters long.')
-            .max(50, 'This field must be at most 50 characters long.')
-            .required('This field must not be empty.'),
-        email: string()
-            .email('This field should be a valid email address.')
-            .matches(/^.{1,64}@/, 'The part before @ of the email can be maximum 64 characters.')
-            .matches(/^.*[a-z]+.*@/, 'This field should be a valid email address.')
-            .max(100, 'This field must be at most 100 characters long.')
-            .required('This field must not be empty.'),
-        uuid: string()
-            .max(20, 'This field must be at most 20 characters long.')
-            .required('This field must not be empty.'),
-        telephone: string()
-            .matches(/^(?:[+]?[0-9]*|[0-9]{2,3}[\/]?[0-9]*)$/, 'Must be a valid phone number')
-            .transform(value => value === '' ? undefined : value)
-            .max(25, 'This field must be at most 25 characters long')
-            .nullable()
-    }
-
-    return {
-        validate: async (value, schemaName) => {
-            try {
-                await schema[schemaName].validate(value);
-                return {
-                    valid: true
-                };
-            } catch (err) {
-                return {
-                    valid: false,
-                    errors: err.errors
-                }
-            }
-        }
-    }
-}
 
 function generateAccessToken(doc) {
     return jwt.sign({
@@ -735,86 +687,14 @@ async function registrationLookup(req, res) {
 async function createHcpProfile(req, res) {
     const response = new Response({}, []);
     const { email, uuid, salutation, first_name, last_name, country_iso2, language_code, specialty_onekey, telephone, birthdate, origin_url } = req.body;
-    const hcpValidator = hcpValidation().validate;
 
-    const firstNameValidationStatus = await hcpValidator(first_name, 'first_name');
-    const lastNameValidationStatus = await hcpValidator(last_name, 'last_name');
-    const telephoneValidationStatus = await hcpValidator(telephone, 'telephone');
-    const emailValidationStatus = await hcpValidator(email, 'email');
+    const specialty_master_data = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwspecialtymaster WHERE cod_id_onekey = $specialty_onekey", {
+        bind: { specialty_onekey },
+        type: QueryTypes.SELECT
+    });
 
-    if (!email || !validator.isEmail(email)) {
-        response.errors.push(new CustomError('Email address is missing or invalid.', 400, 'email'));
-    } else if (email.length > 100) {
-        response.errors.push(new CustomError('Email should be at most 100 characters', 400, 'email'));
-    } else if (!emailValidationStatus.valid) {
-        response.errors.push(new CustomError(emailValidationStatus.errors[0], 400, 'email'));
-    }
-
-    if (!uuid) {
-        response.errors.push(new CustomError('UUID is missing.', 400, 'uuid'));
-    } else if (uuid.length > 20) {
-        response.errors.push(new CustomError('UUID should be at most 20 characters', 400, 'uuid'));
-    }
-
-    if (!salutation) {
-        response.errors.push(new CustomError('Salutation is missing.', 400, 'salutation'));
-    } else if (salutation.length > 5) {
-        response.errors.push(new CustomError('Salutation should be at most 5 characters', 400, 'salutation'));
-    }
-
-    if (!first_name) {
-        response.errors.push(new CustomError('First name is missing.', 400, 'first_name'));
-    } else if (first_name.length > 50) {
-        response.errors.push(new CustomError('First name should be at most 50 characters', 400, 'first_name'));
-    } else if (!firstNameValidationStatus.valid) {
-        response.errors.push(new CustomError(firstNameValidationStatus.errors[0], 400, 'first_name'));
-    }
-
-    if (!last_name) {
-        response.errors.push(new CustomError('Last name is missing.', 400, 'last_name'));
-    } else if (last_name.length > 50) {
-        response.errors.push(new CustomError('Last name should be at most 50 characters', 400, 'last_name'));
-    } else if (!lastNameValidationStatus.valid) {
-        response.errors.push(new CustomError(lastNameValidationStatus.errors[0], 400, 'last_name'));
-    }
-
-    if (!country_iso2) {
-        response.errors.push(new CustomError('country_iso2 is missing.', 400, 'country_iso2'));
-    } else if (country_iso2.length > 2) {
-        response.errors.push(new CustomError('Country code should be at most 2 characters', 400, 'country_iso2'));
-    }
-
-    if (!language_code) {
-        response.errors.push(new CustomError('language_code is missing.', 400, 'language_code'));
-    } else if (language_code.length > 2) {
-        response.errors.push(new CustomError('Language code should be at most 2 characters', 400, 'language_code'));
-    }
-
-    if (!specialty_onekey) {
-        response.errors.push(new CustomError('specialty_onekey is missing.', 400, 'specialty_onekey'));
-    }
-
-    if (!origin_url) {
-        response.errors.push(new CustomError('Origin URL is missing.', 400, 'origin_url'));
-    }
-
-    if (telephone && telephone.length > 25) {
-        response.errors.push(new CustomError('Telephone number should be at most 25 digits including country code', 400, 'telephone'));
-    } else if (!telephoneValidationStatus.valid) {
-        response.errors.push(new CustomError(telephoneValidationStatus.errors[0], 400, 'telephone'));
-    }
-
-    if (specialty_onekey.length > 20) {
-        response.errors.push(new CustomError('Specialty Onekey should be at most 20 characters', 400, 'specialty_onekey'));
-    } else if (specialty_onekey) {
-        const specialty_master_data = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwspecialtymaster WHERE cod_id_onekey = $specialty_onekey", {
-            bind: { specialty_onekey },
-            type: QueryTypes.SELECT
-        });
-
-        if (!specialty_master_data.length) {
-            response.errors.push(new CustomError('specialty_onekey is invalid.', 400, 'specialty_onekey'));
-        }
+    if (!specialty_master_data.length) {
+        response.errors.push(new CustomError('specialty_onekey is invalid.', 400, 'specialty_onekey'));
     }
 
     if (response.errors.length) {

@@ -613,6 +613,14 @@ async function createConsent(req, res) {
                     });
 
                     if (translationCreated) {
+                        await logService.log({
+                            event_type: 'CREATE',
+                            object_id: consentTransation.id,
+                            table_name: 'consent_locales',
+                            actor: req.user.id,
+                            changes: JSON.stringify(consentTransation.dataValues)
+                        });
+
                         data.translations.push(consentTransation);
                     } else {
                         console.error('Create Translation failed: ', translation);
@@ -626,7 +634,7 @@ async function createConsent(req, res) {
             object_id: data.id,
             table_name: 'consents',
             actor: req.user.id,
-            remarks: `"${data.preference.trim()}" consent created`
+            changes: JSON.stringify(consent.dataValues)
         });
 
         res.json(data);
@@ -666,6 +674,8 @@ async function updateCdpConsent(req, res) {
         const consent = await Consent.findOne({ where: { id: id } });
         if (!consent) return res.status(404).send('Consent not found.');
 
+        const consentBeforeUpdate = { ...consent.dataValues };
+
         await consent.update({
             preference: preference.trim(),
             slug: preference.trim(),
@@ -675,14 +685,19 @@ async function updateCdpConsent(req, res) {
             updated_by: req.user.id
         });
 
+        const allTranslationsForConsent = await ConsentLanguage.findAll({ where: { consent_id: consent.id } });
+
+        const deletedTranslations = allTranslationsForConsent
+            .filter(t1 => !translations.some(t2 => t1.id === t2.id));
+
         await ConsentLanguage.destroy({ where: { consent_id: consent.id } });
 
         if (translations) {
             await Promise.all(translations
                 .filter(translation => translation.country_iso2 && translation.lang_code && translation.rich_text)
-                .map(async (translation) => {
+                .map(async (translation,idx) => {
                     const locale = `${translation.lang_code.toLowerCase()}_${translation.country_iso2.toUpperCase()}`;
-                    const [, translationCreated] = await ConsentLanguage.findOrCreate({
+                    const [updatedTranslation, translationCreated] = await ConsentLanguage.findOrCreate({
                         where: {
                             consent_id: consent.id,
                             locale: {
@@ -696,8 +711,29 @@ async function updateCdpConsent(req, res) {
                         }
                     });
 
+                    const isUpdated = allTranslationsForConsent.find(({ id }) => id === translation.id);
+
                     if (!translationCreated) {
                         console.error('Create Translation failed: ', translation);
+                    }else if (isUpdated) {
+                        await logService.log({
+                            event_type: 'UPDATE',
+                            object_id: translation.id,
+                            table_name: 'consent_locales',
+                            actor: req.user.id,
+                            changes: JSON.stringify({
+                                old_value: isUpdated.dataValues,
+                                new_value: updatedTranslation.dataValues
+                            })
+                        });
+                    }else {
+                        await logService.log({
+                            event_type: 'CREATE',
+                            object_id: translation.id,
+                            table_name: 'consent_locales',
+                            actor: req.user.id,
+                            changes: JSON.stringify(updatedTranslation.dataValues)
+                        });
                     }
                 })
             );
@@ -708,8 +744,21 @@ async function updateCdpConsent(req, res) {
             object_id: consent.id,
             table_name: 'consents',
             actor: req.user.id,
-            remarks: `Consent updated`
+            changes: JSON.stringify({
+                old_value: consentBeforeUpdate,
+                new_value: consent.dataValues
+            })
         });
+
+        await Promise.all(deletedTranslations.map(async dt => {
+            return await logService.log({
+                event_type: 'DELETE',
+                object_id: dt.id,
+                table_name: 'consent_locales',
+                actor: req.user.id,
+                changes: JSON.stringify(dt.dataValues)
+            });
+        }))
 
         res.sendStatus(200);
     } catch (err) {
@@ -791,7 +840,7 @@ async function assignConsentToCountry(req, res) {
             object_id: createdCountryConsent.id,
             table_name: 'consent_countries',
             actor: req.user.id,
-            remarks: `Consent assigned to country`
+            changes: JSON.stringify(createdCountryConsent.dataValues)
         });
 
         res.json(createdCountryConsent);
@@ -812,6 +861,8 @@ async function updateCountryConsent(req, res) {
 
         if (!consentCountry) return res.status(404).send('Country-Consent association does not exist.');
 
+        const consentCountryBeforeUpdate = {...consentCountry.dataValues};
+
         await consentCountry.update({
             opt_type: optType
         });
@@ -821,7 +872,10 @@ async function updateCountryConsent(req, res) {
             object_id: consentCountry.id,
             table_name: 'consent_countries',
             actor: req.user.id,
-            remarks: `Country-Consent Opt Type updated`
+            changes: JSON.stringify({
+                old_value: consentCountryBeforeUpdate,
+                new_value: consentCountry.dataValues
+            })
         });
 
         res.json(consentCountry);
@@ -849,7 +903,7 @@ async function deleteCountryConsent(req, res) {
             object_id: id,
             table_name: 'consent_countries',
             actor: req.user.id,
-            remarks: `Country-Consent deleted`
+            changes: JSON.stringify(consentCountry.dataValues)
         });
 
         res.sendStatus(200);
@@ -923,7 +977,7 @@ async function createConsentCategory(req, res) {
             object_id: data.id,
             table_name: 'consent_categories',
             actor: req.user.id,
-            remarks: `"${data.title.trim()}" consent category created`
+            changes: JSON.stringify(data.dataValues)
         });
 
         res.json(data);
@@ -951,6 +1005,8 @@ async function updateConsentCategory(req, res) {
 
         if (isTitleExists) return res.status(400).send('The consent category already exists.');
 
+        const consentCategoryBeforeUpdate = {...consentCategory.dataValues};
+
         const data = await consentCategory.update({ title: title.trim(), slug: title.trim(), updated_by: req.user.id });
 
         await logService.log({
@@ -958,7 +1014,10 @@ async function updateConsentCategory(req, res) {
             object_id: consentCategory.id,
             table_name: 'consent_categories',
             actor: req.user.id,
-            remarks: `Consent category updated`
+            changes: JSON.stringify({
+                old_value: consentCategoryBeforeUpdate,
+                new_value: data.dataValues
+            })
         });
 
         res.json(data);
