@@ -1,6 +1,7 @@
-const passport = require('passport');
 const path = require('path');
+const passport = require('passport');
 const controller = require('./hcp.controller');
+const validationMiddleware = require('./hcp.middleware');
 const { Modules } = require('../../../core/server/authorization/authorization.constants');
 const { ModuleGuard } = require('../../../core/server/authorization/authorization.middleware');
 const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/platform/user/server/user-authentication.middleware.js'));
@@ -23,7 +24,7 @@ module.exports = app => {
         .post(passport.authenticate('application-jwt', { session: false }), controller.getAccessToken);
 
     app.route('/api/hcp-profiles')
-        .post(passport.authenticate('application-jwt', { session: false }), controller.createHcpProfile);
+        .post(passport.authenticate('application-jwt', { session: false }), validationMiddleware.validate(validationMiddleware.hcpProfile), controller.createHcpProfile);
 
     app.route('/api/hcp-profiles/confirm-consents')
         .post(passport.authenticate('application-jwt', { session: false }), controller.confirmConsents);
