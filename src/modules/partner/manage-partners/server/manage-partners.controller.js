@@ -282,11 +282,13 @@ async function updatePartnerHco(req, res) {
 
 async function getPartnerVendors(req, res) {
     try {
+        const type = req.query.type ? req.query.type : 'vendor';
         const page = req.query.page ? +req.query.page - 1 : 0;
         const limit = req.query.limit ? +req.query.limit : 15;
         const offset = page * limit;
 
         const partnerVendors = await PartnerVendors.findAll({
+            where: { type },
             offset,
             limit,
             order: [['created_at', 'DESC']],
@@ -332,9 +334,10 @@ async function getPartnerVendor(req, res) {
 async function createPartnerVendor(req, res) {
     const response = new Response({}, []);
     try {
-        const { request_id, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency, document_urls } = req.body;
+        const { request_id, type, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency, document_urls } = req.body;
 
         if (!request_id) response.errors.push(new CustomError('Request ID is missing.', 400, 'request_id'));
+        if (!type) response.errors.push(new CustomError('Vendor type is missing.', 400, 'type'));
         if (!name) response.errors.push(new CustomError('Name is missing.', 400, 'name'));
         if (!registration_number) response.errors.push(new CustomError('VAT number/Company Registration number is missing.', 400, 'registration_number'));
         if (!address) response.errors.push(new CustomError('Address is missing.', 400, 'address'));
@@ -346,7 +349,7 @@ async function createPartnerVendor(req, res) {
         const partnerRequest = await PartnerRequest.findOne({
             where: {
                 id: request_id,
-                entity_type: 'vendor'
+                entity_type: type
             }
         });
 
@@ -361,7 +364,7 @@ async function createPartnerVendor(req, res) {
         }
 
         const data = {
-            request_id, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency, document_urls
+            request_id, type, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency, document_urls
         };
 
         const [partnerVendor, created] = await PartnerVendors.findOrCreate({

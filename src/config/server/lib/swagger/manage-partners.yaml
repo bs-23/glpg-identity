@@ -168,6 +168,11 @@ paths:
                         schema:
                             type: object
                             properties:
+                                type:
+                                    type: string
+                                    enum:
+                                    - vendor
+                                    - wholesaler
                                 request_id:
                                     type: string
                                 requestor_first_name:
@@ -374,6 +379,11 @@ components:
                     - pending
                     - approved
                     - rejected
+                type:
+                    type: string
+                    enum:
+                    - vendor
+                    - wholesaler
                 request_id:
                     type: string
                 requestor_first_name:

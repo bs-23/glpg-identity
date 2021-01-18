@@ -10,6 +10,12 @@ const PartnerVendors = sequelize.cdpConnector.define('partner_vendors', {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4
     },
+    type: {
+        allowNull: false,
+        type: DataTypes.ENUM,
+        values: ['vendor', 'wholesaler'],
+        defaultValue: 'vendor'
+    },
     request_id: {
         unique: true,
         allowNull: false,
