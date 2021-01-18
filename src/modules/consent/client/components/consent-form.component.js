@@ -6,6 +6,7 @@ import { Form, Formik, Field, FieldArray, ErrorMessage } from 'formik';
 import Modal from 'react-bootstrap/Modal'
 import { useToasts } from 'react-toast-notifications';
 import parse from 'html-react-parser';
+import Dropdown from 'react-bootstrap/Dropdown';
 import { createConsent, updateConsent } from '../consent.actions';
 import CountryCodes from 'country-codes-list';
 import { consentSchema } from '../consent.schema';
@@ -194,14 +195,25 @@ const ConsentForm = (props) => {
                 <div className="container-fluid">
                     <div className="row">
                         <div className="col-12 px-0">
-                            <nav aria-label="breadcrumb">
-                                <ol className="breadcrumb rounded-0">
+                            <nav className="breadcrumb justify-content-between align-items-center" aria-label="breadcrumb">
+                                <ol className="rounded-0 m-0 p-0 d-none d-sm-flex">
                                     <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                     <li className="breadcrumb-item"><NavLink to="/consent/">Data Privacy & Consent Management</NavLink></li>
                                     <li className="breadcrumb-item"><NavLink to="/consent/list">CDP Consents</NavLink></li>
                                     <li className="breadcrumb-item active"><span>{consentId ? 'Edit Consent' : 'Add new Consent'}</span></li>
-                                    <li className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help icon-2x cdp-text-secondary"></i></li>
                                 </ol>
+                                <Dropdown className="dropdown-customize breadcrumb__dropdown d-block d-sm-none ml-2">
+                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center border-0">
+                                        <i className="fas fa-arrow-left mr-2"></i> Back
+                                </Dropdown.Toggle>
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item className="px-2" href="/"><i className="fas fa-link mr-2"></i> Dashboard</Dropdown.Item>
+                                        <Dropdown.Item className="px-2" href="/consent"><i className="fas fa-link mr-2"></i> Data Privacy & Consent Management</Dropdown.Item>
+                                        <Dropdown.Item className="px-2" href="/consent/list"><i className="fas fa-link mr-2"></i> CDP Consents</Dropdown.Item>
+                                        <Dropdown.Item className="px-2" active><i className="fas fa-link mr-2"></i> {consentId ? 'Edit Consent' : 'Add new Consent'}</Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                                <span className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary"></i></span>
                             </nav>
                             <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
                                 <Modal.Header closeButton>
