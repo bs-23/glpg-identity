@@ -6,6 +6,7 @@ import { useToasts } from "react-toast-notifications";
 import Modal from 'react-bootstrap/Modal';
 import { roleCreateSchema } from "./role.schema";
 import { PermissionSetDetailsModal } from "../../../platform";
+import Dropdown from 'react-bootstrap/Dropdown';
 import Faq from '../../../platform/faq/client/faq.component';
 import { ToggleList } from '../../../core/client/components/reusable-ui.components';
 
@@ -191,13 +192,23 @@ export default function ManageRoles() {
             <div className="container-fluid">
                 <div className="row">
                     <div className="col-12 px-0">
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb rounded-0 my-0">
+                        <nav className="breadcrumb justify-content-between align-items-center" aria-label="breadcrumb">
+                            <ol className="rounded-0 m-0 p-0 d-none d-sm-flex">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/platform">Management of Customer Data Platform</NavLink></li>
                                 <li className="breadcrumb-item active"><span>Define Roles</span></li>
-                                <li className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help icon-2x cdp-text-secondary"></i></li>
                             </ol>
+                            <Dropdown className="dropdown-customize breadcrumb__dropdown d-block d-sm-none ml-2">
+                                <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center border-0">
+                                    <i className="fas fa-arrow-left mr-2"></i> Back
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                    <Dropdown.Item className="px-2" href="/"><i className="fas fa-link mr-2"></i> Dashboard</Dropdown.Item>
+                                    <Dropdown.Item className="px-2" href="/platform"><i className="fas fa-link mr-2"></i> Management of Customer Data platform</Dropdown.Item>
+                                    <Dropdown.Item className="px-2" active><i className="fas fa-link mr-2"></i> Define Roles</Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
+                            <span className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary"></i></span>
                         </nav>
                         <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
                             <Modal.Header closeButton>
