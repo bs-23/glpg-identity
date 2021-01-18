@@ -4,7 +4,7 @@ import { Faq } from '../../../../platform';
 import Modal from 'react-bootstrap/Modal';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { useSelector, useDispatch } from 'react-redux';
-import { getHcpPartners } from '../manage-partners.actions';
+import { getHcpPartners, getHcoPartners, getVendorsPartners } from '../manage-partners.actions';
 
 const VendorManagement = () => {
 
@@ -12,6 +12,8 @@ const VendorManagement = () => {
     const history = useHistory();
     const params = new URLSearchParams(window.location.search);
     const dispatch = useDispatch();
+
+    const partnersData = useSelector(state => state.managePartnerReducer.partnersData);
 
 
     const [showFaq, setShowFaq] = useState(false);
@@ -34,8 +36,16 @@ const VendorManagement = () => {
 
     useEffect(() => {
         const partnerType = window.location.pathname.split("/").pop();
-        dispatch(getHcpPartners());
+        if (partnerType === 'hcp') dispatch(getHcpPartners());
+        if (partnerType === 'hco') dispatch(getHcoPartners());
+        if (partnerType === 'vendors') dispatch(getVendorsPartners());
+
     }, [location]);
+
+    useEffect(() => {
+        console.log(partnersData);
+
+    }, [partnersData]);
 
     return (
         <main className="app__content cdp-light-bg">
@@ -92,19 +102,19 @@ const VendorManagement = () => {
                                 </thead>
                                 <tbody>
                                     {
-                                        partnerList.map((item, index) =>
+                                        partnersData.partners && partnersData.partners.length > 0 && partnersData.partners.map((item, index) =>
                                         (
                                             <tr key={index}>
-                                                <td>{item.oneKeyId}</td>
+                                                <td>--</td>
                                                 <td>{item.uuid}</td>
                                                 <td>{item.first_name}</td>
                                                 <td>{item.last_name}</td>
-                                                <td>{item.data_request}</td>
-                                                <td>{item.data_origin}</td>
-                                                <td>{item.language}</td>
-                                                <td>{item.streethouseNo}</td>
+                                                <td>{item.status}</td>
+                                                <td>--</td>
+                                                <td>--</td>
+                                                <td>{item.address}</td>
                                                 <td>{item.city}</td>
-                                                <td>{item.country}</td>
+                                                <td>--</td>
                                                 <td><Dropdown className="ml-auto dropdown-customize">
                                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
                                                     </Dropdown.Toggle>
@@ -119,6 +129,15 @@ const VendorManagement = () => {
                                 </tbody>
                             </table>
                         </div>
+
+                        {partnersData.partners && partnersData.partners.length === 0 &&
+                            <div className="row justify-content-center mt-5 pt-5 mb-3">
+                                <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">
+                                    <i class="icon icon-team icon-6x cdp-text-secondary"></i>
+                                    <h3 className="font-weight-bold cdp-text-primary pt-4">No Partner Found!</h3>
+                                </div>
+                            </div>
+                        }
 
 
                     </div>

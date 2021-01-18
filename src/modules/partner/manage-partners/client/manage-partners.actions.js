@@ -66,3 +66,13 @@ export function updateHcoPartner(id, data) {
         })
     };
 }
+
+export function getVendorsPartners(query = '') {
+    return {
+        type: Types.GET_PARTNER,
+        payload: axios({
+            method: 'get',
+            url: `/api/partner/vendor${query}`
+        })
+    };
+}
