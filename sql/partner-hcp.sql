@@ -27,7 +27,6 @@ CREATE TABLE cdp.partner_hcps
     bank_name character varying(255) COLLATE pg_catalog."default",
     bank_account_no character varying(255) COLLATE pg_catalog."default",
     currency character varying(5) COLLATE pg_catalog."default",
-    document_urls character varying(255)[] COLLATE pg_catalog."default",
     status cdp.enum_partner_status NOT NULL DEFAULT 'pending'::cdp.enum_partner_status,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,

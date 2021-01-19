@@ -7,7 +7,7 @@ paths:
             requestBody:
                 required: true
                 content:
-                    application/json:
+                    multipart/form-data:
                         schema:
                             type: object
                             properties:
@@ -51,10 +51,11 @@ paths:
                                     type: string
                                 currency:
                                     type: string
-                                document_urls:
+                                documents:
                                     type: array
                                     items:
                                         type: string
+                                        format: binary
                             required:
                               - request_id
                               - first_name
@@ -88,7 +89,7 @@ paths:
             requestBody:
                 required: true
                 content:
-                    application/json:
+                    multipart/form-data:
                         schema:
                             type: object
                             properties:
@@ -125,10 +126,11 @@ paths:
                                     type: string
                                 currency:
                                     type: string
-                                document_urls:
+                                documents:
                                     type: array
                                     items:
                                         type: string
+                                        format: binary
                             required:
                               - request_id
                               - contact_first_name
@@ -318,7 +320,7 @@ components:
                     type: string
                 currency:
                     type: string
-                document_urls:
+                documents:
                     type: array
                     items:
                         type: string
@@ -364,7 +366,7 @@ components:
                     type: string
                 currency:
                     type: string
-                document_urls:
+                documents:
                     type: array
                     items:
                         type: string

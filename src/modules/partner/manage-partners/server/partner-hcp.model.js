@@ -72,9 +72,6 @@ const PartnerHcps = sequelize.cdpConnector.define('partner_hcps', {
     currency: {
         type: DataTypes.STRING
     },
-    document_urls: {
-        type: DataTypes.ARRAY(DataTypes.STRING)
-    },
     status: {
         allowNull: false,
         type: DataTypes.ENUM,

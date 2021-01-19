@@ -6,6 +6,55 @@ const { QueryTypes, Op } = require('sequelize');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const PartnerRequest = require(path.join(process.cwd(), 'src/modules/partner/manage-requests/server/partner-request.model'));
+const multer = require('multer');
+const storageService = require(path.join(process.cwd(), 'src/config/server/lib/storage-service/storage.service'));
+const Files = require(path.join(process.cwd(), 'src/config/server/lib/storage-service/file.model'));
+
+async function parseMultipartFormData(req, res) {
+    const upload = multer({ storage: multer.memoryStorage() }).array('documents', 10);
+
+    return await new Promise(function (resolve, reject) {
+        upload(req, res, function (err) {
+            if (req.fileValidationError) {
+                reject(req.fileValidationError);
+                return;
+            } else if (err instanceof multer.MulterError) {
+                reject(err);
+                return;
+            } else if (err) {
+                reject(err);
+                return;
+            }
+
+            const files = req.files;
+            const fields = req.body;
+            resolve({ fields, files });
+        });
+    });
+}
+
+async function uploadDucuments(owner, files) {
+    const fileEntities = [];
+    const bucket = 'cdp-development';
+    for (const file of files) {
+        const uploadOptions = {
+            bucket,
+            folder: 'documents/partner/hcp/',
+            fileName: file.originalname,
+            fileContent: file.buffer
+        };
+
+        const response = await storageService.upload(uploadOptions);
+        const fileCreated = await Files.create({
+            name: file.originalname,
+            bucket,
+            key: response.key,
+            owner_id: owner.id
+        });
+        fileEntities.push(fileCreated.dataValues);
+    };
+    return fileEntities;
+}
 
 async function getPartnerHcps(req, res) {
     try {
@@ -49,6 +98,13 @@ async function getPartnerHcp(req, res) {
 
         if (!partnerHcp) return res.status(404).send('The partner does not exist');
 
+        const documents = await Files.findAll({ where: { owner_id: partnerHcp.id } });
+
+        partnerHcp.dataValues.documents = documents.map(d => ({
+            name: d.dataValues.name,
+            key: d.dataValues.key
+        }));
+
         res.json(partnerHcp);
     } catch (err) {
         console.error(err);
@@ -59,15 +115,23 @@ async function getPartnerHcp(req, res) {
 async function createPartnerHcp(req, res) {
     const response = new Response({}, []);
     try {
+        const { fields, files } = await parseMultipartFormData(req, res);
+
         const { request_id, first_name, last_name, address, city, post_code, email, telephone,
             type, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
-            iban, bank_name, bank_account_no, currency, document_urls } = req.body;
+            iban, bank_name, bank_account_no, currency } = fields;
 
         if (!request_id) response.errors.push(new CustomError('Request ID is missing.', 400, 'request_id'));
         if (!first_name) response.errors.push(new CustomError('First name is missing.', 400, 'first_name'));
         if (!last_name) response.errors.push(new CustomError('Last name is missing.', 400, 'last_name'));
         if (!email) response.errors.push(new CustomError('Email is missing.', 400, 'email'));
         if (!type) response.errors.push(new CustomError('Type is missing.', 400, 'type'));
+
+        const fileWithInvalidType = files.find(f => f.mimetype !== 'application/pdf');
+        if (fileWithInvalidType) response.errors.push(new CustomError('Invalid file type. Only PDF is allowed.', 400, 'documents'));
+
+        const fileWithInvalidSize = files.find(f => f.size > 10485760);
+        if (fileWithInvalidSize) response.errors.push(new CustomError('Invalid file size. Size limit is 10 MB', 400, 'documents'));
 
         if (response.errors.length) return res.status(400).send(response);
 
@@ -85,13 +149,13 @@ async function createPartnerHcp(req, res) {
 
         if (partnerRequest && partnerRequest.status !== 'pending') {
             response.errors.push(new CustomError('Invalid partner request status.', 400));
-            return res.status(404).send(response);
+            return res.status(400).send(response);
         }
 
         const data = {
             request_id, first_name, last_name, address, city, post_code, email, telephone,
             type, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
-            iban, bank_name, bank_account_no, currency, document_urls
+            iban, bank_name, bank_account_no, currency
         };
 
         const [partnerHcp, created] = await PartnerHcps.findOrCreate({
@@ -110,6 +174,9 @@ async function createPartnerHcp(req, res) {
         }
 
         await partnerRequest.update({ status: 'submitted' });
+
+        const documents = await uploadDucuments(partnerHcp, files);
+        partnerHcp.dataValues.documents = documents.map(d => `${d.bucket}/${d.key}`);
 
         delete partnerHcp.created_at;
         delete partnerHcp.updated_at;
@@ -189,6 +256,13 @@ async function getPartnerHco(req, res) {
 
         if (!partnerHco) return res.status(404).send('The partner does not exist');
 
+        const documents = await Files.findAll({ where: { owner_id: partnerHco.id } });
+
+        partnerHco.dataValues.documents = documents.map(d => ({
+            name: d.dataValues.name,
+            key: d.dataValues.key
+        }));
+
         res.json(partnerHco);
     } catch (err) {
         console.error(err);
@@ -199,7 +273,9 @@ async function getPartnerHco(req, res) {
 async function createPartnerHco(req, res) {
     const response = new Response({}, []);
     try {
-        const { request_id, contact_first_name, contact_last_name, name, address, city, post_code, email, telephone, type, registration_number, iban, bank_name, bank_account_no, currency, document_urls } = req.body;
+        const { fields, files } = await parseMultipartFormData(req, res);
+
+        const { request_id, contact_first_name, contact_last_name, name, address, city, post_code, email, telephone, type, registration_number, iban, bank_name, bank_account_no, currency } = fields;
 
         if (!request_id) response.errors.push(new CustomError('Request ID is missing.', 400, 'request_id'));
         if (!contact_first_name) response.errors.push(new CustomError('Contact first name is missing.', 400, 'contact_first_name'));
@@ -207,6 +283,12 @@ async function createPartnerHco(req, res) {
         if (!name) response.errors.push(new CustomError('Name is missing.', 400, 'name'));
         if (!email) response.errors.push(new CustomError('Email is missing.', 400, 'email'));
         if (!type) response.errors.push(new CustomError('Type is missing.', 400, 'type'));
+
+        const fileWithInvalidType = files.find(f => f.mimetype !== 'application/pdf');
+        if (fileWithInvalidType) response.errors.push(new CustomError('Invalid file type. Only PDF is allowed.', 400, 'documents'));
+
+        const fileWithInvalidSize = files.find(f => f.size > 10485760);
+        if (fileWithInvalidSize) response.errors.push(new CustomError('Invalid file size. Size limit is 10 MB', 400, 'documents'));
 
         if (response.errors.length) return res.status(400).send(response);
 
@@ -228,7 +310,7 @@ async function createPartnerHco(req, res) {
         }
 
         const data = {
-            request_id, contact_first_name, contact_last_name, name, address, city, post_code, email, telephone, type, registration_number, iban, bank_name, bank_account_no, currency, document_urls
+            request_id, contact_first_name, contact_last_name, name, address, city, post_code, email, telephone, type, registration_number, iban, bank_name, bank_account_no, currency
         };
 
         const [partnerHco, created] = await PartnerHcos.findOrCreate({
@@ -247,6 +329,9 @@ async function createPartnerHco(req, res) {
         }
 
         await partnerRequest.update({ status: 'submitted' });
+
+        const documents = await uploadDucuments(partnerHco, files);
+        partnerHco.dataValues.documents = documents.map(d => `${d.bucket}/${d.key}`);
 
         delete partnerHco.created_at;
         delete partnerHco.updated_at;
