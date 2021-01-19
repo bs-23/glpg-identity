@@ -29,6 +29,24 @@
         }
     }
 
+    &__dropdown {
+        .dropdown-toggle::after {
+            display: none;
+        }
+
+        .dropdown-item {
+
+            &.active {
+                background-color: inherit !important;
+                color: $secondary-color;
+            }
+        }
+    }
+
+    &__faq-icon {
+        font-size: 1.9rem;
+    }
+
     @media (max-width: $screen-phone) {
 
         &-item {

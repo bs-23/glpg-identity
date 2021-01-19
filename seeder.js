@@ -1,5 +1,14 @@
 const path = require('path');
 const async = require('async');
+const uniqueSlug = require('unique-slug');
+
+const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+
+const makeCustomSlug = (title) => {
+    const code = uniqueSlug(`${title}`);
+    if (title.length > 50) return convertToSlug(`${title.substring(0, 50)} ${code}`);
+    return convertToSlug(`${title} ${code}`);
+};
 
 async function init() {
     const config = require(path.join(process.cwd(), 'src/config/server/config'));
@@ -344,7 +353,7 @@ async function init() {
                     category_id: '59953d51-2449-4b65-950f-9f88654019bb',
                     legal_basis: 'consent',
                     preference: 'Galapagos Terms of Use',
-                    slug: '',
+                    slug: makeCustomSlug('Galapagos Terms of Use'),
                     is_active: true,
                     created_by: admin.id,
                     updated_by: admin.id
@@ -354,7 +363,7 @@ async function init() {
                     category_id: 'fe037405-c676-4d98-bd05-85008900c838',
                     legal_basis: 'consent',
                     preference: 'Galapagos E-Mail Newsletter',
-                    slug: '',
+                    slug: makeCustomSlug('Galapagos E-Mail Newsletter'),
                     is_active: true,
                     created_by: admin.id,
                     updated_by: admin.id
@@ -364,7 +373,7 @@ async function init() {
                     category_id: '59953d51-2449-4b65-950f-9f88654019bb',
                     legal_basis: 'consent',
                     preference: 'Sharing Personal Data With 3rd Parties',
-                    slug: '',
+                    slug: makeCustomSlug('Sharing Personal Data With 3rd Parties'),
                     is_active: true,
                     created_by: admin.id,
                     updated_by: admin.id

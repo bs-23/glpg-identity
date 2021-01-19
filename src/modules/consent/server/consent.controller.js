@@ -2,8 +2,10 @@ const path = require('path');
 const _ = require('lodash');
 const { QueryTypes, Op } = require('sequelize');
 const Sequelize = require('sequelize');
-const Consent = require('./consent.model');
 const validator = require('validator');
+const uniqueSlug = require('unique-slug');
+
+const Consent = require('./consent.model');
 const ConsentLocale = require('./consent-locale.model');
 const ConsentCountry = require('./consent-country.model');
 const ConsentCategory = require('./consent-category.model');
@@ -15,6 +17,14 @@ const HcpConsents = require(path.join(process.cwd(), 'src/modules/information/hc
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/platform/user/server/permission/permissions.js'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
+
+const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+
+const makeCustomSlug = (title) => {
+    const code = uniqueSlug(`${title}`);
+    if (title.length > 50) return convertToSlug(`${title.substring(0, 50)} ${code}`);
+    return convertToSlug(`${title} ${code}`);
+};
 
 function getTranslationViewmodels(translations) {
     return translations.map(t => ({
@@ -576,7 +586,7 @@ async function createConsent(req, res) {
             },
             defaults: {
                 preference: preference.trim(),
-                slug: preference.trim(),
+                slug: makeCustomSlug(preference.trim()),
                 category_id,
                 legal_basis,
                 is_active,
@@ -678,7 +688,6 @@ async function updateCdpConsent(req, res) {
 
         await consent.update({
             preference: preference.trim(),
-            slug: preference.trim(),
             category_id,
             legal_basis,
             is_active,
