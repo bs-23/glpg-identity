@@ -35,6 +35,22 @@ export function getFilterOptions(userCountries, userApplications) {
             schema: array().of(string().required('This field can not be empty.'))
         },
         {
+            fieldName: 'uuid',
+            valueType: 'text',
+            displayText: 'UUID',
+            operators: operators.getStringOperators(),
+            maxLength: 20,
+            schema: array().of(string().required('This field can not be empty.'))
+        },
+        {
+            fieldName: 'telephone',
+            valueType: 'text',
+            displayText: 'Phone',
+            operators: operators.getStringOperators(),
+            maxLength: 25,
+            schema: array().of(string().required('This field can not be empty.'))
+        },
+        {
             fieldName: 'country',
             valueType: 'select',
             displayText: 'Country',
@@ -51,7 +67,7 @@ export function getFilterOptions(userCountries, userApplications) {
         {
             fieldName: 'created_at',
             valueType: 'date',
-            displayText: 'Creation Date',
+            displayText: 'Date of Registration',
             operators: operators.getDateOperators()
         },
         {
