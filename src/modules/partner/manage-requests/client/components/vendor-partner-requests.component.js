@@ -244,7 +244,7 @@ const VendorPartnerRequests = () => {
                                                         <Dropdown.Menu>
                                                             <Dropdown.Item onClick={() => sendFormHandler(row)}> Send Form </Dropdown.Item>
                                                             <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
-                                                            <Dropdown.Item onClick={() => setRequestToDelete(row.id) }> Delete </Dropdown.Item>
+                                                            <Dropdown.Item className="text-danger" onClick={() => setRequestToDelete(row.id)}> Delete </Dropdown.Item>
                                                         </Dropdown.Menu>
                                                     </Dropdown></td>
                                                 </tr>
