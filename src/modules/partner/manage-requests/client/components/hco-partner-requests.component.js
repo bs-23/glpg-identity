@@ -184,7 +184,7 @@ const HcoPartnerRequests = () => {
                     <div className="col-12">
                         <div className="d-sm-flex justify-content-between align-items-end mb-0 mt-3">
                             <div>
-                                <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Overview of Business Partner Requests</h4>
+                                <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Manage HCOs Request</h4>
                                 <div className="pt-3">
                                     <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/hcps">HCPs</NavLink>
                                     <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/hcos">HCOs</NavLink>
@@ -262,7 +262,7 @@ const HcoPartnerRequests = () => {
                 <Modal.Header closeButton>
                     <Modal.Title>
                         {
-                            partnerRequestId ? 'Edit Request' : 'Add Request'
+                            partnerRequestId ? 'Edit HCO Request' : 'Add HCO Request'
                         }
                     </Modal.Title>
                 </Modal.Header>

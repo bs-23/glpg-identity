@@ -190,7 +190,7 @@ const VendorPartnerRequests = () => {
                     <div className="col-12">
                         <div className="d-sm-flex justify-content-between align-items-end mb-0 mt-3">
                             <div>
-                                <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Overview of Business Partner Requests</h4>
+                                <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Manage Vendors Request</h4>
                                 <div className="pt-3">
                                     <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/vendors">General Vendors</NavLink>
                                     <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/wholesalers">Wholesalers</NavLink>
@@ -269,7 +269,7 @@ const VendorPartnerRequests = () => {
                 <Modal.Header closeButton>
                     <Modal.Title>
                         {
-                            partnerRequestId ? 'Edit Request' : 'Add Request'
+                            partnerRequestId ? 'Edit Vendor Request' : 'Add Vendor Request'
                         }
                     </Modal.Title>
                 </Modal.Header>
