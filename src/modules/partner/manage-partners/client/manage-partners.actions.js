@@ -76,3 +76,13 @@ export function getVendorsPartners(query = '') {
         })
     };
 }
+
+export function getWholesalePartners(query = '') {
+    return {
+        type: Types.GET_PARTNER,
+        payload: axios({
+            method: 'get',
+            url: `/api/partner/vendor?type=wholesaler${query}`
+        })
+    };
+}

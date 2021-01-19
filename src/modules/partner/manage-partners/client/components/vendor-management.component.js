@@ -4,7 +4,7 @@ import { Faq } from '../../../../platform';
 import Modal from 'react-bootstrap/Modal';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { useSelector, useDispatch } from 'react-redux';
-import { getHcpPartners, getHcoPartners, getVendorsPartners } from '../manage-partners.actions';
+import { getHcpPartners, getHcoPartners, getVendorsPartners, getWholesalePartners } from '../manage-partners.actions';
 
 const VendorManagement = () => {
 
@@ -19,26 +19,44 @@ const VendorManagement = () => {
     const [showFaq, setShowFaq] = useState(false);
     const handleCloseFaq = () => setShowFaq(false);
     const handleShowFaq = () => setShowFaq(true);
-    const partnerList = [
-        {
-            oneKeyId: "WBE123456",
-            uuid: "1_6566_767",
-            first_name: "Daniel",
-            last_name: "Martin",
-            data_request: "approved",
-            data_origin: "Intranet",
-            language: "FR",
-            streethouseNo: "9 Rue Haute",
-            city: "Luxemburg",
-            country: "Belgium"
-        }
-    ];
+    const pageLeft = () => {
+        if (partnersData.metadata.page > 1) urlChange(partnersData.metadata.page - 1, params.get('orderBy'), true);
+    };
+
+    const pageRight = () => {
+        if (partnersData.metadata.end !== partnersData.metadata.total) urlChange(partnersData.metadata.page + 1, params.get('orderBy'), true);
+    };
+
+    const urlChange = (pageNo, orderColumn, pageChange = false) => {
+        // let orderType = params.get('orderType');
+        // const orderBy = params.get('orderBy');
+        const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
+
+        // if (!pageChange) {
+        //     if (orderBy && !orderType) {
+        //         orderType = 'asc'
+        //     }
+
+        //     (orderBy === orderColumn)
+        //         ? (orderType === 'asc'
+        //             ? orderType = 'desc'
+        //             : orderType = 'asc')
+        //         : orderType = 'asc';
+        // }
+
+        const url = `?page=${page}`
+        // + (orderColumn && orderColumn !== 'null' ? `&orderBy=${orderColumn}` : '')
+        // + (orderColumn && orderType && orderType !== 'null' ? `&orderType=${orderType}` : '');
+
+        history.push(location.pathname + url);
+    }
 
     useEffect(() => {
         const partnerType = window.location.pathname.split("/").pop();
-        if (partnerType === 'hcp') dispatch(getHcpPartners());
-        if (partnerType === 'hco') dispatch(getHcoPartners());
-        if (partnerType === 'vendors') dispatch(getVendorsPartners());
+        if (partnerType === 'hcp') dispatch(getHcpPartners(location.search));
+        if (partnerType === 'hco') dispatch(getHcoPartners(location.search));
+        if (partnerType === 'vendors') dispatch(getVendorsPartners(location.search));
+        if (partnerType === 'wholesalers') dispatch(getWholesalePartners(location.search));
 
     }, [location]);
 
@@ -76,6 +94,7 @@ const VendorManagement = () => {
                                 <h4 className="cdp-text-primary font-weight-bold mb-4">Business Partner Lists</h4>
                                 <div>
                                     <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/vendor-management/vendors">Vendors</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/vendor-management/wholesalers">Wholesalers</NavLink>
                                     <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/vendor-management/hcp">Health Care Professional</NavLink>
                                     <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/vendor-management/hco">Health Care Organizations</NavLink>
                                 </div>
@@ -129,6 +148,17 @@ const VendorManagement = () => {
                                 </tbody>
                             </table>
                         </div>
+                        {
+                            partnersData.metadata && ((partnersData.metadata.page === 1 &&
+                                partnersData.metadata.total > partnersData.metadata.limit) ||
+                                (partnersData.metadata.page > 1))
+                            && partnersData['partners'] &&
+                            <div className="pagination justify-content-end align-items-center border-top p-3">
+                                <span className="cdp-text-primary font-weight-bold">{partnersData.metadata.start + ' - ' + partnersData.metadata.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + partnersData.metadata.total}</span>
+                                <span className="pagination-btn" data-testid='Prev' onClick={() => pageLeft()} disabled={partnersData.metadata.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
+                                <span className="pagination-btn" data-testid='Next' onClick={() => pageRight()} disabled={partnersData.metadata.end === partnersData.metadata.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
+                            </div>
+                        }
 
                         {partnersData.partners && partnersData.partners.length === 0 &&
                             <div className="row justify-content-center mt-5 pt-5 mb-3">

@@ -10,6 +10,7 @@ export default function ManagePartnersRoutes() {
     return (
         <Switch>
             <PrivateRoute path={`${path}/vendor-management/vendors`} component={VendorManagement} />
+            <PrivateRoute path={`${path}/vendor-management/wholesalers`} component={VendorManagement} />
             <PrivateRoute path={`${path}/vendor-management/hcp`} component={VendorManagement} />
             <PrivateRoute path={`${path}/vendor-management/hco`} component={VendorManagement} />
         </Switch>
