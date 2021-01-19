@@ -5,6 +5,7 @@ import ChangePasswordForm from './password.component';
 import Sidebar from './sidebar.component';
 import { Route, useRouteMatch } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
+import Dropdown from 'react-bootstrap/Dropdown';
 
 const MyProfile = () => {
     const myProfileInfo = useSelector(state => state.userReducer.loggedInUser);
@@ -31,11 +32,20 @@ const MyProfile = () => {
             <div className="container-fluid">
                 <div className="row">
                     <div className="col-12 px-0">
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb rounded-0">
+                        <nav className="breadcrumb justify-content-between align-items-center" aria-label="breadcrumb">
+                            <ol className="rounded-0 m-0 p-0 d-none d-sm-flex">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item active"><span>My Profile</span></li>
                             </ol>
+                            <Dropdown className="dropdown-customize breadcrumb__dropdown d-block d-sm-none ml-2">
+                                <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center border-0">
+                                    <i className="fas fa-arrow-left mr-2"></i> Back
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                    <Dropdown.Item className="px-2" href="/"><i className="fas fa-link mr-2"></i> Dashboard</Dropdown.Item>
+                                    <Dropdown.Item className="px-2" active><i className="fas fa-link mr-2"></i> My Profile</Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
                         </nav>
                     </div>
                 </div>

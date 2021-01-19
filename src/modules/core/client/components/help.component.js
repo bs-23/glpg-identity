@@ -6,6 +6,7 @@ import { getFaqItems, getFaqCategories } from '../../../platform/faq/client/faq.
 import { NavLink } from 'react-router-dom';
 import Modal from 'react-bootstrap/Modal';
 import parse from 'html-react-parser';
+import Dropdown from 'react-bootstrap/Dropdown';
 
 export default function Help() {
     const faq = useSelector(state => state.faqReducer.faq_items);
@@ -56,11 +57,20 @@ export default function Help() {
                 <div className="container-fluid">
                     <div className="row">
                         <div className="col-12 px-0">
-                            <nav aria-label="breadcrumb">
-                                <ol className="breadcrumb rounded-0 mb-0">
+                            <nav className="breadcrumb justify-content-between align-items-center" aria-label="breadcrumb">
+                                <ol className="rounded-0 m-0 p-0 d-none d-sm-flex">
                                     <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                     <li className="breadcrumb-item active"><span>Help</span></li>
                                 </ol>
+                                <Dropdown className="dropdown-customize breadcrumb__dropdown d-block d-sm-none ml-2">
+                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center border-0">
+                                        <i className="fas fa-arrow-left mr-2"></i> Back
+                                </Dropdown.Toggle>
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item className="px-2" href="/"><i className="fas fa-link mr-2"></i> Dashboard</Dropdown.Item>
+                                        <Dropdown.Item className="px-2" active><i className="fas fa-link mr-2"></i> Help</Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
                             </nav>
                         </div>
                     </div>
