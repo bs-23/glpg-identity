@@ -1123,57 +1123,20 @@ async function getHCPUserConsents(req, res) {
                 model: Consent,
                 as: 'consent'
             },
-            attributes: ['consent_id', 'consent_confirmed', 'opt_type', 'updated_at']
+            attributes: ['consent_id', 'consent_confirmed', 'rich_text', 'opt_type', 'updated_at']
         });
 
-        if (!userConsents) return res.json([]);
-
-        let userConsentDetails = await ConsentLocale.findAll({
-            where: {
-                consent_id: userConsents.map(consent => consent.consent_id),
-                locale: {
-                    [Op.iLike]: `%${doc.locale}`
-                }
-            }, attributes: ['consent_id', 'rich_text']
-        });
-
-        if (userConsentDetails) {
-            const codbaseCountry = await sequelize.datasyncConnector.query(`
-                SELECT * FROM ciam.vwcountry
-                WHERE countryname = (SELECT codbase_desc FROM ciam.vwcountry
-                WHERE LOWER(ciam.vwcountry.country_iso2) = $country_iso2);`, {
-                bind: {
-                    country_iso2: doc.country_iso2.toLowerCase()
-                },
-                type: QueryTypes.SELECT
-            });
-
-            const localeUsingParentCountryISO = `${doc.language_code}_${codbaseCountry[0].country_iso2}`;
-
-            userConsentDetails = await ConsentLocale.findAll({
-                where: {
-                    consent_id: userConsents.map(consent => consent.consent_id),
-                    locale: {
-                        [Op.iLike]: `%${localeUsingParentCountryISO}`
-                    }
-                }, attributes: ['consent_id', 'rich_text']
-            });
-        }
+        if (!userConsents.length) return res.json([]);
 
         response.data = userConsents.map(userConsent => {
-            const localization = userConsentDetails && userConsentDetails.length
-                ? userConsentDetails.find(ucd => ucd.consent_id === userConsent.consent_id)
-                : { rich_text: 'Localized text not found for this consent.' };
-
-            const consentData = {
+            return {
                 consent_given: userConsent.consent_confirmed,
                 consent_given_time: userConsent.updated_at,
                 id: userConsent.consent_id,
                 opt_type: userConsent.opt_type,
                 preference: userConsent.consent.preference,
-                rich_text: validator.unescape(localization.rich_text)
-            }
-            return consentData;
+                rich_text: userConsent.rich_text
+            };
         });
 
         res.json(response);

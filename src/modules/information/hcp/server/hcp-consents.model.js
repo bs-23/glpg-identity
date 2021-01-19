@@ -33,6 +33,10 @@ const HcpConsents = sequelize.cdpConnector.define("hcp_consents", {
         type: DataTypes.STRING(1000),
         set(value) {
             this.setDataValue('rich_text', validator.escape(value));
+        },
+        get() {
+            const rawValue = this.getDataValue('rich_text');
+            return rawValue ? validator.unescape(rawValue) : '';
         }
     },
     created_by: {
