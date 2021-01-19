@@ -2,7 +2,8 @@ import React from 'react';
 import { Route, useRouteMatch } from 'react-router-dom';
 import { BusinessPartnerManagementClientRoutes } from './common';
 import { ManageRequestsClientRoutes, manageRequestsReducer, manageRequestsActions } from './manage-requests';
-import { ManagePartnersClientRoutes } from './manage-partners'
+import { ManagePartnersClientRoutes, managePartnerReducer, managePartnerActions } from './manage-partners'
+
 
 export function PartnerRoutes() {
     const { path } = useRouteMatch();
@@ -18,5 +19,7 @@ export function PartnerRoutes() {
 
 export {
     manageRequestsReducer,
-    manageRequestsActions
+    manageRequestsActions,
+    managePartnerReducer,
+    managePartnerActions
 };

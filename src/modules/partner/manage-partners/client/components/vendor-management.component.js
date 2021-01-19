@@ -4,7 +4,7 @@ import { Faq } from '../../../../platform';
 import Modal from 'react-bootstrap/Modal';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { useSelector, useDispatch } from 'react-redux';
-import { getHcpPartners } from '../manage-partners.actions';
+import { getHcpPartners, getHcoPartners, getVendorsPartners, getWholesalePartners } from '../manage-partners.actions';
 
 const VendorManagement = () => {
 
@@ -13,42 +13,80 @@ const VendorManagement = () => {
     const params = new URLSearchParams(window.location.search);
     const dispatch = useDispatch();
 
+    const partnersData = useSelector(state => state.managePartnerReducer.partnersData);
+
 
     const [showFaq, setShowFaq] = useState(false);
     const handleCloseFaq = () => setShowFaq(false);
     const handleShowFaq = () => setShowFaq(true);
-    const partnerList = [
-        {
-            oneKeyId: "WBE123456",
-            uuid: "1_6566_767",
-            first_name: "Daniel",
-            last_name: "Martin",
-            data_request: "approved",
-            data_origin: "Intranet",
-            language: "FR",
-            streethouseNo: "9 Rue Haute",
-            city: "Luxemburg",
-            country: "Belgium"
-        }
-    ];
+    const pageLeft = () => {
+        if (partnersData.metadata.page > 1) urlChange(partnersData.metadata.page - 1, params.get('orderBy'), true);
+    };
+
+    const pageRight = () => {
+        if (partnersData.metadata.end !== partnersData.metadata.total) urlChange(partnersData.metadata.page + 1, params.get('orderBy'), true);
+    };
+
+    const urlChange = (pageNo, orderColumn, pageChange = false) => {
+        // let orderType = params.get('orderType');
+        // const orderBy = params.get('orderBy');
+        const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
+
+        // if (!pageChange) {
+        //     if (orderBy && !orderType) {
+        //         orderType = 'asc'
+        //     }
+
+        //     (orderBy === orderColumn)
+        //         ? (orderType === 'asc'
+        //             ? orderType = 'desc'
+        //             : orderType = 'asc')
+        //         : orderType = 'asc';
+        // }
+
+        const url = `?page=${page}`
+        // + (orderColumn && orderColumn !== 'null' ? `&orderBy=${orderColumn}` : '')
+        // + (orderColumn && orderType && orderType !== 'null' ? `&orderType=${orderType}` : '');
+
+        history.push(location.pathname + url);
+    }
 
     useEffect(() => {
         const partnerType = window.location.pathname.split("/").pop();
-        dispatch(getHcpPartners());
+        if (partnerType === 'hcp') dispatch(getHcpPartners(location.search));
+        if (partnerType === 'hco') dispatch(getHcoPartners(location.search));
+        if (partnerType === 'vendors') dispatch(getVendorsPartners(location.search));
+        if (partnerType === 'wholesalers') dispatch(getWholesalePartners(location.search));
+
     }, [location]);
+
+    useEffect(() => {
+        console.log(partnersData);
+
+    }, [partnersData]);
 
     return (
         <main className="app__content cdp-light-bg">
             <div className="container-fluid">
                 <div className="row">
                     <div className="col-12 px-0">
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb rounded-0">
+                        <nav className="breadcrumb justify-content-between align-items-center" aria-label="breadcrumb">
+                            <ol className="rounded-0 m-0 p-0 d-none d-sm-flex">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/business-partner">Business Partner Management</NavLink></li>
                                 <li className="breadcrumb-item active"><span>Business Partner lists</span></li>
-                                <li className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help icon-2x cdp-text-secondary"></i></li>
                             </ol>
+                            <Dropdown className="dropdown-customize breadcrumb__dropdown d-block d-sm-none ml-2">
+                                <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center border-0">
+                                    <i className="fas fa-arrow-left mr-2"></i> Back
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                    <Dropdown.Item className="px-2" href="/"><i className="fas fa-link mr-2"></i> Dashboard</Dropdown.Item>
+                                    <Dropdown.Item className="px-2" href="/business-partner"><i className="fas fa-link mr-2"></i> Business Partner Management</Dropdown.Item>
+                                    <Dropdown.Item className="px-2" active><i className="fas fa-link mr-2"></i> Business Partner lists</Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
+                            <span className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary"></i></span>
                         </nav>
                         <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
                             <Modal.Header closeButton>
@@ -66,6 +104,7 @@ const VendorManagement = () => {
                                 <h4 className="cdp-text-primary font-weight-bold mb-4">Business Partner Lists</h4>
                                 <div>
                                     <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/vendor-management/vendors">Vendors</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/vendor-management/wholesalers">Wholesalers</NavLink>
                                     <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/vendor-management/hcp">Health Care Professional</NavLink>
                                     <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/vendor-management/hco">Health Care Organizations</NavLink>
                                 </div>
@@ -92,19 +131,19 @@ const VendorManagement = () => {
                                 </thead>
                                 <tbody>
                                     {
-                                        partnerList.map((item, index) =>
+                                        partnersData.partners && partnersData.partners.length > 0 && partnersData.partners.map((item, index) =>
                                         (
                                             <tr key={index}>
-                                                <td>{item.oneKeyId}</td>
+                                                <td>--</td>
                                                 <td>{item.uuid}</td>
                                                 <td>{item.first_name}</td>
                                                 <td>{item.last_name}</td>
-                                                <td>{item.data_request}</td>
-                                                <td>{item.data_origin}</td>
-                                                <td>{item.language}</td>
-                                                <td>{item.streethouseNo}</td>
+                                                <td>{item.status}</td>
+                                                <td>--</td>
+                                                <td>--</td>
+                                                <td>{item.address}</td>
                                                 <td>{item.city}</td>
-                                                <td>{item.country}</td>
+                                                <td>--</td>
                                                 <td><Dropdown className="ml-auto dropdown-customize">
                                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
                                                     </Dropdown.Toggle>
@@ -119,6 +158,26 @@ const VendorManagement = () => {
                                 </tbody>
                             </table>
                         </div>
+                        {
+                            partnersData.metadata && ((partnersData.metadata.page === 1 &&
+                                partnersData.metadata.total > partnersData.metadata.limit) ||
+                                (partnersData.metadata.page > 1))
+                            && partnersData['partners'] &&
+                            <div className="pagination justify-content-end align-items-center border-top p-3">
+                                <span className="cdp-text-primary font-weight-bold">{partnersData.metadata.start + ' - ' + partnersData.metadata.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + partnersData.metadata.total}</span>
+                                <span className="pagination-btn" data-testid='Prev' onClick={() => pageLeft()} disabled={partnersData.metadata.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
+                                <span className="pagination-btn" data-testid='Next' onClick={() => pageRight()} disabled={partnersData.metadata.end === partnersData.metadata.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
+                            </div>
+                        }
+
+                        {partnersData.partners && partnersData.partners.length === 0 &&
+                            <div className="row justify-content-center mt-5 pt-5 mb-3">
+                                <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">
+                                    <i class="icon icon-team icon-6x cdp-text-secondary"></i>
+                                    <h3 className="font-weight-bold cdp-text-primary pt-4">No Partner Found!</h3>
+                                </div>
+                            </div>
+                        }
 
 
                     </div>

@@ -72,7 +72,7 @@ async function getPartnerHcps(req, res) {
         const total = await PartnerHcps.count();
 
         const responseData = {
-            hcpPartners,
+            partners: hcpPartners,
             metadata: {
                 page: page + 1,
                 limit,
@@ -230,7 +230,7 @@ async function getPartnerHcos(req, res) {
         const total = await PartnerHcos.count();
 
         const responseData = {
-            hcoPartners,
+            partners: hcoPartners,
             metadata: {
                 page: page + 1,
                 limit,
@@ -383,7 +383,7 @@ async function getPartnerVendors(req, res) {
         const total = await PartnerVendors.count();
 
         const responseData = {
-            partnerVendors,
+            partners: partnerVendors,
             metadata: {
                 page: page + 1,
                 limit,

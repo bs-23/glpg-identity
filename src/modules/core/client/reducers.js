@@ -5,6 +5,7 @@ import consentReducer from '../../consent/client/consent.reducer';
 import { faqReducer, userReducer, profileReducer, roleReducer, permissionSetReducer } from '../../platform';
 import consentCategoryReducer from '../../consent/client/consent-category/category.reducer';
 import { manageRequestsReducer } from '../../partner';
+import { managePartnerReducer } from '../../partner';
 
 export default combineReducers({
     userReducer,
@@ -16,5 +17,6 @@ export default combineReducers({
     profileReducer,
     roleReducer,
     permissionSetReducer,
-    manageRequestsReducer
+    manageRequestsReducer,
+    managePartnerReducer
 })

@@ -158,13 +158,23 @@ const WholesalerPartnerRequests = () => {
             <div className="container-fluid">
                 <div className="row">
                     <div className="col-12 px-0">
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb rounded-0">
+                         <nav className="breadcrumb justify-content-between align-items-center" aria-label="breadcrumb">
+                            <ol className="rounded-0 m-0 p-0 d-none d-sm-flex">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/business-partner">Business Partner Management</NavLink></li>
                                 <li className="breadcrumb-item active"><span>Business Partner Requests</span></li>
-                                <li className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help icon-2x cdp-text-secondary"></i></li>
                             </ol>
+                            <Dropdown className="dropdown-customize breadcrumb__dropdown d-block d-sm-none ml-2">
+                                <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center border-0">
+                                    <i className="fas fa-arrow-left mr-2"></i> Back
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                    <Dropdown.Item className="px-2" href="/"><i className="fas fa-link mr-2"></i> Dashboard</Dropdown.Item>
+                                    <Dropdown.Item className="px-2" href="/business-partner"><i className="fas fa-link mr-2"></i> Business Partner Management</Dropdown.Item>
+                                    <Dropdown.Item className="px-2" active><i className="fas fa-link mr-2"></i> Business Partner Requests</Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
+                            <span className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary"></i></span>
                         </nav>
                         <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
                             <Modal.Header closeButton>
@@ -179,7 +189,7 @@ const WholesalerPartnerRequests = () => {
                     <div className="col-12">
                         <div className="d-sm-flex justify-content-between align-items-end mb-0 mt-3">
                             <div>
-                                <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Overview of Business Partner Requests</h4>
+                                <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Manage Wholesalers Request</h4>
                                 <div className="pt-3">
                                     <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/vendors">General Vendors</NavLink>
                                     <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/wholesalers">Wholesalers</NavLink>
@@ -232,7 +242,7 @@ const WholesalerPartnerRequests = () => {
                                                         <Dropdown.Menu>
                                                             <Dropdown.Item onClick={() => sendFormHandler(row)}> Send Form </Dropdown.Item>
                                                             <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
-                                                            <Dropdown.Item onClick={() => setRequestToDelete(row.id) }> Delete </Dropdown.Item>
+                                                            <Dropdown.Item className="text-danger" onClick={() => setRequestToDelete(row.id) }> Delete </Dropdown.Item>
                                                         </Dropdown.Menu>
                                                     </Dropdown></td>
                                                 </tr>
@@ -257,7 +267,7 @@ const WholesalerPartnerRequests = () => {
                 <Modal.Header closeButton>
                     <Modal.Title>
                         {
-                            partnerRequestId ? 'Edit Request' : 'Add Request'
+                            partnerRequestId ? 'Edit Wholesaler Request' : 'Add Wholesaler Request'
                         }
                     </Modal.Title>
                 </Modal.Header>
