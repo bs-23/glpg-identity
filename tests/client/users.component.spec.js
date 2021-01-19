@@ -71,21 +71,7 @@ describe('Users component', () => {
                 }],
         }
 
-        const filteredUserList = {
-            "users":[
-                {
-                    "id":"e00f1ad7-8dec-402d-b1eb-b3507a4d84ac",
-                    "first_name":"First Name",
-                    "last_name":"Last Name",
-                    "email":"email@gmail.com",
-                    "countries":["country1"],
-                    "createdByUser":{}
-                },
-            ]
-        }
-
-        mockAxios.onGet('api/users?page=1&codbase=aa').reply(200, filteredUserList);
-        mockAxios.onGet("/api/users?page=1").reply(200, userList);
+        mockAxios.onPost("/api/cdp-users?page=1").reply(200, userList);
     });
 
     const wrapperComponent = () => (
@@ -104,26 +90,15 @@ describe('Users component', () => {
         expect(signedInProfile).toBeTruthy()
     })
 
-    it('Should filter users based on country', async () => {
+    it('Should show table', async () => {
         const { debug, container, getAllByText, getByText } = render(wrapperComponent());
 
-        let table;
         await waitFor(() => {
-            table = container.querySelector('table')
-            expect(table).toBeTruthy()
-        })
+            const table = container.querySelector('table');
+            expect(table).toBeTruthy();
+        });
 
-        const tbody = container.querySelector('tbody')
-        expect(tbody.childNodes.length).toBe(2)
-
-        const filter_button = getByText('Filter by Country')
-        fireEvent.click(filter_button)
-
-        const country_label = getAllByText('countryDesc1')[0]
-        fireEvent.click(country_label)
-
-        await waitFor(() => {
-            expect(container.querySelector('tbody')).toBeTruthy()
-        })
+        const tbody = container.querySelector('tbody');
+        expect(tbody.childNodes.length).toBe(2);
     });
 });
