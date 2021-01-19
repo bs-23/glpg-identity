@@ -35,7 +35,7 @@ describe('Users component', () => {
         await store.dispatch(getSignedInUserProfile());
 
         const countries = [
-            // { countryid: 0, codbase: null, country_iso2: null, countryname: '', codbase_desc: 'null' },
+            { countryid: 0, codbase: null, country_iso2: null, countryname: '', codbase_desc: 'null' },
             { countryid: 1, codbase: 'aa',  country_iso2: 'country1', countryname: 'countryName1', codbase_desc: 'countryDesc1' },
             { countryid: 2, codbase: 'bb', country_iso2: 'country2', countryname: 'countryName2', codbase_desc: 'countryDesc2' },
             { countryid: 3, codbase: 'cc', country_iso2: 'country3', countryname: 'countryName3', codbase_desc: 'countryDesc3' },
@@ -45,15 +45,6 @@ describe('Users component', () => {
         await store.dispatch(
             {
                 type: 'GET_COUNTRIES',
-                payload: Promise.resolve({
-                    data: countries
-                })
-            }
-        );
-
-        await store.dispatch(
-            {
-                type: 'GET_ALL_COUNTRIES',
                 payload: Promise.resolve({
                     data: countries
                 })
@@ -80,21 +71,7 @@ describe('Users component', () => {
                 }],
         }
 
-        const filteredUserList = {
-            "users":[
-                {
-                    "id":"e00f1ad7-8dec-402d-b1eb-b3507a4d84ac",
-                    "first_name":"First Name",
-                    "last_name":"Last Name",
-                    "email":"email@gmail.com",
-                    "countries":["country1"],
-                    "createdByUser":{}
-                },
-            ]
-        }
-
-        mockAxios.onGet('/api/cdp-users?page=1&codbase=aa').reply(200, filteredUserList);
-        mockAxios.onGet("/api/cdp-users?page=1").reply(200, userList);
+        mockAxios.onPost("/api/cdp-users?page=1").reply(200, userList);
     });
 
     const wrapperComponent = () => (
@@ -117,11 +94,11 @@ describe('Users component', () => {
         const { debug, container, getAllByText, getByText } = render(wrapperComponent());
 
         await waitFor(() => {
-            // const table = container.querySelector('table');
-            // expect(table).toBeTruthy();
+            const table = container.querySelector('table');
+            expect(table).toBeTruthy();
         });
 
-        // const tbody = container.querySelector('tbody');
-        // expect(tbody.childNodes.length).toBe(2);
+        const tbody = container.querySelector('tbody');
+        expect(tbody.childNodes.length).toBe(2);
     });
 });
