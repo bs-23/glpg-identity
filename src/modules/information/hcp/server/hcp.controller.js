@@ -739,6 +739,95 @@ async function createHcpProfile(req, res) {
             return res.status(400).send(response);
         }
 
+        const countries = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;', { type: QueryTypes.SELECT });
+
+        let hasDoubleOptIn = false;
+        let consentArr = [];
+
+        if (req.body.consents && req.body.consents.length) {
+            await Promise.all(req.body.consents.map(async consent => {
+                const preferenceId = Object.keys(consent)[0];
+                const consentResponse = Object.values(consent)[0];
+
+                if (!consentResponse) return;
+
+                const consentDetails = await Consent.findOne({ where: { id: preferenceId } });
+
+                if (!consentDetails) {
+                    response.errors.push(new CustomError('Invalid consents.', 400));
+                    return;
+                };
+
+                const currentCountry = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+
+                const baseCountry = countries.find(c => c.countryname === currentCountry.codbase_desc);
+
+                const consentCountry = await ConsentCountry.findOne({
+                    where: {
+                        country_iso2: {
+                            [Op.iLike]: baseCountry.country_iso2
+                        },
+                        consent_id: consentDetails.id
+                    }
+                });
+
+                if (!consentCountry) {
+                    response.errors.push(new CustomError('Invalid consent country.', 400));
+                    return;
+                }
+
+                let consentLocale = await ConsentLocale.findOne({
+                    where: {
+                        consent_id: preferenceId,
+                        locale: { [Op.iLike]: `${language_code}_${country_iso2}` }
+                    }
+                });
+
+                if (!consentLocale) {
+                    const codbaseCountry = await sequelize.datasyncConnector.query(`
+                        SELECT * FROM ciam.vwcountry
+                        WHERE countryname = (SELECT codbase_desc FROM ciam.vwcountry
+                        WHERE LOWER(ciam.vwcountry.country_iso2) = $country_iso2);`, {
+                        bind: {
+                            country_iso2: country_iso2.toLowerCase()
+                        },
+                        type: QueryTypes.SELECT
+                    });
+
+                    const localeUsingParentCountryISO = `${language_code}_${codbaseCountry[0].country_iso2}`;
+
+                    consentLocale = await ConsentLocale.findOne({
+                        where: {
+                            consent_id: preferenceId,
+                            locale: { [Op.iLike]: `%${localeUsingParentCountryISO}` }
+                        }
+                    });
+                }
+
+                if (!consentLocale) {
+                    response.errors.push(new CustomError('Invalid consent locale.', 400));
+                    return;
+                }
+
+                if (consentCountry.opt_type === 'double-opt-in') {
+                    hasDoubleOptIn = true;
+                }
+
+                consentArr.push({
+                    consent_id: consentDetails.id,
+                    consent_confirmed: consentCountry.opt_type === 'double-opt-in' ? false : true,
+                    opt_type: consentCountry.opt_type,
+                    rich_text: consentLocale.rich_text,
+                    created_by: req.user.id,
+                    updated_by: req.user.id
+                });
+            }));
+        }
+
+        if(response.errors.length) {
+            return res.status(400).send(response);
+        }
+
         const model = {
             email: email.toLowerCase(),
             uuid: uuid_from_master_data || uuid,
@@ -760,52 +849,12 @@ async function createHcpProfile(req, res) {
 
         const hcpUser = await Hcp.create(model);
 
-        const countries = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;', { type: QueryTypes.SELECT });
-
-        let hasDoubleOptIn = false;
-        const consentArr = [];
-
-        if (req.body.consents && req.body.consents.length) {
-            await Promise.all(req.body.consents.map(async consent => {
-                const preferenceSlug = Object.keys(consent)[0];
-                const consentResponse = Object.values(consent)[0];
-
-                if (!consentResponse) return;
-
-                const consentDetails = await Consent.findOne({ where: { slug: preferenceSlug } });
-
-                if (!consentDetails) return;
-
-                const currentCountry = countries.find(c => c.country_iso2.toLowerCase() === model.country_iso2.toLowerCase());
-
-                const baseCountry = countries.find(c => c.countryname === currentCountry.codbase_desc);
-
-                const consentCountry = await ConsentCountry.findOne({
-                    where: {
-                        country_iso2: {
-                            [Op.iLike]: baseCountry.country_iso2
-                        },
-                        consent_id: consentDetails.id
-                    }
-                });
-
-                if (!consentCountry) return;
-
-                if (consentCountry.opt_type === 'double-opt-in') {
-                    hasDoubleOptIn = true;
-                }
-
-                consentArr.push({
-                    user_id: hcpUser.id,
-                    consent_id: consentDetails.id,
-                    consent_confirmed: consentCountry.opt_type === 'double-opt-in' ? false : true,
-                    opt_type: consentCountry.opt_type,
-                    created_by: req.user.id,
-                    updated_by: req.user.id
-                });
-            }));
-
-            consentArr.length && await HcpConsents.bulkCreate(consentArr, {
+        if (consentArr.length) {
+            consentArr = consentArr.map(c => {
+                c.user_id = hcpUser.id
+                return c;
+            });
+            await HcpConsents.bulkCreate(consentArr, {
                 returning: true,
                 ignoreDuplicates: false
             });

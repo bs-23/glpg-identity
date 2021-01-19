@@ -3,6 +3,7 @@ const { DataTypes } = require("sequelize");
 const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequelize"));
 const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
+const validator = require('validator');
 
 const HcpConsents = sequelize.cdpConnector.define("hcp_consents", {
     id: {
@@ -26,6 +27,13 @@ const HcpConsents = sequelize.cdpConnector.define("hcp_consents", {
         allowNull: false,
         type: DataTypes.ENUM,
         values: ['single-opt-in', 'double-opt-in', 'soft-opt-in', 'opt-out'],
+    },
+    rich_text: {
+        allowNull: false,
+        type: DataTypes.STRING(1000),
+        set(value) {
+            this.setDataValue('rich_text', validator.escape(value));
+        }
     },
     created_by: {
         type: DataTypes.UUID
