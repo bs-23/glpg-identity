@@ -109,21 +109,11 @@ describe('Users component', () => {
 
         let table;
         await waitFor(() => {
-            table = container.querySelector('table')
-            expect(table).toBeTruthy()
+            table = container.querySelector('table');
+            expect(table).toBeTruthy();
         })
 
-        const tbody = container.querySelector('tbody')
-        expect(tbody.childNodes.length).toBe(2)
-
-        const filter_button = getByText('Filter by Country')
-        fireEvent.click(filter_button)
-
-        const country_label = getAllByText('countryDesc1')[0]
-        fireEvent.click(country_label)
-
-        await waitFor(() => {
-            expect(container.querySelector('tbody')).toBeTruthy()
-        })
+        const tbody = container.querySelector('tbody');
+        expect(tbody.childNodes.length).toBe(2);
     });
 });
