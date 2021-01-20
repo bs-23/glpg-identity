@@ -74,7 +74,7 @@ const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
     },
     status: {
         type: DataTypes.ENUM,
-        values: ['self_verified', 'manually_verified', 'consent_pending', 'not_verified']
+        values: ['self_verified', 'manually_verified', 'consent_pending', 'not_verified', 'rejected']
     },
     is_email_verified: {
         type: DataTypes.BOOLEAN,

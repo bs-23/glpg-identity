@@ -1026,6 +1026,8 @@ async function rejectHCPUser(req, res) {
 
         response.data = getHcpViewModel(hcpUser.dataValues);
 
+        await hcpUser.update({ status: 'rejected' });
+
         await archiveService.archiveData({
             object_id: hcpUser.id,
             table_name: 'hcp_profiles',
