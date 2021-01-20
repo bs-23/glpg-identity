@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import validator from 'validator';
 import {stateToHTML} from 'draft-js-export-html';
 import { ContentState, EditorState, convertFromHTML } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
@@ -99,10 +100,15 @@ export default function DraftEditor({ onChangeHTML, htmlContent }) {
         if (onChangeHTML) {
             const editorContentInHTML = convertContentToHtml(state);
             const plainText = state.getCurrentContent().getPlainText();
+
             const props = {
                 plainText,
+                escapedLength: editorContentInHTML
+                    ? validator.escape(editorContentInHTML).length
+                    : 0,
                 cleanupEmptyHtmlTags
             }
+
             onChangeHTML(editorContentInHTML, props);
         }
 
