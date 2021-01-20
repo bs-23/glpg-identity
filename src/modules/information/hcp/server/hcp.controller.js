@@ -7,7 +7,7 @@ const validator = require('validator');
 const { QueryTypes, Op, where, col, fn } = require('sequelize');
 const Hcp = require('./hcp-profile.model');
 const DatasyncHcp = require('./datasync-hcp-profile.model');
-const HcpArchives = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-archives.model'));
+const ArchiveService = require(path.join(process.cwd(), 'src/modules/core/server/archiving/archives.service.js'));
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-consents.model'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
@@ -1024,14 +1024,20 @@ async function rejectHCPUser(req, res) {
             return res.status(400).send(response);
         }
 
-        await HcpArchives.create({ ...hcpUser.dataValues, status: 'rejected' });
-
         response.data = getHcpViewModel(hcpUser.dataValues);
+
+        await ArchiveService.archiveData({
+            object_id: hcpUser.id,
+            table_name: 'hcp_profiles',
+            data: JSON.stringify(hcpUser.dataValues),
+            actor: req.user.id,
+            remarks: (req.body.comment || '').trim()
+        });
 
         await logService.log({
             event_type: 'CREATE',
             object_id: hcpUser.id,
-            table_name: 'hcp_archives',
+            table_name: 'archives',
             actor: req.user.id,
             remarks: (req.body.comment || '').trim()
         });

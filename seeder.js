@@ -55,6 +55,7 @@ async function init() {
     require(path.join(process.cwd(), 'src/modules/core/server/password/password-history.model.js'));
     require(path.join(process.cwd(), 'src/modules/core/server/filter/filter.model.js'));
     require(path.join(process.cwd(), 'src/modules/platform/application/server/data.model.js'));
+    require(path.join(process.cwd(), 'src/modules/core/server/archiving/archives.model.js'));
 
     await sequelize.cdpConnector.sync();
 
