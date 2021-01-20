@@ -105,6 +105,7 @@ async function getConsents(req, res) {
                 category_slug: consentLang.consent.consent_category.slug,
                 country_iso2: country_iso2,
                 locale: consentLang.locale,
+                locale_id: consentLang.id,
                 opt_type: consentCountry.opt_type
             }
         }));
