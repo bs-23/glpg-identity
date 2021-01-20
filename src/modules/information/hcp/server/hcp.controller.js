@@ -748,6 +748,7 @@ async function createHcpProfile(req, res) {
             await Promise.all(req.body.consents.map(async consent => {
                 const preferenceId = Object.keys(consent)[0];
                 const consentResponse = Object.values(consent)[0];
+                let richTextLocale = `${language_code}_${country_iso2}`;
 
                 if (!consentResponse) return;
 
@@ -799,9 +800,11 @@ async function createHcpProfile(req, res) {
                     consentLocale = await ConsentLocale.findOne({
                         where: {
                             consent_id: preferenceId,
-                            locale: { [Op.iLike]: `%${localeUsingParentCountryISO}` }
+                            locale: { [Op.iLike]: localeUsingParentCountryISO }
                         }
                     });
+
+                    richTextLocale = localeUsingParentCountryISO;
                 }
 
                 if (!consentLocale) {
@@ -818,6 +821,7 @@ async function createHcpProfile(req, res) {
                     consent_confirmed: consentCountry.opt_type === 'double-opt-in' ? false : true,
                     opt_type: consentCountry.opt_type,
                     rich_text: consentLocale.rich_text,
+                    locale: richTextLocale,
                     created_by: req.user.id,
                     updated_by: req.user.id
                 });
