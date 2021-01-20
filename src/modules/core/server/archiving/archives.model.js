@@ -4,44 +4,36 @@ const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
-const Audit = sequelize.cdpConnector.define('audits', {
+const Archive = sequelize.cdpConnector.define('archives', {
     id: {
         allowNull: false,
         primaryKey: true,
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4
     },
-    event_time: {
-        allowNull: false,
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
-    },
-    event_type: {
-        allowNull: false,
+    table_name: {
         type: DataTypes.ENUM,
-        values: ['CREATE', 'DELETE', 'UPDATE', 'LOGIN', 'LOGOUT', 'UNAUTHORIZE', 'BAD_REQUEST']
+        values: ['users', 'hcp_profiles', 'consents', 'faq', 'applications', 'hcp_archives', 'permission_sets', 'roles', 'consent_countries', 'consent_categories', 'consent_locales']
     },
     object_id: {
         type: DataTypes.STRING
     },
-    table_name: {
-        type: DataTypes.ENUM,
-        values: ['users', 'hcp_profiles', 'consents', 'faq', 'applications', 'hcp_archives', 'permission_sets', 'roles', 'consent_countries', 'consent_categories', 'consent_locales', 'archives']
+    data: {
+        allowNull: false,
+        type: DataTypes.STRING(5000)
     },
     actor: {
         allowNull: false,
         type: DataTypes.UUID
-    },
-    changes: {
-        type: DataTypes.STRING(5000)
     },
     remarks: {
         type: DataTypes.STRING(500)
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
-    tableName: 'audits',
-    timestamps: false
+    tableName: 'archives',
+    timestamps: false,
+    createdAt: 'created_at',
 });
 
-module.exports = Audit;
+module.exports = Archive;
