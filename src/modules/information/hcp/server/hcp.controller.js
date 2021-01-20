@@ -1039,7 +1039,7 @@ async function rejectHCPUser(req, res) {
         await logService.log({
             event_type: 'CREATE',
             object_id: hcpUser.id,
-            table_name: 'archives',
+            table_name: 'archive',
             actor: req.user.id,
             remarks: (req.body.comment || '').trim()
         });
