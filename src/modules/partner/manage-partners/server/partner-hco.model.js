@@ -61,6 +61,12 @@ const PartnerHcos = sequelize.cdpConnector.define('partner_hcos', {
         allowNull: false,
         type: DataTypes.STRING
     },
+    uuid: {
+        type: DataTypes.STRING
+    },
+    onekey_id: {
+        type: DataTypes.STRING
+    },
     iban: {
         type: DataTypes.STRING
     },

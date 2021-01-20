@@ -57,6 +57,9 @@ const PartnerHcps = sequelize.cdpConnector.define('partner_hcps', {
     uuid: {
         type: DataTypes.STRING
     },
+    onekey_id: {
+        type: DataTypes.STRING
+    },
     is_italian_hcp: {
         type: DataTypes.BOOLEAN
     },

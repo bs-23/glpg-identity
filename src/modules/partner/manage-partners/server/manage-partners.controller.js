@@ -56,7 +56,7 @@ async function getPartnerHcps(req, res) {
             ? req.query.orderType
             : 'asc';
 
-        const sortableColumns = ['first_name', 'last_name', 'status', 'uuid', 'country_iso2', 'language', 'city'];
+        const sortableColumns = ['first_name', 'last_name', 'status', 'uuid', 'onekey_id', 'country_iso2', 'language', 'city'];
 
         const order = [];
         if (orderBy && (sortableColumns || []).includes(orderBy)) {
@@ -121,7 +121,7 @@ async function createPartnerHcp(req, res) {
         const files = req.files;
 
         const { request_id, first_name, last_name, address, city, post_code, email, telephone,
-            type, country_iso2, language, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
+            type, country_iso2, language, uuid, onekey_id, is_italian_hcp, should_report_hco, beneficiary_category,
             iban, bank_name, bank_account_no, currency } = req.body;
 
         if (!request_id) response.errors.push(new CustomError('Request ID is missing.', 400, 'request_id'));
@@ -159,7 +159,7 @@ async function createPartnerHcp(req, res) {
 
         const data = {
             request_id, first_name, last_name, address, city, post_code, email, telephone,
-            type, country_iso2, language, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
+            type, country_iso2, language, uuid, onekey_id, is_italian_hcp, should_report_hco, beneficiary_category,
             iban, bank_name, bank_account_no, currency
         };
 
@@ -232,7 +232,7 @@ async function getPartnerHcos(req, res) {
             ? req.query.orderType
             : 'asc';
 
-        const sortableColumns = ['contact_first_name', 'contact_last_name', 'status', 'country_iso2', 'language', 'city'];
+        const sortableColumns = ['contact_first_name', 'contact_last_name', 'status', 'onekey_id', 'uuid', 'country_iso2', 'language', 'city'];
 
         const order = [];
         if (orderBy && (sortableColumns || []).includes(orderBy)) {
@@ -296,7 +296,7 @@ async function createPartnerHco(req, res) {
     try {
         const files = req.files;
 
-        const { request_id, contact_first_name, contact_last_name, name, address, city, post_code, email, telephone, type, country_iso2, language, registration_number, iban, bank_name, bank_account_no, currency } = req.body;
+        const { request_id, contact_first_name, contact_last_name, name, address, city, post_code, email, telephone, type, uuid, onekey_id, country_iso2, language, registration_number, iban, bank_name, bank_account_no, currency } = req.body;
 
         if (!request_id) response.errors.push(new CustomError('Request ID is missing.', 400, 'request_id'));
         if (!contact_first_name) response.errors.push(new CustomError('Contact first name is missing.', 400, 'contact_first_name'));
@@ -333,7 +333,7 @@ async function createPartnerHco(req, res) {
         }
 
         const data = {
-            request_id, contact_first_name, contact_last_name, name, address, city, post_code, email, telephone, type, country_iso2, language, registration_number, iban, bank_name, bank_account_no, currency
+            request_id, contact_first_name, contact_last_name, name, address, city, post_code, email, telephone, type, uuid, onekey_id, country_iso2, language, registration_number, iban, bank_name, bank_account_no, currency
         };
 
         const [partnerHco, created] = await PartnerHcos.findOrCreate({
