@@ -256,7 +256,7 @@ const ConsentForm = (props) => {
                                                     item.rich_text &&
                                                     item.rich_text !== '<p><br></p>' &&
                                                     item.rich_text.replace(/&nbsp;/g, '') !== '<p></p>' &&
-                                                    validator.escape(item.rich_text).length > 976
+                                                    validator.escape(item.rich_text).length <= 976
                                                 );
 
                                                 if (translations.length !== validTranslations.length) {
