@@ -46,6 +46,14 @@ const PartnerHcps = sequelize.cdpConnector.define('partner_hcps', {
         values: ['individual', 'legal_entity'],
         defaultValue: 'individual'
     },
+    country_iso2: {
+        allowNull: false,
+        type: DataTypes.STRING(2)
+    },
+    language: {
+        allowNull: false,
+        type: DataTypes.STRING
+    },
     uuid: {
         type: DataTypes.STRING
     },

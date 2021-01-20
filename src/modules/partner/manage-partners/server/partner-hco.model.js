@@ -49,6 +49,14 @@ const PartnerHcos = sequelize.cdpConnector.define('partner_hcos', {
         values: ['healthcare_org', 'patient_org'],
         defaultValue: 'healthcare_org'
     },
+    country_iso2: {
+        allowNull: false,
+        type: DataTypes.STRING(2)
+    },
+    language: {
+        allowNull: false,
+        type: DataTypes.STRING
+    },
     registration_number: {
         allowNull: false,
         type: DataTypes.STRING

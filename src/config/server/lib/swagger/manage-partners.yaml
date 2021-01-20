@@ -32,6 +32,10 @@ paths:
                                     enum:
                                     - individual
                                     - legal_entity
+                                country_iso2:
+                                    type: string
+                                language:
+                                    type: string
                                 uuid:
                                     type: string
                                 is_italian_hcp:
@@ -62,6 +66,8 @@ paths:
                               - last_name
                               - email
                               - type
+                              - country_iso2
+                              - language
             responses:
                 200:
                     description: The request has succeeded.
@@ -116,6 +122,10 @@ paths:
                                     enum:
                                     - healthcare_org
                                     - patient_org
+                                country_iso2:
+                                    type: string
+                                language:
+                                    type: string
                                 registration_number:
                                     type: string
                                 iban:
@@ -139,6 +149,8 @@ paths:
                               - registration_number
                               - email
                               - type
+                              - country_iso2
+                              - language
             responses:
                 200:
                     description: The request has succeeded.
@@ -175,6 +187,10 @@ paths:
                                     enum:
                                     - vendor
                                     - wholesaler
+                                country_iso2:
+                                    type: string
+                                language:
+                                    type: string
                                 request_id:
                                     type: string
                                 requestor_first_name:
@@ -251,6 +267,8 @@ paths:
                               - address
                               - city
                               - ordering_email
+                              - country_iso2
+                              - language
             responses:
                 200:
                     description: The request has succeeded.
@@ -302,6 +320,10 @@ components:
                     enum:
                     - individual
                     - legal_entity
+                country_iso2:
+                    type: string
+                language:
+                    type: string
                 uuid:
                     type: string
                 is_italian_hcp:
@@ -357,6 +379,10 @@ components:
                     enum:
                     - healthcare_org
                     - patient_org
+                country_iso2:
+                    type: string
+                language:
+                    type: string
                 registration_number:
                     type: string
                 iban:
@@ -387,6 +413,10 @@ components:
                     enum:
                     - vendor
                     - wholesaler
+                country_iso2:
+                    type: string
+                language:
+                    type: string
                 request_id:
                     type: string
                 requestor_first_name:
