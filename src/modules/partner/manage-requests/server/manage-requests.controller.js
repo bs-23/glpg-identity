@@ -6,7 +6,7 @@ const HcoPartner = require('../../manage-partners/server/partner-hco.model');
 const { QueryTypes, Op } = require('sequelize');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
-const ArchiveService = require(path.join(process.cwd(), 'src/modules/core/server/archiving/archives.service.js'));
+const ArchiveService = require(path.join(process.cwd(), 'src/modules/core/server/archive/archive.service.js'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
@@ -206,7 +206,7 @@ async function deletePartnerRequest(req, res) {
         await logService.log({
             event_type: 'CREATE',
             object_id: partnerRequest.id,
-            table_name: 'archives',
+            table_name: 'archive',
             actor: req.user.id
         });
 
