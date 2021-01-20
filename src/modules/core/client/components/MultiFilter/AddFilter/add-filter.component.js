@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ScrollBars from 'react-scrollbar';
 import _ from 'lodash';
 
@@ -27,6 +27,8 @@ const AddFilter = (props) => {
     const [validationErrors, setValidationErrors] = useState([{}]);
     const [isTouched, setIsTouched] = useState(false);
     const [isFormValid, setIsFormValid] = useState(false);
+
+    const scrollRef = useRef();
 
     const handleAddMoreFilter = () => {
         const emptyFilter = {
@@ -102,9 +104,16 @@ const AddFilter = (props) => {
         const filtersAfterRemoval = filters.filter((filter, ind) => ind !== index);
         const validationErrorsAfterRemoval = validationErrors.filter((ve, ind) => ind !== index);
         const updatedLogic = buildLogicAfterRemoval(logic, index);
+
         setLogic(updatedLogic);
         setFilters(filtersAfterRemoval);
         setValidationErrors(validationErrorsAfterRemoval);
+
+        if(scrollRef) {
+            const scrollPosition = scrollRef.current.state.topPosition;
+            const filterComponentHeight = 230;
+            scrollRef.current.scrollArea.scrollYTo(scrollPosition - filterComponentHeight);
+        }
     }
 
     const scrollBarStyle = {
@@ -148,7 +157,7 @@ const AddFilter = (props) => {
     }, [alreadyAddedFilters, alreadyAddedLogic])
 
     return <div className="filter__sub-panel">
-        <ScrollBars className="custom-scroll" autoHide={true} smoothScrolling={true} style={scrollBarStyle}>
+        <ScrollBars ref={scrollRef} className="custom-scroll" minScrollSize={394} autoHide={true} smoothScrolling={true} style={scrollBarStyle}>
             <div className="bg-light p-2 rounded-top d-flex justify-content-between border-bottom">
                 <span className="font-weight-bold">Add Filter</span>
                 <i className="fas fa-times mr-2 text-secondary font-weight-bold h4 mb-0" type="button" onClick={handleHide} />
