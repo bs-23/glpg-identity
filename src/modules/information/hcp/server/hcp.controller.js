@@ -7,7 +7,7 @@ const validator = require('validator');
 const { QueryTypes, Op, where, col, fn } = require('sequelize');
 const Hcp = require('./hcp-profile.model');
 const DatasyncHcp = require('./datasync-hcp-profile.model');
-const ArchiveService = require(path.join(process.cwd(), 'src/modules/core/server/archiving/archives.service.js'));
+const archiveService = require(path.join(process.cwd(), 'src/modules/core/server/archive/archive.service'));
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-consents.model'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
@@ -17,10 +17,10 @@ const Application = require(path.join(process.cwd(), 'src/modules/platform/appli
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
-const PasswordPolicies = require(path.join(process.cwd(), 'src/modules/core/server/password/password-policies.js'));
-const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/platform/user/server/permission/permissions.js'));
-const Filter = require(path.join(process.cwd(), "src/modules/core/server/filter/filter.model.js"));
-const filterService = require(path.join(process.cwd(), 'src/modules/platform/user/server/filter.js'));
+const PasswordPolicies = require(path.join(process.cwd(), 'src/modules/core/server/password/password-policies'));
+const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/platform/user/server/permission/permissions'));
+const Filter = require(path.join(process.cwd(), "src/modules/core/server/filter/filter.model"));
+const filterService = require(path.join(process.cwd(), 'src/modules/platform/user/server/filter'));
 
 function generateAccessToken(doc) {
     return jwt.sign({
@@ -1026,7 +1026,7 @@ async function rejectHCPUser(req, res) {
 
         response.data = getHcpViewModel(hcpUser.dataValues);
 
-        await ArchiveService.archiveData({
+        await archiveService.archiveData({
             object_id: hcpUser.id,
             table_name: 'hcp_profiles',
             data: JSON.stringify(hcpUser.dataValues),
