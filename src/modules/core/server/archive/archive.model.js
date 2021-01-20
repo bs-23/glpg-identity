@@ -4,7 +4,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
-const Archive = sequelize.cdpConnector.define('archives', {
+const Archive = sequelize.cdpConnector.define('archive', {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -13,14 +13,14 @@ const Archive = sequelize.cdpConnector.define('archives', {
     },
     table_name: {
         type: DataTypes.ENUM,
-        values: ['users', 'hcp_profiles', 'consents', 'faq', 'applications', 'hcp_archives', 'permission_sets', 'roles', 'consent_countries', 'consent_categories', 'consent_locales', 'partner_requests']
+        values: ['hcp_profiles', 'partner_requests']
     },
     object_id: {
         type: DataTypes.STRING
     },
     data: {
         allowNull: false,
-        type: DataTypes.STRING(5000)
+        type: DataTypes.STRING(10000)
     },
     actor: {
         allowNull: false,
@@ -31,9 +31,10 @@ const Archive = sequelize.cdpConnector.define('archives', {
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
-    tableName: 'archives',
-    timestamps: false,
+    tableName: 'archive',
+    timestamps: true,
     createdAt: 'created_at',
+    updatedAt: 'updated_at'
 });
 
 module.exports = Archive;
