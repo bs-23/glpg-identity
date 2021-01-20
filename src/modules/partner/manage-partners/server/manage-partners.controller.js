@@ -6,34 +6,11 @@ const { QueryTypes, Op } = require('sequelize');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const PartnerRequest = require(path.join(process.cwd(), 'src/modules/partner/manage-requests/server/partner-request.model'));
-const multer = require('multer');
 const storageService = require(path.join(process.cwd(), 'src/config/server/lib/storage-service/storage.service'));
-const Files = require(path.join(process.cwd(), 'src/config/server/lib/storage-service/file.model'));
+const File = require(path.join(process.cwd(), 'src/config/server/lib/storage-service/file.model'));
 
 const FILE_SIZE_LIMIT = 5242880; // 5 MB
 
-async function parseMultipartFormData(req, res) {
-    const upload = multer({ storage: multer.memoryStorage() }).array('documents', 5);
-
-    return await new Promise(function (resolve, reject) {
-        upload(req, res, function (err) {
-            if (req.fileValidationError) {
-                reject(req.fileValidationError);
-                return;
-            } else if (err instanceof multer.MulterError) {
-                reject(err);
-                return;
-            } else if (err) {
-                reject(err);
-                return;
-            }
-
-            const files = req.files;
-            const fields = req.body;
-            resolve({ fields, files });
-        });
-    });
-}
 
 async function uploadDucuments(owner, type, files) {
     const fileEntities = [];
@@ -46,12 +23,20 @@ async function uploadDucuments(owner, type, files) {
             fileContent: file.buffer
         };
 
+        const tableNames = {
+            hcp: 'partner_hcps',
+            hco: 'partner_hcos',
+            vendor: 'partner_vendors',
+            wholesaler: 'partner_vendors',
+        };
+
         const response = await storageService.upload(uploadOptions);
-        const fileCreated = await Files.create({
+        const fileCreated = await File.create({
             name: file.originalname,
             bucket,
             key: response.key,
-            owner_id: owner.id
+            owner_id: owner.id,
+            table_name: tableNames[type]
         });
         fileEntities.push(fileCreated.dataValues);
     };
@@ -100,7 +85,7 @@ async function getPartnerHcp(req, res) {
 
         if (!partnerHcp) return res.status(404).send('The partner does not exist');
 
-        const documents = await Files.findAll({ where: { owner_id: partnerHcp.id } });
+        const documents = await File.findAll({ where: { owner_id: partnerHcp.id } });
 
         partnerHcp.dataValues.documents = documents.map(d => ({
             name: d.dataValues.name,
@@ -117,11 +102,11 @@ async function getPartnerHcp(req, res) {
 async function createPartnerHcp(req, res) {
     const response = new Response({}, []);
     try {
-        const { fields, files } = await parseMultipartFormData(req, res);
+        const files = req.files;
 
         const { request_id, first_name, last_name, address, city, post_code, email, telephone,
             type, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
-            iban, bank_name, bank_account_no, currency } = fields;
+            iban, bank_name, bank_account_no, currency } = req.body;
 
         if (!request_id) response.errors.push(new CustomError('Request ID is missing.', 400, 'request_id'));
         if (!first_name) response.errors.push(new CustomError('First name is missing.', 400, 'first_name'));
@@ -258,7 +243,7 @@ async function getPartnerHco(req, res) {
 
         if (!partnerHco) return res.status(404).send('The partner does not exist');
 
-        const documents = await Files.findAll({ where: { owner_id: partnerHco.id } });
+        const documents = await File.findAll({ where: { owner_id: partnerHco.id } });
 
         partnerHco.dataValues.documents = documents.map(d => ({
             name: d.dataValues.name,
@@ -275,9 +260,9 @@ async function getPartnerHco(req, res) {
 async function createPartnerHco(req, res) {
     const response = new Response({}, []);
     try {
-        const { fields, files } = await parseMultipartFormData(req, res);
+        const files = req.files;
 
-        const { request_id, contact_first_name, contact_last_name, name, address, city, post_code, email, telephone, type, registration_number, iban, bank_name, bank_account_no, currency } = fields;
+        const { request_id, contact_first_name, contact_last_name, name, address, city, post_code, email, telephone, type, registration_number, iban, bank_name, bank_account_no, currency } = req.body;
 
         if (!request_id) response.errors.push(new CustomError('Request ID is missing.', 400, 'request_id'));
         if (!contact_first_name) response.errors.push(new CustomError('Contact first name is missing.', 400, 'contact_first_name'));
@@ -411,7 +396,7 @@ async function getPartnerVendor(req, res) {
 
         if (!partnerVendor) return res.status(404).send('The partner does not exist');
 
-        const documents = await Files.findAll({ where: { owner_id: partnerVendor.id } });
+        const documents = await File.findAll({ where: { owner_id: partnerVendor.id } });
 
         partnerVendor.dataValues.documents = documents.map(d => ({
             name: d.dataValues.name,
@@ -428,9 +413,9 @@ async function getPartnerVendor(req, res) {
 async function createPartnerVendor(req, res) {
     const response = new Response({}, []);
     try {
-        const { fields, files } = await parseMultipartFormData(req, res);
+        const files = req.files;
 
-        const { request_id, type, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency } = fields;
+        const { request_id, type, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency } = req.body;
 
         if (!request_id) response.errors.push(new CustomError('Request ID is missing.', 400, 'request_id'));
         if (!type) response.errors.push(new CustomError('Vendor type is missing.', 400, 'type'));

@@ -3,7 +3,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
-const Files = sequelize.cdpConnector.define('files', {
+const File = sequelize.cdpConnector.define('files', {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -24,6 +24,10 @@ const Files = sequelize.cdpConnector.define('files', {
     },
     owner_id: {
         type: DataTypes.UUID
+    },
+    table_name: {
+        allowNull: false,
+        type: DataTypes.STRING
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
@@ -33,4 +37,4 @@ const Files = sequelize.cdpConnector.define('files', {
     updatedAt: 'updated_at'
 });
 
-module.exports = Files;
+module.exports = File;
