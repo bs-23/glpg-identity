@@ -32,29 +32,29 @@ async function init() {
     `);
 
     const Application = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.model'));
-    const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
+    const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model'));
     const ConsentCategory = require(path.join(process.cwd(), 'src/modules/consent/server/consent-category.model'));
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
     const ConsentLocale = require(path.join(process.cwd(), 'src/modules/consent/server/consent-locale.model'));
     const ConsentCountry = require(path.join(process.cwd(), 'src/modules/consent/server/consent-country.model'));
-    const UserProfile = require(path.join(process.cwd(), "src/modules/platform/profile/server/user-profile.model.js"));
-    const ServiceCategory = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/service-category.model.js"));
-    const PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permission-set.model.js"));
-    const PermissionSet_ServiceCategory = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-serviceCategory.model.js"));
-    const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-application.model.js"));
-    const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/userProfile-permissionSet.model.js"));
-    require(path.join(process.cwd(), "src/modules/platform/role/server/role.model.js"));
-    require(path.join(process.cwd(), "src/modules/platform/role/server/user-role.model.js"));
+    const UserProfile = require(path.join(process.cwd(), "src/modules/platform/profile/server/user-profile.model"));
+    const ServiceCategory = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/service-category.model"));
+    const PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permission-set.model"));
+    const PermissionSet_ServiceCategory = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-serviceCategory.model"));
+    const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-application.model"));
+    const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/userProfile-permissionSet.model"));
+    require(path.join(process.cwd(), "src/modules/platform/role/server/role.model"));
+    require(path.join(process.cwd(), "src/modules/platform/role/server/user-role.model"));
     require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
-    const Faq = require(path.join(process.cwd(), 'src/modules/platform/faq/server/faq.model.js'));
+    const Faq = require(path.join(process.cwd(), 'src/modules/platform/faq/server/faq.model'));
     require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model'));
     require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-profile.model'));
     require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-consents.model'));
-    require(path.join(process.cwd(), 'src/modules/platform/user/server/reset-password.model.js'));
-    require(path.join(process.cwd(), 'src/modules/core/server/password/password-history.model.js'));
-    require(path.join(process.cwd(), 'src/modules/core/server/filter/filter.model.js'));
-    require(path.join(process.cwd(), 'src/modules/platform/application/server/data.model.js'));
-    require(path.join(process.cwd(), 'src/modules/core/server/archiving/archives.model.js'));
+    require(path.join(process.cwd(), 'src/modules/platform/user/server/reset-password.model'));
+    require(path.join(process.cwd(), 'src/modules/core/server/password/password-history.model'));
+    require(path.join(process.cwd(), 'src/modules/core/server/filter/filter.model'));
+    require(path.join(process.cwd(), 'src/modules/platform/application/server/data.model'));
+    require(path.join(process.cwd(), 'src/modules/core/server/archive/archive.model'));
 
     await sequelize.cdpConnector.sync();
 
@@ -351,8 +351,8 @@ async function init() {
                     id: '2b9fa7f9-2c1e-4621-a091-5e4bf539b875',
                     category_id: '59953d51-2449-4b65-950f-9f88654019bb',
                     legal_basis: 'consent',
-                    preference: 'Sharing Personal Data With 3rd Parties',
-                    slug: makeCustomSlug('Sharing Personal Data With 3rd Parties'),
+                    preference: 'Accurate Information Confirmation',
+                    slug: makeCustomSlug('Accurate Information Confirmation'),
                     is_active: true,
                     created_by: admin.id,
                     updated_by: admin.id
