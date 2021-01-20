@@ -16,7 +16,7 @@ const Archive = sequelize.cdpConnector.define('archive', {
         values: ['hcp_profiles', 'partner_requests']
     },
     object_id: {
-        type: DataTypes.STRING
+        type: DataTypes.UUID
     },
     data: {
         allowNull: false,
