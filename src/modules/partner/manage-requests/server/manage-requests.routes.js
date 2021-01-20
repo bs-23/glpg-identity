@@ -1,18 +1,20 @@
-const passport = require('passport');
 const path = require("path");
+const passport = require('passport');
 const controller = require('./manage-requests.controller');
+const { Modules } = require('../../../core/server/authorization/authorization.constants');
+const { ModuleGuard } = require('../../../core/server/authorization/authorization.middleware');
 const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/platform/user/server/user-authentication.middleware.js'));
 
 module.exports = app => {
     app.route('/api/partner-requests')
-        .get(controller.getPartnerRequests)
-        .post(controller.createPartnerRequest);
+        .get(CDPAuthStrategy, controller.getPartnerRequests)
+        .post(CDPAuthStrategy, controller.createPartnerRequest);
 
     app.route('/api/partner-requests/:id')
-        .get(controller.getPartnerRequest)
-        .put(controller.updatePartnerRequest)
-        .delete(controller.deletePartnerRequest);
+        .get(CDPAuthStrategy, controller.getPartnerRequest)
+        .put(CDPAuthStrategy, controller.updatePartnerRequest)
+        .delete(CDPAuthStrategy, controller.deletePartnerRequest);
 
     app.route('/api/partner-requests/:id/send-form')
-        .post(controller.sendForm);
+        .post(CDPAuthStrategy, controller.sendForm);
 };

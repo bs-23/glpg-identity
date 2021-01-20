@@ -6,6 +6,8 @@ const HcoPartner = require('../../manage-partners/server/partner-hco.model');
 const { QueryTypes, Op } = require('sequelize');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
+const ArchiveService = require(path.join(process.cwd(), 'src/modules/core/server/archiving/archives.service.js'));
+const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
 async function getPartnerRequests(req, res) {
@@ -194,9 +196,21 @@ async function deletePartnerRequest(req, res) {
         const partnerRequest = await PartnerRequest.findOne({ where: { id } });
         if (!partnerRequest) return res.status(404).send('The partner request does not exist.');
 
-        const deleted = await PartnerRequest.destroy({ where: { id } });
+        await ArchiveService.archiveData({
+            object_id: partnerRequest.id,
+            table_name: 'partner_requests',
+            data: JSON.stringify(partnerRequest.dataValues),
+            actor: req.user.id
+        });
 
-        if (!deleted) return res.status(400).send('Delete failed.');
+        await logService.log({
+            event_type: 'CREATE',
+            object_id: partnerRequest.id,
+            table_name: 'archives',
+            actor: req.user.id
+        });
+
+        await partnerRequest.destroy();
 
         res.json(partnerRequest);
     } catch (err) {

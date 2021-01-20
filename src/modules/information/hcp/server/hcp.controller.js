@@ -7,7 +7,7 @@ const validator = require('validator');
 const { QueryTypes, Op, where, col, fn } = require('sequelize');
 const Hcp = require('./hcp-profile.model');
 const DatasyncHcp = require('./datasync-hcp-profile.model');
-const HcpArchives = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-archives.model'));
+const ArchiveService = require(path.join(process.cwd(), 'src/modules/core/server/archiving/archives.service.js'));
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-consents.model'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
@@ -748,6 +748,7 @@ async function createHcpProfile(req, res) {
             await Promise.all(req.body.consents.map(async consent => {
                 const preferenceId = Object.keys(consent)[0];
                 const consentResponse = Object.values(consent)[0];
+                let richTextLocale = `${language_code}_${country_iso2}`;
 
                 if (!consentResponse) return;
 
@@ -799,9 +800,11 @@ async function createHcpProfile(req, res) {
                     consentLocale = await ConsentLocale.findOne({
                         where: {
                             consent_id: preferenceId,
-                            locale: { [Op.iLike]: `%${localeUsingParentCountryISO}` }
+                            locale: { [Op.iLike]: localeUsingParentCountryISO }
                         }
                     });
+
+                    richTextLocale = localeUsingParentCountryISO;
                 }
 
                 if (!consentLocale) {
@@ -818,6 +821,7 @@ async function createHcpProfile(req, res) {
                     consent_confirmed: consentCountry.opt_type === 'double-opt-in' ? false : true,
                     opt_type: consentCountry.opt_type,
                     rich_text: consentLocale.rich_text,
+                    locale: richTextLocale,
                     created_by: req.user.id,
                     updated_by: req.user.id
                 });
@@ -1020,14 +1024,20 @@ async function rejectHCPUser(req, res) {
             return res.status(400).send(response);
         }
 
-        await HcpArchives.create({ ...hcpUser.dataValues, status: 'rejected' });
-
         response.data = getHcpViewModel(hcpUser.dataValues);
+
+        await ArchiveService.archiveData({
+            object_id: hcpUser.id,
+            table_name: 'hcp_profiles',
+            data: JSON.stringify(hcpUser.dataValues),
+            actor: req.user.id,
+            remarks: (req.body.comment || '').trim()
+        });
 
         await logService.log({
             event_type: 'CREATE',
             object_id: hcpUser.id,
-            table_name: 'hcp_archives',
+            table_name: 'archives',
             actor: req.user.id,
             remarks: (req.body.comment || '').trim()
         });
