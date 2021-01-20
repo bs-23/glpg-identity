@@ -7,6 +7,8 @@ import Modal from 'react-bootstrap/Modal'
 import { useToasts } from 'react-toast-notifications';
 import parse from 'html-react-parser';
 import Dropdown from 'react-bootstrap/Dropdown';
+import validator from 'validator';
+
 import { createConsent, updateConsent } from '../consent.actions';
 import CountryCodes from 'country-codes-list';
 import { consentSchema } from '../consent.schema';
@@ -162,9 +164,9 @@ const ConsentForm = (props) => {
                             <div className="form-group">
                                 <label className="font-weight-bold" htmlFor={richTextId}>Rich Text <span className="text-danger">*</span></label>
                                 <div className="border rounded draft-editor">
-                                    <DraftEditor htmlContent={item.rich_text} onChangeHTML={(html, { plainText, cleanupEmptyHtmlTags }) => {
+                                    <DraftEditor htmlContent={item.rich_text} onChangeHTML={(html, { plainText, cleanupEmptyHtmlTags, escapedLength }) => {
                                         const rich_text = cleanupEmptyHtmlTags(html);
-                                        if (plainText.trim().length === 0 || rich_text.length > 976) setShowError(true);
+                                        if (plainText.trim().length === 0 || escapedLength > 976) setShowError(true);
                                         else setShowError(false);
                                         handleChange({
                                             target: {
@@ -178,7 +180,7 @@ const ConsentForm = (props) => {
                                     }}/>
                                 </div>
                                 {showError && (item.rich_text.length === 0 || item.rich_text === '<p><br></p>' || item.rich_text.replace(/&nbsp;/g, '') === '<p></p>') && <div class="invalid-feedback">This field must not be empty.</div>}
-                                {showError && item.rich_text.length > 976 && <div class="invalid-feedback">Maximum character limit has been exceeded.</div>}
+                                {showError && validator.escape(item.rich_text).length > 976 && <div class="invalid-feedback">Maximum character limit has been exceeded.</div>}
                             </div>
                         </div>
                     </div>
@@ -248,7 +250,15 @@ const ConsentForm = (props) => {
                                             onSubmit={(values, actions) => {
                                                 values.is_active = isActive;
 
-                                                const validTranslations = translations.filter(item => item.country_iso2 && item.lang_code && item.rich_text && item.rich_text !== '<p><br></p>' && item.rich_text.replace(/&nbsp;/g, '') !== '<p></p>');
+                                                const validTranslations = translations.filter(item =>
+                                                    item.country_iso2 &&
+                                                    item.lang_code &&
+                                                    item.rich_text &&
+                                                    item.rich_text !== '<p><br></p>' &&
+                                                    item.rich_text.replace(/&nbsp;/g, '') !== '<p></p>' &&
+                                                    validator.escape(item.rich_text).length > 976
+                                                );
+
                                                 if (translations.length !== validTranslations.length) {
                                                     setShowError(true);
                                                     return;
