@@ -166,7 +166,7 @@ paths:
             requestBody:
                 required: true
                 content:
-                    application/json:
+                    multipart/form-data:
                         schema:
                             type: object
                             properties:
@@ -239,10 +239,11 @@ paths:
                                     type: string
                                 currency:
                                     type: string
-                                document_urls:
+                                documents:
                                     type: array
                                     items:
                                         type: string
+                                        format: binary
                             required:
                               - request_id
                               - name
@@ -450,7 +451,7 @@ components:
                     type: string
                 currency:
                     type: string
-                document_urls:
+                documens:
                     type: array
                     items:
                         type: string

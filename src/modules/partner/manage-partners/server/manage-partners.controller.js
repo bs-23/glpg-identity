@@ -10,8 +10,10 @@ const multer = require('multer');
 const storageService = require(path.join(process.cwd(), 'src/config/server/lib/storage-service/storage.service'));
 const Files = require(path.join(process.cwd(), 'src/config/server/lib/storage-service/file.model'));
 
+const FILE_SIZE_LIMIT = 5242880; // 5 MB
+
 async function parseMultipartFormData(req, res) {
-    const upload = multer({ storage: multer.memoryStorage() }).array('documents', 10);
+    const upload = multer({ storage: multer.memoryStorage() }).array('documents', 5);
 
     return await new Promise(function (resolve, reject) {
         upload(req, res, function (err) {
@@ -33,13 +35,13 @@ async function parseMultipartFormData(req, res) {
     });
 }
 
-async function uploadDucuments(owner, files) {
+async function uploadDucuments(owner, type, files) {
     const fileEntities = [];
     const bucket = 'cdp-development';
     for (const file of files) {
         const uploadOptions = {
             bucket,
-            folder: 'documents/partner/hcp/',
+            folder: `documents/partner/${type}/${owner.id}/`,
             fileName: file.originalname,
             fileContent: file.buffer
         };
@@ -102,7 +104,7 @@ async function getPartnerHcp(req, res) {
 
         partnerHcp.dataValues.documents = documents.map(d => ({
             name: d.dataValues.name,
-            key: d.dataValues.key
+            id: d.dataValues.id
         }));
 
         res.json(partnerHcp);
@@ -130,8 +132,8 @@ async function createPartnerHcp(req, res) {
         const fileWithInvalidType = files.find(f => f.mimetype !== 'application/pdf');
         if (fileWithInvalidType) response.errors.push(new CustomError('Invalid file type. Only PDF is allowed.', 400, 'documents'));
 
-        const fileWithInvalidSize = files.find(f => f.size > 10485760);
-        if (fileWithInvalidSize) response.errors.push(new CustomError('Invalid file size. Size limit is 10 MB', 400, 'documents'));
+        const fileWithInvalidSize = files.find(f => f.size > FILE_SIZE_LIMIT);
+        if (fileWithInvalidSize) response.errors.push(new CustomError('Invalid file size. Size limit is 5 MB', 400, 'documents'));
 
         if (response.errors.length) return res.status(400).send(response);
 
@@ -175,8 +177,8 @@ async function createPartnerHcp(req, res) {
 
         await partnerRequest.update({ status: 'submitted' });
 
-        const documents = await uploadDucuments(partnerHcp, files);
-        partnerHcp.dataValues.documents = documents.map(d => `${d.bucket}/${d.key}`);
+        const documents = await uploadDucuments(partnerHcp, 'hcp', files);
+        partnerHcp.dataValues.documents = documents.map(d => d.key);
 
         delete partnerHcp.created_at;
         delete partnerHcp.updated_at;
@@ -260,7 +262,7 @@ async function getPartnerHco(req, res) {
 
         partnerHco.dataValues.documents = documents.map(d => ({
             name: d.dataValues.name,
-            key: d.dataValues.key
+            id: d.dataValues.id
         }));
 
         res.json(partnerHco);
@@ -287,8 +289,8 @@ async function createPartnerHco(req, res) {
         const fileWithInvalidType = files.find(f => f.mimetype !== 'application/pdf');
         if (fileWithInvalidType) response.errors.push(new CustomError('Invalid file type. Only PDF is allowed.', 400, 'documents'));
 
-        const fileWithInvalidSize = files.find(f => f.size > 10485760);
-        if (fileWithInvalidSize) response.errors.push(new CustomError('Invalid file size. Size limit is 10 MB', 400, 'documents'));
+        const fileWithInvalidSize = files.find(f => f.size > FILE_SIZE_LIMIT);
+        if (fileWithInvalidSize) response.errors.push(new CustomError('Invalid file size. Size limit is 5 MB', 400, 'documents'));
 
         if (response.errors.length) return res.status(400).send(response);
 
@@ -330,8 +332,8 @@ async function createPartnerHco(req, res) {
 
         await partnerRequest.update({ status: 'submitted' });
 
-        const documents = await uploadDucuments(partnerHco, files);
-        partnerHco.dataValues.documents = documents.map(d => `${d.bucket}/${d.key}`);
+        const documents = await uploadDucuments(partnerHco, 'hco', files);
+        partnerHco.dataValues.documents = documents.map(d => d.key);
 
         delete partnerHco.created_at;
         delete partnerHco.updated_at;
@@ -409,6 +411,13 @@ async function getPartnerVendor(req, res) {
 
         if (!partnerVendor) return res.status(404).send('The partner does not exist');
 
+        const documents = await Files.findAll({ where: { owner_id: partnerVendor.id } });
+
+        partnerVendor.dataValues.documents = documents.map(d => ({
+            name: d.dataValues.name,
+            id: d.dataValues.id
+        }));
+
         res.json(partnerVendor);
     } catch (err) {
         console.error(err);
@@ -419,7 +428,9 @@ async function getPartnerVendor(req, res) {
 async function createPartnerVendor(req, res) {
     const response = new Response({}, []);
     try {
-        const { request_id, type, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency, document_urls } = req.body;
+        const { fields, files } = await parseMultipartFormData(req, res);
+
+        const { request_id, type, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency } = fields;
 
         if (!request_id) response.errors.push(new CustomError('Request ID is missing.', 400, 'request_id'));
         if (!type) response.errors.push(new CustomError('Vendor type is missing.', 400, 'type'));
@@ -428,6 +439,12 @@ async function createPartnerVendor(req, res) {
         if (!address) response.errors.push(new CustomError('Address is missing.', 400, 'address'));
         if (!city) response.errors.push(new CustomError('City is missing.', 400, 'city'));
         if (!ordering_email) response.errors.push(new CustomError('Ordering email address is missing.', 400, 'ordering_email'));
+
+        const fileWithInvalidType = files.find(f => f.mimetype !== 'application/pdf');
+        if (fileWithInvalidType) response.errors.push(new CustomError('Invalid file type. Only PDF is allowed.', 400, 'documents'));
+
+        const fileWithInvalidSize = files.find(f => f.size > FILE_SIZE_LIMIT);
+        if (fileWithInvalidSize) response.errors.push(new CustomError('Invalid file size. Size limit is 5 MB', 400, 'documents'));
 
         if (response.errors.length) return res.status(400).send(response);
 
@@ -449,14 +466,19 @@ async function createPartnerVendor(req, res) {
         }
 
         const data = {
-            request_id, type, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency, document_urls
+            request_id, type, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency
         };
 
         const [partnerVendor, created] = await PartnerVendors.findOrCreate({
             where: {
                 [Op.or]: [
                     { request_id: request_id },
-                    { registration_number: { [Op.iLike]: registration_number } }
+                    {
+                        [Op.and]: [
+                            { registration_number: { [Op.iLike]: registration_number } },
+                            { type: type }
+                        ]
+                    }
                 ]
             },
             defaults: data
@@ -468,6 +490,9 @@ async function createPartnerVendor(req, res) {
         }
 
         await partnerRequest.update({ status: 'submitted' });
+
+        const documents = await uploadDucuments(partnerVendor, type, files);
+        partnerVendor.dataValues.documents = documents.map(d => d.key);
 
         delete partnerVendor.created_at;
         delete partnerVendor.updated_at;
