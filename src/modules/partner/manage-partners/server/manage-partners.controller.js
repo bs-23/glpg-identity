@@ -49,10 +49,26 @@ async function getPartnerHcps(req, res) {
         const limit = req.query.limit ? +req.query.limit : 15;
         const offset = page * limit;
 
+        const orderBy = req.query.orderBy === 'null'
+            ? null
+            : req.query.orderBy;
+        const orderType = req.query.orderType === 'asc' || req.query.orderType === 'desc'
+            ? req.query.orderType
+            : 'asc';
+
+        const sortableColumns = ['first_name', 'last_name', 'status', 'uuid', 'country_iso2', 'language', 'city'];
+
+        const order = [];
+        if (orderBy && (sortableColumns || []).includes(orderBy)) {
+            order.push([orderBy, orderType]);
+        }
+
+        if (orderBy !== 'created_at') order.push(['created_at', 'DESC']);
+
         const hcpPartners = await PartnerHcps.findAll({
             offset,
             limit,
-            order: [['created_at', 'DESC']],
+            order,
             attributes: { exclude: ['created_at', 'updated_at'] }
         });
 
@@ -209,10 +225,26 @@ async function getPartnerHcos(req, res) {
         const limit = req.query.limit ? +req.query.limit : 15;
         const offset = page * limit;
 
+        const orderBy = req.query.orderBy === 'null'
+            ? null
+            : req.query.orderBy;
+        const orderType = req.query.orderType === 'asc' || req.query.orderType === 'desc'
+            ? req.query.orderType
+            : 'asc';
+
+        const sortableColumns = ['contact_first_name', 'contact_last_name', 'status', 'country_iso2', 'language', 'city'];
+
+        const order = [];
+        if (orderBy && (sortableColumns || []).includes(orderBy)) {
+            order.push([orderBy, orderType]);
+        }
+
+        if (orderBy !== 'created_at') order.push(['created_at', 'DESC']);
+
         const hcoPartners = await PartnerHcos.findAll({
             offset,
             limit,
-            order: [['created_at', 'DESC']],
+            order,
             attributes: { exclude: ['created_at', 'updated_at'] }
         });
 
@@ -363,11 +395,27 @@ async function getPartnerVendors(req, res) {
         const limit = req.query.limit ? +req.query.limit : 15;
         const offset = page * limit;
 
+        const orderBy = req.query.orderBy === 'null'
+            ? null
+            : req.query.orderBy;
+        const orderType = req.query.orderType === 'asc' || req.query.orderType === 'desc'
+            ? req.query.orderType
+            : 'asc';
+
+        const sortableColumns = ['requestor_first_name', 'requestor_last_name', 'status', 'country_iso2', 'language', 'city'];
+
+        const order = [];
+        if (orderBy && (sortableColumns || []).includes(orderBy)) {
+            order.push([orderBy, orderType]);
+        }
+
+        if (orderBy !== 'created_at') order.push(['created_at', 'DESC']);
+
         const partnerVendors = await PartnerVendors.findAll({
             where: { type },
             offset,
             limit,
-            order: [['created_at', 'DESC']],
+            order,
             attributes: { exclude: ['created_at', 'updated_at'] }
         });
 
