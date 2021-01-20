@@ -6,8 +6,8 @@ const { QueryTypes, Op } = require('sequelize');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const PartnerRequest = require(path.join(process.cwd(), 'src/modules/partner/manage-requests/server/partner-request.model'));
-const storageService = require(path.join(process.cwd(), 'src/config/server/lib/storage-service/storage.service'));
-const File = require(path.join(process.cwd(), 'src/config/server/lib/storage-service/file.model'));
+const storageService = require(path.join(process.cwd(), 'src/modules/core/server/storage/storage.service'));
+const File = require(path.join(process.cwd(), 'src/modules/core/server/storage/file.model'));
 
 const FILE_SIZE_LIMIT = 5242880; // 5 MB
 
