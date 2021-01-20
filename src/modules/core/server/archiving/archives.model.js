@@ -32,7 +32,7 @@ const Archive = sequelize.cdpConnector.define('archives', {
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
     tableName: 'archives',
-    timestamps: false,
+    timestamps: true,
     createdAt: 'created_at',
 });
 
