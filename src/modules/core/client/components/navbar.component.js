@@ -2,9 +2,10 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { useCookies } from 'react-cookie';
 import { useHistory } from 'react-router-dom';
+import { Nav, Navbar, NavDropdown } from "react-bootstrap";
 import _ from 'lodash';
 
-export default function Navbar() {
+export default function Navigationbar() {
     const [, setCookie, removeCookie] = useCookies();
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
     const countries = useSelector(state => state.countryReducer.countries);
@@ -51,7 +52,7 @@ export default function Navbar() {
     return (
         <header className="app__header py-1 shadow-sm">
             <div className="container-fluid">
-                <div className="row align-items-center">
+                <div className="row align-items-center d-none d-sm-flex">
                     <div className="col-3">
                         <div className="d-flex">
                             <h1 className="text-center">
@@ -88,6 +89,37 @@ export default function Navbar() {
                         </div>
                     </div>
                 </div>
+                <Navbar collapseOnSelect expand={false} className="d-flex p-0 d-sm-none">
+                    <Navbar.Brand href="#home">
+                        <h1 className="text-center">
+                            <a href="/"> <img alt="CDP LOGO" src="/assets/CDP.png" height="50" /></a>
+                        </h1>
+                    </Navbar.Brand>
+                    <Navbar.Toggle aria-controls="responsive-navbar-nav"><i className="fas fa-bars py-1 cdp-text-primary"></i></Navbar.Toggle>
+                    <Navbar.Collapse id="responsive-navbar-nav" className="cdp-light-bg">
+                        <div className="text-right">
+                            <Navbar.Toggle className="in-submenu" aria-controls="responsive-navbar-nav">
+                                <i className="fas fa-times fa-2x"></i>
+                            </Navbar.Toggle>
+                        </div>
+                        {loggedInUser.type !== 'admin' && <div className="">
+                            {userApplications.length > 0 && <div className="px-2 border-bottom pb-2 mb-2">
+                                <label className="d-block">Application</label>
+                                {renderApplicationIcon()}
+                            </div>}
+                            {userCountries.length > 0 && <div className="px-2 border-bottom pb-2 mb-2">
+                                <label className="d-block">Countries</label>
+                                {renderCountryIcons()}
+                            </div>}
+                        </div>}
+                        <div className="border-bottom mb-2">
+                            <a className="d-flex align-items-center p-2" onClick={myProfileClickHandler} href="/api/logout"><i className="icon icon-user-round mr-2 app__header-icon-user "></i> {first_name + " " + last_name}</a>
+                        </div>
+                        <div className="">
+                            <a className="d-flex align-items-center p-2" onClick={handleLogOut} href="/api/logout"><i className="icon icon-logout mr-2 app__header-icon-logout"></i> Sign out</a>
+                        </div>
+                    </Navbar.Collapse>
+                </Navbar>
             </div>
         </header>
     );
