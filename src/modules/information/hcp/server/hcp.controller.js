@@ -207,6 +207,16 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
             };
         }
 
+        if (filterObj.fieldName === 'specialty') {
+            return {
+                [Op.or]: [
+                    { specialty_1_code: filterObj.value },
+                    { specialty_2_code: filterObj.value },
+                    { specialty_3_code: filterObj.value }
+                ]
+            };
+        }
+
         return filterService.getFilterQuery(filterObj);
     };
 
