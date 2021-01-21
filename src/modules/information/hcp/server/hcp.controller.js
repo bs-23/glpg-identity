@@ -1740,28 +1740,54 @@ async function getHcpsFromDatasync(req, res) {
 
         const totalUsers = await DatasyncHcp.count({ where: filterOptions });
 
-        const individualIdOnekeyList = hcps.map(h => h.individual_id_onekey);
-        const hcpSpecialties = await sequelize.datasyncConnector.query(`
-            SELECT h.*, s.cod_description, s.cod_locale
-            FROM ciam.vwmaphcpspecialty AS h
-            INNER JOIN ciam.vwspecialtymaster AS s
-            ON (h.specialty_code = s.cod_id_onekey)
-            WHERE individual_id_onekey = ANY($individualIdOnekeyList) AND cod_locale='en'`, {
-            bind: {
-                individualIdOnekeyList: individualIdOnekeyList,
-            },
-            type: QueryTypes.SELECT
-        });
+        // const individualIdOnekeyList = hcps.map(h => h.individual_id_onekey);
+        // const hcpSpecialties = await sequelize.datasyncConnector.query(`
+        //     SELECT h.*, s.cod_description, s.cod_locale
+        //     FROM ciam.vwmaphcpspecialty AS h
+        //     INNER JOIN ciam.vwspecialtymaster AS s
+        //     ON (h.specialty_code = s.cod_id_onekey)
+        //     WHERE individual_id_onekey = ANY($individualIdOnekeyList) AND cod_locale='en'`, {
+        //     bind: {
+        //         individualIdOnekeyList: individualIdOnekeyList,
+        //     },
+        //     type: QueryTypes.SELECT
+        // });
 
-        if (hcpSpecialties) {
-            hcps.forEach(hcp => {
-                const specialties = hcpSpecialties.filter(s => s.individual_id_onekey === hcp.individual_id_onekey);
-                hcp.dataValues.specialties = specialties.map(s => ({
-                    description: s.cod_description,
-                    code: s.specialty_code
-                }));
-            });
-        }
+        // if (hcpSpecialties) {
+        //     hcps.forEach(hcp => {
+        //         const specialties = hcpSpecialties.filter(s => s.individual_id_onekey === hcp.individual_id_onekey);
+        //         hcp.dataValues.specialties = specialties.map(s => ({
+        //             description: s.cod_description,
+        //             code: s.specialty_code
+        //         }));
+        //     });
+        // }
+
+        hcps.forEach(hcp => {
+            const specialties = [
+                {
+                    description: hcp.specialty_1_long_description,
+                    code: hcp.specialty_1_code
+                },
+                {
+                    description: hcp.specialty_2_long_description,
+                    code: hcp.specialty_2_code
+                },
+                {
+                    description: hcp.specialty_3_long_description,
+                    code: hcp.specialty_3_code
+                }
+            ];
+            const filtered = specialties.filter(s => s.code);
+            hcp.dataValues.specialties = filtered;
+
+            delete hcp.dataValues.specialty_1_long_description;
+            delete hcp.dataValues.specialty_1_code;
+            delete hcp.dataValues.specialty_2_long_description;
+            delete hcp.dataValues.specialty_2_code;
+            delete hcp.dataValues.specialty_3_long_description;
+            delete hcp.dataValues.specialty_3_code;
+        });
 
         const data = {
             users: hcps,

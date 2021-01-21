@@ -39,7 +39,12 @@ const DatasyncHcpProfile = sequelize.datasyncConnector.define('vwhcpmaster', {
     donotmail: { type: DataTypes.STRING },
     donotfax: { type: DataTypes.STRING },
     ind_privacylawenabled: { type: DataTypes.STRING },
-    ind_prefixname_desc: { type: DataTypes.STRING },
+    specialty_1_long_description: { type: DataTypes.STRING },
+    specialty_1_code: { type: DataTypes.STRING },
+    specialty_2_long_description: { type: DataTypes.STRING },
+    specialty_2_code: { type: DataTypes.STRING },
+    specialty_3_long_description: { type: DataTypes.STRING },
+    specialty_3_code: { type: DataTypes.STRING }
 }, {
     schema: `ciam`,
     tableName: 'vwhcpmaster',
