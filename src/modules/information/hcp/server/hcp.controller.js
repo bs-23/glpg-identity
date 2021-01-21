@@ -250,19 +250,38 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
         prevOperator = node === "and" || node === "or" ? node : prevOperator;
     }
 
+    const operatorSymbols = Object.getOwnPropertySymbols(customFilter);
+
     if (groupedQueries.length > 1) {
-        customFilter[Op.or] = groupedQueries.map(q => {
+        const queryValue = groupedQueries.map(q => {
             if (q.operator === 'and') {
                 return { [Op.and]: q.values };
             }
             return q;
         });
+        if (operatorSymbols[0] && operatorSymbols[0].toString() === 'Symbol(or)') {
+            customFilter = {
+                [Op.and]: [
+                    customFilter,
+                    { [Op.or]: queryValue }
+                ]
+            };
+        } else {
+            customFilter[Op.or] = queryValue;
+        }
     } else {
         const query = groupedQueries[0];
         if (query.operator === 'and') {
             customFilter[Op.and] = query.values;
         } else {
-            customFilter = { ...customFilter, ...query };
+            customFilter = operatorSymbols[0] && operatorSymbols[0].toString() === 'Symbol(or)'
+                ? {
+                    [Op.and]: [
+                        customFilter,
+                        query
+                    ]
+                }
+                : { ...customFilter, ...query };
         }
     }
 
