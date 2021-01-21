@@ -2,6 +2,7 @@ import { string, array } from 'yup';
 
 import { operators } from '../../../../core/client/components/MultiFilter';
 import SpecialtyFilter from './specialty-filter.component';
+import store from '../../../../core/client/store';
 
 export function getFilterOptions(userCountries, userApplications) {
     const statusOptions = [
@@ -90,10 +91,21 @@ export function getDatasyncFilterOptions(userCountries) {
         { value: 'STA.9', displayText: 'Invalid' }
     ];
 
-    // const specialtyOptions = [
-    //     { value: 'SP.WBE.36', displayText: 'Pneumology' },
-    //     { value: 'SP.WBE.49', displayText: 'Rheumatology' }
-    // ];
+    const getSpecialtyOptions = (filter) => {
+        const { country } = filter;
+
+        if(!country) return [];
+
+        const { specialties } = store.getState().hcpReducer;
+        const country_local_code = `${country.toLowerCase()}_en`;
+        const specialtyOptions = (specialties[country_local_code] || []).map(s => ({
+            value: s.cod_id_onekey,
+            label: s.cod_description,
+            displayText: s.cod_description
+        }));
+
+        return specialtyOptions;
+    }
 
     const filterOptions = [
         {
@@ -139,6 +151,7 @@ export function getDatasyncFilterOptions(userCountries) {
             valueType: 'select',
             displayText: 'Specialty',
             operators: operators.getSelectOperators(),
+            getOptions: getSpecialtyOptions,
             customFilterComponent: SpecialtyFilter
         },
         {

@@ -171,6 +171,7 @@ const AddFilter = (props) => {
                         if (CustomFilterComponent) return <CustomFilterComponent
                             title={index+1}
                             index={index}
+                            filter={filter}
                             fieldValue={filter.fieldName}
                             operatorValue={filter.operator}
                             value={filter.value}

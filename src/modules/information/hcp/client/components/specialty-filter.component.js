@@ -8,9 +8,7 @@ const SpecialtyFilter = (props) => {
     const {
         title,
         index,
-        value,
-        fieldValue,
-        operatorValue,
+        filter,
         filterOptions,
         isTouched,
         validationError,
@@ -18,10 +16,12 @@ const SpecialtyFilter = (props) => {
         onRemove
     } = props;
 
-    const [selectedCountry, setSelectedCountry] = useState(null);
     const countries = useSelector(state => state.countryReducer.countries);
-    const specialties = useSelector(state => state.hcpReducer.specialties);
     const dispatch = useDispatch();
+
+    const { value, fieldName, operator } = filter;
+
+    const currentFilterOption = filterOptions.find(fo => fo.fieldName === fieldName);
 
     const getCountryOptions = () => {
         const countryOptions = countries.map(c => ({ label: c.codbase_desc, value: c.country_iso2 }));
@@ -29,27 +29,20 @@ const SpecialtyFilter = (props) => {
     }
 
     const getSelectedCountry = () => {
-        const country = countries.find(c => c.country_iso2 === selectedCountry);
+        const country = countries.find(c => c.country_iso2 === filter.country);
         if (!country) return [];
         return { value: country.country_iso2, label: country.codbase_desc };
     }
 
-    const getSpecialtyOptions = () => {
-        if(!selectedCountry) return [];
-        const countryLocaleCode = `${selectedCountry.toLowerCase()}_en`;
-        const specialtiesForSelectedCountry = specialties[countryLocaleCode] || [];
-        const specialtyOptions = specialtiesForSelectedCountry.map(s => ({ value: s.cod_id_onekey, label: s.cod_description  }));
-        return specialtyOptions;
-    };
-
     const getSelectedOptions = () => {
-        const selectedOptions = getSpecialtyOptions().filter(o => (value || []).some(v => v === o.value));
+        const selectedOptions = currentFilterOption.getOptions({ country: filter.country }).filter(o => (value || []).some(v => v === o.value));
         return selectedOptions;
     };
 
     useEffect(() => {
-        if(selectedCountry) dispatch(getHCPSpecialities(selectedCountry, 'en'));
-    }, [selectedCountry]);
+        // console.log('Refetching sp......................')
+        if(filter.country) dispatch(getHCPSpecialities(filter.country, 'en'));
+    }, [filter.country]);
 
     return <div className="pb-3 mb-3 border-bottom">
         <div className="d-flex justify-content-between align-items-center">
@@ -65,7 +58,7 @@ const SpecialtyFilter = (props) => {
                 id="field"
                 as="select"
                 name="fieldName"
-                value={fieldValue}
+                value={fieldName}
                 onChange={(e) => onChange(e.target.name, e.target.value, index)}
             >
                 <option className="p-2" value=''> Select an Option </option>
@@ -82,12 +75,12 @@ const SpecialtyFilter = (props) => {
                 id="operator"
                 as="select"
                 name="operator"
-                value={operatorValue}
+                value={operator}
                 onChange={(e) => onChange(e.target.name, e.target.value, index)}
             >
                 <>
                     <option className="p-2" value=''> Select an Option </option>
-                    {filterOptions && filterOptions.find(filter => filter.fieldName === fieldValue)?.operators?.map(item => <option key={item.key} value={item.key} >{item.displayText}</option>)}
+                    {filterOptions && filterOptions.find(filter => filter.fieldName === fieldName)?.operators?.map(item => <option key={item.key} value={item.key} >{item.displayText}</option>)}
                 </>
             </Field>
             {isTouched && <div className="invalid-feedback">{validationError.operator}</div>}
@@ -106,7 +99,10 @@ const SpecialtyFilter = (props) => {
                     className="multiselect"
                     classNamePrefix="multiselect"
                     value={getSelectedCountry()}
-                    onChange={({ value }) => setSelectedCountry(value)}
+                    onChange={({ value }) => {
+                        onChange('country', value, index);
+                        // setSelectedCountry(value);
+                    }}
                 />
                 {isTouched && <div className="invalid-feedback">{validationError.value}</div>}
             </React.Fragment>
@@ -120,9 +116,9 @@ const SpecialtyFilter = (props) => {
                 <Select
                     defaultValue={[]}
                     isMulti={true}
-                    name={fieldValue}
+                    name={fieldName}
                     hideSelectedOptions={false}
-                    options={getSpecialtyOptions()}
+                    options={currentFilterOption.getOptions({ country: filter.country })}
                     className="multiselect"
                     classNamePrefix="multiselect"
                     value={getSelectedOptions()}
