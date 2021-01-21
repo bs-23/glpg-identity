@@ -1,5 +1,7 @@
 import { string, array } from 'yup';
+
 import { operators } from '../../../../core/client/components/MultiFilter';
+import SpecialtyFilter from './specialty-filter.component';
 
 export function getFilterOptions(userCountries, userApplications) {
     const statusOptions = [
@@ -88,10 +90,10 @@ export function getDatasyncFilterOptions(userCountries) {
         { value: 'STA.9', displayText: 'Invalid' }
     ];
 
-    const specialtyOptions = [
-        { value: 'SP.WBE.36', displayText: 'Pneumology' },
-        { value: 'SP.WBE.49', displayText: 'Rheumatology' }
-    ];
+    // const specialtyOptions = [
+    //     { value: 'SP.WBE.36', displayText: 'Pneumology' },
+    //     { value: 'SP.WBE.49', displayText: 'Rheumatology' }
+    // ];
 
     const filterOptions = [
         {
@@ -131,6 +133,13 @@ export function getDatasyncFilterOptions(userCountries) {
             valueType: 'text',
             displayText: 'UUID',
             operators: operators.getStringOperators()
+        },
+        {
+            fieldName: 'specialty',
+            valueType: 'select',
+            displayText: 'Specialty',
+            operators: operators.getSelectOperators(),
+            customFilterComponent: SpecialtyFilter
         },
         {
             fieldName: 'individual_id_onekey',
@@ -185,14 +194,14 @@ export function getDatasyncFilterOptions(userCountries) {
             valueType: 'text',
             displayText: 'Post Code',
             operators: operators.getStringOperators()
-        },
-        {
-            fieldName: 'specialty',
-            valueType: 'select',
-            displayText: 'Specialty',
-            operators: operators.getSelectOperators(),
-            options: specialtyOptions
         }
+        // {
+        //     fieldName: 'specialty',
+        //     valueType: 'select',
+        //     displayText: 'Specialty',
+        //     operators: operators.getSelectOperators(),
+        //     options: specialtyOptions
+        // }
     ];
 
     return filterOptions;
