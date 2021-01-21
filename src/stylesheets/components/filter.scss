@@ -189,6 +189,8 @@
             z-index: 100;
             margin: 0px;
             box-shadow: 1px 49px 400px 200px rgba(0,0,0,0.5);
+            top: 50%;
+            transform: translateY(-58%);
 
             & + .filter__add-filter::before {
                 display: none;
