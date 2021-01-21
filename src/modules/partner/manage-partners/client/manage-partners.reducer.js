@@ -8,10 +8,16 @@ const initialState = {
 export default function reducer(state = initialState, action) {
     switch (action.type) {
         case Types.GET_PARTNER_FULFILLED: {
-            console.log(action.payload.data);
             return {
                 ...state,
                 partnersData: action.payload.data
+            };
+        }
+        case Types.GET_PARTNER_BY_ID_FULFILLED: {
+            console.log(action.payload.data);
+            return {
+                ...state,
+                partner: action.payload.data
             };
         }
         case Types.POST_PARTNER_FULFILLED: {

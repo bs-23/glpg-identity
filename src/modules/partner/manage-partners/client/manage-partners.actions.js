@@ -86,3 +86,14 @@ export function getWholesalePartners(query = '') {
         })
     };
 }
+
+export function getPartnerById(id, type) {
+    return {
+        type: Types.GET_PARTNER_BY_ID,
+        payload: axios({
+            method: 'get',
+            url: `/api/partner/${type}/${id}`
+        })
+    };
+}
+

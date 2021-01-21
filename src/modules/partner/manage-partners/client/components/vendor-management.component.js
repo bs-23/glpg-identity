@@ -5,13 +5,19 @@ import Modal from 'react-bootstrap/Modal';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { useSelector, useDispatch } from 'react-redux';
 import { getHcpPartners, getHcoPartners, getVendorsPartners, getWholesalePartners } from '../manage-partners.actions';
+import PartnerDetails from './partner-details.component';
+import { getAllCountries } from '../../../../core/client/country/country.actions';
 
 const VendorManagement = () => {
 
+    const [detailShow, setDetailShow] = useState(false);
+    const [detailType, setDetailType] = useState(null);
     const location = useLocation();
     const history = useHistory();
     const params = new URLSearchParams(window.location.search);
     const dispatch = useDispatch();
+    const [sort, setSort] = useState({ type: 'asc', value: null });
+    const countries = useSelector(state => state.countryReducer.countries);
 
     const partnersData = useSelector(state => state.managePartnerReducer.partnersData);
 
@@ -28,25 +34,25 @@ const VendorManagement = () => {
     };
 
     const urlChange = (pageNo, orderColumn, pageChange = false) => {
-        // let orderType = params.get('orderType');
-        // const orderBy = params.get('orderBy');
+        let orderType = params.get('orderType');
+        const orderBy = params.get('orderBy');
         const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
 
-        // if (!pageChange) {
-        //     if (orderBy && !orderType) {
-        //         orderType = 'asc'
-        //     }
+        if (!pageChange) {
+            if (orderBy && !orderType) {
+                orderType = 'asc'
+            }
 
-        //     (orderBy === orderColumn)
-        //         ? (orderType === 'asc'
-        //             ? orderType = 'desc'
-        //             : orderType = 'asc')
-        //         : orderType = 'asc';
-        // }
+            (orderBy === orderColumn)
+                ? (orderType === 'asc'
+                    ? orderType = 'desc'
+                    : orderType = 'asc')
+                : orderType = 'asc';
+        }
 
         const url = `?page=${page}`
-        // + (orderColumn && orderColumn !== 'null' ? `&orderBy=${orderColumn}` : '')
-        // + (orderColumn && orderType && orderType !== 'null' ? `&orderType=${orderType}` : '');
+            + (orderColumn && orderColumn !== 'null' ? `&orderBy=${orderColumn}` : '')
+            + (orderColumn && orderType && orderType !== 'null' ? `&orderType=${orderType}` : '');
 
         history.push(location.pathname + url);
     }
@@ -57,13 +63,14 @@ const VendorManagement = () => {
         if (partnerType === 'hco') dispatch(getHcoPartners(location.search));
         if (partnerType === 'vendors') dispatch(getVendorsPartners(location.search));
         if (partnerType === 'wholesalers') dispatch(getWholesalePartners(location.search));
-
+        setDetailType(partnerType === 'vendors' || partnerType === 'wholesalers' ? 'vendor' : partnerType);
+        setSort({ type: params.get('orderType') || 'asc', value: params.get('orderBy') });
     }, [location]);
 
     useEffect(() => {
-        console.log(partnersData);
+        dispatch(getAllCountries());
 
-    }, [partnersData]);
+    }, []);
 
     return (
         <main className="app__content cdp-light-bg">
@@ -118,38 +125,39 @@ const VendorManagement = () => {
                                     <tr>
                                         <th>OneKey Id</th>
                                         <th>UUID</th>
-                                        <th>First Name</th>
-                                        <th>Last Name</th>
-                                        <th>Data Request</th>
+                                        <th><span className={sort.value === 'first_name' || sort.value === 'contact_first_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, detailType === 'hcp' ? 'first_name' : 'contact_first_name')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                        <th><span className={sort.value === 'last_name' || sort.value === 'contact_last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, detailType === 'hcp' ? 'last_name' : 'contact_last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                        <th><span className={sort.value === 'status' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'status')}>Data Request<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                         <th>Data Origin</th>
-                                        <th>Language</th>
+                                        <th><span className={sort.value === 'language' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'status')}>Language<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                         <th>Street House No</th>
-                                        <th>City</th>
-                                        <th>Country</th>
+                                        <th><span className={sort.value === 'city' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'city')}>City<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                        <th><span className={sort.value === 'country_iso2' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'country_iso2')}>Country<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {
-                                        partnersData.partners && partnersData.partners.length > 0 && partnersData.partners.map((item, index) =>
+                                        countries && countries.length > 0 && partnersData.partners && partnersData.partners.length > 0 && partnersData.partners.map((item, index) =>
                                         (
                                             <tr key={index}>
-                                                <td>--</td>
-                                                <td>{item.uuid}</td>
+                                                <td>{detailType === 'hcp' ? item.onekey_id : '--'}</td>
+                                                <td>{detailType === 'hcp' || detailType === 'hco' ? item.uuid : '--'}</td>
                                                 <td>{item.first_name}</td>
                                                 <td>{item.last_name}</td>
                                                 <td>{item.status}</td>
                                                 <td>--</td>
-                                                <td>--</td>
+                                                <td>{item.language}</td>
                                                 <td>{item.address}</td>
                                                 <td>{item.city}</td>
-                                                <td>--</td>
+                                                <td>{(countries.find(i => i.country_iso2.toLowerCase() === item.country_iso2.toLowerCase())).countryname}</td>
                                                 <td><Dropdown className="ml-auto dropdown-customize">
                                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu>
                                                         <Dropdown.Item>Manage Status</Dropdown.Item>
-                                                        <Dropdown.Item>Profile</Dropdown.Item>
+                                                        <Dropdown.Item onClick={() => setDetailShow(true)}>Profile</Dropdown.Item>
+                                                        <PartnerDetails countries={countries} detailId={item.id} detailType={detailType} changeDetailShow={(val) => setDetailShow(val)} detailShow={detailShow} />
                                                     </Dropdown.Menu>
                                                 </Dropdown></td>
                                             </tr>
@@ -178,7 +186,6 @@ const VendorManagement = () => {
                                 </div>
                             </div>
                         }
-
 
                     </div>
                 </div>
