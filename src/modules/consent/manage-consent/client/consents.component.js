@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Modal from 'react-bootstrap/Modal';
-import { getCdpConsents } from '../consent.actions';
+import { getCdpConsents } from '../../client/consent.actions';
 import ConsentComponent from './consent.component';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Popover from 'react-bootstrap/Popover';
