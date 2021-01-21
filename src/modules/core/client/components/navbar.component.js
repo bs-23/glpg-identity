@@ -83,8 +83,8 @@ export default function Navigationbar() {
                                 </div>
                             </div>}
                             <div className="mb-2 mb-sm-0 d-flex justify-content-end align-items-center">
-                                <button className="mr-2 btn cdp-btn-secondary text-white my-profile__btn" onClick={myProfileClickHandler}><i className="icon icon-user-round mr-1 app__header-icon-user "></i> <span className="d-none d-sm-inline-block">{first_name + " " + last_name}</span></button>
-                                <a className="btn cdp-btn-outline-primary d-flex align-items-center" onClick={handleLogOut} href="/api/logout"><i className="icon icon-logout mr-1 app__header-icon-logout"></i>Sign out</a>
+                                <button className="mr-2 btn cdp-btn-secondary text-white my-profile__btn" onClick={myProfileClickHandler}><i className="icon icon-user-round mr-1 app__header-icon-user "></i> <span className="d-none d-lg-inline-block">{first_name + " " + last_name}</span></button>
+                                <a className="btn cdp-btn-outline-primary d-flex align-items-center" title="Sign out" onClick={handleLogOut} href="/api/logout"><i className="icon icon-logout mr-1 app__header-icon-logout"></i> <span className="d-none d-lg-inline-block">Sign out</span></a>
                             </div>
                         </div>
                     </div>
@@ -98,25 +98,25 @@ export default function Navigationbar() {
                     <Navbar.Toggle aria-controls="responsive-navbar-nav"><i className="fas fa-bars py-1 cdp-text-primary"></i></Navbar.Toggle>
                     <Navbar.Collapse id="responsive-navbar-nav" className="cdp-light-bg">
                         <div className="text-right">
-                            <Navbar.Toggle className="in-submenu" aria-controls="responsive-navbar-nav">
-                                <i className="fas fa-times fa-2x"></i>
+                            <Navbar.Toggle className="in-submenu m-2" aria-controls="responsive-navbar-nav">
+                                <i className="fas fa-times cdp-text-secondary fa-2x"></i>
                             </Navbar.Toggle>
                         </div>
                         {loggedInUser.type !== 'admin' && <div className="">
-                            {userApplications.length > 0 && <div className="px-2 border-bottom pb-2 mb-2">
+                            {userApplications.length > 0 && <div className="px-3 border-bottom pb-2 mb-2">
                                 <label className="d-block">Application</label>
                                 {renderApplicationIcon()}
                             </div>}
-                            {userCountries.length > 0 && <div className="px-2 border-bottom pb-2 mb-2">
+                            {userCountries.length > 0 && <div className="px-3 border-bottom pb-2 mb-2">
                                 <label className="d-block">Countries</label>
                                 {renderCountryIcons()}
                             </div>}
                         </div>}
                         <div className="border-bottom mb-2">
-                            <a className="d-flex align-items-center p-2" onClick={myProfileClickHandler} href="/api/logout"><i className="icon icon-user-round mr-2 app__header-icon-user "></i> {first_name + " " + last_name}</a>
+                            <a className="d-flex align-items-center py-2 px-3" onClick={myProfileClickHandler} href="/api/logout"><i className="icon icon-user-round mr-2 app__header-icon-user "></i> {first_name + " " + last_name}</a>
                         </div>
                         <div className="">
-                            <a className="d-flex align-items-center p-2" onClick={handleLogOut} href="/api/logout"><i className="icon icon-logout mr-2 app__header-icon-logout"></i> Sign out</a>
+                            <a className="d-flex align-items-center py-2 px-3" onClick={handleLogOut} href="/api/logout"><i className="icon icon-logout mr-2 app__header-icon-logout"></i> Sign out</a>
                         </div>
                     </Navbar.Collapse>
                 </Navbar>
