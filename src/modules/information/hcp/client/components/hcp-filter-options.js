@@ -90,6 +90,11 @@ export function getDatasyncFilterOptions(userCountries) {
         { value: 'STA.9', displayText: 'Invalid' }
     ];
 
+    const specialtyOptions = [
+        { value: 'SP.WBE.36', displayText: 'Pneumology' },
+        { value: 'SP.WBE.49', displayText: 'Rheumatology' }
+    ];
+
     const filterOptions = [
         {
             fieldName: 'firstname',
@@ -189,6 +194,13 @@ export function getDatasyncFilterOptions(userCountries) {
             valueType: 'text',
             displayText: 'Post Code',
             operators: operators.getStringOperators()
+        },
+        {
+            fieldName: 'specialty',
+            valueType: 'select',
+            displayText: 'Specialty',
+            operators: operators.getSelectOperators(),
+            options: specialtyOptions
         }
     ];
 
