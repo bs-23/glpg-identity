@@ -200,6 +200,7 @@ const MultiFilter = (props, ref) => {
     const getSummaryValueText = (filter) => {
         const currentFilter = options.find(o => o.fieldName === filter.fieldName);
         if (!currentFilter || currentFilter.valueType !== 'select') return filter.value;
+        if(!currentFilter.options) return [];
         return currentFilter.options.filter(o => filter.value.some(f => f === o.value)).map(f => f.displayText);
     }
 

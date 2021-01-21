@@ -90,10 +90,10 @@ export function getDatasyncFilterOptions(userCountries) {
         { value: 'STA.9', displayText: 'Invalid' }
     ];
 
-    const specialtyOptions = [
-        { value: 'SP.WBE.36', displayText: 'Pneumology' },
-        { value: 'SP.WBE.49', displayText: 'Rheumatology' }
-    ];
+    // const specialtyOptions = [
+    //     { value: 'SP.WBE.36', displayText: 'Pneumology' },
+    //     { value: 'SP.WBE.49', displayText: 'Rheumatology' }
+    // ];
 
     const filterOptions = [
         {
@@ -136,9 +136,9 @@ export function getDatasyncFilterOptions(userCountries) {
         },
         {
             fieldName: 'specialty',
-            valueType: 'text',
+            valueType: 'select',
             displayText: 'Specialty',
-            operators: operators.getStringOperators(),
+            operators: operators.getSelectOperators(),
             customFilterComponent: SpecialtyFilter
         },
         {
@@ -194,14 +194,14 @@ export function getDatasyncFilterOptions(userCountries) {
             valueType: 'text',
             displayText: 'Post Code',
             operators: operators.getStringOperators()
-        },
-        {
-            fieldName: 'specialty',
-            valueType: 'select',
-            displayText: 'Specialty',
-            operators: operators.getSelectOperators(),
-            options: specialtyOptions
         }
+        // {
+        //     fieldName: 'specialty',
+        //     valueType: 'select',
+        //     displayText: 'Specialty',
+        //     operators: operators.getSelectOperators(),
+        //     options: specialtyOptions
+        // }
     ];
 
     return filterOptions;
