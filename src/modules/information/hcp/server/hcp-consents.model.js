@@ -39,7 +39,7 @@ const HcpConsents = sequelize.cdpConnector.define("hcp_consents", {
             return rawValue ? validator.unescape(rawValue) : '';
         }
     },
-    locale: {
+    consent_locale: {
         allowNull: false,
         type: DataTypes.STRING(5)
     },
