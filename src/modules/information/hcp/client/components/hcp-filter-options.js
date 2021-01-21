@@ -128,6 +128,12 @@ export function getDatasyncFilterOptions(userCountries) {
             operators: operators.getStringOperators()
         },
         {
+            fieldName: 'individual_id_onekey',
+            valueType: 'text',
+            displayText: 'Individual Onekey ID',
+            operators: operators.getStringOperators()
+        },
+        {
             fieldName: 'activity_id_onekey',
             valueType: 'text',
             displayText: 'Activity Onekey ID',

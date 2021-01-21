@@ -229,7 +229,7 @@ export default function CrdlpHcpProfiles() {
 
                                                 <th width="13%"><span className={sort.value === 'uuid_1' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'uuid_1')}>UUID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
-                                                <th width="13%"><span className={sort.value === 'individual_id_onekey' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'individual_id_onekey')}>Onekey ID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th width="13%"><span className={sort.value === 'individual_id_onekey' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'individual_id_onekey')}>Individual Onekey ID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
                                                 <th width="10%"><span className={sort.value === 'country_iso2' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'country_iso2')}>Country<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
