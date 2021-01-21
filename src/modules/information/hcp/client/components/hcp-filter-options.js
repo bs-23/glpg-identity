@@ -1,5 +1,7 @@
 import { string, array } from 'yup';
+
 import { operators } from '../../../../core/client/components/MultiFilter';
+import SpecialtyFilter from './specialty-filter.component';
 
 export function getFilterOptions(userCountries, userApplications) {
     const statusOptions = [
@@ -126,6 +128,13 @@ export function getDatasyncFilterOptions(userCountries) {
             valueType: 'text',
             displayText: 'UUID',
             operators: operators.getStringOperators()
+        },
+        {
+            fieldName: 'specialty',
+            valueType: 'text',
+            displayText: 'Specialty',
+            operators: operators.getStringOperators(),
+            customFilterComponent: SpecialtyFilter
         },
         {
             fieldName: 'individual_id_onekey',
