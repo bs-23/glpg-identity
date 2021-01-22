@@ -207,6 +207,16 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
             };
         }
 
+        if (filterObj.fieldName === 'specialty') {
+            return {
+                [Op.or]: [
+                    { specialty_1_code: filterObj.value },
+                    { specialty_2_code: filterObj.value },
+                    { specialty_3_code: filterObj.value }
+                ]
+            };
+        }
+
         return filterService.getFilterQuery(filterObj);
     };
 
@@ -240,19 +250,38 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
         prevOperator = node === "and" || node === "or" ? node : prevOperator;
     }
 
+    const operatorSymbols = Object.getOwnPropertySymbols(customFilter);
+
     if (groupedQueries.length > 1) {
-        customFilter[Op.or] = groupedQueries.map(q => {
+        const queryValue = groupedQueries.map(q => {
             if (q.operator === 'and') {
                 return { [Op.and]: q.values };
             }
             return q;
         });
+        if (operatorSymbols[0] && operatorSymbols[0].toString() === 'Symbol(or)') {
+            customFilter = {
+                [Op.and]: [
+                    customFilter,
+                    { [Op.or]: queryValue }
+                ]
+            };
+        } else {
+            customFilter[Op.or] = queryValue;
+        }
     } else {
         const query = groupedQueries[0];
         if (query.operator === 'and') {
             customFilter[Op.and] = query.values;
         } else {
-            customFilter = { ...customFilter, ...query };
+            customFilter = operatorSymbols[0] && operatorSymbols[0].toString() === 'Symbol(or)'
+                ? {
+                    [Op.and]: [
+                        customFilter,
+                        query
+                    ]
+                }
+                : { ...customFilter, ...query };
         }
     }
 
@@ -821,7 +850,7 @@ async function createHcpProfile(req, res) {
                     consent_confirmed: consentCountry.opt_type === 'double-opt-in' ? false : true,
                     opt_type: consentCountry.opt_type,
                     rich_text: consentLocale.rich_text,
-                    locale: richTextLocale,
+                    consent_locale: richTextLocale,
                     created_by: req.user.id,
                     updated_by: req.user.id
                 });
@@ -1740,28 +1769,54 @@ async function getHcpsFromDatasync(req, res) {
 
         const totalUsers = await DatasyncHcp.count({ where: filterOptions });
 
-        const individualIdOnekeyList = hcps.map(h => h.individual_id_onekey);
-        const hcpSpecialties = await sequelize.datasyncConnector.query(`
-            SELECT h.*, s.cod_description, s.cod_locale
-            FROM ciam.vwmaphcpspecialty AS h
-            INNER JOIN ciam.vwspecialtymaster AS s
-            ON (h.specialty_code = s.cod_id_onekey)
-            WHERE individual_id_onekey = ANY($individualIdOnekeyList) AND cod_locale='en'`, {
-            bind: {
-                individualIdOnekeyList: individualIdOnekeyList,
-            },
-            type: QueryTypes.SELECT
-        });
+        // const individualIdOnekeyList = hcps.map(h => h.individual_id_onekey);
+        // const hcpSpecialties = await sequelize.datasyncConnector.query(`
+        //     SELECT h.*, s.cod_description, s.cod_locale
+        //     FROM ciam.vwmaphcpspecialty AS h
+        //     INNER JOIN ciam.vwspecialtymaster AS s
+        //     ON (h.specialty_code = s.cod_id_onekey)
+        //     WHERE individual_id_onekey = ANY($individualIdOnekeyList) AND cod_locale='en'`, {
+        //     bind: {
+        //         individualIdOnekeyList: individualIdOnekeyList,
+        //     },
+        //     type: QueryTypes.SELECT
+        // });
 
-        if (hcpSpecialties) {
-            hcps.forEach(hcp => {
-                const specialties = hcpSpecialties.filter(s => s.individual_id_onekey === hcp.individual_id_onekey);
-                hcp.dataValues.specialties = specialties.map(s => ({
-                    description: s.cod_description,
-                    code: s.specialty_code
-                }));
-            });
-        }
+        // if (hcpSpecialties) {
+        //     hcps.forEach(hcp => {
+        //         const specialties = hcpSpecialties.filter(s => s.individual_id_onekey === hcp.individual_id_onekey);
+        //         hcp.dataValues.specialties = specialties.map(s => ({
+        //             description: s.cod_description,
+        //             code: s.specialty_code
+        //         }));
+        //     });
+        // }
+
+        hcps.forEach(hcp => {
+            const specialties = [
+                {
+                    description: hcp.specialty_1_long_description,
+                    code: hcp.specialty_1_code
+                },
+                {
+                    description: hcp.specialty_2_long_description,
+                    code: hcp.specialty_2_code
+                },
+                {
+                    description: hcp.specialty_3_long_description,
+                    code: hcp.specialty_3_code
+                }
+            ];
+            const filtered = specialties.filter(s => s.code);
+            hcp.dataValues.specialties = filtered;
+
+            delete hcp.dataValues.specialty_1_long_description;
+            delete hcp.dataValues.specialty_1_code;
+            delete hcp.dataValues.specialty_2_long_description;
+            delete hcp.dataValues.specialty_2_code;
+            delete hcp.dataValues.specialty_3_long_description;
+            delete hcp.dataValues.specialty_3_code;
+        });
 
         const data = {
             users: hcps,

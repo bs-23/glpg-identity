@@ -164,21 +164,33 @@ const AddFilter = (props) => {
             </div>
             <div className="px-3 pb-3 pt-2">
                 {
-                    filters && filters.map((filter, index) =>
-                        <Filter
-                            key={`${index}_${Math.random()}`}
+                    filters && filters.map((filter, index) => {
+                        const currentFilterOption = filterOptions.find(fo => fo.fieldName === filter.fieldName);
+                        const CustomFilterComponent = (currentFilterOption || {}).customFilterComponent;
+
+                        if (CustomFilterComponent) return <CustomFilterComponent
                             title={index+1}
                             index={index}
-                            fieldValue={filter.fieldName}
-                            operatorValue={filter.operator}
-                            value={filter.value}
+                            filter={filter}
                             filterOptions={filterOptions}
                             isTouched={isTouched}
                             validationError={validationErrors[index]}
                             onChange={handleChange}
                             onRemove={handleRemove}
                         />
-                    )
+
+                        return <Filter
+                                key={`${index}_${Math.random()}`}
+                                title={index+1}
+                                index={index}
+                                filter={filter}
+                                filterOptions={filterOptions}
+                                isTouched={isTouched}
+                                validationError={validationErrors[index]}
+                                onChange={handleChange}
+                                onRemove={handleRemove}
+                            />
+                    })
                 }
                 <Button className="btn cdp-btn-outline-primary mt-4 btn-block" label="+ add more filter" onClick={handleAddMoreFilter} />
                 <Button className="btn cdp-btn-secondary btn-block text-white" label="Done" onClick={handleDone} />
