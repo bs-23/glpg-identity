@@ -7,11 +7,12 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { LinkContainer } from 'react-router-bootstrap';
 import axios from 'axios';
-import { getAllCountries } from '../../../core/client/country/country.actions';
-import Faq from '../../../platform/faq/client/faq.component';
 import _ from 'lodash';
 import parse from 'html-react-parser';
-import { getConsentReport } from '../consent.actions';
+
+import { getAllCountries } from '../../../core/client/country/country.actions';
+import Faq from '../../../platform/faq/client/faq.component';
+import { getConsentReport } from './consent-performace.actions';
 
 const CdpConsentPerformanceReport = () => {
     const dispatch = useDispatch();
@@ -20,7 +21,7 @@ const CdpConsentPerformanceReport = () => {
     const [, setCurrentAction] = useState({ userId: null, action: null });
     const [currentUser, setCurrentUser] = useState({});
 
-    const consents_init_report = useSelector(state => state.consentReducer.consents);
+    const consents_init_report = useSelector(state => state.consentPerformanceReducer.consents);
     const [consents_report, modify_consents_report] = useState(consents_init_report);
     const countries = useSelector(state => state.countryReducer.countries);
     const allCountries = useSelector(state => state.countryReducer.allCountries);

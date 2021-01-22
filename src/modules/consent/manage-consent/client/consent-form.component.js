@@ -9,7 +9,7 @@ import parse from 'html-react-parser';
 import Dropdown from 'react-bootstrap/Dropdown';
 import CountryCodes from 'country-codes-list';
 
-import { createConsent, updateConsent } from '../../client/consent.actions';
+import { createConsent, updateConsent } from './consent.actions';
 import { consentSchema } from './consent.schema';
 import DraftEditor from '../../../core/client/components/draft-editor';
 import Faq from '../../../platform/faq/client/faq.component';

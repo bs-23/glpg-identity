@@ -5,7 +5,7 @@ import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
 import parse from 'html-react-parser';
 import optTypes from './opt-types.json';
-import { getConsent, setConsent } from '../../client/consent.actions';
+import { getConsent, setConsent } from './consent.actions';
 
 const ConsentComponent = ({ consentId, setConsentId }) => {
     const dispatch = useDispatch();

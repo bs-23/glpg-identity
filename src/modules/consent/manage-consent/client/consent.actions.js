@@ -1,46 +1,6 @@
 import axios from 'axios';
 import Types from './consent.types';
 
-export function getConsentReport(page, codbase, opt_type, orderBy, orderType) {
-    const search_params = new URLSearchParams('');
-
-    page && search_params.append('page', page);
-    codbase && search_params.append('codbase', codbase);
-    opt_type && search_params.append('opt_type', opt_type);
-    orderBy && search_params.append('orderBy', orderBy);
-    orderType && search_params.append('orderType', orderType);
-
-    const url = `/api/cdp-consent-performance-report${search_params.toString() !== '' ? '?' + search_params.toString() : ''}`;
-
-    return {
-        type: Types.GET_CONSENTS_REPORT,
-        payload: axios({
-            method: 'get',
-            url
-        })
-    };
-}
-
-export function getVeevaConsentReport(page, codbase, opt_type, orderBy, orderType) {
-    const search_params = new URLSearchParams('');
-
-    page && search_params.append('page', page);
-    codbase && search_params.append('codbase', codbase);
-    opt_type && search_params.append('opt_type', opt_type);
-    orderBy && search_params.append('orderBy', orderBy);
-    orderType && search_params.append('orderType', orderType);
-
-    const url = `/api/veeva-consent-performance-report${search_params.toString() !== '' ? '?' + search_params.toString() : ''}`;
-
-    return {
-        type: Types.GET_VEEVA_CONSENTS_REPORT,
-        payload: axios({
-            method: 'get',
-            url
-        })
-    };
-}
-
 export function getCdpConsents(translations, category) {
     const search_params = new URLSearchParams('');
 
@@ -80,40 +40,6 @@ export function updateConsent(data, id){
     };
 }
 
-export function getCountryConsents() {
-    const url = '/api/consent/country/';
-    return {
-        type: Types.GET_COUNTRY_CONSENTS,
-        payload: axios({
-            method: 'get',
-            url
-        })
-    };
-}
-
-export function deleteCountryConsent(id) {
-    const url = `/api/consent/country/${id}`;
-    return {
-        type: Types.DELETE_COUNTRY_CONSENT,
-        payload: axios({
-            method: 'delete',
-            url
-        })
-    };
-}
-
-export function updateCountryConsent(id, data) {
-    const url = `/api/consent/country/${id}`;
-    return {
-        type: Types.UPDATE_COUNTRY_CONSENT,
-        payload: axios({
-            method: 'put',
-            url,
-            data
-        })
-    };
-}
-
 export function getConsent(id) {
     return {
         type: Types.GET_CONSENT,
@@ -128,16 +54,5 @@ export function setConsent(consent) {
     return {
         type: Types.SET_CONSENT,
         payload: consent
-    };
-}
-
-export function createCountryConsent(data) {
-    return {
-        type: Types.CREATE_COUNTRY_CONSENT,
-        payload: axios({
-            method: 'post',
-            url: '/api/consent/country',
-            data
-        })
     };
 }

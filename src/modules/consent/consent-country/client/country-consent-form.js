@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import Modal from 'react-bootstrap/Modal'
 import { Form, Formik, Field, ErrorMessage } from "formik";
 import { useToasts } from 'react-toast-notifications';
-import optTypes from '../opt-types.json';
-import { updateCountryConsent, createCountryConsent} from '../../client/consent.actions';
 import { useDispatch, useSelector } from 'react-redux';
-import { countryConsentSchema } from '../../client/consent.schema';
+
+import optTypes from '../../manage-consent/client/opt-types.json';
+import { updateCountryConsent, createCountryConsent} from './consent-country.actions';
+import { countryConsentSchema } from './consent-country.schema';
 
 
 const CountryConsentForm = (props) => {

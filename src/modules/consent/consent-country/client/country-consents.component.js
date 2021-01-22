@@ -3,16 +3,20 @@ import { NavLink } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
 import { useSelector, useDispatch } from 'react-redux';
 import Modal from 'react-bootstrap/Modal';
-import CountryConsentForm from './country-consent-form';
-import optTypes from '../opt-types.json';
-import ConsentComponent from './consent.component';
-import { getCountryConsents, deleteCountryConsent, getCdpConsents } from '../../client/consent.actions';
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Popover from 'react-bootstrap/Popover';
 import Dropdown from 'react-bootstrap/Dropdown';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import parse from 'html-react-parser';
+
+import CountryConsentForm from './country-consent-form';
+import optTypes from '../../manage-consent/client/opt-types.json';
+import { Consent } from '../../../consent';
+import { getCountryConsents, deleteCountryConsent } from './consent-country.actions';
 import Faq from '../../../platform/faq/client/faq.component';
-import { getConsentCategories } from '../consent-category/category.actions';
+import { categoryActions, consentActions } from '../../../consent';
+
+const { getConsentCategories } = categoryActions;
+const { getCdpConsents } = consentActions;
 
 const CountryConsents = () => {
     const dispatch = useDispatch();
@@ -31,9 +35,10 @@ const CountryConsents = () => {
 
     const countries = useSelector(state => state.countryReducer.countries);
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
-    const country_consents = useSelector(state => state.consentReducer.country_consents);
+    const country_consents = useSelector(state => state.consentCountryReducer.country_consents);
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
     const consent_categories = useSelector(state => state.consentCategoryReducer.consent_categories);
+
     useEffect(() => {
         dispatch(getConsentCategories());
     }, []);
@@ -254,7 +259,7 @@ const CountryConsents = () => {
                             </Modal.Footer>
                         </Modal>
 
-                        {consentId && <ConsentComponent consentId={consentId} setConsentId={setConsentId} />}
+                        {consentId && <Consent consentId={consentId} setConsentId={setConsentId} />}
                     </div>
                 </div>
             </div>

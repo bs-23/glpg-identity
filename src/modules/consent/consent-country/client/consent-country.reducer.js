@@ -1,6 +1,8 @@
 import Types from "./consent-country.types";
 
-const initialState = {};
+const initialState = {
+    country_consents: []
+};
 
 export default function reducer(state = initialState, action) {
     switch (action.type) {
