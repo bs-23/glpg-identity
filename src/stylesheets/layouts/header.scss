@@ -12,30 +12,33 @@
         }
     }
 
-    .navbar-light .navbar-toggler {
-        border-color: $primary-color;
 
-        &.in-submenu {
-            border: none;
 
-            .navbar-toggler-icon {
+    nav {
+        .navbar-toggler {
+            border-color: $primary-color;
 
+            &.in-submenu {
+                border: none;
+
+                .navbar-toggler-icon {
+                }
             }
         }
-    }
 
-    nav .navbar-collapse {
-        position: fixed;
-        right: -100%;
-        width: 100vw;
-        height: 100vh;
-        display: block;
-        transition: right 0.3s ease;
-        z-index: 5;
-        top: 0px;
-    }
+        .navbar-collapse {
+            position: fixed;
+            right: -100%;
+            width: 100vw;
+            height: 100vh;
+            display: block;
+            transition: right 0.3s ease;
+            z-index: 5;
+            top: 0px;
 
-    nav .navbar-collapse.show {
-        right: 0;
+            &.show {
+                right: 0;
+            }
+        }
     }
 }

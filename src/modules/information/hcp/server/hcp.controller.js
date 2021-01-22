@@ -207,6 +207,16 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
             };
         }
 
+        if (filterObj.fieldName === 'specialty') {
+            return {
+                [Op.or]: [
+                    { specialty_1_code: filterObj.value },
+                    { specialty_2_code: filterObj.value },
+                    { specialty_3_code: filterObj.value }
+                ]
+            };
+        }
+
         return filterService.getFilterQuery(filterObj);
     };
 
@@ -240,19 +250,38 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
         prevOperator = node === "and" || node === "or" ? node : prevOperator;
     }
 
+    const operatorSymbols = Object.getOwnPropertySymbols(customFilter);
+
     if (groupedQueries.length > 1) {
-        customFilter[Op.or] = groupedQueries.map(q => {
+        const queryValue = groupedQueries.map(q => {
             if (q.operator === 'and') {
                 return { [Op.and]: q.values };
             }
             return q;
         });
+        if (operatorSymbols[0] && operatorSymbols[0].toString() === 'Symbol(or)') {
+            customFilter = {
+                [Op.and]: [
+                    customFilter,
+                    { [Op.or]: queryValue }
+                ]
+            };
+        } else {
+            customFilter[Op.or] = queryValue;
+        }
     } else {
         const query = groupedQueries[0];
         if (query.operator === 'and') {
             customFilter[Op.and] = query.values;
         } else {
-            customFilter = { ...customFilter, ...query };
+            customFilter = operatorSymbols[0] && operatorSymbols[0].toString() === 'Symbol(or)'
+                ? {
+                    [Op.and]: [
+                        customFilter,
+                        query
+                    ]
+                }
+                : { ...customFilter, ...query };
         }
     }
 
@@ -371,61 +400,6 @@ async function getHcps(req, res) {
         };
 
         response.data = data;
-        res.json(response);
-    } catch (err) {
-        console.error(err);
-        response.errors.push(new CustomError('Internal server error', 500));
-        res.status(500).send(response);
-    }
-}
-
-async function editHcp(req, res) {
-    const { first_name, last_name, telephone } = req.body;
-    const response = new Response({}, []);
-
-    if (!first_name) {
-        response.errors.push(new CustomError('First name is missing.', 400, 'first_name'));
-    } else if (first_name.length > 50) {
-        response.errors.push(new CustomError('First name should be at most 50 characters', 400, 'first_name'));
-    }
-
-    if (!last_name) {
-        response.errors.push(new CustomError('Last name is missing.', 400, 'last_name'));
-    } else if (last_name.length > 50) {
-        response.errors.push(new CustomError('Last name should be at most 50 characters', 400, 'last_name'));
-    }
-
-    if (telephone && telephone.length > 25) {
-        response.errors.push(new CustomError('Telephone number should be at most 25 digits including country code', 400, 'telephone'));
-    }
-
-    if (response.errors.length) {
-        return res.status(400).send(response);
-    }
-
-    try {
-        const HcpUser = await Hcp.findOne({ where: { id: req.params.id } });
-
-        if (!HcpUser) {
-            response.errors.push(new CustomError('User not found', 404));
-            return res.status(404).send(response);
-        }
-
-        HcpUser.update({ first_name, last_name, telephone });
-
-        delete HcpUser.dataValues.password;
-        delete HcpUser.dataValues.created_by;
-        delete HcpUser.dataValues.updated_by;
-
-        await logService.log({
-            event_type: 'UPDATE',
-            object_id: HcpUser.id,
-            table_name: 'hcp_profiles',
-            actor: req.user.id,
-            remarks: 'Updated HCP profile'
-        });
-
-        response.data = HcpUser;
         res.json(response);
     } catch (err) {
         console.error(err);
@@ -618,18 +592,6 @@ async function registrationLookup(req, res) {
 
     const response = new Response({}, []);
 
-    if (!email || !validator.isEmail(email)) {
-        response.errors.push(new CustomError('Email address is missing or invalid.', 400, 'email'));
-    }
-
-    if (!uuid) {
-        response.errors.push(new CustomError('UUID is missing.', 400, 'uuid'));
-    }
-
-    if (response.errors.length) {
-        return res.status(400).send(response);
-    }
-
     try {
         const profileByEmail = await Hcp.findOne({ where: where(fn('lower', col('email')), fn('lower', email)) });
 
@@ -658,8 +620,7 @@ async function registrationLookup(req, res) {
             const uuid_1_from_master_data = (master_data[0].uuid_1 || '');
             const uuid_2_from_master_data = (master_data[0].uuid_2 || '');
 
-            uuid_from_master_data = [uuid_1_from_master_data, uuid_2_from_master_data]
-                .find(id => id.replace(/[-/]/gi, '') === uuidWithoutSpecialCharacter);
+            uuid_from_master_data = [uuid_1_from_master_data, uuid_2_from_master_data].find(id => id.replace(/[-/]/gi, '') === uuidWithoutSpecialCharacter);
         }
 
         const profileByUUID = await Hcp.findOne({ where: { uuid: uuid_from_master_data || uuid } });
@@ -846,6 +807,7 @@ async function createHcpProfile(req, res) {
             birthdate,
             application_id: req.user.id,
             individual_id_onekey: master_data.individual_id_onekey,
+            status: master_data.individual_id_onekey ? hasDoubleOptIn ? 'consent_pending' : 'self_verified' : 'not_verified',
             origin_url,
             created_by: req.user.id,
             updated_by: req.user.id
@@ -864,9 +826,6 @@ async function createHcpProfile(req, res) {
             });
         }
 
-        hcpUser.status = master_data.individual_id_onekey ? hasDoubleOptIn ? 'consent_pending' : 'self_verified' : 'not_verified';
-        await hcpUser.save();
-
         response.data = getHcpViewModel(hcpUser.dataValues);
 
         if (hcpUser.dataValues.status === 'consent_pending') {
@@ -884,8 +843,7 @@ async function createHcpProfile(req, res) {
             event_type: 'CREATE',
             object_id: hcpUser.id,
             table_name: 'hcp_profiles',
-            actor: req.user.id,
-            remarks: 'HCP user created'
+            actor: req.user.id
         });
 
         res.json(response);
@@ -1740,28 +1698,54 @@ async function getHcpsFromDatasync(req, res) {
 
         const totalUsers = await DatasyncHcp.count({ where: filterOptions });
 
-        const individualIdOnekeyList = hcps.map(h => h.individual_id_onekey);
-        const hcpSpecialties = await sequelize.datasyncConnector.query(`
-            SELECT h.*, s.cod_description, s.cod_locale
-            FROM ciam.vwmaphcpspecialty AS h
-            INNER JOIN ciam.vwspecialtymaster AS s
-            ON (h.specialty_code = s.cod_id_onekey)
-            WHERE individual_id_onekey = ANY($individualIdOnekeyList) AND cod_locale='en'`, {
-            bind: {
-                individualIdOnekeyList: individualIdOnekeyList,
-            },
-            type: QueryTypes.SELECT
-        });
+        // const individualIdOnekeyList = hcps.map(h => h.individual_id_onekey);
+        // const hcpSpecialties = await sequelize.datasyncConnector.query(`
+        //     SELECT h.*, s.cod_description, s.cod_locale
+        //     FROM ciam.vwmaphcpspecialty AS h
+        //     INNER JOIN ciam.vwspecialtymaster AS s
+        //     ON (h.specialty_code = s.cod_id_onekey)
+        //     WHERE individual_id_onekey = ANY($individualIdOnekeyList) AND cod_locale='en'`, {
+        //     bind: {
+        //         individualIdOnekeyList: individualIdOnekeyList,
+        //     },
+        //     type: QueryTypes.SELECT
+        // });
 
-        if (hcpSpecialties) {
-            hcps.forEach(hcp => {
-                const specialties = hcpSpecialties.filter(s => s.individual_id_onekey === hcp.individual_id_onekey);
-                hcp.dataValues.specialties = specialties.map(s => ({
-                    description: s.cod_description,
-                    code: s.specialty_code
-                }));
-            });
-        }
+        // if (hcpSpecialties) {
+        //     hcps.forEach(hcp => {
+        //         const specialties = hcpSpecialties.filter(s => s.individual_id_onekey === hcp.individual_id_onekey);
+        //         hcp.dataValues.specialties = specialties.map(s => ({
+        //             description: s.cod_description,
+        //             code: s.specialty_code
+        //         }));
+        //     });
+        // }
+
+        hcps.forEach(hcp => {
+            const specialties = [
+                {
+                    description: hcp.specialty_1_long_description,
+                    code: hcp.specialty_1_code
+                },
+                {
+                    description: hcp.specialty_2_long_description,
+                    code: hcp.specialty_2_code
+                },
+                {
+                    description: hcp.specialty_3_long_description,
+                    code: hcp.specialty_3_code
+                }
+            ];
+            const filtered = specialties.filter(s => s.code);
+            hcp.dataValues.specialties = filtered;
+
+            delete hcp.dataValues.specialty_1_long_description;
+            delete hcp.dataValues.specialty_1_code;
+            delete hcp.dataValues.specialty_2_long_description;
+            delete hcp.dataValues.specialty_2_code;
+            delete hcp.dataValues.specialty_3_long_description;
+            delete hcp.dataValues.specialty_3_code;
+        });
 
         const data = {
             users: hcps,
@@ -1781,7 +1765,6 @@ async function getHcpsFromDatasync(req, res) {
 }
 
 exports.getHcps = getHcps;
-exports.editHcp = editHcp;
 exports.registrationLookup = registrationLookup;
 exports.createHcpProfile = createHcpProfile;
 exports.getHcpProfile = getHcpProfile;

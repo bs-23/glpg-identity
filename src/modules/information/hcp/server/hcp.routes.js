@@ -1,7 +1,7 @@
 const path = require('path');
 const passport = require('passport');
 const controller = require('./hcp.controller');
-const { hcpProfile } = require('./hcp.schema');
+const { hcpProfile, registrationLookup } = require('./hcp.schema');
 const { validate } = require(path.join(process.cwd(), 'src/modules/core/server/middlewares/validator.middleware'));
 const { Modules } = require('../../../core/server/authorization/authorization.constants');
 const { ModuleGuard } = require('../../../core/server/authorization/authorization.middleware');
@@ -15,11 +15,10 @@ module.exports = app => {
         .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getSpecialtiesForCdp);
 
     app.route('/api/hcps/:id')
-        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getHcpProfile)
-        .put(CDPAuthStrategy, controller.editHcp);
+        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getHcpProfile);
 
     app.route('/api/hcp-profiles/registration-lookup')
-        .post(passport.authenticate('application-jwt', { session: false }), controller.registrationLookup);
+        .post(passport.authenticate('application-jwt', { session: false }), validate(registrationLookup), controller.registrationLookup);
 
     app.route('/api/hcp-profiles/generate-token')
         .post(passport.authenticate('application-jwt', { session: false }), controller.getAccessToken);
@@ -59,8 +58,7 @@ module.exports = app => {
         .put(passport.authenticate('application-jwt', { session: false }), controller.updateHCPUserConsents);
 
     app.route('/api/hcp-profiles/:id')
-        .get(passport.authenticate('application-jwt', { session: false }), controller.getHcpProfile)
-        .put(passport.authenticate('application-jwt', { session: false }), controller.editHcp);
+        .get(passport.authenticate('application-jwt', { session: false }), controller.getHcpProfile);
 
     app.route('/api/datasync/hcps')
         .post(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getHcpsFromDatasync);

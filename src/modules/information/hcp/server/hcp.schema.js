@@ -42,4 +42,17 @@ const hcpProfile = object().shape({
         .required('This field must not be empty.')
 });
 
+const registrationLookup = object().shape({
+    uuid: string()
+        .max(20, 'This field must be at most 20 characters long.')
+        .required('This field must not be empty.'),
+    email: string()
+        .email('This field must be a valid email address.')
+        .matches(/^.{1,64}@/, 'The part before @ of the email can be maximum 64 characters.')
+        .matches(/^.*[a-z]+.*@/, 'This field should be a valid email address.')
+        .max(100, 'This field must be at most 100 characters long.')
+        .required('This field must not be empty.')
+});
+
 exports.hcpProfile = hcpProfile;
+exports.registrationLookup = registrationLookup;
