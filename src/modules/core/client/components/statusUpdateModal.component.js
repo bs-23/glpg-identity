@@ -70,8 +70,8 @@ return(
           <div className="col">
               {consentForUser.consents && consentForUser.consents.length ?
                 consentForUser.consents.map(consent => {
-                return consent.consent_given && <div className="pb-1" key={consent.id} >
-                  <i className={`icon ${consent.consent_given ? 'icon-check-filled' : 'icon-close-circle text-danger'} cdp-text-primary mr-2 small`}></i>{consent.preference}
+                return <div className="pb-1" key={consent.id} >
+                    <i className={`icon ${consent.consent_given ? 'fas fa-check cdp-text-primary mr-3' : 'fas fa-check-double cdp-text-primary mr-3'} cdp-text-primary mr-2 small`}></i>{consent.preference}
                 </div>
               })
               : <div className="alert alert-warning">The HCP has not given any consent.</div>
