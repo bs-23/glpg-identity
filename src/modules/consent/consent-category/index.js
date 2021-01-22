@@ -1,13 +1,15 @@
 import React from 'react';
-import ClientRoutes from './client/consent-catego.routes';
-// import consentReducer from './client/consent.reducer';
-// import * as consentActions from './client/consent.actions';
+import ClientRoutes from './client/category.routes';
+import ConsentCategories from './client/categories.component';
+import categoryReducer from './client/category.reducer';
+import * as categoryActions from './client/category.actions';
 
 export function ManageConsentCategoryRoutes(props) {
     return <ClientRoutes path={props.path} />;
 }
 
 export {
-    // consentReducer,
-    // consentActions
+    categoryReducer,
+    categoryActions,
+    ConsentCategories
 };

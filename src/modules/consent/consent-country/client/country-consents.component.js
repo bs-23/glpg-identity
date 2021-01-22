@@ -6,7 +6,7 @@ import Modal from 'react-bootstrap/Modal';
 import CountryConsentForm from './country-consent-form';
 import optTypes from '../opt-types.json';
 import ConsentComponent from './consent.component';
-import { getCountryConsents, deleteCountryConsent, getCdpConsents } from '../consent.actions';
+import { getCountryConsents, deleteCountryConsent, getCdpConsents } from '../../client/consent.actions';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Popover from 'react-bootstrap/Popover';
 import Dropdown from 'react-bootstrap/Dropdown';

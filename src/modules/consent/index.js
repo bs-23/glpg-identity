@@ -1,7 +1,8 @@
 import React from 'react';
 import { Route, useRouteMatch } from 'react-router-dom';
 
-import { ManageConsentRoutes } from './manage-consent';
+import { ManageConsentRoutes, consentReducer, consentActions, Consent, Consents, ConsentForm, DataPrivacyConsentMaagement } from './manage-consent';
+import { ManageConsentCategoryRoutes, categoryReducer, ConsentCategories, categoryActions } from './consent-category';
 
 export function ConsentRoutes() {
     const { path } = useRouteMatch();
@@ -9,10 +10,19 @@ export function ConsentRoutes() {
     return (
         <Route>
             <ManageConsentRoutes path={path} />
+            <ManageConsentCategoryRoutes path={path} />
         </Route>
     );
 }
 
 export {
-    // Enter reducer and components here
+    consentReducer,
+    consentActions,
+    Consent,
+    Consents,
+    ConsentForm,
+    DataPrivacyConsentMaagement,
+    categoryReducer,
+    ConsentCategories,
+    categoryActions
 };

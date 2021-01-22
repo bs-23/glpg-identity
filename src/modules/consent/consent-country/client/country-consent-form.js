@@ -3,9 +3,9 @@ import Modal from 'react-bootstrap/Modal'
 import { Form, Formik, Field, ErrorMessage } from "formik";
 import { useToasts } from 'react-toast-notifications';
 import optTypes from '../opt-types.json';
-import { updateCountryConsent, createCountryConsent} from '../consent.actions';
+import { updateCountryConsent, createCountryConsent} from '../../client/consent.actions';
 import { useDispatch, useSelector } from 'react-redux';
-import { countryConsentSchema } from '../consent.schema';
+import { countryConsentSchema } from '../../client/consent.schema';
 
 
 const CountryConsentForm = (props) => {
