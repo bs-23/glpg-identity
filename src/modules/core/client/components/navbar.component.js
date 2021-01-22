@@ -1,9 +1,9 @@
+import _ from 'lodash';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useCookies } from 'react-cookie';
 import { useHistory } from 'react-router-dom';
-import { Nav, Navbar, NavDropdown } from "react-bootstrap";
-import _ from 'lodash';
+import { Navbar } from 'react-bootstrap';
 
 export default function Navigationbar() {
     const [, setCookie, removeCookie] = useCookies();
@@ -16,38 +16,38 @@ export default function Navigationbar() {
     const handleLogOut = () => {
         setCookie('logged_in', '', { path: '/' });
         removeCookie('logged_in');
-    }
+    };
 
     const addFallbackIcon = (e) => {
         e.target.src = '/assets/flag/flag-placeholder.svg';
-    }
+    };
 
     const generateCountryIconPath = (country) => {
         if(country) return `/assets/flag/flag-${country.toLowerCase().replace(/ /g, "-")}.svg`;
         return `/assets/flag/flag-placeholder.svg`;
-    }
+    };
 
     const renderCountryIcons = () => {
-        if(userCountries){
-            const selectedCountries = countries && countries.filter(c => userCountries.includes(c.country_iso2) ? true : false).map(c => c.codbase_desc)
+        if(userCountries) {
+            const selectedCountries = countries && countries.filter(c => userCountries.includes(c.country_iso2) ? true : false).map(c => c.codbase_desc);
             return selectedCountries.map( country => {
                 return <img key={country} height="26" width="26" src={generateCountryIconPath(country)} onError={addFallbackIcon} title={country} alt="Flag" className="ml-1" />;
             })
         }
-    }
+    };
 
     const renderApplicationIcon = () => {
-        if(userApplications){
+        if(userApplications) {
             return userApplications.map(app => {
                 const { name, logo_link, slug } = app;
                 return <img className="ml-2" key={slug} src={logo_link} title={name} alt={`${name} Logo`} width="122" />
             })
         }
-    }
+    };
 
     const myProfileClickHandler = () => {
         history.push('/my-profile');
-    }
+    };
 
     return (
         <header className="app__header py-1 shadow-sm">
@@ -58,18 +58,6 @@ export default function Navigationbar() {
                             <h1 className="text-center">
                                 <a href="/"> <img alt="CDP LOGO" src="/assets/CDP.png" height="64" /></a>
                             </h1>
-                            {/*<Dropdown>
-                                <Dropdown.Toggle variant="secondary" className="mt-2">
-                                    Service
-                                </Dropdown.Toggle>
-                                <Dropdown.Menu>
-                                    <LinkContainer to="hcps"><Dropdown.Item>Information Management</Dropdown.Item></LinkContainer>
-                                    <LinkContainer to="#"><Dropdown.Item>Marketing & Promotion Management</Dropdown.Item></LinkContainer>
-                                    <LinkContainer to="users"><Dropdown.Item>User Management</Dropdown.Item></LinkContainer>
-                                    <LinkContainer to="#"><Dropdown.Item>Sample Request Management</Dropdown.Item></LinkContainer>
-                                    <LinkContainer to="#"><Dropdown.Item>Tag & Persona Management</Dropdown.Item></LinkContainer>
-                                </Dropdown.Menu>
-                            </Dropdown>*/}
                         </div>
                     </div>
                     <div className="col-9 text-right">
@@ -90,7 +78,7 @@ export default function Navigationbar() {
                     </div>
                 </div>
                 <Navbar collapseOnSelect expand={false} className="d-flex p-0 d-sm-none">
-                    <Navbar.Brand href="#home">
+                    <Navbar.Brand>
                         <h1 className="text-center">
                             <a href="/"> <img alt="CDP LOGO" src="/assets/CDP.png" height="50" /></a>
                         </h1>
@@ -102,7 +90,7 @@ export default function Navigationbar() {
                                 <i className="fas fa-times cdp-text-secondary fa-2x"></i>
                             </Navbar.Toggle>
                         </div>
-                        {loggedInUser.type !== 'admin' && <div className="">
+                        { loggedInUser.type !== 'admin' && <div>
                             {userApplications.length > 0 && <div className="px-3 border-bottom pb-2 mb-2">
                                 <label className="d-block">Application</label>
                                 {renderApplicationIcon()}
@@ -115,7 +103,7 @@ export default function Navigationbar() {
                         <div className="border-bottom mb-2">
                             <a className="d-flex align-items-center py-2 px-3" onClick={myProfileClickHandler} href="/api/logout"><i className="icon icon-user-round mr-2 app__header-icon-user "></i> {first_name + " " + last_name}</a>
                         </div>
-                        <div className="">
+                        <div>
                             <a className="d-flex align-items-center py-2 px-3" onClick={handleLogOut} href="/api/logout"><i className="icon icon-logout mr-2 app__header-icon-logout"></i> Sign out</a>
                         </div>
                     </Navbar.Collapse>

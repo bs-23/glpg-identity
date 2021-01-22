@@ -408,61 +408,6 @@ async function getHcps(req, res) {
     }
 }
 
-async function editHcp(req, res) {
-    const { first_name, last_name, telephone } = req.body;
-    const response = new Response({}, []);
-
-    if (!first_name) {
-        response.errors.push(new CustomError('First name is missing.', 400, 'first_name'));
-    } else if (first_name.length > 50) {
-        response.errors.push(new CustomError('First name should be at most 50 characters', 400, 'first_name'));
-    }
-
-    if (!last_name) {
-        response.errors.push(new CustomError('Last name is missing.', 400, 'last_name'));
-    } else if (last_name.length > 50) {
-        response.errors.push(new CustomError('Last name should be at most 50 characters', 400, 'last_name'));
-    }
-
-    if (telephone && telephone.length > 25) {
-        response.errors.push(new CustomError('Telephone number should be at most 25 digits including country code', 400, 'telephone'));
-    }
-
-    if (response.errors.length) {
-        return res.status(400).send(response);
-    }
-
-    try {
-        const HcpUser = await Hcp.findOne({ where: { id: req.params.id } });
-
-        if (!HcpUser) {
-            response.errors.push(new CustomError('User not found', 404));
-            return res.status(404).send(response);
-        }
-
-        HcpUser.update({ first_name, last_name, telephone });
-
-        delete HcpUser.dataValues.password;
-        delete HcpUser.dataValues.created_by;
-        delete HcpUser.dataValues.updated_by;
-
-        await logService.log({
-            event_type: 'UPDATE',
-            object_id: HcpUser.id,
-            table_name: 'hcp_profiles',
-            actor: req.user.id,
-            remarks: 'Updated HCP profile'
-        });
-
-        response.data = HcpUser;
-        res.json(response);
-    } catch (err) {
-        console.error(err);
-        response.errors.push(new CustomError('Internal server error', 500));
-        res.status(500).send(response);
-    }
-}
-
 async function updateHcps(req, res) {
     const Hcps = req.body;
     const response = new Response([], []);
@@ -647,18 +592,6 @@ async function registrationLookup(req, res) {
 
     const response = new Response({}, []);
 
-    if (!email || !validator.isEmail(email)) {
-        response.errors.push(new CustomError('Email address is missing or invalid.', 400, 'email'));
-    }
-
-    if (!uuid) {
-        response.errors.push(new CustomError('UUID is missing.', 400, 'uuid'));
-    }
-
-    if (response.errors.length) {
-        return res.status(400).send(response);
-    }
-
     try {
         const profileByEmail = await Hcp.findOne({ where: where(fn('lower', col('email')), fn('lower', email)) });
 
@@ -687,8 +620,7 @@ async function registrationLookup(req, res) {
             const uuid_1_from_master_data = (master_data[0].uuid_1 || '');
             const uuid_2_from_master_data = (master_data[0].uuid_2 || '');
 
-            uuid_from_master_data = [uuid_1_from_master_data, uuid_2_from_master_data]
-                .find(id => id.replace(/[-/]/gi, '') === uuidWithoutSpecialCharacter);
+            uuid_from_master_data = [uuid_1_from_master_data, uuid_2_from_master_data].find(id => id.replace(/[-/]/gi, '') === uuidWithoutSpecialCharacter);
         }
 
         const profileByUUID = await Hcp.findOne({ where: { uuid: uuid_from_master_data || uuid } });
@@ -875,6 +807,7 @@ async function createHcpProfile(req, res) {
             birthdate,
             application_id: req.user.id,
             individual_id_onekey: master_data.individual_id_onekey,
+            status: master_data.individual_id_onekey ? hasDoubleOptIn ? 'consent_pending' : 'self_verified' : 'not_verified',
             origin_url,
             created_by: req.user.id,
             updated_by: req.user.id
@@ -893,9 +826,6 @@ async function createHcpProfile(req, res) {
             });
         }
 
-        hcpUser.status = master_data.individual_id_onekey ? hasDoubleOptIn ? 'consent_pending' : 'self_verified' : 'not_verified';
-        await hcpUser.save();
-
         response.data = getHcpViewModel(hcpUser.dataValues);
 
         if (hcpUser.dataValues.status === 'consent_pending') {
@@ -913,8 +843,7 @@ async function createHcpProfile(req, res) {
             event_type: 'CREATE',
             object_id: hcpUser.id,
             table_name: 'hcp_profiles',
-            actor: req.user.id,
-            remarks: 'HCP user created'
+            actor: req.user.id
         });
 
         res.json(response);
@@ -1836,7 +1765,6 @@ async function getHcpsFromDatasync(req, res) {
 }
 
 exports.getHcps = getHcps;
-exports.editHcp = editHcp;
 exports.registrationLookup = registrationLookup;
 exports.createHcpProfile = createHcpProfile;
 exports.getHcpProfile = getHcpProfile;

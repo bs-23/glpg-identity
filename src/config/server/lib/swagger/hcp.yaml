@@ -263,50 +263,6 @@ paths:
                         applicaiton/json:
                             schema:
                                 $ref: "#/components/schemas/errorResponse"
-        put:
-            tags:
-                - hcp-profiles
-            summary: Update HCP user's profile by id.
-            parameters:
-                - name: id
-                  in: path
-                  required: true
-                  description: the user identifier
-                  schema:
-                    type: string
-            requestBody:
-                required: false
-                content:
-                    application/json:
-                        schema:
-                            type: object
-                            properties:
-                                first_name:
-                                    type: string
-                                last_name:
-                                    type: string
-                                telephone:
-                                    type: string
-            responses:
-                200:
-                    description: The request has succeeded.
-                    content:
-                        applicaiton/json:
-                            schema:
-                                type: object
-                                properties:
-                                    data:
-                                        $ref: "#/components/schemas/hcpProfile"
-                                    errors:
-                                        $ref: "#/components/schemas/errorBodyInSuccess"
-                401:
-                    description: User is not authenticated.
-                404:
-                    description: Hcp user profile not found.
-                    content:
-                        applicaiton/json:
-                            schema:
-                                $ref: "#/components/schemas/errorResponse"
 
     /api/hcp-profiles/{id}/consents:
             put:
