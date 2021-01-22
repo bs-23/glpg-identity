@@ -73,6 +73,7 @@ const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
         type: DataTypes.STRING(20)
     },
     status: {
+        allowNull: false,
         type: DataTypes.ENUM,
         values: ['self_verified', 'manually_verified', 'consent_pending', 'not_verified', 'rejected']
     },
