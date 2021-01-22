@@ -1,7 +1,7 @@
 const path = require("path");
 const { DataTypes } = require("sequelize");
 const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequelize"));
-const Consent = require(path.join(process.cwd(), 'src/modules/consent/server/consent.model'));
+const Consent = require(path.join(process.cwd(), 'src/modules/consent/manage-consent/server/consent.model'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const validator = require('validator');
 

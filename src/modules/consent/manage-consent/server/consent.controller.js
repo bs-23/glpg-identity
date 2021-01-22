@@ -1,15 +1,14 @@
 const path = require('path');
 const _ = require('lodash');
 const { QueryTypes, Op } = require('sequelize');
-const Sequelize = require('sequelize');
 const validator = require('validator');
 const uniqueSlug = require('unique-slug');
 
-const Consent = require('./consent.model');
-const ConsentLocale = require('./consent-locale.model');
-const ConsentCountry = require('./consent-country.model');
-const ConsentCategory = require('./consent-category.model');
-const ConsentLanguage = require('./consent-locale.model');
+const Consent = require(path.join(process.cwd(), 'src/modules/consent/manage-consent/server/consent.model'));
+const ConsentLocale = require(path.join(process.cwd(), 'src/modules/consent/manage-consent/server/consent-locale.model'));
+const ConsentCountry = require(path.join(process.cwd(), 'src/modules/consent/consent-country/server/consent-country.model'));
+const ConsentCategory = require(path.join(process.cwd(), 'src/modules/consent/consent-category/server/consent-category.model'));
+const ConsentLanguage = require(path.join(process.cwd(), 'src/modules/consent/manage-consent/server/consent-locale.model'));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
 const HCPS = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-profile.model'));
