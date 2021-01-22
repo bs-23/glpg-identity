@@ -11,9 +11,6 @@ phases:
             - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
             - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
             - yarn install
-            # - echo seeding database start
-            # - yarn seed
-            # - echo seeding database end
             # - echo running unit test
             # - yarn test
             # - echo unit test completed
