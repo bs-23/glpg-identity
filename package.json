@@ -105,7 +105,7 @@
         "sonarqube-scanner": "^2.8.0",
         "styled-components": "5.2.1",
         "supertest": "^6.1.1",
-        "swagger-jsdoc": "6.0.1",
+        "swagger-jsdoc": "4.3.1",
         "swagger-ui-express": "^4.1.6",
         "terser-webpack-plugin": "^5.1.1",
         "unique-slug": "^2.0.2",
