@@ -21,6 +21,7 @@ const PasswordPolicies = require(path.join(process.cwd(), 'src/modules/core/serv
 const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/platform/user/server/permission/permissions'));
 const Filter = require(path.join(process.cwd(), "src/modules/core/server/filter/filter.model"));
 const filterService = require(path.join(process.cwd(), 'src/modules/platform/user/server/filter'));
+const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
 function generateAccessToken(doc) {
     return jwt.sign({
@@ -402,7 +403,7 @@ async function getHcps(req, res) {
         response.data = data;
         res.json(response);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -581,7 +582,7 @@ async function updateHcps(req, res) {
 
         res.json(response);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -639,7 +640,7 @@ async function registrationLookup(req, res) {
 
         res.json(response);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -848,7 +849,7 @@ async function createHcpProfile(req, res) {
 
         res.json(response);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -894,7 +895,7 @@ async function confirmConsents(req, res) {
 
         res.json(response);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -942,7 +943,7 @@ async function approveHCPUser(req, res) {
                 reset_password_token: null,
                 reset_password_expires: null
             });
-            console.error(e);
+            logger.error(e);
             response.errors.push(new CustomError('Failed to approve user.', 400));
             return res.status(400).send(response);
         }
@@ -959,7 +960,7 @@ async function approveHCPUser(req, res) {
 
         res.json(response);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -1006,7 +1007,7 @@ async function rejectHCPUser(req, res) {
 
         res.json(response);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -1068,7 +1069,7 @@ async function getHcpProfile(req, res) {
 
         res.json(response);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -1111,7 +1112,7 @@ async function getHCPUserConsents(req, res) {
 
         res.json(response);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -1185,7 +1186,7 @@ async function changePassword(req, res) {
 
         res.send(response);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -1283,7 +1284,7 @@ async function resetPassword(req, res) {
 
         res.json(response);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -1332,7 +1333,7 @@ async function forgetPassword(req, res) {
         res.status(400).send(response);
 
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -1401,7 +1402,7 @@ async function getSpecialties(req, res) {
         response.data = masterDataSpecialties;
         res.json(response);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -1485,7 +1486,7 @@ async function getSpecialtiesWithEnglishTranslation(req, res) {
         response.data = masterDataSpecialties;
         res.json(response);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -1574,7 +1575,7 @@ async function getAccessToken(req, res) {
 
         res.json(response);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -1619,7 +1620,7 @@ async function updateHCPUserConsents(req, res) {
 
         res.json(response);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('An error occurred. Please try again.', 500));
         res.status(500).send(response);
     }
@@ -1655,7 +1656,7 @@ async function getSpecialtiesForCdp(req, res) {
         }));
         res.json(viewModels);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -1759,7 +1760,7 @@ async function getHcpsFromDatasync(req, res) {
 
         res.json(data);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
