@@ -34,7 +34,7 @@ const PartnerDetails = (props) => {
                     <div className="row">
                         <div className="col-12">
                             <h6>{props.detailType === 'hcp' ?
-                                partner.first_name + ' ' + partner.last_name : partner.contact_first_name + ' ' + contact_partner.last_name}</h6>
+                                partner.first_name + ' ' + partner.last_name : partner.requestor_first_name + ' ' + partner.requestor_last_name}</h6>
 
                         </div>
                         <div className="col-6">
