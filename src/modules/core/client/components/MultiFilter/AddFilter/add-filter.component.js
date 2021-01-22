@@ -172,9 +172,6 @@ const AddFilter = (props) => {
                             title={index+1}
                             index={index}
                             filter={filter}
-                            fieldValue={filter.fieldName}
-                            operatorValue={filter.operator}
-                            value={filter.value}
                             filterOptions={filterOptions}
                             isTouched={isTouched}
                             validationError={validationErrors[index]}
@@ -186,9 +183,7 @@ const AddFilter = (props) => {
                                 key={`${index}_${Math.random()}`}
                                 title={index+1}
                                 index={index}
-                                fieldValue={filter.fieldName}
-                                operatorValue={filter.operator}
-                                value={filter.value}
+                                filter={filter}
                                 filterOptions={filterOptions}
                                 isTouched={isTouched}
                                 validationError={validationErrors[index]}

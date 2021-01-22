@@ -4,6 +4,22 @@ import { operators } from '../../../../core/client/components/MultiFilter';
 import SpecialtyFilter from './specialty-filter.component';
 import store from '../../../../core/client/store';
 
+const getSpecialtyOptions = (filter) => {
+    const { country } = filter;
+
+    if(!country) return [];
+
+    const { specialties } = store.getState().hcpReducer;
+    const country_local_code = `${country.toLowerCase()}_en`;
+    const specialtyOptions = (specialties[country_local_code] || []).map(s => ({
+        value: s.cod_id_onekey,
+        label: s.cod_description,
+        displayText: s.cod_description
+    }));
+
+    return specialtyOptions;
+}
+
 export function getFilterOptions(userCountries, userApplications) {
     const statusOptions = [
         { value: 'self_verified', displayText: 'Self Verified' },
@@ -44,6 +60,14 @@ export function getFilterOptions(userCountries, userApplications) {
             operators: operators.getStringOperators(),
             maxLength: 20,
             schema: array().of(string().required('This field can not be empty.'))
+        },
+        {
+            fieldName: 'specialty_onekey',
+            valueType: 'select',
+            displayText: 'Specialty',
+            operators: operators.getSelectOperators(),
+            getOptions: getSpecialtyOptions,
+            customFilterComponent: SpecialtyFilter
         },
         {
             fieldName: 'telephone',
@@ -90,22 +114,6 @@ export function getDatasyncFilterOptions(userCountries) {
         { value: 'STA.3', displayText: 'Valid' },
         { value: 'STA.9', displayText: 'Invalid' }
     ];
-
-    const getSpecialtyOptions = (filter) => {
-        const { country } = filter;
-
-        if(!country) return [];
-
-        const { specialties } = store.getState().hcpReducer;
-        const country_local_code = `${country.toLowerCase()}_en`;
-        const specialtyOptions = (specialties[country_local_code] || []).map(s => ({
-            value: s.cod_id_onekey,
-            label: s.cod_description,
-            displayText: s.cod_description
-        }));
-
-        return specialtyOptions;
-    }
 
     const filterOptions = [
         {
@@ -208,13 +216,6 @@ export function getDatasyncFilterOptions(userCountries) {
             displayText: 'Post Code',
             operators: operators.getStringOperators()
         }
-        // {
-        //     fieldName: 'specialty',
-        //     valueType: 'select',
-        //     displayText: 'Specialty',
-        //     operators: operators.getSelectOperators(),
-        //     options: specialtyOptions
-        // }
     ];
 
     return filterOptions;

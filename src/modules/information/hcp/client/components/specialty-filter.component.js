@@ -16,6 +16,8 @@ const SpecialtyFilter = (props) => {
         onRemove
     } = props;
 
+    const [selectedSpecialties, setSelectedSpecialties] = useState([]);
+    const specialties = useSelector(state => state.hcpReducer.specialties);
     const countries = useSelector(state => state.countryReducer.countries);
     const dispatch = useDispatch();
 
@@ -41,8 +43,15 @@ const SpecialtyFilter = (props) => {
 
     useEffect(() => {
         // console.log('Refetching sp......................')
-        if(filter.country) dispatch(getHCPSpecialities(filter.country, 'en'));
+        if(filter.country) {
+            dispatch(getHCPSpecialities(filter.country, 'en'));
+            setSelectedSpecialties(getSelectedOptions());
+        }
     }, [filter.country]);
+
+    useEffect(() => {
+        setSelectedSpecialties(getSelectedOptions());
+    }, [specialties, value])
 
     return <div className="pb-3 mb-3 border-bottom">
         <div className="d-flex justify-content-between align-items-center">
@@ -101,10 +110,12 @@ const SpecialtyFilter = (props) => {
                     value={getSelectedCountry()}
                     onChange={({ value }) => {
                         onChange('country', value, index);
-                        // setSelectedCountry(value);
+                        onChange('value', [], index);
                     }}
                 />
-                {isTouched && <div className="invalid-feedback">{validationError.value}</div>}
+                {isTouched && getSelectedCountry().length === 0 &&
+                    <div className="invalid-feedback">Field can not be empty.</div>
+                }
             </React.Fragment>
         </div>
         <div>
@@ -121,10 +132,13 @@ const SpecialtyFilter = (props) => {
                     options={currentFilterOption.getOptions({ country: filter.country })}
                     className="multiselect"
                     classNamePrefix="multiselect"
-                    value={getSelectedOptions()}
+                    value={selectedSpecialties}
                     onChange={selectedOption => {
                         const value = (selectedOption || []).map(o => o.value);
+                        const displayText = (selectedOption || []).map(o => o.label);
+
                         onChange('value', value, index);
+                        onChange('displayText', displayText, index);
                     }}
                 />
                 {isTouched && <div className="invalid-feedback">{validationError.value}</div>}
