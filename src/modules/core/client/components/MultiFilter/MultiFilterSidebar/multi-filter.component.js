@@ -198,9 +198,13 @@ const MultiFilter = (props, ref) => {
     };
 
     const getSummaryValueText = (filter) => {
-        const currentFilter = options.find(o => o.fieldName === filter.fieldName);
-        if (!currentFilter || currentFilter.valueType !== 'select') return filter.value;
-        return currentFilter.options.filter(o => filter.value.some(f => f === o.value)).map(f => f.displayText);
+        const currentFilterOption = options.find(o => o.fieldName === filter.fieldName);
+
+        if (!currentFilterOption || currentFilterOption.valueType !== 'select') return filter.value;
+
+        return Array.isArray(filter.displayText)
+            ? filter.displayText.join(', ')
+            : filter.displayText;
     }
 
     const handlePresetChange = (e) => {

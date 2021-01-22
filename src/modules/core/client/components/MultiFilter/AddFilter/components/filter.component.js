@@ -8,9 +8,7 @@ const Filter = (props) => {
     const {
         title,
         index,
-        value,
-        fieldValue,
-        operatorValue,
+        filter,
         filterOptions,
         isTouched,
         validationError,
@@ -18,12 +16,14 @@ const Filter = (props) => {
         onRemove
     } = props;
 
-    const type = filterOptions.find(filter => filter.fieldName === fieldValue)?.valueType || 'text';
+    const { value, fieldName, operator } = filter;
 
-    const filterOption = filterOptions.find(fo => fo.fieldName === fieldValue) || {};
+    const type = filterOptions.find(filter => filter.fieldName === fieldName)?.valueType || 'text';
+
+    const filterOption = filterOptions.find(fo => fo.fieldName === fieldName) || {};
 
     const getOptions = () => {
-        const filter = filterOptions.find(filter => filter.fieldName === fieldValue);
+        const filter = filterOptions.find(filter => filter.fieldName === fieldName);
         const selectOptions = filter && filter.options ? filter.options : [];
         return selectOptions.map(s => ({ label: s.displayText, value: s.value }));
     };
@@ -74,7 +74,7 @@ const Filter = (props) => {
                 id="field"
                 as="select"
                 name="fieldName"
-                value={fieldValue}
+                value={fieldName}
                 onChange={(e) => onChange(e.target.name, e.target.value, index)}
             >
                 <option className="p-2" value=''> Select an Option </option>
@@ -91,12 +91,12 @@ const Filter = (props) => {
                 id="operator"
                 as="select"
                 name="operator"
-                value={operatorValue}
+                value={operator}
                 onChange={(e) => onChange(e.target.name, e.target.value, index)}
             >
                 <>
                     <option className="p-2" value=''> Select an Option </option>
-                    {filterOptions && filterOptions.find(filter => filter.fieldName === fieldValue)?.operators?.map(item => <option key={item.key} value={item.key} >{item.displayText}</option>)}
+                    {filterOptions && filterOptions.find(filter => filter.fieldName === fieldName)?.operators?.map(item => <option key={item.key} value={item.key} >{item.displayText}</option>)}
                 </>
             </Field>
             {isTouched && <div className="invalid-feedback">{validationError.operator}</div>}
@@ -111,7 +111,7 @@ const Filter = (props) => {
                     <Select
                         defaultValue={[]}
                         isMulti={true}
-                        name={fieldValue}
+                        name={fieldName}
                         hideSelectedOptions={false}
                         options={getOptions()}
                         className="multiselect"
@@ -119,7 +119,10 @@ const Filter = (props) => {
                         value={getSelectedOptions()}
                         onChange={selectedOption => {
                             const value = (selectedOption || []).map(o => o.value);
+                            const displayText = (selectedOption || []).map(o => o.label);
+
                             onChange('value', value, index);
+                            onChange('displayText', displayText, index);
                         }}
                     />
                     {isTouched && <div className="invalid-feedback">{validationError.value}</div>}

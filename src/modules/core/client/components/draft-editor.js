@@ -6,6 +6,10 @@ import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import 'draft-js/dist/Draft.css';
 
+String.prototype.escapedHtmlLength = function() {
+    return this ? validator.escape(this).length : 0;
+}
+
 const toolbarOptions = {
     options: ['inline', 'link'],
     inline: {
@@ -103,9 +107,6 @@ export default function DraftEditor({ onChangeHTML, htmlContent }) {
 
             const props = {
                 plainText,
-                escapedLength: editorContentInHTML
-                    ? validator.escape(editorContentInHTML).length
-                    : 0,
                 cleanupEmptyHtmlTags
             }
 
