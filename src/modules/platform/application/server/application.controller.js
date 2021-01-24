@@ -2,8 +2,7 @@ const path = require('path');
 const jwt = require('jsonwebtoken');
 const Application = require('./application.model');
 const Data = require('./data.model');
-const { Op } = require('sequelize');
-const { assign } = require('lodash');
+const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 
@@ -69,7 +68,7 @@ async function getToken(req, res) {
                         response.errors.push(new CustomError('The refresh_token is invalid.', 4401));
                     }
                 } catch(err) {
-                    console.error(err);
+                    logger.error(err);
                     response.errors.push(new CustomError('The refresh_token is expired.', 4401));
                 }
             }
@@ -86,7 +85,7 @@ async function getToken(req, res) {
 
         res.send(response);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -101,7 +100,7 @@ async function getApplications(req, res) {
         res.json(applications);
 
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -109,7 +108,7 @@ async function getApplications(req, res) {
 async function saveData(req, res) {
     const response = new Response({}, []);
 
-    try{
+    try {
         const {type, data} = req.body;
 
         if(!type) {
@@ -136,8 +135,6 @@ async function saveData(req, res) {
             return res.status(400).send(response);
         }
 
-
-
         const info = await Data.create({
             application_id: req.user.id,
             type,
@@ -155,16 +152,16 @@ async function saveData(req, res) {
         };
 
         res.json(response);
-    }
-    catch(err){
-        console.error(err);
+    } catch(err) {
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
 
 async function getData(req, res) {
     const response = new Response({}, []);
-    try{
+
+    try {
         const doc = await Data.findOne({
             where: { id: req.params.id },
             include: {
@@ -181,9 +178,8 @@ async function getData(req, res) {
         response.data = doc;
 
         res.json(response);
-    }
-    catch(err){
-        console.error(err);
+    } catch(err) {
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
