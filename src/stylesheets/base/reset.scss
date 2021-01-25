@@ -383,3 +383,13 @@ a {
         border-top-color: $white-color !important;
     }
 }
+
+
+
+.recaptcha-info a {
+    color: $secondary-color;
+}
+
+.grecaptcha-badge {
+    visibility: hidden;
+}

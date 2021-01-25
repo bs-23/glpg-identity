@@ -11,6 +11,7 @@ const AddFilter = (props) => {
         filters: alreadyAddedFilters,
         logic: alreadyAddedLogic,
         filterOptions,
+        maxNumberOfFilters,
         onDone,
         onHide
     } = props;
@@ -192,7 +193,7 @@ const AddFilter = (props) => {
                             />
                     })
                 }
-                <Button className="btn cdp-btn-outline-primary mt-4 btn-block" label="+ add more filter" onClick={handleAddMoreFilter} />
+                {filters.length < maxNumberOfFilters && <Button className="btn cdp-btn-outline-primary mt-4 btn-block" label="+ add more filter" onClick={handleAddMoreFilter} />}
                 <Button className="btn cdp-btn-secondary btn-block text-white" label="Done" onClick={handleDone} />
             </div>
         </ScrollBars>
