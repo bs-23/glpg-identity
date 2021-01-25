@@ -2,11 +2,13 @@ const path = require('path');
 const helmet = require('helmet');
 const hbs = require('express-hbs');
 const express = require('express');
-const config = require('../config');
+const passport = require('passport');
+const morganBody = require('morgan-body');
 const compression = require('compression');
 const cookieParser = require('cookie-parser');
-const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
-const passport = require('passport');
+const config = require('../config');
+const logger = require('./winston');
+const nodecache = require('./nodecache');
 const swagger = require('./swagger/swagger');
 const swaggerUi = require('swagger-ui-express');
 
@@ -36,10 +38,19 @@ module.exports = async function () {
     app.use(compression());
     app.use(cookieParser(nodecache.getValue('CDP_COOKIE_SECRET')));
     app.use(express.json());
+    morganBody(app, {
+        noColors: true,
+        prettify: false,
+        filterParameters: ['password'],
+        stream: {
+            write: message => {
+                logger.info(message);
+            }
+        }
+    });
     app.use(express.urlencoded({ extended: true }));
     app.use(express.static(path.join(process.cwd(), 'wwwroot')));
-    app.use('/api-docs', passport.authenticate("swagger-jwt",
-        { session: false, failureRedirect: '/swagger/login' }), swaggerUi.serve, swaggerUi.setup(swagger.specs, swagger.uiOptions));
+    app.use('/api-docs', passport.authenticate("swagger-jwt", { session: false, failureRedirect: '/swagger/login' }), swaggerUi.serve, swaggerUi.setup(swagger.specs, swagger.uiOptions));
 
     app.engine('html', hbs.express4({ extname: '.html' }));
     app.set('view engine', 'html');
