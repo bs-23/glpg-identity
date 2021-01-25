@@ -1,4 +1,4 @@
-// require('newrelic');
+require('newrelic');
 
 (async function () {
     const path = require('path');
