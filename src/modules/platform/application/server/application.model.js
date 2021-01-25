@@ -59,6 +59,9 @@ const Application = sequelize.cdpConnector.define('applications', {
     },
     updated_by: {
         type: DataTypes.UUID
+    },
+    metadata: {
+        type: DataTypes.STRING
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
