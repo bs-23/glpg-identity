@@ -303,8 +303,6 @@ async function getHcps(req, res) {
 
         const [userPermittedApplications, userPermittedCountries] = await getUserPermissions(req.user.id);
 
-        const specialty_list = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwspecialtymaster', { type: QueryTypes.SELECT });
-
         const orderBy = req.query.orderBy === 'null'
             ? null
             : req.query.orderBy;
@@ -331,33 +329,11 @@ async function getHcps(req, res) {
                 as: 'hcpConsents',
                 attributes: ['consent_id', 'consent_confirmed', 'opt_type'],
             }],
-            attributes: { exclude: ['password', 'created_by', 'updated_by'] },
+            attributes: { exclude: ['origin_url', 'password', 'password_updated_at', 'reset_password_expires', 'reset_password_token', 'failed_auth_attempt', 'created_by', 'updated_by', 'updated_at'] },
             offset,
             limit,
             order
         });
-
-        // await Promise.all(hcps.map(async hcp => {
-        //     const opt_types = new Set();
-
-        //     await Promise.all(hcp['hcpConsents'].map(async hcpConsent => {
-
-        //         if (hcpConsent.consent_confirmed) {
-        //             const country_consent = await ConsentCountry.findOne({
-        //                 where: {
-        //                     consent_id: hcpConsent.consent_id,
-        //                     country_iso2: {
-        //                         [Op.iLike]: hcp.country_iso2
-        //                     },
-        //                 }
-        //             });
-        //             opt_types.add(country_consent.opt_type);
-        //         }
-        //     }));
-
-        //     hcp.dataValues.opt_types = [...opt_types];
-        //     delete hcp.dataValues['hcpConsents'];
-        // }));
 
         hcps.map(hcp => {
             const opt_types = new Set();
@@ -372,31 +348,30 @@ async function getHcps(req, res) {
             delete hcp.dataValues['hcpConsents'];
         });
 
-        const totalUser = await Hcp.count({//counting total data for pagintaion
-            where: filterOptions
+        const totalUser = await Hcp.count({ where: filterOptions });
+
+        const specialties = _.uniq(_.map(hcps, 'specialty_onekey')).join("','");
+
+        const specialty_list = await sequelize.datasyncConnector.query(`
+            SELECT cod_id_onekey, cod_description
+            FROM ciam.vwspecialtymaster
+            WHERE cod_id_onekey IN ('${specialties}') AND cod_locale='en'
+        `, {
+            type: QueryTypes.SELECT
         });
 
-        const hcp_users = [];
-        hcps.forEach(user => {//add specialty name from data sync
-            const specialties = specialty_list.filter(i => i.cod_id_onekey === user.specialty_onekey);
-            const specialtyInEnglish = specialties && specialties.find(s => s.cod_locale === 'en');
-            (specialtyInEnglish)
-                ? user.dataValues.specialty_description = specialtyInEnglish.cod_description
-                : specialties.length
-                    ? user.dataValues.specialty_description = specialties[0].cod_description
-                    : user.dataValues.specialty_description = null;
-            hcp_users.push(user);
+        hcps.forEach(h => {
+            h.setDataValue('specialty_description', specialty_list.find(x => x.cod_id_onekey === h.specialty_onekey).cod_description);
         });
 
         const data = {
-            users: hcp_users,
+            users: hcps,
             page: page + 1,
             limit,
             total: totalUser,
             start: limit * page + 1,
             end: offset + limit > totalUser ? totalUser : offset + limit,
             status: status ? status : null,
-            // codbase: codbase ? codbase : null,
             countries: userPermittedCountries
         };
 
