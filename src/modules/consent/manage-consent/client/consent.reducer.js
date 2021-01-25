@@ -1,10 +1,7 @@
 import Types from "./consent.types";
 
 const initialState = {
-    consents: {},
-    veeva_consents: {},
     cdp_consents: [],
-    country_consents: [],
     consent: null
 };
 

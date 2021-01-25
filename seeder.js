@@ -33,7 +33,7 @@ async function init() {
 
     const Application = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.model'));
     const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model'));
-    const ConsentCategory = require(path.join(process.cwd(), 'src/modules/consent/server/consent-category.model'));
+    const ConsentCategory = require(path.join(process.cwd(), 'src/modules/consent/consent-category/server/consent-category.model'));
     const Consent = require(path.join(process.cwd(), 'src/modules/consent/manage-consent/server/consent.model.js'));
     const ConsentLocale = require(path.join(process.cwd(), 'src/modules/consent/manage-consent/server/consent-locale.model.js'));
     const ConsentCountry = require(path.join(process.cwd(), 'src/modules/consent/consent-country/server/consent-country.model.js'));

@@ -1,5 +1,5 @@
 const path = require("path");
-const controller = require('./consent.controller');
+const controller = require('./consent-performance.controller');
 const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/platform/user/server/user-authentication.middleware.js'));
 
 module.exports = app => {

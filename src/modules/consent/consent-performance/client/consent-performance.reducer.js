@@ -2,9 +2,7 @@ import Types from "./consent-performace.types";
 
 const initialState = {
     consents: {},
-    veeva_consents: {},
-    cdp_consents: [],
-    consent: null
+    veeva_consents: {}
 };
 
 export default function reducer(state = initialState, action) {
