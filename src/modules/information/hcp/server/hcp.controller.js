@@ -1681,9 +1681,6 @@ async function getHcpsFromDatasync(req, res) {
             order.push([orderBy, orderType]);
         }
 
-        if (orderBy !== 'firstname') order.push(['firstname', 'ASC']);
-        if (orderBy !== 'lastname') order.push(['lastname', 'ASC']);
-
         const currentFilter = req.body;
 
         const [, userPermittedCountries] = await getUserPermissions(req.user.id);
