@@ -8,4 +8,8 @@ module.exports = app => {
 
     app.route('/api/veeva-consent-performance-report')
         .get(CDPAuthStrategy, controller.getVeevaConsentsReport);
+
+    app.route('/api/export-veeva-consent-performance-report')
+        .get(CDPAuthStrategy, controller.exportVeevaConsentsReport);
+
 };

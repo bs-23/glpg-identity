@@ -9,6 +9,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 import axios from 'axios';
 import _ from 'lodash';
 import parse from 'html-react-parser';
+import fileDownload from 'js-file-download';
 
 import { getAllCountries } from '../../../core/client/country/country.actions';
 import { getVeevaConsentReport } from './consent-performace.actions';
@@ -103,6 +104,13 @@ const ConsentPerformanceReport = () => {
         return splitStr.join(' ');
     }
 
+    function exportExcelFile() {
+        axios.get('/api/export-veeva-consent-performance-report', { responseType: 'blob',})
+        .then(res => {
+            fileDownload(res.data, 'veeva-consent-report.xlsx');
+        });
+    }
+
 
     useEffect(() => {
         dispatch(getAllCountries());
@@ -154,7 +162,10 @@ const ConsentPerformanceReport = () => {
                                 </div>
 
                                 <div className="d-flex pt-3 pt-sm-0 mb-2">
+
                                     <React.Fragment>
+                                        <button onClick={() => exportExcelFile()}>Export Excel</button>
+
                                         {countries && consents_report['countries'] &&
                                             <Dropdown className="ml-auto dropdown-customize mr-2">
                                                 <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center">
