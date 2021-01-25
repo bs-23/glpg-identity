@@ -56,6 +56,7 @@ const UsersFilter = ({ selectedFilterSetting, onHide, onExecute, show, tableName
         onExecute={onExecute}
         ref={multiFilterRef}
         selectedScopeKey={selectedScopeKey}
+        maxNumberOfFilters={5}
     />
 }
 
