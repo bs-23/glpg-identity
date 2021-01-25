@@ -143,11 +143,11 @@ const VendorManagement = () => {
                                                 <tr key={index}>
                                                     {
                                                         (detailType === 'hcp' || detailType === 'hco') &&
-                                                        <td>{detailType === 'hcp' || detailType === 'hco' ? item.onekey_id : '--'}</td>
+                                                        <td>{item.onekey_id || '--'}</td>
                                                     }
                                                     {
                                                         (detailType === 'hcp' || detailType === 'hco') &&
-                                                        <td>{detailType === 'hco' ? item.uuid : '--'}</td>
+                                                        <td>{item.uuid || '--'}</td>
                                                     }
                                                     <td>{item.first_name ? item.first_name : item.requestor_first_name}</td>
                                                     <td>{item.last_name ? item.last_name : item.requestor_last_name}</td>

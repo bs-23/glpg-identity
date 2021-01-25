@@ -14,7 +14,7 @@ const File = sequelize.cdpConnector.define('files', {
         allowNull: false,
         type: DataTypes.STRING
     },
-    bucket: {
+    bucket_name: {
         allowNull: false,
         type: DataTypes.STRING
     },
@@ -27,7 +27,9 @@ const File = sequelize.cdpConnector.define('files', {
     },
     table_name: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.ENUM,
+        values: ['partners', 'partner_vendors'],
+        defaultValue: 'partners'
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
