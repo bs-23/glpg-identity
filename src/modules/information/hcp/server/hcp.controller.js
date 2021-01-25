@@ -55,21 +55,6 @@ function getHcpViewModel(hcp) {
     return model;
 }
 
-function mapMasterDataToHcpProfile(masterData) {
-    const model = {};
-
-    model.salutation = masterData.ind_prefixname_desc;
-    model.individual_id_onekey = masterData.individual_id_onekey;
-    model.uuid = masterData.uuid_1 || masterData.uuid_2;
-    model.first_name = masterData.firstname;
-    model.last_name = masterData.lastname;
-    model.country_iso2 = masterData.country_iso2;
-    model.telephone = masterData.telephone;
-    model.specialty_onekey = masterData.specialty_code;
-
-    return model;
-}
-
 async function notifyHcpUserApproval(hcpUser) {
     const userApplication = await Application.findOne({ where: { id: hcpUser.application_id } });
     const token = jwt.sign({
@@ -579,12 +564,10 @@ async function registrationLookup(req, res) {
         const uuidWithoutSpecialCharacter = uuid.replace(/[-/]/gi, '');
 
         const master_data = await sequelize.datasyncConnector.query(`
-            SELECT h.*, s.specialty_code
-            FROM ciam.vwhcpmaster AS h
-            INNER JOIN ciam.vwmaphcpspecialty AS s
-            ON s.individual_id_onekey = h.individual_id_onekey
-            WHERE regexp_replace(h.uuid_1, '[-]', '', 'gi') = $uuid
-            OR regexp_replace(h.uuid_2, '[-]', '', 'gi') = $uuid
+            SELECT individual_id_onekey, uuid_1, uuid_2, ind_prefixname_desc, firstname, lastname, country_iso2, telephone, specialty_1_code
+            FROM ciam.vwhcpmaster
+            WHERE regexp_replace(uuid_1, '[-]', '', 'gi') = $uuid
+            OR regexp_replace(uuid_2, '[-]', '', 'gi') = $uuid
         `, {
             bind: { uuid: uuidWithoutSpecialCharacter },
             type: QueryTypes.SELECT
@@ -607,7 +590,16 @@ async function registrationLookup(req, res) {
         }
 
         if (master_data && master_data.length) {
-            response.data = mapMasterDataToHcpProfile(master_data[0]);
+            response.data = {
+                salutation: master_data[0].ind_prefixname_desc,
+                individual_id_onekey: master_data[0].individual_id_onekey,
+                uuid: master_data[0].uuid_1 || master_data[0].uuid_2,
+                first_name: master_data[0].firstname,
+                last_name: master_data[0].lastname,
+                country_iso2: master_data[0].country_iso2,
+                telephone: master_data[0].telephone,
+                specialty_onekey: master_data[0].specialty_1_code
+            };
         } else {
             response.errors.push(new CustomError('Invalid UUID.', 4100, 'uuid'));
             return res.status(400).send(response);
