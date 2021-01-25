@@ -57,6 +57,7 @@ const HCPFilter = ({ selectedFilterSetting, onHide, onExecute, show, tableName, 
         ref={multiFilterRef}
         scopeOptions={scopeOptions}
         selectedScopeKey={selectedScopeKey}
+        maxNumberOfFilters={5}
     />
 }
 
