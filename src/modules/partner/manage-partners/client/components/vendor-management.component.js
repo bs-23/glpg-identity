@@ -112,7 +112,7 @@ const VendorManagement = () => {
                                 <div>
                                     <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/vendor-management/vendors">Vendors</NavLink>
                                     <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/vendor-management/wholesalers">Wholesalers</NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/vendor-management/hcp">Health Care Professional</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/vendor-management/hcp">Health Care Professionals</NavLink>
                                     <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/vendor-management/hco">Health Care Organizations</NavLink>
                                 </div>
                             </div>
@@ -120,51 +120,57 @@ const VendorManagement = () => {
                         </div>
 
                         <div className="table-responsive shadow-sm mb-3">
-                            <table className="table table-hover table-sm mb-0 cdp-table mb-2">
-                                <thead className="cdp-table__header  cdp-bg-primary text-white">
-                                    <tr>
-                                        <th>OneKey Id</th>
-                                        <th>UUID</th>
-                                        <th><span className={sort.value === 'first_name' || sort.value === 'requestor_first_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, detailType === 'hcp' ? 'first_name' : 'requestor_first_name')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                        <th><span className={sort.value === 'last_name' || sort.value === 'requestor_last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, detailType === 'hcp' ? 'last_name' : 'requestor_last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                        <th><span className={sort.value === 'status' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'status')}>Data Request<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                        <th>Data Origin</th>
-                                        <th><span className={sort.value === 'language' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'status')}>Language<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                        <th>Street House No</th>
-                                        <th><span className={sort.value === 'city' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'city')}>City<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                        <th><span className={sort.value === 'country_iso2' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'country_iso2')}>Country<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {
-                                        countries && countries.length > 0 && partnersData.partners && partnersData.partners.length > 0 && partnersData.partners.map((item, index) =>
-                                        (
-                                            <tr key={index}>
-                                                <td>{detailType === 'hcp' ? item.onekey_id : '--'}</td>
-                                                <td>{detailType === 'hcp' || detailType === 'hco' ? item.uuid : '--'}</td>
-                                                <td>{item.first_name}</td>
-                                                <td>{item.last_name}</td>
-                                                <td>{item.status}</td>
-                                                <td>--</td>
-                                                <td>{item.language}</td>
-                                                <td>{item.address}</td>
-                                                <td>{item.city}</td>
-                                                <td>{(countries.find(i => i.country_iso2.toLowerCase() === item.country_iso2.toLowerCase())).countryname}</td>
-                                                <td><Dropdown className="ml-auto dropdown-customize">
-                                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
-                                                    </Dropdown.Toggle>
-                                                    <Dropdown.Menu>
-                                                        <Dropdown.Item>Manage Status</Dropdown.Item>
-                                                        <Dropdown.Item onClick={() => setDetailShow(true)}>Profile</Dropdown.Item>
-                                                        <PartnerDetails countries={countries} detailId={item.id} detailType={detailType} changeDetailShow={(val) => setDetailShow(val)} detailShow={detailShow} />
-                                                    </Dropdown.Menu>
-                                                </Dropdown></td>
-                                            </tr>
-                                        ))
-                                    }
-                                </tbody>
-                            </table>
+                            {countries && countries.length > 0 && partnersData.partners && partnersData.partners.length > 0 &&
+                                <table className="table table-hover table-sm mb-0 cdp-table mb-2">
+                                    <thead className="cdp-table__header  cdp-bg-primary text-white">
+                                        <tr>
+                                            {(detailType === 'hcp' || detailType === 'hco') && <th>OneKey Id</th>}
+                                            {(detailType === 'hcp' || detailType === 'hco') && <th>UUID</th>}
+                                            <th><span className={sort.value === 'first_name' || sort.value === 'requestor_first_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, detailType === 'hcp' ? 'first_name' : 'requestor_first_name')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                            <th><span className={sort.value === 'last_name' || sort.value === 'requestor_last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, detailType === 'hcp' ? 'last_name' : 'requestor_last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                            <th>Data Origin</th>
+                                            <th><span className={sort.value === 'language' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'status')}>Language<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                            <th>Street House No</th>
+                                            <th><span className={sort.value === 'city' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'city')}>City<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                            <th><span className={sort.value === 'country_iso2' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'country_iso2')}>Country<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {
+                                            partnersData.partners.map((item, index) =>
+                                            (
+                                                <tr key={index}>
+                                                    {
+                                                        (detailType === 'hcp' || detailType === 'hco') &&
+                                                        <td>{detailType === 'hcp' || detailType === 'hco' ? item.onekey_id : '--'}</td>
+                                                    }
+                                                    {
+                                                        (detailType === 'hcp' || detailType === 'hco') &&
+                                                        <td>{detailType === 'hco' ? item.uuid : '--'}</td>
+                                                    }
+                                                    <td>{item.first_name ? item.first_name : item.requestor_first_name}</td>
+                                                    <td>{item.last_name ? item.last_name : item.requestor_last_name}</td>
+                                                    <td>--</td>
+                                                    <td>{item.language}</td>
+                                                    <td>{item.address}</td>
+                                                    <td>{item.city}</td>
+                                                    <td>{(countries.find(i => i.country_iso2.toLowerCase() === item.country_iso2.toLowerCase())).countryname}</td>
+                                                    <td><Dropdown className="ml-auto dropdown-customize">
+                                                        <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
+                                                        </Dropdown.Toggle>
+                                                        <Dropdown.Menu>
+                                                            <Dropdown.Item>Manage Status</Dropdown.Item>
+                                                            <Dropdown.Item onClick={() => setDetailShow(true)}>Profile</Dropdown.Item>
+                                                            <PartnerDetails countries={countries} detailId={item.id} detailType={detailType} changeDetailShow={(val) => setDetailShow(val)} detailShow={detailShow} />
+                                                        </Dropdown.Menu>
+                                                    </Dropdown></td>
+                                                </tr>
+                                            ))
+                                        }
+                                    </tbody>
+                                </table>
+                            }
                         </div>
                         {
                             partnersData.metadata && ((partnersData.metadata.page === 1 &&

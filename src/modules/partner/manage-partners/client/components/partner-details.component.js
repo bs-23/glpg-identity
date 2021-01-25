@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import { getPartnerById } from '../manage-partners.actions';
 import { useSelector, useDispatch } from 'react-redux';
+import axios from 'axios';
+import { useToasts } from 'react-toast-notifications';
 
 const PartnerDetails = (props) => {
     const [, setDetailShow] = useState(false);
     const dispatch = useDispatch();
+    const { addToast } = useToasts();
     const partner = useSelector(state => state.managePartnerReducer.partner);
     const handleClose = () => {
         setDetailShow(false);
@@ -17,6 +20,20 @@ const PartnerDetails = (props) => {
         dispatch(getPartnerById(props.detailId, props.detailType));
 
     }, [props.detailId]);
+
+    const downloadFile = (id) => {
+        axios.get(`/api/partner/document/${id}`)
+            .then(({ data }) => {
+                const newWindow = window.open(data, '_blank', 'noopener,noreferrer')
+                if (newWindow) newWindow.opener = null
+            })
+            .catch(err => {
+                addToast('Could not download file', {
+                    appearance: 'error',
+                    autoDismiss: true
+                });
+            });
+    }
 
     return (
         <Modal size="lg" centered show={props.detailShow} onHide={handleClose}>
@@ -58,7 +75,7 @@ const PartnerDetails = (props) => {
                         <div className="col-12">
                             <p>Galapagos Contracts</p>
                             {partner.documents && partner.documents.map(doc => (
-                                <a key={doc.id} className="d-block text-primary">{doc.name}</a>
+                                <a key={doc.id} onClick={() => downloadFile(doc.id)} className="d-block text-primary">{doc.name}</a>
                             ))
                             }
                         </div>
