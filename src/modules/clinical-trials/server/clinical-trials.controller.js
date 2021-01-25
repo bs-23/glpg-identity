@@ -5,6 +5,8 @@ const History = require('./clinical-trials.history.model');
 const https = require('https');
 const Trial = require('./clinical-trials.trial.model');
 const Location = require('./clinical-trials.location.model');
+const { Op } = require('sequelize');
+const { object } = require('yup');
 
 async function dumpAllData(req, res) {
     const response = new Response({}, []);
@@ -33,8 +35,8 @@ async function dumpAllData(req, res) {
                 res.json(response);
             });
 
-        }).on("error", (err) => {
-            console.log("Error: " + err.message);
+        }).on('error', (err) => {
+            console.log('Error: ' + err.message);
         });
     } catch (err) {
         console.error(err);
@@ -81,21 +83,28 @@ async function mergeProcessData(req, res) {
         result.forEach(res => {
              jsonValue = JSON.parse(res.value);
              data = data.concat(data, jsonValue.FullStudiesResponse.FullStudies.map(element=>{
+                 let locationList = element.Study.ProtocolSection.ContactsLocationsModule.LocationList;
                  return {
-                    "rank": element.Rank,
-                    "protocol_number": element.Study.ProtocolSection.IdentificationModule.OrgStudyIdInfo.OrgStudyId,
-                    "gov_ddentifier": element.Study.ProtocolSection.IdentificationModule.NCTId,
-                    "clinical_trial_purpose": element.Study.ProtocolSection.DescriptionModule.BriefSummary,
-                    "clinical_trial_summary": element.Study.ProtocolSection.IdentificationModule.BriefTitle,
-                    "gender": element.Study.ProtocolSection.EligibilityModule.Gender,
-                    "min_age": element.Study.ProtocolSection.EligibilityModule.MinimumAge,
-                    "max_age": element.Study.ProtocolSection.EligibilityModule.MaximumAge,
-                    "std_age": element.Study.ProtocolSection.EligibilityModule.StdAgeList.StdAge,
-                    "phase": element.Study.ProtocolSection.DesignModule.PhaseList.Phase,
-                    "trial_status": element.Study.ProtocolSection.StatusModule.OverallStatus,
-                    "inclusion_exclusion_criteria": element.Study.ProtocolSection.EligibilityModule.EligibilityCriteria,
-                    "type_of_drug": "Yet to fix",
-                    "location": element.Study.ProtocolSection.ContactsLocationsModule.LocationList.Location
+                    'rank': element.Rank,
+                    'protocol_number': element.Study.ProtocolSection.IdentificationModule.OrgStudyIdInfo.OrgStudyId,
+                    'gov_ddentifier': element.Study.ProtocolSection.IdentificationModule.NCTId,
+                    'clinical_trial_purpose': element.Study.ProtocolSection.DescriptionModule.BriefSummary,
+                    'clinical_trial_summary': element.Study.ProtocolSection.IdentificationModule.BriefTitle,
+                    'gender': element.Study.ProtocolSection.EligibilityModule.Gender,
+                    'min_age': element.Study.ProtocolSection.EligibilityModule.MinimumAge,
+                    'max_age': element.Study.ProtocolSection.EligibilityModule.MaximumAge,
+                    'std_age': element.Study.ProtocolSection.EligibilityModule.StdAgeList.StdAge,
+                    'phase': element.Study.ProtocolSection.DesignModule.PhaseList.Phase,
+                    'trial_status': element.Study.ProtocolSection.StatusModule.OverallStatus,
+                    'inclusion_exclusion_criteria': element.Study.ProtocolSection.EligibilityModule.EligibilityCriteria,
+                    'type_of_drug': 'Yet to fix',
+                    'locations': locationList? locationList.Location.map(location=> {return {
+                        'location_facility': location.LocationFacility,
+                        'location_city': location.LocationFacility,
+                        'location_state': location.LocationState,
+                        'location_zip': location.LocationZip,
+                        'location_country': location.LocationCountry
+                  }}) : ''
                 }
              }));
         });
@@ -103,9 +112,9 @@ async function mergeProcessData(req, res) {
         Trial.bulkCreate(data,
                     {
                     returning: true,
-                    ignoreDuplicates: false
+                    ignoreDuplicates: false,
+                    include: { model: Location, as: 'locations' }
                 }).then(trial=>{
-                    data = trial
                 });
 
         if (!result) {
@@ -127,17 +136,64 @@ async function mergeProcessData(req, res) {
 
 async function getTrials(req, res) {
     const response = new Response({}, []);
-    let { items_per_page, page_no } = req.query;
+    let { items_per_page, 
+        page_number,
+        status,
+        phases,
+        gender,
+        location,
+        distance,
+        search_term,
+        diseases,
+        age_range } = req.query;
 
-    page_no = page_no ? Number(page_no) : 1;
+    page_number = page_number ? Number(page_number) : 1;
     items_per_page = items_per_page? Number(items_per_page) : 100;
+    status = status? status.map(x=>{
+        switch(x){
+            case 'RECSTATUS_RECRUITING':
+                return 'Enrolling by invitation';
+                break;
+            case 'RECSTATUS_NOT_YET_RECRUITING':
+                return 'Active, not recruiting'
+                break;
+            case 'RECSTATUS_STUDY_COMPLETED':
+                return 'Completed'
+                break;
+            case 'RECSTATUS_TERMINATED':
+                return 'Withdrawn'
+                break;
+            default:
+                return '';
+                break;
+        }
+    }) : null;
+    // phases = phases ? phases.map(x=> x.replace('_',' ').replace('PHASE','Phase')) : null;
 
     try {
-        let result = await Trial.findAll({
-            offset: items_per_page*page_no,
-            limit: items_per_page});
 
-        let total_item_count = await Trial.count();
+        let query = {
+            phase: phases , 
+            trial_status: status
+        }
+
+        Object.keys(query).forEach(key=>{
+            if (!query[key]){
+                delete query[key]
+            }
+        });
+
+        let pageing = {
+            offset: items_per_page * Number(page_number - 1),
+            limit: items_per_page,
+        }
+        let result = await Trial.findAll({
+            where: query,
+            ...pageing});
+
+        let total_item_count = await Trial.count({
+            where: query
+        });
 
         if (!result) {
             response.data = [];
@@ -146,7 +202,7 @@ async function getTrials(req, res) {
 
         response.data = {
            search_result: result,
-           items: total_item_count
+           total_count: total_item_count
         }
         res.json(response);
     } catch (err) {
@@ -168,7 +224,8 @@ async function getTrialDetails(req, res) {
         let result = await Trial.findOne({
             where: {
                 id: id,
-            }
+            },
+            include: ['locations'] 
         });
 
         if (!result) {
