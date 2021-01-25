@@ -287,6 +287,14 @@ const ConsentForm = (props) => {
                                                 if (consentId) {
                                                     dispatch(updateConsent(values, consentId))
                                                         .then(res => {
+                                                            const updatedTranslations = res.value.data.translations;
+                                                            const newTranslations = translations.map((tr, ind) => {
+                                                                tr.id = updatedTranslations[ind].id;
+                                                                return tr;
+                                                            });
+
+                                                            setTranslations(newTranslations);
+
                                                             addToast('Consent updated successfully', {
                                                                 appearance: 'success',
                                                                 autoDismiss: true

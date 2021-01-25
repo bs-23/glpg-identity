@@ -694,55 +694,71 @@ async function updateCdpConsent(req, res) {
             updated_by: req.user.id
         });
 
+        const response = {
+            ...consent.dataValues,
+            translations: Array.apply(null, Array(translations.length))
+        };
+
         const allTranslationsForConsent = await ConsentLanguage.findAll({ where: { consent_id: consent.id } });
 
         const deletedTranslations = allTranslationsForConsent
             .filter(t1 => !translations.some(t2 => t1.id === t2.id));
 
-        await ConsentLanguage.destroy({ where: { consent_id: consent.id } });
+        await ConsentLanguage.destroy({ where: { id: deletedTranslations.map(dt => dt.id) } });
 
         if (translations) {
             await Promise.all(translations
                 .filter(translation => translation.country_iso2 && translation.lang_code && translation.rich_text)
-                .map(async (translation,idx) => {
+                .map(async (translation, idx) => {
                     const locale = `${translation.lang_code.toLowerCase()}_${translation.country_iso2.toUpperCase()}`;
-                    const [updatedTranslation, translationCreated] = await ConsentLanguage.findOrCreate({
-                        where: {
-                            consent_id: consent.id,
-                            locale: {
-                                [Op.iLike]: locale
-                            }
-                        },
-                        defaults: {
-                            locale: locale,
-                            rich_text: translation.rich_text,
-                            consent_id: consent.id
-                        }
-                    });
 
-                    const isUpdated = allTranslationsForConsent.find(({ id }) => id === translation.id);
+                    const currentTranslationFromDB = allTranslationsForConsent.find(at => at.id === translation.id);
 
-                    if (!translationCreated) {
-                        console.error('Create Translation failed: ', translation);
-                    }else if (isUpdated) {
-                        await logService.log({
-                            event_type: 'UPDATE',
-                            object_id: translation.id,
-                            table_name: 'consent_locales',
-                            actor: req.user.id,
-                            changes: JSON.stringify({
-                                old_value: isUpdated.dataValues,
-                                new_value: updatedTranslation.dataValues
+                    if (currentTranslationFromDB) {
+                        try{
+                            const previousTranslation = { ...currentTranslationFromDB.dataValues };
+
+                            await currentTranslationFromDB.update({
+                                locale,
+                                rich_text: translation.rich_text,
+                                consent_id: consent.id
                             })
-                        });
-                    }else {
-                        await logService.log({
-                            event_type: 'CREATE',
-                            object_id: translation.id,
-                            table_name: 'consent_locales',
-                            actor: req.user.id,
-                            changes: JSON.stringify(updatedTranslation.dataValues)
-                        });
+
+                            await logService.log({
+                                event_type: 'UPDATE',
+                                object_id: currentTranslationFromDB.id,
+                                table_name: 'consent_locales',
+                                actor: req.user.id,
+                                changes: JSON.stringify({
+                                    old_value: previousTranslation,
+                                    new_value: currentTranslationFromDB.dataValues
+                                })
+                            });
+
+                            response.translations[idx] = currentTranslationFromDB.dataValues;
+                        } catch(err) {
+                            console.error(err);
+                        }
+                    } else {
+                        try{
+                            const createdTranslation = await ConsentLanguage.create({
+                                consent_id: consent.id,
+                                locale,
+                                rich_text: translation.rich_text
+                            });
+
+                            await logService.log({
+                                event_type: 'CREATE',
+                                object_id: createdTranslation.id,
+                                table_name: 'consent_locales',
+                                actor: req.user.id,
+                                changes: JSON.stringify(createdTranslation.dataValues)
+                            });
+
+                            response.translations[idx] = createdTranslation;
+                        } catch(err) {
+                            console.error(err);
+                        }
                     }
                 })
             );
@@ -767,9 +783,9 @@ async function updateCdpConsent(req, res) {
                 actor: req.user.id,
                 changes: JSON.stringify(dt.dataValues)
             });
-        }))
+        }));
 
-        res.sendStatus(200);
+        res.status(200).json(response);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
