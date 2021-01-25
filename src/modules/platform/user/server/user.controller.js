@@ -224,6 +224,9 @@ async function login(req, res) {
         let user;
         const { username, password, recaptchaToken, grant_type } = req.body;
 
+        const response = await axios.post(`https://www.google.com/recaptcha/api/siteverify?secret=${nodecache.getValue('RECAPTCHA_SECRET_KEY')}&response=${recaptchaToken}`);
+        if(!response.data.success) return res.status(400).send('reCAPTCHA validation failed! Please try again.');
+
         if(!grant_type) return res.status(400).send('Invalid grant_type.');
 
         if(grant_type && grant_type !== 'password') {
@@ -270,12 +273,6 @@ async function login(req, res) {
                 return res.status(401).send('Password has been expired. Please reset the password.');
             }
 
-            // const isSiteVerified = await verifySite(recaptchaToken);
-
-            // if (!isSiteVerified) {
-            //     return res.status(400).send('Failed captcha verification.');
-            // }
-
             await user.update({ refresh_token: generateRefreshToken(user) });
         }
 
@@ -291,8 +288,7 @@ async function login(req, res) {
             event_type: 'LOGIN',
             object_id: user.id,
             table_name: 'users',
-            actor: user.id,
-            remarks: 'CDP login success'
+            actor: user.id
         });
 
         res.json(await formatProfile(user));
@@ -1061,33 +1057,6 @@ async function resetPassword(req, res) {
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
-    }
-}
-
-async function verifySite(captchaResponseToken) {
-    return true;
-    try {
-        const secretKey = nodecache.getValue('RECAPTCHA_SECRET_KEY');
-
-        const siteverifyResponse = await axios.post(
-            `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${captchaResponseToken}`,
-            null,
-            {
-                headers: {
-                    Accept: "application/json",
-                    "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
-                }
-            }
-        );
-
-        if (!siteverifyResponse || !siteverifyResponse.data || !siteverifyResponse.data.success) {
-            console.error(siteverifyResponse.data);
-        }
-
-        return siteverifyResponse.data.success;
-    } catch (error) {
-        console.error(error);
-        return false;
     }
 }
 

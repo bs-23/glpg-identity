@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useCookies } from 'react-cookie';
-// import ReCAPTCHA from 'react-google-recaptcha';
+import ReCAPTCHA from 'react-google-recaptcha';
 import { useToasts } from 'react-toast-notifications';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 
@@ -11,6 +11,7 @@ import { loginSchema } from '../user.schema';
 import { getAllCountries } from '../../../../core/client/country/country.actions';
 
 export default function Login() {
+    const recaptchaRef = useRef();
     const dispatch = useDispatch();
     const { addToast } = useToasts();
     const [, setCookie] = useCookies();
@@ -28,29 +29,31 @@ export default function Login() {
                             <div className="card-body p-4 p-sm-5 border bg-white">
                                 <Formik
                                     initialValues={{
-                                        email: "",
-                                        password: "",
-                                        recaptchaToken: ""
+                                        email: '',
+                                        password: ''
                                     }}
                                     displayName="Login"
                                     validationSchema={loginSchema}
                                     onSubmit={(values, actions) => {
-                                        dispatch(login({
-                                            username: values.email,
-                                            password: values.password,
-                                            grant_type: 'password',
-                                            recaptchaToken: '1234' // values.recaptchaToken
-                                        })).then( response => {
-                                            dispatch(getAllCountries());
-                                            setCookie('logged_in', true, { path: '/' });
-                                        }).catch(error => {
-                                            addToast(error.response.data, {
-                                                appearance: 'error',
-                                                autoDismiss: true
+                                        recaptchaRef.current.executeAsync().then(recaptchaToken => {
+                                            dispatch(login({
+                                                username: values.email,
+                                                password: values.password,
+                                                grant_type: 'password',
+                                                recaptchaToken
+                                            })).then(response => {
+                                                dispatch(getAllCountries());
+                                                setCookie('logged_in', true, { path: '/' });
+                                            }).catch(error => {
+                                                addToast(error.response.data, {
+                                                    appearance: 'error',
+                                                    autoDismiss: true
+                                                });
                                             });
-                                        });
 
-                                        actions.setSubmitting(false);
+                                            recaptchaRef.current.reset();
+                                            actions.setSubmitting(false);
+                                        });
                                     }}
                                 >
                                     {formikProps => (
@@ -65,29 +68,23 @@ export default function Login() {
                                                 <Field className="form-control" data-testid="password" type="password" name="password" autoComplete="current-password" />
                                                 <div className="invalid-feedback" data-testid="password-error"><ErrorMessage name="password" /></div>
                                             </div>
+                                            <small class="form-text text-muted recaptcha-info">
+                                                This site is protected by reCAPTCHA and the Google <a href="https://policies.google.com/privacy">Privacy Policy</a> and <a href="https://policies.google.com/terms">Terms of Service</a> apply.
+                                            </small>
 
-                                            {/* { process.env.RECAPTCHA_SITE_KEY &&
-                                                <div className="form-group mt-2">
-                                                    <ReCAPTCHA
-                                                        sitekey={process.env.RECAPTCHA_SITE_KEY}
-                                                        testprops={formikProps}
-                                                        data-testid="captcha"
-                                                        onChange={
-                                                            (response) => {
-                                                                formikProps.setFieldValue("recaptchaToken", response);
-                                                            }
-                                                        }
-                                                    />
-                                                    {formikProps.errors.recaptchaToken && formikProps.touched.recaptchaToken && (
-                                                        <div className="invalid-feedback">{formikProps.errors.recaptchaToken}</div>
-                                                    )}
-                                                </div>
-                                            } */}
+                                            { process.env.RECAPTCHA_SITE_KEY &&
+                                                <ReCAPTCHA
+                                                    size="invisible"
+                                                    ref={recaptchaRef}
+                                                    sitekey={process.env.RECAPTCHA_SITE_KEY}
+                                                />
+                                            }
 
                                             <button type="submit" className="btn btn-block text-white app-login__btn mt-4 p-2 font-weight-bold">Sign In</button>
                                         </Form>
                                     )}
                                 </Formik>
+
                                 <div className="mt-4 text-center">
                                     <Link
                                         to="/forgot-password"
