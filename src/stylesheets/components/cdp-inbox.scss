@@ -4,7 +4,7 @@
     }
 
     &__tab {
-        .sc-bdVaJa {
+        div > div > div {
             background: $gray-F2F2F2;
 
             svg {
@@ -45,29 +45,32 @@
             }
         }
 
-        .sc-EHOje {
-            white-space: nowrap;
-            color: $primary-color !important;
-            font-size: 12px;
-            font-weight: bold;
-            padding: 15px 3px 10px 3px;
-            margin: 0px 7px;
-            border-radius: 0px;
-            border: none;
+        ul[role="tablist"] {
+            li[role="tab"] {
+                white-space: nowrap;
+                color: $primary-color !important;
+                font-size: 12px;
+                font-weight: bold;
+                padding: 15px 3px 10px 3px;
+                margin: 0px 7px;
+                border-radius: 0px;
+                border: none;
 
-            &:hover {
-                border-bottom: 5px solid $secondary-color-lighter;
-            }
+                &:hover {
+                    border-bottom: 5px solid $secondary-color-lighter;
+                }
 
-            &.disabled {
-                color: $primary-color-lighter !important;
-            }
+                &.disabled {
+                    color: $primary-color-lighter !important;
+                }
 
-            &[aria-selected="true"] {
-                background-color: inherit;
-                border-bottom: 5px solid $secondary-color;
+                &[aria-selected="true"] {
+                    background-color: inherit;
+                    border-bottom: 5px solid $secondary-color;
+                }
             }
         }
+
 
         &-detail {
         }
