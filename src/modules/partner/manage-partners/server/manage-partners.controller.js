@@ -546,6 +546,23 @@ async function createPartnerVendor(req, res) {
     }
 }
 
+async function getDownloadUrl(req, res) {
+    try {
+        const file = await File.findOne({
+            where: { id: req.params.id }
+        });
+
+        if (!file) return res.status(404).send('The file does not exist');
+
+        const url = storageService.getSignedUrl(file.bucket, file.key);
+
+        res.json(url)
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal server error');
+    }
+}
+
 exports.getPartnerHcps = getPartnerHcps;
 exports.getPartnerHcp = getPartnerHcp;
 exports.createPartnerHcp = createPartnerHcp;
@@ -557,3 +574,4 @@ exports.updatePartnerHco = updatePartnerHco;
 exports.getPartnerVendors = getPartnerVendors;
 exports.getPartnerVendor = getPartnerVendor;
 exports.createPartnerVendor = createPartnerVendor;
+exports.getDownloadUrl = getDownloadUrl;
