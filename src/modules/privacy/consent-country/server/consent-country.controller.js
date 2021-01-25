@@ -3,9 +3,9 @@ const _ = require('lodash');
 const { Op } = require('sequelize');
 const validator = require('validator');
 
-const Consent = require(path.join(process.cwd(), 'src/modules/consent/manage-consent/server/consent.model.js'));
-const ConsentCountry = require(path.join(process.cwd(), 'src/modules/consent/consent-country/server/consent-country.model.js'));
-const ConsentLanguage = require(path.join(process.cwd(), 'src/modules/consent/manage-consent/server/consent-locale.model.js'));
+const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model.js'));
+const ConsentCountry = require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model.js'));
+const ConsentLanguage = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent-locale.model.js'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 
 function getTranslationViewmodels(translations) {

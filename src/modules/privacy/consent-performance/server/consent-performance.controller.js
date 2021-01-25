@@ -2,9 +2,9 @@ const path = require('path');
 const _ = require('lodash');
 const { QueryTypes, Op } = require('sequelize');
 
-const Consent = require(path.join(process.cwd(), 'src/modules/consent/manage-consent/server/consent.model.js'));
-const ConsentCountry = require(path.join(process.cwd(), 'src/modules/consent/consent-country/server/consent-country.model.js'));
-const ConsentCategory = require(path.join(process.cwd(), 'src/modules/consent/consent-category/server/consent-category.model.js'));
+const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model.js'));
+const ConsentCountry = require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model.js'));
+const ConsentCategory = require(path.join(process.cwd(), 'src/modules/privacy/consent-category/server/consent-category.model.js'));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const HCPS = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-profile.model'));
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-consents.model'));

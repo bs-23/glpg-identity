@@ -26,14 +26,14 @@ module.exports = async function () {
     const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
     const Hcp_profile = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-profile.model'));
     const Application = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.model'));
-    const ConsentCategory = require(path.join(process.cwd(), 'src/modules/consent/consent-category/server/consent-category.model'));
-    const Consent = require(path.join(process.cwd(), 'src/modules/consent/manage-consent/server/consent.model.js'));
-    const ConsentLocale = require(path.join(process.cwd(), 'src/modules/consent/manage-consent/server/consent-locale.model.js'));
-    const ConsentCountry = require(path.join(process.cwd(), 'src/modules/consent/consent-country/server/consent-country.model.js'));
+    const ConsentCategory = require(path.join(process.cwd(), 'src/modules/privacy/consent-category/server/consent-category.model'));
+    const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model.js'));
+    const ConsentLocale = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent-locale.model.js'));
+    const ConsentCountry = require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model.js'));
     const Faq = require(path.join(process.cwd(), 'src/modules/platform/faq/server/faq.model.js'));
 
-    require(path.join(process.cwd(), 'src/modules/consent/consent-country/server/consent-country.model.js'));
-    require(path.join(process.cwd(), 'src/modules/consent/manage-consent/server/consent-locale.model.js'));
+    require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model.js'));
+    require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent-locale.model.js'));
     require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-consents.model'));
     require(path.join(process.cwd(), 'src/modules/platform/user/server/reset-password.model.js'));
     require(path.join(process.cwd(), 'src/modules/core/server/password/password-history.model'));

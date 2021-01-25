@@ -14,7 +14,7 @@ import NoMatch from "./NoMatch";
 import PublicRoute from "./PublicRoute";
 import PrivateRoute from "./PrivateRoute";
 import { Dashboard, Login, ForgotPassword, ResetPassword, PlatformRoutes, userActions, MyProfile } from "../../platform";
-import { ConsentRoutes } from "../../consent";
+import { ConsentRoutes } from "../../privacy";
 import SwaggerLogin from '../../../config/server/lib/swagger/swagger-login.component';
 import store from './store';
 import { PartnerRoutes } from '../../partner';

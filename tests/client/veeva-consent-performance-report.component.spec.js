@@ -8,8 +8,8 @@ import { BrowserRouter } from 'react-router-dom';
 import MockAdapter from 'axios-mock-adapter'
 import { ToastProvider } from 'react-toast-notifications';
 import store from '../../src/modules/core/client/store.js';
-import ConsentPerformanceReport from '../../src/modules/consent/client/components/veeva-consent-performance-report.component';
-import { getVeevaConsentReport } from '../../src/modules/consent/client/consent.actions';
+import ConsentPerformanceReport from '../../src/modules/privacy/client/components/veeva-consent-performance-report.component';
+import { getVeevaConsentReport } from '../../src/modules/privacy/client/consent.actions';
 import { act } from 'react-dom/test-utils';
 import { screen } from '@testing-library/dom'
 import { login } from '../../src/modules/platform/user/client/user.actions';
