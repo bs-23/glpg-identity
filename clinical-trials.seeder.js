@@ -11,6 +11,7 @@ async function init() {
 
     const ClinicalTrialHistoryModel = require(path.join(process.cwd(), 'src/modules/clinical-trials/server/clinical-trials.history.model.js'));
     require(path.join(process.cwd(), 'src/modules/clinical-trials/server/clinical-trials.trial.model.js'));
+    const ClinicalTrialTrialModel = require(path.join(process.cwd(), 'src/modules/clinical-trials/server/clinical-trials.trial.model.js'));
     const ClinicalTrialLocationModel = require(path.join(process.cwd(), 'src/modules/clinical-trials/server/clinical-trials.location.model.js'));
 
     async function clinicalTrilalsDbStructureSeeder() {
@@ -19,28 +20,29 @@ async function init() {
     }
 
     function clinicalTrialsDbDummyDataSeeder() {
-        ClinicalTrialHistoryModel.bulkCreate([
-            {
-                description: 'initial history entry',
-                value: ''
-            }
-        ], {
-            returning: true,
-            ignoreDuplicates: false
+        ClinicalTrialHistoryModel.destroy({ truncate: { cascade: true } }).then(() => {
+            ClinicalTrialHistoryModel.bulkCreate([
+                {
+                    description: 'initial history entry',
+                    value: ''
+                }
+            ], {
+                returning: true,
+                ignoreDuplicates: false
+            });
         });
-
-        ClinicalTrialLocationModel.bulkCreate([
-            {
-                location_facility: 'facility',
-                location_city: 'test city',
-                location_zip: '12721',
-                location_country: 'TestCountry',
-                lat: 17.669,
-                long: 23.000
-            }
-        ], {
-            returning: true,
-            ignoreDuplicates: false
+        ClinicalTrialTrialModel.destroy({ truncate: { cascade: true } }).then(() => {
+            ClinicalTrialTrialModel.bulkCreate([
+                {
+                    
+                }
+                
+            ], {
+                returning: true,
+                ignoreDuplicates: false,
+                include: { model: ClinicalTrialLocationModel, as: 'locations' }
+            }).then(trial=>{
+            });
         });
     }
 

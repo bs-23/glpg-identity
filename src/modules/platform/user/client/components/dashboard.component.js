@@ -56,6 +56,12 @@ export default function Dashboard() {
                                             InField-Team Effectiveness
                                         </NavLink>
                                     </li>
+                                    <li className="pr-sm-4 pb-4 service__item">
+                                        <NavLink to="/clinical-trials" className="d-block py-5 px-3 service__link">
+                                            <i className="icon icon-infield-team d-block service__icon"></i>
+                                            Clinical Trials
+                                        </NavLink>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
