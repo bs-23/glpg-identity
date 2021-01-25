@@ -1,11 +1,10 @@
 const path = require('path');
 const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
-const Consent = require(path.join(process.cwd(), 'src/modules/consent/manage-consent/server/consent.model.js'));
-const validator = require('validator');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
+const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model.js'));
 
-const ConsentLanguage = sequelize.cdpConnector.define('consent_locales', {
+const ConsentCountry = sequelize.cdpConnector.define('consent_countries', {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -16,24 +15,24 @@ const ConsentLanguage = sequelize.cdpConnector.define('consent_locales', {
         allowNull: false,
         type: DataTypes.UUID
     },
-    rich_text: {
+    country_iso2: {
         allowNull: false,
-        type: DataTypes.STRING(1000),
-        set(value) {
-            this.setDataValue('rich_text', validator.escape(value));
-        }
-    },
-    locale: {
         type: DataTypes.STRING
+    },
+    opt_type: {
+        allowNull: false,
+        type: DataTypes.ENUM,
+        values: ['single-opt-in', 'double-opt-in', 'soft-opt-in', 'opt-out'],
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
-    tableName: 'consent_locales',
+    tableName: 'consent_countries',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
 
-ConsentLanguage.belongsTo(Consent, { as: 'consent', foreignKey: 'consent_id' });
+Consent.hasMany(ConsentCountry, { as: 'consent_country', foreignKey: 'consent_id' });
+ConsentCountry.belongsTo(Consent, { as: 'consent', foreignKey: 'consent_id' });
 
-module.exports = ConsentLanguage;
+module.exports = ConsentCountry;

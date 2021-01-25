@@ -10,10 +10,10 @@ import parse from 'html-react-parser';
 
 import CountryConsentForm from './country-consent-form';
 import optTypes from '../../manage-consent/client/opt-types.json';
-import { Consent } from '../../../consent';
+import { Consent } from '../../../privacy';
 import { getCountryConsents, deleteCountryConsent } from './consent-country.actions';
 import Faq from '../../../platform/faq/client/faq.component';
-import { categoryActions, consentActions } from '../../../consent';
+import { categoryActions, consentActions } from '../../../privacy';
 
 const { getConsentCategories } = categoryActions;
 const { getCdpConsents } = consentActions;

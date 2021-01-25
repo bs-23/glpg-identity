@@ -1,7 +1,7 @@
 const path = require('path');
 const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
-const ConsentCategory = require(path.join(process.cwd(), 'src/modules/consent/consent-category/server/consent-category.model.js'));
+const ConsentCategory = require(path.join(process.cwd(), 'src/modules/privacy/consent-category/server/consent-category.model.js'));
 const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
