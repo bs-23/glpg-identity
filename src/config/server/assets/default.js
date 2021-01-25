@@ -17,6 +17,10 @@ module.exports = {
             "src/modules/platform/role/server/**/*.routes.js",
             "src/modules/platform/profile/server/**/*.routes.js",
             "src/modules/platform/permission-set/server/**/*.routes.js",
+            "src/modules/consent/manage-consent/server/**/*.routes.js",
+            "src/modules/consent/consent-country/server/**/*.routes.js",
+            "src/modules/consent/consent-category/server/**/*.routes.js",
+            "src/modules/consent/consent-performance/server/**/*.routes.js",
             "src/modules/core/server/**/*.routes.js",
             "src/config/server/lib/swagger/swagger.controller.js"
         ],

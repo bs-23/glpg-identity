@@ -14,8 +14,7 @@ import NoMatch from "./NoMatch";
 import PublicRoute from "./PublicRoute";
 import PrivateRoute from "./PrivateRoute";
 import { Dashboard, Login, ForgotPassword, ResetPassword, PlatformRoutes, userActions, MyProfile } from "../../platform";
-// import HcpRoutes from "../../information/hcp/client/hcp.routes";
-import ConsentRoutes from "../../consent/client/consent.routes";
+import { ConsentRoutes } from "../../consent";
 import SwaggerLogin from '../../../config/server/lib/swagger/swagger-login.component';
 import store from './store';
 import { PartnerRoutes } from '../../partner';
@@ -86,8 +85,6 @@ export default function App() {
                 <PublicRoute path="/login" component={Login}/>
 
                 <PrivateRoute exact path="/" component={Dashboard}/>
-
-                {/* <Route path="/hcps" component={HcpRoutes}/> */}
 
                 <Route path='/consent' component={ConsentRoutes}/>
 
