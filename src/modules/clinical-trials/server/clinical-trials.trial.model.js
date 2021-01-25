@@ -90,8 +90,12 @@ let trialModel = {
 
 const Trial = sequelize.clinitalTrialsConnector.define(trialModel.name, trialModel.db_properties , trialModel.db_schema);
 
-Location.hasMany(Trial, {
-    foreignKey: 'location_id'
+Trial.hasMany(Location, { as: "locations" });
+Location.belongsTo(Trial, {
+  foreignKey: "trial_id",
+  as: "trial",
 });
+
+Location.belog
 
 module.exports = Trial;

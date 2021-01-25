@@ -11,15 +11,15 @@ paths:
                   description: determine how many items are shown in each page. (page_number*item_per_page)
                   example: 100
                   schema:
-                    type: string
+                    type: integer
                 - name: page_number
                   in: query
                   required: false
-                  description: retrive data from particular page.
+                  description: retrive data from particular page. Starts from 1.
                   example: 1
                   schema:
-                    type: string
-                - name: Status
+                    type: integer
+                - name: status
                   in: query
                   type: string
                   schema:
@@ -32,16 +32,16 @@ paths:
                         - RECSTATUS_STUDY_COMPLETED
                         - RECSTATUS_TERMINATED
                     style: matrix
-                - name: Diseases
+                - name: diseases
                   in: query
                   type: string
-                - name: Location
+                - name: location
                   in: query
                   type: string
-                - name: Distance
+                - name: distance
                   in: query
                   type: string
-                - name: AgeRanges
+                - name: age_ranges
                   in: query
                   type: string
                   schema:
@@ -54,7 +54,7 @@ paths:
                         - AGERANGE_THREE
                   style: matrix
                   description: AGERANGE_ONE(0-17 years), AGERANGE_TWO(18-65 years), AGERANGE_THREE(66+years)
-                - name: Gender
+                - name: gender
                   in: query
                   type: string
                   schema:
@@ -66,7 +66,7 @@ paths:
                         - GENDER_MALE
                         - GENDER_ALL
                   style: matrix
-                - name: Phases
+                - name: phases
                   in: query
                   type: string
                   schema:
@@ -78,8 +78,8 @@ paths:
                         - PHASE_2
                         - PHASE_3
                         - PHASE_4
-                  style: matrix
-                - name: SearchTerm
+                    style: matrix
+                - name: search_term
                   in: query
                   type: string
             responses:
@@ -94,6 +94,8 @@ paths:
                                         type: string
                                     description:
                                         type: string
+                                    total_count:
+                                        type: number
                                     log:
                                         type: string
                                     created_by:
