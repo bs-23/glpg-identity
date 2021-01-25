@@ -287,6 +287,87 @@ async function getVeevaConsentsReport(req, res) {
     }
 }
 
+async function exportCdpConsentsReport(req, res) {
+    try {
+        const order = [];
+        order.push([HCPS, 'created_at', 'DESC']);
+        order.push([HCPS, 'id', 'DESC']);
+
+        const countries = await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT });
+        const userCountriesApplication = await getUserPermissions(req.user.id);
+        const userPermittedCodbases = countries.filter(i => userCountriesApplication[1].includes(i.country_iso2)).map(i => i.codbase);
+        const userPermittedCountries = countries.filter(i => userPermittedCodbases.includes(i.codbase)).map(i => i.country_iso2);
+        const userPermittedApplications = userCountriesApplication[0].map(app => app.id);
+
+        const application_list = (await HCPS.findAll()).map(i => i.get("application_id"));
+
+        const codbase_list = countries.filter(i => userPermittedCountries.includes(i.country_iso2)).map(i => i.codbase);
+        const country_iso2_list = countries.filter(i => codbase_list.includes(i.codbase)).map(i => i.country_iso2);
+        const country_iso2_list_with_ignorecase = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
+
+        const consent_filter = {
+            [Op.or]: [{ 'consent_confirmed': true }, { 'opt_type': 'opt-out' }],
+            '$hcp_profile.application_id$': req.user.type === 'admin' ? { [Op.or]: application_list } : userPermittedApplications,
+            '$hcp_profile.country_iso2$': { [Op.any]: [country_iso2_list_with_ignorecase] },
+        };
+
+        const hcp_consents = await HcpConsents.findAll({
+            where: consent_filter,
+            include: [
+                {
+                    model: HCPS,
+                    attributes: { exclude: ['password', 'created_by', 'updated_by'] }
+                },
+                {
+                    model: Consent,
+                    attributes: ['preference', 'legal_basis', 'updated_at'],
+                    include: [
+                        {
+                            model: ConsentCategory,
+                            attributes: ['title', 'slug']
+                        }
+                    ]
+                }
+            ],
+            attributes: ['consent_id', 'opt_type', 'consent_confirmed', 'updated_at'],
+            order: order,
+            subQuery: false
+        });
+
+        const data = hcp_consents.map(hcp_consent => ({
+            'First Name': hcp_consent.first_name,
+            'Last Name': hcp_consent.last_name,
+            'Email': hcp_consent.email,
+            'Consent Type': hcp_consent.consent.consent_category.title,
+            'Opt Type': hcp_consent.opt_type,
+            'Legal Basis': hcp_consent.consent.legal_basis,
+            'Preferences': hcp_consent.consent.preference,
+            'Date': (new Date(hcp_consent.updated_at)).toLocaleDateString('en-GB').replace(/\//g, '.')
+        }));
+
+        const filePath = ExportService.createExcelFile(data, 'cdp-consent-report.xlsx', 'Cdp consent report');
+
+        res.download(filePath, function (err) {
+            if (err) {
+              console.log('Error : ')
+              console.log(err);
+            }
+            else {
+                fs.unlink(filePath, function(e){
+                    if(e) {
+                        console.log(e)
+                    }
+                    else console.log('Removed file');
+                });
+            }
+        });
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send(err);
+    }
+}
+
 async function exportVeevaConsentsReport(req, res) {
     try {
         const [, userPermittedCountries] = await getUserPermissions(req.user.id);
@@ -323,12 +404,12 @@ async function exportVeevaConsentsReport(req, res) {
             });
 
         const data = hcp_consents.map(hcp_consent => ({
-            Name: hcp_consent.account_name,
-            Email: hcp_consent.account_name,
+            'Name': hcp_consent.account_name,
+            'Email': hcp_consent.account_name,
             'Opt Type': hcp_consent.opt_type === 'Opt_In_vod' ? hcp_consent.double_opt_in ? 'double-opt-in' : 'single-opt-in' : 'opt-out',
             'Legal Basis': 'consent',
-            Preferences: hcp_consent.content_type,
-            Date: hcp_consent.capture_datetime
+            'Preferences': hcp_consent.content_type,
+            'Date': (new Date(hcp_consent.capture_datetime)).toLocaleDateString('en-GB').replace(/\//g, '.')
         }));
 
         const filePath = ExportService.createExcelFile(data, 'veeva-consent-report.xlsx', 'VeevaCRM consent report');
@@ -358,4 +439,5 @@ async function exportVeevaConsentsReport(req, res) {
 
 exports.getCdpConsentsReport = getCdpConsentsReport;
 exports.getVeevaConsentsReport = getVeevaConsentsReport;
+exports.exportCdpConsentsReport = exportCdpConsentsReport;
 exports.exportVeevaConsentsReport = exportVeevaConsentsReport;
