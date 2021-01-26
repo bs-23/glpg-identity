@@ -110,10 +110,10 @@ const VendorManagement = () => {
                             <div>
                                 <h4 className="cdp-text-primary font-weight-bold mb-4">Business Partner Lists</h4>
                                 <div>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/vendor-management/vendors">Vendors</NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/vendor-management/wholesalers">Wholesalers</NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/vendor-management/hcp">Health Care Professionals</NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/vendor-management/hco">Health Care Organizations</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/vendor-management/hcp"><i className="fas fa-user-md mr-2"></i>Health Care Professionals</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/vendor-management/hco"><i className="fas fa-hospital mr-2"></i>Health Care Organizations</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/vendor-management/vendors"><i className="fas fa-hospital-user mr-2"></i>General Vendors</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/vendor-management/wholesalers"><i className="fas fa-dolly mr-2"></i>Wholesalers</NavLink>
                                 </div>
                             </div>
 
