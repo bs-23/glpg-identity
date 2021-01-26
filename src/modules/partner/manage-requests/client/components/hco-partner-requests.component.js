@@ -224,7 +224,7 @@ const HcoPartnerRequests = () => {
                                                 <td>
                                                     {
                                                         row.company_codes.map((companyCode, idx) => (
-                                                            <p key={idx}>{companyCode}</p>
+                                                            <span className="badge badge-pill badge-light mr-1" key={idx}>{companyCode}</span>
                                                         ))
                                                     }
                                                 </td>
@@ -328,16 +328,7 @@ const HcoPartnerRequests = () => {
                         {formikProps => (
                             <Form onSubmit={formikProps.handleSubmit}>
                                 <div className="row">
-                                    <div className="col-12 col-sm-6 col-lg-4">
-                                        <div className="form-group">
-                                            <label className="font-weight-bold" htmlFor="country_iso2">Country <span className="text-danger">*</span></label>
-                                            <Field data-testid="country_iso2" as="select" name="country_iso2" className="form-control">
-                                                <option key="select-country" value="" disabled>--Select Country--</option>
-                                                {countries.map(item => <option key={item.countryid} value={item.country_iso2}>{item.codbase_desc}</option>)}
-                                            </Field>
-                                            <div className="invalid-feedback"><ErrorMessage name="country_iso2" /></div>
-                                        </div>
-                                    </div>
+                                    
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="uuid">UUID <span className="text-danger">*</span></label>
@@ -398,6 +389,16 @@ const HcoPartnerRequests = () => {
                                                     </div>
                                                 </div>
                                             </div>
+                                        </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="country_iso2">Country <span className="text-danger">*</span></label>
+                                            <Field data-testid="country_iso2" as="select" name="country_iso2" className="form-control">
+                                                <option key="select-country" value="" disabled>--Select Country--</option>
+                                                {countries.map(item => <option key={item.countryid} value={item.country_iso2}>{item.codbase_desc}</option>)}
+                                            </Field>
+                                            <div className="invalid-feedback"><ErrorMessage name="country_iso2" /></div>
                                         </div>
                                     </div>
                                     <div className="col-12 col-sm-6 col-lg-4">
