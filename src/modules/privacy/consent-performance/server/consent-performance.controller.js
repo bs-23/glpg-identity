@@ -316,7 +316,7 @@ async function exportCdpConsentsReport(req, res) {
             include: [
                 {
                     model: HCPS,
-                    attributes: { exclude: ['password', 'created_by', 'updated_by'] }
+                    attributes: ['first_name', 'last_name', 'email'],
                 },
                 {
                     model: Consent,
@@ -335,13 +335,12 @@ async function exportCdpConsentsReport(req, res) {
         });
 
         const data = hcp_consents.map(hcp_consent => ({
-            'First Name': hcp_consent.first_name,
-            'Last Name': hcp_consent.last_name,
-            'Email': hcp_consent.email,
+            'First Name': hcp_consent.hcp_profile.first_name,
+            'Last Name': hcp_consent.hcp_profile.last_name,
+            'Email': hcp_consent.hcp_profile.email,
             'Consent Type': hcp_consent.consent.consent_category.title,
-            'Opt Type': hcp_consent.opt_type,
-            'Legal Basis': hcp_consent.consent.legal_basis,
             'Preferences': hcp_consent.consent.preference,
+            'Opt Type': hcp_consent.opt_type,
             'Date': (new Date(hcp_consent.updated_at)).toLocaleDateString('en-GB').replace(/\//g, '.')
         }));
 

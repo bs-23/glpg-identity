@@ -362,6 +362,17 @@ const CdpConsentPerformanceReport = () => {
                                                     </th>
 
                                                     <th>
+                                                        <LinkContainer to={getUrl('preferences')}>
+                                                            <span
+                                                                className={consents_report.orderBy === 'preferences' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
+                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'preferences', getorderType('preferences')))}
+                                                            >
+                                                                Preferences
+                                                            <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                                        </LinkContainer>
+                                                    </th>
+
+                                                    <th>
                                                         <LinkContainer to={getUrl('opt_type')}>
                                                             <span
                                                                 className={consents_report.orderBy === 'opt_type' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
@@ -382,18 +393,6 @@ const CdpConsentPerformanceReport = () => {
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
                                                         </LinkContainer>
                                                     </th>
-
-                                                    <th>
-                                                        <LinkContainer to={getUrl('preferences')}>
-                                                            <span
-                                                                className={consents_report.orderBy === 'preferences' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'preferences', getorderType('preferences')))}
-                                                            >
-                                                                Preferences
-                                                            <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
-                                                        </LinkContainer>
-                                                    </th>
-
                                                     <th>
                                                         <LinkContainer to={getUrl('date')}>
                                                             <span
@@ -417,9 +416,9 @@ const CdpConsentPerformanceReport = () => {
                                                             <i className={`fas mr-2 ` + (row.hcp_profile.is_email_verified ? `fa-check-circle cdp-text-primary` : `fa-circle cdp-text-secondary`)}></i>
                                                             {row.hcp_profile.email}</td>
                                                         <td>{row.category}</td>
+                                                        <td>{row.preference}</td>
                                                         <td>{titleCase(row.opt_type)}</td>
                                                         <td>{titleCase(row.legal_basis)}</td>
-                                                        <td>{row.preference}</td>
                                                         <td>{(new Date(row.given_date)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                         <td>
                                                             <span>
