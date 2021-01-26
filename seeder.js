@@ -254,6 +254,9 @@ async function init() {
                     approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
                     auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6a',
                     logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
+                    metadata: JSON.stringify({
+                        cache_clearing_url: "https://gwcm-dev.glpg.com/bin/public/glpg-hcpportal/clear/author-publish-cache"
+                    }),
                     created_by: admin.id,
                     updated_by: admin.id
                 },
@@ -266,6 +269,9 @@ async function init() {
                     approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
                     auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6a',
                     logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/jyseleca/logo.png`,
+                    metadata: JSON.stringify({
+                        cache_clearing_url: "https://gwcm-dev.glpg.com/bin/public/glpg-brandx/clear/author-publish-cache"
+                    }),
                     created_by: admin.id,
                     updated_by: admin.id
                 },
