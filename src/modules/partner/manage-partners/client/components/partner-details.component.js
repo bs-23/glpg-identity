@@ -16,10 +16,9 @@ const PartnerDetails = (props) => {
     };
 
     useEffect(() => {
-        console.log();
-        dispatch(getPartnerById(props.detailId, props.detailType));
+        if (props.detailShow) dispatch(getPartnerById(props.detailId, props.detailType));
 
-    }, [props.detailId]);
+    }, [props.detailShow]);
 
     const downloadFile = (id) => {
         axios.get(`/api/partner/document/${id}`)
@@ -49,8 +48,8 @@ const PartnerDetails = (props) => {
             <Modal.Body className="p-3 p-sm-5">
                 {props.countries && props.countries.length > 0 && partner &&
                     <div className="row">
-                    <div className="col-12">
-                        <h4 className="mb-3">{props.detailType === 'hcp' ?
+                        <div className="col-12">
+                            <h4 className="mb-3">{props.detailType === 'hcp' ?
                                 partner.first_name + ' ' + partner.last_name : partner.requestor_first_name + ' ' + partner.requestor_last_name}</h4>
 
                         </div>

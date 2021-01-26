@@ -128,7 +128,6 @@ const VendorManagement = () => {
                                             {(detailType === 'hcp' || detailType === 'hco') && <th>UUID</th>}
                                             <th><span className={sort.value === 'first_name' || sort.value === 'requestor_first_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, detailType === 'hcp' ? 'first_name' : 'requestor_first_name')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                             <th><span className={sort.value === 'last_name' || sort.value === 'requestor_last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, detailType === 'hcp' ? 'last_name' : 'requestor_last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                            <th>Data Origin</th>
                                             <th><span className={sort.value === 'language' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'status')}>Language<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                             <th>Street House No</th>
                                             <th><span className={sort.value === 'city' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'city')}>City<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
@@ -151,7 +150,6 @@ const VendorManagement = () => {
                                                     }
                                                     <td>{item.first_name ? item.first_name : item.requestor_first_name}</td>
                                                     <td>{item.last_name ? item.last_name : item.requestor_last_name}</td>
-                                                    <td>--</td>
                                                     <td>{item.language}</td>
                                                     <td>{item.address}</td>
                                                     <td>{item.city}</td>
