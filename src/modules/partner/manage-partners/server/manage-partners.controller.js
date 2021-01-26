@@ -1,10 +1,7 @@
 const path = require('path');
 const Partner = require('./partner.model');
-const PartnerHcps = require('./partner-hcp.model');
-const PartnerHcos = require('./partner-hco.model');
 const PartnerVendors = require('./partner-vendor.model');
-const { QueryTypes, Op } = require('sequelize');
-const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
+const { Op } = require('sequelize');
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const PartnerRequest = require(path.join(process.cwd(), 'src/modules/partner/manage-requests/server/partner-request.model'));
 const storageService = require(path.join(process.cwd(), 'src/modules/core/server/storage/storage.service'));
@@ -98,14 +95,13 @@ async function getPartnerHcp(req, res) {
     try {
         const partnerHcp = await Partner.findOne({
             where: { id: req.params.id },
-            attributes: { exclude: ['organization_name', 'organization_type', 'created_at', 'updated_at'] }
+            attributes: { exclude: ['entity_type', 'organization_name', 'organization_type', 'created_at', 'updated_at'] }
         });
 
         if (!partnerHcp) return res.status(404).send('The partner does not exist');
 
         partnerHcp.dataValues.type = partnerHcp.dataValues.individual_type;
         delete partnerHcp.dataValues.individual_type;
-        delete partnerHcp.dataValues.entity_type;
 
         const documents = await File.findAll({ where: { owner_id: partnerHcp.id } });
 
@@ -260,17 +256,13 @@ async function getPartnerHco(req, res) {
     try {
         const partnerHco = await Partner.findOne({
             where: { id: req.params.id },
-            attributes: { exclude: ['created_at', 'updated_at'] }
+            attributes: { exclude: ['entity_type', 'is_italian_hcp', 'should_report_hco', 'beneficiary_category', 'created_at', 'updated_at'] }
         });
 
         if (!partnerHco) return res.status(404).send('The partner does not exist');
 
-        delete partnerHco.dataValues.entity_type;
         partnerHco.dataValues.type = partnerHco.dataValues.organization_type;
         delete partnerHco.dataValues.organization_type;
-        delete partnerHco.dataValues.is_italian_hcp;
-        delete partnerHco.dataValues.should_report_hco;
-        delete partnerHco.dataValues.beneficiary_category;
 
         const documents = await File.findAll({ where: { owner_id: partnerHco.id } });
 
@@ -399,7 +391,7 @@ async function getPartnerVendors(req, res) {
             offset,
             limit,
             order,
-            attributes: { exclude: ['created_at', 'updated_at'] }
+            attributes: ['id', 'requestor_first_name', 'requestor_last_name', 'language', 'address', 'city', 'country_iso2']
         });
 
         const total = await PartnerVendors.count();
@@ -426,7 +418,7 @@ async function getPartnerVendor(req, res) {
     try {
         const partnerVendor = await PartnerVendors.findOne({
             where: { id: req.params.id },
-            attributes: { exclude: ['created_at', 'updated_at'] }
+            attributes: { exclude: ['type', 'created_at', 'updated_at'] }
         });
 
         if (!partnerVendor) return res.status(404).send('The partner does not exist');
@@ -516,8 +508,8 @@ async function createPartnerVendor(req, res) {
         const documents = await uploadDucuments(partnerVendor, type, files);
         partnerVendor.dataValues.documents = documents.map(d => d.key);
 
-        delete partnerVendor.created_at;
-        delete partnerVendor.updated_at;
+        delete partnerVendor.dataValues.created_at;
+        delete partnerVendor.dataValues.updated_at;
 
         response.data = partnerVendor;
         res.json(response);

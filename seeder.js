@@ -56,8 +56,6 @@ async function init() {
     require(path.join(process.cwd(), 'src/modules/platform/application/server/data.model'));
     require(path.join(process.cwd(), 'src/modules/core/server/archive/archive.model'));
     require(path.join(process.cwd(), 'src/modules/partner/manage-requests/server/partner-request.model'));
-    require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-hcp.model'));
-    require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-hco.model'));
     require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-vendor.model'));
     require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner.model'));
     require(path.join(process.cwd(), 'src/modules/core/server/storage/file.model'));
