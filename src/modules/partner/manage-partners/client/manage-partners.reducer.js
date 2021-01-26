@@ -14,7 +14,6 @@ export default function reducer(state = initialState, action) {
             };
         }
         case Types.GET_PARTNER_BY_ID_FULFILLED: {
-            console.log(action.payload.data);
             return {
                 ...state,
                 partner: action.payload.data
