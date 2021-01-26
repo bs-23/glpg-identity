@@ -280,7 +280,6 @@ const WholesalerPartnerRequests = () => {
                             mdr_id: partnerRequestId && Object.keys(request).length ? request.mdr_id : '',
                             iqvia_wholesaler_id: partnerRequestId && Object.keys(request).length ? request.iqvia_wholesaler_id : '',
                             procurement_contact: partnerRequestId && Object.keys(request).length ? request.procurement_contact : '',
-                            purchasing_organization: partnerRequestId && Object.keys(request).length ? request.purchasing_organization : '',
                             company_codes: [],
                             country_iso2: partnerRequestId && Object.keys(request).length ? request.country_iso2 : '',
                             language: partnerRequestId && Object.keys(request).length ? request.language : '',

@@ -31,6 +31,24 @@ const PartnerRequest = sequelize.cdpConnector.define('partner_requests', {
         allowNull: false,
         type: DataTypes.STRING(100)
     },
+    mdr_id: {
+        allowNull: false,
+        type: DataTypes.STRING(100)
+    },
+    country_iso2: {
+        allowNull: false,
+        type: DataTypes.STRING
+    },
+    language: {
+        allowNull: false,
+        type: DataTypes.STRING
+    },
+    is_supplier: {
+        type: DataTypes.BOOLEAN
+    },
+    is_customer: {
+        type: DataTypes.BOOLEAN
+    },
     procurement_contact: {
         allowNull: false,
         type: DataTypes.STRING(100)
@@ -45,13 +63,19 @@ const PartnerRequest = sequelize.cdpConnector.define('partner_requests', {
     company_codes: {
         type: DataTypes.ARRAY(DataTypes.STRING)
     },
-    country_iso2: {
-        allowNull: false,
-        type: DataTypes.STRING
+    workplace_name: {
+        type: DataTypes.ARRAY(DataTypes.STRING)
     },
-    language: {
-        allowNull: false,
-        type: DataTypes.STRING
+    workplace_type: {
+        type: DataTypes.ENUM,
+        values: ['healthcare_org', 'patient_org'],
+        defaultValue: null,
+    },
+    specialty: {
+        type: DataTypes.STRING(50)
+    },
+    iqvia_wholesaler_id: {
+        type: DataTypes.STRING,
     },
     status: {
         allowNull: false,
