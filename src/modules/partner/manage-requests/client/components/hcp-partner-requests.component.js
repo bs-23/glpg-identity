@@ -6,7 +6,7 @@ import { Faq } from '../../../../platform';
 import { useSelector, useDispatch } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
-import { partnerRequestSchema } from '../manage-requests.schema'
+import { partnerRequestSchemaForHcps } from '../manage-requests.schema'
 import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm} from '../manage-requests.actions';
 
 const HcpPartnerRequests = () => {
@@ -287,7 +287,7 @@ const HcpPartnerRequests = () => {
                             partner_type: partnerRequestId && Object.keys(request).length ? request.partner_type : '',
                         }}
                         displayName="PartnerRequestsForm"
-                        validationSchema={partnerRequestSchema}
+                        validationSchema={partnerRequestSchemaForHcps}
                         enableReinitialize={true}
                         onSubmit={(values, actions) => {
                             values.company_codes = companyCodes.map(i => i.company_code);
