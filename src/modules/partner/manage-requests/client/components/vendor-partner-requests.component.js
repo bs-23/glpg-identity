@@ -279,6 +279,7 @@ const VendorPartnerRequests = () => {
                             first_name: partnerRequestId && Object.keys(request).length ? request.first_name : '',
                             last_name: partnerRequestId && Object.keys(request).length ? request.last_name : '',
                             email: partnerRequestId && Object.keys(request).length ? request.email : '',
+                            mdr_id: partnerRequestId && Object.keys(request).length ? request.mdr_id : '',
                             procurement_contact: partnerRequestId && Object.keys(request).length ? request.procurement_contact : '',
                             purchasing_organization: partnerRequestId && Object.keys(request).length ? request.purchasing_organization : '',
                             company_codes: [],
@@ -335,7 +336,7 @@ const VendorPartnerRequests = () => {
                         {formikProps => (
                             <Form onSubmit={formikProps.handleSubmit}>
                                 <div className="row">
-                                   
+
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="first_name">First Name <span className="text-danger">*</span></label>
@@ -372,6 +373,13 @@ const VendorPartnerRequests = () => {
                                             <label className="font-weight-bold" htmlFor="procurement_contact">Procurement Contact <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="procurement_contact" />
                                             <div className="invalid-feedback"><ErrorMessage name="procurement_contact" /></div>
+                                        </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="mdr_id">MDR ID <span className="text-danger">*</span></label>
+                                            <Field className="form-control" type="text" name="mdr_id" />
+                                            <div className="invalid-feedback"><ErrorMessage name="mdr_id" /></div>
                                         </div>
                                     </div>
                                     <div className="col-12">
