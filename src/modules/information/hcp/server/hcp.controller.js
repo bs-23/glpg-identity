@@ -335,19 +335,21 @@ async function getHcps(req, res) {
 
         const totalUser = await Hcp.count({ where: filterOptions });
 
-        const specialties = _.uniq(_.map(hcps, 'specialty_onekey')).join("','");
+        if(hcps.length) {
+            const specialties = _.uniq(_.map(hcps, 'specialty_onekey')).join("','");
 
-        const specialty_list = await sequelize.datasyncConnector.query(`
-            SELECT cod_id_onekey, cod_description
-            FROM ciam.vwspecialtymaster
-            WHERE cod_id_onekey IN ('${specialties}') AND cod_locale='en'
-        `, {
-            type: QueryTypes.SELECT
-        });
+            const specialty_list = await sequelize.datasyncConnector.query(`
+                SELECT cod_id_onekey, cod_description
+                FROM ciam.vwspecialtymaster
+                WHERE cod_id_onekey IN ('${specialties}') AND cod_locale='en'
+            `, {
+                type: QueryTypes.SELECT
+            });
 
-        hcps.forEach(h => {
-            h.setDataValue('specialty_description', specialty_list.find(x => x.cod_id_onekey === h.specialty_onekey).cod_description);
-        });
+            hcps.forEach(h => {
+                h.setDataValue('specialty_description', specialty_list.find(x => x.cod_id_onekey === h.specialty_onekey).cod_description);
+            });
+        }
 
         const data = {
             users: hcps,
