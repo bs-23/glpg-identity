@@ -1,11 +1,7 @@
 const path = require('path');
 const PartnerRequest = require('./partner-request.model');
 const Application = require('./../../../platform/application/server/application.model');
-const HcpPartner = require('../../manage-partners/server/partner-hcp.model');
-const HcoPartner = require('../../manage-partners/server/partner-hco.model');
-const { QueryTypes, Op } = require('sequelize');
-const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
-const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
+const { Op } = require('sequelize');
 const ArchiveService = require(path.join(process.cwd(), 'src/modules/core/server/archive/archive.service.js'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const jwt = require('jsonwebtoken');

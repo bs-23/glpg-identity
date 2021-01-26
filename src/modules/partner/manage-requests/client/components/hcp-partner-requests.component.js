@@ -186,8 +186,8 @@ const HcpPartnerRequests = () => {
                             <div>
                                 <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Manage HCPs Request</h4>
                                 <div className="pt-3">
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/hcps">HCPs</NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/hcos">HCOs</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/hcps"><i className="fas fa-user-md mr-2"></i> Health Care Professionals</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/hcos"><i className="fas fa-hospital mr-2"></i>Health Care Organizations</NavLink>
                                 </div>
                             </div>
                             <div className="d-flex justify-content-between align-items-center mb-2">
@@ -224,7 +224,7 @@ const HcpPartnerRequests = () => {
                                                 <td>
                                                     {
                                                         row.company_codes.map((companyCode, idx) => (
-                                                            <p key={idx}>{companyCode}</p>
+                                                            <span className="badge badge-pill badge-light mr-1" key={idx}>{companyCode}</span>
                                                         ))
                                                     }
                                                 </td>
@@ -329,13 +329,19 @@ const HcpPartnerRequests = () => {
                             <Form onSubmit={formikProps.handleSubmit}>
                                 <div className="row">
                                     <div className="col-12 col-sm-6 col-lg-4">
-                                        <div className="form-group">
-                                            <label className="font-weight-bold" htmlFor="country_iso2">Country <span className="text-danger">*</span></label>
-                                            <Field data-testid="country_iso2" as="select" name="country_iso2" className="form-control">
-                                                <option key="select-country" value="" disabled>--Select Country--</option>
-                                                {countries.map(item => <option key={item.countryid} value={item.country_iso2}>{item.codbase_desc}</option>)}
-                                            </Field>
-                                            <div className="invalid-feedback"><ErrorMessage name="country_iso2" /></div>
+                                        <div className="form-group pb-3">
+                                            <div className="custom-control custom-checkbox">
+                                                <input type="checkbox" className="custom-control-input" id="supplier" />
+                                                <label className="custom-control-label font-weight-bold-light" for="supplier">HCP Is Already Supplier</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-8">
+                                        <div className="form-group pb-3">
+                                            <div className="custom-control custom-checkbox">
+                                                <input type="checkbox" className="custom-control-input" id="customer" />
+                                                <label className="custom-control-label font-weight-bold-light" for="customer">HCP Is Already Customer</label>
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="col-12 col-sm-6 col-lg-4">
@@ -395,6 +401,16 @@ const HcpPartnerRequests = () => {
                                                     <span className="cdp-text-secondary mb-0">Add Company Code</span>
                                                 </div>
                                             </div>
+                                        </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="country_iso2">Country <span className="text-danger">*</span></label>
+                                            <Field data-testid="country_iso2" as="select" name="country_iso2" className="form-control">
+                                                <option key="select-country" value="" disabled>--Select Country--</option>
+                                                {countries.map(item => <option key={item.countryid} value={item.country_iso2}>{item.codbase_desc}</option>)}
+                                            </Field>
+                                            <div className="invalid-feedback"><ErrorMessage name="country_iso2" /></div>
                                         </div>
                                     </div>
                                     <div className="col-12 col-sm-6 col-lg-4">
