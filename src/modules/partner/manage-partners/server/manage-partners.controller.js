@@ -232,7 +232,7 @@ async function getPartnerHcos(req, res) {
             ? req.query.orderType
             : 'asc';
 
-        const sortableColumns = ['contact_first_name', 'contact_last_name', 'status', 'onekey_id', 'uuid', 'Ö', 'language', 'city'];
+        const sortableColumns = ['contact_first_name', 'contact_last_name', 'status', 'onekey_id', 'uuid', 'country_iso2', 'language', 'city'];
 
         const order = [];
         if (orderBy && (sortableColumns || []).includes(orderBy)) {
