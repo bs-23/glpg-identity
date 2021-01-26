@@ -328,7 +328,22 @@ const HcpPartnerRequests = () => {
                         {formikProps => (
                             <Form onSubmit={formikProps.handleSubmit}>
                                 <div className="row">
-                                   
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="form-group pb-3">
+                                            <div className="custom-control custom-checkbox">
+                                                <input type="checkbox" className="custom-control-input" id="supplier" />
+                                                <label className="custom-control-label font-weight-bold-light" for="supplier">HCP Is Already Supplier</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-8">
+                                        <div className="form-group pb-3">
+                                            <div className="custom-control custom-checkbox">
+                                                <input type="checkbox" className="custom-control-input" id="customer" />
+                                                <label className="custom-control-label font-weight-bold-light" for="customer">HCP Is Already Customer</label>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="uuid">UUID <span className="text-danger">*</span></label>
