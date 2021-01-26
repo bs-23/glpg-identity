@@ -325,6 +325,17 @@ const ConsentPerformanceReport = () => {
                                                     </th>
 
                                                     <th>
+                                                        <LinkContainer to={getUrl('preferences')}>
+                                                            <span
+                                                                className={consents_report.orderBy === 'preferences' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
+                                                                onClick={() => dispatch(getVeevaConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'preferences', getorderType('preferences')))}
+                                                            >
+                                                                Preferences
+                                                            <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                                        </LinkContainer>
+                                                    </th>
+
+                                                    <th>
                                                         <LinkContainer to={getUrl('opt_type')}>
                                                             <span
                                                                 className={consents_report.orderBy === 'opt_type' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
@@ -342,17 +353,6 @@ const ConsentPerformanceReport = () => {
                                                                 onClick={() => dispatch(getVeevaConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'legal_basis', getorderType('legal_basis')))}
                                                             >
                                                                 Legal Basis
-                                                            <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
-                                                        </LinkContainer>
-                                                    </th>
-
-                                                    <th>
-                                                        <LinkContainer to={getUrl('preferences')}>
-                                                            <span
-                                                                className={consents_report.orderBy === 'preferences' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getVeevaConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'preferences', getorderType('preferences')))}
-                                                            >
-                                                                Preferences
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
                                                         </LinkContainer>
                                                     </th>
@@ -376,9 +376,9 @@ const ConsentPerformanceReport = () => {
                                                     <tr key={index}>
                                                         <td>{row.name}</td>
                                                         <td>{row.email}</td>
+                                                        <td>{row.preference}</td>
                                                         <td>{titleCase(row.opt_type)}</td>
                                                         <td>{titleCase(row.legal_basis)}</td>
-                                                        <td>{row.preference}</td>
                                                         <td>{(new Date(row.given_date)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                         <td>
                                                             <span>

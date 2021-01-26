@@ -383,15 +383,11 @@ async function exportVeevaConsentsReport(req, res) {
         const hcp_consents = await sequelize.datasyncConnector.query(
             `SELECT
                 account_name,
-                content_type,
+                channel_value,
                 opt_type,
-                capture_datetime,
-                onekeyid,
-                uuid_mixed,
-                country_code,
                 double_opt_in,
-                uuid_mixed,
-                channel_value
+                content_type,
+                capture_datetime
             FROM
                 ciam.vw_veeva_consent_master
             WHERE ciam.vw_veeva_consent_master.country_code = ANY($countries)`
@@ -404,10 +400,9 @@ async function exportVeevaConsentsReport(req, res) {
 
         const data = hcp_consents.map(hcp_consent => ({
             'Name': hcp_consent.account_name,
-            'Email': hcp_consent.account_name,
-            'Opt Type': hcp_consent.opt_type === 'Opt_In_vod' ? hcp_consent.double_opt_in ? 'double-opt-in' : 'single-opt-in' : 'opt-out',
-            'Legal Basis': 'consent',
+            'Email': hcp_consent.channel_value,
             'Preferences': hcp_consent.content_type,
+            'Opt Type': hcp_consent.opt_type === 'Opt_In_vod' ? hcp_consent.double_opt_in ? 'double-opt-in' : 'single-opt-in' : 'opt-out',
             'Date': (new Date(hcp_consent.capture_datetime)).toLocaleDateString('en-GB').replace(/\//g, '.')
         }));
 
