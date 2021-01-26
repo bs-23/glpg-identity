@@ -334,8 +334,28 @@ export default function CrdlpHcpProfiles() {
                                                 <div className="">{profileDetails.uuid_1 || '--'}</div>
                                             </div>
                                             <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Email</div>
+                                                <div className="text-capitalize">{profileDetails.email_1 || '--'}</div>
+                                            </div>
+                                        </div>
+                                        <div className="row mt-3">
+                                            <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">OneKeyID</div>
                                                 <div className="">{profileDetails.individual_id_onekey || '--'}</div>
+                                            </div>
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Activity ID Onekey</div>
+                                                <div className="">{profileDetails.activity_id_onekey || '--'}</div>
+                                            </div>
+                                        </div>
+                                        <div className="row mt-3">
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Address ID Onekey</div>
+                                                <div className="">{profileDetails.adr_id_onekey || '--'}</div>
+                                            </div>
+                                            <div className="col-6">
+                                                <div className="mt-1 font-weight-bold">Workplace ID Onekey</div>
+                                                <div className="text-capitalize">{profileDetails.workplace_id_onekey || '--'}</div>
                                             </div>
                                         </div>
                                         <div className="row mt-3">

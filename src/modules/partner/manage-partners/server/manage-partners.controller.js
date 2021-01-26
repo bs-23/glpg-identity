@@ -1,4 +1,5 @@
 const path = require('path');
+const Partner = require('./partner.model');
 const PartnerHcps = require('./partner-hcp.model');
 const PartnerHcos = require('./partner-hco.model');
 const PartnerVendors = require('./partner-vendor.model');
@@ -14,18 +15,18 @@ const FILE_SIZE_LIMIT = 5242880; // 5 MB
 
 async function uploadDucuments(owner, type, files) {
     const fileEntities = [];
-    const bucket = 'cdp-development';
+    const bucketName = 'cdp-development';
     for (const file of files) {
         const uploadOptions = {
-            bucket,
+            bucket: bucketName,
             folder: `documents/partner/${type}/${owner.id}/`,
             fileName: file.originalname,
             fileContent: file.buffer
         };
 
         const tableNames = {
-            hcp: 'partner_hcps',
-            hco: 'partner_hcos',
+            hcp: 'partners',
+            hco: 'partners',
             vendor: 'partner_vendors',
             wholesaler: 'partner_vendors',
         };
@@ -33,7 +34,7 @@ async function uploadDucuments(owner, type, files) {
         const response = await storageService.upload(uploadOptions);
         const fileCreated = await File.create({
             name: file.originalname,
-            bucket,
+            bucket_name: bucketName,
             key: response.key,
             owner_id: owner.id,
             table_name: tableNames[type]
@@ -56,7 +57,7 @@ async function getPartnerHcps(req, res) {
             ? req.query.orderType
             : 'asc';
 
-        const sortableColumns = ['first_name', 'last_name', 'status', 'uuid', 'onekey_id', 'country_iso2', 'language', 'city'];
+        const sortableColumns = ['first_name', 'last_name', 'onekey_id', 'uuid', 'language', 'city'];
 
         const order = [];
         if (orderBy && (sortableColumns || []).includes(orderBy)) {
@@ -65,14 +66,15 @@ async function getPartnerHcps(req, res) {
 
         if (orderBy !== 'created_at') order.push(['created_at', 'DESC']);
 
-        const hcpPartners = await PartnerHcps.findAll({
+        const hcpPartners = await Partner.findAll({
+            where: { entity_type: 'hcp' },
             offset,
             limit,
             order,
-            attributes: { exclude: ['created_at', 'updated_at'] }
+            attributes: ['id', 'onekey_id', 'uuid', 'first_name', 'last_name', 'address', 'city', 'country_iso2', 'language']
         });
 
-        const total = await PartnerHcps.count();
+        const total = await Partner.count({ where: { entity_type: 'hcp' }, });
 
         const responseData = {
             partners: hcpPartners,
@@ -94,12 +96,16 @@ async function getPartnerHcps(req, res) {
 
 async function getPartnerHcp(req, res) {
     try {
-        const partnerHcp = await PartnerHcps.findOne({
+        const partnerHcp = await Partner.findOne({
             where: { id: req.params.id },
-            attributes: { exclude: ['created_at', 'updated_at'] }
+            attributes: { exclude: ['organization_name', 'organization_type', 'created_at', 'updated_at'] }
         });
 
         if (!partnerHcp) return res.status(404).send('The partner does not exist');
+
+        partnerHcp.dataValues.type = partnerHcp.dataValues.individual_type;
+        delete partnerHcp.dataValues.individual_type;
+        delete partnerHcp.dataValues.entity_type;
 
         const documents = await File.findAll({ where: { owner_id: partnerHcp.id } });
 
@@ -117,11 +123,12 @@ async function getPartnerHcp(req, res) {
 
 async function createPartnerHcp(req, res) {
     const response = new Response({}, []);
+    const entityType = 'hcp';
     try {
         const files = req.files;
 
         const { request_id, first_name, last_name, address, city, post_code, email, telephone,
-            type, country_iso2, language, uuid, onekey_id, is_italian_hcp, should_report_hco, beneficiary_category,
+            type, country_iso2, language, registration_number, uuid, onekey_id, is_italian_hcp, should_report_hco, beneficiary_category,
             iban, bank_name, bank_account_no, currency } = req.body;
 
         if (!request_id) response.errors.push(new CustomError('Request ID is missing.', 400, 'request_id'));
@@ -143,7 +150,7 @@ async function createPartnerHcp(req, res) {
         const partnerRequest = await PartnerRequest.findOne({
             where: {
                 id: request_id,
-                entity_type: 'hcp'
+                entity_type: entityType
             }
         });
 
@@ -158,18 +165,14 @@ async function createPartnerHcp(req, res) {
         }
 
         const data = {
-            request_id, first_name, last_name, address, city, post_code, email, telephone,
-            type, country_iso2, language, uuid, onekey_id, is_italian_hcp, should_report_hco, beneficiary_category,
-            iban, bank_name, bank_account_no, currency
+            request_id, first_name, last_name, address, city, post_code, email, telephone, country_iso2, language, registration_number, uuid, onekey_id, is_italian_hcp, should_report_hco, beneficiary_category, iban, bank_name, bank_account_no, currency
         };
 
-        const [partnerHcp, created] = await PartnerHcps.findOrCreate({
-            where: {
-                [Op.or]: [
-                    { request_id: request_id },
-                    { email: { [Op.iLike]: email } }
-                ]
-            },
+        data.entity_type = entityType;
+        data.individual_type = type;
+
+        const [partnerHcp, created] = await Partner.findOrCreate({
+            where: { request_id: request_id },
             defaults: data
         });
 
@@ -180,11 +183,18 @@ async function createPartnerHcp(req, res) {
 
         await partnerRequest.update({ status: 'submitted' });
 
-        const documents = await uploadDucuments(partnerHcp, 'hcp', files);
+        const documents = await uploadDucuments(partnerHcp, entityType, files);
         partnerHcp.dataValues.documents = documents.map(d => d.key);
 
-        delete partnerHcp.created_at;
-        delete partnerHcp.updated_at;
+        partnerHcp.dataValues.type = partnerHcp.dataValues.individual_type;
+
+        delete partnerHcp.dataValues.created_at;
+        delete partnerHcp.dataValues.updated_at;
+        delete partnerHcp.dataValues.individual_type;
+        delete partnerHcp.dataValues.organization_name;
+        delete partnerHcp.dataValues.organization_type;
+        delete partnerHcp.dataValues.entity_type;
+
 
         response.data = partnerHcp;
         res.json(response);
@@ -193,29 +203,6 @@ async function createPartnerHcp(req, res) {
         console.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
-    }
-}
-
-async function updatePartnerHcp(req, res) {
-    try {
-        const { first_name, last_name, address, city, post_code, email, telephone,
-            type, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
-            iban, bank_name, bank_account_no, currency, document_urls } = req.body;
-
-        const hcpPartner = await PartnerHcos.findOne({ where: { id: req.params.id } });
-        if (!hcpPartner) return res.status(404).send('The partner does not exist');
-
-        const data = {
-            first_name, last_name, address, city, post_code, email, telephone,
-            type, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
-            iban, bank_name, bank_account_no, currency, document_urls
-        }
-        const updated_data = await PartnerHcps.update(data);
-
-        res.json(updated_data);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Internal server error');
     }
 }
 
@@ -232,7 +219,7 @@ async function getPartnerHcos(req, res) {
             ? req.query.orderType
             : 'asc';
 
-        const sortableColumns = ['contact_first_name', 'contact_last_name', 'status', 'onekey_id', 'uuid', 'country_iso2', 'language', 'city'];
+        const sortableColumns = ['first_name', 'last_name', 'onekey_id', 'uuid', 'language', 'city'];
 
         const order = [];
         if (orderBy && (sortableColumns || []).includes(orderBy)) {
@@ -241,14 +228,15 @@ async function getPartnerHcos(req, res) {
 
         if (orderBy !== 'created_at') order.push(['created_at', 'DESC']);
 
-        const hcoPartners = await PartnerHcos.findAll({
+        const hcoPartners = await Partner.findAll({
+            where: { entity_type: 'hco' },
             offset,
             limit,
             order,
-            attributes: { exclude: ['created_at', 'updated_at'] }
+            attributes: ['id', 'onekey_id', 'uuid', 'first_name', 'last_name', 'address', 'city', 'country_iso2', 'language']
         });
 
-        const total = await PartnerHcos.count();
+        const total = await Partner.count({ where: { entity_type: 'hco' } });
 
         const responseData = {
             partners: hcoPartners,
@@ -270,12 +258,19 @@ async function getPartnerHcos(req, res) {
 
 async function getPartnerHco(req, res) {
     try {
-        const partnerHco = await PartnerHcos.findOne({
+        const partnerHco = await Partner.findOne({
             where: { id: req.params.id },
             attributes: { exclude: ['created_at', 'updated_at'] }
         });
 
         if (!partnerHco) return res.status(404).send('The partner does not exist');
+
+        delete partnerHco.dataValues.entity_type;
+        partnerHco.dataValues.type = partnerHco.dataValues.organization_type;
+        delete partnerHco.dataValues.organization_type;
+        delete partnerHco.dataValues.is_italian_hcp;
+        delete partnerHco.dataValues.should_report_hco;
+        delete partnerHco.dataValues.beneficiary_category;
 
         const documents = await File.findAll({ where: { owner_id: partnerHco.id } });
 
@@ -293,15 +288,16 @@ async function getPartnerHco(req, res) {
 
 async function createPartnerHco(req, res) {
     const response = new Response({}, []);
+    const entityType = 'hco';
     try {
         const files = req.files;
 
-        const { request_id, contact_first_name, contact_last_name, name, address, city, post_code, email, telephone, type, uuid, onekey_id, country_iso2, language, registration_number, iban, bank_name, bank_account_no, currency } = req.body;
+        const { request_id, contact_first_name, contact_last_name, organization_name, address, city, post_code, email, telephone, type, uuid, onekey_id, country_iso2, language, registration_number, iban, bank_name, bank_account_no, currency } = req.body;
 
         if (!request_id) response.errors.push(new CustomError('Request ID is missing.', 400, 'request_id'));
         if (!contact_first_name) response.errors.push(new CustomError('Contact first name is missing.', 400, 'contact_first_name'));
         if (!contact_last_name) response.errors.push(new CustomError('Contact last name is missing.', 400, 'contact_last_name'));
-        if (!name) response.errors.push(new CustomError('Name is missing.', 400, 'name'));
+        if (!organization_name) response.errors.push(new CustomError('Name is missing.', 400, 'name'));
         if (!email) response.errors.push(new CustomError('Email is missing.', 400, 'email'));
         if (!type) response.errors.push(new CustomError('Type is missing.', 400, 'type'));
         if (!country_iso2) response.errors.push(new CustomError('Country code is missing.', 400, 'country_iso2'));
@@ -318,7 +314,7 @@ async function createPartnerHco(req, res) {
         const partnerRequest = await PartnerRequest.findOne({
             where: {
                 id: request_id,
-                entity_type: 'hco'
+                entity_type: entityType
             }
         });
 
@@ -333,16 +329,15 @@ async function createPartnerHco(req, res) {
         }
 
         const data = {
-            request_id, contact_first_name, contact_last_name, name, address, city, post_code, email, telephone, type, uuid, onekey_id, country_iso2, language, registration_number, iban, bank_name, bank_account_no, currency
+            request_id, organization_name, address, city, post_code, email, telephone, uuid, onekey_id, country_iso2, language, registration_number, iban, bank_name, bank_account_no, currency
         };
+        data.entityType = entityType;
+        data.first_name = contact_first_name;
+        data.last_name = contact_last_name;
+        data.organization_type = type;
 
-        const [partnerHco, created] = await PartnerHcos.findOrCreate({
-            where: {
-                [Op.or]: [
-                    { request_id: request_id },
-                    { registration_number: { [Op.iLike]: registration_number } }
-                ]
-            },
+        const [partnerHco, created] = await Partner.findOrCreate({
+            where: { request_id: request_id },
             defaults: data
         });
 
@@ -353,11 +348,18 @@ async function createPartnerHco(req, res) {
 
         await partnerRequest.update({ status: 'submitted' });
 
-        const documents = await uploadDucuments(partnerHco, 'hco', files);
+        const documents = await uploadDucuments(partnerHco, entityType, files);
         partnerHco.dataValues.documents = documents.map(d => d.key);
 
-        delete partnerHco.created_at;
-        delete partnerHco.updated_at;
+        partnerHco.dataValues.contact_first_name = partnerHco.dataValues.first_name;
+        partnerHco.dataValues.contact_last_name = partnerHco.dataValues.last_name;
+
+        delete partnerHco.dataValues.individual_type;
+        delete partnerHco.dataValues.is_italian_hcp;
+        delete partnerHco.dataValues.should_report_hco;
+        delete partnerHco.dataValues.beneficiary_category;
+        delete partnerHco.dataValues.created_at;
+        delete partnerHco.dataValues.updated_at;
 
         response.data = partnerHco;
         res.json(response);
@@ -366,25 +368,6 @@ async function createPartnerHco(req, res) {
         console.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
-    }
-}
-
-async function updatePartnerHco(req, res) {
-    try {
-        const { contact_first_name, contact_last_name, name, address, city, post_code, email, telephone, type, registration_number, iban, bank_name, bank_account_no, currency, document_urls } = req.body;
-
-        const hcpPartner = await PartnerHcos.findOne({ where: { id: req.params.id } });
-        if (!hcpPartner) return res.status(404).send('The partner does not exist');
-
-        const data = {
-            contact_first_name, contact_last_name, name, address, city, post_code, email, telephone, type, registration_number, iban, bank_name, bank_account_no, currency, document_urls
-        }
-        const updated_data = await PartnerHcps.update(data);
-
-        res.json(updated_data);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Internal server error');
     }
 }
 
@@ -554,7 +537,7 @@ async function getDownloadUrl(req, res) {
 
         if (!file) return res.status(404).send('The file does not exist');
 
-        const url = storageService.getSignedUrl(file.bucket, file.key);
+        const url = storageService.getSignedUrl(file.bucket_name, file.key);
 
         res.json(url)
     } catch (error) {
@@ -566,11 +549,9 @@ async function getDownloadUrl(req, res) {
 exports.getPartnerHcps = getPartnerHcps;
 exports.getPartnerHcp = getPartnerHcp;
 exports.createPartnerHcp = createPartnerHcp;
-exports.updatePartnerHcp = updatePartnerHcp;
 exports.getPartnerHcos = getPartnerHcos;
 exports.getPartnerHco = getPartnerHco;
 exports.createPartnerHco = createPartnerHco;
-exports.updatePartnerHco = updatePartnerHco;
 exports.getPartnerVendors = getPartnerVendors;
 exports.getPartnerVendor = getPartnerVendor;
 exports.createPartnerVendor = createPartnerVendor;

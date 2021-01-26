@@ -12,16 +12,14 @@ module.exports = app => {
         .post(passport.authenticate('application-jwt', { session: false }), multer.array('documents', 5), controller.createPartnerHcp);
 
     app.route('/api/partner/hcp/:id')
-        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getPartnerHcp)
-        .put(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.updatePartnerHcp);
+        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getPartnerHcp);
 
     app.route('/api/partner/hco')
         .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getPartnerHcos)
         .post(passport.authenticate('application-jwt', { session: false }), multer.array('documents', 5), controller.createPartnerHco);
 
     app.route('/api/partner/hco/:id')
-        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getPartnerHco)
-        .put(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.updatePartnerHco);
+        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getPartnerHco);
 
     app.route('/api/partner/vendor')
         .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getPartnerVendors)
