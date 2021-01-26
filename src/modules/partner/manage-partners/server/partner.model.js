@@ -62,13 +62,13 @@ const Partner = sequelize.cdpConnector.define('partners', {
     },
     language: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING(2)
     },
     registration_number: {
         type: DataTypes.STRING
     },
     uuid: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING(20)
     },
     onekey_id: {
         type: DataTypes.STRING
