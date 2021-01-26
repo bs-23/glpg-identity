@@ -43,11 +43,9 @@ const Application = sequelize.cdpConnector.define('applications', {
         type: DataTypes.UUID
     },
     approve_user_path: {
-        allowNull: false,
         type: DataTypes.STRING,
     },
     logo_link: {
-        allowNull: false,
         type: DataTypes.STRING
     },
     is_active: {
