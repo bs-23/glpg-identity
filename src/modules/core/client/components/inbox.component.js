@@ -24,7 +24,7 @@ export default function Inbox() {
             logic: '1',
             fields: ['id', 'first_name', 'last_name', 'email', 'created_at']
         }
-        dispatch(getHcpProfiles('', reqBody));
+        dispatch(getHcpProfiles('?limit=5', reqBody));
     };
 
     let hcps = useSelector(state => state.hcpReducer.hcps);
