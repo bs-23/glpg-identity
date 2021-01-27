@@ -6,6 +6,8 @@ import { Button } from '../common';
 import { Filter } from './components';
 import { buildLogicAfterAddition, buildLogicAfterRemoval } from '../utils';
 
+const generateRandomKey = () => `${Math.random()}_${Math.random()}`;
+
 const AddFilter = (props) => {
     const {
         filters: alreadyAddedFilters,
@@ -16,13 +18,13 @@ const AddFilter = (props) => {
         onHide
     } = props;
 
-    const emptyFilter = {
-        key: `${Math.random()}_${Math.random()}`,
+    const createEmptyFilter = () => ({
+        key: generateRandomKey(),
         name: '',
         fieldName: '',
         operator: '',
         value: []
-    };
+    });
 
     const [filters, setFilters] = useState([]);
     const [logic, setLogic] = useState('');
@@ -33,16 +35,12 @@ const AddFilter = (props) => {
     const scrollRef = useRef();
 
     const handleAddMoreFilter = () => {
-        const emptyFilter = {
-            name: String(filters.length + 1),
-            key: `${Math.random()}_${Math.random()}`,
-            fieldName: '',
-            operator: '',
-            value: []
-        };
+        const emptyFilter = createEmptyFilter();
+        emptyFilter.name = String(filters.length + 1);
+        const updateLogic = buildLogicAfterAddition([String(filters.length+1)], logic);
+
         setFilters([...filters, emptyFilter]);
         setValidationErrors([...validationErrors, {}]);
-        const updateLogic = buildLogicAfterAddition([String(filters.length+1)], logic);
         setLogic(updateLogic);
     }
 
@@ -143,7 +141,7 @@ const AddFilter = (props) => {
 
     useEffect(() => {
         if(!alreadyAddedFilters.length) {
-            const updatedFilters = [..._.cloneDeep(alreadyAddedFilters), emptyFilter];
+            const updatedFilters = [createEmptyFilter()].map(filter => ({ ...filter, key: generateRandomKey() }));
             setFilters(updatedFilters);
 
             const updateLogic = buildLogicAfterAddition([String(updatedFilters.length)], alreadyAddedLogic);
@@ -169,7 +167,7 @@ const AddFilter = (props) => {
 
                         if (CustomFilterComponent) {
                             return <CustomFilterComponent
-                                key={filter.key}
+                                key={filter.key || index}
                                 title={index+1}
                                 index={index}
                                 filter={filter}
@@ -182,7 +180,7 @@ const AddFilter = (props) => {
                         }
 
                         return <Filter
-                                key={filter.key}
+                                key={filter.key || index}
                                 title={index+1}
                                 index={index}
                                 filter={filter}
