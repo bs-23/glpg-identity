@@ -1,4 +1,4 @@
-import { string, object, boolean } from 'yup';
+import { string, object, boolean, ref } from 'yup';
 import XRegExp from 'xregexp';
 
 function isEmailLengthValid(email) {
@@ -25,6 +25,9 @@ export const partnerRequestSchemaForHcps = object().shape({
         .required('This field must not be empty')
         .test('is-valid-email-length', 'The part before @ of the email can be maximum 64 characters ',
             email => isEmailLengthValid(email)),
+    confirm_email: string()
+        .required('This field must not be empty')
+        .oneOf([ref('email'), null], 'Email must match'),
     procurement_contact: string()
         .email('This field should be a valid email address')
         .max(100, 'This field must be at most 100 characters long')
@@ -64,6 +67,9 @@ export const partnerRequestSchemaForHcos = object().shape({
         .required('This field must not be empty')
         .test('is-valid-email-length', 'The part before @ of the email can be maximum 64 characters ',
             email => isEmailLengthValid(email)),
+    confirm_email: string()
+        .required('This field must not be empty')
+        .oneOf([ref('email'), null], 'Email must match'),
     country_iso2: string()
         .min(1, 'This field must be selected')
         .required('This field must be selected'),
@@ -101,6 +107,9 @@ export const partnerRequestSchemaForVendors = object().shape({
         .required('This field must not be empty')
         .test('is-valid-email-length', 'The part before @ of the email can be maximum 64 characters ',
             email => isEmailLengthValid(email)),
+    confirm_email: string()
+        .required('This field must not be empty')
+        .oneOf([ref('email'), null], 'Email must match'),
     mdr_id: string()
         .required('This field must be selected'),
     procurement_contact: string()
@@ -136,6 +145,9 @@ export const partnerRequestSchemaForWholesalers = object().shape({
         .required('This field must not be empty')
         .test('is-valid-email-length', 'The part before @ of the email can be maximum 64 characters ',
             email => isEmailLengthValid(email)),
+    confirm_email: string()
+        .required('This field must not be empty')
+        .oneOf([ref('email'), null], 'Email must match'),
     mdr_id: string()
         .required('This field must be selected'),
     iqvia_wholesaler_id: string()

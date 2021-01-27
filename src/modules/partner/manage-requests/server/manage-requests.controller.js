@@ -185,8 +185,6 @@ async function updatePartnerRequest(req, res) {
         if (isEmailExists) return res.status(400).send('The Email already exists.');
 
         const data = {
-            entity_type,
-            application_id: application.id,
             first_name,
             last_name,
             email,
