@@ -32,4 +32,8 @@ module.exports = app => {
 
     app.route('/api/partner/document/:id')
         .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getDownloadUrl);
+
+    app.route('/api/partner/registration-lookup')
+        .get(passport.authenticate('application-jwt', { session: false }), controller.registrationLookup);
 };
+

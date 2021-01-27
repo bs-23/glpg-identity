@@ -296,6 +296,37 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/errorResponse"
 
+    /api/partner/registration-lookup:
+        get:
+            tags:
+                - manage-partners
+            summary: Get partner request info with request id.
+            parameters:
+                - name: request_id
+                  in: query
+                  required: true
+                  description: Partner request id
+                  schema:
+                    type: string
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/partnerRequestInfo"
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+                400:
+                    description: Bad request.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+
 components:
     schemas:
         partnerHcpProfile:
@@ -505,3 +536,35 @@ components:
                     type: array
                     items:
                         type: string
+        partnerRequestInfo:
+                type: object
+                properties:
+                id:
+                    type: string
+                application_id:
+                    type: string
+                entity_type:
+                    type: string
+                    enum:
+                    - hcp
+                    - hco
+                    - vendor
+                    - wholesaler
+                first_name:
+                    type: string
+                last_name:
+                    type: string
+                email:
+                    type: string
+                procurement_contact:
+                    type: string
+                partner_type:
+                    type: string
+                uuid:
+                    type: string
+                company_codes:
+                    type: string
+                country_iso2:
+                    type: string
+                language:
+                    type: string
