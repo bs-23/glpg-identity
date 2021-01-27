@@ -548,6 +548,7 @@ export default function hcpUsers() {
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const filterID = params.get('filter');
+
         if(filterID) axios.get(`/api/filter/${filterID}`)
             .then(res => {
                 setSelectedFilterSetting(res.data);
@@ -557,18 +558,9 @@ export default function hcpUsers() {
         else {
             let filterSetting;
 
-            if(params.get('status')) {
-                filterSetting = {
-                    filters: [
-                        {
-                            name: '1',
-                            fieldName: 'status',
-                            operator: 'equal',
-                            value: [`${params.get('status')}`]
-                        }
-                    ],
-                    logic: '1'
-                }
+            if(location.state && location.state.filterSetting) {
+                filterSetting = location.state.filterSetting;
+
                 setIsFilterEnabled(true);
                 setSelectedFilterSetting({ settings: filterSetting });
             }
