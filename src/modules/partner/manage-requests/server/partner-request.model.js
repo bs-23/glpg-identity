@@ -80,7 +80,13 @@ const PartnerRequest = sequelize.cdpConnector.define('partner_requests', {
         type: DataTypes.ENUM,
         values: ['new', 'pending', 'submitted'],
         defaultValue: 'new'
-    }
+    },
+    created_by: {
+        type: DataTypes.UUID
+    },
+    updated_by: {
+        type: DataTypes.UUID
+    },
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
     tableName: 'partner_requests',

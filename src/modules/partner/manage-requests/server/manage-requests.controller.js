@@ -40,7 +40,7 @@ async function createPartnerRequest(req, res) {
             iqvia_wholesaler_id,
         } = req.body;
 
-        const application = await Application.findOne({ where: { email: 'patients-organization@glpg.com'} });
+        const application = await Application.findOne({ where: { email: 'patients-organization@glpg.com' } });
 
         const data = {
             entity_type,
@@ -51,9 +51,11 @@ async function createPartnerRequest(req, res) {
             mdr_id,
             country_iso2,
             language,
+            created_by: req.user.id,
+            updated_by: req.user.id,
         };
 
-        if(entity_type === 'hcp'){
+        if (entity_type === 'hcp') {
             data.uuid = uuid;
             data.is_supplier = is_supplier;
             data.is_customer = is_customer;
@@ -61,18 +63,18 @@ async function createPartnerRequest(req, res) {
             data.partner_type = partner_type;
             data.company_codes = company_codes;
         }
-        else if(entity_type === 'hco'){
+        else if (entity_type === 'hco') {
             data.uuid = uuid;
             data.workplace_name = workplace_name;
             data.workplace_type = workplace_type;
             data.specialty = specialty;
         }
-        else if(entity_type === 'vendor'){
+        else if (entity_type === 'vendor') {
             data.procurement_contact = procurement_contact;
             data.partner_type = partner_type;
             data.company_codes = company_codes;
         }
-        else if(entity_type === 'wholesaler'){
+        else if (entity_type === 'wholesaler') {
             data.iqvia_wholesaler_id = iqvia_wholesaler_id;
             data.procurement_contact = procurement_contact;
             data.partner_type = partner_type;
@@ -136,8 +138,8 @@ async function sendForm(req, res) {
         };
 
         const metaData = await Application.findAll({
-             where: { id: application_id },
-             attributes: ['metadata']
+            where: { id: application_id },
+            attributes: ['metadata']
         });
 
         const sendFormLink = JSON.parse(metaData[0].dataValues.metadata).request_notification_link;
@@ -191,9 +193,10 @@ async function updatePartnerRequest(req, res) {
             mdr_id,
             country_iso2,
             language,
+            updated_by: req.user.id
         };
 
-        if(entity_type === 'hcp'){
+        if (entity_type === 'hcp') {
             data.uuid = uuid;
             data.is_supplier = is_supplier;
             data.is_customer = is_customer;
@@ -201,18 +204,18 @@ async function updatePartnerRequest(req, res) {
             data.company_codes = company_codes;
             data.partner_type = partner_type;
         }
-        else if(entity_type === 'hco'){
+        else if (entity_type === 'hco') {
             data.uuid = uuid;
             data.workplace_name = workplace_name;
             data.workplace_type = workplace_type;
             data.specialty = specialty;
         }
-        else if(entity_type === 'vendor'){
+        else if (entity_type === 'vendor') {
             data.procurement_contact = procurement_contact;
             data.company_codes = company_codes;
             data.partner_type = partner_type;
         }
-        else if(entity_type === 'wholesaler'){
+        else if (entity_type === 'wholesaler') {
             data.iqvia_wholesaler_id = iqvia_wholesaler_id;
             data.procurement_contact = procurement_contact;
             data.company_codes = company_codes;
