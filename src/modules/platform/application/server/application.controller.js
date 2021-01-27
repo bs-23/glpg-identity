@@ -189,7 +189,7 @@ async function getData(req, res) {
 }
 
 async function clearApplicationCache() {
-    const applications = await Application.findAll({ where: { metadata: { [Op.iLike]: '%cache_clearing_url%' } } });
+    const applications = await Application.findAll({ where: { metadata: { [Op.like]: '%cache_clearing_url%' } } });
     const maximumConcurrentCalls = 15;
     const tasks = [];
 
@@ -203,6 +203,9 @@ async function clearApplicationCache() {
         });
 
         const url = JSON.parse(app.metadata).cache_clearing_url;
+
+        if(!url) return;
+
         const requestBody = { jwt_token: token };
         const requestOptions = {
             headers: {
@@ -213,11 +216,10 @@ async function clearApplicationCache() {
         tasks.push(generatePostCaller(url, requestBody, requestOptions));
     });
 
-    // async.parallelLimit(tasks, maximumConcurrentCalls, (error, result) => {
-    //     if(error) console.log(error);
-    //     // console.log(result);
-    //     result.forEach(r => r.error && console.log(r.error));
-    // });
+    async.parallelLimit(tasks, maximumConcurrentCalls, (error, result) => {
+        if(error) console.log(error);
+        result.forEach(r => r.error && console.log(r.error));
+    });
 }
 
 exports.getToken = getToken;
