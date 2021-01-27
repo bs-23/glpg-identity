@@ -7,6 +7,7 @@ const Trial = require('./clinical-trials.trial.model');
 const Location = require('./clinical-trials.location.model');
 const { Op } = require('sequelize');
 const { object } = require('yup');
+const fetch = require('cross-fetch');
 
 async function dumpAllData(req, res) {
     const response = new Response({}, []);
@@ -69,6 +70,18 @@ async function showAllVersions(req, res) {
     }
 }
 
+async function getCoordinates(facility, zip, city, state, country)
+{
+    var API_KEY = "AIzaSyAXBeTXzlo_-vwKTza6MGrzNwRHn8ppHrQ";
+    var BASE_URL = "https://maps.googleapis.com/maps/api/geocode/json?address=";
+    var address = `${facility}, ${zip}, ${city}, ${state}, ${country}`;
+    var url = BASE_URL + address + "&key=" + API_KEY;
+
+    const response = await fetch(url);
+    const json = await response.json()
+    return json;
+}
+
 async function mergeProcessData(req, res) {
     const response = new Response({}, []);
     const { ids } = req.body;
@@ -103,7 +116,9 @@ async function mergeProcessData(req, res) {
                         'location_city': location.LocationFacility,
                         'location_state': location.LocationState,
                         'location_zip': location.LocationZip,
-                        'location_country': location.LocationCountry
+                        'location_country': location.LocationCountry,
+                        'location_lat': 25.1,
+                        'location_lng': 110.2
                   }}) : ''
                 }
              }));
