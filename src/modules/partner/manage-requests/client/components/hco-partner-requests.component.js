@@ -226,6 +226,7 @@ const HcoPartnerRequests = () => {
                             first_name: partnerRequestId && Object.keys(request).length ? request.first_name : '',
                             last_name: partnerRequestId && Object.keys(request).length ? request.last_name : '',
                             email: partnerRequestId && Object.keys(request).length ? request.email : '',
+                            confirm_email: partnerRequestId && Object.keys(request).length ? request.email : '',
                             mdr_id: partnerRequestId && Object.keys(request).length ? request.mdr_id : '',
                             workplace_name: partnerRequestId && Object.keys(request).length ? request.workplace_name : '',
                             workplace_type: partnerRequestId && Object.keys(request).length ? request.workplace_type : '',
@@ -302,6 +303,13 @@ const HcoPartnerRequests = () => {
                                             <label className="font-weight-bold" htmlFor="email">Email Address <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="email" />
                                             <div className="invalid-feedback"><ErrorMessage name="email" /></div>
+                                        </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="confirm_email">Confirm Email Address <span className="text-danger">*</span></label>
+                                            <Field className="form-control" type="text" name="confirm_email" />
+                                            <div className="invalid-feedback"><ErrorMessage name="confirm_email" /></div>
                                         </div>
                                     </div>
                                     <div className="col-12 col-sm-6 col-lg-4">
