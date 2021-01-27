@@ -50,21 +50,19 @@ const PartnerRequest = sequelize.cdpConnector.define('partner_requests', {
         type: DataTypes.BOOLEAN
     },
     procurement_contact: {
-        allowNull: false,
         type: DataTypes.STRING(100)
     },
     partner_type: {
-        allowNull: false,
         type: DataTypes.STRING
     },
     uuid: {
         type: DataTypes.STRING,
     },
     company_codes: {
-        type: DataTypes.ARRAY(DataTypes.STRING)
+        type: DataTypes.ARRAY(DataTypes.STRING),
     },
     workplace_name: {
-        type: DataTypes.ARRAY(DataTypes.STRING)
+        type: DataTypes.STRING
     },
     workplace_type: {
         type: DataTypes.ENUM,

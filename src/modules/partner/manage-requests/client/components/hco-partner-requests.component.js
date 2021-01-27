@@ -168,7 +168,6 @@ const HcoPartnerRequests = () => {
                                             <th>Name</th>
                                             <th>MDR ID</th>
                                             <th>Status</th>
-                                            <th>Company Code</th>
                                             <th>Partner Type</th>
                                             <th>Email Address</th>
                                             <th>Procurement Contact</th>
@@ -183,13 +182,6 @@ const HcoPartnerRequests = () => {
                                                 <td>{`${row.first_name} ${row.last_name}`}</td>
                                                 <td>{row.mdr_id}</td>
                                                 <td>{row.status}</td>
-                                                <td>
-                                                    {
-                                                        row.company_codes.map((companyCode, idx) => (
-                                                            <span className="badge badge-pill badge-light mr-1" key={idx}>{companyCode}</span>
-                                                        ))
-                                                    }
-                                                </td>
                                                 <td>{row.partner_type}</td>
                                                 <td>{row.email}</td>
                                                 <td>{row.procurement_contact}</td>
@@ -235,8 +227,8 @@ const HcoPartnerRequests = () => {
                             last_name: partnerRequestId && Object.keys(request).length ? request.last_name : '',
                             email: partnerRequestId && Object.keys(request).length ? request.email : '',
                             mdr_id: partnerRequestId && Object.keys(request).length ? request.mdr_id : '',
-                            workplace_name: partnerRequestId && Object.keys(request).length ? request.workplcae_name : '',
-                            workplace_type: partnerRequestId && Object.keys(request).length ? request.wokrkplace_type : '',
+                            workplace_name: partnerRequestId && Object.keys(request).length ? request.workplace_name : '',
+                            workplace_type: partnerRequestId && Object.keys(request).length ? request.workplace_type : '',
                             specialty: partnerRequestId && Object.keys(request).length ? request.specialty : '',
                             country_iso2: partnerRequestId && Object.keys(request).length ? request.country_iso2 : '',
                             language: partnerRequestId && Object.keys(request).length ? request.language : '',
