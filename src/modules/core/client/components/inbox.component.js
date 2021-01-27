@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import StatusupdateModal from './statusUpdateModal.component';
 import { Tabs, TabList, Tab, PanelList, Panel } from 'react-tabtab';
@@ -11,17 +11,22 @@ export default function Inbox() {
     const [showModal, setShowModal] = useState(false);
     const [modalId, setModalId] = useState(null);
 
+    const filterSetting = {
+        filters: [
+            {
+                name: '1',
+                fieldName: 'status',
+                operator: 'equal',
+                displayText: 'Not Verified',
+                value: ['not_verified']
+            }
+        ],
+        logic: '1'
+    }
+
     const getHcps = () => {
         const reqBody = {
-            filters: [
-                {
-                    name: '1',
-                    fieldName: 'status',
-                    operator: 'equal',
-                    value: ['not_verified']
-                }
-            ],
-            logic: '1',
+            ...filterSetting,
             fields: ['id', 'first_name', 'last_name', 'email', 'created_at']
         }
         dispatch(getHcpProfiles('?limit=5', reqBody));
@@ -71,9 +76,9 @@ export default function Inbox() {
                                 )}
 
                                 {hcps.users !== undefined && hcps.users.length !== 0 ?
-                                    <NavLink to="/information/list/cdp?page=1&status=not_verified" className="d-inline-block p-3 text-uppercase cdp-text-secondary active small font-weight-bold">
+                                    <Link to={{ pathname: "/information/list/cdp",  state: { filterSetting } }} className="d-inline-block p-3 text-uppercase cdp-text-secondary active small font-weight-bold">
                                         {hcps.total > 5 && 'More Pending'}
-                                    </NavLink>
+                                    </Link>
                                     : <h5 className="d-block py-5 px-2 text-uppercase cdp-text-secondary active text-center mb-0"><i className="far fa-folder-open mr-2"></i>No Data Found</h5>
                                 }
                             </div>
