@@ -72,14 +72,23 @@ async function showAllVersions(req, res) {
 
 async function getCoordinates(facility, zip, city, state, country)
 {
+    var params = [facility, zip, city, state, country]
+    var filteredParams = params.filter(function (el) {
+        return el != null;
+      });
+      
     var API_KEY = "AIzaSyAXBeTXzlo_-vwKTza6MGrzNwRHn8ppHrQ";
     var BASE_URL = "https://maps.googleapis.com/maps/api/geocode/json?address=";
-    var address = `${facility}, ${zip}, ${city}, ${state}, ${country}`;
-    var url = BASE_URL + address + "&key=" + API_KEY;
-
-    const response = await fetch(url);
-    const json = await response.json()
-    return json;
+    var url = BASE_URL + filteredParams.join(' ') + "&key=" + API_KEY;
+    
+    try {
+        const response = await fetch(url);
+        const json = await response.json()
+        return json.results[0].geometry.location;    
+    } catch (error) {
+        return {lat: -1, lng: -1}    
+    }
+    
 }
 
 async function mergeProcessData(req, res) {
@@ -111,14 +120,23 @@ async function mergeProcessData(req, res) {
                     'trial_status': element.Study.ProtocolSection.StatusModule.OverallStatus,
                     'inclusion_exclusion_criteria': element.Study.ProtocolSection.EligibilityModule.EligibilityCriteria,
                     'type_of_drug': 'Yet to fix',
-                    'locations': locationList? locationList.Location.map(location=> {return {
+                    'locations': locationList? locationList.Location.map(async location=> {
+                        
+                        var {lat,lng} = await getCoordinates(location.LocationFacility,
+                            location.LocationZip,
+                            location.LocationCity,
+                            location.LocationState,
+                            location.LocationCountry
+                            );
+                            
+                        return {
                         'location_facility': location.LocationFacility,
-                        'location_city': location.LocationFacility,
+                        'location_city': location.LocationCity,
                         'location_state': location.LocationState,
                         'location_zip': location.LocationZip,
                         'location_country': location.LocationCountry,
-                        'location_lat': 25.1,
-                        'location_lng': 110.2
+                        'location_lat': lat,
+                        'location_lng': lng
                   }}) : ''
                 }
              }));
