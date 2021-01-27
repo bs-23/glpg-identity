@@ -13,7 +13,7 @@ const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequel
 const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
-const { clearApplicationCache } = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.controller.js'));
+const { clearApplicationCache } = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.controller'));
 
 const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
 

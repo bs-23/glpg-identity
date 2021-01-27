@@ -7,7 +7,7 @@ const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-con
 const ConsentCountry = require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model.js'));
 const ConsentLanguage = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent-locale.model.js'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
-const { clearApplicationCache } = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.controller.js'));
+const { clearApplicationCache } = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.controller'));
 
 function getTranslationViewmodels(translations) {
     return translations.map(t => ({

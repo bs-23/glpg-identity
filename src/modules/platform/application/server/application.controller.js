@@ -193,7 +193,7 @@ async function clearApplicationCache() {
     const maximumConcurrentCalls = 15;
     const tasks = [];
 
-    const generatePostCaller = (url, requestBody, options) => async.reflect(async () => axios.post(url, requestBody, options));
+    const generatePostCaller = (url, requestBody) => async.reflect(async () => axios.post(url, requestBody));
 
     applications.forEach(app => {
         const token = jwt.sign({
@@ -207,13 +207,8 @@ async function clearApplicationCache() {
         if(!url) return;
 
         const requestBody = { jwt_token: token };
-        const requestOptions = {
-            headers: {
-                jwt_token: token
-            }
-        }
 
-        tasks.push(generatePostCaller(url, requestBody, requestOptions));
+        tasks.push(generatePostCaller(url, requestBody));
     });
 
     async.parallelLimit(tasks, maximumConcurrentCalls, (error, result) => {
