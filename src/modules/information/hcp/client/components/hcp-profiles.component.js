@@ -352,7 +352,10 @@ export default function hcpUsers() {
     }
 
     const renderOptInTypes = ({ value }) => {
+        if(!value) return null;
+
         const allOptTypes = ['single-opt-in', 'double-opt-in', 'opt-out'];
+
         return <div className="text-center ml-n2">
             {value.includes('single-opt-in') ? <i title="Single Opt-In" className="fas fa-check cdp-text-primary mr-3"></i> : ''}
             {value.includes('double-opt-in') ? <i title="Double Opt-In" className="fas fa-check-double cdp-text-primary mr-3"></i> : ''}

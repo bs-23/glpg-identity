@@ -10,8 +10,21 @@ export default function Inbox() {
     const [show, setShow] = React.useState();
     const [showModal, setShowModal] = useState(false);
     const [modalId, setModalId] = useState(null);
+
     const getHcps = () => {
-        dispatch(getHcpProfiles('?page=1&status=not_verified&limit=5'));
+        const reqBody = {
+            filters: [
+                {
+                    name: '1',
+                    fieldName: 'status',
+                    operator: 'equal',
+                    value: ['not_verified']
+                }
+            ],
+            logic: '1',
+            fields: ['id', 'first_name', 'last_name', 'email', 'created_at']
+        }
+        dispatch(getHcpProfiles('', reqBody));
     };
 
     let hcps = useSelector(state => state.hcpReducer.hcps);
