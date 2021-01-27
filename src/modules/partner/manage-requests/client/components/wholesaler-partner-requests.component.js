@@ -191,8 +191,8 @@ const WholesalerPartnerRequests = () => {
                             <div>
                                 <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Manage Wholesalers Request</h4>
                                 <div className="pt-3">
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/vendors"><i className="fas fa-hospital-user mr-2"></i>General Vendors</NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/wholesalers"><i className="fas fa-dolly mr-2"></i>Wholesalers</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 font-weight-normal cdp-border-primary" to="/business-partner/requests/vendors"><i className="fas fa-hospital-user fa-1_5x mr-2"></i>General Vendors</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 font-weight-normal cdp-border-primary" to="/business-partner/requests/wholesalers"><i className="fas fa-dolly fa-1_5x mr-2"></i>Wholesalers</NavLink>
                                 </div>
                             </div>
                             <div className="d-flex justify-content-between align-items-center mb-2">
