@@ -1,5 +1,9 @@
 const path = require('path');
 const jwt = require('jsonwebtoken');
+const { Op } = require('sequelize');
+const async = require('async');
+const axios = require('axios');
+
 const Application = require('./application.model');
 const Data = require('./data.model');
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
@@ -184,7 +188,40 @@ async function getData(req, res) {
     }
 }
 
+async function clearApplicationCache() {
+    const applications = await Application.findAll({ where: { metadata: { [Op.iLike]: '%cache_clearing_url%' } } });
+    const maximumConcurrentCalls = 15;
+    const tasks = [];
+
+    const generatePostCaller = (url, requestBody, options) => async.reflect(async () => axios.post(url, requestBody, options));
+
+    applications.forEach(app => {
+        const token = jwt.sign({
+            id: app.id
+        }, app.auth_secret, {
+            expiresIn: '1h'
+        });
+
+        const url = JSON.parse(app.metadata).cache_clearing_url;
+        const requestBody = { jwt_token: token };
+        const requestOptions = {
+            headers: {
+                jwt_token: token
+            }
+        }
+
+        tasks.push(generatePostCaller(url, requestBody, requestOptions));
+    });
+
+    // async.parallelLimit(tasks, maximumConcurrentCalls, (error, result) => {
+    //     if(error) console.log(error);
+    //     // console.log(result);
+    //     result.forEach(r => r.error && console.log(r.error));
+    // });
+}
+
 exports.getToken = getToken;
 exports.getApplications = getApplications;
 exports.saveData = saveData;
 exports.getData = getData;
+exports.clearApplicationCache = clearApplicationCache;

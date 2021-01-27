@@ -5,6 +5,7 @@ const { Op } = require('sequelize');
 const ConsentCategory = require('./consent-category.model');
 const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
+const { clearApplicationCache } = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.controller.js'));
 
 async function getConsentCategory(req, res) {
     try {
@@ -73,6 +74,8 @@ async function createConsentCategory(req, res) {
             changes: JSON.stringify(data.dataValues)
         });
 
+        clearApplicationCache();
+
         res.json(data);
     } catch (err) {
         console.error(err);
@@ -112,6 +115,8 @@ async function updateConsentCategory(req, res) {
                 new_value: data.dataValues
             })
         });
+
+        clearApplicationCache();
 
         res.json(data);
     } catch (err) {

@@ -7,6 +7,7 @@ const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-con
 const ConsentCountry = require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model.js'));
 const ConsentLanguage = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent-locale.model.js'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
+const { clearApplicationCache } = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.controller.js'));
 
 function getTranslationViewmodels(translations) {
     return translations.map(t => ({
@@ -92,6 +93,8 @@ async function assignConsentToCountry(req, res) {
             changes: JSON.stringify(createdCountryConsent.dataValues)
         });
 
+        clearApplicationCache();
+
         res.json(createdCountryConsent);
     } catch (err) {
         console.error(err);
@@ -127,6 +130,8 @@ async function updateCountryConsent(req, res) {
             })
         });
 
+        clearApplicationCache();
+
         res.json(consentCountry);
     } catch (err) {
         console.error(err);
@@ -155,14 +160,14 @@ async function deleteCountryConsent(req, res) {
             changes: JSON.stringify(consentCountry.dataValues)
         });
 
+        clearApplicationCache();
+
         res.sendStatus(200);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
     }
 }
-
-
 
 exports.getCountryConsents = getCountryConsents;
 exports.assignConsentToCountry = assignConsentToCountry;
