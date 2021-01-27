@@ -32,4 +32,7 @@ module.exports = app => {
 
     app.route('/api/partner/document/:id')
         .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getDownloadUrl);
+
+    app.route('/api/partner/approve/:entityType/:id')
+        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.approvePartner);
 };

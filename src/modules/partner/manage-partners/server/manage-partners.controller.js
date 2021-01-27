@@ -68,7 +68,7 @@ async function getPartnerHcps(req, res) {
             offset,
             limit,
             order,
-            attributes: ['id', 'onekey_id', 'uuid', 'first_name', 'last_name', 'address', 'city', 'country_iso2', 'language']
+            attributes: ['id', 'onekey_id', 'uuid', 'first_name', 'last_name', 'address', 'city', 'country_iso2', 'language', 'status']
         });
 
         const total = await Partner.count({ where: { entity_type: 'hcp' }, });
@@ -215,7 +215,7 @@ async function getPartnerHcos(req, res) {
             offset,
             limit,
             order,
-            attributes: ['id', 'onekey_id', 'uuid', 'first_name', 'last_name', 'address', 'city', 'country_iso2', 'language']
+            attributes: ['id', 'onekey_id', 'uuid', 'first_name', 'last_name', 'address', 'city', 'country_iso2', 'language', 'status']
         });
 
         const total = await Partner.count({ where: { entity_type: 'hco' } });
@@ -358,11 +358,11 @@ async function getPartnerVendors(req, res) {
         if (orderBy !== 'created_at') order.push(['created_at', 'DESC']);
 
         const partnerVendors = await PartnerVendors.findAll({
-            where: { type },
+            where: { entity_type: type },
             offset,
             limit,
             order,
-            attributes: ['id', 'requestor_first_name', 'requestor_last_name', 'language', 'address', 'city', 'country_iso2']
+            attributes: ['id', 'requestor_first_name', 'requestor_last_name', 'language', 'address', 'city', 'country_iso2', 'status']
         });
 
         const total = await PartnerVendors.count();
@@ -389,7 +389,7 @@ async function getPartnerVendor(req, res) {
     try {
         const partnerVendor = await PartnerVendors.findOne({
             where: { id: req.params.id },
-            attributes: { exclude: ['type', 'created_at', 'updated_at'] }
+            attributes: { exclude: ['entity_type', 'created_at', 'updated_at'] }
         });
 
         if (!partnerVendor) return res.status(404).send('The partner does not exist');
@@ -435,8 +435,10 @@ async function createPartnerVendor(req, res) {
         }
 
         const data = {
-            request_id, type, country_iso2, language, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency
+            request_id, country_iso2, language, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency
         };
+
+        data.entity_type = type;
 
         const [partnerVendor, created] = await PartnerVendors.findOrCreate({
             where: {
@@ -445,7 +447,7 @@ async function createPartnerVendor(req, res) {
                     {
                         [Op.and]: [
                             { registration_number: { [Op.iLike]: registration_number } },
-                            { type: type }
+                            { entity_type: type }
                         ]
                     }
                 ]
@@ -493,6 +495,35 @@ async function getDownloadUrl(req, res) {
     }
 }
 
+async function approvePartner(req, res) {
+    try {
+        const id = req.params.id;
+        const entityType = req.params.entityType;
+
+        const PartnerModel = entityType === 'hcp' || entityType === 'hco'
+            ? Partner
+            : PartnerVendors;
+
+        const partner = await PartnerModel.findOne({
+            where: {
+                id: id,
+                entity_type: entityType
+            }
+        });
+
+        if (!partner) return res.status(404).send(`The ${entityType} partner does not exist`);
+
+        if (partner.status !== 'pending') return res.status(400).send(`The ${entityType} partner has already been approved/rejected`);
+
+        await partner.update({ status: 'approved' });
+
+        res.sendStatus(200);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal server error');
+    }
+}
+
 exports.getPartnerHcps = getPartnerHcps;
 exports.getPartnerHcp = getPartnerHcp;
 exports.createPartnerHcp = createPartnerHcp;
@@ -503,3 +534,4 @@ exports.getPartnerVendors = getPartnerVendors;
 exports.getPartnerVendor = getPartnerVendor;
 exports.createPartnerVendor = createPartnerVendor;
 exports.getDownloadUrl = getDownloadUrl;
+exports.approvePartner = approvePartner;
