@@ -89,6 +89,30 @@
             "title": "Generate Data Privacy & Consent Performance Report",
             "slug": "consent-performance-report",
             "icon": "icon icon-handshake icon-2x "
+        },
+        {
+            "category": "partner",
+            "title": "Business Partner Management",
+            "slug": "business-partner-management",
+            "icon": "icon icon-handshake icon-2x "
+        },
+        {
+            "category": "partner",
+            "title": "Manage Vendor Request",
+            "slug": "vendor-request",
+            "icon": "icon icon-handshake icon-2x "
+        },
+        {
+            "category": "partner",
+            "title": "Manage Healthcare Entity Request",
+            "slug": "healthcare-request",
+            "icon": "icon icon-handshake icon-2x "
+        },
+        {
+            "category": "partner",
+            "title": "Business Partner Management to submit to ERP System (x)",
+            "slug": "partner-management",
+            "icon": "icon icon-handshake icon-2x "
         }
     ]
 }

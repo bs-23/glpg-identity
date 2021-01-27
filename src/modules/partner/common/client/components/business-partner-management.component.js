@@ -82,7 +82,7 @@ const BusinessPartnerManagement = () => {
                         </div>
                     </div>
                     <div className="col-12 col-lg-4 col-xl-3 py-3 app__content-panel-right">
-                        <Faq />
+                        <Faq topic="business-partner-management" />
                     </div>
                 </div>
             </div>
