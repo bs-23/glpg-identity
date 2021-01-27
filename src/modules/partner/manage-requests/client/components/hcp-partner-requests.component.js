@@ -132,6 +132,11 @@ const HcpPartnerRequests = () => {
     }, [partnerRequestId]);
 
     useEffect(() => {
+        setIsSupplier(request?.is_supplier || false);
+        setIsCustomer(request?.is_customer  || false);
+    }, [request]);
+
+    useEffect(() => {
         if (request.company_codes) {
             const codes = request.company_codes.map(company_code => ({ id: Math.random(), company_code }));
             setCompanyCodes(codes);
@@ -330,6 +335,8 @@ const HcpPartnerRequests = () => {
                                 });
                             }
 
+                            setIsSupplier(false);
+                            setIsCustomer(false);
                             actions.setSubmitting(false);
                         }}
                     >
