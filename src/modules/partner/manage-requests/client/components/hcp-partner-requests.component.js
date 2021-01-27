@@ -132,6 +132,11 @@ const HcpPartnerRequests = () => {
     }, [partnerRequestId]);
 
     useEffect(() => {
+        setIsSupplier(request?.is_supplier || false);
+        setIsCustomer(request?.is_customer  || false);
+    }, [request]);
+
+    useEffect(() => {
         if (request.company_codes) {
             const codes = request.company_codes.map(company_code => ({ id: Math.random(), company_code }));
             setCompanyCodes(codes);
@@ -188,8 +193,8 @@ const HcpPartnerRequests = () => {
                             <div>
                                 <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Manage HCPs Request</h4>
                                 <div className="pt-3">
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/hcps"><i className="fas fa-user-md mr-2"></i> Health Care Professionals</NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/hcos"><i className="fas fa-hospital mr-2"></i>Health Care Organizations</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 font-weight-normal cdp-border-primary" to="/business-partner/requests/hcps"><i className="fas fa-user-md fa-1_5x mr-2"></i> Health Care Professionals</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 font-weight-normal cdp-border-primary" to="/business-partner/requests/hcos"><i className="fas fa-hospital fa-1_5x mr-2"></i>Health Care Organizations</NavLink>
                                 </div>
                             </div>
                             <div className="d-flex justify-content-between align-items-center mb-2">
@@ -330,6 +335,8 @@ const HcpPartnerRequests = () => {
                                 });
                             }
 
+                            setIsSupplier(false);
+                            setIsCustomer(false);
                             actions.setSubmitting(false);
                         }}
                     >

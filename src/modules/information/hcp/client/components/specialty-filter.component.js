@@ -107,6 +107,8 @@ const SpecialtyFilter = (props) => {
                     options={getCountryOptions()}
                     className="multiselect"
                     classNamePrefix="multiselect"
+                    closeMenuOnScroll={false}
+                    captureMenuScroll={true}
                     value={getSelectedCountry()}
                     onChange={({ value }) => {
                         onChange('country', value, index);
