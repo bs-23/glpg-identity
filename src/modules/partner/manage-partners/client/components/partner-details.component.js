@@ -17,7 +17,6 @@ const PartnerDetails = (props) => {
 
     useEffect(() => {
         if (props.detailShow) dispatch(getPartnerById(props.detailId, props.detailType));
-
     }, [props.detailShow]);
 
     const downloadFile = (id) => {

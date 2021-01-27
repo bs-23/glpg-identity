@@ -87,7 +87,7 @@ const VendorPartnerRequests = () => {
     }
 
     const removeCompanyCode = (idx) => {
-        if(companyCodes.length === 1) return;
+        if (companyCodes.length === 1) return;
         const newCompanyCodes = [...companyCodes];
         newCompanyCodes.splice(idx, 1);
         setCompanyCodes(newCompanyCodes);
@@ -108,10 +108,10 @@ const VendorPartnerRequests = () => {
                                 <span className="text-danger">*</span>
                             </span>
                             {
-                                len === 1 ? null :<i className="fas fa-minus-circle text-danger hover-opacity ml-auto" type="button" title="Remove" onClick={() => removeCompanyCode(idx)}></i>
+                                len === 1 ? null : <i className="fas fa-minus-circle text-danger hover-opacity ml-auto" type="button" title="Remove" onClick={() => removeCompanyCode(idx)}></i>
                             }
                         </label>
-                        <Field className="form-control company_code" type='text' value={item.company_code} onChange={(e) => handleChange(e)} data-id={idx} name={companyCodeId} id={companyCodeId}/>
+                        <Field className="form-control company_code" type='text' value={item.company_code} onChange={(e) => handleChange(e)} data-id={idx} name={companyCodeId} id={companyCodeId} />
                         {showError && !item.company_code && <div class="invalid-feedback">This field must not be empty.</div>}
                     </div>
                 </div>
@@ -148,7 +148,7 @@ const VendorPartnerRequests = () => {
     }, [formData]);
 
     useEffect(() => {
-        if(request.company_codes) {
+        if (request.company_codes) {
             const codes = request.company_codes.map(company_code => ({ id: Math.random(), company_code }));
             setCompanyCodes(codes);
         }
@@ -181,7 +181,7 @@ const VendorPartnerRequests = () => {
                             <Modal.Header closeButton>
                                 <Modal.Title>Questions You May Have</Modal.Title>
                             </Modal.Header>
-                            <Modal.Body className="faq__in-modal"><Faq topic="consent-performance-report" /></Modal.Body>
+                            <Modal.Body className="faq__in-modal"><Faq topic="vendor-request" /></Modal.Body>
                         </Modal>
                     </div>
                 </div>
@@ -265,7 +265,7 @@ const VendorPartnerRequests = () => {
                 </div>
             </div>
 
-            <Modal dialogClassName="modal-customize" size="lg" centered show={showForm}  onHide={toggleForm}>
+            <Modal dialogClassName="modal-customize" size="lg" centered show={showForm} onHide={toggleForm}>
                 <Modal.Header closeButton>
                     <Modal.Title>
                         {
@@ -335,7 +335,7 @@ const VendorPartnerRequests = () => {
                         {formikProps => (
                             <Form onSubmit={formikProps.handleSubmit}>
                                 <div className="row">
-                                   
+
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="first_name">First Name <span className="text-danger">*</span></label>

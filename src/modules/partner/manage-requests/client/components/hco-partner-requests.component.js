@@ -7,7 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { partnerRequestSchema } from '../manage-requests.schema'
-import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm} from '../manage-requests.actions';
+import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm } from '../manage-requests.actions';
 
 const HcoPartnerRequests = () => {
     const dispatch = useDispatch();
@@ -86,7 +86,7 @@ const HcoPartnerRequests = () => {
     }
 
     const removeCompanyCode = (idx) => {
-        if(companyCodes.length === 1) return;
+        if (companyCodes.length === 1) return;
         const newCompanyCodes = [...companyCodes];
         newCompanyCodes.splice(idx, 1);
         setCompanyCodes(newCompanyCodes);
@@ -107,7 +107,7 @@ const HcoPartnerRequests = () => {
                                 len === 1 ? null : <i className="fas fa-minus-circle text-danger hover-opacity ml-auto" type="button" title="Remove" onClick={() => removeCompanyCode(idx)}></i>
                             }
                         </label>
-                        <Field className="form-control company_code" type='text' value={item.company_code} onChange={(e) => handleChange(e)} data-id={idx} name={companyCodeId} id={companyCodeId}/>
+                        <Field className="form-control company_code" type='text' value={item.company_code} onChange={(e) => handleChange(e)} data-id={idx} name={companyCodeId} id={companyCodeId} />
                         {showError && !item.company_code && <div className="invalid-feedback">This field must not be empty.</div>}
                     </div>
                 </div>
@@ -131,7 +131,7 @@ const HcoPartnerRequests = () => {
     }, [partnerRequestId]);
 
     useEffect(() => {
-        if(request.company_codes) {
+        if (request.company_codes) {
             const codes = request.company_codes.map(company_code => ({ id: Math.random(), company_code }));
             setCompanyCodes(codes);
         }
@@ -175,7 +175,7 @@ const HcoPartnerRequests = () => {
                             <Modal.Header closeButton>
                                 <Modal.Title>Questions You May Have</Modal.Title>
                             </Modal.Header>
-                            <Modal.Body className="faq__in-modal"><Faq topic="consent-performance-report" /></Modal.Body>
+                            <Modal.Body className="faq__in-modal"><Faq topic="healthcare-request" /></Modal.Body>
                         </Modal>
                     </div>
                 </div>
@@ -238,7 +238,7 @@ const HcoPartnerRequests = () => {
                                                     <Dropdown.Menu>
                                                         <Dropdown.Item onClick={() => sendFormHandler(row)}> Send Form </Dropdown.Item>
                                                         <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
-                                                        <Dropdown.Item className="text-danger" onClick={() => setRequestToDelete(row.id) }> Delete </Dropdown.Item>
+                                                        <Dropdown.Item className="text-danger" onClick={() => setRequestToDelete(row.id)}> Delete </Dropdown.Item>
                                                     </Dropdown.Menu>
                                                 </Dropdown></td>
                                             </tr>
@@ -258,7 +258,7 @@ const HcoPartnerRequests = () => {
                 </div>
             </div>
 
-            <Modal dialogClassName="modal-customize" size="lg" centered show={showForm}  onHide={toggleForm}>
+            <Modal dialogClassName="modal-customize" size="lg" centered show={showForm} onHide={toggleForm}>
                 <Modal.Header closeButton>
                     <Modal.Title>
                         {
@@ -328,7 +328,7 @@ const HcoPartnerRequests = () => {
                         {formikProps => (
                             <Form onSubmit={formikProps.handleSubmit}>
                                 <div className="row">
-                                    
+
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="uuid">UUID <span className="text-danger">*</span></label>

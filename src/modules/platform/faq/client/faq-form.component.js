@@ -119,7 +119,9 @@ const FaqForm = (props) => {
                                                                             {category.category === 'general' ? "General" :
                                                                                 category.category === 'information' ? "Information Management" :
                                                                                     category.category === 'cdp' ? "Management of Customer Data Platform" :
-                                                                                        "Data Privacy & Consent Management"
+                                                                                        category.category === 'privacy' ? "Data Privacy & Consent Management" :
+                                                                                            category.category === 'partner' ? "Business Partner Management" :
+                                                                                                null
                                                                             }
                                                                         </span>
                                                                         {category.subcategories.map((topic, id) => (

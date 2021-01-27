@@ -8,7 +8,7 @@ import { getHcpPartners, getHcoPartners, getVendorsPartners, getWholesalePartner
 import PartnerDetails from './partner-details.component';
 import { getAllCountries } from '../../../../core/client/country/country.actions';
 
-const VendorManagement = () => {
+const PartnerManagement = () => {
 
     const [detailShow, setDetailShow] = useState(false);
     const [detailType, setDetailType] = useState(null);
@@ -99,7 +99,7 @@ const VendorManagement = () => {
                             <Modal.Header closeButton>
                                 <Modal.Title>Questions You May Have</Modal.Title>
                             </Modal.Header>
-                            <Modal.Body className="faq__in-modal"><Faq topic="consent-performance-report" /></Modal.Body>
+                            <Modal.Body className="faq__in-modal"><Faq topic="partner-management" /></Modal.Body>
                         </Modal>
                     </div>
                 </div>
@@ -199,4 +199,4 @@ const VendorManagement = () => {
     );
 };
 
-export default VendorManagement;
+export default PartnerManagement;

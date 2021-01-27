@@ -7,7 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { partnerRequestSchema } from '../manage-requests.schema'
-import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm} from '../manage-requests.actions';
+import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm } from '../manage-requests.actions';
 
 const HcpPartnerRequests = () => {
     const dispatch = useDispatch();
@@ -81,7 +81,7 @@ const HcpPartnerRequests = () => {
         }, 50);
     }
     const removeCompanyCode = (idx) => {
-        if(companyCodes.length === 1) return;
+        if (companyCodes.length === 1) return;
         const newCompanyCodes = [...companyCodes];
         newCompanyCodes.splice(idx, 1);
         setCompanyCodes(newCompanyCodes);
@@ -99,10 +99,10 @@ const HcpPartnerRequests = () => {
                         <label className="font-weight-bold d-flex align-items-center justify-content-between" htmlFor={companyCodeId}>
                             <span>{`Company Code ${idx + 1}`} <span className="text-danger">*</span></span>
                             {
-                                len === 1 ? null :<i className="fas fa-minus-circle text-danger hover-opacity ml-auto" type="button" title="Remove" onClick={() => removeCompanyCode(idx)}></i>
+                                len === 1 ? null : <i className="fas fa-minus-circle text-danger hover-opacity ml-auto" type="button" title="Remove" onClick={() => removeCompanyCode(idx)}></i>
                             }
                         </label>
-                        <Field className="form-control company_code" type='text' value={item.company_code} onChange={(e) => handleChange(e)} data-id={idx} name={companyCodeId} id={companyCodeId}/>
+                        <Field className="form-control company_code" type='text' value={item.company_code} onChange={(e) => handleChange(e)} data-id={idx} name={companyCodeId} id={companyCodeId} />
                         {showError && !item.company_code && <div className="invalid-feedback">This field must not be empty.</div>}
                     </div>
                 </div>
@@ -130,7 +130,7 @@ const HcpPartnerRequests = () => {
     }, [partnerRequestId]);
 
     useEffect(() => {
-        if(request.company_codes) {
+        if (request.company_codes) {
             const codes = request.company_codes.map(company_code => ({ id: Math.random(), company_code }));
             setCompanyCodes(codes);
         }
@@ -175,7 +175,7 @@ const HcpPartnerRequests = () => {
                             <Modal.Header closeButton>
                                 <Modal.Title>Questions You May Have</Modal.Title>
                             </Modal.Header>
-                            <Modal.Body className="faq__in-modal"><Faq topic="consent-performance-report" /></Modal.Body>
+                            <Modal.Body className="faq__in-modal"><Faq topic="healthcare-request" /></Modal.Body>
                         </Modal>
                     </div>
                 </div>
@@ -202,7 +202,7 @@ const HcpPartnerRequests = () => {
                         {requests && requests.length > 0 ?
                             <div className="table-responsive shadow-sm bg-white">
                                 <table className="table table-hover table-sm mb-0 cdp-table">
-                                <thead className="cdp-bg-primary text-white cdp-table__header">
+                                    <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
                                             <th>UUID</th>
                                             <th>Name</th>
@@ -238,7 +238,7 @@ const HcpPartnerRequests = () => {
                                                     <Dropdown.Menu>
                                                         <Dropdown.Item onClick={() => sendFormHandler(row)}> Send Form </Dropdown.Item>
                                                         <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
-                                                        <Dropdown.Item className="text-danger" onClick={() => setRequestToDelete(row.id) }> Delete </Dropdown.Item>
+                                                        <Dropdown.Item className="text-danger" onClick={() => setRequestToDelete(row.id)}> Delete </Dropdown.Item>
                                                     </Dropdown.Menu>
                                                 </Dropdown></td>
                                             </tr>
@@ -258,7 +258,7 @@ const HcpPartnerRequests = () => {
                 </div>
             </div>
 
-            <Modal dialogClassName="modal-customize" size="lg" centered show={showForm}  onHide={toggleForm}>
+            <Modal dialogClassName="modal-customize" size="lg" centered show={showForm} onHide={toggleForm}>
                 <Modal.Header closeButton>
                     <Modal.Title>
                         {
