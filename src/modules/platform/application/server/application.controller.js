@@ -212,8 +212,8 @@ async function clearApplicationCache() {
     });
 
     async.parallelLimit(tasks, maximumConcurrentCalls, (error, result) => {
-        if(error) console.log(error);
-        result.forEach(r => r.error && console.log(r.error));
+        if (error) logger.error(error);
+        result.forEach(r => r.error && logger.error(r.error));
     });
 }
 
