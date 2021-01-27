@@ -12,7 +12,7 @@ const File = sequelize.cdpConnector.define('files', {
     },
     name: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING(224)
     },
     bucket_name: {
         allowNull: false,

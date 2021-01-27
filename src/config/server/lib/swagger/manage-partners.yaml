@@ -61,6 +61,7 @@ paths:
                                     type: string
                                 documents:
                                     type: array
+                                    description: Upto 5 files each upto 5 MB in size. File name may contain a-zA-Z0-9/!\'() .*-_
                                     items:
                                         type: string
                                         format: binary
@@ -146,6 +147,7 @@ paths:
                                     type: string
                                 documents:
                                     type: array
+                                    description: Upto 5 files each upto 5 MB in size. File name may contain a-zA-Z0-9/!\'() .*-_
                                     items:
                                         type: string
                                         format: binary
@@ -265,6 +267,7 @@ paths:
                                     type: string
                                 documents:
                                     type: array
+                                    description: Upto 5 files each upto 5 MB in size. File name may contain a-zA-Z0-9/!\'() .*-_
                                     items:
                                         type: string
                                         format: binary
@@ -501,7 +504,7 @@ components:
                     type: string
                 currency:
                     type: string
-                documens:
+                documents:
                     type: array
                     items:
                         type: string

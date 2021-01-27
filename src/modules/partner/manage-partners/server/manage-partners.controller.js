@@ -127,12 +127,6 @@ async function createPartnerHcp(req, res) {
             type, country_iso2, language, registration_number, uuid, onekey_id, is_italian_hcp, should_report_hco, beneficiary_category,
             iban, bank_name, bank_account_no, currency } = req.body;
 
-        const fileWithInvalidType = files.find(f => f.mimetype !== 'application/pdf');
-        if (fileWithInvalidType) response.errors.push(new CustomError('Invalid file type. Only PDF is allowed.', 400, 'documents'));
-
-        const fileWithInvalidSize = files.find(f => f.size > FILE_SIZE_LIMIT);
-        if (fileWithInvalidSize) response.errors.push(new CustomError('Invalid file size. Size limit is 5 MB', 400, 'documents'));
-
         if (response.errors.length) return res.status(400).send(response);
 
         const partnerRequest = await PartnerRequest.findOne({
@@ -278,12 +272,6 @@ async function createPartnerHco(req, res) {
 
         const { request_id, contact_first_name, contact_last_name, organization_name, address, city, post_code, email, telephone, type, uuid, onekey_id, country_iso2, language, registration_number, iban, bank_name, bank_account_no, currency } = req.body;
 
-        const fileWithInvalidType = files.find(f => f.mimetype !== 'application/pdf');
-        if (fileWithInvalidType) response.errors.push(new CustomError('Invalid file type. Only PDF is allowed.', 400, 'documents'));
-
-        const fileWithInvalidSize = files.find(f => f.size > FILE_SIZE_LIMIT);
-        if (fileWithInvalidSize) response.errors.push(new CustomError('Invalid file size. Size limit is 5 MB', 400, 'documents'));
-
         if (response.errors.length) return res.status(400).send(response);
 
         const partnerRequest = await PartnerRequest.findOne({
@@ -426,12 +414,6 @@ async function createPartnerVendor(req, res) {
         const files = req.files;
 
         const { request_id, type, country_iso2, language, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency } = req.body;
-
-        const fileWithInvalidType = files.find(f => f.mimetype !== 'application/pdf');
-        if (fileWithInvalidType) response.errors.push(new CustomError('Invalid file type. Only PDF is allowed.', 400, 'documents'));
-
-        const fileWithInvalidSize = files.find(f => f.size > FILE_SIZE_LIMIT);
-        if (fileWithInvalidSize) response.errors.push(new CustomError('Invalid file size. Size limit is 5 MB', 400, 'documents'));
 
         if (response.errors.length) return res.status(400).send(response);
 
