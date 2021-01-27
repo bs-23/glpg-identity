@@ -17,7 +17,6 @@ const PartnerDetails = (props) => {
 
     useEffect(() => {
         if (props.detailShow) dispatch(getPartnerById(props.detailId, props.detailType));
-
     }, [props.detailShow]);
 
     const downloadFile = (id) => {
@@ -49,7 +48,7 @@ const PartnerDetails = (props) => {
                 {props.countries && props.countries.length > 0 && partner &&
                     <div className="row">
                         <div className="col-12">
-                            <h4 className="mb-3">{props.detailType === 'hcp' ?
+                            <h4 className="mb-3">{props.detailType === 'hcp' || props.detailType === 'hco' ?
                                 partner.first_name + ' ' + partner.last_name : partner.requestor_first_name + ' ' + partner.requestor_last_name}</h4>
 
                         </div>

@@ -6,7 +6,7 @@ import { Faq } from '../../../../platform';
 import { useSelector, useDispatch } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
-import { partnerRequestSchema } from '../manage-requests.schema'
+import { partnerRequestSchemaForHcps } from '../manage-requests.schema'
 import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm} from '../manage-requests.actions';
 
 const HcpPartnerRequests = () => {
@@ -16,6 +16,8 @@ const HcpPartnerRequests = () => {
     const [companyCodes, setCompanyCodes] = useState([{ id: Math.random(), company_code: '' }]);
     const [showError, setShowError] = useState(false);
     const [partnerRequestId, setPartnerRequestId] = useState(undefined);
+    const [isSupplier, setIsSupplier] = useState(false);
+    const [isCustomer, setIsCustomer] = useState(false);
     const [formData, setFormData] = useState(undefined);
     const countryLanguages = [
         { language_name: 'English', language_code: 'en' },
@@ -81,7 +83,7 @@ const HcpPartnerRequests = () => {
         }, 50);
     }
     const removeCompanyCode = (idx) => {
-        if(companyCodes.length === 1) return;
+        if (companyCodes.length === 1) return;
         const newCompanyCodes = [...companyCodes];
         newCompanyCodes.splice(idx, 1);
         setCompanyCodes(newCompanyCodes);
@@ -99,10 +101,10 @@ const HcpPartnerRequests = () => {
                         <label className="font-weight-bold d-flex align-items-center justify-content-between" htmlFor={companyCodeId}>
                             <span>{`Company Code ${idx + 1}`} <span className="text-danger">*</span></span>
                             {
-                                len === 1 ? null :<i className="fas fa-minus-circle text-danger hover-opacity ml-auto" type="button" title="Remove" onClick={() => removeCompanyCode(idx)}></i>
+                                len === 1 ? null : <i className="fas fa-minus-circle text-danger hover-opacity ml-auto" type="button" title="Remove" onClick={() => removeCompanyCode(idx)}></i>
                             }
                         </label>
-                        <Field className="form-control company_code" type='text' value={item.company_code} onChange={(e) => handleChange(e)} data-id={idx} name={companyCodeId} id={companyCodeId}/>
+                        <Field className="form-control company_code" type='text' value={item.company_code} onChange={(e) => handleChange(e)} data-id={idx} name={companyCodeId} id={companyCodeId} />
                         {showError && !item.company_code && <div className="invalid-feedback">This field must not be empty.</div>}
                     </div>
                 </div>
@@ -130,7 +132,12 @@ const HcpPartnerRequests = () => {
     }, [partnerRequestId]);
 
     useEffect(() => {
-        if(request.company_codes) {
+        setIsSupplier(request?.is_supplier || false);
+        setIsCustomer(request?.is_customer  || false);
+    }, [request]);
+
+    useEffect(() => {
+        if (request.company_codes) {
             const codes = request.company_codes.map(company_code => ({ id: Math.random(), company_code }));
             setCompanyCodes(codes);
         }
@@ -175,7 +182,7 @@ const HcpPartnerRequests = () => {
                             <Modal.Header closeButton>
                                 <Modal.Title>Questions You May Have</Modal.Title>
                             </Modal.Header>
-                            <Modal.Body className="faq__in-modal"><Faq topic="consent-performance-report" /></Modal.Body>
+                            <Modal.Body className="faq__in-modal"><Faq topic="healthcare-request" /></Modal.Body>
                         </Modal>
                     </div>
                 </div>
@@ -186,8 +193,8 @@ const HcpPartnerRequests = () => {
                             <div>
                                 <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Manage HCPs Request</h4>
                                 <div className="pt-3">
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/hcps"><i className="fas fa-user-md mr-2"></i> Health Care Professionals</NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/hcos"><i className="fas fa-hospital mr-2"></i>Health Care Organizations</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 font-weight-normal cdp-border-primary" to="/business-partner/requests/hcps"><i className="fas fa-user-md fa-1_5x mr-2"></i> Health Care Professionals</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 font-weight-normal cdp-border-primary" to="/business-partner/requests/hcos"><i className="fas fa-hospital fa-1_5x mr-2"></i>Health Care Organizations</NavLink>
                                 </div>
                             </div>
                             <div className="d-flex justify-content-between align-items-center mb-2">
@@ -202,10 +209,11 @@ const HcpPartnerRequests = () => {
                         {requests && requests.length > 0 ?
                             <div className="table-responsive shadow-sm bg-white">
                                 <table className="table table-hover table-sm mb-0 cdp-table">
-                                <thead className="cdp-bg-primary text-white cdp-table__header">
+                                    <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
                                             <th>UUID</th>
                                             <th>Name</th>
+                                            <th>MDR ID</th>
                                             <th>Status</th>
                                             <th>Company Code</th>
                                             <th>Partner Type</th>
@@ -220,6 +228,7 @@ const HcpPartnerRequests = () => {
                                             <tr key={index}>
                                                 <td>{row.uuid}</td>
                                                 <td>{`${row.first_name} ${row.last_name}`}</td>
+                                                <td>{row.mdr_id}</td>
                                                 <td>{row.status}</td>
                                                 <td>
                                                     {
@@ -238,7 +247,7 @@ const HcpPartnerRequests = () => {
                                                     <Dropdown.Menu>
                                                         <Dropdown.Item onClick={() => sendFormHandler(row)}> Send Form </Dropdown.Item>
                                                         <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
-                                                        <Dropdown.Item className="text-danger" onClick={() => setRequestToDelete(row.id) }> Delete </Dropdown.Item>
+                                                        <Dropdown.Item className="text-danger" onClick={() => setRequestToDelete(row.id)}> Delete </Dropdown.Item>
                                                     </Dropdown.Menu>
                                                 </Dropdown></td>
                                             </tr>
@@ -258,7 +267,7 @@ const HcpPartnerRequests = () => {
                 </div>
             </div>
 
-            <Modal dialogClassName="modal-customize" size="lg" centered show={showForm}  onHide={toggleForm}>
+            <Modal dialogClassName="modal-customize" size="lg" centered show={showForm} onHide={toggleForm}>
                 <Modal.Header closeButton>
                     <Modal.Title>
                         {
@@ -269,9 +278,13 @@ const HcpPartnerRequests = () => {
                 <Modal.Body>
                     <Formik
                         initialValues={{
+                            is_supplier: partnerRequestId && Object.keys(request).length ? request.is_supplier : false,
+                            is_customer: partnerRequestId && Object.keys(request).length ? request.is_customer : false,
                             first_name: partnerRequestId && Object.keys(request).length ? request.first_name : '',
                             last_name: partnerRequestId && Object.keys(request).length ? request.last_name : '',
                             email: partnerRequestId && Object.keys(request).length ? request.email : '',
+                            confirm_email: partnerRequestId && Object.keys(request).length ? request.email : '',
+                            mdr_id: partnerRequestId && Object.keys(request).length ? request.mdr_id : '',
                             procurement_contact: partnerRequestId && Object.keys(request).length ? request.procurement_contact : '',
                             company_codes: [],
                             country_iso2: partnerRequestId && Object.keys(request).length ? request.country_iso2 : '',
@@ -280,7 +293,7 @@ const HcpPartnerRequests = () => {
                             partner_type: partnerRequestId && Object.keys(request).length ? request.partner_type : '',
                         }}
                         displayName="PartnerRequestsForm"
-                        validationSchema={partnerRequestSchema}
+                        validationSchema={partnerRequestSchemaForHcps}
                         enableReinitialize={true}
                         onSubmit={(values, actions) => {
                             values.company_codes = companyCodes.map(i => i.company_code);
@@ -322,6 +335,8 @@ const HcpPartnerRequests = () => {
                                 });
                             }
 
+                            setIsSupplier(false);
+                            setIsCustomer(false);
                             actions.setSubmitting(false);
                         }}
                     >
@@ -331,16 +346,36 @@ const HcpPartnerRequests = () => {
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group pb-3">
                                             <div className="custom-control custom-checkbox">
-                                                <input type="checkbox" className="custom-control-input" id="supplier" />
-                                                <label className="custom-control-label font-weight-bold-light" for="supplier">HCP Is Already Supplier</label>
+                                                <input
+                                                    type="checkbox"
+                                                    className="custom-control-input"
+                                                    name="is_supplier"
+                                                    id="is_supplier"
+                                                    checked={isSupplier}
+                                                    onChange={(e) => {
+                                                        formikProps.setFieldValue('is_supplier', e.target.checked);
+                                                        setIsSupplier(e.target.checked);
+                                                    }}
+                                                />
+                                                <label className="custom-control-label font-weight-bold-light" for="is_supplier">HCP Is Already Supplier</label>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="col-12 col-sm-6 col-lg-8">
                                         <div className="form-group pb-3">
                                             <div className="custom-control custom-checkbox">
-                                                <input type="checkbox" className="custom-control-input" id="customer" />
-                                                <label className="custom-control-label font-weight-bold-light" for="customer">HCP Is Already Customer</label>
+                                                <input
+                                                    type="checkbox"
+                                                    className="custom-control-input"
+                                                    name="is_customer"
+                                                    id="is_customer"
+                                                    checked={isCustomer}
+                                                    onChange={(e) => {
+                                                        formikProps.setFieldValue('is_customer', e.target.checked);
+                                                        setIsCustomer(e.target.checked);
+                                                    }}
+                                                />
+                                                <label className="custom-control-label font-weight-bold-light" for="is_customer">HCP Is Already Customer</label>
                                             </div>
                                         </div>
                                     </div>
@@ -384,9 +419,23 @@ const HcpPartnerRequests = () => {
                                     </div>
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="confirm_email">Confirm Email Address <span className="text-danger">*</span></label>
+                                            <Field className="form-control" type="text" name="confirm_email" />
+                                            <div className="invalid-feedback"><ErrorMessage name="confirm_email" /></div>
+                                        </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="procurement_contact">Procurement Contact <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="procurement_contact" />
                                             <div className="invalid-feedback"><ErrorMessage name="procurement_contact" /></div>
+                                        </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="mdr_id">MDR ID <span className="text-danger">*</span></label>
+                                            <Field className="form-control" type="text" name="mdr_id" />
+                                            <div className="invalid-feedback"><ErrorMessage name="mdr_id" /></div>
                                         </div>
                                     </div>
                                     <div className="col-12">

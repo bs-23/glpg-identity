@@ -87,7 +87,7 @@ const VendorPartnerRequests = () => {
     }
 
     const removeCompanyCode = (idx) => {
-        if(companyCodes.length === 1) return;
+        if (companyCodes.length === 1) return;
         const newCompanyCodes = [...companyCodes];
         newCompanyCodes.splice(idx, 1);
         setCompanyCodes(newCompanyCodes);
@@ -108,10 +108,10 @@ const VendorPartnerRequests = () => {
                                 <span className="text-danger">*</span>
                             </span>
                             {
-                                len === 1 ? null :<i className="fas fa-minus-circle text-danger hover-opacity ml-auto" type="button" title="Remove" onClick={() => removeCompanyCode(idx)}></i>
+                                len === 1 ? null : <i className="fas fa-minus-circle text-danger hover-opacity ml-auto" type="button" title="Remove" onClick={() => removeCompanyCode(idx)}></i>
                             }
                         </label>
-                        <Field className="form-control company_code" type='text' value={item.company_code} onChange={(e) => handleChange(e)} data-id={idx} name={companyCodeId} id={companyCodeId}/>
+                        <Field className="form-control company_code" type='text' value={item.company_code} onChange={(e) => handleChange(e)} data-id={idx} name={companyCodeId} id={companyCodeId} />
                         {showError && !item.company_code && <div class="invalid-feedback">This field must not be empty.</div>}
                     </div>
                 </div>
@@ -148,7 +148,7 @@ const VendorPartnerRequests = () => {
     }, [formData]);
 
     useEffect(() => {
-        if(request.company_codes) {
+        if (request.company_codes) {
             const codes = request.company_codes.map(company_code => ({ id: Math.random(), company_code }));
             setCompanyCodes(codes);
         }
@@ -181,7 +181,7 @@ const VendorPartnerRequests = () => {
                             <Modal.Header closeButton>
                                 <Modal.Title>Questions You May Have</Modal.Title>
                             </Modal.Header>
-                            <Modal.Body className="faq__in-modal"><Faq topic="consent-performance-report" /></Modal.Body>
+                            <Modal.Body className="faq__in-modal"><Faq topic="vendor-request" /></Modal.Body>
                         </Modal>
                     </div>
                 </div>
@@ -192,8 +192,8 @@ const VendorPartnerRequests = () => {
                             <div>
                                 <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Manage Vendors Request</h4>
                                 <div className="pt-3">
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/vendors"><i className="fas fa-hospital-user mr-2"></i>General Vendors</NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/wholesalers"><i className="fas fa-dolly mr-2"></i> Wholesalers</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 font-weight-normal cdp-border-primary" to="/business-partner/requests/vendors"><i className="fas fa-hospital-user fa-1_5x mr-2"></i>General Vendors</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 font-weight-normal cdp-border-primary" to="/business-partner/requests/wholesalers"><i className="fas fa-dolly fa-1_5x mr-2"></i> Wholesalers</NavLink>
                                 </div>
                             </div>
                             <div className="d-flex justify-content-between align-items-center mb-2">
@@ -265,7 +265,7 @@ const VendorPartnerRequests = () => {
                 </div>
             </div>
 
-            <Modal dialogClassName="modal-customize" size="lg" centered show={showForm}  onHide={toggleForm}>
+            <Modal dialogClassName="modal-customize" size="lg" centered show={showForm} onHide={toggleForm}>
                 <Modal.Header closeButton>
                     <Modal.Title>
                         {
@@ -279,8 +279,9 @@ const VendorPartnerRequests = () => {
                             first_name: partnerRequestId && Object.keys(request).length ? request.first_name : '',
                             last_name: partnerRequestId && Object.keys(request).length ? request.last_name : '',
                             email: partnerRequestId && Object.keys(request).length ? request.email : '',
+                            confirm_email: partnerRequestId && Object.keys(request).length ? request.email : '',
+                            mdr_id: partnerRequestId && Object.keys(request).length ? request.mdr_id : '',
                             procurement_contact: partnerRequestId && Object.keys(request).length ? request.procurement_contact : '',
-                            purchasing_organization: partnerRequestId && Object.keys(request).length ? request.purchasing_organization : '',
                             company_codes: [],
                             country_iso2: partnerRequestId && Object.keys(request).length ? request.country_iso2 : '',
                             language: partnerRequestId && Object.keys(request).length ? request.language : '',
@@ -335,7 +336,7 @@ const VendorPartnerRequests = () => {
                         {formikProps => (
                             <Form onSubmit={formikProps.handleSubmit}>
                                 <div className="row">
-                                   
+
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="first_name">First Name <span className="text-danger">*</span></label>
@@ -369,9 +370,23 @@ const VendorPartnerRequests = () => {
                                     </div>
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="confirm_email">Confirm Email Address <span className="text-danger">*</span></label>
+                                            <Field className="form-control" type="text" name="confirm_email" />
+                                            <div className="invalid-feedback"><ErrorMessage name="confirm_email" /></div>
+                                        </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="procurement_contact">Procurement Contact <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="procurement_contact" />
                                             <div className="invalid-feedback"><ErrorMessage name="procurement_contact" /></div>
+                                        </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="mdr_id">MDR ID <span className="text-danger">*</span></label>
+                                            <Field className="form-control" type="text" name="mdr_id" />
+                                            <div className="invalid-feedback"><ErrorMessage name="mdr_id" /></div>
                                         </div>
                                     </div>
                                     <div className="col-12">

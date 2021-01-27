@@ -1,7 +1,7 @@
 import React from "react";
 import { Switch, useRouteMatch, Route } from "react-router-dom";
 import PrivateRoute from "../../../core/client/PrivateRoute";
-import VendorManagement from "./components/vendor-management.component";
+import PartnerManagement from "./components/partner-management.component";
 
 
 export default function ManagePartnersRoutes() {
@@ -9,10 +9,10 @@ export default function ManagePartnersRoutes() {
 
     return (
         <Switch>
-            <PrivateRoute path={`${path}/vendor-management/vendors`} component={VendorManagement} />
-            <PrivateRoute path={`${path}/vendor-management/wholesalers`} component={VendorManagement} />
-            <PrivateRoute path={`${path}/vendor-management/hcp`} component={VendorManagement} />
-            <PrivateRoute path={`${path}/vendor-management/hco`} component={VendorManagement} />
+            <PrivateRoute path={`${path}/partner-management/vendors`} component={PartnerManagement} />
+            <PrivateRoute path={`${path}/partner-management/wholesalers`} component={PartnerManagement} />
+            <PrivateRoute path={`${path}/partner-management/hcp`} component={PartnerManagement} />
+            <PrivateRoute path={`${path}/partner-management/hco`} component={PartnerManagement} />
         </Switch>
     );
 }

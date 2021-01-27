@@ -8,7 +8,7 @@ import { getHcpPartners, getHcoPartners, getVendorsPartners, getWholesalePartner
 import PartnerDetails from './partner-details.component';
 import { getAllCountries } from '../../../../core/client/country/country.actions';
 
-const VendorManagement = () => {
+const PartnerManagement = () => {
 
     const [detailShow, setDetailShow] = useState(false);
     const [detailType, setDetailType] = useState(null);
@@ -99,7 +99,7 @@ const VendorManagement = () => {
                             <Modal.Header closeButton>
                                 <Modal.Title>Questions You May Have</Modal.Title>
                             </Modal.Header>
-                            <Modal.Body className="faq__in-modal"><Faq topic="consent-performance-report" /></Modal.Body>
+                            <Modal.Body className="faq__in-modal"><Faq topic="partner-management" /></Modal.Body>
                         </Modal>
                     </div>
                 </div>
@@ -110,10 +110,10 @@ const VendorManagement = () => {
                             <div>
                                 <h4 className="cdp-text-primary font-weight-bold mb-4">Business Partner Lists</h4>
                                 <div>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/vendor-management/hcp"><i className="fas fa-user-md mr-2"></i>Health Care Professionals</NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/vendor-management/hco"><i className="fas fa-hospital mr-2"></i>Health Care Organizations</NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/vendor-management/vendors"><i className="fas fa-hospital-user mr-2"></i>General Vendors</NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/vendor-management/wholesalers"><i className="fas fa-dolly mr-2"></i>Wholesalers</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/hcp"><i className="fas fa-user-md fa-1_5x mr-2"></i>Health Care Professionals</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/hco"><i className="fas fa-hospital fa-1_5x mr-2"></i>Health Care Organizations</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/vendors"><i className="fas fa-hospital-user fa-1_5x mr-2"></i>General Vendors</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/wholesalers"><i className="fas fa-dolly fa-1_5x mr-2"></i>Wholesalers</NavLink>
                                 </div>
                             </div>
 
@@ -199,4 +199,4 @@ const VendorManagement = () => {
     );
 };
 
-export default VendorManagement;
+export default PartnerManagement;

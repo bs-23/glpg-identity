@@ -385,11 +385,15 @@ a {
 }
 
 
-
 .recaptcha-info a {
     color: $secondary-color;
 }
 
 .grecaptcha-badge {
     visibility: hidden;
+}
+
+
+.fa-1_5x {
+    font-size: 1.5rem;
 }

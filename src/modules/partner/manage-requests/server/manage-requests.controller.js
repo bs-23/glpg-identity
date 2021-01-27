@@ -6,6 +6,7 @@ const ArchiveService = require(path.join(process.cwd(), 'src/modules/core/server
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
+
 async function getPartnerRequests(req, res) {
     try {
         const PartnerRequests = await PartnerRequest.findAll();
@@ -24,36 +25,59 @@ async function createPartnerRequest(req, res) {
             first_name,
             last_name,
             email,
-            procurement_contact,
-            company_codes,
-            uuid,
-            partner_type,
+            mdr_id,
             country_iso2,
             language,
+            uuid,
+            is_supplier,
+            is_customer,
+            procurement_contact,
+            company_codes,
+            partner_type,
+            workplace_name,
+            workplace_type,
+            specialty,
+            iqvia_wholesaler_id,
         } = req.body;
-
-        const companyCodes = company_codes && Array.isArray(company_codes)
-            ? company_codes.filter(cb => 'string' === typeof cb)
-            : null;
-
-        if (!companyCodes || !companyCodes.length) return res.status(400).send('Invalid Company Codes.');
 
         const application = await Application.findOne({ where: { email: 'patients-organization@glpg.com'} });
 
         const data = {
             entity_type,
+            application_id: application.id,
             first_name,
             last_name,
             email,
-            procurement_contact,
-            partner_type,
-            company_codes: companyCodes,
-            application_id: application.id,
+            mdr_id,
             country_iso2,
             language,
         };
 
-        if (entity_type === 'hcp' || entity_type === 'hco') data.uuid = uuid;
+        if(entity_type === 'hcp'){
+            data.uuid = uuid;
+            data.is_supplier = is_supplier;
+            data.is_customer = is_customer;
+            data.procurement_contact = procurement_contact;
+            data.partner_type = partner_type;
+            data.company_codes = company_codes;
+        }
+        else if(entity_type === 'hco'){
+            data.uuid = uuid;
+            data.workplace_name = workplace_name;
+            data.workplace_type = workplace_type;
+            data.specialty = specialty;
+        }
+        else if(entity_type === 'vendor'){
+            data.procurement_contact = procurement_contact;
+            data.partner_type = partner_type;
+            data.company_codes = company_codes;
+        }
+        else if(entity_type === 'wholesaler'){
+            data.iqvia_wholesaler_id = iqvia_wholesaler_id;
+            data.procurement_contact = procurement_contact;
+            data.partner_type = partner_type;
+            data.company_codes = company_codes;
+        }
 
         const [user, created] = await PartnerRequest.findOrCreate({
             where: { entity_type, email: email.toLowerCase() },
@@ -132,20 +156,20 @@ async function updatePartnerRequest(req, res) {
             first_name,
             last_name,
             email,
-            procurement_contact,
-            company_codes,
-            uuid,
-            partner_type,
+            mdr_id,
             country_iso2,
             language,
-            status
+            uuid,
+            is_supplier,
+            is_customer,
+            procurement_contact,
+            company_codes,
+            partner_type,
+            workplace_name,
+            workplace_type,
+            specialty,
+            iqvia_wholesaler_id,
         } = req.body;
-
-        const companyCodes = company_codes && Array.isArray(company_codes)
-            ? company_codes.filter(cb => 'string' === typeof cb)
-            : null;
-
-        if (!companyCodes || !companyCodes.length) return res.status(400).send('Invalid Company Codes.');
 
         const partnerRequest = await PartnerRequest.findOne({ where: { id: req.params.id } });
         if (!partnerRequest) return res.status(404).send('The partner request does not exist');
@@ -164,15 +188,36 @@ async function updatePartnerRequest(req, res) {
             first_name,
             last_name,
             email,
-            procurement_contact,
-            partner_type,
-            company_codes: companyCodes,
+            mdr_id,
             country_iso2,
             language,
-            status
         };
 
-        if (entity_type === 'hcp' || entity_type === 'hco') data.uuid = uuid;
+        if(entity_type === 'hcp'){
+            data.uuid = uuid;
+            data.is_supplier = is_supplier;
+            data.is_customer = is_customer;
+            data.procurement_contact = procurement_contact;
+            data.company_codes = company_codes;
+            data.partner_type = partner_type;
+        }
+        else if(entity_type === 'hco'){
+            data.uuid = uuid;
+            data.workplace_name = workplace_name;
+            data.workplace_type = workplace_type;
+            data.specialty = specialty;
+        }
+        else if(entity_type === 'vendor'){
+            data.procurement_contact = procurement_contact;
+            data.company_codes = company_codes;
+            data.partner_type = partner_type;
+        }
+        else if(entity_type === 'wholesaler'){
+            data.iqvia_wholesaler_id = iqvia_wholesaler_id;
+            data.procurement_contact = procurement_contact;
+            data.company_codes = company_codes;
+            data.partner_type = partner_type;
+        }
 
         const updated_data = await partnerRequest.update(data);
 

@@ -6,7 +6,7 @@ import { useToasts } from 'react-toast-notifications';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { NavLink } from 'react-router-dom';
 import { Faq } from '../../../../platform';
-import { partnerRequestSchemaForVendors } from './../manage-requests.schema';
+import { partnerRequestSchemaForWholesalers } from './../manage-requests.schema';
 import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm} from '../manage-requests.actions';
 
 const WholesalerPartnerRequests = () => {
@@ -84,7 +84,7 @@ const WholesalerPartnerRequests = () => {
     }
 
     const removeCompanyCode = (idx) => {
-        if(companyCodes.length === 1) return;
+        if (companyCodes.length === 1) return;
         const newCompanyCodes = [...companyCodes];
         newCompanyCodes.splice(idx, 1);
         setCompanyCodes(newCompanyCodes);
@@ -106,10 +106,10 @@ const WholesalerPartnerRequests = () => {
                                 {`Company Code ${idx + 1}`} <span className="text-danger">*</span>
                             </span>
                             {
-                                len === 1 ? null :  <i className="fas fa-minus-circle text-danger hover-opacity ml-auto" type="button" title="Remove" onClick={() => removeCompanyCode(idx)}></i>
+                                len === 1 ? null : <i className="fas fa-minus-circle text-danger hover-opacity ml-auto" type="button" title="Remove" onClick={() => removeCompanyCode(idx)}></i>
                             }
                         </label>
-                        <Field className="form-control company_code" type='text' value={item.company_code} onChange={(e) => handleChange(e)} data-id={idx} name={companyCodeId} id={companyCodeId}/>
+                        <Field className="form-control company_code" type='text' value={item.company_code} onChange={(e) => handleChange(e)} data-id={idx} name={companyCodeId} id={companyCodeId} />
                         {showError && !item.company_code && <div className="invalid-feedback">This field must not be empty.</div>}
                     </div>
                 </div>
@@ -147,7 +147,7 @@ const WholesalerPartnerRequests = () => {
         }
     }, [formData]);
     useEffect(() => {
-        if(request.company_codes) {
+        if (request.company_codes) {
             const codes = request.company_codes.map(company_code => ({ id: Math.random(), company_code }));
             setCompanyCodes(codes);
         }
@@ -158,7 +158,7 @@ const WholesalerPartnerRequests = () => {
             <div className="container-fluid">
                 <div className="row">
                     <div className="col-12 px-0">
-                         <nav className="breadcrumb justify-content-between align-items-center" aria-label="breadcrumb">
+                        <nav className="breadcrumb justify-content-between align-items-center" aria-label="breadcrumb">
                             <ol className="rounded-0 m-0 p-0 d-none d-sm-flex">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/business-partner">Business Partner Management</NavLink></li>
@@ -180,7 +180,7 @@ const WholesalerPartnerRequests = () => {
                             <Modal.Header closeButton>
                                 <Modal.Title>Questions You May Have</Modal.Title>
                             </Modal.Header>
-                            <Modal.Body className="faq__in-modal"><Faq topic="consent-performance-report" /></Modal.Body>
+                            <Modal.Body className="faq__in-modal"><Faq topic="vendor-request" /></Modal.Body>
                         </Modal>
                     </div>
                 </div>
@@ -191,8 +191,8 @@ const WholesalerPartnerRequests = () => {
                             <div>
                                 <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Manage Wholesalers Request</h4>
                                 <div className="pt-3">
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/vendors"><i className="fas fa-hospital-user mr-2"></i>General Vendors</NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/business-partner/requests/wholesalers"><i className="fas fa-dolly mr-2"></i>Wholesalers</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 font-weight-normal cdp-border-primary" to="/business-partner/requests/vendors"><i className="fas fa-hospital-user fa-1_5x mr-2"></i>General Vendors</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 font-weight-normal cdp-border-primary" to="/business-partner/requests/wholesalers"><i className="fas fa-dolly fa-1_5x mr-2"></i>Wholesalers</NavLink>
                                 </div>
                             </div>
                             <div className="d-flex justify-content-between align-items-center mb-2">
@@ -242,7 +242,7 @@ const WholesalerPartnerRequests = () => {
                                                         <Dropdown.Menu>
                                                             <Dropdown.Item onClick={() => sendFormHandler(row)}> Send Form </Dropdown.Item>
                                                             <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
-                                                            <Dropdown.Item className="text-danger" onClick={() => setRequestToDelete(row.id) }> Delete </Dropdown.Item>
+                                                            <Dropdown.Item className="text-danger" onClick={() => setRequestToDelete(row.id)}> Delete </Dropdown.Item>
                                                         </Dropdown.Menu>
                                                     </Dropdown></td>
                                                 </tr>
@@ -263,7 +263,7 @@ const WholesalerPartnerRequests = () => {
                 </div>
             </div>
 
-            <Modal dialogClassName="modal-customize" size="lg" centered show={showForm}  onHide={toggleForm}>
+            <Modal dialogClassName="modal-customize" size="lg" centered show={showForm} onHide={toggleForm}>
                 <Modal.Header closeButton>
                     <Modal.Title>
                         {
@@ -277,15 +277,17 @@ const WholesalerPartnerRequests = () => {
                             first_name: partnerRequestId && Object.keys(request).length ? request.first_name : '',
                             last_name: partnerRequestId && Object.keys(request).length ? request.last_name : '',
                             email: partnerRequestId && Object.keys(request).length ? request.email : '',
+                            confirm_email: partnerRequestId && Object.keys(request).length ? request.email : '',
+                            mdr_id: partnerRequestId && Object.keys(request).length ? request.mdr_id : '',
+                            iqvia_wholesaler_id: partnerRequestId && Object.keys(request).length ? request.iqvia_wholesaler_id : '',
                             procurement_contact: partnerRequestId && Object.keys(request).length ? request.procurement_contact : '',
-                            purchasing_organization: partnerRequestId && Object.keys(request).length ? request.purchasing_organization : '',
                             company_codes: [],
                             country_iso2: partnerRequestId && Object.keys(request).length ? request.country_iso2 : '',
                             language: partnerRequestId && Object.keys(request).length ? request.language : '',
                             partner_type: partnerRequestId && Object.keys(request).length ? request.partner_type : '',
                         }}
                         displayName="PartnerRequestsForm"
-                        validationSchema={partnerRequestSchemaForVendors}
+                        validationSchema={partnerRequestSchemaForWholesalers}
                         enableReinitialize={true}
                         onSubmit={(values, actions) => {
                             values.company_codes = companyCodes.map(i => i.company_code);
@@ -333,7 +335,7 @@ const WholesalerPartnerRequests = () => {
                         {formikProps => (
                             <Form onSubmit={formikProps.handleSubmit}>
                                 <div className="row">
-                                    
+
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="first_name">First Name <span className="text-danger">*</span></label>
@@ -367,9 +369,30 @@ const WholesalerPartnerRequests = () => {
                                     </div>
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="confirm_email">Confirm Email Address <span className="text-danger">*</span></label>
+                                            <Field className="form-control" type="text" name="confirm_email" />
+                                            <div className="invalid-feedback"><ErrorMessage name="confirm_email" /></div>
+                                        </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="procurement_contact">Procurement Contact <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="procurement_contact" />
                                             <div className="invalid-feedback"><ErrorMessage name="procurement_contact" /></div>
+                                        </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="mdr_id">MDR ID <span className="text-danger">*</span></label>
+                                            <Field className="form-control" type="text" name="mdr_id" />
+                                            <div className="invalid-feedback"><ErrorMessage name="mdr_id" /></div>
+                                        </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="iqvia_wholesaler_id"> IQVIA Wholesaler ID <span className="text-danger">*</span></label>
+                                            <Field className="form-control" type="text" name="iqvia_wholesaler_id" />
+                                            <div className="invalid-feedback"><ErrorMessage name="iqvia_wholesaler_id" /></div>
                                         </div>
                                     </div>
                                     <div className="col-12">
