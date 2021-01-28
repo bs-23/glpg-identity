@@ -25,9 +25,9 @@ const PartnerVendors = sequelize.cdpConnector.define('partner_vendors', {
         allowNull: false,
         type: DataTypes.STRING(2)
     },
-    language: {
+    locale: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING(5)
     },
     requestor_first_name: {
         type: DataTypes.STRING(50)

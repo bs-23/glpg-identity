@@ -60,14 +60,15 @@ const Partner = sequelize.cdpConnector.define('partners', {
         allowNull: false,
         type: DataTypes.STRING(2)
     },
-    language: {
+    locale: {
         allowNull: false,
-        type: DataTypes.STRING(2)
+        type: DataTypes.STRING(5)
     },
     registration_number: {
         type: DataTypes.STRING
     },
     uuid: {
+        allowNull: false,
         type: DataTypes.STRING(20)
     },
     onekey_id: {
