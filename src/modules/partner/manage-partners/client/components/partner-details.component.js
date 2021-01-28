@@ -52,48 +52,50 @@ const PartnerDetails = (props) => {
                                 partner.first_name + ' ' + partner.last_name : partner.requestor_first_name + ' ' + partner.requestor_last_name}</h4>
 
                         </div>
-                        <div className="col-12">
-                            <div className="row">
-                                <div className="col-12 col-sm-6">
-                                    <div className="border rounded">
-                                        <h5 className="bg-light p-3 cdp-text-primary font-weight-bold-light rounded-top">Information</h5>
-                                        <ul className="p-3 m-0 list-unstyled">
-                                            <li className="pb-3">
-                                                <strong className="h5 font-weight-bold-light d-block">Beneficiary Type</strong>
-                                                <span className="h5 d-block">{partner.beneficiary_category}</span>
-                                            </li>
-                                            <li className="pb-3">
-                                                <strong className="h5 font-weight-bold-light d-block">Customer OneKey Id</strong>
-                                                <span className="h5 d-block">{partner.onekey_id}</span>
-                                            </li>
-                                            <li className="pb-3">
-                                                <strong className="h5 font-weight-bold-light d-block">Local UUID</strong>
-                                                <span className="h5 d-block">{partner.uuid}</span>
-                                            </li>
-                                        </ul>
+                        {props.detailType === 'hcps' || props.detailType === 'hcos' &&
+                            <div className="col-12">
+                                <div className="row">
+                                    <div className="col-12 col-sm-6">
+                                        <div className="border rounded">
+                                            <h5 className="bg-light p-3 cdp-text-primary font-weight-bold-light rounded-top">Information</h5>
+                                            <ul className="p-3 m-0 list-unstyled">
+                                                <li className="pb-3">
+                                                    <strong className="h5 font-weight-bold-light d-block">Beneficiary Type</strong>
+                                                    <span className="h5 d-block">{partner.beneficiary_category}</span>
+                                                </li>
+                                                <li className="pb-3">
+                                                    <strong className="h5 font-weight-bold-light d-block">Customer OneKey Id</strong>
+                                                    <span className="h5 d-block">{partner.onekey_id}</span>
+                                                </li>
+                                                <li className="pb-3">
+                                                    <strong className="h5 font-weight-bold-light d-block">Local UUID</strong>
+                                                    <span className="h5 d-block">{partner.uuid}</span>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="col-12 col-sm-6 ">
-                                    <div className="border rounded">
-                                        <h5 className="bg-light p-3 cdp-text-primary font-weight-bold-light rounded-top">Address</h5>
-                                        <ul className="p-3 m-0 list-unstyled">
-                                            <li className="pb-3">
-                                                <strong className="h5 font-weight-bold-light d-block">Streetname & House no</strong>
-                                                <span className="h5 d-block">{partner.address}</span>
-                                            </li>
-                                            <li className="pb-3">
-                                                <strong className="h5 font-weight-bold-light d-block">Postcode & City</strong>
-                                                <span className="h5 d-block">{partner.post_code + ' ' + partner.city}</span>
-                                            </li>
-                                            <li className="pb-3">
-                                                <strong className="h5 font-weight-bold-light d-block">Country</strong>
-                                                {partner.country_iso2 && <span className="h5 d-block">{(props.countries.find(i => i.country_iso2.toLowerCase() === partner.country_iso2.toLowerCase())).countryname}</span>}
-                                            </li>
-                                        </ul>
+                                    <div className="col-12 col-sm-6 ">
+                                        <div className="border rounded">
+                                            <h5 className="bg-light p-3 cdp-text-primary font-weight-bold-light rounded-top">Address</h5>
+                                            <ul className="p-3 m-0 list-unstyled">
+                                                <li className="pb-3">
+                                                    <strong className="h5 font-weight-bold-light d-block">Streetname & House no</strong>
+                                                    <span className="h5 d-block">{partner.address}</span>
+                                                </li>
+                                                <li className="pb-3">
+                                                    <strong className="h5 font-weight-bold-light d-block">Postcode & City</strong>
+                                                    <span className="h5 d-block">{partner.post_code + ' ' + partner.city}</span>
+                                                </li>
+                                                <li className="pb-3">
+                                                    <strong className="h5 font-weight-bold-light d-block">Country</strong>
+                                                    {partner.country_iso2 && <span className="h5 d-block">{(props.countries.find(i => i.country_iso2.toLowerCase() === partner.country_iso2.toLowerCase())).countryname}</span>}
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        }
                         <div className="col-12">
                             <div className="border rounded shadow-sm mt-4">
                                 <h6 className="bg-light p-3 font-weight-bold-light rounded-top">Galapagos Contracts</h6>
