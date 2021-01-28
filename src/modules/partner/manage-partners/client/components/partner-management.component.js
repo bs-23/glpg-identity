@@ -61,12 +61,6 @@ const PartnerManagement = () => {
 
     const exportApprovedList = () => {
         const partnerType = window.location.pathname.split('/').pop();
-        const keyMap = {
-            hcp: 'hcp',
-            hco: 'hco',
-            vendor: 'vendor',
-            wholesaler: 'wholesaler'
-        };
 
         const url = `/api/partners/export/${partnerType}`
         window.open(url,'_blank');
