@@ -241,7 +241,7 @@ async function deletePartnerRequest(req, res) {
         const partnerRequest = await PartnerRequest.findOne({ where: { id } });
         if (!partnerRequest) return res.status(404).send('The partner request does not exist.');
 
-        await ArchiveService.archiveData({
+        const archive = await ArchiveService.archiveData({
             object_id: partnerRequest.id,
             table_name: 'partner_requests',
             data: JSON.stringify(partnerRequest.dataValues),
@@ -250,10 +250,18 @@ async function deletePartnerRequest(req, res) {
 
         await logService.log({
             event_type: 'CREATE',
-            object_id: partnerRequest.id,
+            object_id: archive.id,
             table_name: 'archive',
             actor: req.user.id
         });
+
+        await logService.log({
+            event_type: 'CREATE',
+            object_id: partnerRequest.id,
+            table_name: 'partner_requests',
+            actor: req.user.id
+        });
+
 
         await partnerRequest.destroy();
 
