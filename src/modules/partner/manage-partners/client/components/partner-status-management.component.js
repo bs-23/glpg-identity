@@ -7,6 +7,7 @@ import { useToasts } from 'react-toast-notifications';
 
 const PartnerStatusManage = (props) => {
     const [, setStatusShow] = useState(false);
+    const [statusSelect, setStatusSelect] = useState(null);
     const dispatch = useDispatch();
     const { addToast } = useToasts();
     const partner = useSelector(state => state.managePartnerReducer.partner);
@@ -47,6 +48,12 @@ const PartnerStatusManage = (props) => {
         });
 
         handleClose();
+    }
+
+    const confirmStatus = () => {
+        if (statusSelect === 'approve') {
+            userApprove();
+        }
     }
 
 
@@ -96,7 +103,9 @@ const PartnerStatusManage = (props) => {
                         </div>
 
                         <div className="col-12">
-                            <button onClick={() => userApprove()} className="btn btn-block cdp-btn-outline-primary mt-4 p-2 font-weight-bold">Approve User</button>
+                            <button onClick={() => setStatusSelect("approve")} className={statusSelect === 'approve' ? "btn cdp-btn-primary mt-4 p-2 font-weight-bold" : "btn cdp-btn-outline-primary mt-4 p-2 font-weight-bold"}>Approve User</button>
+                            <button disabled className="btn cdp-btn-outline-primary mt-4 p-2 font-weight-bold">Reject User</button>
+                            <button onClick={() => confirmStatus()} className="btn btn-block cdp-btn-outline-primary mt-4 p-2 font-weight-bold">Confirm</button>
                         </div>
                     </div>
                 }

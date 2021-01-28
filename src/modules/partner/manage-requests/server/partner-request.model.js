@@ -82,9 +82,11 @@ const PartnerRequest = sequelize.cdpConnector.define('partner_requests', {
         defaultValue: 'new'
     },
     created_by: {
+        allowNull: false,
         type: DataTypes.UUID
     },
     updated_by: {
+        allowNull: false,
         type: DataTypes.UUID
     },
 }, {
