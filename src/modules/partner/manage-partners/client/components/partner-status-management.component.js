@@ -21,7 +21,7 @@ const PartnerStatusManage = (props) => {
     }, [props.statusShow]);
 
     const downloadFile = (id) => {
-        axios.get(`/api/partner/document/${id}`)
+        axios.get(`/api/partners/documents/${id}`)
             .then(({ data }) => {
                 const newWindow = window.open(data, '_blank', 'noopener,noreferrer')
                 if (newWindow) newWindow.opener = null

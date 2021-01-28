@@ -20,7 +20,7 @@ const PartnerDetails = (props) => {
     }, [props.detailShow]);
 
     const downloadFile = (id) => {
-        axios.get(`/api/partner/document/${id}`)
+        axios.get(`/api/partners/documents/${id}`)
             .then(({ data }) => {
                 const newWindow = window.open(data, '_blank', 'noopener,noreferrer')
                 if (newWindow) newWindow.opener = null
@@ -37,8 +37,8 @@ const PartnerDetails = (props) => {
         <Modal size="lg" centered show={props.detailShow} onHide={handleClose}>
             <Modal.Header closeButton>
                 <Modal.Title className="modal-title_small">
-                    {props.detailType === 'hcp' ? 'HCP' :
-                        props.detailType === 'hco' ? 'HCO' :
+                    {props.detailType === 'hcps' ? 'HCP' :
+                        props.detailType === 'hcos' ? 'HCO' :
                             props.detailType === 'wholesalers' ? 'WHOLESALER' :
                                 props.detailType === 'vendors' ? 'VENDOR' : null
                     } Business Partner Request Details
@@ -48,7 +48,7 @@ const PartnerDetails = (props) => {
                 {props.countries && props.countries.length > 0 && partner &&
                     <div className="row">
                         <div className="col-12">
-                            <h4 className="mb-3">{props.detailType === 'hcp' || props.detailType === 'hco' ?
+                            <h4 className="mb-3">{props.detailType === 'hcps' || props.detailType === 'hcos' ?
                                 partner.first_name + ' ' + partner.last_name : partner.requestor_first_name + ' ' + partner.requestor_last_name}</h4>
 
                         </div>
