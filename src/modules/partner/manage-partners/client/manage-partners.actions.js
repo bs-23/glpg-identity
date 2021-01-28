@@ -6,7 +6,7 @@ export function getHcpPartners(query = '') {
         type: Types.GET_PARTNER,
         payload: axios({
             method: 'get',
-            url: `/api/partner/hcp${query}`
+            url: `/api/partners/hcps${query}`
         })
     };
 }
@@ -17,7 +17,7 @@ export function createHcpPartner(data) {
         type: Types.POST_PARTNER,
         payload: axios({
             method: 'post',
-            url: `/api/partner/hcp/`,
+            url: `/api/partners/hcps/`,
             data
         })
     };
@@ -28,7 +28,7 @@ export function updateHcpPartner(id, data) {
         type: Types.UPDATE_PARTNER,
         payload: axios({
             method: 'put',
-            url: `/api/partner/hcp/${id}`,
+            url: `/api/partners/hcps/${id}`,
             data
         })
     };
@@ -40,7 +40,7 @@ export function getHcoPartners(query = '') {
         type: Types.GET_PARTNER,
         payload: axios({
             method: 'get',
-            url: `/api/partner/hco${query}`
+            url: `/api/partners/hcos${query}`
         })
     };
 }
@@ -50,7 +50,7 @@ export function createHcoPartner(data) {
         type: Types.POST_PARTNER,
         payload: axios({
             method: 'post',
-            url: `/api/partner/hco/`,
+            url: `/api/partners/hcos/`,
             data
         })
     };
@@ -61,7 +61,7 @@ export function updateHcoPartner(id, data) {
         type: Types.UPDATE_PARTNER,
         payload: axios({
             method: 'put',
-            url: `/api/partner/hco/${id}`,
+            url: `/api/partners/hcos/${id}`,
             data
         })
     };
@@ -72,7 +72,7 @@ export function getVendorsPartners(query = '') {
         type: Types.GET_PARTNER,
         payload: axios({
             method: 'get',
-            url: `/api/partner/vendor${query}`
+            url: `/api/partners/vendors${query}`
         })
     };
 }
@@ -82,19 +82,17 @@ export function getWholesalePartners(query = '') {
         type: Types.GET_PARTNER,
         payload: axios({
             method: 'get',
-            url: `/api/partner/vendor?type=wholesaler${query}`
+            url: `/api/partners/wholesalers${query}`
         })
     };
 }
 
 export function getPartnerById(id, type) {
-    let partnerType = null;
-    (type === 'vendor' || type === 'wholesaler') ? partnerType = 'vendor' : partnerType = type;
     return {
         type: Types.GET_PARTNER_BY_ID,
         payload: axios({
             method: 'get',
-            url: `/api/partner/${partnerType}/${id}`
+            url: `/api/partners/${type}/${id}`
         })
     };
 }
@@ -104,7 +102,7 @@ export function approveUser(id, type) {
         type: Types.GET_USER_APPROVE,
         payload: axios({
             method: 'get',
-            url: `/api/partner/approve/${type}/${id}`
+            url: `/api/partners/approve/${type}/${id}`
         })
     };
 }
