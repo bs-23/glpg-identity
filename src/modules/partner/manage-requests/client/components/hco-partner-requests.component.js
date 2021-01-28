@@ -8,7 +8,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { partnerRequestSchemaForHcos } from '../manage-requests.schema'
-import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm} from '../manage-requests.actions';
+import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm } from '../manage-requests.actions';
 
 const HcoPartnerRequests = () => {
     const dispatch = useDispatch();
@@ -232,7 +232,7 @@ const HcoPartnerRequests = () => {
                             workplace_type: partnerRequestId && Object.keys(request).length ? request.workplace_type : '',
                             specialty: partnerRequestId && Object.keys(request).length ? request.specialty : '',
                             country_iso2: partnerRequestId && Object.keys(request).length ? request.country_iso2 : '',
-                            language: partnerRequestId && Object.keys(request).length ? request.language : '',
+                            language: partnerRequestId && Object.keys(request).length ? request.language : 'en',
                             uuid: partnerRequestId && Object.keys(request).length ? request.uuid : '',
                         }}
                         displayName="PartnerRequestsForm"
@@ -362,7 +362,7 @@ const HcoPartnerRequests = () => {
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="language">Language<span className="text-danger">*</span></label>
                                             <Field className="form-control lang_code" as="select" name="language" className="form-control" id="language">
-                                                <option key="select-language" value="" disabled>--Select Language--</option>
+
                                                 {countryLanguages.map((element, lang_idx) => {
                                                     const { language_name, language_code } = element;
                                                     return language_name && <option key={lang_idx} value={language_code}>{language_name}</option>
