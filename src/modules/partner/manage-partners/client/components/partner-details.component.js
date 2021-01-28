@@ -49,16 +49,17 @@ const PartnerDetails = (props) => {
                     <div className="row">
                         <div className="col-12">
                             <h4 className="mb-3">{(props.detailType === 'hcps' || props.detailType === 'hcos') ?
-                                partner.first_name + ' ' + partner.last_name : partner.requestor_first_name + ' ' + partner.requestor_last_name}</h4>
+                                partner.first_name + ' ' + partner.last_name : partner.name}</h4>
 
                         </div>
 
                         <div className="col-12">
                             <div className="row">
-                                {(props.detailType === 'hcps' || props.detailType === 'hcos') &&
-                                    <div className="col-12 col-sm-6">
-                                        <div className="border rounded">
-                                            <h5 className="bg-light p-3 cdp-text-primary font-weight-bold-light rounded-top">Information</h5>
+
+                                <div className="col-12 col-sm-6">
+                                    <div className="border rounded">
+                                        <h5 className="bg-light p-3 cdp-text-primary font-weight-bold-light rounded-top">Information</h5>
+                                        {(props.detailType === 'hcps' || props.detailType === 'hcos') ?
                                             <ul className="p-3 m-0 list-unstyled">
                                                 <li className="pb-3">
                                                     <strong className="h5 font-weight-bold-light d-block">Beneficiary Type</strong>
@@ -73,9 +74,26 @@ const PartnerDetails = (props) => {
                                                     <span className="h5 d-block">{partner.uuid}</span>
                                                 </li>
                                             </ul>
-                                        </div>
+                                            :
+                                            <ul className="p-3 m-0 list-unstyled">
+                                                <li className="pb-3">
+                                                    <strong className="h5 font-weight-bold-light d-block">Requestor Name</strong>
+                                                    <span className="h5 d-block">{partner.requestor_first_name + ' ' + partner.requestor_last_name}</span>
+                                                </li>
+                                                <li className="pb-3">
+                                                    <strong className="h5 font-weight-bold-light d-block">Registration no/VAT code</strong>
+                                                    <span className="h5 d-block">{partner.registration_number}</span>
+                                                </li>
+                                                <li className="pb-3">
+                                                    <strong className="h5 font-weight-bold-light d-block">Purchasing Organization</strong>
+                                                    <span className="h5 d-block">{partner.purchasing_org}</span>
+                                                </li>
+                                            </ul>
+
+                                        }
                                     </div>
-                                }
+                                </div>
+
                                 <div className="col-12 col-sm-6 ">
                                     <div className="border rounded">
                                         <h5 className="bg-light p-3 cdp-text-primary font-weight-bold-light rounded-top">Address</h5>

@@ -365,7 +365,7 @@ async function getNonHealthcarePartners(req, res, type) {
             ? req.query.orderType
             : 'asc';
 
-        const sortableColumns = ['requestor_first_name', 'requestor_last_name', 'status', 'country_iso2', 'locale', 'city'];
+        const sortableColumns = ['name', 'status', 'country_iso2', 'locale', 'city'];
 
         const order = [];
         if (orderBy && (sortableColumns || []).includes(orderBy)) {
@@ -379,7 +379,7 @@ async function getNonHealthcarePartners(req, res, type) {
             offset,
             limit,
             order,
-            attributes: ['id', 'requestor_first_name', 'requestor_last_name', 'locale', 'address', 'city', 'country_iso2', 'status']
+            attributes: ['id', 'name', 'locale', 'address', 'city', 'country_iso2', 'status']
         });
 
         const total = await PartnerVendors.count();
