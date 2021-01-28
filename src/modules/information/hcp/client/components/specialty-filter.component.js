@@ -107,6 +107,7 @@ const SpecialtyFilter = (props) => {
                     options={getCountryOptions()}
                     className="multiselect"
                     classNamePrefix="multiselect"
+                    menuPosition="fixed"
                     closeMenuOnScroll={false}
                     captureMenuScroll={true}
                     value={getSelectedCountry()}
@@ -134,6 +135,7 @@ const SpecialtyFilter = (props) => {
                     options={currentFilterOption.getOptions({ country: filter.country })}
                     className="multiselect"
                     classNamePrefix="multiselect"
+                    menuPosition="fixed"
                     value={selectedSpecialties}
                     onChange={selectedOption => {
                         const value = (selectedOption || []).map(o => o.value);
