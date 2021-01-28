@@ -9,9 +9,34 @@ const axios = require('axios');
 
 async function getPartnerRequests(req, res) {
     try {
-        const PartnerRequests = await PartnerRequest.findAll();
-        res.json(PartnerRequests);
+        const page = req.query.page ? req.query.page - 1 : 0;
+        if (page < 0) return res.status(404).send("page must be greater or equal 1");
 
+        const limit = 1;
+        const offset = page * limit;
+        const entitytype = req.query.entitytype;
+
+        const partnerRequests = await PartnerRequest.findAll({
+            where: { entity_type: entitytype },
+            offset,
+            limit,
+            subQuery: false
+        });
+
+        const totalRequests = await PartnerRequest.count({
+            where: { entity_type: entitytype }
+        });
+
+        const data = {
+            partnerRequests,
+            page: page + 1,
+            limit,
+            total: totalRequests,
+            start: limit * page + 1,
+            end: offset + limit > totalRequests ? totalRequests : offset + limit,
+        };
+
+        res.json(data);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');

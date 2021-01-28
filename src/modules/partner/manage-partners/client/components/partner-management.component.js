@@ -125,11 +125,7 @@ const PartnerManagement = () => {
                                     <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/wholesalers"><i className="fas fa-dolly fa-1_5x mr-2"></i>Wholesalers</NavLink>
                                 </div>
                             </div>
-
-                        </div>
-
-                        <div className="d-sm-flex justify-content-end align-items-center mb-3 mt-4">
-                            <div class="d-flex justify-content-between align-items-center">
+                            <div className="d-flex justify-content-between align-items-center mb-2">
                                 <button onClick={() => exportApprovedList()} className="btn cdp-btn-secondary text-white ml-2">
                                     Export Approved List for SAP
                                 </button>
@@ -209,7 +205,7 @@ const PartnerManagement = () => {
                         {partnersData.partners && partnersData.partners.length === 0 &&
                             <div className="row justify-content-center mt-5 pt-5 mb-3">
                                 <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">
-                                    <i class="icon icon-team icon-6x cdp-text-secondary"></i>
+                                    <i className="icon icon-team icon-6x cdp-text-secondary"></i>
                                     <h3 className="font-weight-bold cdp-text-primary pt-4">No Partner Found!</h3>
                                 </div>
                             </div>

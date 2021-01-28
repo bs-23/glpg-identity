@@ -82,8 +82,8 @@ const PartnerStatusManage = (props) => {
                                 {partner.documents && partner.documents.length > 0 &&
                                     <div className="col-6">
                                         <div className="mt-4">
-                                            <h6 className="bg-light p-3 font-weight-bold-light rounded-top">Galapagos Contracts</h6>
-                                            <div className="p-3">
+                                            <h4 className="font-weight-bold-light">Galapagos Contracts</h4>
+                                            <div className="py-3">
                                                 {partner.documents && partner.documents.map(doc => (
                                                     <a key={doc.id} onClick={() => downloadFile(doc.id)} className="d-block text-primary">{doc.name}</a>
                                                 ))
@@ -94,18 +94,19 @@ const PartnerStatusManage = (props) => {
                                 }
                                 {partner.bank_account_no &&
                                     <div className="col-6">
-                                        <h6 className="bg-light p-3 font-weight-bold-light rounded-top">Bank Account</h6>
-                                        <p>{partner.bank_account_no}</p>
+                                        <h4 className="font-weight-bold-light">Bank Account</h4>
+                                        <span className="d-block py-1">{partner.bank_account_no}</span>
                                     </div>
                                 }
                             </div>
 
                         </div>
-
+                        <div className="col-12 d-flex">
+                            <button onClick={() => setStatusSelect("approve")} className={statusSelect === 'approve' ? "btn btn-block mr-2 cdp-btn-primary mt-4 p-2 font-weight-bold text-white" : "btn btn-block mr-2 cdp-btn-outline-primary mt-4 p-2 font-weight-bold"}>Approve User</button>
+                            <button disabled className="btn btn-block ml-2 btn-danger mt-4 p-2 font-weight-bold">Reject User</button>
+                        </div>
                         <div className="col-12">
-                            <button onClick={() => setStatusSelect("approve")} className={statusSelect === 'approve' ? "btn cdp-btn-primary mt-4 p-2 font-weight-bold" : "btn cdp-btn-outline-primary mt-4 p-2 font-weight-bold"}>Approve User</button>
-                            <button disabled className="btn cdp-btn-outline-primary mt-4 p-2 font-weight-bold">Reject User</button>
-                            <button onClick={() => confirmStatus()} className="btn btn-block cdp-btn-outline-primary mt-4 p-2 font-weight-bold">Confirm</button>
+                         <button onClick={() => confirmStatus()} className="btn btn-block btn-secondary mt-4 p-2 font-weight-bold">Confirm and Request SAP Export</button>
                         </div>
                     </div>
                 }
