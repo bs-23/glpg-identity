@@ -57,6 +57,19 @@ const PartnerManagement = () => {
         history.push(location.pathname + url);
     }
 
+    const exportApprovedList = () => {
+        const partnerType = window.location.pathname.split('/').pop();
+        const keyMap = {
+            hcp: 'hcp',
+            hco: 'hco',
+            vendors: 'vendor',
+            wholesalers: 'wholesaler'
+        };
+
+        const url = `/api/partner/export/${keyMap[partnerType]}`
+        window.open(url,'_blank');
+    };
+
     useEffect(() => {
         const partnerType = window.location.pathname.split("/").pop();
         if (partnerType === 'hcp') dispatch(getHcpPartners(location.search));
@@ -117,6 +130,14 @@ const PartnerManagement = () => {
                                 </div>
                             </div>
 
+                        </div>
+
+                        <div className="d-sm-flex justify-content-end align-items-center mb-3 mt-4">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <button onClick={() => exportApprovedList()} className="btn cdp-btn-secondary text-white ml-2">
+                                    Export Approved List for SAP
+                                </button>
+                            </div>
                         </div>
 
                         <div className="table-responsive shadow-sm mb-3">
