@@ -84,8 +84,8 @@ async function getCoordinates(facility, zip, city, state, country)
     try {
         const response = await fetch(url);
         const json = await response.json()
-        return json.results[0].geometry.location;    
-    } catch (error) {
+        return json.results[0].geometry.location;
+    }catch (error) {
         return {lat: -1, lng: -1}    
     }
     
@@ -102,11 +102,11 @@ async function mergeProcessData(req, res) {
             }
         });
         let data = [];
-        result.forEach(res => {
+        await Promise.all(result.map(async res => {
              jsonValue = JSON.parse(res.value);
-             data = data.concat(data, jsonValue.FullStudiesResponse.FullStudies.map(element=>{
+             data = [...data, ...await Promise.all(jsonValue.FullStudiesResponse.FullStudies.map(async element=>{
                  let locationList = element.Study.ProtocolSection.ContactsLocationsModule.LocationList;
-                 return {
+                 return await {
                     'rank': element.Rank,
                     'protocol_number': element.Study.ProtocolSection.IdentificationModule.OrgStudyIdInfo.OrgStudyId,
                     'gov_ddentifier': element.Study.ProtocolSection.IdentificationModule.NCTId,
@@ -120,34 +120,33 @@ async function mergeProcessData(req, res) {
                     'trial_status': element.Study.ProtocolSection.StatusModule.OverallStatus,
                     'inclusion_exclusion_criteria': element.Study.ProtocolSection.EligibilityModule.EligibilityCriteria,
                     'type_of_drug': 'Yet to fix',
-                    'locations': locationList? locationList.Location.map(async location=> {
+                    'locations': locationList? await Promise.all(locationList.Location.map(async location=> {
                         
                         var {lat,lng} = await getCoordinates(location.LocationFacility,
                             location.LocationZip,
                             location.LocationCity,
                             location.LocationState,
                             location.LocationCountry
-                            );
-                            
+                            );   
                         return {
+                        'location_status': location.LocationStatus,
                         'location_facility': location.LocationFacility,
                         'location_city': location.LocationCity,
                         'location_state': location.LocationState,
                         'location_zip': location.LocationZip,
                         'location_country': location.LocationCountry,
-                        'location_lat': lat,
-                        'location_lng': lng
-                  }}) : ''
+                        'lat': lat,
+                        'lng': lng
+                  }})) : ''
                 }
-             }));
-        });
+             }))];
+        }));
 
-        Trial.bulkCreate(data,
+        data = await Trial.bulkCreate(data,
                     {
                     returning: true,
                     ignoreDuplicates: false,
                     include: { model: Location, as: 'locations' }
-                }).then(trial=>{
                 });
 
         if (!result) {
