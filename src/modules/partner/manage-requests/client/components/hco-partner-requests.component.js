@@ -228,6 +228,7 @@ const HcoPartnerRequests = () => {
                             email: partnerRequestId && Object.keys(request).length ? request.email : '',
                             confirm_email: partnerRequestId && Object.keys(request).length ? request.email : '',
                             mdr_id: partnerRequestId && Object.keys(request).length ? request.mdr_id : '',
+                            procurement_contact: partnerRequestId && Object.keys(request).length ? request.procurement_contact : '',
                             workplace_name: partnerRequestId && Object.keys(request).length ? request.workplace_name : '',
                             workplace_type: partnerRequestId && Object.keys(request).length ? request.workplace_type : '',
                             specialty: partnerRequestId && Object.keys(request).length ? request.specialty : '',
@@ -314,6 +315,13 @@ const HcoPartnerRequests = () => {
                                     </div>
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="procurement_contact">Procurement Contact <span className="text-danger">*</span></label>
+                                            <Field className="form-control" type="text" name="procurement_contact" />
+                                            <div className="invalid-feedback"><ErrorMessage name="procurement_contact" /></div>
+                                        </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="workplace_name">Workplace Name <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="workplace_name" />
                                             <div className="invalid-feedback"><ErrorMessage name="workplace_name" /></div>
@@ -386,7 +394,7 @@ const HcoPartnerRequests = () => {
                 <Modal.Body>
                     {requestToDelete !== null ? (
                         <div>
-                            Are you sure you want to remove the following request?
+                            Are you sure you want to remove this request?
                         </div>
                     ) : null}
                 </Modal.Body>

@@ -441,7 +441,7 @@ const VendorPartnerRequests = () => {
                 <Modal.Body>
                     {requestToDelete !== null ? (
                         <div>
-                            Are you sure you want to remove the following request?
+                            Are you sure you want to remove this request
                         </div>
                     ) : null}
                 </Modal.Body>

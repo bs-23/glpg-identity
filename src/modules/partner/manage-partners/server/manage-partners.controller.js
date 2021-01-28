@@ -94,10 +94,10 @@ async function registrationLookup(req, res) {
     try {
 
         const request_id = (url.parse(req.url, true).query).request_id;
-        console.log(request_id);
+        if (!request_id) res.status(500).send('Request Id missing');
         const partnerRequest = await PartnerRequest.findOne({
             where: { id: request_id },
-            attributes: ["id", "application_id", "entity_type", "first_name", "last_name", "email", "procurement_contact", "partner_type", "uuid", "company_codes", "country_iso2", "language"]
+            attributes: ["id", "entity_type", "first_name", "last_name", "email", "procurement_contact", "partner_type", "uuid", "company_codes", "country_iso2", "locale"]
         });
         res.json(partnerRequest);
 
