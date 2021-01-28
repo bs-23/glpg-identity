@@ -19,6 +19,22 @@ export default function reducer(state = initialState, action) {
                 partner: action.payload.data
             };
         }
+        case Types.GET_USER_APPROVE_FULFILLED: {
+            const userId = (action.payload.config.url).split('/').pop();
+            const partners = state.partnersData.partners;
+            const idx = partners.findIndex(item => item.id === userId);
+            const updatedRow = partners[idx];
+            updatedRow.status = "approved";
+            partners.splice(idx, 1, updatedRow);
+            return {
+                ...state,
+                partnersData: {
+                    metadata: state.partnersData.metadata,
+                    partners: partners
+                }
+
+            };
+        }
         case Types.POST_PARTNER_FULFILLED: {
             return {
                 ...state,

@@ -6,11 +6,13 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import { useSelector, useDispatch } from 'react-redux';
 import { getHcpPartners, getHcoPartners, getVendorsPartners, getWholesalePartners } from '../manage-partners.actions';
 import PartnerDetails from './partner-details.component';
+import PartnerStatusManage from './partner-status-management.component';
 import { getAllCountries } from '../../../../core/client/country/country.actions';
 
 const PartnerManagement = () => {
 
     const [detailShow, setDetailShow] = useState(false);
+    const [statusShow, setStatusShow] = useState(false);
     const [detailType, setDetailType] = useState(null);
     const location = useLocation();
     const history = useHistory();
@@ -61,9 +63,9 @@ const PartnerManagement = () => {
         const partnerType = window.location.pathname.split("/").pop();
         if (partnerType === 'hcp') dispatch(getHcpPartners(location.search));
         if (partnerType === 'hco') dispatch(getHcoPartners(location.search));
-        if (partnerType === 'vendors') dispatch(getVendorsPartners(location.search));
-        if (partnerType === 'wholesalers') dispatch(getWholesalePartners(location.search));
-        setDetailType(partnerType === 'vendors' || partnerType === 'wholesalers' ? 'vendor' : partnerType);
+        if (partnerType === 'vendor') dispatch(getVendorsPartners(location.search));
+        if (partnerType === 'wholesaler') dispatch(getWholesalePartners(location.search));
+        setDetailType(partnerType === 'vendor' || partnerType === 'wholesaler' ? 'vendor' : partnerType);
         setSort({ type: params.get('orderType') || 'asc', value: params.get('orderBy') });
     }, [location]);
 
@@ -112,8 +114,8 @@ const PartnerManagement = () => {
                                 <div>
                                     <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/hcp"><i className="fas fa-user-md fa-1_5x mr-2"></i>Health Care Professionals</NavLink>
                                     <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/hco"><i className="fas fa-hospital fa-1_5x mr-2"></i>Health Care Organizations</NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/vendors"><i className="fas fa-hospital-user fa-1_5x mr-2"></i>General Vendors</NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/wholesalers"><i className="fas fa-dolly fa-1_5x mr-2"></i>Wholesalers</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/vendor"><i className="fas fa-hospital-user fa-1_5x mr-2"></i>General Vendors</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/wholesaler"><i className="fas fa-dolly fa-1_5x mr-2"></i>Wholesalers</NavLink>
                                 </div>
                             </div>
 
@@ -158,7 +160,12 @@ const PartnerManagement = () => {
                                                         <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
-                                                            <Dropdown.Item>Manage Status</Dropdown.Item>
+                                                            {item.status === 'pending' &&
+                                                                <>
+                                                                    <Dropdown.Item onClick={() => setStatusShow(true)}>Manage Status</Dropdown.Item>
+                                                                    <PartnerStatusManage partnerInfo={item} detailType={detailType} changeStatusShow={(val) => setStatusShow(val)} statusShow={statusShow}></PartnerStatusManage>
+                                                                </>
+                                                            }
                                                             <Dropdown.Item onClick={() => setDetailShow(true)}>Profile</Dropdown.Item>
                                                             <PartnerDetails countries={countries} detailId={item.id} detailType={detailType} changeDetailShow={(val) => setDetailShow(val)} detailShow={detailShow} />
                                                         </Dropdown.Menu>

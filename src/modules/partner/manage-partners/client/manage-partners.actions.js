@@ -97,3 +97,13 @@ export function getPartnerById(id, type) {
     };
 }
 
+export function approveUser(id, type) {
+    return {
+        type: Types.GET_USER_APPROVE,
+        payload: axios({
+            method: 'get',
+            url: `/api/partner/approve/${type}/${id}`
+        })
+    };
+}
+
