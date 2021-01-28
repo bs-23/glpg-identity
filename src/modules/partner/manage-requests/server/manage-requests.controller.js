@@ -50,7 +50,7 @@ async function createPartnerRequest(req, res) {
             email,
             mdr_id,
             country_iso2,
-            language,
+            locale: language.toLowerCase() + "_" + country_iso2.toUpperCase(),
             created_by: req.user.id,
             updated_by: req.user.id,
         };
@@ -67,6 +67,7 @@ async function createPartnerRequest(req, res) {
             data.uuid = uuid;
             data.workplace_name = workplace_name;
             data.workplace_type = workplace_type;
+            data.procurement_contact = procurement_contact;
             data.specialty = specialty;
         }
         else if (entity_type === 'vendor') {
@@ -117,7 +118,7 @@ async function sendForm(req, res) {
             email,
             partner_type,
             country_iso2,
-            language
+            locale
         } = req.body;
 
         const userApplication = await Application.findOne({ where: { id: application_id } });
@@ -134,7 +135,7 @@ async function sendForm(req, res) {
             email,
             partner_type: partner_type.toLowerCase(),
             country_iso2: country_iso2.toLowerCase(),
-            locale: `${language}_${country_iso2.toUpperCase()}`
+            locale: locale
         };
 
         const metaData = await Application.findAll({
@@ -192,7 +193,7 @@ async function updatePartnerRequest(req, res) {
             email,
             mdr_id,
             country_iso2,
-            language,
+            locale: language.toLowerCase() + "_" + country_iso2.toUpperCase(),
             updated_by: req.user.id
         };
 
@@ -240,7 +241,7 @@ async function deletePartnerRequest(req, res) {
         const partnerRequest = await PartnerRequest.findOne({ where: { id } });
         if (!partnerRequest) return res.status(404).send('The partner request does not exist.');
 
-        await ArchiveService.archiveData({
+        const archive = await ArchiveService.archiveData({
             object_id: partnerRequest.id,
             table_name: 'partner_requests',
             data: JSON.stringify(partnerRequest.dataValues),
@@ -249,10 +250,18 @@ async function deletePartnerRequest(req, res) {
 
         await logService.log({
             event_type: 'CREATE',
-            object_id: partnerRequest.id,
+            object_id: archive.id,
             table_name: 'archive',
             actor: req.user.id
         });
+
+        await logService.log({
+            event_type: 'CREATE',
+            object_id: partnerRequest.id,
+            table_name: 'partner_requests',
+            actor: req.user.id
+        });
+
 
         await partnerRequest.destroy();
 

@@ -39,7 +39,7 @@ const PartnerRequest = sequelize.cdpConnector.define('partner_requests', {
         allowNull: false,
         type: DataTypes.STRING
     },
-    language: {
+    locale: {
         allowNull: false,
         type: DataTypes.STRING
     },

@@ -13,6 +13,8 @@ import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPart
 const HcoPartnerRequests = () => {
     const dispatch = useDispatch();
     const { addToast } = useToasts();
+
+    const [selectedCountry, setSelectedCountry] = useState('');
     const [showForm, setShowForm] = useState(false);
     const [specialties, setSpecialties] = useState([]);
     const [showError, setShowError] = useState(false);
@@ -39,6 +41,7 @@ const HcoPartnerRequests = () => {
     const request = useSelector(state => state.manageRequestsReducer.partnerRequest);
 
     const countries = useSelector(state => state.countryReducer.countries);
+    const allCountries = useSelector(state => state.countryReducer.allCountries);
 
     const getCountryName = (country_iso2) => {
         if (!countries || !country_iso2) return null;
@@ -74,14 +77,13 @@ const HcoPartnerRequests = () => {
         dispatch(getPartnerRequests());
     }
 
-    async function getSpecialties() {
-        const response = await axios.get(`/api/hcps/specialties`);
+    async function getSpecialties(codbase) {
+        const response = await axios.get(`/api/hcps/specialties?codbases=${codbase}`);
         setSpecialties(response.data);
     }
 
     useEffect(() => {
         loadRequests();
-        getSpecialties();
     }, []);
 
     useEffect(() => {
@@ -91,11 +93,19 @@ const HcoPartnerRequests = () => {
     }, [partnerRequestId]);
 
     useEffect(() => {
-        if (request.company_codes) {
-            const codes = request.company_codes.map(company_code => ({ id: Math.random(), company_code }));
-            setCompanyCodes(codes);
+        if(request.country_iso2){
+            const country = allCountries.find(i => i.country_iso2 === request.country_iso2);
+            if(country) getSpecialties(country.codbase);
         }
-    }, [request.company_codes]);
+    }, [partnerRequestId, request.country_iso2]);
+
+    useEffect(() => {
+        if(selectedCountry) {
+            const country = allCountries.find(i => i.country_iso2 === selectedCountry);
+            if(country) getSpecialties(country.codbase);
+        }
+    }, [selectedCountry]);
+
     useEffect(() => {
         if (formData) {
             dispatch(sendForm(formData)).then(() => {
@@ -212,7 +222,7 @@ const HcoPartnerRequests = () => {
                 </div>
             </div>
 
-            <Modal dialogClassName="modal-customize" size="xl" centered show={showForm} onHide={toggleForm}>
+            <Modal dialogClassName="modal-customize" size="lg" centered show={showForm} onHide={() => toggleForm(null)}>
                 <Modal.Header closeButton>
                     <Modal.Title>
                         {
@@ -228,6 +238,7 @@ const HcoPartnerRequests = () => {
                             email: partnerRequestId && Object.keys(request).length ? request.email : '',
                             confirm_email: partnerRequestId && Object.keys(request).length ? request.email : '',
                             mdr_id: partnerRequestId && Object.keys(request).length ? request.mdr_id : '',
+                            procurement_contact: partnerRequestId && Object.keys(request).length ? request.procurement_contact : '',
                             workplace_name: partnerRequestId && Object.keys(request).length ? request.workplace_name : '',
                             workplace_type: partnerRequestId && Object.keys(request).length ? request.workplace_type : '',
                             specialty: partnerRequestId && Object.keys(request).length ? request.specialty : '',
@@ -314,6 +325,13 @@ const HcoPartnerRequests = () => {
                                     </div>
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="procurement_contact">Procurement Contact <span className="text-danger">*</span></label>
+                                            <Field className="form-control" type="text" name="procurement_contact" />
+                                            <div className="invalid-feedback"><ErrorMessage name="procurement_contact" /></div>
+                                        </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="workplace_name">Workplace Name <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="workplace_name" />
                                             <div className="invalid-feedback"><ErrorMessage name="workplace_name" /></div>
@@ -351,7 +369,16 @@ const HcoPartnerRequests = () => {
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="country_iso2">Country <span className="text-danger">*</span></label>
-                                            <Field data-testid="country_iso2" as="select" name="country_iso2" className="form-control">
+                                            <Field
+                                                data-testid="country_iso2"
+                                                as="select"
+                                                name="country_iso2"
+                                                className="form-control"
+                                                onChange={(e) => {
+                                                    formikProps.setFieldValue('country_iso2', e.target.value);
+                                                    setSelectedCountry(e.target.value);
+                                                }}
+                                            >
                                                 <option key="select-country" value="" disabled>--Select Country--</option>
                                                 {countries.map(item => <option key={item.countryid} value={item.country_iso2}>{item.codbase_desc}</option>)}
                                             </Field>
@@ -386,7 +413,7 @@ const HcoPartnerRequests = () => {
                 <Modal.Body>
                     {requestToDelete !== null ? (
                         <div>
-                            Are you sure you want to remove the following request?
+                            Are you sure you want to remove this request?
                         </div>
                     ) : null}
                 </Modal.Body>
