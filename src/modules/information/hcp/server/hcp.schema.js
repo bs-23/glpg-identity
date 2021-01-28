@@ -1,5 +1,5 @@
 const XRegExp = require('xregexp');
-const { string, object } = require('yup');
+const { string, object, array } = require('yup');
 
 const hcpProfile = object().shape({
     first_name: string()
@@ -54,5 +54,44 @@ const registrationLookup = object().shape({
         .required('This field must not be empty.')
 });
 
+const getAccessToken = object().shape({
+    email: string()
+        .email('This field must be a valid email address.')
+        .matches(/^.{1,64}@/, 'The part before @ of the email can be maximum 64 characters.')
+        .matches(/^.*[a-z]+.*@/, 'This field should be a valid email address.')
+        .max(100, 'This field must be at most 100 characters long.')
+        .required('This field must not be empty.'),
+    password: string().required('This field must not be empty.')
+});
+
+const updateHCPUserConsents = object().shape({
+    consents: array().required('Consents are missing.')
+});
+
+const changePassword = object().shape({
+    email: string()
+        .email('This field must be a valid email address.')
+        .required('Missing required parameter.'),
+    current_password: string().required('Missing required parameter.'),
+    new_password: string().required('Missing required parameter.'),
+    confirm_password: string().required('Missing required parameter.')
+});
+
+const forgetPassword = object().shape({
+    email: string()
+        .email('This field must be a valid email address.')
+        .required('Missing required parameter.')
+});
+
+const resetPassword = object().shape({
+    new_password: string().required('Missing required parameter.'),
+    confirm_password: string().required('Missing required parameter.')
+});
+
 exports.hcpProfile = hcpProfile;
 exports.registrationLookup = registrationLookup;
+exports.getAccessToken = getAccessToken;
+exports.updateHCPUserConsents = updateHCPUserConsents;
+exports.changePassword = changePassword;
+exports.forgetPassword = forgetPassword;
+exports.resetPassword = resetPassword;

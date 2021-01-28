@@ -1117,11 +1117,6 @@ async function changePassword(req, res) {
         });
     }
 
-    if (!email || !current_password || !new_password || !confirm_password) {
-        response.errors.push(new CustomError('Missing required parameters.', 400));
-        return res.status(400).send(response);
-    }
-
     try {
         const doc = await Hcp.findOne({ where: where(fn('lower', col('email')), fn('lower', email)) });
 
@@ -1279,16 +1274,6 @@ async function forgetPassword(req, res) {
     const { email } = req.body;
 
     try {
-        if (!email) {
-            response.errors.push(new CustomError('Missing required parameters.', 400));
-            return res.status(400).send(response);
-        }
-
-        if (!validator.isEmail(email)) {
-            response.errors.push(new CustomError('The email address format is invalid.', 4000, 'email'));
-            return res.status(400).send(response);
-        }
-
         const doc = await Hcp.findOne({
             where: where(fn('lower', col('email')), fn('lower', email))
         });
@@ -1482,18 +1467,6 @@ async function getAccessToken(req, res) {
     try {
         const { email, password } = req.body;
 
-        if (!email) {
-            response.errors.push(new CustomError('Email is required.', 400, 'email'));
-        }
-
-        if (!password) {
-            response.errors.push(new CustomError('Password is required.', 400, 'password'));
-        }
-
-        if (!email || !password) {
-            return res.status(400).json(response);
-        }
-
         const doc = await Hcp.findOne({
             where: where(fn('lower', col('email')), fn('lower', email))
         });
@@ -1574,8 +1547,6 @@ async function updateHCPUserConsents(req, res) {
         if (!hcpUser) {
             response.errors.push(new CustomError('Invalid HCP User.', 400));
         }
-
-        if (!req.body.consents) response.errors.push(new CustomError('consents are missing.', 400, 'consents'));
 
         if (response.errors.length) {
             return res.status(400).send(response);

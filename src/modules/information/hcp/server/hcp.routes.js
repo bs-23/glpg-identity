@@ -1,7 +1,7 @@
 const path = require('path');
 const passport = require('passport');
 const controller = require('./hcp.controller');
-const { hcpProfile, registrationLookup } = require('./hcp.schema');
+const { hcpProfile, registrationLookup, getAccessToken, updateHCPUserConsents, changePassword, forgetPassword, resetPassword } = require('./hcp.schema');
 const { validate } = require(path.join(process.cwd(), 'src/modules/core/server/middlewares/validator.middleware'));
 const { Modules } = require('../../../core/server/authorization/authorization.constants');
 const { ModuleGuard } = require('../../../core/server/authorization/authorization.middleware');
@@ -21,7 +21,7 @@ module.exports = app => {
         .post(passport.authenticate('application-jwt', { session: false }), validate(registrationLookup), controller.registrationLookup);
 
     app.route('/api/hcp-profiles/generate-token')
-        .post(passport.authenticate('application-jwt', { session: false }), controller.getAccessToken);
+        .post(passport.authenticate('application-jwt', { session: false }), validate(getAccessToken), controller.getAccessToken);
 
     app.route('/api/hcp-profiles')
         .post(passport.authenticate('application-jwt', { session: false }), validate(hcpProfile), controller.createHcpProfile);
@@ -30,13 +30,13 @@ module.exports = app => {
         .post(passport.authenticate('application-jwt', { session: false }), controller.confirmConsents);
 
     app.route('/api/hcp-profiles/forget-password')
-        .post(passport.authenticate('application-jwt', { session: false }), controller.forgetPassword);
+        .post(passport.authenticate('application-jwt', { session: false }), validate(forgetPassword), controller.forgetPassword);
 
     app.route('/api/hcp-profiles/reset-password')
-        .put(passport.authenticate('application-jwt', { session: false }), controller.resetPassword);
+        .put(passport.authenticate('application-jwt', { session: false }), validate(resetPassword), controller.resetPassword);
 
     app.route('/api/hcp-profiles/change-password')
-        .put(passport.authenticate('application-jwt', { session: false }), controller.changePassword);
+        .put(passport.authenticate('application-jwt', { session: false }), validate(changePassword), controller.changePassword);
 
     app.route('/api/hcp-profiles/specialties')
         .get(passport.authenticate('application-jwt', { session: false }), controller.getSpecialties);
@@ -55,7 +55,7 @@ module.exports = app => {
 
     app.route('/api/hcp-profiles/:id/consents')
         .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getHCPUserConsents)
-        .put(passport.authenticate('application-jwt', { session: false }), controller.updateHCPUserConsents);
+        .put(passport.authenticate('application-jwt', { session: false }), validate(updateHCPUserConsents), controller.updateHCPUserConsents);
 
     app.route('/api/hcp-profiles/:id')
         .get(passport.authenticate('application-jwt', { session: false }), controller.getHcpProfile);
