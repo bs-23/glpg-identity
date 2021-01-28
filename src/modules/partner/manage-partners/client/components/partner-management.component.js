@@ -63,7 +63,7 @@ const PartnerManagement = () => {
         const partnerType = window.location.pathname.split('/').pop();
 
         const url = `/api/partners/export/${partnerType}`
-        window.open(url,'_blank');
+        window.open(url, '_blank');
     };
 
     useEffect(() => {
@@ -125,11 +125,7 @@ const PartnerManagement = () => {
                                     <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/wholesalers"><i className="fas fa-dolly fa-1_5x mr-2"></i>Wholesalers</NavLink>
                                 </div>
                             </div>
-
-                        </div>
-
-                        <div className="d-sm-flex justify-content-end align-items-center mb-3 mt-4">
-                            <div class="d-flex justify-content-between align-items-center">
+                            <div className="d-flex justify-content-between align-items-center mb-2">
                                 <button onClick={() => exportApprovedList()} className="btn cdp-btn-secondary text-white ml-2">
                                     Export Approved List for SAP
                                 </button>
@@ -141,11 +137,12 @@ const PartnerManagement = () => {
                                 <table className="table table-hover table-sm mb-0 cdp-table mb-2">
                                     <thead className="cdp-table__header  cdp-bg-primary text-white">
                                         <tr>
-                                            {(detailType === 'hcp' || detailType === 'hco') && <th>OneKey Id</th>}
-                                            {(detailType === 'hcp' || detailType === 'hco') && <th>UUID</th>}
-                                            <th><span className={sort.value === 'first_name' || sort.value === 'requestor_first_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, detailType === 'hcp' ? 'first_name' : 'requestor_first_name')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                            <th><span className={sort.value === 'last_name' || sort.value === 'requestor_last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, detailType === 'hcp' ? 'last_name' : 'requestor_last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                            <th><span className={sort.value === 'language' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'status')}>Language<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                            {(detailType === 'hcps' || detailType === 'hcos') && <th>OneKey Id</th>}
+                                            {(detailType === 'hcps' || detailType === 'hcos') && <th>UUID</th>}
+                                            {(detailType === 'hcps' || detailType === 'hcos') && <th><span className={sort.value === 'first_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'first_name')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>}
+                                            {(detailType === 'hcps' || detailType === 'hcos') && <th><span className={sort.value === 'last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>}
+                                            {(detailType === 'vendors' || detailType === 'wholesalers') && <th><span className={sort.value === 'name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'name')}>Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>}
+                                            <th><span className={sort.value === 'locale' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'locale')}>Locale<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                             <th>Street House No</th>
                                             <th><span className={sort.value === 'city' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'city')}>City<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                             <th><span className={sort.value === 'country_iso2' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'country_iso2')}>Country<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
@@ -158,16 +155,17 @@ const PartnerManagement = () => {
                                             (
                                                 <tr key={index}>
                                                     {
-                                                        (detailType === 'hcp' || detailType === 'hco') &&
+                                                        (detailType === 'hcps' || detailType === 'hcos') &&
                                                         <td>{item.onekey_id || '--'}</td>
                                                     }
                                                     {
-                                                        (detailType === 'hcp' || detailType === 'hco') &&
+                                                        (detailType === 'hcps' || detailType === 'hcos') &&
                                                         <td>{item.uuid || '--'}</td>
                                                     }
-                                                    <td>{item.first_name ? item.first_name : item.requestor_first_name}</td>
-                                                    <td>{item.last_name ? item.last_name : item.requestor_last_name}</td>
-                                                    <td>{item.language}</td>
+                                                    { (detailType === 'hcps' || detailType === 'hcos') && <td> {item.first_name} </td>}
+                                                    { (detailType === 'hcps' || detailType === 'hcos') && <td> {item.last_name} </td>}
+                                                    { (detailType === 'vendors' || detailType === 'wholesalers') && <td> {item.name}</td>}
+                                                    <td>{item.locale}</td>
                                                     <td>{item.address}</td>
                                                     <td>{item.city}</td>
                                                     <td>{(countries.find(i => i.country_iso2.toLowerCase() === item.country_iso2.toLowerCase())).countryname}</td>
@@ -207,7 +205,7 @@ const PartnerManagement = () => {
                         {partnersData.partners && partnersData.partners.length === 0 &&
                             <div className="row justify-content-center mt-5 pt-5 mb-3">
                                 <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">
-                                    <i class="icon icon-team icon-6x cdp-text-secondary"></i>
+                                    <i className="icon icon-team icon-6x cdp-text-secondary"></i>
                                     <h3 className="font-weight-bold cdp-text-primary pt-4">No Partner Found!</h3>
                                 </div>
                             </div>

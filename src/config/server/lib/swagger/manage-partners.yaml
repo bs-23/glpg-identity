@@ -36,11 +36,9 @@ paths:
                                     type: string
                                 country_iso2:
                                     type: string
-                                language:
+                                locale:
                                     type: string
                                 uuid:
-                                    type: string
-                                onekey_id:
                                     type: string
                                 is_italian_hcp:
                                     type: boolean
@@ -72,7 +70,8 @@ paths:
                               - email
                               - type
                               - country_iso2
-                              - language
+                              - locale
+                              - uuid
             responses:
                 200:
                     description: The request has succeeded.
@@ -129,11 +128,9 @@ paths:
                                     - patient_org
                                 country_iso2:
                                     type: string
-                                language:
+                                locale:
                                     type: string
                                 uuid:
-                                    type: string
-                                onekey_id:
                                     type: string
                                 registration_number:
                                     type: string
@@ -160,7 +157,8 @@ paths:
                               - email
                               - type
                               - country_iso2
-                              - language
+                              - locale
+                              - uuid
             responses:
                 200:
                     description: The request has succeeded.
@@ -199,7 +197,7 @@ paths:
                                     - wholesaler
                                 country_iso2:
                                     type: string
-                                language:
+                                locale:
                                     type: string
                                 request_id:
                                     type: string
@@ -279,7 +277,7 @@ paths:
                               - city
                               - ordering_email
                               - country_iso2
-                              - language
+                              - locale
             responses:
                 200:
                     description: The request has succeeded.
@@ -368,11 +366,9 @@ components:
                     type: string
                 country_iso2:
                     type: string
-                language:
+                locale:
                     type: string
                 uuid:
-                    type: string
-                onekey_id:
                     type: string
                 is_italian_hcp:
                     type: boolean
@@ -431,11 +427,9 @@ components:
                     - patient_org
                 country_iso2:
                     type: string
-                language:
+                locale:
                     type: string
                 uuid:
-                    type: string
-                onekey_id:
                     type: string
                 registration_number:
                     type: string
@@ -469,7 +463,7 @@ components:
                     - wholesaler
                 country_iso2:
                     type: string
-                language:
+                locale:
                     type: string
                 request_id:
                     type: string
@@ -569,5 +563,5 @@ components:
                     type: string
                 country_iso2:
                     type: string
-                language:
+                locale:
                     type: string

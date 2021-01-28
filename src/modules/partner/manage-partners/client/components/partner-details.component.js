@@ -48,31 +48,52 @@ const PartnerDetails = (props) => {
                 {props.countries && props.countries.length > 0 && partner &&
                     <div className="row">
                         <div className="col-12">
-                            <h4 className="mb-3">{props.detailType === 'hcps' || props.detailType === 'hcos' ?
-                                partner.first_name + ' ' + partner.last_name : partner.requestor_first_name + ' ' + partner.requestor_last_name}</h4>
+                            <h4 className="mb-3">{(props.detailType === 'hcps' || props.detailType === 'hcos') ?
+                                partner.first_name + ' ' + partner.last_name : partner.name}</h4>
 
                         </div>
+
                         <div className="col-12">
                             <div className="row">
+
                                 <div className="col-12 col-sm-6">
                                     <div className="border rounded">
                                         <h5 className="bg-light p-3 cdp-text-primary font-weight-bold-light rounded-top">Information</h5>
-                                        <ul className="p-3 m-0 list-unstyled">
-                                            <li className="pb-3">
-                                                <strong className="h5 font-weight-bold-light d-block">Beneficiary Type</strong>
-                                                <span className="h5 d-block">{partner.beneficiary_category}</span>
-                                            </li>
-                                            <li className="pb-3">
-                                                <strong className="h5 font-weight-bold-light d-block">Customer OneKey Id</strong>
-                                                <span className="h5 d-block">{partner.onekey_id}</span>
-                                            </li>
-                                            <li className="pb-3">
-                                                <strong className="h5 font-weight-bold-light d-block">Local UUID</strong>
-                                                <span className="h5 d-block">{partner.uuid}</span>
-                                            </li>
-                                        </ul>
+                                        {(props.detailType === 'hcps' || props.detailType === 'hcos') ?
+                                            <ul className="p-3 m-0 list-unstyled">
+                                                <li className="pb-3">
+                                                    <strong className="h5 font-weight-bold-light d-block">Beneficiary Type</strong>
+                                                    <span className="h5 d-block">{partner.beneficiary_category}</span>
+                                                </li>
+                                                <li className="pb-3">
+                                                    <strong className="h5 font-weight-bold-light d-block">Customer OneKey Id</strong>
+                                                    <span className="h5 d-block">{partner.onekey_id}</span>
+                                                </li>
+                                                <li className="pb-3">
+                                                    <strong className="h5 font-weight-bold-light d-block">Local UUID</strong>
+                                                    <span className="h5 d-block">{partner.uuid}</span>
+                                                </li>
+                                            </ul>
+                                            :
+                                            <ul className="p-3 m-0 list-unstyled">
+                                                <li className="pb-3">
+                                                    <strong className="h5 font-weight-bold-light d-block">Requestor Name</strong>
+                                                    <span className="h5 d-block">{partner.requestor_first_name + ' ' + partner.requestor_last_name}</span>
+                                                </li>
+                                                <li className="pb-3">
+                                                    <strong className="h5 font-weight-bold-light d-block">Registration no/VAT code</strong>
+                                                    <span className="h5 d-block">{partner.registration_number}</span>
+                                                </li>
+                                                <li className="pb-3">
+                                                    <strong className="h5 font-weight-bold-light d-block">Purchasing Organization</strong>
+                                                    <span className="h5 d-block">{partner.purchasing_org}</span>
+                                                </li>
+                                            </ul>
+
+                                        }
                                     </div>
                                 </div>
+
                                 <div className="col-12 col-sm-6 ">
                                     <div className="border rounded">
                                         <h5 className="bg-light p-3 cdp-text-primary font-weight-bold-light rounded-top">Address</h5>
@@ -92,18 +113,22 @@ const PartnerDetails = (props) => {
                                         </ul>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
+
                         <div className="col-12">
-                            <div className="border rounded shadow-sm mt-4">
-                                <h6 className="bg-light p-3 font-weight-bold-light rounded-top">Galapagos Contracts</h6>
-                                <div className="p-3">
-                                    {partner.documents && partner.documents.map(doc => (
-                                        <a key={doc.id} onClick={() => downloadFile(doc.id)} className="d-block text-primary">{doc.name}</a>
-                                    ))
-                                    }
+                            {partner.documents && partner.documents.length > 0 &&
+                                <div className="border rounded shadow-sm mt-4">
+                                    <h6 className="bg-light p-3 font-weight-bold-light rounded-top">Galapagos Contracts</h6>
+                                    <div className="p-3">
+                                        {partner.documents && partner.documents.map(doc => (
+                                            <a key={doc.id} onClick={() => downloadFile(doc.id)} className="d-block text-primary">{doc.name}</a>
+                                        ))
+                                        }
+                                    </div>
                                 </div>
-                            </div>
+                            }
                         </div>
                     </div>
                 }

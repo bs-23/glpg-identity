@@ -63,11 +63,11 @@ export default function Inbox() {
                                 {hcps.users !== undefined && hcps.users.length < 6 &&
                                     hcps.users.map((user, key) => <ul key={key} className="cdp-inbox__list p-0 m-0">
                                         <li key={key} className="cdp-inbox__list-item d-flex justify-content-between  align-items-center border-bottom py-3 px-3">
-                                            <span className="cdp-inbox__list-item-col large cdp-text-primary font-weight-bold">{user.email}</span>
-                                            <span className="cdp-inbox__list-item-col cdp-text-primary font-weight-bold px-3">{new Date(user.created_at).toLocaleDateString('en-GB', {
+                                            <span className="cdp-inbox__list-item-col large cdp-text-primary font-weight-bold text-break">{user.email}</span>
+                                            <span className="cdp-inbox__list-item-col cdp-text-primary font-weight-bold px-3 text-break">{new Date(user.created_at).toLocaleDateString('en-GB', {
                                                 day: 'numeric', month: 'short', year: 'numeric'
                                             }).replace(/ /g, ' ')}</span>
-                                            <span className="cdp-inbox__list-item-col">
+                                            <span className="cdp-inbox__list-item-col text-break">
                                                 <button className="btn cdp-btn-secondary btn-sm text-white" onClick={() => { setModalId(key); setShowModal(true) }}>Update Status</button>
                                             </span>
                                         </li>
