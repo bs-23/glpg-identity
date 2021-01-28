@@ -450,16 +450,17 @@ async function updateCdpConsent(req, res) {
                                 consent_id: consent.id
                             })
 
-                            await logService.log({
-                                event_type: 'UPDATE',
-                                object_id: currentTranslationFromDB.id,
-                                table_name: 'consent_locales',
-                                actor: req.user.id,
-                                changes: JSON.stringify({
-                                    old_value: previousTranslation,
-                                    new_value: currentTranslationFromDB.dataValues
-                                })
-                            });
+                            const updatesInTranslation = logService.difference(currentTranslationFromDB.dataValues, previousTranslation);
+
+                            if (updatesInTranslation) {
+                                await logService.log({
+                                    event_type: 'UPDATE',
+                                    object_id: currentTranslationFromDB.id,
+                                    table_name: 'consent_locales',
+                                    actor: req.user.id,
+                                    changes: JSON.stringify(updatesInTranslation)
+                                });
+                            }
 
                             response.translations[idx] = currentTranslationFromDB.dataValues;
                         } catch(err) {
@@ -492,16 +493,17 @@ async function updateCdpConsent(req, res) {
 
         clearApplicationCache();
 
-        await logService.log({
-            event_type: 'UPDATE',
-            object_id: consent.id,
-            table_name: 'consents',
-            actor: req.user.id,
-            changes: JSON.stringify({
-                old_value: consentBeforeUpdate,
-                new_value: consent.dataValues
-            })
-        });
+        const updatesInConsent = logService.difference(consent.dataValues, consentBeforeUpdate);
+
+        if (updatesInConsent) {
+            await logService.log({
+                event_type: 'UPDATE',
+                object_id: consent.id,
+                table_name: 'consents',
+                actor: req.user.id,
+                changes: JSON.stringify(updatesInConsent)
+            });
+        }
 
         await Promise.all(deletedTranslations.map(async dt => {
             return await logService.log({
