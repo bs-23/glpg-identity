@@ -4,14 +4,17 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import { useSelector, useDispatch } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import { Faq } from '../../../../platform';
 import { partnerRequestSchemaForVendors } from './../manage-requests.schema';
 import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm } from '../manage-requests.actions';
 
 const VendorPartnerRequests = () => {
     const dispatch = useDispatch();
+    const location = useLocation();
+    const history = useHistory();
     const { addToast } = useToasts();
+
     const [showForm, setShowForm] = useState(false);
     const [companyCodes, setCompanyCodes] = useState([{ id: Math.random(), company_code: '' }]);
     const [showError, setShowError] = useState(false);
@@ -31,8 +34,7 @@ const VendorPartnerRequests = () => {
     const handleCloseFaq = () => setShowFaq(false);
     const handleShowFaq = () => setShowFaq(true);
 
-    const total_requests = useSelector(state => state.manageRequestsReducer.partnerRequests);
-    const requests = total_requests.filter(i => i.entity_type === 'vendor');
+    const requestData = useSelector(state => state.manageRequestsReducer.partnerRequests);
     const request = useSelector(state => state.manageRequestsReducer.partnerRequest);
 
     const countries = useSelector(state => state.countryReducer.countries);
@@ -49,6 +51,7 @@ const VendorPartnerRequests = () => {
                 appearance: 'success',
                 autoDismiss: true
             });
+            urlChange(1);
         }).catch(error => {
             addToast(error.response.data, {
                 appearance: 'error',
@@ -121,12 +124,32 @@ const VendorPartnerRequests = () => {
     };
 
     async function loadRequests() {
-        dispatch(getPartnerRequests());
+        const searchObj = {};
+        const searchParams = location.search.slice(1).split("&");
+        searchParams.forEach(element => {
+            searchObj[element.split("=")[0]] = element.split("=")[1];
+        });
+        const query = '?entitytype=vendor' + (searchObj.page ? `&page=${searchObj.page}` : '');
+        dispatch(getPartnerRequests(query));
     }
+
+    const urlChange = (pageNo) => {
+        const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
+        const url = `?page=${page}`;
+        history.push(location.pathname + url);
+    };
+
+    const pageLeft = () => {
+        if (requestData.page > 1) urlChange(requestData.page - 1);
+    };
+
+    const pageRight = () => {
+        if (requestData.end !== requestData.total) urlChange(requestData.page + 1);
+    };
 
     useEffect(() => {
         loadRequests();
-    }, []);
+    }, [location]);
 
     useEffect(() => {
         if (partnerRequestId) {
@@ -205,7 +228,7 @@ const VendorPartnerRequests = () => {
 
 
 
-                        {requests && requests.length > 0 ?
+                        {requestData['partnerRequests'] && requestData['partnerRequests'].length > 0 ?
                             <div className="table-responsive shadow-sm mb-3">
                                 <table className="table table-hover table-sm mb-0 cdp-table mb-2">
                                     <thead className="cdp-table__header  cdp-bg-primary text-white">
@@ -222,7 +245,7 @@ const VendorPartnerRequests = () => {
                                     </thead>
                                     <tbody>
                                         {
-                                            requests.map((row, index) =>
+                                            requestData['partnerRequests'].map((row, index) =>
                                             (
                                                 <tr key={index}>
                                                     <td>{`${row.first_name} ${row.last_name}`}</td>
@@ -252,6 +275,16 @@ const VendorPartnerRequests = () => {
                                         }
                                     </tbody>
                                 </table>
+                                {((requestData.page === 1 &&
+                                    requestData.total > requestData.limit) ||
+                                    (requestData.page > 1))
+                                    && requestData['partnerRequests'] &&
+                                    <div className="pagination justify-content-end align-items-center border-top p-3">
+                                        <span className="cdp-text-primary font-weight-bold">{requestData.start + ' - ' + requestData.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + requestData.total}</span>
+                                        <span className="pagination-btn" onClick={() => pageLeft()} disabled={requestData.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
+                                        <span className="pagination-btn" onClick={() => pageRight()} disabled={requestData.end === requestData.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
+                                    </div>
+                                }
                             </div>
                             :
                             <div className="row justify-content-center mt-sm-5 pt-5 mb-3">
@@ -284,7 +317,7 @@ const VendorPartnerRequests = () => {
                             procurement_contact: partnerRequestId && Object.keys(request).length ? request.procurement_contact : '',
                             company_codes: [],
                             country_iso2: partnerRequestId && Object.keys(request).length ? request.country_iso2 : '',
-                            language: partnerRequestId && Object.keys(request).length ? request.language : 'en',
+                            language: partnerRequestId && Object.keys(request).length ? request.locale.split('_')[0] : 'en',
                             partner_type: partnerRequestId && Object.keys(request).length ? request.partner_type : '',
                         }}
                         displayName="PartnerRequestsForm"
@@ -322,6 +355,7 @@ const VendorPartnerRequests = () => {
                                         appearance: 'success',
                                         autoDismiss: true
                                     });
+                                    urlChange(1);
                                 }).catch(error => {
                                     addToast(error.response.data, {
                                         appearance: 'error',
