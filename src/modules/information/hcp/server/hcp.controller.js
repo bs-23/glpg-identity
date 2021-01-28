@@ -859,7 +859,13 @@ async function confirmConsents(req, res) {
         let userConsents = await HcpConsents.findAll({ where: { user_id: payload.id } });
 
         if (userConsents && userConsents.length) {
-            userConsents = userConsents.map(consent => ({ ...consent.dataValues, consent_confirmed: true }));
+            userConsents = userConsents.map(consent => ({
+                ...consent.dataValues,
+                rich_text: consent.rich_text
+                    ? validator.unescape(consent.rich_text)
+                    : consent.rich_text,
+                consent_confirmed: true
+            }));
 
             await HcpConsents.bulkCreate(userConsents, {
                 updateOnDuplicate: ['consent_confirmed']
@@ -880,6 +886,7 @@ async function confirmConsents(req, res) {
         res.json(response);
     } catch (err) {
         logger.error(err);
+        console.log(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
