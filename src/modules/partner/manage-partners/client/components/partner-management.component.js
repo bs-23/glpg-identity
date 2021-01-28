@@ -145,7 +145,7 @@ const PartnerManagement = () => {
                                             {(detailType === 'hcp' || detailType === 'hco') && <th>UUID</th>}
                                             <th><span className={sort.value === 'first_name' || sort.value === 'requestor_first_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, detailType === 'hcp' ? 'first_name' : 'requestor_first_name')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                             <th><span className={sort.value === 'last_name' || sort.value === 'requestor_last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, detailType === 'hcp' ? 'last_name' : 'requestor_last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-                                            <th><span className={sort.value === 'language' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'status')}>Language<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                            <th><span className={sort.value === 'locale' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'locale')}>Locale<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                             <th>Street House No</th>
                                             <th><span className={sort.value === 'city' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'city')}>City<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                             <th><span className={sort.value === 'country_iso2' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'country_iso2')}>Country<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
@@ -167,7 +167,7 @@ const PartnerManagement = () => {
                                                     }
                                                     <td>{item.first_name ? item.first_name : item.requestor_first_name}</td>
                                                     <td>{item.last_name ? item.last_name : item.requestor_last_name}</td>
-                                                    <td>{item.language}</td>
+                                                    <td>{item.locale}</td>
                                                     <td>{item.address}</td>
                                                     <td>{item.city}</td>
                                                     <td>{(countries.find(i => i.country_iso2.toLowerCase() === item.country_iso2.toLowerCase())).countryname}</td>

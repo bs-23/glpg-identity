@@ -23,7 +23,8 @@ const partnerHcpSchema = object().shape({
         .max(100, 'This field must be at most 100 characters long.')
         .required('This field must not be empty.'),
     uuid: string()
-        .max(20, 'This field must be at most 20 characters long.'),
+        .max(20, 'This field must be at most 20 characters long.')
+        .required('This field must not be empty.'),
     telephone: string()
         .matches(/^(?:[+]?[0-9]*|[0-9]{2,3}[\/]?[0-9]*)$/, 'This field must be a valid phone number.')
         .transform(value => value === '' ? undefined : value)
@@ -32,8 +33,8 @@ const partnerHcpSchema = object().shape({
     country_iso2: string()
         .max(2, 'This field must be at most 2 characters long.')
         .required('This field must not be empty.'),
-    language: string()
-        .max(2, 'This field must be at most 2 characters long.')
+    locale: string()
+        .max(5, 'This field must be at most 5 characters long.')
         .required('This field must not be empty.'),
     type: string()
         .oneOf(['individual', 'legal_entity'], 'Type must be either individual or legal_entity')
@@ -64,7 +65,8 @@ const partnerHcoSchema = object().shape({
         .max(100, 'This field must be at most 100 characters long.')
         .required('This field must not be empty.'),
     uuid: string()
-        .max(20, 'This field must be at most 20 characters long.'),
+        .max(20, 'This field must be at most 20 characters long.')
+        .required('This field must not be empty.'),
     telephone: string()
         .matches(/^(?:[+]?[0-9]*|[0-9]{2,3}[\/]?[0-9]*)$/, 'This field must be a valid phone number.')
         .transform(value => value === '' ? undefined : value)
@@ -73,8 +75,8 @@ const partnerHcoSchema = object().shape({
     country_iso2: string()
         .max(2, 'This field must be at most 2 characters long.')
         .required('This field must not be empty.'),
-    language: string()
-        .max(2, 'This field must be at most 2 characters long.')
+    locale: string()
+        .max(5, 'This field must be at most 5 characters long.')
         .required('This field must not be empty.'),
     type: string()
         .oneOf(['healthcare_org', 'patient_org'], 'Type must be either healthcare_org or patient_org')
@@ -108,8 +110,8 @@ const partnerVendorSchema = object().shape({
     country_iso2: string()
         .max(2, 'This field must be at most 2 characters long.')
         .required('This field must not be empty.'),
-    language: string()
-        .max(2, 'This field must be at most 2 characters long.')
+    locale: string()
+        .max(5, 'This field must be at most 5 characters long.')
         .required('This field must not be empty.'),
     type: string()
         .oneOf(['vendor', 'wholesaler'], 'Type must be either vendor or wholesaler')

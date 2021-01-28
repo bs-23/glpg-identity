@@ -10,12 +10,11 @@ const File = require(path.join(process.cwd(), 'src/modules/core/server/storage/f
 const ExportService = require(path.join(process.cwd(), 'src/modules/core/server/export/export.service'));
 
 async function uploadDucuments(owner, type, files) {
-    const fileEntities = [];
     const bucketName = 'cdp-development';
     for (const file of files) {
         const uploadOptions = {
             bucket: bucketName,
-            folder: `documents/partner/${type}/${owner.id}/`,
+            folder: `business-partner/documents/${owner.id}/`,
             fileName: file.originalname,
             fileContent: file.buffer
         };
@@ -35,9 +34,7 @@ async function uploadDucuments(owner, type, files) {
             owner_id: owner.id,
             table_name: tableNames[type]
         });
-        fileEntities.push(fileCreated.dataValues);
     };
-    return fileEntities;
 }
 
 async function getPartnerHcps(req, res) {
@@ -53,7 +50,7 @@ async function getPartnerHcps(req, res) {
             ? req.query.orderType
             : 'asc';
 
-        const sortableColumns = ['first_name', 'last_name', 'onekey_id', 'uuid', 'language', 'city'];
+        const sortableColumns = ['first_name', 'last_name', 'onekey_id', 'uuid', 'locale', 'city'];
 
         const order = [];
         if (orderBy && (sortableColumns || []).includes(orderBy)) {
@@ -67,7 +64,7 @@ async function getPartnerHcps(req, res) {
             offset,
             limit,
             order,
-            attributes: ['id', 'onekey_id', 'uuid', 'first_name', 'last_name', 'address', 'city', 'country_iso2', 'language', 'status']
+            attributes: ['id', 'onekey_id', 'uuid', 'first_name', 'last_name', 'address', 'city', 'country_iso2', 'locale', 'status']
         });
 
         const total = await Partner.count({ where: { entity_type: 'hcp' }, });
@@ -97,7 +94,7 @@ async function registrationLookup(req, res) {
         console.log(request_id);
         const partnerRequest = await PartnerRequest.findOne({
             where: { id: request_id },
-            attributes: ["id", "application_id", "entity_type", "first_name", "last_name", "email", "procurement_contact", "partner_type", "uuid", "company_codes", "country_iso2", "language"]
+            attributes: ["id", "application_id", "entity_type", "first_name", "last_name", "email", "procurement_contact", "partner_type", "uuid", "company_codes", "country_iso2", "locale"]
         });
         res.json(partnerRequest);
 
@@ -141,7 +138,7 @@ async function createPartnerHcp(req, res) {
         const files = req.files;
 
         const { request_id, first_name, last_name, address, city, post_code, email, telephone,
-            type, country_iso2, language, registration_number, uuid, onekey_id, is_italian_hcp, should_report_hco, beneficiary_category,
+            type, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
             iban, bank_name, bank_account_no, currency } = req.body;
 
         if (response.errors.length) return res.status(400).send(response);
@@ -164,7 +161,7 @@ async function createPartnerHcp(req, res) {
         }
 
         const data = {
-            request_id, first_name, last_name, address, city, post_code, email, telephone, country_iso2, language, registration_number, uuid, onekey_id, is_italian_hcp, should_report_hco, beneficiary_category, iban, bank_name, bank_account_no, currency
+            request_id, first_name, last_name, address, city, post_code, email, telephone, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category, iban, bank_name, bank_account_no, currency
         };
 
         data.entity_type = entityType;
@@ -182,8 +179,7 @@ async function createPartnerHcp(req, res) {
 
         await partnerRequest.update({ status: 'submitted' });
 
-        const documents = await uploadDucuments(partnerHcp, entityType, files);
-        partnerHcp.dataValues.documents = documents.map(d => d.key);
+        await uploadDucuments(partnerHcp, entityType, files);
 
         partnerHcp.dataValues.type = partnerHcp.dataValues.individual_type;
 
@@ -193,6 +189,7 @@ async function createPartnerHcp(req, res) {
         delete partnerHcp.dataValues.organization_name;
         delete partnerHcp.dataValues.organization_type;
         delete partnerHcp.dataValues.entity_type;
+        delete partnerHcp.dataValues.onekey_id;
 
 
         response.data = partnerHcp;
@@ -218,7 +215,7 @@ async function getPartnerHcos(req, res) {
             ? req.query.orderType
             : 'asc';
 
-        const sortableColumns = ['first_name', 'last_name', 'onekey_id', 'uuid', 'language', 'city'];
+        const sortableColumns = ['first_name', 'last_name', 'onekey_id', 'uuid', 'locale', 'city'];
 
         const order = [];
         if (orderBy && (sortableColumns || []).includes(orderBy)) {
@@ -232,7 +229,7 @@ async function getPartnerHcos(req, res) {
             offset,
             limit,
             order,
-            attributes: ['id', 'onekey_id', 'uuid', 'first_name', 'last_name', 'address', 'city', 'country_iso2', 'language', 'status']
+            attributes: ['id', 'onekey_id', 'uuid', 'first_name', 'last_name', 'address', 'city', 'country_iso2', 'locale', 'status']
         });
 
         const total = await Partner.count({ where: { entity_type: 'hco' } });
@@ -287,7 +284,7 @@ async function createPartnerHco(req, res) {
     try {
         const files = req.files;
 
-        const { request_id, contact_first_name, contact_last_name, organization_name, address, city, post_code, email, telephone, type, uuid, onekey_id, country_iso2, language, registration_number, iban, bank_name, bank_account_no, currency } = req.body;
+        const { request_id, contact_first_name, contact_last_name, organization_name, address, city, post_code, email, telephone, type, uuid, country_iso2, locale, registration_number, iban, bank_name, bank_account_no, currency } = req.body;
 
         if (response.errors.length) return res.status(400).send(response);
 
@@ -309,7 +306,7 @@ async function createPartnerHco(req, res) {
         }
 
         const data = {
-            request_id, organization_name, address, city, post_code, email, telephone, uuid, onekey_id, country_iso2, language, registration_number, iban, bank_name, bank_account_no, currency
+            request_id, organization_name, address, city, post_code, email, telephone, uuid, country_iso2, locale, registration_number, iban, bank_name, bank_account_no, currency
         };
         data.entityType = entityType;
         data.first_name = contact_first_name;
@@ -328,8 +325,7 @@ async function createPartnerHco(req, res) {
 
         await partnerRequest.update({ status: 'submitted' });
 
-        const documents = await uploadDucuments(partnerHco, entityType, files);
-        partnerHco.dataValues.documents = documents.map(d => d.key);
+        await uploadDucuments(partnerHco, entityType, files);
 
         partnerHco.dataValues.contact_first_name = partnerHco.dataValues.first_name;
         partnerHco.dataValues.contact_last_name = partnerHco.dataValues.last_name;
@@ -338,6 +334,7 @@ async function createPartnerHco(req, res) {
         delete partnerHco.dataValues.is_italian_hcp;
         delete partnerHco.dataValues.should_report_hco;
         delete partnerHco.dataValues.beneficiary_category;
+        delete partnerHco.dataValues.onekey_id;
         delete partnerHco.dataValues.created_at;
         delete partnerHco.dataValues.updated_at;
 
@@ -364,7 +361,7 @@ async function getNonHealthcarePartners(req, res, type) {
             ? req.query.orderType
             : 'asc';
 
-        const sortableColumns = ['requestor_first_name', 'requestor_last_name', 'status', 'country_iso2', 'language', 'city'];
+        const sortableColumns = ['requestor_first_name', 'requestor_last_name', 'status', 'country_iso2', 'locale', 'city'];
 
         const order = [];
         if (orderBy && (sortableColumns || []).includes(orderBy)) {
@@ -378,7 +375,7 @@ async function getNonHealthcarePartners(req, res, type) {
             offset,
             limit,
             order,
-            attributes: ['id', 'requestor_first_name', 'requestor_last_name', 'language', 'address', 'city', 'country_iso2', 'status']
+            attributes: ['id', 'requestor_first_name', 'requestor_last_name', 'locale', 'address', 'city', 'country_iso2', 'status']
         });
 
         const total = await PartnerVendors.count();
@@ -437,7 +434,7 @@ async function createPartnerVendor(req, res) {
     try {
         const files = req.files;
 
-        const { request_id, type, country_iso2, language, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency } = req.body;
+        const { request_id, type, country_iso2, locale, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency } = req.body;
 
         if (response.errors.length) return res.status(400).send(response);
 
@@ -459,7 +456,7 @@ async function createPartnerVendor(req, res) {
         }
 
         const data = {
-            request_id, country_iso2, language, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency
+            request_id, country_iso2, locale, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency
         };
 
         data.entity_type = type;
@@ -486,8 +483,7 @@ async function createPartnerVendor(req, res) {
 
         await partnerRequest.update({ status: 'submitted' });
 
-        const documents = await uploadDucuments(partnerVendor, type, files);
-        partnerVendor.dataValues.documents = documents.map(d => d.key);
+        await uploadDucuments(partnerVendor, type, files);
 
         delete partnerVendor.dataValues.created_at;
         delete partnerVendor.dataValues.updated_at;
@@ -566,7 +562,7 @@ function getExportData(entityType, partners) {
         'City': partner.city,
         'Post code': partner.post_code,
         'Country code': partner.country_iso2,
-        'Language code': partner.language,
+        'Locale': partner.locale,
         'Type': partner.individual_type,
         'UUID': partner.uuid,
         'Onekey Id': partner.onekey_id,
@@ -592,7 +588,7 @@ function getExportData(entityType, partners) {
         'City': partner.city,
         'Post code': partner.post_code,
         'Country code': partner.country_iso2,
-        'Language code': partner.language,
+        'Locale': partner.locale,
         'Registration no./VAT code': partner.registration_number,
         'Type': partner.organization_type,
         'UUID': partner.uuid,
@@ -620,7 +616,7 @@ function getExportData(entityType, partners) {
         'Post code': partner.post_code,
         'Phone': partner.telephone,
         'Country code': partner.country_iso2,
-        'Language code': partner.language,
+        'Locale': partner.locale,
         'Invoice Contact Name': partner.invoice_contact_name,
         'Invoice Contact Address': partner.invoice_address,
         'Invoice Contact City': partner.invoice_city,
