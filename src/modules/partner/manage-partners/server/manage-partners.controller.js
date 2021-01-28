@@ -7,9 +7,7 @@ const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/
 const PartnerRequest = require(path.join(process.cwd(), 'src/modules/partner/manage-requests/server/partner-request.model'));
 const storageService = require(path.join(process.cwd(), 'src/modules/core/server/storage/storage.service'));
 const File = require(path.join(process.cwd(), 'src/modules/core/server/storage/file.model'));
-
-const FILE_SIZE_LIMIT = 5242880; // 5 MB
-
+const ExportService = require(path.join(process.cwd(), 'src/modules/core/server/export/export.service'));
 
 async function uploadDucuments(owner, type, files) {
     const fileEntities = [];
@@ -543,6 +541,149 @@ async function approvePartner(req, res) {
     }
 }
 
+function getExportData(entityType, partners) {
+    if (entityType === 'hcp') return partners.map(partner => ({
+        'Id': partner.id,
+        'Request Id': partner.request_id,
+        'First Name': partner.first_name,
+        'Last Name': partner.last_name,
+        'Email': partner.email,
+        'Phone': partner.telephone,
+        'Address': partner.address,
+        'City': partner.city,
+        'Post code': partner.post_code,
+        'Country code': partner.country_iso2,
+        'Language code': partner.language,
+        'Type': partner.individual_type,
+        'UUID': partner.uuid,
+        'Onekey Id': partner.onekey_id,
+        'Italian HCP?': partner.is_italian_hcp,
+        'Should Report to HCO?': partner.should_report_hco,
+        'Beneficiary Category': partner.beneficiary_category,
+        'IBAN': partner.iban,
+        'Bank Name': partner.bank_name,
+        'Bank Account No': partner.bank_account_no,
+        'Currency': partner.currency,
+        'Created at': (new Date(partner.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')
+    }));
+
+    if (entityType === 'hco') return partners.map(partner => ({
+        'Id': partner.id,
+        'Request Id': partner.request_id,
+        'First Name': partner.first_name,
+        'Last Name': partner.last_name,
+        'Organization Name': partner.organization_name,
+        'Email': partner.email,
+        'Phone': partner.telephone,
+        'Address': partner.address,
+        'City': partner.city,
+        'Post code': partner.post_code,
+        'Country code': partner.country_iso2,
+        'Language code': partner.language,
+        'Registration no./VAT code': partner.registration_number,
+        'Type': partner.organization_type,
+        'UUID': partner.uuid,
+        'Onekey Id': partner.onekey_id,
+        'IBAN': partner.iban,
+        'Bank Name': partner.bank_name,
+        'Bank Account No': partner.bank_account_no,
+        'Currency': partner.currency,
+        'Created at': (new Date(partner.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')
+    }));
+
+    if (entityType === 'vendor' || entityType === 'wholesaler') return partners.map(partner => ({
+        'Id': partner.id,
+        'Request Id': partner.request_id,
+        'Requestor First Name': partner.requestor_first_name,
+        'Requestor Last Name': partner.requestor_last_name,
+        'Purchasing Organization': partner.purchasing_org,
+        'Company Code': partner.company_code,
+        'Requestor Email': partner.requestor_email,
+        'Procurement Contact': partner.procurement_contact,
+        'Name': partner.name,
+        'Registration no./VAT code': partner.registration_number,
+        'Address': partner.address,
+        'City': partner.city,
+        'Post code': partner.post_code,
+        'Phone': partner.telephone,
+        'Country code': partner.country_iso2,
+        'Language code': partner.language,
+        'Invoice Contact Name': partner.invoice_contact_name,
+        'Invoice Contact Address': partner.invoice_address,
+        'Invoice Contact City': partner.invoice_city,
+        'Invoice Contact Post Code': partner.invoice_post_code,
+        'Invoice Contact Email': partner.invoice_email,
+        'Invoice Contact Phone': partner.invoice_telephone,
+        'Commercial Contact Name': partner.commercial_contact_name,
+        'Commercial Contact Address': partner.commercial_address,
+        'Commercial Contact City': partner.commercial_city,
+        'Commercial Contact Post Code': partner.commercial_post_code,
+        'Commercial Contact Email': partner.commercial_email,
+        'Commercial Contact Phone': partner.commercial_telephone,
+        'Ordering Contact Name': partner.ordering_contact_name,
+        'Ordering Contact Email': partner.ordering_email,
+        'Ordering Contact Phone': partner.ordering_telephone,
+        'IBAN': partner.iban,
+        'Bank Name': partner.bank_name,
+        'Bank Account No': partner.bank_account_no,
+        'Currency': partner.currency,
+        'Created at': (new Date(partner.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')
+    }));
+}
+
+async function exportApprovedPartners(req, res) {
+    try {
+        const entityType = req.params.entityType;
+
+        const entityTypes = ['hcp', 'hco', 'vendor', 'wholesaler'];
+
+        if (!entityTypes.includes(entityType)) return res.status(404).send(`No ${entityType} partners found`);
+
+        const PartnerModel = entityType === 'hcp' || entityType === 'hco'
+            ? Partner
+            : PartnerVendors;
+
+        const partners = await PartnerModel.findAll({
+            where: {
+                entity_type: entityType,
+                status: 'approved'
+            }
+        });
+
+        if (!partners) return res.status(404).send(`No ${entityType} partners found`);
+
+        const data = getExportData(entityType, partners);
+
+        const sheetNames = {
+            hcp: 'HCP Partners',
+            hco: 'HCO Partners',
+            vendor: 'Vendor Partners',
+            wholesaler: 'Wholesaler Partners'
+        };
+
+        const sheetName = sheetNames[entityType];
+        const fileBuffer = ExportService.exportDataToExcel(data, sheetName);
+
+        const fileName = `${sheetNames[entityType].replace(' ', '_')}_${getFormattedTimestamp()}.xlsx`;
+        res.writeHead(200, {
+            "Content-Disposition": "attachment;filename=" + fileName,
+            'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+        res.end(fileBuffer);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal server error');
+    }
+}
+
+function getFormattedTimestamp() {
+    const pad2 = (n) => (n < 10 ? '0' + n : n);
+
+    var date = new Date();
+    const timestamp = date.getFullYear().toString() + pad2(date.getMonth() + 1) + pad2(date.getDate()) + pad2(date.getHours()) + pad2(date.getMinutes()) + pad2(date.getSeconds());
+    return timestamp;
+}
+
 exports.getPartnerHcps = getPartnerHcps;
 exports.getPartnerHcp = getPartnerHcp;
 exports.createPartnerHcp = createPartnerHcp;
@@ -555,3 +696,4 @@ exports.createPartnerVendor = createPartnerVendor;
 exports.getDownloadUrl = getDownloadUrl;
 exports.registrationLookup = registrationLookup;
 exports.approvePartner = approvePartner;
+exports.exportApprovedPartners = exportApprovedPartners;

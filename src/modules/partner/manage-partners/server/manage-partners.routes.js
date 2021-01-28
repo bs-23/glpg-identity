@@ -37,5 +37,8 @@ module.exports = app => {
         .get(passport.authenticate('application-jwt', { session: false }), controller.registrationLookup);
     app.route('/api/partner/approve/:entityType/:id')
         .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.approvePartner);
+
+    app.route('/api/partner/export/:entityType')
+        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.exportApprovedPartners);
 };
 

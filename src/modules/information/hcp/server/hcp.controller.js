@@ -285,6 +285,7 @@ async function getHcps(req, res) {
         const offset = page * limit;
 
         const currentFilter = req.body;
+        const { fields } = req.body;
 
         const [userPermittedApplications, userPermittedCountries] = await getUserPermissions(req.user.id);
 
@@ -305,37 +306,51 @@ async function getHcps(req, res) {
         order.push(['created_at', 'DESC']);
         order.push(['id', 'DESC']);
 
+        const getAttributes = () => {
+            const fieldsToExclude = ['hcpConsents', 'origin_url', 'password', 'password_updated_at', 'reset_password_expires', 'reset_password_token', 'failed_auth_attempt', 'created_by', 'updated_by', 'updated_at'];
+
+            let requiredAttributes = fields && fields.length
+                ? fields.filter(field => !fieldsToExclude.includes(field))
+                : null;
+
+            return requiredAttributes ? requiredAttributes : { exclude: fieldsToExclude };
+        }
+
         const filterOptions = await generateFilterOptions(currentFilter, userPermittedApplications, userPermittedCountries, status, 'hcp_profiles');
 
         const hcps = await Hcp.findAll({
             where: filterOptions,
-            include: [{
-                model: HcpConsents,
-                as: 'hcpConsents',
-                attributes: ['consent_id', 'consent_confirmed', 'opt_type'],
-            }],
-            attributes: { exclude: ['origin_url', 'password', 'password_updated_at', 'reset_password_expires', 'reset_password_token', 'failed_auth_attempt', 'created_by', 'updated_by', 'updated_at'] },
+            include: !fields || fields.includes('hcpConsent')
+                ? [{
+                    model: HcpConsents,
+                    as: 'hcpConsents',
+                    attributes: ['consent_id', 'consent_confirmed', 'opt_type'],
+                }]
+                : null,
+            attributes: getAttributes(),
             offset,
             limit,
             order
         });
 
-        hcps.map(hcp => {
-            const opt_types = new Set();
+        if (!fields || !fields.length) {
+            hcps.map(hcp => {
+                const opt_types = new Set();
 
-            hcp['hcpConsents'].map(hcpConsent => {
-                if (hcpConsent.consent_confirmed || hcpConsent.opt_type === 'opt-out') {
-                    opt_types.add(hcpConsent.opt_type);
-                }
+                hcp['hcpConsents'].map(hcpConsent => {
+                    if (hcpConsent.consent_confirmed || hcpConsent.opt_type === 'opt-out') {
+                        opt_types.add(hcpConsent.opt_type);
+                    }
+                });
+
+                hcp.dataValues.opt_types = [...opt_types];
+                delete hcp.dataValues['hcpConsents'];
             });
-
-            hcp.dataValues.opt_types = [...opt_types];
-            delete hcp.dataValues['hcpConsents'];
-        });
+        }
 
         const totalUser = await Hcp.count({ where: filterOptions });
 
-        if(hcps.length) {
+        if (hcps.length && (!fields || !fields.length || fields.includes('specialty_onekey'))) {
             const specialties = _.uniq(_.map(hcps, 'specialty_onekey')).join("','");
 
             const specialty_list = await sequelize.datasyncConnector.query(`
