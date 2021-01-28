@@ -119,16 +119,17 @@ async function updateCountryConsent(req, res) {
             opt_type: optType
         });
 
-        await logService.log({
-            event_type: 'UPDATE',
-            object_id: consentCountry.id,
-            table_name: 'consent_countries',
-            actor: req.user.id,
-            changes: JSON.stringify({
-                old_value: consentCountryBeforeUpdate,
-                new_value: consentCountry.dataValues
-            })
-        });
+        const updatesInConsentCountry = logService.difference(consentCountry.dataValues, consentCountryBeforeUpdate);
+
+        if (updatesInConsentCountry) {
+            await logService.log({
+                event_type: 'UPDATE',
+                object_id: consentCountry.id,
+                table_name: 'consent_countries',
+                actor: req.user.id,
+                changes: JSON.stringify(updatesInConsentCountry)
+            });
+        }
 
         clearApplicationCache();
 

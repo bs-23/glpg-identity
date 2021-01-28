@@ -105,16 +105,17 @@ async function updateConsentCategory(req, res) {
 
         const data = await consentCategory.update({ title: title.trim(), slug: title.trim(), updated_by: req.user.id });
 
-        await logService.log({
-            event_type: 'UPDATE',
-            object_id: consentCategory.id,
-            table_name: 'consent_categories',
-            actor: req.user.id,
-            changes: JSON.stringify({
-                old_value: consentCategoryBeforeUpdate,
-                new_value: data.dataValues
-            })
-        });
+        const updatesInCategory = logService.difference(data.dataValues, consentCategoryBeforeUpdate);
+
+        if (updatesInCategory) {
+            await logService.log({
+                event_type: 'UPDATE',
+                object_id: consentCategory.id,
+                table_name: 'consent_categories',
+                actor: req.user.id,
+                changes: JSON.stringify(updatesInCategory)
+            });
+        }
 
         clearApplicationCache();
 
