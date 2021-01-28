@@ -61,24 +61,18 @@ const PartnerManagement = () => {
 
     const exportApprovedList = () => {
         const partnerType = window.location.pathname.split('/').pop();
-        const keyMap = {
-            hcp: 'hcp',
-            hco: 'hco',
-            vendors: 'vendor',
-            wholesalers: 'wholesaler'
-        };
 
-        const url = `/api/partner/export/${keyMap[partnerType]}`
+        const url = `/api/partners/export/${partnerType}`
         window.open(url,'_blank');
     };
 
     useEffect(() => {
         const partnerType = window.location.pathname.split("/").pop();
-        if (partnerType === 'hcp') dispatch(getHcpPartners(location.search));
-        if (partnerType === 'hco') dispatch(getHcoPartners(location.search));
-        if (partnerType === 'vendor') dispatch(getVendorsPartners(location.search));
-        if (partnerType === 'wholesaler') dispatch(getWholesalePartners(location.search));
-        setDetailType(partnerType === 'vendor' || partnerType === 'wholesaler' ? 'vendor' : partnerType);
+        if (partnerType === 'hcps') dispatch(getHcpPartners(location.search));
+        if (partnerType === 'hcos') dispatch(getHcoPartners(location.search));
+        if (partnerType === 'vendors') dispatch(getVendorsPartners(location.search));
+        if (partnerType === 'wholesalers') dispatch(getWholesalePartners(location.search));
+        setDetailType(partnerType);
         setSort({ type: params.get('orderType') || 'asc', value: params.get('orderBy') });
     }, [location]);
 
@@ -125,10 +119,10 @@ const PartnerManagement = () => {
                             <div>
                                 <h4 className="cdp-text-primary font-weight-bold mb-4">Business Partner Lists</h4>
                                 <div>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/hcp"><i className="fas fa-user-md fa-1_5x mr-2"></i>Health Care Professionals</NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/hco"><i className="fas fa-hospital fa-1_5x mr-2"></i>Health Care Organizations</NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/vendor"><i className="fas fa-hospital-user fa-1_5x mr-2"></i>General Vendors</NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/wholesaler"><i className="fas fa-dolly fa-1_5x mr-2"></i>Wholesalers</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/hcps"><i className="fas fa-user-md fa-1_5x mr-2"></i>Health Care Professionals</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/hcos"><i className="fas fa-hospital fa-1_5x mr-2"></i>Health Care Organizations</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/vendors"><i className="fas fa-hospital-user fa-1_5x mr-2"></i>General Vendors</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/wholesalers"><i className="fas fa-dolly fa-1_5x mr-2"></i>Wholesalers</NavLink>
                                 </div>
                             </div>
 

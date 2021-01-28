@@ -94,10 +94,10 @@ async function registrationLookup(req, res) {
     try {
 
         const request_id = (url.parse(req.url, true).query).request_id;
-        console.log(request_id);
+        if (!request_id) res.status(500).send('Request Id missing');
         const partnerRequest = await PartnerRequest.findOne({
             where: { id: request_id },
-            attributes: ["id", "application_id", "entity_type", "first_name", "last_name", "email", "procurement_contact", "partner_type", "uuid", "company_codes", "country_iso2", "language"]
+            attributes: ["id", "entity_type", "first_name", "last_name", "email", "procurement_contact", "partner_type", "uuid", "company_codes", "country_iso2", "locale"]
         });
         res.json(partnerRequest);
 
@@ -351,9 +351,8 @@ async function createPartnerHco(req, res) {
     }
 }
 
-async function getPartnerVendors(req, res) {
+async function getNonHealthcarePartners(req, res, type) {
     try {
-        const type = req.query.type ? req.query.type : 'vendor';
         const page = req.query.page ? +req.query.page - 1 : 0;
         const limit = req.query.limit ? +req.query.limit : 15;
         const offset = page * limit;
@@ -402,7 +401,15 @@ async function getPartnerVendors(req, res) {
     }
 }
 
-async function getPartnerVendor(req, res) {
+async function getPartnerVendors(req, res) {
+    await getNonHealthcarePartners(req, res, 'vendor');
+}
+
+async function getPartnerWholesalers(req, res) {
+    await getNonHealthcarePartners(req, res, 'wholesaler');
+}
+
+async function getNonHealthcarePartner(req, res) {
     try {
         const partnerVendor = await PartnerVendors.findOne({
             where: { id: req.params.id },
@@ -515,7 +522,13 @@ async function getDownloadUrl(req, res) {
 async function approvePartner(req, res) {
     try {
         const id = req.params.id;
-        const entityType = req.params.entityType;
+        const entityMap = {
+            hcps: 'hcp',
+            hcos: 'hco',
+            vendors: 'vendor',
+            wholesalers: 'wholesaler'
+        };
+        const entityType = entityMap[req.params.entityType];
 
         const PartnerModel = entityType === 'hcp' || entityType === 'hco'
             ? Partner
@@ -633,11 +646,16 @@ function getExportData(entityType, partners) {
 
 async function exportApprovedPartners(req, res) {
     try {
-        const entityType = req.params.entityType;
+        const entityMap = {
+            hcps: 'hcp',
+            hcos: 'hco',
+            vendors: 'vendor',
+            wholesalers: 'wholesaler'
+        };
 
-        const entityTypes = ['hcp', 'hco', 'vendor', 'wholesaler'];
+        const entityType = entityMap[req.params.entityType];
 
-        if (!entityTypes.includes(entityType)) return res.status(404).send(`No ${entityType} partners found`);
+        if (!entityType) return res.status(404).send(`No ${req.params.entityType} partners found`);
 
         const PartnerModel = entityType === 'hcp' || entityType === 'hco'
             ? Partner
@@ -691,7 +709,8 @@ exports.getPartnerHcos = getPartnerHcos;
 exports.getPartnerHco = getPartnerHco;
 exports.createPartnerHco = createPartnerHco;
 exports.getPartnerVendors = getPartnerVendors;
-exports.getPartnerVendor = getPartnerVendor;
+exports.getPartnerWholesalers = getPartnerWholesalers;
+exports.getNonHealthcarePartner = getNonHealthcarePartner;
 exports.createPartnerVendor = createPartnerVendor;
 exports.getDownloadUrl = getDownloadUrl;
 exports.registrationLookup = registrationLookup;

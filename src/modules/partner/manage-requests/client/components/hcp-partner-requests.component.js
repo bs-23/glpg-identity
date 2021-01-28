@@ -7,7 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { partnerRequestSchemaForHcps } from '../manage-requests.schema'
-import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm} from '../manage-requests.actions';
+import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm } from '../manage-requests.actions';
 
 const HcpPartnerRequests = () => {
     const dispatch = useDispatch();
@@ -133,7 +133,7 @@ const HcpPartnerRequests = () => {
 
     useEffect(() => {
         setIsSupplier(request?.is_supplier || false);
-        setIsCustomer(request?.is_customer  || false);
+        setIsCustomer(request?.is_customer || false);
     }, [request]);
 
     useEffect(() => {
@@ -178,7 +178,7 @@ const HcpPartnerRequests = () => {
                             </Dropdown>
                             <span className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary"></i></span>
                         </nav>
-                        <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
+                        <Modal show={showFaq} onHide={handleCloseFaq} size="xl" centered>
                             <Modal.Header closeButton>
                                 <Modal.Title>Questions You May Have</Modal.Title>
                             </Modal.Header>
@@ -267,7 +267,7 @@ const HcpPartnerRequests = () => {
                 </div>
             </div>
 
-            <Modal dialogClassName="modal-customize" size="lg" centered show={showForm} onHide={toggleForm}>
+            <Modal dialogClassName="modal-customize" size="xl" centered show={showForm} onHide={toggleForm}>
                 <Modal.Header closeButton>
                     <Modal.Title>
                         {
@@ -288,7 +288,7 @@ const HcpPartnerRequests = () => {
                             procurement_contact: partnerRequestId && Object.keys(request).length ? request.procurement_contact : '',
                             company_codes: [],
                             country_iso2: partnerRequestId && Object.keys(request).length ? request.country_iso2 : '',
-                            language: partnerRequestId && Object.keys(request).length ? request.language : '',
+                            language: partnerRequestId && Object.keys(request).length ? request.language : 'en',
                             uuid: partnerRequestId && Object.keys(request).length ? request.uuid : '',
                             partner_type: partnerRequestId && Object.keys(request).length ? request.partner_type : '',
                         }}
@@ -490,7 +490,7 @@ const HcpPartnerRequests = () => {
                 <Modal.Body>
                     {requestToDelete !== null ? (
                         <div>
-                            Are you sure you want to remove the following request?
+                            Are you sure you want to remove this request
                         </div>
                     ) : null}
                 </Modal.Body>

@@ -14,6 +14,7 @@ const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const { clearApplicationCache } = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.controller'));
+const archiveService = require(path.join(process.cwd(), 'src/modules/core/server/archive/archive.service'));
 
 const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
 
@@ -506,12 +507,19 @@ async function updateCdpConsent(req, res) {
         }
 
         await Promise.all(deletedTranslations.map(async dt => {
-            return await logService.log({
+            await logService.log({
                 event_type: 'DELETE',
                 object_id: dt.id,
                 table_name: 'consent_locales',
                 actor: req.user.id,
                 changes: JSON.stringify(dt.dataValues)
+            });
+
+            await archiveService.archiveData({
+                object_id: dt.id,
+                table_name: 'consent_locales',
+                data: JSON.stringify(dt.dataValues),
+                actor: req.user.id
             });
         }));
 

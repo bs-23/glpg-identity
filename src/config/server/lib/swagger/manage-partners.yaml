@@ -1,5 +1,5 @@
 paths:
-    /api/partner/hcp:
+    /api/partners/hcps:
         post:
             tags:
                 - manage-partners
@@ -92,7 +92,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/errorResponse"
 
-    /api/partner/hco:
+    /api/partners/hcos:
         post:
             tags:
                 - manage-partners
@@ -180,7 +180,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/errorResponse"
 
-    /api/partner/vendor:
+    /api/partners/vendors:
         post:
             tags:
                 - manage-partners
@@ -299,7 +299,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/errorResponse"
 
-    /api/partner/registration-lookup:
+    /api/partners/registration-lookup:
         get:
             tags:
                 - manage-partners

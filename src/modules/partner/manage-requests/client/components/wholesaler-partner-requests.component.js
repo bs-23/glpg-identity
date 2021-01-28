@@ -7,7 +7,7 @@ import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { NavLink } from 'react-router-dom';
 import { Faq } from '../../../../platform';
 import { partnerRequestSchemaForWholesalers } from './../manage-requests.schema';
-import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm} from '../manage-requests.actions';
+import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm } from '../manage-requests.actions';
 
 const WholesalerPartnerRequests = () => {
     const dispatch = useDispatch();
@@ -176,7 +176,7 @@ const WholesalerPartnerRequests = () => {
                             </Dropdown>
                             <span className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary"></i></span>
                         </nav>
-                        <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
+                        <Modal show={showFaq} onHide={handleCloseFaq} size="xl" centered>
                             <Modal.Header closeButton>
                                 <Modal.Title>Questions You May Have</Modal.Title>
                             </Modal.Header>
@@ -263,7 +263,7 @@ const WholesalerPartnerRequests = () => {
                 </div>
             </div>
 
-            <Modal dialogClassName="modal-customize" size="lg" centered show={showForm} onHide={toggleForm}>
+            <Modal dialogClassName="modal-customize" size="xl" centered show={showForm} onHide={toggleForm}>
                 <Modal.Header closeButton>
                     <Modal.Title>
                         {
@@ -283,7 +283,7 @@ const WholesalerPartnerRequests = () => {
                             procurement_contact: partnerRequestId && Object.keys(request).length ? request.procurement_contact : '',
                             company_codes: [],
                             country_iso2: partnerRequestId && Object.keys(request).length ? request.country_iso2 : '',
-                            language: partnerRequestId && Object.keys(request).length ? request.language : '',
+                            language: partnerRequestId && Object.keys(request).length ? request.language : 'en',
                             partner_type: partnerRequestId && Object.keys(request).length ? request.partner_type : '',
                         }}
                         displayName="PartnerRequestsForm"
@@ -448,7 +448,7 @@ const WholesalerPartnerRequests = () => {
                 <Modal.Body>
                     {requestToDelete !== null ? (
                         <div>
-                            Are you sure you want to remove the following request?
+                            Are you sure you want to remove this request?
                         </div>
                     ) : null}
                 </Modal.Body>

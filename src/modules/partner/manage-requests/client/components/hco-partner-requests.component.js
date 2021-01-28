@@ -8,7 +8,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { partnerRequestSchemaForHcos } from '../manage-requests.schema'
-import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm} from '../manage-requests.actions';
+import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm } from '../manage-requests.actions';
 
 const HcoPartnerRequests = () => {
     const dispatch = useDispatch();
@@ -141,7 +141,7 @@ const HcoPartnerRequests = () => {
                             </Dropdown>
                             <span className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary"></i></span>
                         </nav>
-                        <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
+                        <Modal show={showFaq} onHide={handleCloseFaq} size="xl" centered>
                             <Modal.Header closeButton>
                                 <Modal.Title>Questions You May Have</Modal.Title>
                             </Modal.Header>
@@ -238,11 +238,12 @@ const HcoPartnerRequests = () => {
                             email: partnerRequestId && Object.keys(request).length ? request.email : '',
                             confirm_email: partnerRequestId && Object.keys(request).length ? request.email : '',
                             mdr_id: partnerRequestId && Object.keys(request).length ? request.mdr_id : '',
+                            procurement_contact: partnerRequestId && Object.keys(request).length ? request.procurement_contact : '',
                             workplace_name: partnerRequestId && Object.keys(request).length ? request.workplace_name : '',
                             workplace_type: partnerRequestId && Object.keys(request).length ? request.workplace_type : '',
                             specialty: partnerRequestId && Object.keys(request).length ? request.specialty : '',
                             country_iso2: partnerRequestId && Object.keys(request).length ? request.country_iso2 : '',
-                            language: partnerRequestId && Object.keys(request).length ? request.language : '',
+                            language: partnerRequestId && Object.keys(request).length ? request.language : 'en',
                             uuid: partnerRequestId && Object.keys(request).length ? request.uuid : '',
                         }}
                         displayName="PartnerRequestsForm"
@@ -324,6 +325,13 @@ const HcoPartnerRequests = () => {
                                     </div>
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="procurement_contact">Procurement Contact <span className="text-danger">*</span></label>
+                                            <Field className="form-control" type="text" name="procurement_contact" />
+                                            <div className="invalid-feedback"><ErrorMessage name="procurement_contact" /></div>
+                                        </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="workplace_name">Workplace Name <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="workplace_name" />
                                             <div className="invalid-feedback"><ErrorMessage name="workplace_name" /></div>
@@ -381,7 +389,7 @@ const HcoPartnerRequests = () => {
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="language">Language<span className="text-danger">*</span></label>
                                             <Field className="form-control lang_code" as="select" name="language" className="form-control" id="language">
-                                                <option key="select-language" value="" disabled>--Select Language--</option>
+
                                                 {countryLanguages.map((element, lang_idx) => {
                                                     const { language_name, language_code } = element;
                                                     return language_name && <option key={lang_idx} value={language_code}>{language_name}</option>
@@ -405,7 +413,7 @@ const HcoPartnerRequests = () => {
                 <Modal.Body>
                     {requestToDelete !== null ? (
                         <div>
-                            Are you sure you want to remove the following request?
+                            Are you sure you want to remove this request?
                         </div>
                     ) : null}
                 </Modal.Body>

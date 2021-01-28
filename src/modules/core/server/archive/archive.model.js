@@ -13,7 +13,7 @@ const Archive = sequelize.cdpConnector.define('archive', {
     },
     table_name: {
         type: DataTypes.ENUM,
-        values: ['hcp_profiles', 'partner_requests']
+        values: ['hcp_profiles', 'partner_requests', 'consent_locales']
     },
     object_id: {
         type: DataTypes.UUID
