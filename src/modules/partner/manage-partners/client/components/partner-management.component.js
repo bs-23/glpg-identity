@@ -64,12 +64,12 @@ const PartnerManagement = () => {
         const keyMap = {
             hcp: 'hcp',
             hco: 'hco',
-            vendors: 'vendor',
-            wholesalers: 'wholesaler'
+            vendor: 'vendor',
+            wholesaler: 'wholesaler'
         };
 
         const url = `/api/partner/export/${keyMap[partnerType]}`
-        window.open(url,'_blank');
+        window.open(url, '_blank');
     };
 
     useEffect(() => {
@@ -78,7 +78,7 @@ const PartnerManagement = () => {
         if (partnerType === 'hco') dispatch(getHcoPartners(location.search));
         if (partnerType === 'vendor') dispatch(getVendorsPartners(location.search));
         if (partnerType === 'wholesaler') dispatch(getWholesalePartners(location.search));
-        setDetailType(partnerType === 'vendor' || partnerType === 'wholesaler' ? 'vendor' : partnerType);
+        setDetailType(partnerType);
         setSort({ type: params.get('orderType') || 'asc', value: params.get('orderBy') });
     }, [location]);
 

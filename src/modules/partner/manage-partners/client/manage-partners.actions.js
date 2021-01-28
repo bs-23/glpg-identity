@@ -88,11 +88,13 @@ export function getWholesalePartners(query = '') {
 }
 
 export function getPartnerById(id, type) {
+    let partnerType = null;
+    (type === 'vendor' || type === 'wholesaler') ? partnerType = 'vendor' : partnerType = type;
     return {
         type: Types.GET_PARTNER_BY_ID,
         payload: axios({
             method: 'get',
-            url: `/api/partner/${type}/${id}`
+            url: `/api/partner/${partnerType}/${id}`
         })
     };
 }
