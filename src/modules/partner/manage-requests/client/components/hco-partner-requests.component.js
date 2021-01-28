@@ -131,7 +131,7 @@ const HcoPartnerRequests = () => {
                             </Dropdown>
                             <span className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary"></i></span>
                         </nav>
-                        <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
+                        <Modal show={showFaq} onHide={handleCloseFaq} size="xl" centered>
                             <Modal.Header closeButton>
                                 <Modal.Title>Questions You May Have</Modal.Title>
                             </Modal.Header>
@@ -212,7 +212,7 @@ const HcoPartnerRequests = () => {
                 </div>
             </div>
 
-            <Modal dialogClassName="modal-customize" size="lg" centered show={showForm} onHide={toggleForm}>
+            <Modal dialogClassName="modal-customize" size="xl" centered show={showForm} onHide={toggleForm}>
                 <Modal.Header closeButton>
                     <Modal.Title>
                         {
