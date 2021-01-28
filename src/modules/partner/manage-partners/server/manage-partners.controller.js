@@ -88,22 +88,26 @@ async function getPartnerHcps(req, res) {
 }
 
 async function registrationLookup(req, res) {
-    try {
+    const response = new Response({}, []);
 
-        const request_id = (url.parse(req.url, true).query).request_id;
-        if (!request_id) res.status(500).send('Request Id missing');
+    try {
+        if (!req.query.request_id) response.errors.push(new CustomError('Request Id missing.', 400));
+
+        if (response.errors.length) return res.status(400).send(response);
+
         const partnerRequest = await PartnerRequest.findOne({
-            where: { id: request_id },
+            where: { id: req.query.request_id },
             attributes: ["id", "entity_type", "first_name", "last_name", "email", "procurement_contact", "partner_type", "uuid", "company_codes", "country_iso2", "locale"]
         });
-        res.json(partnerRequest);
 
+        response.data = partnerRequest;
+
+        res.json(response);
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
     }
 }
-
 
 async function getPartnerHcp(req, res) {
     try {
