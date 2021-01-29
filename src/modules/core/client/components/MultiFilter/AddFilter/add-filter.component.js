@@ -50,9 +50,19 @@ const AddFilter = (props) => {
         const valueSchema = (options || {}).schema;
 
         const isIdenticalFilter = filters.some((f, ind) => {
-            const f1 = { fieldName: f.fieldName, operator: f.operator, value: f.value };
-            const f2 = { fieldName: filter.fieldName, operator: filter.operator, value: filter.value };
-            return ind !== index && _.isEqual(f1, f2);
+            if (ind === index) return false;
+
+            const f1 = { fieldName: f.fieldName, operator: f.operator };
+            const f2 = { fieldName: filter.fieldName, operator: filter.operator };
+
+            if (!_.isEqual(f1, f2)) return false;
+
+            const value1 = Array.isArray(f.value) ? f.value : [f.value];
+            const value2 = Array.isArray(filter.value) ? filter.value : [filter.value];
+
+            const areValuesSame = _.difference(value1, value2).concat(_.difference(value2, value1)).length === 0;
+
+            return areValuesSame;
         });
 
         if(isIdenticalFilter) validationError.value = 'This filter is identical to another filter in the list.';
