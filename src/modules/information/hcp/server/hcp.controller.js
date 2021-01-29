@@ -861,9 +861,7 @@ async function confirmConsents(req, res) {
         if (userConsents && userConsents.length) {
             userConsents = userConsents.map(consent => ({
                 ...consent.dataValues,
-                rich_text: consent.rich_text
-                    ? validator.unescape(consent.rich_text)
-                    : consent.rich_text,
+                rich_text: consent.rich_text,
                 consent_confirmed: true
             }));
 
@@ -886,7 +884,6 @@ async function confirmConsents(req, res) {
         res.json(response);
     } catch (err) {
         logger.error(err);
-        console.log(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }

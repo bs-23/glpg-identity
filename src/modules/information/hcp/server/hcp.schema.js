@@ -88,6 +88,10 @@ const resetPassword = object().shape({
     confirm_password: string().required('Missing required parameter.')
 });
 
+const confirmConsents = object().shape({
+    token: string().required('Missing required parameter.')
+});
+
 exports.hcpProfile = hcpProfile;
 exports.registrationLookup = registrationLookup;
 exports.getAccessToken = getAccessToken;
@@ -95,3 +99,4 @@ exports.updateHCPUserConsents = updateHCPUserConsents;
 exports.changePassword = changePassword;
 exports.forgetPassword = forgetPassword;
 exports.resetPassword = resetPassword;
+exports.confirmConsents = confirmConsents;

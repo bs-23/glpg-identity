@@ -1,11 +1,11 @@
 const path = require('path');
 const passport = require('passport');
 const controller = require('./hcp.controller');
-const { hcpProfile, registrationLookup, getAccessToken, updateHCPUserConsents, changePassword, forgetPassword, resetPassword } = require('./hcp.schema');
 const { validate } = require(path.join(process.cwd(), 'src/modules/core/server/middlewares/validator.middleware'));
 const { Modules } = require('../../../core/server/authorization/authorization.constants');
 const { ModuleGuard } = require('../../../core/server/authorization/authorization.middleware');
 const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/platform/user/server/user-authentication.middleware.js'));
+const { hcpProfile, registrationLookup, getAccessToken, updateHCPUserConsents, changePassword, forgetPassword, resetPassword, confirmConsents } = require('./hcp.schema');
 
 module.exports = app => {
     app.route('/api/hcps')
@@ -27,7 +27,7 @@ module.exports = app => {
         .post(passport.authenticate('application-jwt', { session: false }), validate(hcpProfile), controller.createHcpProfile);
 
     app.route('/api/hcp-profiles/confirm-consents')
-        .post(passport.authenticate('application-jwt', { session: false }), controller.confirmConsents);
+        .post(passport.authenticate('application-jwt', { session: false }), validate(confirmConsents), controller.confirmConsents);
 
     app.route('/api/hcp-profiles/forget-password')
         .post(passport.authenticate('application-jwt', { session: false }), validate(forgetPassword), controller.forgetPassword);
