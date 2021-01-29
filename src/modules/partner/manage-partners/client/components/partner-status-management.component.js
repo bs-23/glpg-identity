@@ -68,8 +68,8 @@ const PartnerStatusManage = (props) => {
                 {partner &&
                     <div className="row">
                         <div className="col-12">
-                            <h4 className="mb-3">{props.detailType === 'hcp' || props.detailType === 'hco' ?
-                                partner.first_name + ' ' + partner.last_name : partner.requestor_first_name + ' ' + partner.requestor_last_name}</h4>
+                            <h4 className="mb-3">{props.detailType === 'hcps' || props.detailType === 'hcos' ?
+                                partner.first_name + ' ' + partner.last_name : partner.name}</h4>
 
                             <p>{partner.email}</p>
                         </div>
@@ -106,7 +106,7 @@ const PartnerStatusManage = (props) => {
                             <button disabled className="btn btn-block ml-2 btn-danger mt-4 p-2 font-weight-bold">Reject User</button>
                         </div>
                         <div className="col-12">
-                         <button onClick={() => confirmStatus()} className="btn btn-block btn-secondary mt-4 p-2 font-weight-bold">Confirm and Request SAP Export</button>
+                            <button onClick={() => confirmStatus()} className="btn btn-block btn-secondary mt-4 p-2 font-weight-bold">Confirm and Request SAP Export</button>
                         </div>
                     </div>
                 }
