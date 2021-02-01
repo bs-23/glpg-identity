@@ -19,4 +19,8 @@ module.exports = app => {
 
     app.route('/api/clinical-trials/:id')
         .get(auth, controller.getTrialDetails);
+
+    app.route('/api/clinical-trials/countries')
+        .get(auth, controller.getCountryList)
+        .post(auth, controller.getPostalCodes);
 };
