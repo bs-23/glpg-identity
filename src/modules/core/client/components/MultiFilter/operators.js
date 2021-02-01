@@ -15,8 +15,8 @@ export function getSelectOperators() {
 export function getDateOperators() {
     return [
         { key: 'date-equal', displayText: 'Equals to' },
-        { key: 'less-than', displayText: 'Before' },
-        { key: 'greater-than', displayText: 'After' }
+        { key: 'date-less-than', displayText: 'Before' },
+        { key: 'date-greater-than', displayText: 'After' }
     ]
 }
 
