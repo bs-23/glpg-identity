@@ -107,10 +107,8 @@ const SpecialtyFilter = (props) => {
                     options={getCountryOptions()}
                     className="multiselect"
                     classNamePrefix="multiselect"
-                    menuPosition="fixed"
-                    closeMenuOnScroll={false}
-                    captureMenuScroll={true}
                     value={getSelectedCountry()}
+                    closeMenuOnScroll={false}
                     onChange={({ value }) => {
                         onChange('country', value, index);
                         onChange('value', [], index);
@@ -129,13 +127,12 @@ const SpecialtyFilter = (props) => {
             <React.Fragment>
                 <Select
                     defaultValue={[]}
-                    isMulti={true}
+                    isMulti
                     name={fieldName}
-                    hideSelectedOptions={false}
                     options={currentFilterOption.getOptions({ country: filter.country })}
-                    className="multiselect"
-                    classNamePrefix="multiselect"
-                    menuPosition="fixed"
+                    className="basic-multi-select"
+                    classNamePrefix="select"
+                    menuPortalTarget={document.body}
                     value={selectedSpecialties}
                     onChange={selectedOption => {
                         const value = (selectedOption || []).map(o => o.value);
