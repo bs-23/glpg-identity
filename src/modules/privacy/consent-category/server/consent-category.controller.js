@@ -74,7 +74,7 @@ async function createConsentCategory(req, res) {
             changes: JSON.stringify(data.dataValues)
         });
 
-        clearApplicationCache();
+        // clearApplicationCache();
 
         res.json(data);
     } catch (err) {
@@ -117,7 +117,7 @@ async function updateConsentCategory(req, res) {
             });
         }
 
-        clearApplicationCache();
+        // clearApplicationCache();
 
         res.json(data);
     } catch (err) {

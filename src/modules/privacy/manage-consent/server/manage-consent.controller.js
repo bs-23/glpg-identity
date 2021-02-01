@@ -372,7 +372,7 @@ async function createConsent(req, res) {
             changes: JSON.stringify(consent.dataValues)
         });
 
-        clearApplicationCache();
+        // clearApplicationCache();
 
         res.json(data);
     } catch (err) {
@@ -492,7 +492,7 @@ async function updateCdpConsent(req, res) {
             );
         }
 
-        clearApplicationCache();
+        // clearApplicationCache();
 
         const updatesInConsent = logService.difference(consent.dataValues, consentBeforeUpdate);
 
