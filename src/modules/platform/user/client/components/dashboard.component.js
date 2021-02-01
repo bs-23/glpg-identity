@@ -33,7 +33,7 @@ export default function Dashboard() {
                                         </NavLink>
                                     </li>
                                     <li className="pr-sm-4 pb-4 service__item">
-                                        <NavLink to="/business-partner" className="d-block py-5 px-3 service__link">
+                                        <NavLink to="/" className="d-block py-5 px-3 service__link disabled">
                                             <i className="icon icon-partner d-block service__icon"></i>
                                             Business Partner Management
                                         </NavLink>
@@ -57,7 +57,7 @@ export default function Dashboard() {
                                         </NavLink>
                                     </li>
                                     <li className="pr-sm-4 pb-4 service__item">
-                                        <NavLink to="/clinical-trials" className="d-block py-5 px-3 service__link">
+                                        <NavLink to="/" className="d-block py-5 px-3 service__link disabled">
                                             <i className="icon icon-infield-team d-block service__icon"></i>
                                             Clinical Trials
                                         </NavLink>
