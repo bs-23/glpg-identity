@@ -254,6 +254,7 @@ const HcpPartnerRequests = () => {
                                                 <td>{row.status}</td>
                                                 <td>
                                                     {
+                                                        row.company_codes && row.company_codes.length &&
                                                         row.company_codes.map((companyCode, idx) => (
                                                             <span className="badge badge-pill badge-light mr-1" key={idx}>{companyCode}</span>
                                                         ))
