@@ -35,46 +35,30 @@ async function getToken(req, res) {
         let application;
         const { grant_type, username, password, refresh_token } = req.body;
 
-        if(!grant_type) {
-            response.errors.push(new CustomError('grant_type is missing.', 400, 'grant_type'));
-        }
-
-        if(grant_type && grant_type !== 'password' && grant_type !== 'refresh_token') {
-            response.errors.push(new CustomError('The requested grant_type is not supported.', 400, 'grant_type'));
-        }
-
         if(grant_type === 'password') {
-            if(!username || !password) {
-                response.errors.push(new CustomError('The request is missing required parameters.', 400));
+            application = await Application.findOne({ where: { email: username } });
+
+            if (!application || !application.validPassword(password)) {
+                response.errors.push(new CustomError('Invalid username or password.', 401));
             } else {
-                application = await Application.findOne({ where: { email: username } });
+                const new_refresh_token = generateRefreshToken(application);
+                await application.update({ refresh_token: new_refresh_token });
 
-                if (!application || !application.validPassword(password)) {
-                    response.errors.push(new CustomError('Invalid username or password.', 401));
-                } else {
-                    const new_refresh_token = generateRefreshToken(application);
-                    await application.update({ refresh_token: new_refresh_token });
-
-                    response.data.refresh_token = new_refresh_token;
-                }
+                response.data.refresh_token = new_refresh_token;
             }
         }
 
         if(grant_type === 'refresh_token') {
-            if(!refresh_token) {
-                response.errors.push(new CustomError('refresh_token is missing.', 400, 'refresh_token'));
-            } else {
-                try {
-                    const decoded = jwt.verify(refresh_token, nodecache.getValue('APPLICATION_REFRESH_SECRET'));
-                    application = await Application.findOne({ where: { id: decoded.id } });
+            try {
+                const decoded = jwt.verify(refresh_token, nodecache.getValue('APPLICATION_REFRESH_SECRET'));
+                application = await Application.findOne({ where: { id: decoded.id } });
 
-                    if(application.refresh_token !== refresh_token) {
-                        response.errors.push(new CustomError('The refresh_token is invalid.', 4401));
-                    }
-                } catch(err) {
-                    logger.error(err);
-                    response.errors.push(new CustomError('The refresh_token is expired.', 4401));
+                if(application.refresh_token !== refresh_token) {
+                    response.errors.push(new CustomError('The refresh_token is invalid.', 4401));
                 }
+            } catch(err) {
+                logger.error(err);
+                response.errors.push(new CustomError('The refresh_token is expired.', 4401));
             }
         }
 
@@ -114,30 +98,6 @@ async function saveData(req, res) {
 
     try {
         const {type, data} = req.body;
-
-        if(!type) {
-            response.errors.push(new CustomError('Type is missing.', 400, 'type'));
-        }
-
-        if(!data) {
-            response.errors.push(new CustomError('Data is missing.', 400, 'data'));
-        }
-
-        const isJSON = (str) => {
-            try {
-                return (JSON.parse(str) && !!str);
-            } catch (e) {
-                return false;
-            }
-        }
-
-        if(!isJSON(data)){
-            response.errors.push(new CustomError('Data is not valid.', 400, 'data'));
-        }
-
-        if (response.errors.length) {
-            return res.status(400).send(response);
-        }
 
         const info = await Data.create({
             application_id: req.user.id,
@@ -189,32 +149,36 @@ async function getData(req, res) {
 }
 
 async function clearApplicationCache() {
-    const applications = await Application.findAll({ where: { metadata: { [Op.like]: '%cache_clearing_url%' } } });
-    const maximumConcurrentCalls = 15;
-    const tasks = [];
+    try {
+        const applications = await Application.findAll({ where: { metadata: { [Op.like]: '%cache_clearing_url%' } } });
+        const maximumConcurrentCalls = 15;
+        const tasks = [];
 
-    const generatePostCaller = (url, requestBody) => async.reflect(async () => axios.post(url, requestBody));
+        const generatePostCaller = (url, requestBody) => async.reflect(async () => axios.post(url, requestBody));
 
-    applications.forEach(app => {
-        const token = jwt.sign({
-            id: app.id
-        }, app.auth_secret, {
-            expiresIn: '1h'
+        applications.forEach(app => {
+            const token = jwt.sign({
+                id: app.id
+            }, app.auth_secret, {
+                expiresIn: '1h'
+            });
+
+            const url = JSON.parse(app.metadata).cache_clearing_url;
+
+            if(!url) return;
+
+            const requestBody = { jwt_token: token };
+
+            tasks.push(generatePostCaller(url, requestBody));
         });
 
-        const url = JSON.parse(app.metadata).cache_clearing_url;
-
-        if(!url) return;
-
-        const requestBody = { jwt_token: token };
-
-        tasks.push(generatePostCaller(url, requestBody));
-    });
-
-    async.parallelLimit(tasks, maximumConcurrentCalls, (error, result) => {
-        if (error) logger.error(error);
-        result.forEach(r => r.error && logger.error(r.error));
-    });
+        async.parallelLimit(tasks, maximumConcurrentCalls, (error, result) => {
+            if (error) logger.error(error);
+            result.forEach(r => r.error && logger.error(r.error));
+        });
+    } catch(err) {
+        logger.error(err);
+    }
 }
 
 exports.getToken = getToken;
