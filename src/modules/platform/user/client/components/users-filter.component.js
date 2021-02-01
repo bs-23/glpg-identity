@@ -29,7 +29,9 @@ const UsersFilter = ({ selectedFilterSetting, onHide, onExecute, show, tableName
     let profileOptions;
 
     if(allProfiles) {
-        profileOptions = allProfiles.map(p => ({ value: p.id, displayText: p.title }));
+        profileOptions = allProfiles
+            .filter(p => p.slug !== 'system_admin')
+            .map(p => ({ value: p.id, displayText: p.title }));
     }
 
     const filterOptions = getFilterOptions(userCountryFilterOption, profileOptions);

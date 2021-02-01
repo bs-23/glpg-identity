@@ -225,7 +225,7 @@ export function getDatasyncFilterOptions(userCountries) {
         {
             fieldName: 'lgpostcode',
             valueType: 'text',
-            displayText: 'Post Code',
+            displayText: 'Postal Code',
             operators: operators.getStringOperators(),
             maxLength: 50
         }
