@@ -154,3 +154,86 @@ paths:
                                                         type: string
                                     errors:
                                         $ref: "#/components/schemas/errorBodyInSuccess"
+
+    /api/clinical-trials/countries:
+        get:
+            tags:
+                - clinical-trials
+            summary: get list of countries with iso code
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        type: object
+                                        properties:
+                                            name:
+                                                type: string
+                                            code:
+                                                type: string
+                                                    
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+
+        post:
+            tags:
+                - clinical-trials
+            summary: get list of countries with iso code
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                iso:
+                                    type: string
+                                    description: from the country iso code get available zip codes
+                                    example: DE
+                            required:
+                                - iso
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        type: object
+                                        properties:
+                                            name:
+                                                type: string
+                                                    
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+
+    /api/clinical-trials/conditions:
+        get:
+            tags:
+                - clinical-trials
+            summary: get list of conditions
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        type: object
+                                        properties:
+                                            name:
+                                                type: string
+                                                    
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+
+
+            
