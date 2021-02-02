@@ -147,7 +147,7 @@ export default function ManageFaq() {
                         </div>
 
                         {faqData.faq && faqData.faq.length > 0 && serviceTopics && serviceTopics.length > 0 &&
-                            <div className="table-responsive shadow-sm bg-white mb-3">
+                            <div className="table-responsive shadow-sm bg-white mb-3 cdp-table__responsive-wrapper">
                             <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
