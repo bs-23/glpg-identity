@@ -668,7 +668,7 @@ async function exportApprovedPartners(req, res) {
             }
         });
 
-        if (!partners) return res.status(404).send(`No ${entityType} partners found`);
+        if (!partners || !partners.length) return res.status(404).send(`No approved ${entityType} partners found.`);
 
         const data = getExportData(entityType, partners);
 
@@ -682,9 +682,8 @@ async function exportApprovedPartners(req, res) {
         const sheetName = sheetNames[entityType];
         const fileBuffer = ExportService.exportDataToExcel(data, sheetName);
 
-        const fileName = `${sheetNames[entityType].replace(' ', '_')}_${getFormattedTimestamp()}.xlsx`;
         res.writeHead(200, {
-            "Content-Disposition": "attachment;filename=" + fileName,
+            'Content-Disposition': `attachment;filename=${sheetNames[entityType].replace(' ', '_')}.xlsx`,
             'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         });
         res.end(fileBuffer);
@@ -692,14 +691,6 @@ async function exportApprovedPartners(req, res) {
         console.error(error);
         res.status(500).send('Internal server error');
     }
-}
-
-function getFormattedTimestamp() {
-    const pad2 = (n) => (n < 10 ? '0' + n : n);
-
-    var date = new Date();
-    const timestamp = date.getFullYear().toString() + pad2(date.getMonth() + 1) + pad2(date.getDate()) + pad2(date.getHours()) + pad2(date.getMinutes()) + pad2(date.getSeconds());
-    return timestamp;
 }
 
 exports.getPartnerHcps = getPartnerHcps;

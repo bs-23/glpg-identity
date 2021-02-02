@@ -1,16 +1,19 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from 'react';
 import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import { Faq } from '../../../../platform';
 import Modal from 'react-bootstrap/Modal';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { useSelector, useDispatch } from 'react-redux';
+import axios from 'axios';
+import fileDownload from 'js-file-download';
+import { useToasts } from 'react-toast-notifications';
 import { getHcpPartners, getHcoPartners, getVendorsPartners, getWholesalePartners } from '../manage-partners.actions';
 import PartnerDetails from './partner-details.component';
 import PartnerStatusManage from './partner-status-management.component';
 import { getAllCountries } from '../../../../core/client/country/country.actions';
 
 const PartnerManagement = () => {
-
+    const { addToast } = useToasts();
     const [detailShow, setDetailShow] = useState(false);
     const [statusShow, setStatusShow] = useState(false);
     const [detailType, setDetailType] = useState(null);
@@ -62,8 +65,34 @@ const PartnerManagement = () => {
     const exportApprovedList = () => {
         const partnerType = window.location.pathname.split('/').pop();
 
-        const url = `/api/partners/export/${partnerType}`
-        window.open(url, '_blank');
+        const fileNames = {
+            hcps: 'HCP_Partners',
+            hcos: 'HCO_Partners',
+            vendors: 'Vendor_Partners',
+            wholesalers: 'Wholesaler_Partners'
+        };
+
+        axios.get(`/api/partners/export/${partnerType}`, {
+            responseType: 'blob',
+        }).then(res => {
+            const pad2 = (n) => (n < 10 ? '0' + n : n);
+
+            var date = new Date();
+            const timestamp = date.getFullYear().toString() + pad2(date.getMonth() + 1) + pad2(date.getDate()) + pad2(date.getHours()) + pad2(date.getMinutes()) + pad2(date.getSeconds());
+
+            fileDownload(res.data, `${fileNames[partnerType]}_${timestamp}.xlsx`);
+        }).catch(error => {
+            /**
+             * the error response is a blob because of the responseType option.
+             * text() converts it back to string
+             */
+            error.response.data.text().then(text => {
+                addToast(text, {
+                    appearance: 'error',
+                    autoDismiss: true
+                });
+            });
+        });
     };
 
     useEffect(() => {
