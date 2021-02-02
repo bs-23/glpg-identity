@@ -19,7 +19,7 @@ const getToken = object().shape({
     refresh_token: string().when('grant_type', {
         is: 'refresh_token',
         then: string().required('refresh_token is missing.'),
-        otherwise: string()
+        otherwise: string().nullable()
     })
 });
 

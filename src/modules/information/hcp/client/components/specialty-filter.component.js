@@ -109,6 +109,7 @@ const SpecialtyFilter = (props) => {
                     classNamePrefix="multiselect"
                     value={getSelectedCountry()}
                     closeMenuOnScroll={false}
+                    menuPortalTarget={document.body}
                     onChange={({ value }) => {
                         onChange('country', value, index);
                         onChange('value', [], index);
