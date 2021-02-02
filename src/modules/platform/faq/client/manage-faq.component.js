@@ -120,7 +120,7 @@ export default function ManageFaq() {
 
                 <div className="row">
                     <div className="col-12">
-                        <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
+                        <div className="d-sm-flex justify-content-between align-items-center mb-3">
                             <h4 class="cdp-text-primary font-weight-bold mb-3 mb-sm-0">FAQ List</h4>
                             {serviceTopics && serviceTopics.length > 0 && faqData.metadata &&
                                 <div class="d-flex justify-content-between align-items-center">
@@ -147,8 +147,8 @@ export default function ManageFaq() {
                         </div>
 
                         {faqData.faq && faqData.faq.length > 0 && serviceTopics && serviceTopics.length > 0 &&
-                            <div className="table-responsive shadow-sm bg-white">
-                                <table className="table table-hover table-sm mb-0 cdp-table">
+                            <div className="table-responsive shadow-sm bg-white mb-3">
+                            <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
                                             <th width="25%"><span className={sort.value === 'question' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.topic, 'question')}>Question<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
@@ -161,15 +161,15 @@ export default function ManageFaq() {
                                     <tbody className="cdp-table__body bg-white">
                                         {faqData.faq.map((row, index) => (
                                             <tr key={index}>
-                                                <td className="text-break">{row.question}</td>
-                                                <td className="text-break cdp-link-secondary">{parse(parse(row.answer))}</td>
-                                                <td className="text-break">
+                                                <td data-for="Question" className="text-break">{row.question}</td>
+                                                <td data-for="Answer" className="text-break cdp-link-secondary">{parse(parse(row.answer))}</td>
+                                                <td data-for="Topics" className="text-break">
                                                     {row.topics && row.topics.map((item, key) => (
                                                         (serviceTopics.find(x => x.slug === item).title) + (key < row.topics.length - 1 ? ', ' : '')))}
 
                                                 </td>
-                                                <td className="text-break">{row.createdBy}</td>
-                                                <td><Dropdown className="ml-auto dropdown-customize">
+                                                <td data-for="Created By" className="text-break">{row.createdBy}</td>
+                                                <td data-for="Action"><Dropdown className="ml-auto dropdown-customize">
                                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu>

@@ -268,7 +268,7 @@ export default function Users() {
                 </div>
                 <div className="row">
                     <div className="col-12">
-                        <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
+                        <div className="d-sm-flex justify-content-between align-items-center mb-3">
                             <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">CDP User List</h4>
                             <div className="d-flex justify-content-between align-items-center">
                                 {/* <Dropdown className="ml-auto dropdown-customize">
@@ -313,8 +313,8 @@ export default function Users() {
 
                         {userdata['users'] && userdata['users'].length > 0 &&
                             <React.Fragment>
-                                <div className="table-responsive shadow-sm bg-white">
-                                    <table className="table table-hover table-sm mb-0 cdp-table">
+                            <div className="table-responsive shadow-sm bg-white mb-3">
+                                <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
                                         <thead className="cdp-bg-primary text-white cdp-table__header">
                                             <tr>
                                                 <th width="12%"><span className={sort.value === 'first_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'first_name')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
@@ -331,16 +331,16 @@ export default function Users() {
                                         <tbody className="cdp-table__body bg-white">
                                             {userdata.users.map(row => (
                                                 <tr key={row.id}>
-                                                    <td className="text-break">{row.first_name}</td>
-                                                    <td className="text-break">{row.last_name}</td>
-                                                    <td className="text-break">{row.email}</td>
-                                                    <td className="text-capitalize">{row.status}</td>
-                                                    <td>{sortCountries(extractUserCountries(row))}</td>
-                                                    <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
-                                                    <td>{(new Date(row.expiry_date)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
-                                                    <td>{row.createdBy}</td>
-                                                    <td>
-                                                        <NavLink to={`/platform/users/${row.id}`} className="btn cdp-btn-outline-primary btn-sm"><i class="icon icon-user mr-2"></i>Profile</NavLink>
+                                                    <td data-for="First Name" className="text-break">{row.first_name}</td>
+                                                    <td data-for="Last Name" className="text-break">{row.last_name}</td>
+                                                    <td data-for="Email" className="text-break">{row.email}</td>
+                                                    <td data-for="Status" className="text-capitalize">{row.status}</td>
+                                                    <td data-for="Countries">{sortCountries(extractUserCountries(row))}</td>
+                                                    <td data-for="Creation Date">{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
+                                                    <td data-for="Expiry Date">{(new Date(row.expiry_date)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
+                                                    <td data-for="Created By">{row.createdBy}</td>
+                                                    <td data-for="Action">
+                                                        <NavLink to={`/platform/users/${row.id}`} className="btn cdp-btn-outline-primary btn-xs-block btn-sm"><i class="icon icon-user mr-2"></i>Profile</NavLink>
                                                     </td>
                                                 </tr>
                                             ))}

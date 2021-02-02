@@ -100,7 +100,7 @@ export default function ManagePermissionSets() {
                 </div>
                 <div className="row">
                     <div className="col-12 col-sm-12 pt-3">
-                        <div className="d-flex justify-content-between align-items-center mb-3 mt-4">
+                        <div className="d-flex justify-content-between align-items-center mb-3">
                             <h4 className="cdp-text-primary font-weight-bold mb-0">Manage Permission Sets</h4>
                             <button className="btn cdp-btn-secondary text-white ml-auto " onClick={() => { setPermissionModalShow(true) }}>
                                 <i className="icon icon-plus pr-1"></i> Add New Permission Set
@@ -108,8 +108,8 @@ export default function ManagePermissionSets() {
                         </div>
 
                         {permissionSets.length > 0 &&
-                            <div className="table-responsive shadow-sm bg-white">
-                                <table className="table table-hover table-sm mb-0 cdp-table">
+                            <div className="table-responsive shadow-sm bg-white mb-3">
+                            <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
                                             <th className="py-2" width="15%">Title</th>
@@ -124,13 +124,13 @@ export default function ManagePermissionSets() {
                                     <tbody className="cdp-table__body bg-white">
                                         {permissionSets.map(row => (
                                             <tr key={row.id}>
-                                                <td>{row.title}</td>
-                                                <td className="text-capitalize">{row.type}</td>
-                                                <td>{row.description}</td>
-                                                <td>{getApplicationNames(row)}</td>
-                                                <td>{getCountryNamesFromCodes(row.countries)}</td>
-                                                <td>{getServiceCategoryNames(row)}</td>
-                                                <td>
+                                                <td data-for="Title">{row.title}</td>
+                                                <td data-for="Type" className="text-capitalize">{row.type}</td>
+                                                <td data-for="Description">{row.description}</td>
+                                                <td data-for="Applications">{getApplicationNames(row)}</td>
+                                                <td data-for="Countries">{getCountryNamesFromCodes(row.countries)}</td>
+                                                <td data-for="Service Categories">{getServiceCategoryNames(row)}</td>
+                                                <td data-for="Action">
                                                     <Dropdown className="ml-auto dropdown-customize">
                                                         <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
                                                         </Dropdown.Toggle>

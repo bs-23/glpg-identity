@@ -210,12 +210,71 @@
             top: 1px;
         }
     }
+
+    @media (max-width: $screen-phone) {
+        &__responsive {
+            thead {
+                display: none;
+            }
+
+            tbody, td, tr {
+                display: block;
+            }
+
+            tr {
+                border: 1px solid #ccc;
+                margin-bottom: 5px;
+
+                &:nth-child(odd) {
+                    background: #DEE1E6;
+                }
+            }
+
+            td {
+                /* Behave  like a "row" */
+                border: none;
+                border-bottom: 1px solid #eee;
+                position: relative;
+                padding-left: 40% !important;
+            }
+
+            td:before {
+                /* Now like a table header */
+                position: absolute;
+                /* Top/left values mimic padding */
+                top: 6px;
+                left: 6px;
+                width: 55%;
+                padding-right: 10px;
+                white-space: nowrap;
+            }
+
+            td::before {
+                content: "" attr(data-for) "";
+            }
+
+            .btn-xs-block {
+                width: 100%;
+            }
+        }
+    }
+
+    @media (min-width: $screen-phone + 1) {
+        &__responsive {
+            thead {
+                display: block !important;
+            }
+        }
+    }
 }
+
 @media (min-width: $screen-desktop) {
     .table-responsive {
         overflow: visible;
     }
 }
+
+
 
 .search-in-okla {
     visibility: hidden;

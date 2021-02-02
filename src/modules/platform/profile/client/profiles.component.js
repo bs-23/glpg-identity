@@ -218,7 +218,7 @@ export default function ManageProfiles() {
                 </div>
                 <div className="row">
                     <div className="col-12 col-sm-12 pt-3">
-                        <div className="d-flex justify-content-between align-items-center mb-3 mt-4">
+                        <div className="d-flex justify-content-between align-items-center mb-3">
                             <h4 className="cdp-text-primary font-weight-bold mb-0">Manage Profiles</h4>
                             <button hidden disabled className="btn cdp-btn-secondary text-white ml-auto " onClick={() => setModalShow({ ...modalShow, createProfile: true })}>
                                 <i className="icon icon-plus pr-1"></i> Add New Profile
@@ -226,8 +226,8 @@ export default function ManageProfiles() {
                         </div>
 
                         {profiles.length > 0 &&
-                            <div className="table-responsive shadow-sm bg-white">
-                                <table className="table table-hover table-sm mb-0 cdp-table">
+                            <div className="table-responsive shadow-sm bg-white mb-3">
+                            <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
                                             <th width="20%" className="py-2">Title</th>
@@ -240,11 +240,11 @@ export default function ManageProfiles() {
                                     <tbody className="cdp-table__body bg-white">
                                         {profiles.map(row => (
                                             <tr key={row.id}>
-                                                <td>{row.title}</td>
-                                                <td className="text-capitalize">{row.type}</td>
-                                                <td>{row.description}</td>
-                                                <td>{extractPermissionSetNames(row)}</td>
-                                                <td><button className="btn cdp-btn-outline-primary btn-sm" onClick={() => handlepProfileEditClick(row)}> <i className="icon icon-edit-pencil pr-2"></i>Edit</button></td>
+                                                <td data-for="Title">{row.title}</td>
+                                                <td data-for="Type" className="text-capitalize">{row.type}</td>
+                                                <td data-for="Description">{row.description}</td>
+                                                <td data-for="Permission Sets">{extractPermissionSetNames(row)}</td>
+                                                <td data-for="Action"><button className="btn cdp-btn-outline-primary btn-xs-block btn-sm" onClick={() => handlepProfileEditClick(row)}> <i className="icon icon-edit-pencil pr-2"></i>Edit</button></td>
                                             </tr>
                                         ))}
                                     </tbody>
