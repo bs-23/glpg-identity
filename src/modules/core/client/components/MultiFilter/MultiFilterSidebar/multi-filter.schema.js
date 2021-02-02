@@ -7,7 +7,7 @@ export const multiFilterSchema = object().shape({
             is: 'save_existing',
             then: string()
                 .transform(value => value.trim())
-                .max(50, 'This field must be at most 50 characters long')
+                .max(30, 'This field must be at most 30 characters long')
                 .required('This field must not be empty'),
             otherwise: string()
         }),
@@ -19,7 +19,7 @@ export const multiFilterSchema = object().shape({
             is: 'save_as_new',
             then: string()
                 .transform(value => value.trim())
-                .max(50, 'This field must be at most 50 characters long')
+                .max(30, 'This field must be at most 30 characters long')
                 .required('This field must not be empty'),
             otherwise: string()
         }),
