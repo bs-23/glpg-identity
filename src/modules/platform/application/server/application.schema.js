@@ -9,12 +9,12 @@ const getToken = object().shape({
     username: string().when('grant_type', {
         is: 'password',
         then: string().required('The request is missing required parameters.'),
-        otherwise: string()
+        otherwise: string().nullable()
     }),
     password: string().when('grant_type', {
         is: 'password',
         then: string().required('The request is missing required parameters.'),
-        otherwise: string()
+        otherwise: string().nullable()
     }),
     refresh_token: string().when('grant_type', {
         is: 'refresh_token',
