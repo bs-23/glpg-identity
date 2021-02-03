@@ -146,6 +146,8 @@ export default function Users() {
     const urlChange = (pageNo, country_codbase, orderColumn, pageChange = false) => {
         let orderType = params.get('orderType');
         const orderBy = params.get('orderBy');
+        const filterId = params.get('filter');
+
         const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
         const codbase = country_codbase ? country_codbase : params.get('codbase');
 
@@ -161,12 +163,19 @@ export default function Users() {
                 : orderType = 'asc';
         }
 
-        const url = `?page=${page}`
-            + (codbase && codbase !== 'null' ? `&codbase=${codbase}` : '')
-            + (orderColumn && orderColumn !== 'null' ? `&orderBy=${orderColumn}` : '')
-            + (orderColumn && orderType && orderType !== 'null' ? `&orderType=${orderType}` : '');
+        const search = new URLSearchParams();
 
-        history.push(location.pathname + url);
+        page && search.append('page', page);
+        codbase && codbase !== 'null' && search.append('codbase', codbase);
+        orderColumn && orderColumn !== 'null' && search.append('orderBy', orderColumn);
+        orderColumn && orderType && orderType !== 'null' && search.append('orderType', orderType);
+        filterId && search.append('filter', filterId);
+
+        const url = location.pathname + search
+            ? `?${search.toString()}`
+            : '';
+
+        history.push(url);
     };
 
 
