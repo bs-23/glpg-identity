@@ -8,8 +8,7 @@ import { BrowserRouter } from 'react-router-dom';
 import MockAdapter from 'axios-mock-adapter'
 import { ToastProvider } from 'react-toast-notifications';
 import store from '../../src/modules/core/client/store.js';
-import ConsentPerformanceReport from '../../src/modules/privacy/client/components/cdp-consent-performance-report.component';
-import { getVeevaConsentReport } from '../../src/modules/privacy/client/consent.actions';
+import { CDPConsentPermanceReport } from '../../src/modules/privacy/';
 import { act } from 'react-dom/test-utils';
 import { screen } from '@testing-library/dom'
 import { login } from '../../src/modules/platform/user/client/user.actions';
@@ -138,7 +137,7 @@ describe('Cdp consent performance report component', () => {
         <BrowserRouter>
             <ToastProvider>
                 <Provider store={store}>
-                    <ConsentPerformanceReport/>
+                    <CDPConsentPermanceReport/>
                 </Provider>
             </ToastProvider>
         </BrowserRouter>

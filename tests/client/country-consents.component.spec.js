@@ -8,7 +8,7 @@ import { BrowserRouter } from 'react-router-dom';
 import MockAdapter from 'axios-mock-adapter'
 import { ToastProvider } from 'react-toast-notifications';
 import store from '../../src/modules/core/client/store.js';
-import CountryConsents from '../../src/modules/privacy/client/components/country-consents.component';
+import { CountryConsent } from '../../src/modules/privacy';
 import { act } from 'react-dom/test-utils';
 import { screen } from '@testing-library/dom'
 import { login } from '../../src/modules/platform/user/client/user.actions';
@@ -125,7 +125,7 @@ describe('Country consents component', () => {
         <BrowserRouter>
             <ToastProvider>
                 <Provider store={store}>
-                    <CountryConsents/>
+                    <CountryConsent/>
                 </Provider>
             </ToastProvider>
         </BrowserRouter>
