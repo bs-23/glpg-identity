@@ -5,6 +5,8 @@ phases:
             - echo install step.but nothing to install..
     pre_build:
         commands:
+            - echo logging in to docker hub...
+            - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
             - echo logging in to AWS ECR....
             - $(aws ecr get-login --no-include-email --region ${AWS_DEFAULT_REGION})
             - REPOSITORY_URI=$(aws sts get-caller-identity --query 'Account' --output text).dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${REPO_NAME}
