@@ -766,7 +766,7 @@ async function createHcpProfile(req, res) {
                     consent_id: consentDetails.id,
                     consent_confirmed: consentCountry.opt_type === 'double-opt-in' ? false : true,
                     opt_type: consentCountry.opt_type,
-                    rich_text: consentLocale.rich_text,
+                    rich_text: validator.unescape(consentLocale.rich_text),
                     consent_locale: richTextLocale,
                     created_by: req.user.id,
                     updated_by: req.user.id

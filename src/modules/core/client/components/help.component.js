@@ -20,8 +20,14 @@ export default function Help() {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if (faq.faq && faq.faq.length > 0 && faqTopics) {
-            setFaqData(faqMapping(faqTopics, faq.faq));
+
+        if (faqTopics) {
+            if (faq.faq && faq.faq.length > 0) {
+                setFaqData(faqMapping(faqTopics, faq.faq));
+            } else {
+                setFaqData(faqMapping(faqTopics, null));
+            }
+
         }
 
     }, [faq]);
@@ -41,7 +47,7 @@ export default function Help() {
             const subcategories = topics.filter(x => x.category === element);
             subcategories.forEach(item => {
                 delete item.category;
-                item.faq = faqs.filter(x => x.topics.indexOf(item.slug) >= 0);
+                if (faqs) item.faq = faqs.filter(x => x.topics.indexOf(item.slug) >= 0);
             });
             faqWithTopics.push({
                 category: element,
@@ -74,7 +80,7 @@ export default function Help() {
                             </nav>
                         </div>
                     </div>
-                    {faq.faq && faq.faq.length > 0 && faqData && <div className="container px-0 py-2">
+                    {faqData && <div className="container px-0 py-2">
                         <div className="row">
 
                             <div className="col-12"><h3 className="cdp-text-primary py-3">Topics</h3></div>
@@ -87,7 +93,7 @@ export default function Help() {
                                                 <div className="d-flex align-items-center">
                                                     <i className={`${topics.icon} ${id === 0 ? 'cdp-text-secondary' : 'cdp-text-primary'} faq__list-group-icon`}></i>
                                                     <span className="pr-3">{topics.title}</span>
-                                                    <span className="badge badge-light badge-pill cdp-text-primary">{topics.faq.length}</span>
+                                                    <span className="badge badge-light badge-pill cdp-text-primary">{topics.faq ? topics.faq.length : 0}</span>
                                                 </div>
                                                 <i className="fas fa-external-link-square-alt cdp-text-primary faq__list-group--modal-open" onClick={() => handleShow(topics.faq)}></i>
                                             </li>
@@ -105,7 +111,7 @@ export default function Help() {
                                                 <div className="d-flex align-items-center">
                                                     <i className={`${topics.icon} ${id === 0 ? 'cdp-text-secondary' : 'cdp-text-primary'} faq__list-group-icon`}></i>
                                                     <span className="pr-3">{topics.title}</span>
-                                                    <span className="badge badge-light badge-pill cdp-text-primary">{topics.faq.length}</span>
+                                                    <span className="badge badge-light badge-pill cdp-text-primary">{topics.faq ? topics.faq.length : 0}</span>
                                                 </div>
                                                 <i className="fas fa-external-link-square-alt cdp-text-primary faq__list-group--modal-open" onClick={() => handleShow(topics.faq)}></i>
                                             </li>
@@ -123,7 +129,7 @@ export default function Help() {
                                 <Modal.Body className="faq">
                                     <Accordion defaultActiveKey="0" className="faq__body">
                                         {
-                                            selectedfaq.map((item, index) => (
+                                            selectedfaq && selectedfaq.map((item, index) => (
                                                 <Card key={index}>
                                                     <Accordion.Collapse eventKey={index + ""}>
                                                         <Card.Body>{parse(parse(item.answer))}</Card.Body>
@@ -135,7 +141,7 @@ export default function Help() {
                                                 </Card>
                                             ))
                                         }
-                                        {selectedfaq.length === 0 ?
+                                        {!selectedfaq || (selectedfaq && selectedfaq.length === 0) ?
                                             <div className="bg-white text-center py-3 px-2 border-0">
                                                 <i className="icon icon-help icon-3x cdp-text-secondary"></i>
                                                 <h5 className="cdp-text-primary pt-4">No data found related to this service category</h5>
