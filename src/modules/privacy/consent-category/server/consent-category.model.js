@@ -21,10 +21,7 @@ const ConsentCategory = sequelize.cdpConnector.define('consent_categories', {
     slug: {
         unique: true,
         allowNull: false,
-        type: DataTypes.STRING,
-        set() {
-            this.setDataValue('slug', convertToSlug(this.title));
-        }
+        type: DataTypes.STRING
     },
     created_by: {
         type: DataTypes.UUID
