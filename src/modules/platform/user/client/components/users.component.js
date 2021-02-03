@@ -268,16 +268,16 @@ export default function Users() {
                 </div>
                 <div className="row">
                     <div className="col-12">
-                        <div className="d-sm-flex justify-content-between align-items-center mb-3">
-                            <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">CDP User List</h4>
+                        <div className="d-flex justify-content-between align-items-center my-3">
+                            <h4 className="cdp-text-primary font-weight-bold mb-0 mb-sm-0">CDP User List</h4>
                             <div className="d-flex justify-content-between align-items-center">
                                 <button
                                     className={`btn cdp-btn-outline-primary ${isFilterEnabled ? 'multifilter_enabled' : ''}`}
                                     onClick={() => setShowFilter(true)}
                                 >
-                                    <i className={`fas fa-filter  ${isFilterEnabled ? '' : 'mr-2'}`}></i>
-                                    <i className={`fas fa-database ${isFilterEnabled ? 'd-inline-block filter__sub-icon mr-1' : 'd-none'}`}></i>
-                                    <span className="d-none d-sm-inline-block">Filter</span>
+                                    <i className={`fas fa-filter  ${isFilterEnabled ? '' : ''}`}></i>
+                                    <i className={`fas fa-database ${isFilterEnabled ? 'd-inline-block filter__sub-icon' : 'd-none'}`}></i>
+                                    <span className="d-none d-sm-inline-block ml-2">Filter</span>
                                 </button>
                                 {
                                     isFilterEnabled &&
