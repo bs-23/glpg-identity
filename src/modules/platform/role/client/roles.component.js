@@ -223,7 +223,7 @@ export default function ManageRoles() {
                         <div className="d-flex justify-content-between align-items-center mb-3">
                             <h4 className="cdp-text-primary font-weight-bold mb-0">Define Roles</h4>
                             <button className="btn cdp-btn-secondary text-white ml-auto " onClick={() => setModalShow({ ...modalShow, createRole: true })}>
-                                <i className="icon icon-plus pr-1"></i> Add New Role
+                                <i className="icon icon-plus"></i> <span className="d-none d-sm-inline-block pl-1">Add New Role</span>
                             </button>
                         </div>
 

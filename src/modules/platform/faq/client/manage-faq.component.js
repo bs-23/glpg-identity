@@ -120,8 +120,8 @@ export default function ManageFaq() {
 
                 <div className="row">
                     <div className="col-12">
-                        <div className="d-sm-flex justify-content-between align-items-center mb-3">
-                            <h4 class="cdp-text-primary font-weight-bold mb-3 mb-sm-0">FAQ List</h4>
+                        <div className="d-flex justify-content-between align-items-center my-3">
+                            <h4 class="cdp-text-primary font-weight-bold mb-0 mb-sm-0">FAQ List</h4>
                             {serviceTopics && serviceTopics.length > 0 && faqData.metadata &&
                                 <div class="d-flex justify-content-between align-items-center">
                                     <Dropdown className="ml-auto dropdown-customize">
@@ -132,15 +132,15 @@ export default function ManageFaq() {
                                             {serviceTopics.length > 0 && faqData.metadata.topic && <Dropdown.Item onClick={() => urlChange(1, 'null', params.get('orderBy'))}>All</Dropdown.Item>
                                             }
                                             {
-                                                serviceTopics.length > 0 && serviceTopics.map((item, index) => (
-                                                    item.title !== faqData.metadata.topic && <Dropdown.Item key={index} onClick={() => urlChange(1, item.slug, params.get('orderBy'))}>{item.title}</Dropdown.Item>
+                                            serviceTopics.length > 0 && serviceTopics.map((item, index) => (
+                                                item.title !== faqData.metadata.topic && <Dropdown.Item className="text-break" key={index} onClick={() => urlChange(1, item.slug, params.get('orderBy'))}>{item.title}</Dropdown.Item>
                                                 ))
                                             }
                                         </Dropdown.Menu>
                                     </Dropdown>
 
                                     <button onClick={() => { setShow(true); setEditMode(false); setEditData(null); }} className="btn cdp-btn-secondary text-white ml-2">
-                                        <i className="icon icon-plus pr-1"></i> Add New FAQ
+                                    <i className="icon icon-plus"></i> <span className="d-none d-sm-inline-block pl-1">Add New FAQ</span>
                                     </button>
                                 </div>
                             }

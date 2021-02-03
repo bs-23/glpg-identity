@@ -103,7 +103,7 @@ export default function ManagePermissionSets() {
                         <div className="d-flex justify-content-between align-items-center mb-3">
                             <h4 className="cdp-text-primary font-weight-bold mb-0">Manage Permission Sets</h4>
                             <button className="btn cdp-btn-secondary text-white ml-auto " onClick={() => { setPermissionModalShow(true) }}>
-                                <i className="icon icon-plus pr-1"></i> Add New Permission Set
+                                <i className="icon icon-plus"></i> <span className="d-none d-sm-inline-block pl-1">Add New Permission Set</span>
                             </button>
                         </div>
 
@@ -132,7 +132,7 @@ export default function ManagePermissionSets() {
                                                 <td data-for="Service Categories">{getServiceCategoryNames(row)}</td>
                                                 <td data-for="Action">
                                                     <Dropdown className="ml-auto dropdown-customize">
-                                                        <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
+                                                        <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-2 px-sm-1">
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
                                                             <LinkContainer to="#"><Dropdown.Item disabled={row.type === 'standard'} onClick={() => handlePermissionSetEditClick(row)}>Edit</Dropdown.Item></LinkContainer>
