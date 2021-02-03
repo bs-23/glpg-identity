@@ -601,7 +601,7 @@ async function getUsers(req, res) {
                 'id',
                 'email',
             ],
-            group: ['users.id'],
+            group: ['users.id', 'createdByUser.first_name', 'createdByUser.last_name'],
             having: literal(
                 `
                 ARRAY_CONCAT_AGG("userRoles->role->role_ps->ps"."countries") && '${codbase ? countries_ignorecase_for_codbase_formatted : user_countries_ignorecase_formatted}'
