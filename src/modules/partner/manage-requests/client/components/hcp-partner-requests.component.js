@@ -46,6 +46,10 @@ const HcpPartnerRequests = () => {
         return country && country.countryname;
     };
 
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+
     const deleteRequest = (id) => {
         dispatch(deletePartnerRequest(id)).then(() => {
             addToast('Request Deleted', {
@@ -416,7 +420,10 @@ const HcpPartnerRequests = () => {
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="uuid">UUID <span className="text-danger">*</span></label>
-                                            <Field className="form-control" type="text" name="uuid" />
+                                            <div className="d-flex align-items-center">
+                                                <Field className="form-control" type="text" name="uuid" />
+                                                <i title="OKLA Search" type="button" className="fas fa-search ml-2 cdp-text-primary" onClick={handleShow}></i>
+                                            </div>
                                             <div className="invalid-feedback"><ErrorMessage name="uuid" /></div>
                                         </div>
                                     </div>
@@ -514,6 +521,14 @@ const HcpPartnerRequests = () => {
                             </Form>
                         )}
                     </Formik>
+                </Modal.Body>
+            </Modal>
+            <Modal centered size="xl" animation show={show} onHide={handleClose} backdrop="static" keyboard={false}>
+                <Modal.Header closeButton>
+                    <Modal.Title className="modal-title_small">OKLA Search</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                   Hello this is OKLA search
                 </Modal.Body>
             </Modal>
 

@@ -23,7 +23,7 @@ export default function Dashboard() {
                                     <li className="pr-sm-4 pb-4 service__item">
                                         <NavLink to="/platform" className="d-block py-5 px-3 service__link">
                                             <i className="icon icon-customer-data-platform d-block service__icon"></i>
-                                          Management of Customer Data Platform
+                                            Management of Customer Data Platform
                                         </NavLink>
                                     </li>
                                     <li className="pr-sm-4 pb-4 service__item">
@@ -33,7 +33,7 @@ export default function Dashboard() {
                                         </NavLink>
                                     </li>
                                     <li className="pr-sm-4 pb-4 service__item">
-                                        <NavLink to="/" className="d-block py-5 px-3 service__link disabled">
+                                        <NavLink to="/business-partner" className="d-block py-5 px-3 service__link">
                                             <i className="icon icon-partner d-block service__icon"></i>
                                             Business Partner Management
                                         </NavLink>
@@ -47,7 +47,7 @@ export default function Dashboard() {
                                     <li className="pr-sm-4 pb-4 service__item">
                                         <NavLink to="/" className="d-block py-5 px-3 service__link disabled">
                                             <i className="icon icon-market-research d-block service__icon"></i>
-                                           Market Research
+                                            Market Research
                                         </NavLink>
                                     </li>
                                     <li className="pr-sm-4 pb-4 service__item">
@@ -66,8 +66,8 @@ export default function Dashboard() {
                             </div>
                         </div>
                     </div>
-                   <div className="col-12 col-lg-5 col-xl-4 py-3 app__content-panel-right">
-                      <Inbox />
+                    <div className="col-12 col-lg-5 col-xl-4 py-3 app__content-panel-right">
+                        <Inbox />
                         <Faq topic="general-information" />
                     </div>
                 </div>
