@@ -14,7 +14,8 @@ module.exports = app => {
         .post(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), validate(partnerHcpSchema), controller.createPartnerHcp);
 
     app.route('/api/partners/hcps/:id')
-        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getPartnerHcp);
+        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getPartnerHcp)
+        .put(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.updatePartnerHcp);
 
     app.route('/api/partners/hcos')
         .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getPartnerHcos)

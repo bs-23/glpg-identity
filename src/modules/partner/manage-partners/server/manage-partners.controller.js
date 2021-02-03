@@ -206,6 +206,60 @@ async function createPartnerHcp(req, res) {
     }
 }
 
+async function updatePartnerHcp(req, res) {
+    const response = new Response({}, []);
+    const entityType = 'hcp';
+    try {
+        const files = req.files;
+
+        const { first_name, last_name, address, city, post_code, email, telephone,
+            type, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
+            iban, bank_name, bank_account_no, currency } = req.body;
+
+        if (response.errors.length) return res.status(400).send(response);
+
+        const partner = await Partner.findOne({
+            where: {
+                id: req.param.request_id,
+                entity_type: entityType
+            }
+        });
+
+        if (!partner) {
+            response.errors.push(new CustomError('Partner not found.', 404));
+            return res.status(404).send(response);
+        }
+
+        const data = {
+            first_name, last_name, address, city, post_code, email, telephone, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category, iban, bank_name, bank_account_no, currency
+        };
+
+
+        const updated_data = await partner.update(data);
+
+        await uploadDucuments(partner, entityType, files);
+
+        updated_data.dataValues.type = partner.dataValues.individual_type;
+
+        delete updated_data.dataValues.created_at;
+        delete updated_data.dataValues.updated_at;
+        delete updated_data.dataValues.individual_type;
+        delete updated_data.dataValues.organization_name;
+        delete updated_data.dataValues.organization_type;
+        delete updated_data.dataValues.entity_type;
+        delete updated_data.dataValues.onekey_id;
+
+
+        response.data = updated_data;
+        res.json(updated_data);
+
+    } catch (err) {
+        console.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
+    }
+}
+
 async function getPartnerHcos(req, res) {
     try {
         const page = req.query.page ? +req.query.page - 1 : 0;
@@ -696,6 +750,7 @@ async function exportApprovedPartners(req, res) {
 exports.getPartnerHcps = getPartnerHcps;
 exports.getPartnerHcp = getPartnerHcp;
 exports.createPartnerHcp = createPartnerHcp;
+exports.updatePartnerHcp = updatePartnerHcp;
 exports.getPartnerHcos = getPartnerHcos;
 exports.getPartnerHco = getPartnerHco;
 exports.createPartnerHco = createPartnerHco;
