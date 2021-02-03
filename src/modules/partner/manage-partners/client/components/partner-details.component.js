@@ -34,7 +34,7 @@ const PartnerDetails = (props) => {
     }
 
     return (
-        <Modal size="lg" centered show={props.detailShow} onHide={handleClose}>
+        <Modal size="xl" centered show={props.detailShow} onHide={handleClose}>
             <Modal.Header closeButton>
                 <Modal.Title className="modal-title_small">
                     {props.detailType === 'hcps' ? 'HCP' :
