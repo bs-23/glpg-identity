@@ -288,6 +288,51 @@ $font-path: "../../../../wwwroot/assets/fonts";
     content: "\21";
 }
 
+.icon-ct-management:before {
+    content: "\22";
+}
+
+.icon-managae-general-disclaimer:before {
+    content: "\23";
+}
+
+.icon-manage-catalouge:before {
+    content: "\24";
+}
+
+.icon-manage-content:before {
+    content: "\25";
+}
+
+.icon-manage-criteria:before {
+    content: "\26";
+}
+
+.icon-manage-gps:before {
+    content: "\27";
+}
+
+.icon-manage-mapping:before {
+    content: "\28";
+}
+
+.icon-manage-patient-application:before {
+    content: "\29";
+}
+
+.icon-manage-scheduler:before {
+    content: "\2a";
+}
+
+.icon-manage-study-design:before {
+    content: "\2b";
+}
+
+.icon-version-control:before {
+    content: "\2c";
+}
+
+
 //custome css
 $class-slug: icon- !default;
 
