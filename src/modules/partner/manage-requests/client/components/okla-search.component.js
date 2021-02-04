@@ -11,10 +11,27 @@ import getUserPermittedCountries from '../../../../core/client/util/user-country
 import uuidAuthorities from '../../../../information/hcp/client/uuid-authorities.json';
 
 const OklaSearch = (props) => {
-    const {
+    let {
         show,
+        searchInput,
         resultSelected
     } = props;
+
+    const defaultFormValue = {
+        countries: [],
+        isInContract: false,
+        phonetic: false,
+        duplicates: false,
+        firstName: '',
+        lastName: '',
+        address: '',
+        city: '',
+        postCode: '',
+        onekeyId: '',
+        individualEid: '',
+        externalIdentifier: '',
+        specialties: [],
+    };
 
     const dispatch = useDispatch();
     const formikRef = useRef();
@@ -25,6 +42,7 @@ const OklaSearch = (props) => {
     const userProfile = useSelector(state => state.userReducer.loggedInUser);
     const userCountries = getUserPermittedCountries(userProfile, countries);
 
+    const [initVal, setInitVal] = useState(defaultFormValue);
     const [users, setUsers] = useState({});
     const [selectedCountries, setSelectedCountries] = useState([]);
     const [specialties, setSpecialties] = useState([]);
@@ -34,17 +52,44 @@ const OklaSearch = (props) => {
     const [duplicates, setDuplicates] = useState(false);
     const [formData, setFormData] = useState({});
     const [currentPage, setCurrentPage] = useState(1);
-    const [hcpProfile, setHcpProfile] = useState(null);
-    const [isAssigned, setIsAssigned] = useState(false);
     const [hcpSpecialty, setHcpSpecialty] = useState();
     const [uuidLabel, setUuidLabel] = useState('UUID');
 
+    useEffect(() => {
+        if (searchInput) {
+            const countries = getCountries().filter(c => c.countryIso2 === searchInput.countryIso2);
+            setSelectedCountries(countries);
+
+            setInitVal({
+                ...defaultFormValue,
+                countries: countries || [],
+                firstName: searchInput.firstName || '',
+                lastName: searchInput.lastName || '',
+                externalIdentifier: searchInput.uuid || ''
+            });
+        }
+    }, [searchInput]);
 
     const handleClose = (hcpDetails) => {
         resultSelected(hcpDetails);
         setUsers({});
         setSelectedCountries([]);
         setSelectedSpecialties([]);
+    };
+
+    const resetSearch = (properties) => {
+        searchInput = null;
+        setInitVal(defaultFormValue);
+        setFormData({});
+        setCurrentPage(1);
+        setSelectedCountries([]);
+        setSelectedSpecialties([]);
+        setIsInContract(false);
+        setDuplicates(false);
+        setPhonetic(false);
+        setUsers({});
+        properties.resetForm();
+        setHcpSpecialty(null);
     };
 
     const handleResultSelection = (hcp) => {
@@ -197,21 +242,8 @@ const OklaSearch = (props) => {
                         <div className="add-user mx-3 mt-0 p-3 bg-white rounded border">
                             <Formik
                                 innerRef={formikRef}
-                                initialValues={{
-                                    countries: [],
-                                    isInContract: false,
-                                    phonetic: false,
-                                    duplicates: false,
-                                    firstName: '',
-                                    lastName: '',
-                                    address: '',
-                                    city: '',
-                                    postCode: '',
-                                    onekeyId: '',
-                                    individualEid: '',
-                                    externalIdentifier: '',
-                                    specialties: [],
-                                }}
+                                enableReinitialize={true}
+                                initialValues={initVal}
                                 displayName="SearchForm"
                                 onSubmit={async (values, actions) => {
                                     const data = { ...values };

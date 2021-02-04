@@ -48,7 +48,16 @@ const HcpPartnerRequests = () => {
     };
 
     const [showSearch, setShowSearch] = useState(false);
-    const openSearch = () => setShowSearch(true);
+    const [searchInput, setSearchInput] = useState(false);
+    const openSearch = (values) => {
+        setSearchInput({
+            firstName: values.first_name,
+            lastName: values.last_name,
+            uuid: values.uuid,
+            countryIso2: values.country_iso2
+        });
+        setShowSearch(true);
+    };
     const resultSelected = (selectedHcp) => {
         console.log('++++++++++++++++++++++++++++++++++ ', selectedHcp);
         setShowSearch(false);
@@ -426,7 +435,7 @@ const HcpPartnerRequests = () => {
                                             <label className="font-weight-bold" htmlFor="uuid">UUID <span className="text-danger">*</span></label>
                                             <div className="d-flex align-items-center">
                                                 <Field className="form-control" type="text" name="uuid" />
-                                                <i title="OKLA Search" type="button" className="fas fa-search ml-2 cdp-text-primary" onClick={openSearch}></i>
+                                                <i title="OKLA Search" type="button" className="fas fa-search ml-2 cdp-text-primary" onClick={() => openSearch(formikProps.values)}></i>
                                             </div>
                                             <div className="invalid-feedback"><ErrorMessage name="uuid" /></div>
                                         </div>
@@ -528,7 +537,7 @@ const HcpPartnerRequests = () => {
                 </Modal.Body>
             </Modal>
 
-            {OklaSearch && <OklaSearch show={showSearch} resultSelected={resultSelected}/>}
+            {OklaSearch && <OklaSearch show={showSearch} resultSelected={resultSelected} searchInput={searchInput}/>}
 
             <Modal centered show={requestToDelete !== null} onHide={() => setRequestToDelete(null)}>
                 <Modal.Header closeButton>
