@@ -145,7 +145,7 @@ async function createPartnerHcp(req, res) {
             type, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
             iban, bank_name, bank_account_no, currency } = req.body;
 
-        if (response.errors.length) return res.status(400).send(response);
+        if (response.errors.length) return res.status(400).send(response); ÖÖ
 
         const partnerRequest = await PartnerRequest.findOne({
             where: {
@@ -207,7 +207,6 @@ async function createPartnerHcp(req, res) {
 }
 
 async function updatePartnerHcp(req, res) {
-    const response = new Response({}, []);
     const entityType = 'hcp';
     try {
         const files = req.files;
@@ -216,22 +215,20 @@ async function updatePartnerHcp(req, res) {
             type, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
             iban, bank_name, bank_account_no, currency } = req.body;
 
-        if (response.errors.length) return res.status(400).send(response);
-
         const partner = await Partner.findOne({
             where: {
-                id: req.param.request_id,
+                id: req.param.id,
                 entity_type: entityType
             }
         });
 
         if (!partner) {
-            response.errors.push(new CustomError('Partner not found.', 404));
-            return res.status(404).send(response);
+            return res.status(404).send('Partner not found.');
         }
 
         const data = {
-            first_name, last_name, address, city, post_code, email, telephone, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category, iban, bank_name, bank_account_no, currency
+            first_name, last_name, address, city, post_code, email, telephone, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category, iban, bank_name, bank_account_no, currency,
+            individual_type: type
         };
 
 
@@ -249,14 +246,11 @@ async function updatePartnerHcp(req, res) {
         delete updated_data.dataValues.entity_type;
         delete updated_data.dataValues.onekey_id;
 
-
-        response.data = updated_data;
         res.json(updated_data);
 
     } catch (err) {
         console.error(err);
-        response.errors.push(new CustomError('Internal server error', 500));
-        res.status(500).send(response);
+        res.status(500).send('Internal server error');
     }
 }
 
@@ -747,6 +741,41 @@ async function exportApprovedPartners(req, res) {
     }
 }
 
+async function getPartnerById(req, res) {
+
+    try {
+        let excludedFields = [];
+        const entityType = req.param.entityType;
+
+        if (entityType === 'hcps') { excludedFields = ['entity_type', 'organization_name', 'organization_type', 'created_at', 'updated_at'] }
+        else if (entityType === 'hcos') { excludedFields = ['entity_type', 'is_italian_hcp', 'should_report_hco', 'beneficiary_category', 'created_at', 'updated_at'] }
+        else if (entityType === 'vendors' || 'wholesalers') { excludedFields = ['entity_type', 'created_at', 'updated_at'] }
+        else { res.status(404).send(`The ${entityType} does not exist`); }
+
+        const partner = await Partner.findOne({
+            where: { id: req.params.id },
+            attributes: { exclude: excludedFields }
+        });
+
+        if (!partner) return res.status(404).send('The partner does not exist');
+
+        partner.dataValues.type = partner.dataValues.individual_type;
+        delete partner.dataValues.individual_type;
+
+        const documents = await File.findAll({ where: { owner_id: partner.id } });
+
+        partner.dataValues.documents = documents.map(d => ({
+            name: d.dataValues.name,
+            id: d.dataValues.id
+        }));
+
+        res.json(partner);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 exports.getPartnerHcps = getPartnerHcps;
 exports.getPartnerHcp = getPartnerHcp;
 exports.createPartnerHcp = createPartnerHcp;
@@ -762,3 +791,4 @@ exports.getDownloadUrl = getDownloadUrl;
 exports.registrationLookup = registrationLookup;
 exports.approvePartner = approvePartner;
 exports.exportApprovedPartners = exportApprovedPartners;
+exports.getPartnerById = getPartnerById;

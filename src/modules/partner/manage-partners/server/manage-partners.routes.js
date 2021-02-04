@@ -13,6 +13,9 @@ module.exports = app => {
         .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getPartnerHcps)
         .post(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), validate(partnerHcpSchema), controller.createPartnerHcp);
 
+    app.route('/api/partners/lookup/:entityType/:id')
+        .get(passport.authenticate('application-jwt', { session: false }), controller.getPartnerById);
+
     app.route('/api/partners/hcps/:id')
         .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getPartnerHcp)
         .put(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.updatePartnerHcp);
@@ -41,6 +44,9 @@ module.exports = app => {
         .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getDownloadUrl);
 
     app.route('/api/partners/registration-lookup')
+        .get(passport.authenticate('application-jwt', { session: false }), controller.registrationLookup);
+
+    app.route('/api/partners/lookup/:type')
         .get(passport.authenticate('application-jwt', { session: false }), controller.registrationLookup);
 
     app.route('/api/partners/approve/:entityType/:id')
