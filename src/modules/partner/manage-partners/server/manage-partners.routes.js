@@ -25,14 +25,16 @@ module.exports = app => {
         .post(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), validate(partnerHcoSchema), controller.createPartnerHco);
 
     app.route('/api/partners/hcos/:id')
-        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getPartnerHco);
+        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getPartnerHco)
+        .put(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.updatePartnerHco);
 
     app.route('/api/partners/vendors')
         .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getPartnerVendors)
         .post(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), validate(partnerVendorSchema), controller.createPartnerVendor);
 
     app.route('/api/partners/vendors/:id')
-        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getNonHealthcarePartner);
+        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getNonHealthcarePartner)
+        .put(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.updatePartnerVendor);
 
     app.route('/api/partners/wholesalers')
         .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getPartnerWholesalers);
