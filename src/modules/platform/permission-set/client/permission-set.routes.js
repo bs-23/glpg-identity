@@ -8,7 +8,7 @@ export default function PermissionSetRoutes() {
 
     return (
         <Switch>
-            <PrivateRoute path={`${path}/permission-sets`} component={ManagePermissionSets} module={'platform'} />
+            <PrivateRoute path={`${path}/permission-sets`} component={ManagePermissionSets} module={'manage-permission-sets'} />
         </Switch>
     );
 }

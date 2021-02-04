@@ -9,7 +9,7 @@ export default function ConsentCountryRoutes() {
 
     return (
         <Switch>
-            <PrivateRoute path={`${path}/manage-consents-per-country`} component={CountryConsent} module={'privacy'} />
+            <PrivateRoute path={`${path}/manage-consents-per-country`} component={CountryConsent} module={'consent-country'} />
         </Switch>
     );
 }

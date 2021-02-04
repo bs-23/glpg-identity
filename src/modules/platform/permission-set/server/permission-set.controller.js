@@ -2,9 +2,9 @@ const path = require('path');
 const { Op } = require('sequelize');
 const validator = require('validator');
 const PermissionSet = require('./permission-set.model');
-const PermissionSet_ServiceCategory = require('./permissionSet-serviceCategory.model');
+const PermissionSet_Service = require('./permissionset-service.model');
 const PermissionSet_Application = require('./permissionSet-application.model');
-const ServiceCategory = require('../../user/server/permission/service-category.model');
+const Service = require('../../user/server/permission/service.model');
 const Application = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.model'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const UserProfile_PermissionSet = require(path.join(process.cwd(), 'src/modules/platform/permission-set/server/userProfile-permissionSet.model.js'));
@@ -16,12 +16,12 @@ async function getPermissionSets(req, res) {
     try {
         const permissionSets = await PermissionSet.findAll({
             include: [{
-                model: PermissionSet_ServiceCategory,
+                model: PermissionSet_Service,
                 as: 'ps_sc',
                 attributes: [ 'id'],
                 include: [{
-                    model: ServiceCategory,
-                    as: 'serviceCategory',
+                    model: Service,
+                    as: 'service',
                     attributes: [ 'id', 'title', 'slug' ]
 
                 }]
@@ -63,12 +63,12 @@ async function getPermissionSet(req, res) {
             where: { id },
             include: [
                 {
-                    model: PermissionSet_ServiceCategory,
+                    model: PermissionSet_Service,
                     as: 'ps_sc',
                     attributes: [ 'id'],
                     include: [{
-                        model: ServiceCategory,
-                        as: 'serviceCategory',
+                        model: Service,
+                        as: 'service',
                         attributes: [ 'id', 'title', 'slug' ]
 
                     }]
@@ -145,7 +145,7 @@ async function createPermissionSet(req, res) {
         serviceCategories_permissionSet = serviceCategories.map(id => ({ permissionSetId: doc.id, serviceCategoryId: id }));
 
 
-        await PermissionSet_ServiceCategory.bulkCreate(serviceCategories_permissionSet);
+        await PermissionSet_Service.bulkCreate(serviceCategories_permissionSet);
 
         let applications_permissionSet = [];
 
@@ -178,7 +178,7 @@ async function editPermissionSet(req, res) {
         const doc = await PermissionSet.findOne({
             where: { id: req.params.id },
             include: [{
-                model: PermissionSet_ServiceCategory,
+                model: PermissionSet_Service,
                 as: 'ps_sc'
             }]
         });

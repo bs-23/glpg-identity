@@ -10,8 +10,8 @@ export default function ConsentRoutes() {
 
     return (
         <Switch>
-            <PrivateRoute path={`${path}/consent-performance-report/cdp`} component={CDPConsentPerformanceReport} module={'privacy'} />
-            <PrivateRoute path={`${path}/consent-performance-report/veeva-crm`} component={VeevaConsentPerformanceReport} module={'privacy'} />
+            <PrivateRoute path={`${path}/consent-performance-report/cdp`} component={CDPConsentPerformanceReport} module={'consent-performance'} />
+            <PrivateRoute path={`${path}/consent-performance-report/veeva-crm`} component={VeevaConsentPerformanceReport} module={'consent-performance'} />
         </Switch>
     );
 }

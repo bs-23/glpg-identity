@@ -1,8 +1,8 @@
-const ServiceCategory = require('./service-category.model');
+const Service = require('./service.model');
 
 async function getServiceCategories(req, res) {
     try {
-        const serviceCategories = await ServiceCategory.findAll();
+        const serviceCategories = await Service.findAll();
 
         res.json(serviceCategories);
     } catch(err) {

@@ -8,9 +8,9 @@ const Role_PermissionSet = require(path.join(process.cwd(), "src/modules/platfor
 const Role = require(path.join(process.cwd(), "src/modules/platform/role/server/role.model.js"));
 const PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permission-set.model.js"));
 const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
-const PermissionSet_ServiceCateory = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-serviceCategory.model.js"));
+const PermissionSet_Service = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionset-service.model.js"));
 const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-application.model.js"));
-const ServiceCategory = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/service-category.model.js"));
+const Service = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/service.model.js"));
 
 const getUserWithPermissionRelations = async (whereCondition) => {
     const user = await User.findOne({
@@ -26,12 +26,12 @@ const getUserWithPermissionRelations = async (whereCondition) => {
                     as: 'ps',
                     include: [
                         {
-                            model: PermissionSet_ServiceCateory,
+                            model: PermissionSet_Service,
                             as: 'ps_sc',
                             include: [
                                 {
-                                    model: ServiceCategory,
-                                    as: 'serviceCategory',
+                                    model: Service,
+                                    as: 'service',
                                 }
                             ]
                         },
@@ -63,12 +63,12 @@ const getUserWithPermissionRelations = async (whereCondition) => {
                         as: 'ps',
                         include: [
                             {
-                                model: PermissionSet_ServiceCateory,
+                                model: PermissionSet_Service,
                                 as: 'ps_sc',
                                 include: [
                                     {
-                                        model: ServiceCategory,
-                                        as: 'serviceCategory',
+                                        model: Service,
+                                        as: 'service',
                                     }
                                 ]
                             },
@@ -150,7 +150,7 @@ async function getPermissionsFromPermissionSet(permissionSet) {
 
     if(permissionSet.ps_sc){
         for (const ps_sc of permissionSet.ps_sc) {
-            const userServiceCategory = ps_sc.serviceCategory;
+            const userServiceCategory = ps_sc.service;
 
             serviceCategories.push(userServiceCategory);
         }

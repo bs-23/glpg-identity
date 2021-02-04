@@ -1,17 +1,5 @@
 const path = require("path");
-const jwt = require('jsonwebtoken');
 const passport = require('passport');
-const User = require(path.join(process.cwd(), "src/modules/platform/user/server/user.model.js"));
-const UserProfile = require(path.join(process.cwd(), "src/modules/platform/profile/server/user-profile.model.js"));
-const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/userProfile-permissionSet.model.js"));
-const PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permission-set.model.js"));
-const PermissionSet_ServiceCateory = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-serviceCategory.model.js"));
-const ServiceCategory = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/service-category.model.js"));
-const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-application.model.js"));
-const Application = require(path.join(process.cwd(), "src/modules/platform/application/server/application.model"));
-const User_Role = require(path.join(process.cwd(), "src/modules/platform/role/server/user-role.model.js"));
-const Role_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/role-permissionSet.model.js"));
-const Role = require(path.join(process.cwd(), "src/modules/platform/role/server/role.model.js"));
 const logService = require(path.join(process.cwd(), "src/modules/core/server/audit/audit.service.js"));
 const { getUserWithPermissionRelations } = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/permissions.js"));
 
@@ -42,7 +30,7 @@ async function getProfilePermissions(profile) {
         for (const userProPermSet of profile.up_ps) {
             let permissionSet = userProPermSet.ps;
             for (const psc of permissionSet.ps_sc) {
-                serviceCategories.push(psc.serviceCategory);
+                serviceCategories.push(psc.service);
             }
 
         }
@@ -57,7 +45,7 @@ async function getRolePermissions(roles) {
         for (const rolePermSet of userRole.role.role_ps) {
             let permissionSet = rolePermSet.ps;
             for (const psc of permissionSet.ps_sc) {
-                serviceCategories.push(psc.serviceCategory);
+                serviceCategories.push(psc.service);
             }
 
         }

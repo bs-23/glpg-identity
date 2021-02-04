@@ -8,7 +8,7 @@ export default function UserRoutes() {
 
     return (
         <Switch>
-            <PrivateRoute path={`${path}/profiles`} component={ManageProfiles} module={'platform'} />
+            <PrivateRoute path={`${path}/profiles`} component={ManageProfiles} module={'manage-profile'} />
         </Switch>
     );
 }

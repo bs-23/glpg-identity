@@ -1,33 +1,33 @@
 const path = require('path');
 const { DataTypes } = require('sequelize');
-const ServiceCategory = require('../../user/server/permission/service-category.model');
+const Service = require('../../user/server/permission/service.model');
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
-const PermissionSet_ServiceCategory = sequelize.cdpConnector.define('permissionSets_serviceCategories', {
+const PermissionSet_Service = sequelize.cdpConnector.define('permissionSets_services', {
     id: {
         allowNull: false,
         primaryKey: true,
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4
     },
-    permissionSetId: {
+    permissionset_id: {
         allowNull: false,
         type: DataTypes.UUID
     },
-    serviceCategoryId  : {
+    service_id: {
         allowNull: false,
         type: DataTypes.UUID
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
-    tableName: 'permissionSets_serviceCategories',
+    tableName: 'permissionSets_services',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
 
-PermissionSet_ServiceCategory.belongsTo(ServiceCategory, {as: 'serviceCategory', foreignKey: 'serviceCategoryId'});
+PermissionSet_Service.belongsTo(Service, {as: 'service', foreignKey: 'service_id'});
 
-module.exports = PermissionSet_ServiceCategory;
+module.exports = PermissionSet_Service;

@@ -38,9 +38,9 @@ async function init() {
     const ConsentLocale = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent-locale.model.js'));
     const ConsentCountry = require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model.js'));
     const UserProfile = require(path.join(process.cwd(), "src/modules/platform/profile/server/user-profile.model"));
-    const ServiceCategory = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/service-category.model"));
+    const Service = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/service.model"));
     const PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permission-set.model"));
-    const PermissionSet_ServiceCategory = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-serviceCategory.model"));
+    const PermissionSet_Service = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionset-service.model"));
     const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-application.model"));
     const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/userProfile-permissionSet.model"));
     require(path.join(process.cwd(), "src/modules/platform/role/server/role.model"));
@@ -107,9 +107,9 @@ async function init() {
         });
     }
 
-    function serviceCategorySeeder(callback) {
+    function serviceSeeder(callback) {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
-            const serviceCategories = [
+            const services = [
                 { title: "Management of Customer Data Platform", slug: "platform", created_by: admin.id, updated_by: admin.id },
                 { title: "Information Management", slug: "information", created_by: admin.id, updated_by: admin.id },
                 { title: "Data Privacy & Consent Management", slug: "privacy", created_by: admin.id, updated_by: admin.id },
@@ -117,12 +117,48 @@ async function init() {
                 { title: "Clinical Trials Management", slug: "clinical-trials", created_by: admin.id, updated_by: admin.id }
             ];
 
-            ServiceCategory.destroy({ truncate: { cascade: true } }).then(() => {
-                ServiceCategory.bulkCreate(serviceCategories, {
+            Service.destroy({ truncate: { cascade: true } }).then(() => {
+                Service.bulkCreate(services, {
                     returning: true,
                     ignoreDuplicates: false
                 }).then(function () {
-                    callback();
+                    const platform = Service.findOne({ where: { slug: 'platform' }});
+                    const information = Service.findOne({ where: { slug: 'information' }});
+                    const privacy = Service.findOne({ where: { slug: 'privacy' }});
+                    const businessPartner = Service.findOne({ where: { slug: 'business-partner' }});
+                    const clinicalTrials = Service.findOne({ where: { slug: 'clinical-trials' }});
+
+                    Promise.all([platform, information, privacy, businessPartner, clinicalTrials]).then(values => {
+                        const [platform, information, privacy, businessPartner, clinicalTrials] = values;
+
+                        const platformServices = [
+                            { title: "User & Access Management", slug: "manage-user", parent_id: platform.id, created_by: admin.id, updated_by: admin.id },
+                            { title: "Manage Profiles", slug: "manage-profile", parent_id: platform.id, created_by: admin.id, updated_by: admin.id },
+                            { title: "Define Roles", slug: "manage-role", parent_id: platform.id, created_by: admin.id, updated_by: admin.id },
+                            { title: "Manage Permission Sets", slug: "manage-permission-sets", parent_id: platform.id, created_by: admin.id, updated_by: admin.id },
+                            { title: "Manage FAQs", slug: "manage-faqs", parent_id: platform.id, created_by: admin.id, updated_by: admin.id }
+                        ];
+
+                        const informationServices = [
+                            { title: "Manage HCP Master Data", slug: "manage-hcp", parent_id: information.id, created_by: admin.id, updated_by: admin.id },
+                            { title: "Discover Missing HCPs and HCOs", slug: "discover-hcp-hco", parent_id: information.id, created_by: admin.id, updated_by: admin.id }
+                        ];
+
+                        const privacyServices = [
+                            { title: "Manage New Consent", slug: "manage-consent", parent_id: privacy.id, created_by: admin.id, updated_by: admin.id },
+                            { title: "Configure Consent Category", slug: "consent-category", parent_id: privacy.id, created_by: admin.id, updated_by: admin.id },
+                            { title: "Assign Consent to Country", slug: "consent-country", parent_id: privacy.id, created_by: admin.id, updated_by: admin.id },
+                            { title: "Generate Data Privacy & Consent Performance Report ", slug: "consent-performance", parent_id: privacy.id, created_by: admin.id, updated_by: admin.id }
+                        ];
+
+                        const allServices = [
+                            ...platformServices,
+                            ...informationServices,
+                            ...privacyServices
+                        ]
+
+                        Service.bulkCreate(allServices, { returning: true, ignoreDuplicates: false }).then(res => { callback() });
+                    })
                 });
             });
         });
@@ -171,35 +207,90 @@ async function init() {
 
     function permissionSetServiceCategorySeeder(callback) {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
-            const systemAdmin_permissionSet = PermissionSet.findOne({ where: { slug: 'system_admin' } });
-            const siteAdmin_permissionSet = PermissionSet.findOne({ where: { slug: 'site_admin' } });
-            const hcpServiceCategory = ServiceCategory.findOne({ where: { slug: 'information' } });
-            const userServiceCategory = ServiceCategory.findOne({ where: { slug: 'platform' } });
-            const consentServiceCategory = ServiceCategory.findOne({ where: { slug: 'privacy' } });
-            const businessPartnerServiceCategory = ServiceCategory.findOne({ where: { slug: 'clinical-trials' } });
-            const dpo_permissionSet = PermissionSet.findOne({ where: { slug: 'data_privacy_officer' } });
-            const gds_permissionSet = PermissionSet.findOne({ where: { slug: 'gds' } });
-            const lds_permissionSet = PermissionSet.findOne({ where: { slug: 'lds' } });
+            Promise.all([
+                // Service Categories
+                Service.findOne({ where: { slug: 'information' }, include: { model: Service, as: 'childServices' } }),
+                Service.findOne({ where: { slug: 'platform' }, include: { model: Service, as: 'childServices' } }),
+                Service.findOne({ where: { slug: 'privacy' }, include: { model: Service, as: 'childServices' } }),
+                Service.findOne({ where: { slug: 'business-partner' }, include: { model: Service, as: 'childServices' } }),
+                Service.findOne({ where: { slug: 'clinical-trials' }, include: { model: Service, as: 'childServices' } }),
+                // Permission Sets
+                PermissionSet.findOne({ where: { slug: 'system_admin' } }),
+                PermissionSet.findOne({ where: { slug: 'site_admin' } }),
+                PermissionSet.findOne({ where: { slug: 'data_privacy_officer' } }),
+                PermissionSet.findOne({ where: { slug: 'gds' } }),
+                PermissionSet.findOne({ where: { slug: 'lds' } })
+            ]).then((values) => {
+                const [
+                    informationServiceCategory,
+                    platformServiceCategory,
+                    privacyServiceCategory,
+                    businessPartnerServiceCategory,
+                    clinicalTrialServiceCategory,
+                    systemAdmin_permissionSet,
+                    siteAdmin_permissionSet,
+                    dpo_permissionSet,
+                    gds_permissionSet,
+                    lds_permissionSet,
+                ] = values;
 
-            Promise.all([systemAdmin_permissionSet, siteAdmin_permissionSet, hcpServiceCategory, userServiceCategory, consentServiceCategory, dpo_permissionSet, gds_permissionSet, lds_permissionSet, businessPartnerServiceCategory]).then((values) => {
                 const permissionSet_serviceCategory = [
-                    { permissionSetId: values[0].id, serviceCategoryId: values[2].id },
-                    { permissionSetId: values[0].id, serviceCategoryId: values[3].id },
-                    { permissionSetId: values[0].id, serviceCategoryId: values[4].id },
-                    { permissionSetId: values[0].id, serviceCategoryId: values[8].id },
-
-                    { permissionSetId: values[1].id, serviceCategoryId: values[2].id },
-                    { permissionSetId: values[1].id, serviceCategoryId: values[3].id },
-                    { permissionSetId: values[1].id, serviceCategoryId: values[4].id },
-
-                    { permissionSetId: values[5].id, serviceCategoryId: values[4].id },
-
-                    { permissionSetId: values[6].id, serviceCategoryId: values[2].id },
-                    { permissionSetId: values[7].id, serviceCategoryId: values[2].id }
+                    // Setup System Admin PermissionSet Service Category
+                    { permissionset_id: systemAdmin_permissionSet.id, service_id: informationServiceCategory.id },
+                    { permissionset_id: systemAdmin_permissionSet.id, service_id: platformServiceCategory.id },
+                    { permissionset_id: systemAdmin_permissionSet.id, service_id: privacyServiceCategory.id },
+                    { permissionset_id: systemAdmin_permissionSet.id, service_id: businessPartnerServiceCategory.id },
+                    { permissionset_id: systemAdmin_permissionSet.id, service_id: clinicalTrialServiceCategory.id },
+                    // Setup Site Admin PermissionSet Service Category
+                    { permissionset_id: siteAdmin_permissionSet.id, service_id: informationServiceCategory.id },
+                    { permissionset_id: siteAdmin_permissionSet.id, service_id: platformServiceCategory.id },
+                    { permissionset_id: siteAdmin_permissionSet.id, service_id: privacyServiceCategory.id },
+                    // Setup DPO Admin PermissionSet Service Category
+                    { permissionset_id: dpo_permissionSet.id, service_id: privacyServiceCategory.id },
+                    // Setup GDS PermissionSet
+                    { permissionset_id: gds_permissionSet.id, service_id: informationServiceCategory.id },
+                    // Setup LDS PermissionSet Service Category
+                    { permissionset_id: lds_permissionSet.id, service_id: informationServiceCategory.id }
                 ];
 
-                PermissionSet_ServiceCategory.destroy({ truncate: { cascade: true } }).then(() => {
-                    PermissionSet_ServiceCategory.bulkCreate(permissionSet_serviceCategory, {
+                if (informationServiceCategory.childServices) {
+                    informationServiceCategory.childServices.forEach(service => {
+                        permissionSet_serviceCategory.push({ permissionset_id: systemAdmin_permissionSet.id, service_id: service.id });
+                        permissionSet_serviceCategory.push({ permissionset_id: siteAdmin_permissionSet.id, service_id: service.id });
+                        permissionSet_serviceCategory.push({ permissionset_id: gds_permissionSet.id, service_id: service.id });
+                        permissionSet_serviceCategory.push({ permissionset_id: lds_permissionSet.id, service_id: service.id });
+                    });
+                }
+
+                if (platformServiceCategory.childServices) {
+                    platformServiceCategory.childServices.forEach(service => {
+                        permissionSet_serviceCategory.push({ permissionset_id: systemAdmin_permissionSet.id, service_id: service.id });
+                        permissionSet_serviceCategory.push({ permissionset_id: siteAdmin_permissionSet.id, service_id: service.id });
+                    });
+                }
+
+                if (privacyServiceCategory.childServices) {
+                    privacyServiceCategory.childServices.forEach(service => {
+                        permissionSet_serviceCategory.push({ permissionset_id: systemAdmin_permissionSet.id, service_id: service.id });
+                        permissionSet_serviceCategory.push({ permissionset_id: siteAdmin_permissionSet.id, service_id: service.id });
+                        permissionSet_serviceCategory.push({ permissionset_id: dpo_permissionSet.id, service_id: service.id });
+                    });
+                }
+
+                if (businessPartnerServiceCategory.childServices) {
+                    businessPartnerServiceCategory.childServices.forEach(service => {
+                        permissionSet_serviceCategory.push({ permissionset_id: systemAdmin_permissionSet.id, service_id: service.id });
+                    });
+                }
+
+                if (clinicalTrialServiceCategory.childServices) {
+                    clinicalTrialServiceCategory.childServices.forEach(service => {
+                        permissionSet_serviceCategory.push({ permissionset_id: systemAdmin_permissionSet.id, service_id: service.id });
+                    });
+                }
+
+                PermissionSet_Service.destroy({ truncate: { cascade: true } }).then(() => {
+                    PermissionSet_Service.bulkCreate(permissionSet_serviceCategory, {
                         returning: true,
                         ignoreDuplicates: false
                     }).then(function () {
@@ -480,7 +571,7 @@ async function init() {
         userProfileSeeder,
         faqSeeder,
         userUpdateSeeder,
-        serviceCategorySeeder,
+        serviceSeeder,
         permissionSetSeeder,
         permissionSetServiceCategorySeeder,
         userProfilePermissionSetSeeder,

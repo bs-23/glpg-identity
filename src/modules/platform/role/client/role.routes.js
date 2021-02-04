@@ -8,7 +8,7 @@ export default function UserRoutes() {
 
     return (
         <Switch>
-            <PrivateRoute path={`${path}/roles`} component={Roles} module={'platform'} />
+            <PrivateRoute path={`${path}/roles`} component={Roles} module={'manage-role'} />
         </Switch>
     );
 }
