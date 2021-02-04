@@ -214,9 +214,11 @@ async function updatePartnerHcp(req, res) {
             type, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
             iban, bank_name, bank_account_no, currency } = req.body;
 
+        console.log(req.params.id);
+
         const partner = await Partner.findOne({
             where: {
-                id: req.param.id
+                id: req.params.id
             }
         });
 
@@ -404,7 +406,7 @@ async function updatePartnerHco(req, res) {
 
         const partner = await Partner.findOne({
             where: {
-                id: req.param.id
+                id: req.params.id
             }
         });
 
@@ -604,7 +606,7 @@ async function updatePartnerVendor(req, res) {
 
         const partner = await PartnerVendors.findOne({
             where: {
-                id: req.param.id
+                id: req.params.id
             }
         });
 
@@ -828,7 +830,7 @@ async function getPartnerById(req, res) {
 
     try {
         let excludedFields = [];
-        const entityType = req.param.entityType;
+        const entityType = req.params.entityType;
 
         if (entityType === 'hcp') { excludedFields = ['entity_type', 'organization_name', 'organization_type', 'created_at', 'updated_at'] }
         else if (entityType === 'hco') { excludedFields = ['entity_type', 'is_italian_hcp', 'should_report_hco', 'beneficiary_category', 'created_at', 'updated_at'] }
