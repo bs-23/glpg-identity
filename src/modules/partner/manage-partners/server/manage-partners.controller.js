@@ -400,7 +400,7 @@ async function updatePartnerHco(req, res) {
     try {
         const files = req.files;
 
-        const { request_id, contact_first_name, contact_last_name, type, organization_name, address, city, post_code, email, telephone, type, uuid, country_iso2, locale, registration_number, iban, bank_name, bank_account_no, currency } = req.body;
+        const { contact_first_name, contact_last_name, organization_name, address, city, post_code, email, telephone, type, uuid, country_iso2, locale, registration_number, iban, bank_name, bank_account_no, currency } = req.body;
 
         const partner = await Partner.findOne({
             where: {
@@ -413,7 +413,7 @@ async function updatePartnerHco(req, res) {
         }
 
         const data = {
-            request_id, contact_first_name, contact_last_name, organization_name, address, city, post_code, email, telephone, type, uuid, country_iso2, locale, registration_number, iban, bank_name, bank_account_no, currency
+            contact_first_name, contact_last_name, organization_name, address, city, post_code, email, telephone, type, uuid, country_iso2, locale, registration_number, iban, bank_name, bank_account_no, currency
         };
 
         data.entity_type = entityType;
