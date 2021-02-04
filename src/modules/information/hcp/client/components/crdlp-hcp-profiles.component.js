@@ -67,6 +67,7 @@ export default function CrdlpHcpProfiles() {
     const urlChange = (pageNo, country_codbase, orderColumn, pageChange = false) => {
         let orderType = params.get('orderType');
         const orderBy = params.get('orderBy');
+        const filterId = params.get('filter');
         const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
         const codbase = country_codbase ? country_codbase : params.get('codbase');
 
@@ -85,7 +86,8 @@ export default function CrdlpHcpProfiles() {
         const url = `?page=${page}`
             + (codbase && codbase !== 'null' ? `&codbase=${codbase}` : '')
             + (orderColumn && orderColumn !== 'null' ? `&orderBy=${orderColumn}` : '')
-            + (orderColumn && orderType && orderType !== 'null' ? `&orderType=${orderType}` : '');
+            + (orderColumn && orderType && orderType !== 'null' ? `&orderType=${orderType}` : '')
+            + (filterId ? `&filter=${filterId}` : '');
 
         history.push(location.pathname + url);
     };

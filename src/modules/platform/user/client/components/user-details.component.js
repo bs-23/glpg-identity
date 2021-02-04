@@ -144,7 +144,7 @@ const UserDetails = (props) => {
                         </nav>
                     </div>
                 </div>
-                <div className="container">
+                <div className="container px-0">
                     <Formik
                         initialValues={{
                             roleId: userInfo.role ? userInfo.role.id : '',
@@ -158,7 +158,7 @@ const UserDetails = (props) => {
                             <Form onSubmit={formikProps.handleSubmit}>
                                 <div className="row justify-content-center">
                                     <div className="col-12 col-sm-12 col-lg-10">
-                                        <div className="shadow-sm bg-white rounded mt-5">
+                                        <div className="shadow-sm bg-white rounded mt-3 mt-sm-5">
                                             <h2 className="d-flex align-items-center p-3 p-sm-4 px-sm-5 page-title light">
                                                 <span className="page-title__text font-weight-bold py-3">Profile Details</span>
                                             </h2>
