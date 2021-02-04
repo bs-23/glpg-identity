@@ -79,15 +79,15 @@ export default function Inbox() {
                                     <Link to={{ pathname: "/information/list/cdp",  state: { filterSetting } }} className="d-inline-block p-3 text-uppercase cdp-text-secondary active small font-weight-bold">
                                         {hcps.total > 5 && 'More Pending'}
                                     </Link>
-                                    : <h5 className="d-block py-5 px-2 text-uppercase cdp-text-secondary active text-center mb-0"><i className="far fa-folder-open mr-2"></i>No Data Found</h5>
+                                    : <h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found</h5>
                                 }
                             </div>
                         </Panel>
 
-                        <Panel><div className="cdp-inbox__tab-detail"><h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found.</h5></div></Panel>
-                        <Panel><div className="cdp-inbox__tab-detail"><h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found.</h5></div></Panel>
-                        <Panel><div className="cdp-inbox__tab-detail"><h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found.</h5></div></Panel>
-                        <Panel><div className="cdp-inbox__tab-detail"><h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found.</h5></div></Panel>
+                        <Panel><div className="cdp-inbox__tab-detail"><h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found</h5></div></Panel>
+                        <Panel><div className="cdp-inbox__tab-detail"><h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found</h5></div></Panel>
+                        <Panel><div className="cdp-inbox__tab-detail"><h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found</h5></div></Panel>
+                        <Panel><div className="cdp-inbox__tab-detail"><h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found</h5></div></Panel>
                     </PanelList>
                 </Tabs>
             </div>
