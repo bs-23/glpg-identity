@@ -216,6 +216,10 @@
 
             &-wrapper {
                 background-color: transparent !important;
+
+                .pagination {
+                    background: $white-color;
+                }
             }
 
             thead {
