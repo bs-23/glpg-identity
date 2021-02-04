@@ -8,6 +8,7 @@ import { useToasts } from 'react-toast-notifications';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { partnerRequestSchemaForHcps } from '../manage-requests.schema'
 import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm } from '../manage-requests.actions';
+import OklaSearch from './okla-search.component';
 
 const HcpPartnerRequests = () => {
     const dispatch = useDispatch();
@@ -46,9 +47,12 @@ const HcpPartnerRequests = () => {
         return country && country.countryname;
     };
 
-    const [show, setShow] = useState(false);
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
+    const [showSearch, setShowSearch] = useState(false);
+    const openSearch = () => setShowSearch(true);
+    const resultSelected = (selectedHcp) => {
+        console.log('++++++++++++++++++++++++++++++++++ ', selectedHcp);
+        setShowSearch(false);
+    }
 
     const deleteRequest = (id) => {
         dispatch(deletePartnerRequest(id)).then(() => {
@@ -422,7 +426,7 @@ const HcpPartnerRequests = () => {
                                             <label className="font-weight-bold" htmlFor="uuid">UUID <span className="text-danger">*</span></label>
                                             <div className="d-flex align-items-center">
                                                 <Field className="form-control" type="text" name="uuid" />
-                                                <i title="OKLA Search" type="button" className="fas fa-search ml-2 cdp-text-primary" onClick={handleShow}></i>
+                                                <i title="OKLA Search" type="button" className="fas fa-search ml-2 cdp-text-primary" onClick={openSearch}></i>
                                             </div>
                                             <div className="invalid-feedback"><ErrorMessage name="uuid" /></div>
                                         </div>
@@ -523,14 +527,8 @@ const HcpPartnerRequests = () => {
                     </Formik>
                 </Modal.Body>
             </Modal>
-            <Modal centered size="xl" animation show={show} onHide={handleClose} backdrop="static" keyboard={false}>
-                <Modal.Header closeButton>
-                    <Modal.Title className="modal-title_small">OKLA Search</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                   Hello this is OKLA search
-                </Modal.Body>
-            </Modal>
+
+            {OklaSearch && <OklaSearch show={showSearch} resultSelected={resultSelected}/>}
 
             <Modal centered show={requestToDelete !== null} onHide={() => setRequestToDelete(null)}>
                 <Modal.Header closeButton>
