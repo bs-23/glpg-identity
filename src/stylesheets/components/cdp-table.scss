@@ -210,12 +210,88 @@
             top: 1px;
         }
     }
+
+    @media (max-width: $screen-phone) {
+        &__responsive {
+
+            &-wrapper {
+                background-color: transparent !important;
+            }
+
+            thead {
+                display: none;
+            }
+
+            tbody {
+                background-color: transparent !important;
+            }
+
+            tbody, td, tr {
+                display: block;
+            }
+
+            tr {
+                border: 1px solid #ccc;
+                margin-top: 5px;
+
+                &:nth-child(odd) {
+                    background: rgba(20, 77, 67, 0.07);
+                }
+
+                &:nth-child(even) {
+                    background: $white-color;
+                }
+            }
+
+            td {
+                /* Behave  like a "row" */
+                border: none;
+                border-bottom: 1px solid #eee;
+                position: relative;
+                padding-left: 40% !important;
+                min-height: 31px;
+            }
+
+            td:before {
+                /* Now like a table header */
+                position: absolute;
+                /* Top/left values mimic padding */
+                top: 6px;
+                left: 6px;
+                width: 40%;
+                padding-right: 10px;
+                white-space: nowrap;
+                font-weight: 600;
+                text-overflow: ellipsis;
+                overflow: hidden;
+            }
+
+            td::before {
+                content: "" attr(data-for) "";
+            }
+
+            .btn-xs-block {
+                width: 100%;
+            }
+        }
+    }
+
+    @media (min-width: $screen-phone + 1) {
+        &__responsive {
+            thead {
+                display: block !important;
+            }
+        }
+    }
 }
+
 @media (min-width: $screen-desktop) {
     .table-responsive {
         overflow: visible;
     }
 }
+
+
 
 .search-in-okla {
     visibility: hidden;

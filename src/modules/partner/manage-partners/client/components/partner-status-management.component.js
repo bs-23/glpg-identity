@@ -12,6 +12,7 @@ const PartnerStatusManage = (props) => {
     const { addToast } = useToasts();
     const partner = useSelector(state => state.managePartnerReducer.partner);
     const handleClose = () => {
+        setStatusSelect(null);
         setStatusShow(false);
         props.changeStatusShow(false);
     };
@@ -55,7 +56,6 @@ const PartnerStatusManage = (props) => {
             userApprove();
         }
     }
-
 
     return (
         <Modal size="lg" centered show={props.statusShow} onHide={handleClose}>
@@ -106,7 +106,7 @@ const PartnerStatusManage = (props) => {
                             <button disabled className="btn btn-block ml-2 btn-danger mt-4 p-2 font-weight-bold">Reject User</button>
                         </div>
                         <div className="col-12">
-                            <button onClick={() => confirmStatus()} className="btn btn-block btn-secondary mt-4 p-2 font-weight-bold">Confirm and Request SAP Export</button>
+                            <button disabled={!statusSelect} onClick={() => confirmStatus()} className="btn btn-block btn-secondary mt-4 p-2 font-weight-bold">Confirm and Request SAP Export</button>
                         </div>
                     </div>
                 }

@@ -365,7 +365,7 @@ async function createPartnerHco(req, res) {
         const data = {
             request_id, organization_name, address, city, post_code, email, telephone, uuid, country_iso2, locale, registration_number, iban, bank_name, bank_account_no, currency
         };
-        data.entityType = entityType;
+        data.entity_type = entityType;
         data.first_name = contact_first_name;
         data.last_name = contact_last_name;
         data.organization_type = type;

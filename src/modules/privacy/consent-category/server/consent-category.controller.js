@@ -7,6 +7,8 @@ const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const { clearApplicationCache } = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.controller'));
 
+const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+
 async function getConsentCategory(req, res) {
     try {
         const data = await ConsentCategory.findOne({ where: { id: req.params.id } });
@@ -56,7 +58,7 @@ async function createConsentCategory(req, res) {
             },
             defaults: {
                 title: req.body.title.trim(),
-                slug: req.body.title.trim(),
+                slug: convertToSlug(req.body.title.trim()),
                 created_by: req.user.id,
                 updated_by: req.user.id
             }
@@ -103,7 +105,7 @@ async function updateConsentCategory(req, res) {
 
         const consentCategoryBeforeUpdate = {...consentCategory.dataValues};
 
-        const data = await consentCategory.update({ title: title.trim(), slug: title.trim(), updated_by: req.user.id });
+        const data = await consentCategory.update({ title: title.trim(), updated_by: req.user.id });
 
         const updatesInCategory = logService.difference(data.dataValues, consentCategoryBeforeUpdate);
 

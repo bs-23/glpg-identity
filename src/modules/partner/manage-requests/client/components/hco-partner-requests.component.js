@@ -255,7 +255,7 @@ const HcoPartnerRequests = () => {
                 </div>
             </div>
 
-            <Modal dialogClassName="modal-customize" size="lg" centered show={showForm} onHide={() => toggleForm(null)}>
+            <Modal dialogClassName="modal-customize" size="xl" centered show={showForm} onHide={() => toggleForm(null)}>
                 <Modal.Header closeButton>
                     <Modal.Title>
                         {

@@ -225,11 +225,12 @@
 
     @media (max-width: $screen-phone) {
         &__icon {
-            font-size: 1.7em;
+            font-size: 1.5em;
         }
 
         &__text {
-            font-size: 24px;
+            font-size: 22px;
+            font-weight: 600 !important;
         }
     }
 }

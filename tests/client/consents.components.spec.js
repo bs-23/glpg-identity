@@ -8,11 +8,11 @@ import { BrowserRouter } from 'react-router-dom';
 import MockAdapter from 'axios-mock-adapter'
 import { ToastProvider } from 'react-toast-notifications';
 import store from '../../src/modules/core/client/store.js';
-import ConsentsComponent from '../../src/modules/privacy/client/components/consents.component';
+import { Consents } from '../../src/modules/privacy/';
+import { consentActions } from '../../src/modules/privacy/';
 import { act } from 'react-dom/test-utils';
 import { screen } from '@testing-library/dom'
 import { login } from '../../src/modules/platform/user/client/user.actions';
-import { getCdpConsents } from '../../src/modules/privacy/client/consent.actions';
 
 configure({ adapter: new Adapter() });
 
@@ -65,7 +65,7 @@ describe('Manage consents component', () => {
         ]
         mockAxios.onGet('/api/cdp-consents?translations=true&category=true').reply(200, consents);
 
-        await store.dispatch(getCdpConsents(true, true))
+        await store.dispatch(consentActions.getCdpConsents(true, true))
     });
 
     const userSlice = () => store.getState().userReducer;
@@ -74,7 +74,7 @@ describe('Manage consents component', () => {
         <BrowserRouter>
             <ToastProvider>
                 <Provider store={store}>
-                    <ConsentsComponent/>
+                    <Consents/>
                 </Provider>
             </ToastProvider>
         </BrowserRouter>

@@ -3,7 +3,7 @@ import { Route, useRouteMatch } from 'react-router-dom';
 
 import { ManageConsentRoutes, consentReducer, consentActions, Consent, Consents, ConsentForm, DataPrivacyConsentMaagement } from './manage-consent';
 import { ManageConsentCategoryRoutes, consentCategoryReducer, ConsentCategories, categoryActions } from './consent-category';
-import { consentCountryReducer, ConsentCountryRoutes } from './consent-country';
+import { consentCountryReducer, ConsentCountryRoutes, CountryConsent } from './consent-country';
 import { ConsentPerformanceRoutes, consentPerformanceReducer, consentPerformanceActions, CDPConsentPermanceReport, VeevaConsentPermanceReport } from './consent-performance';
 
 export function ConsentRoutes() {
@@ -30,6 +30,7 @@ export {
     ConsentCategories,
     categoryActions,
     consentCountryReducer,
+    CountryConsent,
     consentPerformanceReducer,
     consentPerformanceActions,
     CDPConsentPermanceReport,
