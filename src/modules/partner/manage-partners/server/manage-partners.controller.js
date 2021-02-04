@@ -145,7 +145,7 @@ async function createPartnerHcp(req, res) {
             type, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
             iban, bank_name, bank_account_no, currency } = req.body;
 
-        if (response.errors.length) return res.status(400).send(response);
+        if (response.errors.length) return res.status(400).send(response); ÖÖ
 
         const partnerRequest = await PartnerRequest.findOne({
             where: {
@@ -216,11 +216,9 @@ async function updatePartnerHcp(req, res) {
             type, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
             iban, bank_name, bank_account_no, currency } = req.body;
 
-        if (response.errors.length) return res.status(400).send(response);
-
         const partner = await Partner.findOne({
             where: {
-                id: req.param.request_id,
+                request_id: req.param.request_id,
                 entity_type: entityType
             }
         });
@@ -231,7 +229,8 @@ async function updatePartnerHcp(req, res) {
         }
 
         const data = {
-            first_name, last_name, address, city, post_code, email, telephone, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category, iban, bank_name, bank_account_no, currency
+            first_name, last_name, address, city, post_code, email, telephone, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category, iban, bank_name, bank_account_no, currency,
+            individual_type: type
         };
 
 
