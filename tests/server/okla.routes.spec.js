@@ -217,6 +217,7 @@ describe('Okla Routes', () => {
                     workplaces: [
                         {
                             id: 'WBEH01410437',
+                            isInContract: false,
                             isValid: true,
                             name: 'Centre Médical Malou',
                             addresss: 'Mont Saint-Lambert 5',
@@ -315,6 +316,7 @@ describe('Okla Routes', () => {
             workplaces: [
               {
                 id: 'WBEH01410437',
+                isInContract: false,
                 isValid: true,
                 name: 'Centre Médical Malou',
                 address: 'Mont Saint-Lambert 5',
