@@ -214,7 +214,7 @@ async function updatePartnerHcp(req, res) {
             type, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
             iban, bank_name, bank_account_no, currency } = req.body;
 
-        console.log(req.params.id);
+        console.log(files);
 
         const partner = await Partner.findOne({
             where: {
