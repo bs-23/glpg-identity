@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import parse from 'html-react-parser';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Modal from 'react-bootstrap/Modal';
+import Accordion from 'react-bootstrap/Accordion';
 import { useToasts } from 'react-toast-notifications';
 import Faq from '../../../platform/faq/client/faq.component';
 
@@ -121,12 +122,25 @@ export default function ManageFaq() {
                 <div className="row">
                     <div className="col-12">
                         <div className="d-flex justify-content-between align-items-center my-3">
-                            <h4 class="cdp-text-primary font-weight-bold mb-0 mb-sm-0">FAQ List</h4>
+                            <h4 className="cdp-text-primary font-weight-bold mb-0 mb-sm-0 d-flex align-items-end pr-2">
+                                FAQ List
+                                <Accordion className="cdp-table__responsive-accordion d-block d-sm-none">
+                                    <Accordion.Toggle eventKey="0" className="btn btn-sm borrder-0 shadow-0 mb-0 ml-2"><i className="fas fa-sort cdp-text-primary"></i></Accordion.Toggle>
+                                    <Accordion.Collapse eventKey="0" className="cdp-table__responsive-accordion-body">
+                                        <div className="cdp-bg-primary p-2 text-white">
+                                            <span className={sort.value === 'question' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.topic, 'question')}>Question<i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                            <span className={sort.value === 'answer' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.topic, 'answer')}>Answer<i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                            <span className={sort.value === 'topics' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.topic, 'topics')}>Topics<i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                            <span className={sort.value === 'created_by' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.topic, 'created_by')}>Created By<i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                        </div>
+                                    </Accordion.Collapse>
+                                </Accordion>
+                            </h4>
                             {serviceTopics && serviceTopics.length > 0 && faqData.metadata &&
-                                <div class="d-flex justify-content-between align-items-center">
+                                <div className="d-flex justify-content-between align-items-center">
                                     <Dropdown className="ml-auto dropdown-customize">
-                                        <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center">
-                                            <i className="icon icon-filter mr-2 mb-n1"></i> {faqData.metadata.topic === null || history.action === "PUSH" ? 'Filter by Topics' : serviceTopics.find(x => x.slug === faqData.metadata.topic).title}
+                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center">
+                                        <i className="icon icon-filter mr-2 mb-n1"></i> <span className="d-none d-sm-inline-block">{faqData.metadata.topic === null || history.action === "PUSH" ? 'Filter by Topics' : serviceTopics.find(x => x.slug === faqData.metadata.topic).title}</span>
                                         </Dropdown.Toggle>
                                         <Dropdown.Menu>
                                             {serviceTopics.length > 0 && faqData.metadata.topic && <Dropdown.Item onClick={() => urlChange(1, 'null', params.get('orderBy'))}>All</Dropdown.Item>
