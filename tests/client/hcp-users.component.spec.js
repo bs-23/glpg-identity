@@ -58,12 +58,11 @@ describe('Hcp user component', () => {
 
         const updated_field = {"data":[{"rowIndex":2,"property":"first_name","value":"THOMAS"}],"errors":[]}
 
-        const status = null, country_iso2 = null;
-        fakeAxios.onGet('/api/hcps').reply(200, data);
-        fakeAxios.onGet('/api/hcps?page=1').reply(200, data);
-        fakeAxios.onGet(`/api/hcps?page=${1}`).reply(200, data);
-        fakeAxios.onGet(`/api/hcps?page=${2}`).reply(200, data);
-        fakeAxios.onGet(`/api/hcps?page=${3}`).reply(200, data);
+        fakeAxios.onPost('/api/hcps').reply(200, data);
+        fakeAxios.onPost('/api/hcps?').reply(200, data);
+        fakeAxios.onPost(`/api/hcps?page=${1}`).reply(200, data);
+        fakeAxios.onPost(`/api/hcps?page=${2}`).reply(200, data);
+        fakeAxios.onPost(`/api/hcps?page=${3}`).reply(200, data);
         fakeAxios.onGet('/api/hcp-profiles/1/consents').reply(200, []);
         fakeAxios.onPut('/api/hcp-profiles/update-hcps').reply(200, updated_field);
 
