@@ -111,6 +111,16 @@
     }
 }
 
+.modal-okla-width {
+    width: 90vw; /* Occupy the 90% of the screen width */
+    max-width: 90vw;
+
+    @media (max-width: $screen-phone) {
+        width: 96vw; /* Occupy the 90% of the screen width */
+        max-width: 96vw;
+    }
+}
+
 .custom-modal-size {
     max-width: 1050px;
 

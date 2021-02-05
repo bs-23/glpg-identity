@@ -228,7 +228,7 @@ const OklaSearch = (props) => {
 
     return <Modal
         centered
-        size="xl"
+        size="okla-width"
         animation
         show={show}
         onHide={handleClose}
