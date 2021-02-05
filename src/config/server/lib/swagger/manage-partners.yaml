@@ -129,6 +129,7 @@ paths:
                                     enum:
                                     - individual
                                     - legal_entity
+                                    default: individual
                                 registration_number:
                                     type: string
                                 country_iso2:
@@ -190,6 +191,7 @@ paths:
                     multipart/form-data:
                         schema:
                             type: object
+                            allowEmptyValue: false
                             properties:
                                 request_id:
                                     type: string
@@ -615,6 +617,139 @@ paths:
                         applicaiton/json:
                             schema:
                                 $ref: "#/components/schemas/errorResponse"
+
+    /api/partners/lookup/hcp/{id}:
+        get:
+            tags:
+                - manage-partners
+            summary: Get HCP partner's detail by id.
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  description: the user identifier
+                  schema:
+                    type: string
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/partnerHcpProfile"
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+                401:
+                    description: User is not authenticated.
+                404:
+                    description: The partner does not exist.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+
+    /api/partners/lookup/hco/{id}:
+        get:
+            tags:
+                - manage-partners
+            summary: Get HCO partner's detail by id.
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  description: the user identifier
+                  schema:
+                   type: string
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/partnerHcoProfile"
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+                401:
+                    description: User is not authenticated.
+                404:
+                    description: The partner does not exist.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+
+    /api/partners/lookup/vendor/{id}:
+        get:
+            tags:
+                - manage-partners
+            summary: Get Vendor's detail by id.
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  description: the user identifier
+                  schema:
+                   type: string
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/partnerVendorProfile"
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+                401:
+                    description: User is not authenticated.
+                404:
+                    description: The partner does not exist.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+
+    /api/partners/lookup/wholesaler/{id}:
+            get:
+                tags:
+                    - manage-partners
+                summary: Get Wholesaler's detail by id.
+                parameters:
+                    - name: id
+                      in: path
+                      required: true
+                      description: the user identifier
+                      schema:
+                       type: string
+                responses:
+                    200:
+                        description: The request has succeeded.
+                        content:
+                            application/json:
+                                schema:
+                                    type: object
+                                    properties:
+                                        data:
+                                            $ref: "#/components/schemas/partnerVendorProfile"
+                                        errors:
+                                            $ref: "#/components/schemas/errorBodyInSuccess"
+                    401:
+                        description: User is not authenticated.
+                    404:
+                        description: The partner does not exist.
+                        content:
+                            applicaiton/json:
+                                schema:
+                                    $ref: "#/components/schemas/errorResponse"
+
 
 components:
     schemas:
