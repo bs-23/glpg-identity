@@ -207,7 +207,6 @@ async function createPartnerHcp(req, res) {
 }
 
 async function updatePartnerHcp(req, res) {
-    const entityType = 'hcp';
     try {
         const files = req.files;
 
@@ -215,10 +214,11 @@ async function updatePartnerHcp(req, res) {
             type, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
             iban, bank_name, bank_account_no, currency } = req.body;
 
+        console.log(req.params.id);
+
         const partner = await Partner.findOne({
             where: {
-                id: req.param.id,
-                entity_type: entityType
+                id: req.params.id
             }
         });
 
@@ -234,7 +234,7 @@ async function updatePartnerHcp(req, res) {
 
         const updated_data = await partner.update(data);
 
-        await uploadDucuments(partner, entityType, files);
+        await uploadDucuments(partner, updated_data.dataValues.entity_type, files);
 
         updated_data.dataValues.type = partner.dataValues.individual_type;
 
@@ -330,15 +330,13 @@ async function getPartnerHco(req, res) {
     }
 }
 
+
 async function createPartnerHco(req, res) {
-    const response = new Response({}, []);
     const entityType = 'hco';
     try {
         const files = req.files;
 
         const { request_id, contact_first_name, contact_last_name, organization_name, address, city, post_code, email, telephone, type, uuid, country_iso2, locale, registration_number, iban, bank_name, bank_account_no, currency } = req.body;
-
-        if (response.errors.length) return res.status(400).send(response);
 
         const partnerRequest = await PartnerRequest.findOne({
             where: {
@@ -397,6 +395,56 @@ async function createPartnerHco(req, res) {
         console.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
+    }
+}
+
+async function updatePartnerHco(req, res) {
+    try {
+        const files = req.files;
+
+        const { contact_first_name, contact_last_name, organization_name, address, city, post_code, email, telephone, type, uuid, country_iso2, locale, registration_number, iban, bank_name, bank_account_no, currency } = req.body;
+
+        const partner = await Partner.findOne({
+            where: {
+                id: req.params.id
+            }
+        });
+
+        if (!partner) {
+            return res.status(404).send('Partner not found.');
+        }
+
+        const data = {
+            contact_first_name, contact_last_name, organization_name, address, city, post_code, email, telephone, type, uuid, country_iso2, locale, registration_number, iban, bank_name, bank_account_no, currency
+        };
+
+        data.entity_type = entityType;
+        data.first_name = contact_first_name;
+        data.last_name = contact_last_name;
+        data.organization_type = type;
+
+
+        const updated_data = await partner.update(data);
+
+        await uploadDucuments(partner, updated_data.dataValues.entity_type, files);
+
+        updated_data.dataValues.contact_first_name = updated_data.dataValues.first_name;
+        updated_data.dataValues.contact_last_name = updated_data.dataValues.last_name;
+
+        delete updated_data.dataValues.individual_type;
+        delete updated_data.dataValues.is_italian_hcp;
+        delete updated_data.dataValues.should_report_hco;
+        delete updated_data.dataValues.beneficiary_category;
+        delete updated_data.dataValues.onekey_id;
+        delete updated_data.dataValues.created_at;
+        delete updated_data.dataValues.updated_at;
+
+
+        res.json(updated_data);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
     }
 }
 
@@ -547,6 +595,43 @@ async function createPartnerVendor(req, res) {
         console.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
+    }
+}
+
+async function updatePartnerVendor(req, res) {
+    try {
+        const files = req.files;
+
+        const { type, country_iso2, locale, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency } = req.body;
+
+        const partner = await PartnerVendors.findOne({
+            where: {
+                id: req.params.id
+            }
+        });
+
+        if (!partner) {
+            return res.status(404).send('Partner not found.');
+        }
+
+        const data = {
+            type, country_iso2, locale, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency,
+            entity_type: type
+        };
+
+
+        const updated_data = await partner.update(data);
+
+        await uploadDucuments(partner, updated_data.dataValues.entity_type, files);
+
+        delete updated_data.dataValues.created_at;
+        delete updated_data.dataValues.updated_at;
+
+        res.json(updated_data);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error');
     }
 }
 
@@ -745,17 +830,25 @@ async function getPartnerById(req, res) {
 
     try {
         let excludedFields = [];
-        const entityType = req.param.entityType;
+        const entityType = req.params.entityType;
 
-        if (entityType === 'hcps') { excludedFields = ['entity_type', 'organization_name', 'organization_type', 'created_at', 'updated_at'] }
-        else if (entityType === 'hcos') { excludedFields = ['entity_type', 'is_italian_hcp', 'should_report_hco', 'beneficiary_category', 'created_at', 'updated_at'] }
-        else if (entityType === 'vendors' || 'wholesalers') { excludedFields = ['entity_type', 'created_at', 'updated_at'] }
+        if (entityType === 'hcp') { excludedFields = ['entity_type', 'organization_name', 'organization_type', 'created_at', 'updated_at'] }
+        else if (entityType === 'hco') { excludedFields = ['entity_type', 'is_italian_hcp', 'should_report_hco', 'beneficiary_category', 'created_at', 'updated_at'] }
+        else if (entityType === 'vendor' || 'wholesaler') { excludedFields = ['entity_type', 'created_at', 'updated_at'] }
         else { res.status(404).send(`The ${entityType} does not exist`); }
 
-        const partner = await Partner.findOne({
-            where: { id: req.params.id },
-            attributes: { exclude: excludedFields }
-        });
+        let partner = null;
+        if (entityType === 'hcp' || entityType === 'hco') {
+            partner = await Partner.findOne({
+                where: { id: req.params.id },
+                attributes: { exclude: excludedFields }
+            });
+        } else {
+            partner = await PartnerVendors.findOne({
+                where: { id: req.params.id },
+                attributes: { exclude: excludedFields }
+            });
+        }
 
         if (!partner) return res.status(404).send('The partner does not exist');
 
@@ -783,10 +876,12 @@ exports.updatePartnerHcp = updatePartnerHcp;
 exports.getPartnerHcos = getPartnerHcos;
 exports.getPartnerHco = getPartnerHco;
 exports.createPartnerHco = createPartnerHco;
+exports.updatePartnerHco = updatePartnerHco;
 exports.getPartnerVendors = getPartnerVendors;
 exports.getPartnerWholesalers = getPartnerWholesalers;
 exports.getNonHealthcarePartner = getNonHealthcarePartner;
 exports.createPartnerVendor = createPartnerVendor;
+exports.updatePartnerVendor = updatePartnerVendor;
 exports.getDownloadUrl = getDownloadUrl;
 exports.registrationLookup = registrationLookup;
 exports.approvePartner = approvePartner;
