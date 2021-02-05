@@ -70,14 +70,7 @@ const OklaSearch = (props) => {
         }
     }, [searchInput]);
 
-    const handleClose = (hcpDetails) => {
-        resultSelected(hcpDetails);
-        setUsers({});
-        setSelectedCountries([]);
-        setSelectedSpecialties([]);
-    };
-
-    const resetSearch = (properties) => {
+    function clearFileds() {
         searchInput = null;
         setInitVal(defaultFormValue);
         setFormData({});
@@ -88,8 +81,17 @@ const OklaSearch = (props) => {
         setDuplicates(false);
         setPhonetic(false);
         setUsers({});
-        properties.resetForm();
         setHcpSpecialty(null);
+    };
+
+    const handleClose = (hcpDetails) => {
+        resultSelected(hcpDetails);
+        clearFileds();
+    };
+
+    const resetSearch = (properties) => {
+        properties.resetForm();
+        clearFileds();
     };
 
     const handleResultSelection = (hcp) => {

@@ -58,6 +58,9 @@ const PartnerRequest = sequelize.cdpConnector.define('partner_requests', {
     uuid: {
         type: DataTypes.STRING,
     },
+    onekey_id: {
+        type: DataTypes.STRING
+    },
     company_codes: {
         type: DataTypes.ARRAY(DataTypes.STRING),
     },

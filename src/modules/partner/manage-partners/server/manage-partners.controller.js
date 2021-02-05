@@ -145,7 +145,7 @@ async function createPartnerHcp(req, res) {
             type, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
             iban, bank_name, bank_account_no, currency } = req.body;
 
-        if (response.errors.length) return res.status(400).send(response); ÖÖ
+        if (response.errors.length) return res.status(400).send(response);
 
         const partnerRequest = await PartnerRequest.findOne({
             where: {
@@ -170,6 +170,7 @@ async function createPartnerHcp(req, res) {
 
         data.entity_type = entityType;
         data.individual_type = type;
+        data.onekey_id = partnerRequest.onekey_id;
 
         const [partnerHcp, created] = await Partner.findOrCreate({
             where: { request_id: request_id },
