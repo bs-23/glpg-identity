@@ -129,18 +129,20 @@ describe('HCP Routes', () => {
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
-    // it('Should edit an HCP user - Edit HCP user', async () => {
-    //     const response = await request.put(`/api/hcps/${defaultUser.id}`)
-    //         .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`])
-    //         .send({
-    //             first_name: faker.name.firstName(),
-    //             last_name: faker.name.lastName()
-    //         });
+    it('Should edit an HCP user - Edit HCP user', async () => {
+        const response = await request.put(`/api/hcp-profiles/update-hcps`)
+            .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`])
+            .send([{
+                id: defaultUser.id,
+                first_name: "Ah",
+                comment: "Testing",
+                _rowIndex: 0
+            }]);
 
-    //     expect(response.statusCode).toBe(200);
-    //     expect(response.body).toHaveProperty('data');
-    //     expect(response.res.headers['content-type']).toMatch('application/json');
-    // });
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('data');
+        expect(response.res.headers['content-type']).toMatch('application/json');
+    });
 
     // it('Should get 404 when trying to edit an non existing HCP user - Edit HCP user', async () => {
     //     const response = await request.put(`/api/hcps/${faker.random.uuid()}`)
@@ -169,15 +171,24 @@ describe('HCP Routes', () => {
     //     expect(response.res.headers['content-type']).toMatch('application/json');
     // });
 
-    // it('Should get hcp users data', async () => {
-    //     const response = await request
-    //         .get('/api/hcps/?page=1&status=self_verified')
-    //         .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`])
+    it('Should get hcp users data', async () => {
+        const response = await request
+            .post('/api/hcps?page=1&status=self_verified')
+            .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`])
 
-    //     expect(response.statusCode).toBe(200);
-    //     expect(response.body).toHaveProperty('data');
-    //     expect(response.res.headers['content-type']).toMatch('application/json');
-    // });
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('data');
+        expect(response.res.headers['content-type']).toMatch('application/json');
+    });
+
+    it('Should get specialties with given codbase for cdp', async () => {
+        const response = await request
+        .get('/api/hcps/specialties?codbases=WNL')
+        .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`])
+
+        expect(response.statusCode).toBe(200);
+        expect(response.res.headers['content-type']).toMatch('application/json');
+    });
 
     it('Should get specialties for given locale', async () => {
         const response = await request
@@ -206,6 +217,34 @@ describe('HCP Routes', () => {
             .set('Authorization', `bearer ${defaultApplication.access_token}`);
 
         expect(response.statusCode).toBe(204);
+    });
+
+    it('Should get specialties with english translation', async () => {
+        const response = await request
+            .get(`/api/hcp-profiles/specialties-eng?country_iso2=nl&locale=nl_NL`)
+            .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`])
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('data');
+        expect(response.res.headers['content-type']).toMatch('application/json');
+    });
+
+    it('Should get hcp consents for given id of a hcp user', async () => {
+        const response = await request
+            .get(`/api/hcp-profiles/${defaultUser.id}/consents`)
+            .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`])
+
+        expect(response.statusCode).toBe(200);
+        expect(response.res.headers['content-type']).toMatch('application/json');
+    });
+
+    it('Should get datasync hcp users data', async () => {
+        const response = await request
+            .post('/api/datasync/hcps')
+            .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`])
+
+        expect(response.statusCode).toBe(200);
+        expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
     describe('HCP Registration Journeys', () => {
@@ -467,6 +506,6 @@ describe('HCP Routes', () => {
                 expect(response.body.data).toHaveProperty('password_reset_token');
                 expect(response.res.headers['content-type']).toMatch('application/json');
             });
-        })
-    })
+        });
+    });
 });
