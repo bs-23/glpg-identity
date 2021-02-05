@@ -189,7 +189,7 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
         setPermissionSet({
             ...permSet,
             applications: permSet.ps_app.map(app => app.application.id),
-            serviceCategories: permSet.ps_sc.map(sc => sc.serviceCategory.id),
+            serviceCategories: permSet.ps_sc.map(sc => sc.service.id),
         });
     }
 

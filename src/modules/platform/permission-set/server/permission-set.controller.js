@@ -142,7 +142,7 @@ async function createPermissionSet(req, res) {
 
         let serviceCategories_permissionSet = [];
 
-        serviceCategories_permissionSet = serviceCategories.map(id => ({ permissionSetId: doc.id, serviceCategoryId: id }));
+        serviceCategories_permissionSet = serviceCategories.map(id => ({ permissionset_id: doc.id, service_id: id }));
 
 
         await PermissionSet_Service.bulkCreate(serviceCategories_permissionSet);
@@ -199,7 +199,7 @@ async function editPermissionSet(req, res) {
             updated_by: req.user.id
         });
 
-        await doc.setService_categories(serviceCategories);
+        await doc.setServices(serviceCategories);
 
         await doc.setApplications(applications);
 
