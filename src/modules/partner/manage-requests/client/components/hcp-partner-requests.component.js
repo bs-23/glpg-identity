@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import Modal from 'react-bootstrap/Modal';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -15,6 +15,8 @@ const HcpPartnerRequests = () => {
     const location = useLocation();
     const history = useHistory();
     const { addToast } = useToasts();
+    const formikRef = useRef();
+    const formikBag = formikRef.current;
 
     const [showForm, setShowForm] = useState(false);
     const [companyCodes, setCompanyCodes] = useState([{ id: Math.random(), company_code: '' }]);
@@ -58,8 +60,23 @@ const HcpPartnerRequests = () => {
         });
         setShowSearch(true);
     };
-    const resultSelected = (selectedHcp) => {
-        console.log('++++++++++++++++++++++++++++++++++ ', selectedHcp);
+    const resultSelected = (selectedHcp = {}) => {
+        if (selectedHcp.externalIdentifiers && selectedHcp.externalIdentifiers.length) {
+            formikBag.setFieldValue('uuid', selectedHcp.externalIdentifiers[0].value);
+        }
+
+        if (selectedHcp.individualEid) {
+            formikBag.setFieldValue('onekey_id', selectedHcp.individualEid);
+        }
+
+        if (!formikBag.values.first_name && selectedHcp.firstName) {
+            formikBag.setFieldValue('first_name', selectedHcp.firstName);
+        }
+
+        if (!formikBag.values.last_name && selectedHcp.lastName) {
+            formikBag.setFieldValue('last_name', selectedHcp.lastName);
+        }
+
         setShowSearch(false);
     }
 
@@ -340,8 +357,10 @@ const HcpPartnerRequests = () => {
                             country_iso2: partnerRequestId && Object.keys(request).length ? request.country_iso2 : '',
                             language: partnerRequestId && Object.keys(request).length ? request.locale.split('_')[0] : 'en',
                             uuid: partnerRequestId && Object.keys(request).length ? request.uuid : '',
+                            onekey_id: partnerRequestId && Object.keys(request).length ? request.onekey_id : '',
                             partner_type: partnerRequestId && Object.keys(request).length ? request.partner_type : '',
                         }}
+                        innerRef={formikRef}
                         displayName="PartnerRequestsForm"
                         validationSchema={partnerRequestSchemaForHcps}
                         enableReinitialize={true}

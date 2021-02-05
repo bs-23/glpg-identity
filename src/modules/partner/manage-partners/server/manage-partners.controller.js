@@ -170,6 +170,7 @@ async function createPartnerHcp(req, res) {
 
         data.entity_type = entityType;
         data.individual_type = type;
+        data.onekey_id = partnerRequest.onekey_id;
 
         const [partnerHcp, created] = await Partner.findOrCreate({
             where: { request_id: request_id },

@@ -63,6 +63,7 @@ async function createPartnerRequest(req, res) {
             workplace_type,
             specialty,
             iqvia_wholesaler_id,
+            onekey_id
         } = req.body;
 
         const application = await Application.findOne({ where: { email: 'patients-organization@glpg.com' } });
@@ -87,6 +88,7 @@ async function createPartnerRequest(req, res) {
             data.procurement_contact = procurement_contact;
             data.partner_type = partner_type;
             data.company_codes = company_codes;
+            data.onekey_id = onekey_id;
         }
         else if (entity_type === 'hco') {
             data.uuid = uuid;
