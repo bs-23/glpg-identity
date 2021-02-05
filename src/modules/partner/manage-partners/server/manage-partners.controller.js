@@ -836,7 +836,7 @@ async function getPartnerById(req, res) {
         if (entityType === 'hcp') { excludedFields = ['entity_type', 'organization_name', 'organization_type', 'created_at', 'updated_at'] }
         else if (entityType === 'hco') { excludedFields = ['entity_type', 'is_italian_hcp', 'should_report_hco', 'beneficiary_category', 'created_at', 'updated_at'] }
         else if (entityType === 'vendor' || 'wholesaler') { excludedFields = ['entity_type', 'created_at', 'updated_at'] }
-        else { res.status(404).send(`The ${entityType} does not exist`); }
+        else { return res.status(404).send(`The ${entityType} does not exist`); }
 
         let partner = null;
         if (entityType === 'hcp' || entityType === 'hco') {
