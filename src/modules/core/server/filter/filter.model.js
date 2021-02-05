@@ -11,7 +11,7 @@ const FilterSettings = sequelize.cdpConnector.define('filter_settings', {
     },
     title: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING(35)
     },
     user_id: {
         allowNull: false,
