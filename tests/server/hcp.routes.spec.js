@@ -144,33 +144,6 @@ describe('HCP Routes', () => {
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
-    // it('Should get 404 when trying to edit an non existing HCP user - Edit HCP user', async () => {
-    //     const response = await request.put(`/api/hcps/${faker.random.uuid()}`)
-    //         .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`])
-    //         .send({
-    //             first_name: faker.name.firstName(),
-    //             last_name: faker.name.lastName(),
-    //             telephone: faker.phone.phoneNumber()
-    //         });
-
-    //     expect(response.statusCode).toBe(404);
-    //     expect(response.body).toHaveProperty('errors');
-    //     expect(response.body.errors).toHaveLength(1);
-    // });
-
-    // it('Should edit an HCP user profile for hcp-portal - Edit HCP profile', async () => {
-    //     const response = await request.put(`/api/hcp-profiles/${defaultUser.id}`)
-    //         .set('Authorization', `bearer ${defaultApplication.access_token}`)
-    //         .send({
-    //             first_name: faker.name.firstName(),
-    //             last_name: faker.name.lastName()
-    //         });
-
-    //     expect(response.statusCode).toBe(200);
-    //     expect(response.body).toHaveProperty('data');
-    //     expect(response.res.headers['content-type']).toMatch('application/json');
-    // });
-
     it('Should get hcp users data', async () => {
         const response = await request
             .post('/api/hcps?page=1&status=self_verified')
