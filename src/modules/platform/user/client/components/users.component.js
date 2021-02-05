@@ -6,6 +6,7 @@ import { useToasts } from 'react-toast-notifications';
 import { getUsers } from '../user.actions';
 import axios from 'axios';
 import Modal from 'react-bootstrap/Modal';
+import Accordion from 'react-bootstrap/Accordion';
 import Faq from '../../../faq/client/faq.component';
 import UsersFilter from './users-filter.component';
 
@@ -278,7 +279,25 @@ export default function Users() {
                 <div className="row">
                     <div className="col-12">
                         <div className="d-flex justify-content-between align-items-center my-3">
-                            <h4 className="cdp-text-primary font-weight-bold mb-0 mb-sm-0">CDP User List</h4>
+                            <h4 className="cdp-text-primary font-weight-bold mb-0 mb-sm-0 d-flex align-items-end pr-2">
+                                CDP User List
+                                {userdata['users'] && userdata['users'].length > 0 &&
+                                    <Accordion className="cdp-table__responsive-accordion d-block d-sm-none">
+                                        <Accordion.Toggle eventKey="0" className="btn btn-sm borrder-0 shadow-0 mb-0 ml-2"><i className="fas fa-sort cdp-text-primary"></i></Accordion.Toggle>
+                                        <Accordion.Collapse eventKey="0" className="cdp-table__responsive-accordion-body">
+                                            <div className="cdp-bg-primary p-2 text-white">
+                                                <span className={sort.value === 'first_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'first_name')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                                <span className={sort.value === 'last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                                <span className={sort.value === 'email' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'email')}>Email<i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                                <span className={sort.value === 'status' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'status')}>Status<i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                                <span className={sort.value === 'created_at' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'created_at')}>Creation Date<i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                                <span className={sort.value === 'expiry_date' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'expiry_date')}>Expiry Date<i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                                <span className={sort.value === 'created_by' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(null, codBase, 'created_by')}>Created By<i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                            </div>
+                                        </Accordion.Collapse>
+                                    </Accordion>
+                                }
+                            </h4>
                             <div className="d-flex justify-content-between align-items-center">
                                 <button
                                     className={`btn cdp-btn-outline-primary ${isFilterEnabled ? 'multifilter_enabled' : ''}`}

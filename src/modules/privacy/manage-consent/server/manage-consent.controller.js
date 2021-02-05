@@ -353,7 +353,7 @@ async function createConsent(req, res) {
                             object_id: consentTransation.id,
                             table_name: 'consent_locales',
                             actor: req.user.id,
-                            changes: JSON.stringify(consentTransation.dataValues)
+                            changes: consentTransation.dataValues
                         });
 
                         data.translations.push(consentTransation);
@@ -369,7 +369,7 @@ async function createConsent(req, res) {
             object_id: data.id,
             table_name: 'consents',
             actor: req.user.id,
-            changes: JSON.stringify(consent.dataValues)
+            changes: consent.dataValues
         });
 
         // clearApplicationCache();
@@ -459,7 +459,7 @@ async function updateCdpConsent(req, res) {
                                     object_id: currentTranslationFromDB.id,
                                     table_name: 'consent_locales',
                                     actor: req.user.id,
-                                    changes: JSON.stringify(updatesInTranslation)
+                                    changes: updatesInTranslation
                                 });
                             }
 
@@ -480,7 +480,7 @@ async function updateCdpConsent(req, res) {
                                 object_id: createdTranslation.id,
                                 table_name: 'consent_locales',
                                 actor: req.user.id,
-                                changes: JSON.stringify(createdTranslation.dataValues)
+                                changes: createdTranslation.dataValues
                             });
 
                             response.translations[idx] = createdTranslation;
@@ -502,7 +502,7 @@ async function updateCdpConsent(req, res) {
                 object_id: consent.id,
                 table_name: 'consents',
                 actor: req.user.id,
-                changes: JSON.stringify(updatesInConsent)
+                changes: updatesInConsent
             });
         }
 
@@ -512,7 +512,7 @@ async function updateCdpConsent(req, res) {
                 object_id: dt.id,
                 table_name: 'consent_locales',
                 actor: req.user.id,
-                changes: JSON.stringify(dt.dataValues)
+                changes: dt.dataValues
             });
 
             await archiveService.archiveData({
