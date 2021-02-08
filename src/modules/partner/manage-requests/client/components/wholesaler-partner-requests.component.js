@@ -229,8 +229,8 @@ const WholesalerPartnerRequests = () => {
 
 
                         {requestData['partnerRequests'] && requestData['partnerRequests'].length > 0 ?
-                            <div className="table-responsive shadow-sm mb-3">
-                                <table className="table table-hover table-sm mb-0 cdp-table mb-2">
+                            <div className="table-responsive shadow-sm mb-3 cdp-table__responsive-wrapper mb-3">
+                                <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
                                     <thead className="cdp-table__header  cdp-bg-primary text-white">
                                         <tr>
                                             <th>Name</th>
@@ -248,28 +248,28 @@ const WholesalerPartnerRequests = () => {
                                             requestData['partnerRequests'].map((row, index) =>
                                             (
                                                 <tr key={index}>
-                                                    <td>{`${row.first_name} ${row.last_name}`}</td>
-                                                    <td>{row.status}</td>
-                                                    <td>
-                                                        {
-                                                            row.company_codes.map((companyCode, idx) => (
-                                                                <span className="badge badge-pill badge-light mr-1" key={idx}>{companyCode}</span>
-                                                            ))
-                                                        }
+                                                    <td data-for="Name">{`${row.first_name} ${row.last_name}`}</td>
+                                                    <td data-for="Status">{row.status}</td>
+                                                    <td data-for="Company Code">
+                                                    {
+                                                        row.company_codes.map((companyCode, idx) => (
+                                                            <span className="badge badge-pill badge-light mr-1" key={idx}>{companyCode}</span>
+                                                        ))
+                                                    }
                                                     </td>
-                                                    <td>{row.partner_type}</td>
-                                                    <td>{row.email}</td>
-                                                    <td>{row.procurement_contact}</td>
-                                                    <td>{getCountryName(row.country_iso2)}</td>
-                                                    <td><Dropdown className="ml-auto dropdown-customize">
-                                                        <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
-                                                        </Dropdown.Toggle>
-                                                        <Dropdown.Menu>
-                                                            <Dropdown.Item onClick={() => sendFormHandler(row)}> Send Form </Dropdown.Item>
-                                                            <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
-                                                            <Dropdown.Item className="text-danger" onClick={() => setRequestToDelete(row.id)}> Delete </Dropdown.Item>
-                                                        </Dropdown.Menu>
-                                                    </Dropdown></td>
+                                                    <td data-for="Partner Type">{row.partner_type}</td>
+                                                    <td data-for="Email Address">{row.email}</td>
+                                                    <td data-for="Procurement Contact">{row.procurement_contact}</td>
+                                                    <td data-for="Country">{getCountryName(row.country_iso2)}</td>
+                                                    <td data-for="Action"><Dropdown className="ml-auto dropdown-customize">
+                                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
+                                                    </Dropdown.Toggle>
+                                                    <Dropdown.Menu>
+                                                        <Dropdown.Item onClick={() => sendFormHandler(row)}> Send Form </Dropdown.Item>
+                                                        <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
+                                                        <Dropdown.Item className="text-danger" onClick={() => setRequestToDelete(row.id)}> Delete </Dropdown.Item>
+                                                    </Dropdown.Menu>
+                                                </Dropdown></td>
                                                 </tr>
                                             ))
                                         }

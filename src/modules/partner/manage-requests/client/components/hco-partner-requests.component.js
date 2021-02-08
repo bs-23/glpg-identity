@@ -193,8 +193,8 @@ const HcoPartnerRequests = () => {
 
 
                         {requestData['partnerRequests'] && requestData['partnerRequests'].length > 0 ?
-                            <div className="table-responsive shadow-sm bg-white">
-                                <table className="table table-hover table-sm mb-0 cdp-table">
+                            <div className="table-responsive shadow-sm bg-white cdp-table__responsive-wrapper mb-3">
+                                <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
                                             <th>UUID</th>
@@ -211,15 +211,15 @@ const HcoPartnerRequests = () => {
                                     <tbody className="cdp-table__body bg-white">
                                         {requestData['partnerRequests'].map((row, index) => (
                                             <tr key={index}>
-                                                <td>{row.uuid}</td>
-                                                <td>{`${row.first_name} ${row.last_name}`}</td>
-                                                <td>{row.mdr_id}</td>
-                                                <td>{row.status}</td>
-                                                <td>{row.partner_type}</td>
-                                                <td>{row.email}</td>
-                                                <td>{row.procurement_contact}</td>
-                                                <td>{getCountryName(row.country_iso2)}</td>
-                                                <td><Dropdown className="ml-auto dropdown-customize">
+                                                <td data-for="UUID">{row.uuid}</td>
+                                                <td data-for="Name">{`${row.first_name} ${row.last_name}`}</td>
+                                                <td data-for="MDR ID">{row.mdr_id}</td>
+                                                <td data-for="Status">{row.status}</td>
+                                                <td data-for="Partner Type">{row.partner_type}</td>
+                                                <td data-for="Email Address">{row.email}</td>
+                                                <td data-for="Procurement Contact">{row.procurement_contact}</td>
+                                                <td data-for="Country">{getCountryName(row.country_iso2)}</td>
+                                                <td data-for="Action"><Dropdown className="ml-auto dropdown-customize">
                                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu>
