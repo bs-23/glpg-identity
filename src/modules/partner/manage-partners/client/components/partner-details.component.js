@@ -34,13 +34,13 @@ const PartnerDetails = (props) => {
     }
 
     return (
-        <Modal size="xl" centered show={props.detailShow} onHide={handleClose}>
+        <Modal size="lg" centered show={props.detailShow} onHide={handleClose}>
             <Modal.Header closeButton>
                 <Modal.Title className="modal-title_small">
-                    {props.detailType === 'hcps' ? 'HCP' :
-                        props.detailType === 'hcos' ? 'HCO' :
-                            props.detailType === 'wholesalers' ? 'WHOLESALER' :
-                                props.detailType === 'vendors' ? 'VENDOR' : null
+                    {props.detailType === 'hcps' ? <span><i className="fas fa-user-md fa-1_5x pr-2"></i> HCP</span> :
+                        props.detailType === 'hcos' ? <span><i className="fas fa-hospital fa-1_5x pr-2"></i> HCO</span> :
+                            props.detailType === 'wholesalers' ? <span><i className="fas fa-hospital-user fa-1_5x pr-2"></i> Wholesaler</span> :
+                                props.detailType === 'vendors' ? <span><i className="fas fa-dolly fa-1_5x pr-2"></i> Vendor</span> : null
                     } Business Partner Request Details
                 </Modal.Title>
             </Modal.Header>
@@ -48,7 +48,7 @@ const PartnerDetails = (props) => {
                 {props.countries && props.countries.length > 0 && partner &&
                     <div className="row">
                         <div className="col-12">
-                            <h4 className="mb-3">{(props.detailType === 'hcps' || props.detailType === 'hcos') ?
+                            <h4 className="mb-4 pb-2">{(props.detailType === 'hcps' || props.detailType === 'hcos') ?
                                 partner.first_name + ' ' + partner.last_name : partner.name}</h4>
 
                         </div>
