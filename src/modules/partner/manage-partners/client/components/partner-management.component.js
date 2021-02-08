@@ -144,26 +144,26 @@ const PartnerManagement = () => {
 
                 <div className="row">
                     <div className="col-12">
-                        <div className="d-sm-flex justify-content-between align-items-end mb-0 mt-4">
+                        <div className="d-flex justify-content-between align-items-end mb-0 mt-4">
                             <div>
                                 <h4 className="cdp-text-primary font-weight-bold mb-4">Business Partner Lists</h4>
                                 <div>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/hcps"><i className="fas fa-user-md fa-1_5x mr-2"></i>Health Care Professionals</NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/hcos"><i className="fas fa-hospital fa-1_5x mr-2"></i>Health Care Organizations</NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/vendors"><i className="fas fa-hospital-user fa-1_5x mr-2"></i>General Vendors</NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/wholesalers"><i className="fas fa-dolly fa-1_5x mr-2"></i>Wholesalers</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/hcps"><i className="fas fa-user-md fa-1_5x"></i><span className="d-none d-sm-inline-block ml-2">Health Care Professionals</span></NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/hcos"><i className="fas fa-hospital fa-1_5x"></i><span className="d-none d-sm-inline-block ml-2">Health Care Organizations</span></NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/vendors"><i className="fas fa-hospital-user fa-1_5x"></i><span className="d-none d-sm-inline-block ml-2">General Vendors</span></NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/wholesalers"><i className="fas fa-dolly fa-1_5x"></i><span className="d-none d-sm-inline-block ml-2">Wholesalers</span></NavLink>
                                 </div>
                             </div>
                             <div className="d-flex justify-content-between align-items-center mb-2">
                                 <button onClick={() => exportApprovedList()} className="btn cdp-btn-secondary text-white ml-2">
-                                    Export Approved List for SAP
+                                    <i className="fas fa-download"></i> <span className="d-none d-sm-inline-block pl-1">Export Approved List for SAP</span>
                                 </button>
                             </div>
                         </div>
 
-                        <div className="table-responsive shadow-sm mb-3">
+                        <div className="table-responsive shadow-sm mb-3 cdp-table__responsive-wrapper">
                             {countries && countries.length > 0 && partnersData.partners && partnersData.partners.length > 0 &&
-                                <table className="table table-hover table-sm mb-0 cdp-table mb-2">
+                                <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
                                     <thead className="cdp-table__header  cdp-bg-primary text-white">
                                         <tr>
                                             {(detailType === 'hcps' || detailType === 'hcos') && <th>OneKey Id</th>}
@@ -185,20 +185,20 @@ const PartnerManagement = () => {
                                                 <tr key={index}>
                                                     {
                                                         (detailType === 'hcps' || detailType === 'hcos') &&
-                                                        <td>{item.onekey_id || '--'}</td>
+                                                        <td data-for="OneKey Id">{item.onekey_id || '--'}</td>
                                                     }
                                                     {
                                                         (detailType === 'hcps' || detailType === 'hcos') &&
-                                                        <td>{item.uuid || '--'}</td>
+                                                        <td data-for="UUID">{item.uuid || '--'}</td>
                                                     }
-                                                    { (detailType === 'hcps' || detailType === 'hcos') && <td> {item.first_name} </td>}
-                                                    { (detailType === 'hcps' || detailType === 'hcos') && <td> {item.last_name} </td>}
-                                                    { (detailType === 'vendors' || detailType === 'wholesalers') && <td> {item.name}</td>}
-                                                    <td>{item.locale}</td>
-                                                    <td>{item.address}</td>
-                                                    <td>{item.city}</td>
-                                                    <td>{(countries.find(i => i.country_iso2.toLowerCase() === item.country_iso2.toLowerCase())).countryname}</td>
-                                                    <td><Dropdown className="ml-auto dropdown-customize">
+                                                    {(detailType === 'hcps' || detailType === 'hcos') && <td data-for="First Name"> {item.first_name} </td>}
+                                                    {(detailType === 'hcps' || detailType === 'hcos') && <td data-for="Last Name"> {item.last_name} </td>}
+                                                    {(detailType === 'vendors' || detailType === 'wholesalers') && <td data-for="Name"> {item.name}</td>}
+                                                    <td data-for="Locale">{item.locale}</td>
+                                                    <td data-for="Street House No">{item.address}</td>
+                                                    <td data-for="City">{item.city}</td>
+                                                    <td data-for="Country">{(countries.find(i => i.country_iso2.toLowerCase() === item.country_iso2.toLowerCase())).countryname}</td>
+                                                    <td data-for="Action"><Dropdown className="ml-auto dropdown-customize">
                                                         <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
