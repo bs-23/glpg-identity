@@ -373,8 +373,17 @@ async function getOklaHcoDetails(req, res) {
             };
         });
 
+        const externalIdentifiers = workplace.externalKeys ? Object.keys(workplace.externalKeys).map(key => {
+            const externalKey = workplace.externalKeys[key];
+            return {
+                name: externalKey.typeLabel,
+                value: externalKey.value
+            };
+        }) : [];
+
         const data = {
             workplaceEid: workplace.workplaceEid,
+            externalIdentifiers,
             name,
             activity: workplace.activityLocationCorporateLabel,
             isInContract,
