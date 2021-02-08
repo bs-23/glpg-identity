@@ -21,6 +21,26 @@ const Modules = {
     }
 }
 
+const Services = {
+    MANAGE_CONSENT: {
+        value: 'manage-consent',
+        title: 'Manage New Consent'
+    },
+    CONSENT_COUNTRY: {
+        value: 'consent-country',
+        title: 'Assign Consent to Country'
+    },
+    CONSENT_CATEGORY: {
+        value: 'consent-category',
+        title: 'Configure Consent Category'
+    },
+    CONSENT_PERFORMANCE: {
+        value: 'consent-performance',
+        title: 'Generate Data Privacy & Consent Performance Report'
+    }
+}
+
 module.exports = {
-    Modules
+    Modules,
+    Services
 };

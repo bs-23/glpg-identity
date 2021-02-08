@@ -148,7 +148,7 @@ async function init() {
                             { title: "Manage New Consent", slug: "manage-consent", parent_id: privacy.id, created_by: admin.id, updated_by: admin.id },
                             { title: "Configure Consent Category", slug: "consent-category", parent_id: privacy.id, created_by: admin.id, updated_by: admin.id },
                             { title: "Assign Consent to Country", slug: "consent-country", parent_id: privacy.id, created_by: admin.id, updated_by: admin.id },
-                            { title: "Generate Data Privacy & Consent Performance Report ", slug: "consent-performance", parent_id: privacy.id, created_by: admin.id, updated_by: admin.id }
+                            { title: "Generate Data Privacy & Consent Performance Report", slug: "consent-performance", parent_id: privacy.id, created_by: admin.id, updated_by: admin.id }
                         ];
 
                         const allServices = [

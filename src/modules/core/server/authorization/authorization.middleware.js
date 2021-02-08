@@ -1,19 +1,54 @@
 const path = require("path");
-const passport = require('passport');
+const _ = require('lodash');
 const logService = require(path.join(process.cwd(), "src/modules/core/server/audit/audit.service.js"));
 const { getUserWithPermissionRelations } = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/permissions.js"));
+const Service = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/service.model.js"));
 
-const AdminGuard = (req, res, next) => {
-    if (!req.user) return res.status(401).send('unauthorized');
-    if (req.user.type.toLowerCase() !== 'admin') return res.status(403).send('forbidden');
+const evaluateAllowedServices = async (services) => {
+    if (!Array.isArray(services) && !services.length) return [];
 
-    next();
+    let serviceCategoriesSlugs;
+
+    if (_.isPlainObject(services[0])) serviceCategoriesSlugs = services.map(s => s.serviceCategory);
+    else serviceCategoriesSlugs = services;
+
+    const allowedServices = [];
+
+    const serviceCategories = await Service.findAll({
+        where: { slug: serviceCategoriesSlugs },
+        include: {
+            model: Service,
+            as: 'childServices'
+        }
+    });
+
+    if (_.isPlainObject(services[0])) {
+        serviceCategories.forEach(sc => {
+            const { services: servicesOptions } = services.find(ser => ser.serviceCategory === sc.slug) || {};
+
+            if (sc.childServices) sc.childServices.forEach(s => {
+                if (!servicesOptions) return allowedServices.push(s.slug);
+
+                if (Array.isArray(servicesOptions) && servicesOptions.includes(s.slug)) return allowedServices.push(s.slug);
+
+                if (_.isPlainObject(servicesOptions) && servicesOptions.exclude && !servicesOptions.exclude.includes(s.slug)) {
+                    allowedServices.push(s.slug);
+                }
+            });
+            else allowedServices.push(s.slug);
+        });
+    } else {
+        serviceCategories.forEach(sc => {
+            if (sc.childServices && sc.childServices.length) sc.childServices.forEach(s => allowedServices.push(s.slug));
+            else allowedServices.push(sc.slug);
+        });
+    }
+
+    return allowedServices;
 };
 
-const AuthGuard = passport.authenticate('user-jwt', { session: false });
-
-const isPermitted = (module, permissions) => {
-    if (permissions.some(p => p.slug === module)) {
+const isPermitted = (userServices, allowedServices) => {
+    if (userServices.some(p => allowedServices.includes(p.slug))) {
         return true;
     }
     return false;
@@ -55,14 +90,16 @@ async function getRolePermissions(roles) {
 
 }
 
-const ModuleGuard = (moduleName) => {
+const ModuleGuard = (services) => {
     return async function (req, res, next) {
         const user = await getUserWithProfiles(req.user.id);
-        const userPermissions = await getProfilePermissions(user.userProfile);
-        const rolePermissions = await getRolePermissions(user.userRoles);
-        let all_permissions = userPermissions.concat(rolePermissions);
+        const profileServices = await getProfilePermissions(user.userProfile);
+        const roleServices = await getRolePermissions(user.userRoles);
+        let userServices = profileServices.concat(roleServices);
 
-        if (!isPermitted(moduleName, all_permissions)) {
+        const allowedServices = await evaluateAllowedServices(services);
+
+        if (!isPermitted(userServices, allowedServices)) {
             await logService.log({
                 event_type: 'UNAUTHORIZE',
                 actor: req.user.id
@@ -75,9 +112,4 @@ const ModuleGuard = (moduleName) => {
     }
 };
 
-const adminPipeline = [AuthGuard, AdminGuard];
-
-exports.AdminGuard = AdminGuard;
-exports.AuthGuard = AuthGuard;
 exports.ModuleGuard = ModuleGuard;
-exports.adminPipeline = adminPipeline;
