@@ -211,17 +211,17 @@ const VendorPartnerRequests = () => {
 
                 <div className="row">
                     <div className="col-12">
-                        <div className="d-sm-flex justify-content-between align-items-end mb-0 mt-3">
+                        <div className="d-flex justify-content-between align-items-end mb-0 mt-3">
                             <div>
-                                <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Manage Vendors Request</h4>
+                                <h4 className="cdp-text-primary font-weight-bold mb-0">Manage Vendors Request</h4>
                                 <div className="pt-3">
-                                    <NavLink className="custom-tab px-3 py-3 font-weight-normal cdp-border-primary" to="/business-partner/requests/vendors"><i className="fas fa-hospital-user fa-1_5x mr-2"></i>General Vendors</NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 font-weight-normal cdp-border-primary" to="/business-partner/requests/wholesalers"><i className="fas fa-dolly fa-1_5x mr-2"></i> Wholesalers</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 font-weight-normal cdp-border-primary" to="/business-partner/requests/vendors"><i className="fas fa-hospital-user fa-1_5x"></i><span className="d-none d-sm-inline-block ml-2">General Vendors</span></NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 font-weight-normal cdp-border-primary" to="/business-partner/requests/wholesalers"><i className="fas fa-dolly fa-1_5x"></i><span className="d-none d-sm-inline-block ml-2">Wholesalers</span></NavLink>
                                 </div>
                             </div>
                             <div className="d-flex justify-content-between align-items-center mb-2">
                                 <button onClick={() => setShowForm(true)} className="btn cdp-btn-secondary text-white ml-2">
-                                    <i className="icon icon-plus pr-1"></i> Add New Request
+                                    <i className="icon icon-plus"></i> <span className="d-none d-sm-inline-block pl-1">Add New Request</span>
                                 </button>
                             </div>
                         </div>
