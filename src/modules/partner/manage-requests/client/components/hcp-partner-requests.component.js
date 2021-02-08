@@ -549,7 +549,11 @@ const HcpPartnerRequests = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <button type="submit" disabled={showError} className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" >Submit</button>
+                                <div className="row">
+                                    <div className="col-12 col-sm-6">
+                                        <button type="submit" disabled={showError} className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" >Submit</button>
+                                    </div>
+                                </div>
                             </Form>
                         )}
                     </Formik>
