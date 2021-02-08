@@ -179,6 +179,7 @@ paths:
                                     errors:
                                         $ref: "#/components/schemas/errorBodyInSuccess"
 
+    /api/clinical-trials/countries/zip:
         post:
             tags:
                 - clinical-trials
@@ -196,6 +197,46 @@ paths:
                                     example: DE
                             required:
                                 - iso
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        type: object
+                                        properties:
+                                            name:
+                                                type: string
+                                                    
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+                        
+    /api/clinical-trials/countries/zip/validate:
+        post:
+            tags:
+                - clinical-trials
+            summary: validate country and zipcode combination
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                country:
+                                    type: string
+                                    description: full country name
+                                    example: Afganistan
+                                zipcode:
+                                    type: string
+                                    description: zipcode
+                                    example: 123
+                            required:
+                                - country
+                                - zipcode
             responses:
                 200:
                     description: The request has succeeded.

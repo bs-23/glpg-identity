@@ -57,7 +57,7 @@ export default function Dashboard() {
                                         </NavLink>
                                     </li>
                                     <li className="pr-sm-4 pb-4 service__item">
-                                        <NavLink to="/" className="d-block py-5 px-3 service__link disabled">
+                                        <NavLink to="/clinical-trials" className="d-block py-5 px-3 service__link">
                                             <i className="icon icon-ct-management d-block service__icon"></i>
                                             Clinical Trials
                                         </NavLink>

@@ -18,8 +18,13 @@ module.exports = app => {
         .post(CDPAuthStrategy, ModuleGuard(Modules.CLINICAL_TRIALS.value), controller.mergeProcessData);
         
     app.route('/api/clinical-trials/countries')
-        .get(auth, controller.getCountryList)
+        .get(auth, controller.getCountryList);
+
+    app.route('/api/clinical-trials/countries/zip')
         .post(auth, controller.getPostalCodes);
+
+    app.route('/api/clinical-trials/countries/zip/validate')
+        .post(auth, controller.validateAddress);
     
     app.route('/api/clinical-trials/conditions')
         .get(auth, controller.getConditions);
