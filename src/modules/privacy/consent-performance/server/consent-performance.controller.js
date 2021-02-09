@@ -10,7 +10,7 @@ const HCPS = require(path.join(process.cwd(), 'src/modules/information/hcp/serve
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-consents.model'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/platform/user/server/permission/permissions'));
-const ExportService = require(path.join(process.cwd(), 'src/modules/core/server/export/create-excel-file.service'));
+const ExportService = require(path.join(process.cwd(), 'src/modules/core/server/export/export.service'));
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
 function ignoreCaseArray(str) {
@@ -344,7 +344,7 @@ async function exportCdpConsentsReport(req, res) {
             'Date': (new Date(hcp_consent.updated_at)).toLocaleDateString('en-GB').replace(/\//g, '.')
         }));
 
-        const filePath = ExportService.createExcelFile(data, 'cdp-consents.xlsx', 'Cdp consent report');
+        const filePath = ExportService.exportExcel(data, 'cdp-consents.xlsx', 'CDP consents report');
 
         res.download(filePath, function (err) {
             if (err) {
@@ -402,7 +402,7 @@ async function exportVeevaConsentsReport(req, res) {
             'Date': (new Date(hcp_consent.capture_datetime)).toLocaleDateString('en-GB').replace(/\//g, '.')
         }));
 
-        const filePath = ExportService.createExcelFile(data, 'veeva-consents.xlsx', 'VeevaCRM consent report');
+        const filePath = ExportService.exportExcel(data, 'veeva-consents.xlsx', 'VeevaCRM consent report');
 
         res.download(filePath, function (err) {
             if (err) {
