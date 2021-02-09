@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useRef, useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useCookies } from 'react-cookie';
 import ReCAPTCHA from 'react-google-recaptcha';
@@ -13,8 +13,20 @@ import { getAllCountries } from '../../../../core/client/country/country.actions
 export default function Login() {
     const recaptchaRef = useRef();
     const dispatch = useDispatch();
+    const location = useLocation();
     const { addToast } = useToasts();
     const [, setCookie] = useCookies();
+    const [rbk, setRbk] = useState(null); // rbk: Recaptcha Bypass Key
+
+    useEffect(() => {
+        const searchObj = {};
+        const searchParams = location.search.slice(1).split("&");
+
+        searchParams.forEach(element => {
+            searchObj[element.split("=")[0]] = element.split("=")[1];
+        });
+        setRbk(searchObj.rbk);
+    }, [location]);
 
     return (
         <div className="app-login">
@@ -40,7 +52,8 @@ export default function Login() {
                                                 username: values.email,
                                                 password: values.password,
                                                 grant_type: 'password',
-                                                recaptchaToken
+                                                recaptchaToken,
+                                                recaptchaBypassKey: rbk
                                             })).then(response => {
                                                 dispatch(getAllCountries());
                                                 setCookie('logged_in', true, { path: '/' });
@@ -76,7 +89,7 @@ export default function Login() {
                                                 <ReCAPTCHA
                                                     size="invisible"
                                                     ref={recaptchaRef}
-                                                    sitekey={process.env.RECAPTCHA_SITE_KEY}
+                                                    sitekey={rbk === process.env.RECAPTCHA_BYPASS_KEY ? '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI' : process.env.RECAPTCHA_SITE_KEY}
                                                 />
                                             }
 
