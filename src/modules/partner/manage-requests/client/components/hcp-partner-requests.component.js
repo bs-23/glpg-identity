@@ -8,7 +8,7 @@ import { useToasts } from 'react-toast-notifications';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { partnerRequestSchemaForHcps } from '../manage-requests.schema'
 import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm } from '../manage-requests.actions';
-import OklaSearch from './okla-search.component';
+import SearchHcpModal from './search-hcp-modal.component';
 
 const HcpPartnerRequests = () => {
     const dispatch = useDispatch();
@@ -560,7 +560,7 @@ const HcpPartnerRequests = () => {
                 </Modal.Body>
             </Modal>
 
-            {OklaSearch && <OklaSearch show={showSearch} resultSelected={resultSelected} searchInput={searchInput}/>}
+            {SearchHcpModal && <SearchHcpModal show={showSearch} resultSelected={resultSelected} searchInput={searchInput}/>}
 
             <Modal centered show={requestToDelete !== null} onHide={() => setRequestToDelete(null)}>
                 <Modal.Header closeButton>

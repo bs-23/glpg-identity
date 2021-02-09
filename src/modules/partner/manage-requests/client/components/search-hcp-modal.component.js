@@ -10,7 +10,7 @@ import axios from 'axios';
 import getUserPermittedCountries from '../../../../core/client/util/user-country';
 import uuidAuthorities from '../../../../information/hcp/client/uuid-authorities.json';
 
-const OklaSearch = (props) => {
+const SearchHcpModal = (props) => {
     let {
         show,
         searchInput,
@@ -561,4 +561,4 @@ const OklaSearch = (props) => {
     </Modal>
 };
 
-export default OklaSearch;
+export default SearchHcpModal;
