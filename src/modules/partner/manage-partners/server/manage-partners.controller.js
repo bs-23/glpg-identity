@@ -222,6 +222,7 @@ async function createPartnerHcp(req, res) {
 }
 
 async function updatePartnerHcp(req, res) {
+    const response = new Response({}, []);
     try {
         const files = req.files;
 
@@ -245,9 +246,9 @@ async function updatePartnerHcp(req, res) {
         };
 
         if (remove_files) {
-            const documents = await File.findAll({ where: { table_name: 'partners' } });
-            fileKeys = documents.map(function (obj) {
-                return obj.key;
+            const documents = await File.findAll({ where: { table_name: 'partners', owner_id: req.params.id } });
+            fileIds = documents.map(function (obj) {
+                return obj.id;
             });
 
             function fileExists(mainArr, subArr) {
@@ -257,10 +258,19 @@ async function updatePartnerHcp(req, res) {
             let files = null;
             (typeof remove_files === 'string') ? files = [remove_files] : files = remove_files;
 
-            const check = fileExists(fileKeys, files);
-            if (!check) return res.status(404).send('Files not exist');
+            const check = fileExists(fileIds, files);
+            if (!check) {
+                response.errors.push(new CustomError('File does not exist', 404));
+                return res.status(404).send(response);
+            }
 
-            await removeDocuments(files);
+            let file_keys = [];
+
+            files.forEach(element => {
+                file_keys.push(documents.find(x => x.id === element).key);
+            });
+
+            await removeDocuments(file_keys);
 
         }
 
@@ -278,11 +288,13 @@ async function updatePartnerHcp(req, res) {
         delete updated_data.dataValues.entity_type;
         delete updated_data.dataValues.onekey_id;
 
-        res.json(updated_data);
+        response.data = updated_data;
+        res.json(response);
 
     } catch (err) {
         console.error(err);
-        res.status(500).send('Internal server error');
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
     }
 }
 
@@ -365,6 +377,7 @@ async function getPartnerHco(req, res) {
 
 async function createPartnerHco(req, res) {
     const entityType = 'hco';
+    const response = new Response({}, []);
     try {
         const files = req.files;
 
