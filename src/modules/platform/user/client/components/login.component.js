@@ -16,7 +16,6 @@ export default function Login() {
     const location = useLocation();
     const { addToast } = useToasts();
     const [, setCookie] = useCookies();
-    const [rbk, setRbk] = useState(null); // rbk: Recaptcha Bypass Key
 
     useEffect(() => {
         const searchObj = {};
@@ -25,7 +24,6 @@ export default function Login() {
         searchParams.forEach(element => {
             searchObj[element.split("=")[0]] = element.split("=")[1];
         });
-        setRbk(searchObj.rbk);
     }, [location]);
 
     return (
@@ -52,8 +50,7 @@ export default function Login() {
                                                 username: values.email,
                                                 password: values.password,
                                                 grant_type: 'password',
-                                                recaptchaToken,
-                                                recaptchaBypassKey: rbk
+                                                recaptchaToken
                                             })).then(response => {
                                                 dispatch(getAllCountries());
                                                 setCookie('logged_in', true, { path: '/' });
@@ -89,7 +86,7 @@ export default function Login() {
                                                 <ReCAPTCHA
                                                     size="invisible"
                                                     ref={recaptchaRef}
-                                                    sitekey={rbk === process.env.RECAPTCHA_BYPASS_KEY ? '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI' : process.env.RECAPTCHA_SITE_KEY}
+                                                    sitekey={process.env.RECAPTCHA_SITE_KEY}
                                                 />
                                             }
 
