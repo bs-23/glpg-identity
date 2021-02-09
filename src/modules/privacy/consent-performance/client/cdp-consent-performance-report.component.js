@@ -106,8 +106,7 @@ const CdpConsentPerformanceReport = () => {
     }
 
     function exportExcelFile() {
-        axios.get('/api/export-cdp-consent-performance-report', { responseType: 'blob',})
-        .then(res => {
+        axios.get('/api/export-cdp-consent-performance-report', { responseType: 'blob'}).then(res => {
             fileDownload(res.data, 'cdp-consent-report.xlsx');
         });
     }
@@ -165,7 +164,7 @@ const CdpConsentPerformanceReport = () => {
                                 </div>
                                 <div className="d-flex pt-3 pt-sm-0 mb-2">
                                     <React.Fragment>
-                                        <button onClick={() => exportExcelFile()}>Export</button>
+                                        <button onClick={() => exportExcelFile()}>Export Full Report</button>
 
                                         {countries && consents_report['countries'] &&
                                             <Dropdown className="ml-auto dropdown-customize mr-2">

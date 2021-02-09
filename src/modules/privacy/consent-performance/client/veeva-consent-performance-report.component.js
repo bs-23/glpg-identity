@@ -105,12 +105,10 @@ const ConsentPerformanceReport = () => {
     }
 
     function exportExcelFile() {
-        axios.get('/api/export-veeva-consent-performance-report', { responseType: 'blob',})
-        .then(res => {
+        axios.get('/api/export-veeva-consent-performance-report', { responseType: 'blob'}).then(res => {
             fileDownload(res.data, 'veeva-consent-report.xlsx');
         });
     }
-
 
     useEffect(() => {
         dispatch(getAllCountries());
@@ -164,7 +162,7 @@ const ConsentPerformanceReport = () => {
                                 <div className="d-flex pt-3 pt-sm-0 mb-2">
 
                                     <React.Fragment>
-                                        <button onClick={() => exportExcelFile()}>Export</button>
+                                        <button onClick={() => exportExcelFile()}>Export Full Report</button>
 
                                         {countries && consents_report['countries'] &&
                                             <Dropdown className="ml-auto dropdown-customize mr-2">
