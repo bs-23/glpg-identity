@@ -162,7 +162,7 @@ const ConsentPerformanceReport = () => {
                                 <div className="d-flex pt-3 pt-sm-0 mb-2">
 
                                     <React.Fragment>
-                                        <button onClick={() => exportExcelFile()}>Export Full Report</button>
+                                        <button className="btn cdp-btn-outline-primary mr-2" onClick={() => exportExcelFile()}><i className="fas fa-download pr-1"></i> Export Full Report</button>
 
                                         {countries && consents_report['countries'] &&
                                             <Dropdown className="ml-auto dropdown-customize mr-2">
