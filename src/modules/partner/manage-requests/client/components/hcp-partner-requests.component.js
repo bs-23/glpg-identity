@@ -247,24 +247,24 @@ const HcpPartnerRequests = () => {
 
                 <div className="row">
                     <div className="col-12">
-                        <div className="d-sm-flex justify-content-between align-items-end mb-0 mt-3">
+                        <div className="d-flex justify-content-between align-items-end mb-0 mt-3">
                             <div>
-                                <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Manage HCPs Request</h4>
+                                <h4 className="cdp-text-primary font-weight-bold mb-0">Manage HCPs Request</h4>
                                 <div className="pt-3">
-                                    <NavLink className="custom-tab px-3 py-3 font-weight-normal cdp-border-primary" to="/business-partner/requests/hcps"><i className="fas fa-user-md fa-1_5x mr-2"></i> Health Care Professionals</NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 font-weight-normal cdp-border-primary" to="/business-partner/requests/hcos"><i className="fas fa-hospital fa-1_5x mr-2"></i>Health Care Organizations</NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 font-weight-normal cdp-border-primary" to="/business-partner/requests/hcps"><i className="fas fa-user-md fa-1_5x"></i><span className="d-none d-sm-inline-block ml-2">Health Care Professionals</span></NavLink>
+                                    <NavLink className="custom-tab px-3 py-3 font-weight-normal cdp-border-primary" to="/business-partner/requests/hcos"><i className="fas fa-hospital fa-1_5x"></i><span className="d-none d-sm-inline-block ml-2">Health Care Organizations</span></NavLink>
                                 </div>
                             </div>
                             <div className="d-flex justify-content-between align-items-center mb-2">
                                 <button onClick={() => setShowForm(true)} className="btn cdp-btn-secondary text-white ml-2">
-                                    <i className="icon icon-plus pr-1"></i> Add New Request
+                                    <i className="icon icon-plus"></i> <span className="d-none d-sm-inline-block pl-1">Add New Request</span>
                                 </button>
                             </div>
                         </div>
 
                         {requestData['partnerRequests'] && requestData['partnerRequests'].length > 0 ?
-                            <div className="table-responsive shadow-sm bg-white">
-                                <table className="table table-hover table-sm mb-0 cdp-table">
+                            <div className="table-responsive shadow-sm bg-white cdp-table__responsive-wrapper mb-3">
+                                <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
                                             <th>UUID</th>
@@ -282,11 +282,11 @@ const HcpPartnerRequests = () => {
                                     <tbody className="cdp-table__body bg-white">
                                         {requestData['partnerRequests'].map((row, index) => (
                                             <tr key={index}>
-                                                <td>{row.uuid}</td>
-                                                <td>{`${row.first_name} ${row.last_name}`}</td>
-                                                <td>{row.mdr_id}</td>
-                                                <td>{row.status}</td>
-                                                <td>
+                                                <td data-for="UUID">{row.uuid}</td>
+                                                <td data-for="Name">{`${row.first_name} ${row.last_name}`}</td>
+                                                <td data-for="MDR ID">{row.mdr_id}</td>
+                                                <td data-for="Status">{row.status}</td>
+                                                <td data-for="Company Code">
                                                     {
                                                         row.company_codes && row.company_codes.length &&
                                                         row.company_codes.map((companyCode, idx) => (
@@ -294,11 +294,11 @@ const HcpPartnerRequests = () => {
                                                         ))
                                                     }
                                                 </td>
-                                                <td>{row.partner_type}</td>
-                                                <td>{row.email}</td>
-                                                <td>{row.procurement_contact}</td>
-                                                <td>{getCountryName(row.country_iso2)}</td>
-                                                <td><Dropdown className="ml-auto dropdown-customize">
+                                                <td data-for="Partner Type">{row.partner_type}</td>
+                                                <td data-for="Email Address">{row.email}</td>
+                                                <td data-for="Procurement Contact">{row.procurement_contact}</td>
+                                                <td data-for="Country">{getCountryName(row.country_iso2)}</td>
+                                                <td data-for="Action"><Dropdown className="ml-auto dropdown-customize">
                                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu>
@@ -549,7 +549,11 @@ const HcpPartnerRequests = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <button type="submit" disabled={showError} className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" >Submit</button>
+                                <div className="row">
+                                    <div className="col-12 col-sm-6">
+                                        <button type="submit" disabled={showError} className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" >Submit</button>
+                                    </div>
+                                </div>
                             </Form>
                         )}
                     </Formik>
