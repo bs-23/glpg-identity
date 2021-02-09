@@ -22,6 +22,26 @@ const Modules = {
 }
 
 const Services = {
+    MANAGE_USER: {
+        title: "User & Access Management",
+        value: "manage-user"
+    },
+    MANAGE_PROFILE: {
+        title: "Manage Profiles",
+        value: "manage-profile"
+    },
+    MANAGE_ROLE: {
+        title: "Define Roles",
+        value: "manage-role"
+    },
+    MANAGE_PERMISSION_SETS: {
+        title: "Manage Permission Sets",
+        value: "manage-permission-sets"
+    },
+    MANAGE_FAQS: {
+        title: "Manage FAQs",
+        value: "manage-faqs"
+    },
     MANAGE_CONSENT: {
         value: 'manage-consent',
         title: 'Manage New Consent'
