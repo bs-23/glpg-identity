@@ -3,6 +3,7 @@ const url = require('url');
 const Partner = require('./partner.model');
 const PartnerVendors = require('./partner-vendor.model');
 const { Op } = require('sequelize');
+const { string } = require('yup');
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const PartnerRequest = require(path.join(process.cwd(), 'src/modules/partner/manage-requests/server/partner-request.model'));
 const storageService = require(path.join(process.cwd(), 'src/modules/core/server/storage/storage.service'));
@@ -35,6 +36,19 @@ async function uploadDucuments(owner, type, files) {
             table_name: tableNames[type]
         });
     };
+}
+
+async function removeDocuments(fileKeys) {
+    const bucketName = 'cdp-development';
+    const deleteParam = {
+        Bucket: bucketName,
+        Delete: {
+            Objects: fileKeys.map((key) => ({ Key: key }))
+        }
+    };
+    await storageService.deleteFiles(deleteParam);
+
+    await File.destroy({ where: { key: fileKeys } });
 }
 
 async function getPartnerHcps(req, res) {
@@ -213,9 +227,7 @@ async function updatePartnerHcp(req, res) {
 
         const { first_name, last_name, address, city, post_code, email, telephone,
             type, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
-            iban, bank_name, bank_account_no, currency } = req.body;
-
-        console.log(files);
+            iban, bank_name, bank_account_no, currency, remove_files } = req.body;
 
         const partner = await Partner.findOne({
             where: {
@@ -232,6 +244,25 @@ async function updatePartnerHcp(req, res) {
             individual_type: type
         };
 
+        if (remove_files) {
+            const documents = await File.findAll({ where: { table_name: 'partners' } });
+            fileKeys = documents.map(function (obj) {
+                return obj.key;
+            });
+
+            function fileExists(mainArr, subArr) {
+                return subArr.every(i => mainArr.includes(i));
+            }
+
+            let files = null;
+            (typeof remove_files === 'string') ? files = [remove_files] : files = remove_files;
+
+            const check = fileExists(fileKeys, files);
+            if (!check) return res.status(404).send('Files not exist');
+
+            await removeDocuments(files);
+
+        }
 
         const updated_data = await partner.update(data);
 

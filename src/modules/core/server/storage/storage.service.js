@@ -22,6 +22,12 @@ async function upload(options) {
     return response;
 }
 
+async function deleteFiles(options) {
+    const response = await S3.deleteObjects(options).promise();
+    return response;
+}
+
+
 function getSignedUrl(bucket, key) {
     const url = S3.getSignedUrl('getObject', {
         Bucket: bucket,
@@ -33,3 +39,4 @@ function getSignedUrl(bucket, key) {
 
 exports.upload = upload;
 exports.getSignedUrl = getSignedUrl;
+exports.deleteFiles = deleteFiles;
