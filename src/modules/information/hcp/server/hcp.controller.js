@@ -692,13 +692,13 @@ async function createHcpProfile(req, res) {
 
         if (req.body.consents && req.body.consents.length) {
             await Promise.all(req.body.consents.map(async consent => {
-                const preferenceSlug = Object.keys(consent)[0];
+                const preferenceId = Object.keys(consent)[0];
                 const consentResponse = Object.values(consent)[0];
                 let richTextLocale = `${language_code}_${country_iso2}`;
 
                 if (!consentResponse) return;
 
-                const consentDetails = await Consent.findOne({ where: { slug: preferenceSlug } });
+                const consentDetails = await Consent.findOne({ where: { id: preferenceId } });
 
                 if (!consentDetails) {
                     response.errors.push(new CustomError('Invalid consents.', 400));
@@ -725,7 +725,7 @@ async function createHcpProfile(req, res) {
 
                 let consentLocale = await ConsentLocale.findOne({
                     where: {
-                        consent_id: consentDetails.id,
+                        consent_id: preferenceId,
                         locale: { [Op.iLike]: `${language_code}_${country_iso2}` }
                     }
                 });
@@ -745,7 +745,7 @@ async function createHcpProfile(req, res) {
 
                     consentLocale = await ConsentLocale.findOne({
                         where: {
-                            consent_id: consentDetails.id,
+                            consent_id: preferenceId,
                             locale: { [Op.iLike]: localeUsingParentCountryISO }
                         }
                     });
