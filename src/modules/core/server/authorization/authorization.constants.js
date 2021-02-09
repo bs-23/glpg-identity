@@ -42,6 +42,14 @@ const Services = {
         title: "Manage FAQs",
         value: "manage-faqs"
     },
+    MANAGE_HCP: {
+        title: "Manage HCP Master Data",
+        value: "manage-hcp"
+    },
+    DISCOVER_HCP_HCO: {
+        title: "Discover Missing HCPs and HCOs",
+        value: "discover-hcp-hco"
+    },
     MANAGE_CONSENT: {
         value: 'manage-consent',
         title: 'Manage New Consent'
