@@ -352,7 +352,10 @@ export default function hcpUsers() {
     }
 
     const renderOptInTypes = ({ value }) => {
+        if(!value) return null;
+
         const allOptTypes = ['single-opt-in', 'double-opt-in', 'opt-out'];
+
         return <div className="text-center ml-n2">
             {value.includes('single-opt-in') ? <i title="Single Opt-In" className="fas fa-check cdp-text-primary mr-3"></i> : ''}
             {value.includes('double-opt-in') ? <i title="Double Opt-In" className="fas fa-check-double cdp-text-primary mr-3"></i> : ''}
@@ -545,6 +548,7 @@ export default function hcpUsers() {
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const filterID = params.get('filter');
+
         if(filterID) axios.get(`/api/filter/${filterID}`)
             .then(res => {
                 setSelectedFilterSetting(res.data);
@@ -554,18 +558,9 @@ export default function hcpUsers() {
         else {
             let filterSetting;
 
-            if(params.get('status')) {
-                filterSetting = {
-                    filters: [
-                        {
-                            name: '1',
-                            fieldName: 'status',
-                            operator: 'equal',
-                            value: [`${params.get('status')}`]
-                        }
-                    ],
-                    logic: '1'
-                }
+            if(location.state && location.state.filterSetting) {
+                filterSetting = location.state.filterSetting;
+
                 setIsFilterEnabled(true);
                 setSelectedFilterSetting({ settings: filterSetting });
             }

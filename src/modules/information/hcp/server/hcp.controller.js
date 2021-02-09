@@ -285,6 +285,7 @@ async function getHcps(req, res) {
         const offset = page * limit;
 
         const currentFilter = req.body;
+        const { fields } = req.body;
 
         const [userPermittedApplications, userPermittedCountries] = await getUserPermissions(req.user.id);
 
@@ -305,37 +306,51 @@ async function getHcps(req, res) {
         order.push(['created_at', 'DESC']);
         order.push(['id', 'DESC']);
 
+        const getAttributes = () => {
+            const fieldsToExclude = ['hcpConsents', 'origin_url', 'password', 'password_updated_at', 'reset_password_expires', 'reset_password_token', 'failed_auth_attempt', 'created_by', 'updated_by', 'updated_at'];
+
+            let requiredAttributes = fields && fields.length
+                ? fields.filter(field => !fieldsToExclude.includes(field))
+                : null;
+
+            return requiredAttributes ? requiredAttributes : { exclude: fieldsToExclude };
+        }
+
         const filterOptions = await generateFilterOptions(currentFilter, userPermittedApplications, userPermittedCountries, status, 'hcp_profiles');
 
         const hcps = await Hcp.findAll({
             where: filterOptions,
-            include: [{
-                model: HcpConsents,
-                as: 'hcpConsents',
-                attributes: ['consent_id', 'consent_confirmed', 'opt_type'],
-            }],
-            attributes: { exclude: ['origin_url', 'password', 'password_updated_at', 'reset_password_expires', 'reset_password_token', 'failed_auth_attempt', 'created_by', 'updated_by', 'updated_at'] },
+            include: !fields || fields.includes('hcpConsent')
+                ? [{
+                    model: HcpConsents,
+                    as: 'hcpConsents',
+                    attributes: ['consent_id', 'consent_confirmed', 'opt_type'],
+                }]
+                : null,
+            attributes: getAttributes(),
             offset,
             limit,
             order
         });
 
-        hcps.map(hcp => {
-            const opt_types = new Set();
+        if (!fields || !fields.length) {
+            hcps.map(hcp => {
+                const opt_types = new Set();
 
-            hcp['hcpConsents'].map(hcpConsent => {
-                if (hcpConsent.consent_confirmed || hcpConsent.opt_type === 'opt-out') {
-                    opt_types.add(hcpConsent.opt_type);
-                }
+                hcp['hcpConsents'].map(hcpConsent => {
+                    if (hcpConsent.consent_confirmed || hcpConsent.opt_type === 'opt-out') {
+                        opt_types.add(hcpConsent.opt_type);
+                    }
+                });
+
+                hcp.dataValues.opt_types = [...opt_types];
+                delete hcp.dataValues['hcpConsents'];
             });
-
-            hcp.dataValues.opt_types = [...opt_types];
-            delete hcp.dataValues['hcpConsents'];
-        });
+        }
 
         const totalUser = await Hcp.count({ where: filterOptions });
 
-        if(hcps.length) {
+        if (hcps.length && (!fields || !fields.length || fields.includes('specialty_onekey'))) {
             const specialties = _.uniq(_.map(hcps, 'specialty_onekey')).join("','");
 
             const specialty_list = await sequelize.datasyncConnector.query(`
@@ -531,7 +546,7 @@ async function updateHcps(req, res) {
                 table_name: 'hcp_profiles',
                 actor: req.user.id,
                 remarks: Hcps[index].comment.trim(),
-                changes: JSON.stringify(allUpdateRecordsForLogging[index])
+                changes: allUpdateRecordsForLogging[index]
             });
         }));
 
@@ -677,13 +692,13 @@ async function createHcpProfile(req, res) {
 
         if (req.body.consents && req.body.consents.length) {
             await Promise.all(req.body.consents.map(async consent => {
-                const preferenceId = Object.keys(consent)[0];
+                const preferenceSlug = Object.keys(consent)[0];
                 const consentResponse = Object.values(consent)[0];
                 let richTextLocale = `${language_code}_${country_iso2}`;
 
                 if (!consentResponse) return;
 
-                const consentDetails = await Consent.findOne({ where: { id: preferenceId } });
+                const consentDetails = await Consent.findOne({ where: { slug: preferenceSlug } });
 
                 if (!consentDetails) {
                     response.errors.push(new CustomError('Invalid consents.', 400));
@@ -710,7 +725,7 @@ async function createHcpProfile(req, res) {
 
                 let consentLocale = await ConsentLocale.findOne({
                     where: {
-                        consent_id: preferenceId,
+                        consent_id: consentDetails.id,
                         locale: { [Op.iLike]: `${language_code}_${country_iso2}` }
                     }
                 });
@@ -730,7 +745,7 @@ async function createHcpProfile(req, res) {
 
                     consentLocale = await ConsentLocale.findOne({
                         where: {
-                            consent_id: preferenceId,
+                            consent_id: consentDetails.id,
                             locale: { [Op.iLike]: localeUsingParentCountryISO }
                         }
                     });
@@ -751,7 +766,7 @@ async function createHcpProfile(req, res) {
                     consent_id: consentDetails.id,
                     consent_confirmed: consentCountry.opt_type === 'double-opt-in' ? false : true,
                     opt_type: consentCountry.opt_type,
-                    rich_text: consentLocale.rich_text,
+                    rich_text: validator.unescape(consentLocale.rich_text),
                     consent_locale: richTextLocale,
                     created_by: req.user.id,
                     updated_by: req.user.id
@@ -844,7 +859,11 @@ async function confirmConsents(req, res) {
         let userConsents = await HcpConsents.findAll({ where: { user_id: payload.id } });
 
         if (userConsents && userConsents.length) {
-            userConsents = userConsents.map(consent => ({ ...consent.dataValues, consent_confirmed: true }));
+            userConsents = userConsents.map(consent => ({
+                ...consent.dataValues,
+                rich_text: consent.rich_text,
+                consent_confirmed: true
+            }));
 
             await HcpConsents.bulkCreate(userConsents, {
                 updateOnDuplicate: ['consent_confirmed']
@@ -1102,11 +1121,6 @@ async function changePassword(req, res) {
         });
     }
 
-    if (!email || !current_password || !new_password || !confirm_password) {
-        response.errors.push(new CustomError('Missing required parameters.', 400));
-        return res.status(400).send(response);
-    }
-
     try {
         const doc = await Hcp.findOne({ where: where(fn('lower', col('email')), fn('lower', email)) });
 
@@ -1264,16 +1278,6 @@ async function forgetPassword(req, res) {
     const { email } = req.body;
 
     try {
-        if (!email) {
-            response.errors.push(new CustomError('Missing required parameters.', 400));
-            return res.status(400).send(response);
-        }
-
-        if (!validator.isEmail(email)) {
-            response.errors.push(new CustomError('The email address format is invalid.', 4000, 'email'));
-            return res.status(400).send(response);
-        }
-
         const doc = await Hcp.findOne({
             where: where(fn('lower', col('email')), fn('lower', email))
         });
@@ -1467,18 +1471,6 @@ async function getAccessToken(req, res) {
     try {
         const { email, password } = req.body;
 
-        if (!email) {
-            response.errors.push(new CustomError('Email is required.', 400, 'email'));
-        }
-
-        if (!password) {
-            response.errors.push(new CustomError('Password is required.', 400, 'password'));
-        }
-
-        if (!email || !password) {
-            return res.status(400).json(response);
-        }
-
         const doc = await Hcp.findOne({
             where: where(fn('lower', col('email')), fn('lower', email))
         });
@@ -1559,8 +1551,6 @@ async function updateHCPUserConsents(req, res) {
         if (!hcpUser) {
             response.errors.push(new CustomError('Invalid HCP User.', 400));
         }
-
-        if (!req.body.consents) response.errors.push(new CustomError('consents are missing.', 400, 'consents'));
 
         if (response.errors.length) {
             return res.status(400).send(response);

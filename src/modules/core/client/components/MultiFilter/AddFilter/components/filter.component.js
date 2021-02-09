@@ -117,7 +117,7 @@ const Filter = (props) => {
                         className="multiselect"
                         classNamePrefix="multiselect"
                         closeMenuOnScroll={false}
-                        captureMenuScroll={true}
+                        menuPortalTarget={document.body}
                         value={getSelectedOptions()}
                         onChange={selectedOption => {
                             const value = (selectedOption || []).map(o => o.value);

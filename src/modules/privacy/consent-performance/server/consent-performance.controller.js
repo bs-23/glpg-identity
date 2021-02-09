@@ -38,7 +38,7 @@ async function getCdpConsentsReport(req, res) {
 
             if (orderBy === 'consent_type') order.push([Consent, ConsentCategory, 'title', orderType]);
 
-            if (orderBy === 'opt_type') order.push([Consent, { model: ConsentCountry, as: 'consent_country' }, 'opt_type', orderType === 'ASC' ? 'DESC' : 'ASC']);
+            if (orderBy === 'opt_type') order.push(['opt_type', orderType === 'ASC' ? 'DESC' : 'ASC']);
 
             if (orderBy === 'legal_basis') order.push([Consent, 'legal_basis', orderType]);
             if (orderBy === 'preferences') order.push([Consent, 'preference', orderType]);

@@ -38,6 +38,14 @@ function getFilterQuery(filter, tableName) {
             : { [Op.iLike]: `${escapeValues(filter.value)}%` };
     }
 
+    if (filter.operator === 'date-less-than') {
+        queryValue = where(fn('date', col(tableName ? `${tableName}.${filter.fieldName}` : filter.fieldName)), '<', filter.value);
+    }
+
+    if (filter.operator === 'date-greater-than') {
+        queryValue = where(fn('date', col(tableName ? `${tableName}.${filter.fieldName}` : filter.fieldName)), '>', filter.value);
+    }
+
     if (filter.operator === 'less-than') {
         queryValue = { [Op.lt]: filter.value };
     }

@@ -120,19 +120,22 @@ export function getDatasyncFilterOptions(userCountries) {
             fieldName: 'firstname',
             valueType: 'text',
             displayText: 'First Name',
-            operators: operators.getStringOperators()
+            operators: operators.getStringOperators(),
+            maxLength: 50
         },
         {
             fieldName: 'lastname',
             valueType: 'text',
             displayText: 'Last Name',
-            operators: operators.getStringOperators()
+            operators: operators.getStringOperators(),
+            maxLength: 50
         },
         {
             fieldName: 'email_1',
             valueType: 'text',
             displayText: 'Email',
-            operators: operators.getStringOperators()
+            operators: operators.getStringOperators(),
+            maxLength: 100
         },
         {
             fieldName: 'codbase',
@@ -152,7 +155,8 @@ export function getDatasyncFilterOptions(userCountries) {
             fieldName: 'uuid_1',
             valueType: 'text',
             displayText: 'UUID',
-            operators: operators.getStringOperators()
+            operators: operators.getStringOperators(),
+            maxLength: 20
         },
         {
             fieldName: 'specialty',
@@ -166,55 +170,64 @@ export function getDatasyncFilterOptions(userCountries) {
             fieldName: 'individual_id_onekey',
             valueType: 'text',
             displayText: 'Individual Onekey ID',
-            operators: operators.getStringOperators()
+            operators: operators.getStringOperators(),
+            maxLength: 30
         },
         {
             fieldName: 'activity_id_onekey',
             valueType: 'text',
             displayText: 'Activity Onekey ID',
-            operators: operators.getStringOperators()
+            operators: operators.getStringOperators(),
+            maxLength: 30
         },
         {
             fieldName: 'workplace_id_onekey',
             valueType: 'text',
             displayText: 'Workplace Onekey ID',
-            operators: operators.getStringOperators()
+            operators: operators.getStringOperators(),
+            maxLength: 30
         },
         {
             fieldName: 'telephone',
             valueType: 'text',
             displayText: 'Phone',
-            operators: operators.getStringOperators()
+            operators: operators.getStringOperators(),
+            maxLength: 50
         },
         {
             fieldName: 'adr_id_onekey',
             valueType: 'text',
             displayText: 'Address Onekey ID',
-            operators: operators.getStringOperators()
+            operators: operators.getStringOperators(),
+            maxLength: 30
         },
         {
             fieldName: 'address_lbl',
             valueType: 'text',
             displayText: 'Address Label',
-            operators: operators.getStringOperators()
+            operators: operators.getStringOperators(),
+            maxLength: 50
         },
         {
             fieldName: 'postal_city',
             valueType: 'text',
             displayText: 'Postal City',
-            operators: operators.getStringOperators()
+            operators: operators.getStringOperators(),
+            maxLength: 50
         },
         {
             fieldName: 'fax',
             valueType: 'text',
             displayText: 'Fax',
-            operators: operators.getStringOperators()
+            operators: operators.getStringOperators(),
+            maxLength: 50
         },
         {
             fieldName: 'lgpostcode',
             valueType: 'text',
-            displayText: 'Post Code',
-            operators: operators.getStringOperators()
+            displayText: 'Postal Code',
+            operators: operators.getStringOperators(),
+            maxLength: 50
         }
     ];
 

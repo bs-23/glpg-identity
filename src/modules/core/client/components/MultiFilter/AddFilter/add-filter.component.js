@@ -6,6 +6,8 @@ import { Button } from '../common';
 import { Filter } from './components';
 import { buildLogicAfterAddition, buildLogicAfterRemoval } from '../utils';
 
+const generateRandomKey = () => `${Math.random()}_${Math.random()}`;
+
 const AddFilter = (props) => {
     const {
         filters: alreadyAddedFilters,
@@ -16,12 +18,13 @@ const AddFilter = (props) => {
         onHide
     } = props;
 
-    const emptyFilter = {
+    const createEmptyFilter = () => ({
+        key: generateRandomKey(),
         name: '',
         fieldName: '',
         operator: '',
         value: []
-    };
+    });
 
     const [filters, setFilters] = useState([]);
     const [logic, setLogic] = useState('');
@@ -32,15 +35,12 @@ const AddFilter = (props) => {
     const scrollRef = useRef();
 
     const handleAddMoreFilter = () => {
-        const emptyFilter = {
-            name: String(filters.length + 1),
-            fieldName: '',
-            operator: '',
-            value: []
-        };
+        const emptyFilter = createEmptyFilter();
+        emptyFilter.name = String(filters.length + 1);
+        const updateLogic = buildLogicAfterAddition([String(filters.length+1)], logic);
+
         setFilters([...filters, emptyFilter]);
         setValidationErrors([...validationErrors, {}]);
-        const updateLogic = buildLogicAfterAddition([String(filters.length+1)], logic);
         setLogic(updateLogic);
     }
 
@@ -50,14 +50,20 @@ const AddFilter = (props) => {
         const valueSchema = (options || {}).schema;
 
         const isIdenticalFilter = filters.some((f, ind) => {
-            const f1 = {...f};
-            const f2 = {...filter};
+            if (ind === index) return false;
 
-            delete f1.name;
-            delete f2.name;
+            const f1 = { fieldName: f.fieldName, operator: f.operator };
+            const f2 = { fieldName: filter.fieldName, operator: filter.operator };
 
-            return ind !== index && _.isEqual(f1, f2);
-        })
+            if (!_.isEqual(f1, f2)) return false;
+
+            const value1 = Array.isArray(f.value) ? f.value : [f.value];
+            const value2 = Array.isArray(filter.value) ? filter.value : [filter.value];
+
+            const areValuesSame = _.difference(value1, value2).concat(_.difference(value2, value1)).length === 0;
+
+            return areValuesSame;
+        });
 
         if(isIdenticalFilter) validationError.value = 'This filter is identical to another filter in the list.';
 
@@ -145,7 +151,7 @@ const AddFilter = (props) => {
 
     useEffect(() => {
         if(!alreadyAddedFilters.length) {
-            const updatedFilters = [..._.cloneDeep(alreadyAddedFilters), emptyFilter];
+            const updatedFilters = [createEmptyFilter()].map(filter => ({ ...filter, key: generateRandomKey() }));
             setFilters(updatedFilters);
 
             const updateLogic = buildLogicAfterAddition([String(updatedFilters.length)], alreadyAddedLogic);
@@ -169,19 +175,22 @@ const AddFilter = (props) => {
                         const currentFilterOption = filterOptions.find(fo => fo.fieldName === filter.fieldName);
                         const CustomFilterComponent = (currentFilterOption || {}).customFilterComponent;
 
-                        if (CustomFilterComponent) return <CustomFilterComponent
-                            title={index+1}
-                            index={index}
-                            filter={filter}
-                            filterOptions={filterOptions}
-                            isTouched={isTouched}
-                            validationError={validationErrors[index]}
-                            onChange={handleChange}
-                            onRemove={handleRemove}
-                        />
+                        if (CustomFilterComponent) {
+                            return <CustomFilterComponent
+                                key={filter.key || index}
+                                title={index+1}
+                                index={index}
+                                filter={filter}
+                                filterOptions={filterOptions}
+                                isTouched={isTouched}
+                                validationError={validationErrors[index]}
+                                onChange={handleChange}
+                                onRemove={handleRemove}
+                            />
+                        }
 
                         return <Filter
-                                key={`${index}_${Math.random()}`}
+                                key={filter.key || index}
                                 title={index+1}
                                 index={index}
                                 filter={filter}

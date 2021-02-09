@@ -16,7 +16,20 @@ module.exports = app => {
 
     app.route('/api/clinical-trials/merge-versions')
         .post(CDPAuthStrategy, ModuleGuard(Modules.CLINICAL_TRIALS.value), controller.mergeProcessData);
+        
+    app.route('/api/clinical-trials/countries')
+        .get(auth, controller.getCountryList);
+
+    app.route('/api/clinical-trials/countries/zip')
+        .post(auth, controller.getPostalCodes);
+
+    app.route('/api/clinical-trials/countries/zip/validate')
+        .post(auth, controller.validateAddress);
+    
+    app.route('/api/clinical-trials/conditions')
+        .get(auth, controller.getConditions);
 
     app.route('/api/clinical-trials/:id')
         .get(auth, controller.getTrialDetails);
+
 };

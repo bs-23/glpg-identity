@@ -1,5 +1,7 @@
 import { string, object, array } from 'yup';
 
+const MAX_FILTER_SETTING_NAME_LENGTH = 35;
+
 export const multiFilterSchema = object().shape({
     selectedFilterSettingName: string().when('shouldSaveFilter', {
         is: true,
@@ -7,7 +9,7 @@ export const multiFilterSchema = object().shape({
             is: 'save_existing',
             then: string()
                 .transform(value => value.trim())
-                .max(50, 'This field must be at most 50 characters long')
+                .max(MAX_FILTER_SETTING_NAME_LENGTH, `This field must be at most ${MAX_FILTER_SETTING_NAME_LENGTH} characters long`)
                 .required('This field must not be empty'),
             otherwise: string()
         }),
@@ -19,7 +21,7 @@ export const multiFilterSchema = object().shape({
             is: 'save_as_new',
             then: string()
                 .transform(value => value.trim())
-                .max(50, 'This field must be at most 50 characters long')
+                .max(MAX_FILTER_SETTING_NAME_LENGTH, `This field must be at most ${MAX_FILTER_SETTING_NAME_LENGTH} characters long`)
                 .required('This field must not be empty'),
             otherwise: string()
         }),
@@ -33,4 +35,3 @@ export const multiFilterSchema = object().shape({
         .test('is-valid', 'All logic fields must be provided',
         logic => logic ? !logic.includes('null') : true)
 })
-'isChosenFromExisting'

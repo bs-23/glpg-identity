@@ -34,6 +34,7 @@ export default function Input (props) {
         return <Field
             type={type}
             value={dateValue}
+            max={"9999-12-31"}
             {...rest}
         />
     }

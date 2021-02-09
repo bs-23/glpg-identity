@@ -5,6 +5,9 @@ const { Op } = require('sequelize');
 const ConsentCategory = require('./consent-category.model');
 const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
+const { clearApplicationCache } = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.controller'));
+
+const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
 
 async function getConsentCategory(req, res) {
     try {
@@ -55,7 +58,7 @@ async function createConsentCategory(req, res) {
             },
             defaults: {
                 title: req.body.title.trim(),
-                slug: req.body.title.trim(),
+                slug: convertToSlug(req.body.title.trim()),
                 created_by: req.user.id,
                 updated_by: req.user.id
             }
@@ -70,8 +73,10 @@ async function createConsentCategory(req, res) {
             object_id: data.id,
             table_name: 'consent_categories',
             actor: req.user.id,
-            changes: JSON.stringify(data.dataValues)
+            changes: data.dataValues
         });
+
+        // clearApplicationCache();
 
         res.json(data);
     } catch (err) {
@@ -100,18 +105,21 @@ async function updateConsentCategory(req, res) {
 
         const consentCategoryBeforeUpdate = {...consentCategory.dataValues};
 
-        const data = await consentCategory.update({ title: title.trim(), slug: title.trim(), updated_by: req.user.id });
+        const data = await consentCategory.update({ title: title.trim(), updated_by: req.user.id });
 
-        await logService.log({
-            event_type: 'UPDATE',
-            object_id: consentCategory.id,
-            table_name: 'consent_categories',
-            actor: req.user.id,
-            changes: JSON.stringify({
-                old_value: consentCategoryBeforeUpdate,
-                new_value: data.dataValues
-            })
-        });
+        const updatesInCategory = logService.difference(data.dataValues, consentCategoryBeforeUpdate);
+
+        if (updatesInCategory) {
+            await logService.log({
+                event_type: 'UPDATE',
+                object_id: consentCategory.id,
+                table_name: 'consent_categories',
+                actor: req.user.id,
+                changes: updatesInCategory
+            });
+        }
+
+        // clearApplicationCache();
 
         res.json(data);
     } catch (err) {

@@ -7,6 +7,7 @@ const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-con
 const ConsentCountry = require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model.js'));
 const ConsentLanguage = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent-locale.model.js'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
+const { clearApplicationCache } = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.controller'));
 
 function getTranslationViewmodels(translations) {
     return translations.map(t => ({
@@ -89,8 +90,10 @@ async function assignConsentToCountry(req, res) {
             object_id: createdCountryConsent.id,
             table_name: 'consent_countries',
             actor: req.user.id,
-            changes: JSON.stringify(createdCountryConsent.dataValues)
+            changes: createdCountryConsent.dataValues
         });
+
+        // clearApplicationCache();
 
         res.json(createdCountryConsent);
     } catch (err) {
@@ -116,16 +119,19 @@ async function updateCountryConsent(req, res) {
             opt_type: optType
         });
 
-        await logService.log({
-            event_type: 'UPDATE',
-            object_id: consentCountry.id,
-            table_name: 'consent_countries',
-            actor: req.user.id,
-            changes: JSON.stringify({
-                old_value: consentCountryBeforeUpdate,
-                new_value: consentCountry.dataValues
-            })
-        });
+        const updatesInConsentCountry = logService.difference(consentCountry.dataValues, consentCountryBeforeUpdate);
+
+        if (updatesInConsentCountry) {
+            await logService.log({
+                event_type: 'UPDATE',
+                object_id: consentCountry.id,
+                table_name: 'consent_countries',
+                actor: req.user.id,
+                changes: updatesInConsentCountry
+            });
+        }
+
+        // clearApplicationCache();
 
         res.json(consentCountry);
     } catch (err) {
@@ -152,8 +158,10 @@ async function deleteCountryConsent(req, res) {
             object_id: id,
             table_name: 'consent_countries',
             actor: req.user.id,
-            changes: JSON.stringify(consentCountry.dataValues)
+            changes: consentCountry.dataValues
         });
+
+        // clearApplicationCache();
 
         res.sendStatus(200);
     } catch (err) {
@@ -161,8 +169,6 @@ async function deleteCountryConsent(req, res) {
         res.status(500).send('Internal server error');
     }
 }
-
-
 
 exports.getCountryConsents = getCountryConsents;
 exports.assignConsentToCountry = assignConsentToCountry;

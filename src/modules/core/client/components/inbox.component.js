@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import StatusupdateModal from './statusUpdateModal.component';
 import { Tabs, TabList, Tab, PanelList, Panel } from 'react-tabtab';
@@ -10,8 +10,26 @@ export default function Inbox() {
     const [show, setShow] = React.useState();
     const [showModal, setShowModal] = useState(false);
     const [modalId, setModalId] = useState(null);
+
+    const filterSetting = {
+        filters: [
+            {
+                name: '1',
+                fieldName: 'status',
+                operator: 'equal',
+                displayText: 'Not Verified',
+                value: ['not_verified']
+            }
+        ],
+        logic: '1'
+    }
+
     const getHcps = () => {
-        dispatch(getHcpProfiles('?page=1&status=not_verified&limit=5'));
+        const reqBody = {
+            ...filterSetting,
+            fields: ['id', 'first_name', 'last_name', 'email', 'created_at']
+        }
+        dispatch(getHcpProfiles('?limit=5', reqBody));
     };
 
     let hcps = useSelector(state => state.hcpReducer.hcps);
@@ -45,11 +63,11 @@ export default function Inbox() {
                                 {hcps.users !== undefined && hcps.users.length < 6 &&
                                     hcps.users.map((user, key) => <ul key={key} className="cdp-inbox__list p-0 m-0">
                                         <li key={key} className="cdp-inbox__list-item d-flex justify-content-between  align-items-center border-bottom py-3 px-3">
-                                            <span className="cdp-inbox__list-item-col large cdp-text-primary font-weight-bold">{user.email}</span>
-                                            <span className="cdp-inbox__list-item-col cdp-text-primary font-weight-bold px-3">{new Date(user.created_at).toLocaleDateString('en-GB', {
+                                            <span className="cdp-inbox__list-item-col large cdp-text-primary font-weight-bold text-break">{user.email}</span>
+                                            <span className="cdp-inbox__list-item-col cdp-text-primary font-weight-bold px-3 text-break">{new Date(user.created_at).toLocaleDateString('en-GB', {
                                                 day: 'numeric', month: 'short', year: 'numeric'
                                             }).replace(/ /g, ' ')}</span>
-                                            <span className="cdp-inbox__list-item-col">
+                                            <span className="cdp-inbox__list-item-col text-break">
                                                 <button className="btn cdp-btn-secondary btn-sm text-white" onClick={() => { setModalId(key); setShowModal(true) }}>Update Status</button>
                                             </span>
                                         </li>
@@ -58,18 +76,18 @@ export default function Inbox() {
                                 )}
 
                                 {hcps.users !== undefined && hcps.users.length !== 0 ?
-                                    <NavLink to="/information/list/cdp?page=1&status=not_verified" className="d-inline-block p-3 text-uppercase cdp-text-secondary active small font-weight-bold">
+                                    <Link to={{ pathname: "/information/list/cdp",  state: { filterSetting } }} className="d-inline-block p-3 text-uppercase cdp-text-secondary active small font-weight-bold">
                                         {hcps.total > 5 && 'More Pending'}
-                                    </NavLink>
-                                    : <h5 className="d-block py-5 px-2 text-uppercase cdp-text-secondary active text-center mb-0"><i className="far fa-folder-open mr-2"></i>No Data Found</h5>
+                                    </Link>
+                                    : <h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found</h5>
                                 }
                             </div>
                         </Panel>
 
-                        <Panel><div className="cdp-inbox__tab-detail"><h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found.</h5></div></Panel>
-                        <Panel><div className="cdp-inbox__tab-detail"><h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found.</h5></div></Panel>
-                        <Panel><div className="cdp-inbox__tab-detail"><h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found.</h5></div></Panel>
-                        <Panel><div className="cdp-inbox__tab-detail"><h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found.</h5></div></Panel>
+                        <Panel><div className="cdp-inbox__tab-detail"><h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found</h5></div></Panel>
+                        <Panel><div className="cdp-inbox__tab-detail"><h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found</h5></div></Panel>
+                        <Panel><div className="cdp-inbox__tab-detail"><h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found</h5></div></Panel>
+                        <Panel><div className="cdp-inbox__tab-detail"><h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found</h5></div></Panel>
                     </PanelList>
                 </Tabs>
             </div>
