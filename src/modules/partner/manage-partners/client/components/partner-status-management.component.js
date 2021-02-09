@@ -58,7 +58,7 @@ const PartnerStatusManage = (props) => {
     }
 
     return (
-        <Modal size="lg" centered show={props.statusShow} onHide={handleClose}>
+        <Modal size="" centered show={props.statusShow} onHide={handleClose}>
             <Modal.Header closeButton>
                 <Modal.Title className="modal-title_small">
                     Status Update
@@ -72,10 +72,6 @@ const PartnerStatusManage = (props) => {
                                 partner.first_name + ' ' + partner.last_name : partner.name}</h4>
 
                             <p>{partner.email}</p>
-                        </div>
-                        <div className="col-12">
-
-
                         </div>
                         <div className="col-12">
                             <div className="row">
