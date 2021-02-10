@@ -10,40 +10,23 @@ import axios from 'axios';
 import getUserPermittedCountries from '../../../../core/client/util/user-country';
 import uuidAuthorities from '../../../../information/hcp/client/uuid-authorities.json';
 
-const SearchHcpModal = (props) => {
+const SearchHcoModal = (props) => {
     let {
         show,
         searchInput,
         resultSelected
     } = props;
 
-    const defaultFormValue = {
-        countries: [],
-        isInContract: false,
-        phonetic: false,
-        duplicates: false,
-        firstName: '',
-        lastName: '',
-        address: '',
-        city: '',
-        postCode: '',
-        onekeyId: '',
-        individualEid: '',
-        externalIdentifier: '',
-        specialties: [],
-    };
-
     const dispatch = useDispatch();
-    const formikRef = useRef();
     const { addToast } = useToasts();
+    const formikRef = useRef();
 
     const countries = useSelector(state => state.countryReducer.countries);
     const allCountries = useSelector(state => state.countryReducer.allCountries);
     const userProfile = useSelector(state => state.userReducer.loggedInUser);
     const userCountries = getUserPermittedCountries(userProfile, countries);
 
-    const [initVal, setInitVal] = useState(defaultFormValue);
-    const [users, setUsers] = useState({});
+    const [hcos, setHcos] = useState({});
     const [selectedCountries, setSelectedCountries] = useState([]);
     const [specialties, setSpecialties] = useState([]);
     const [selectedSpecialties, setSelectedSpecialties] = useState([]);
@@ -52,27 +35,11 @@ const SearchHcpModal = (props) => {
     const [duplicates, setDuplicates] = useState(false);
     const [formData, setFormData] = useState({});
     const [currentPage, setCurrentPage] = useState(1);
-    const [hcpSpecialty, setHcpSpecialty] = useState();
+    const [hcoSpecialty, setHcoSpecialty] = useState();
     const [uuidLabel, setUuidLabel] = useState('UUID');
-
-    useEffect(() => {
-        if (searchInput) {
-            const countries = getCountries().filter(c => c.countryIso2 === searchInput.countryIso2);
-            setSelectedCountries(countries);
-
-            setInitVal({
-                ...defaultFormValue,
-                countries: countries || [],
-                firstName: searchInput.firstName || '',
-                lastName: searchInput.lastName || '',
-                externalIdentifier: searchInput.uuid || ''
-            });
-        }
-    }, [searchInput]);
 
     function clearFileds() {
         searchInput = null;
-        setInitVal(defaultFormValue);
         setFormData({});
         setCurrentPage(1);
         setSelectedCountries([]);
@@ -80,12 +47,12 @@ const SearchHcpModal = (props) => {
         setIsInContract(false);
         setDuplicates(false);
         setPhonetic(false);
-        setUsers({});
-        setHcpSpecialty(null);
+        setHcos({});
+        setHcoSpecialty(null);
     };
 
-    const handleClose = (hcpDetails) => {
-        resultSelected(hcpDetails);
+    const handleClose = (hcoDetails) => {
+        resultSelected(hcoDetails);
         clearFileds();
     };
 
@@ -94,8 +61,8 @@ const SearchHcpModal = (props) => {
         clearFileds();
     };
 
-    const handleResultSelection = (hcp) => {
-        axios.get(`/api/okla/hcps/${hcp.codbase}/${hcp.individualEid}`)
+    const handleResultSelection = (hco) => {
+        axios.get(`/api/okla/hcos/${hco.codbase}/${hco.workplaceEid}`)
             .then(response => {
                 handleClose(response.data);
             })
@@ -163,16 +130,19 @@ const SearchHcpModal = (props) => {
         searchResult.scrollIntoView({ behavior: 'smooth' });
     };
 
-    const searchHcps = (newPage) => {
-        axios.post(`/api/okla/hcps/search?page=${newPage}`, formData)
+    const searchHcos = (newPage) => {
+        axios.post(`/api/okla/hcos/search?page=${newPage}`, formData)
             .then(response => {
-                setUsers(response.data);
+                setHcos(response.data);
                 setCurrentPage(newPage);
                 try {
                     scrollToResult(response.data.results.length === 0);
                 }
                 catch (err) {
-                    console.log(err);
+                    addToast('Error! Please try again.', {
+                        appearance: 'error',
+                        autoDismiss: true
+                    });
                 }
             })
             .catch(err => {
@@ -188,12 +158,12 @@ const SearchHcpModal = (props) => {
 
     const pageLeft = () => {
         if (currentPage === 1) return;
-        searchHcps(currentPage - 1);
+        searchHcos(currentPage - 1);
     };
 
     const pageRight = () => {
-        if (currentPage === Math.ceil(users.totalNumberOfResults / users.resultSize)) return;
-        searchHcps(currentPage + 1);
+        if (currentPage === Math.ceil(hcos.totalNumberOfResults / hcos.resultSize)) return;
+        searchHcos(currentPage + 1);
     };
 
     const getUuidLabel = (selectedCountries) => {
@@ -205,6 +175,19 @@ const SearchHcpModal = (props) => {
     };
 
     useEffect(() => {
+        if (searchInput) {
+            const countries = getCountries().filter(c => c.countryIso2 === searchInput.countryIso2);
+            setSelectedCountries(countries);
+
+            if (countries) formikRef.current.setFieldValue('countries', countries);
+
+            if (searchInput.uuid) formikRef.current.setFieldValue('workplaceEid', searchInput.uuid);
+
+            if (searchInput.specialty) setHcoSpecialty(searchInput.specialty);
+        }
+    }, [searchInput]);
+
+    useEffect(() => {
         const fetchSpecialties = async () => {
             const codbases = selectedCountries.map(item => `codbases=${item.value}`);
             const parameters = codbases.join('&');
@@ -212,7 +195,7 @@ const SearchHcpModal = (props) => {
                 const response = await axios.get(`/api/hcps/specialties?${parameters}`);
                 const groupedSpecialties = groupSpecialties(response.data);
 
-                const filtered = hcpSpecialty ? groupedSpecialties.filter(i => i.codIdOnekeys.includes(hcpSpecialty)) : [];
+                const filtered = hcoSpecialty ? groupedSpecialties.filter(i => i.codIdOnekeys.includes(hcoSpecialty)) : [];
 
                 if (filtered && filtered.length) {
                     setSelectedSpecialties([{ label: filtered[0].codDescription, value: filtered[0].codIdOnekeys }]);
@@ -224,7 +207,7 @@ const SearchHcpModal = (props) => {
         }
         fetchSpecialties();
         setUuidLabel(getUuidLabel(selectedCountries));
-    }, [selectedCountries, hcpSpecialty]);
+    }, [selectedCountries, hcoSpecialty]);
 
     return <Modal
         centered
@@ -243,9 +226,22 @@ const SearchHcpModal = (props) => {
                     <div className="shadow-sm bg-light pb-3">
                         <div className="add-user mx-3 mt-0 p-3 bg-white rounded border">
                             <Formik
+                                initialValues={{
+                                    countries: [],
+                                    isInContract: false,
+                                    phonetic: false,
+                                    duplicates: false,
+                                    firstName: '',
+                                    lastName: '',
+                                    address: '',
+                                    city: '',
+                                    postCode: '',
+                                    onekeyId: '',
+                                    workplaceEid: '',
+                                    specialties: []
+                                }}
                                 innerRef={formikRef}
                                 enableReinitialize={true}
-                                initialValues={initVal}
                                 displayName="SearchForm"
                                 onSubmit={async (values, actions) => {
                                     const data = { ...values };
@@ -259,44 +255,26 @@ const SearchHcpModal = (props) => {
                                     data.codbases = data.countries.map(i => i.value);
                                     delete data.countries;
 
-                                    axios.post('/api/okla/hcps/search', data)
-                                        .then(response => {
-                                            setUsers(response.data);
-                                            setFormData(data);
-                                            setCurrentPage(1);
-                                            actions.setSubmitting(false);
-                                            try {
-                                                scrollToResult(response.data.results.length === 0);
-                                            }
-                                            catch (err) {
-                                                addToast('Error! Please try again.', {
-                                                    appearance: 'error',
-                                                    autoDismiss: true
-                                                });
-                                            }
-                                        })
-                                        .catch(err => {
-                                            const message = err.response.status === 400
-                                                ? err.response.data
-                                                : 'Sorry! Search failed. Please, try again.';
-                                            addToast(message, {
-                                                appearance: 'error',
-                                                autoDismiss: true
-                                            });
+                                    try {
+                                        const response = await axios.post('/api/okla/hcos/search', data);
+                                        setHcos(response.data);
+                                        setFormData(data);
+                                        setCurrentPage(1);
+                                        actions.setSubmitting(false);
+                                        scrollToResult(response.data.results.length === 0);
+                                    } catch (err) {
+                                        const message = err.response.status === 400
+                                            ? err.response.data
+                                            : 'Sorry! Search failed. Please, try again.';
+                                        addToast(message, {
+                                            appearance: 'error',
+                                            autoDismiss: true
                                         });
+                                    }
                                 }}
                             >
                                 {formikProps => (
-                                    <Form
-                                        onSubmit={formikProps.handleSubmit}
-                                        onChange={e => {
-                                            if (e.target.id !== 'isInContractCheckbox'
-                                                && e.target.id !== 'phoneticCheckbox'
-                                                && e.target.id !== 'duplicatesCheckbox') {
-                                                // changeUrl();
-                                            }
-                                        }}
-                                    >
+                                    <Form onSubmit={formikProps.handleSubmit}>
                                         <div className="row align-items-center">
                                             <div className="col-12 col-sm-6 col-lg-4">
                                                 <div className="form-group">
@@ -314,11 +292,10 @@ const SearchHcpModal = (props) => {
                                                         classNamePrefix="multiselect"
                                                         value={selectedCountries}
                                                         onChange={selectedOption => {
-                                                            formikProps.values.countries = selectedOption;
+                                                            formikProps.setFieldValue('countries', selectedOption || []);
                                                             setSelectedCountries(selectedOption || []);
                                                             formikProps.values.specialties = [];
                                                             setSelectedSpecialties([]);
-                                                            // changeUrl();
                                                         }}
                                                     />
                                                 </div>
@@ -329,15 +306,14 @@ const SearchHcpModal = (props) => {
                                                         type="checkbox"
                                                         className="custom-control-input"
                                                         name="isInContract"
-                                                        id="isInContractCheckbox"
                                                         checked={isInContract}
+                                                        id="customControlInline"
                                                         onChange={(e) => {
                                                             formikProps.values.isInContract = e.target.checked;
                                                             setIsInContract(e.target.checked);
                                                         }} />
-                                                    <label className="custom-control-label" for="isInContractCheckbox">In My Contract</label>
+                                                    <label className="custom-control-label" for="customControlInline">In My Contract</label>
                                                 </div>
-
                                             </div>
                                             <div className="col-12 col-sm-6 col-lg-4">
                                                 <div className="form-group">
@@ -347,67 +323,31 @@ const SearchHcpModal = (props) => {
                                                             type="checkbox"
                                                             className="custom-control-input"
                                                             name="phonetic"
-                                                            id="phoneticCheckbox"
                                                             checked={phonetic}
+                                                            id="customControlInline2"
                                                             onChange={(e) => {
                                                                 formikProps.values.phonetic = e.target.checked;
                                                                 setPhonetic(e.target.checked);
                                                             }} />
-                                                        <label className="custom-control-label" for="phoneticCheckbox">Phonetic</label>
+                                                        <label className="custom-control-label" for="customControlInline2">Phonetic</label>
                                                     </div>
                                                     <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-2">
                                                         <input
                                                             type="checkbox"
                                                             className="custom-control-input"
                                                             name="duplicates"
-                                                            id="duplicatesCheckbox"
                                                             checked={duplicates}
+                                                            id="customControlInline3"
                                                             onChange={(e) => {
                                                                 formikProps.values.duplicates = e.target.checked;
                                                                 setDuplicates(e.target.checked);
                                                             }} />
-                                                        <label className="custom-control-label" for="duplicatesCheckbox">Duplicates</label>
+                                                        <label className="custom-control-label" for="customControlInline3">Duplicates</label>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <h5 className="border-bottom pt-5 pb-2 "><i className="far fa-user cdp-text-secondary mr-2"></i>Individual</h5>
-                                        <div className="row">
-                                            <div className="col-12 col-sm-4">
-                                                <div className="form-group">
-                                                    <label for="exampleFormControlInput1">First Name</label>
-                                                    <Field className="form-control firstName" type='text' name='firstName' id='firstName' />
-                                                </div>
-                                            </div>
-                                            <div className="col-12 col-sm-4">
-                                                <div className="form-group">
-                                                    <label for="exampleFormControlInput1">Last Name</label>
-                                                    <Field className="form-control lastName" type='text' name='lastName' id='lastName' />
-                                                </div>
-                                            </div>
-                                            <div className="col-12 col-sm-4">
-                                                <div className="form-group">
-                                                    <label for="Specialty">Specialty</label>
-                                                    <Select
-                                                        defaultValue={[]}
-                                                        isMulti={true}
-                                                        name="specialties"
-                                                        components={{ Option: CustomOption }}
-                                                        hideSelectedOptions={false}
-                                                        // controlShouldRenderValue = { false }
-                                                        options={getSpecialties()}
-                                                        className="multiselect"
-                                                        classNamePrefix="multiselect"
-                                                        value={selectedSpecialties}
-                                                        onChange={selectedOption => {
-                                                            formikProps.setFieldValue('specialties', Array.isArray(selectedOption) ? selectedOption : []);
-                                                            setSelectedSpecialties(selectedOption || []);
-                                                            // changeUrl();
-                                                        }}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
+
                                         <h5 className="border-bottom pt-4 pb-2 "><i className="far fa-building cdp-text-secondary mr-2"></i>Workplace</h5>
                                         <div className="row">
                                             <div className="col-12 col-sm-4">
@@ -428,13 +368,34 @@ const SearchHcpModal = (props) => {
                                                     <Field className="form-control postCode" type='text' name='postCode' id='postCode' />
                                                 </div>
                                             </div>
+                                            <div className="col-12 col-sm-4">
+                                                <div className="form-group">
+                                                    <label for="Specialty">Specialty</label>
+                                                    <Select
+                                                        defaultValue={[]}
+                                                        isMulti={true}
+                                                        name="specialties"
+                                                        components={{ Option: CustomOption }}
+                                                        hideSelectedOptions={false}
+                                                        // controlShouldRenderValue = { false }
+                                                        options={getSpecialties()}
+                                                        className="multiselect"
+                                                        classNamePrefix="multiselect"
+                                                        value={selectedSpecialties}
+                                                        onChange={selectedOption => {
+                                                            formikProps.setFieldValue('specialties', Array.isArray(selectedOption) ? selectedOption : []);
+                                                            setSelectedSpecialties(selectedOption || []);
+                                                        }}
+                                                    />
+                                                </div>
+                                            </div>
                                         </div>
                                         <h5 className="border-bottom pt-4 pb-2 "><i className="fas fa-key cdp-text-secondary mr-2"></i>Identifiers</h5>
                                         <div className="row align-items-end">
                                             <div className="col-12 col-sm-4">
                                                 <div className="form-group">
                                                     <label for="OnekeyID">
-                                                        Activity Onekey Id
+                                                        Workplace Onekey ID
                                                         {/* <OverlayTrigger trigger="click" rootClose placement="top" overlay={activityOnekeyIDHintPopup}>
                                                             <i className="fas fa-info-circle ml-1 text-secondary" role="button"></i>
                                                         </OverlayTrigger> */}
@@ -444,14 +405,8 @@ const SearchHcpModal = (props) => {
                                             </div>
                                             <div className="col-12 col-sm-4">
                                                 <div className="form-group">
-                                                    <label for="Individual ">Individual Onekey ID</label>
-                                                    <Field className="form-control individual" type='text' name='individualEid' id='individual' />
-                                                </div>
-                                            </div>
-                                            <div className="col-12 col-sm-4">
-                                                <div className="form-group">
-                                                    <label for="Individual" className="text-break">{uuidLabel}</label>
-                                                    <Field className="form-control externalIdentifier" type='text' name='externalIdentifier' id='externalIdentifier' />
+                                                    <label for="workplaceEid" className="text-break">{uuidLabel}</label>
+                                                    <Field className="form-control individual" type='text' name='workplaceEid' id='workplaceEid' />
                                                 </div>
                                             </div>
                                         </div>
@@ -462,7 +417,7 @@ const SearchHcpModal = (props) => {
                                             </div>
                                             <div className="col-6">
                                                 <div className="d-flex align-items-center">
-                                                    <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2 okla-search__btn-search" disabled={!selectedCountries || !selectedCountries.length || !(formikProps.values.firstName || formikProps.values.lastName || formikProps.values.address || formikProps.values.city || formikProps.values.postCode || formikProps.values.onekeyId || formikProps.values.individualEid || formikProps.values.externalIdentifier || (selectedSpecialties && selectedSpecialties.length))}>SEARCH</button>
+                                                    <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2 okla-search__btn-search" disabled={!formikProps.values.countries || !formikProps.values.countries.length || !(formikProps.values.address || formikProps.values.city || formikProps.values.postCode || formikProps.values.onekeyId || formikProps.values.workplaceEid || (selectedSpecialties && selectedSpecialties.length))}> SEARCH </button>
                                                     {/* <OverlayTrigger trigger="click" rootClose placement="left" overlay={searchHintPopup}>
                                                         <i className="fas fa-info-circle mt-4 ml-2 cdp-text-primary" role="button"></i>
                                                     </OverlayTrigger> */}
@@ -476,14 +431,14 @@ const SearchHcpModal = (props) => {
                     </div>
                 </div>
             </div>
-            {users.results && users.results.length > 0 &&
+
+            {hcos.results && hcos.results.length > 0 &&
                 <div className="row" id="search-result">
                     <div className="col-12">
                         <div className="my-3">
                             <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
                                 <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Search Result</h4>
                                 <div className="d-flex justify-content-between align-items-center">
-
                                 </div>
                             </div>
 
@@ -492,57 +447,38 @@ const SearchHcpModal = (props) => {
                                 <table className="table table-hover table-sm mb-0 cdp-table">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
-                                            <th>Name
-                                                {/* <OverlayTrigger trigger="click" rootClose placement="right" overlay={nameHintPopup}>
+                                            <th>
+                                                Name
+                                                {/* <OverlayTrigger trigger="click" rootClose placement="right" overlay={namehintpopup}>
                                                     <i className="fas fa-info-circle ml-1 text-white" role="button"></i>
                                                 </OverlayTrigger> */}
                                             </th>
                                             <th>Specialty</th>
-                                            <th>Workplace
-                                                {/* <OverlayTrigger trigger="click" rootClose placement="right" overlay={workplaceHintPopup}>
-                                                    <i className="fas fa-info-circle ml-1 text-white" role="button"></i>
-                                                </OverlayTrigger> */}
-                                            </th>
-                                            <th>Individual Onekey ID</th>
+                                            <th>Address</th>
+                                            <th>City</th>
                                             <th>Country</th>
                                         </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
                                         {
-                                            users.results.map((user, idx) => (
-                                                <tr key={idx} onClick={() => handleResultSelection(user)}>
-                                                    <td>{user.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary" title="In my contract"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary" title="Not in my contract"></i>} {`${user.firstName} ${user.lastName}`}</td>
-                                                    <td>{(user.specialties || ['--']).join(', ')}</td>
-                                                    <td>
-                                                        {
-                                                            user.workplaces.map((item, idxOfWorkPlace) => (
-                                                                <div key={idxOfWorkPlace} className="currentWorkplace">
-                                                                    <span className="okla-search__workplace-icons position-relative">
-                                                                        {
-                                                                            item.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary" title="In my contract"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary" title="Not in my contract"></i>
-                                                                        }
-                                                                        {
-                                                                            item.isValid ? <i className="fas fa-check cdp-text-primary border-left"></i> : <i className="fas fa-times cdp-text-secondary border-left"></i>
-                                                                        }
-                                                                    </span>
-                                                                    {[item.name, item.address, item.city].filter(i => i).join(', ')}
-                                                                </div>
-                                                            ))
-                                                        }
-                                                    </td>
-                                                    <td>{user.individualEid}</td>
-                                                    <td>{getCountryName(user.countryIso2)}</td>
+                                            hcos.results.map((hco, idx) => (
+                                                <tr key={idx} onClick={() => handleResultSelection(hco)}>
+                                                    <td>{hco.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary" title="In my contract"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary" title="Not In my contract"></i>} {`${hco.name}`}</td>
+                                                    <td>{(hco.specialties || ['--']).join(', ')}</td>
+                                                    <td>{hco.address}</td>
+                                                    <td>{hco.city}</td>
+                                                    <td>{getCountryName(hco.countryIso2)}</td>
                                                 </tr>
                                             ))
                                         }
                                     </tbody>
                                 </table>
                                 {
-                                    (Math.ceil(users.totalNumberOfResults / users.resultSize) >= 1) &&
+                                    (Math.ceil(hcos.totalNumberOfResults / hcos.resultSize) >= 1) &&
                                     <div className="pagination justify-content-end align-items-center border-top p-3">
-                                        <span className="cdp-text-primary font-weight-bold">{`Page ${currentPage} of ${Math.ceil(users.totalNumberOfResults / users.resultSize)}`}</span>
+                                        <span className="cdp-text-primary font-weight-bold">{`Page ${currentPage} of ${Math.ceil(hcos.totalNumberOfResults / hcos.resultSize)}`}</span>
                                         <span className="pagination-btn" onClick={() => pageLeft()} disabled={currentPage === 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
-                                        <span className="pagination-btn" onClick={() => pageRight()} disabled={Math.ceil(users.totalNumberOfResults / users.resultSize) === currentPage}><i className="icon icon-arrow-down ml-2 next"></i></span>
+                                        <span className="pagination-btn" onClick={() => pageRight()} disabled={Math.ceil(hcos.totalNumberOfResults / hcos.resultSize) === currentPage}><i className="icon icon-arrow-down ml-2 next"></i></span>
                                     </div>
                                 }
                             </div>
@@ -551,11 +487,11 @@ const SearchHcpModal = (props) => {
                 </div>
             }
 
-            {users.results && users.results.length <= 0 &&
+            {hcos.results && hcos.results.length <= 0 &&
                 <div className="row justify-content-center my-5 py-5 mb-3" id="empty-search-result">
                     <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">
-                        <i className="icon icon-team icon-6x cdp-text-secondary"></i>
-                        <h3 className="font-weight-bold cdp-text-primary pt-4">No Health Care Professionals found</h3>
+                        <i className="far fa-building fa-4x cdp-text-secondary"></i>
+                        <h3 className="font-weight-bold cdp-text-primary pt-4">No Health Care Organizations found</h3>
                         <h4 className="cdp-text-primary pt-3 pb-5">you might need to change some settings and search again</h4>
                     </div>
                 </div>
@@ -564,4 +500,4 @@ const SearchHcpModal = (props) => {
     </Modal>
 };
 
-export default SearchHcpModal;
+export default SearchHcoModal;
