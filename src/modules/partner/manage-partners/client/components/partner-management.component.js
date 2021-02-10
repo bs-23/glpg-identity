@@ -17,6 +17,7 @@ const PartnerManagement = () => {
     const [detailShow, setDetailShow] = useState(false);
     const [statusShow, setStatusShow] = useState(false);
     const [detailType, setDetailType] = useState(null);
+    const [partner, setPartner] = useState(null);
     const location = useLocation();
     const history = useHistory();
     const params = new URLSearchParams(window.location.search);
@@ -204,17 +205,18 @@ const PartnerManagement = () => {
                                                         <Dropdown.Menu>
                                                             {item.status === 'pending' &&
                                                                 <>
-                                                                    <Dropdown.Item onClick={() => setStatusShow(true)}>Manage Status</Dropdown.Item>
-                                                                    <PartnerStatusManage partnerInfo={item} detailType={detailType} changeStatusShow={(val) => setStatusShow(val)} statusShow={statusShow}></PartnerStatusManage>
+                                                                    <Dropdown.Item onClick={() => { setStatusShow(true); setPartner(item); }}>Manage Status</Dropdown.Item>
+
                                                                 </>
                                                             }
-                                                            <Dropdown.Item onClick={() => setDetailShow(true)}>Profile</Dropdown.Item>
-                                                            <PartnerDetails countries={countries} detailId={item.id} detailType={detailType} changeDetailShow={(val) => setDetailShow(val)} detailShow={detailShow} />
+                                                            <Dropdown.Item onClick={() => { setDetailShow(true); setPartner(item); }}>Profile</Dropdown.Item>
                                                         </Dropdown.Menu>
                                                     </Dropdown></td>
                                                 </tr>
                                             ))
                                         }
+                                        <PartnerStatusManage partnerInfo={partner} detailType={detailType} changeStatusShow={(val) => setStatusShow(val)} statusShow={statusShow}></PartnerStatusManage>
+                                        <PartnerDetails countries={countries} detailId={partner ? partner.id : null} detailType={detailType} changeDetailShow={(val) => setDetailShow(val)} detailShow={detailShow} />
                                     </tbody>
                                 </table>
                             }
