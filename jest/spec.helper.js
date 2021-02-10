@@ -67,7 +67,7 @@ module.exports = {
             password: faker.internet.password(8),
             updated_by: defaultAdminId,
             countries: ['BE', 'AD', 'DE', 'IT', 'NL', 'ES', 'IE'],
-            profileId: SystemAdminProfileID,
+            profile_id: SystemAdminProfileID,
             access_token: jwt.sign({ id: defaultAdminId }, process.env.CDP_TOKEN_SECRET, { expiresIn: '2d', issuer: defaultAdminId }),
         },
         defaultUser: {
@@ -78,7 +78,7 @@ module.exports = {
             email: 'default-user@cdp.com',
             password: 'strong-password',
             expiry_date: new Date(Date.now() + 24 * 60 * 60 * 1000),
-            profileId: SystemAdminProfileID,
+            profile_id: SystemAdminProfileID,
             created_by: defaultAdminId,
             updated_by: defaultAdminId,
             access_token: jwt.sign({ id: defaultUserId }, process.env.CDP_TOKEN_SECRET, { expiresIn: '2d', issuer: defaultUserId }),

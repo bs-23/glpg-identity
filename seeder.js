@@ -100,7 +100,7 @@ async function init() {
             where: { email: 'glpg@brainstation-23.com' }
         }).then(admin => {
             UserProfile.findOne({ where: { slug: 'system_admin' } }).then(sysAdminProfile => {
-                admin.update({ profileId: sysAdminProfile.id });
+                admin.update({ profile_id: sysAdminProfile.id });
             });
         }).then(function () {
             callback();

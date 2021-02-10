@@ -19,7 +19,7 @@ const User = sequelize.cdpConnector.define('users', {
             isUUID: 4
         }
     },
-    profileId: {
+    profile_id: {
         type: DataTypes.UUID,
         allowNull: true
     },
@@ -114,7 +114,7 @@ User.prototype.validPassword = function(password) {
 };
 
 User.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by' });
-User.belongsTo(UserProfile, { as: 'userProfile', foreignKey: 'profileId' });
+User.belongsTo(UserProfile, { as: 'userProfile', foreignKey: 'profile_id' });
 User.belongsTo(Role, { as: 'userRole', foreignKey: 'role_id' });
 // User.hasMany(User_Role, {as: 'userRoles', foreignKey: 'userId', sourceKey: 'id'});
 

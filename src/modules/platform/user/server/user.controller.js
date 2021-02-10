@@ -328,7 +328,7 @@ async function createUser(req, res) {
                 first_name,
                 last_name,
                 phone: phone_number ? phone_number.replace(/\s+/g, '') : null,
-                profileId: profile,
+                profile_id: profile,
                 role_id: role || null,
                 created_by: req.user.id,
                 updated_by: req.user.id,
