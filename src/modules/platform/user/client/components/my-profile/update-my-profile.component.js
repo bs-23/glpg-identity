@@ -21,7 +21,7 @@ const UpdateMyProfile = () => {
         if(!myProfileInfo) return [];
 
         const myProfile = myProfileInfo.profile;
-        const myRoles = myProfileInfo.role;
+        const myRole = myProfileInfo.role;
         const myProfileCountries = [];
         const myRoleCountries = [];
 
@@ -33,16 +33,12 @@ const UpdateMyProfile = () => {
             })
         }
 
-        if(myRoles) {
-            myRoles.map(myRole => {
-                if(myRole.permissionSets) {
-                    myRole.permissionSets.map(ps => {
-                        if(ps.countries){
-                            ps.countries.map(country_iso2 => myRoleCountries.push(country_iso2));
-                        }
-                    });
+        if(myRole.permissionSets) {
+            myRole.permissionSets.map(ps => {
+                if(ps.countries){
+                    ps.countries.map(country_iso2 => myRoleCountries.push(country_iso2));
                 }
-            })
+            });
         }
 
         const myCountries = [...new Set([...myProfileCountries, ...myRoleCountries])];
@@ -54,7 +50,7 @@ const UpdateMyProfile = () => {
         if(!myProfileInfo) return [];
 
         const myProfile = myProfileInfo.profile;
-        const myRoles = myProfileInfo.role;
+        const myRole = myProfileInfo.role;
         const myProfileApplications = [];
         const myRoleApplications = [];
 
@@ -66,16 +62,12 @@ const UpdateMyProfile = () => {
             })
         }
 
-        if(myRoles) {
-            myRoles.map(myRole => {
-                if(myRole.permissionSets) {
-                    myRole.permissionSets.map(ps => {
-                        if(ps.application) {
-                            ps.application.map(({name}) => myRoleApplications.push(name));
-                        }
-                    });
+        if(myRole.permissionSets) {
+            myRole.permissionSets.map(ps => {
+                if(ps.application) {
+                    ps.application.map(({name}) => myRoleApplications.push(name));
                 }
-            })
+            });
         }
 
         const myApplicationNames = [...new Set([...myProfileApplications, ...myRoleApplications])];
@@ -317,10 +309,10 @@ const UpdateMyProfile = () => {
                                                     as="select"
                                                     name="role"
                                                     className="form-control"
-                                                    value={myProfileInfo && myProfileInfo.role && myProfileInfo.role.length ? myProfileInfo.role[0].title : ''}
+                                                    value={myProfileInfo && myProfileInfo.role ? myProfileInfo.role.title : ''}
                                                     disabled
                                                 >
-                                                    <option value={myProfileInfo && myProfileInfo.role && myProfileInfo.role.length ? myProfileInfo.role[0].title : ''}>{myProfileInfo && myProfileInfo.role && myProfileInfo.role.length ? myProfileInfo.role[0].title : ''}</option>
+                                                    <option value={myProfileInfo && myProfileInfo.role ? myProfileInfo.role.title : ''}>{myProfileInfo && myProfileInfo.role ? myProfileInfo.role.title : ''}</option>
                                                 </Field>
                                             </div>
                                         </div>

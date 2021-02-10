@@ -10,7 +10,7 @@ const logService = require(path.join(process.cwd(), 'src/modules/core/server/aud
 const ResetPassword = require('./reset-password.model');
 const UserProfile = require(path.join(process.cwd(), "src/modules/platform/profile/server/user-profile.model.js"));
 const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/userProfile-permissionSet.model"));
-const User_Role = require(path.join(process.cwd(), "src/modules/platform/role/server/user-role.model"));
+// const User_Role = require(path.join(process.cwd(), "src/modules/platform/role/server/user-role.model"));
 const Role_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/role-permissionSet.model"));
 const Role = require(path.join(process.cwd(), "src/modules/platform/role/server/role.model"));
 const PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permission-set.model"));
@@ -75,33 +75,30 @@ async function getRolePermissions(user) {
     const permissionSets = [];
     let applications = [];
     let countries = [];
-    const userRoles = user.userRoles;
-    const roles = [];
+    const userRole = user.userRole;
 
-    if (userRoles && userRoles.length) {
-        for (const userRole of userRoles) {
-            for (const rolePermSet of userRole.role.role_ps) {
-                const permissions = await getPermissionsFromPermissionSet(rolePermSet.ps);
+    if (userRole) {
+        for (const rolePermSet of userRole.role_ps) {
+            const permissions = await getPermissionsFromPermissionSet(rolePermSet.ps);
 
-                applications = permissions[0];
-                countries = permissions[1];
-                serviceCategories = permissions[2];
+            applications = permissions[0];
+            countries = permissions[1];
+            serviceCategories = permissions[2];
 
-                permissionSets.push({
-                    serviceCategories: serviceCategories.map(sc => ({ title: sc.title, slug: sc.slug })),
-                    application: applications.length > 0 ? applications : null,
-                    countries: countries
-                });
-            }
-
-            roles.push({
-                title: userRole.role.title,
-                permissionSets: permissionSets
-            })
+            permissionSets.push({
+                serviceCategories: serviceCategories.map(sc => ({ title: sc.title, slug: sc.slug })),
+                application: applications.length > 0 ? applications : null,
+                countries: countries
+            });
         }
 
+        return {
+            title: userRole.title,
+            permissionSets: permissionSets
+        }
     }
-    return roles;
+
+    return null;
 }
 
 async function getCommaSeparatedAppCountryPermissions(user) {
@@ -115,8 +112,8 @@ async function getCommaSeparatedAppCountryPermissions(user) {
     let role_ps = [];
     let all_ps = [];
 
-    for (const userRole of user.userRoles) {
-        for (const rolePermSet of userRole.role.role_ps) {
+    if (user.userRole) {
+        for (const rolePermSet of user.userRole.role_ps) {
             const applicationsCountries = await getPermissionsFromPermissionSet(rolePermSet.ps);
             role_applications = role_applications.concat(applicationsCountries[0]);
             role_countries = role_countries.concat(applicationsCountries[1])
@@ -125,9 +122,7 @@ async function getCommaSeparatedAppCountryPermissions(user) {
                 title: rolePermSet.ps.title,
                 type: rolePermSet.ps.type,
             });
-
         }
-
     }
 
     if (user.userProfile) {
@@ -195,7 +190,7 @@ async function formatProfileDetail(user) {
         profiles: user.userProfile.title,
         application: appCounPermissionFormatted[0],
         countries: appCounPermissionFormatted[1],
-        role: user.userRoles && user.userRoles.length && { id: user.userRoles[0].role.id, title: user.userRoles[0].role.title },
+        role: user.userRole && { id: user.userRole.id, title: user.userRole.title },
         permissionSets: appCounPermissionFormatted[2]
     };
 
@@ -319,7 +314,7 @@ async function createUser(req, res) {
         country_code,
         phone,
         profile,
-        role,
+        role
     } = req.body;
 
     const phone_number = phone ? country_code + phone : '';
@@ -334,6 +329,7 @@ async function createUser(req, res) {
                 last_name,
                 phone: phone_number ? phone_number.replace(/\s+/g, '') : null,
                 profileId: profile,
+                role_id: role,
                 created_by: req.user.id,
                 updated_by: req.user.id,
                 expiry_date: new Date(currentDate.setMonth(currentDate.getMonth() + validForMonths))
@@ -344,12 +340,12 @@ async function createUser(req, res) {
             return res.status(400).send('Email already exists.');
         }
 
-        if (role) {
-            await User_Role.create({
-                userId: user.id,
-                roleId: role,
-            });
-        }
+        // if (role) {
+        //     await User_Role.create({
+        //         userId: user.id,
+        //         roleId: role,
+        //     });
+        // }
 
         const logData = {
             event_type: 'CREATE',
@@ -420,7 +416,7 @@ function generateFilterOptions(currentFilter, defaultFilter, countries) {
 
             return {
                 [Op.or]: [
-                    { '$userRoles->role->role_ps->ps.countries$': { [Op.overlap]: countries_ignorecase_for_codbase_formatted } },
+                    { '$role->role_ps->ps.countries$': { [Op.overlap]: countries_ignorecase_for_codbase_formatted } },
                     { '$userProfile->up_ps->ps.countries$': { [Op.overlap]: countries_ignorecase_for_codbase_formatted } }
                 ]
             }
@@ -576,25 +572,18 @@ async function getUsers(req, res) {
                 }]
             },
             {
-                model: User_Role,
-                as: 'userRoles',
+                model: Role,
+                as: 'userRole',
                 attributes: [],
                 include: [{
-                    model: Role,
-                    as: 'role',
+                    model: Role_PermissionSet,
+                    as: 'role_ps',
                     attributes: [],
                     include: [{
-                        model: Role_PermissionSet,
-                        as: 'role_ps',
+                        model: PermissionSet,
+                        as: 'ps',
                         attributes: [],
-                        include: [{
-                            model: PermissionSet,
-                            as: 'ps',
-                            attributes: [],
-                        }]
                     }]
-
-
                 }]
             }],
             attributes: [
@@ -604,7 +593,7 @@ async function getUsers(req, res) {
             group: ['users.id', 'createdByUser.first_name', 'createdByUser.last_name'],
             having: literal(
                 `
-                ARRAY_CONCAT_AGG("userRoles->role->role_ps->ps"."countries") && '${codbase ? countries_ignorecase_for_codbase_formatted : user_countries_ignorecase_formatted}'
+                ARRAY_CONCAT_AGG("userRole->role_ps->ps"."countries") && '${codbase ? countries_ignorecase_for_codbase_formatted : user_countries_ignorecase_formatted}'
                 OR
                 ARRAY_CONCAT_AGG("userProfile->up_ps->ps"."countries") && '${codbase ? countries_ignorecase_for_codbase_formatted : user_countries_ignorecase_formatted}'
                 ${codbase ? '' :
@@ -612,9 +601,9 @@ async function getUsers(req, res) {
                 OR
                 (
                     (
-                        ARRAY_CONCAT_AGG("userRoles->role->role_ps->ps"."countries") = '{}'
+                        ARRAY_CONCAT_AGG("userRole->role_ps->ps"."countries") = '{}'
                         OR
-                        ARRAY_CONCAT_AGG("userRoles->role->role_ps->ps"."countries") IS NULL
+                        ARRAY_CONCAT_AGG("userRole->role_ps->ps"."countries") IS NULL
                     )
                     AND
                     (
@@ -656,18 +645,14 @@ async function getUsers(req, res) {
                 }]
             },
             {
-                model: User_Role,
-                as: 'userRoles',
+                model: Role,
+                as: 'userRole',
                 include: [{
-                    model: Role,
-                    as: 'role',
+                    model: Role_PermissionSet,
+                    as: 'role_ps',
                     include: [{
-                        model: Role_PermissionSet,
-                        as: 'role_ps',
-                        include: [{
-                            model: PermissionSet,
-                            as: 'ps',
-                        }]
+                        model: PermissionSet,
+                        as: 'ps',
                     }]
                 }]
             }]
@@ -782,8 +767,7 @@ async function updateSignedInUserProfile(req, res) {
 async function updateUserDetails(req, res) {
     const id = req.params.id;
     const { first_name, last_name, email, phone, type, status, roleId } = req.body;
-    const partialUserData = { first_name, last_name, email, phone, type, status };
-    const userRoles = roleId ? [roleId] : [];
+    // const userRoles = roleId ? [roleId] : [];
 
     try {
         if([first_name, last_name, email].includes(null)) return res.sendStatus(400);
@@ -805,9 +789,11 @@ async function updateUserDetails(req, res) {
 
         const previousStatus = user.status;
 
+        const partialUserData = { first_name, last_name, email, phone, type, status, role_id: roleId || null };
+
         await user.update(partialUserData);
 
-        await user.setRoles(userRoles);
+        // await user.setRoles(userRoles);
 
         let logMessage = status !== previousStatus
             ? status === 'active'

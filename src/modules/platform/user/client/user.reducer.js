@@ -47,16 +47,12 @@ const getUserPermissions = (loggedInUser) => {
         profile_service_categories = profile_service_categories.concat(p_services);
     }
 
-    if(role) {
-        role.map(rl => {
-            if(rl.permissionSets) {
-                const role_ps = rl.permissionSets;
-                const [r_countries, r_app, r_services] = getPermissionsFromPermissionSet(role_ps)
-                role_countries = role_countries.concat(r_countries);
-                role_applications = role_applications.concat(r_app);
-                role_service_categories = role_service_categories.concat(r_services);
-            }
-        })
+    if(role && role.permissionSets) {
+        const role_ps = role.permissionSets;
+        const [r_countries, r_app, r_services] = getPermissionsFromPermissionSet(role_ps)
+        role_countries = role_countries.concat(r_countries);
+        role_applications = role_applications.concat(r_app);
+        role_service_categories = role_service_categories.concat(r_services);
     }
 
     const userCountries = [...new Set([...profile_countries, ...role_countries])];

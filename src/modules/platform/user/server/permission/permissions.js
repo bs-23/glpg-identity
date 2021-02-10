@@ -50,44 +50,39 @@ const getUserWithPermissionRelations = async (whereCondition) => {
             }]
         },
         {
-            model: User_Role,
-            as: 'userRoles',
+            model: Role,
+            as: 'userRole',
             include: [{
-                model: Role,
-                as: 'role',
+                model: Role_PermissionSet,
+                as: 'role_ps',
                 include: [{
-                    model: Role_PermissionSet,
-                    as: 'role_ps',
-                    include: [{
-                        model: PermissionSet,
-                        as: 'ps',
-                        include: [
-                            {
-                                model: PermissionSet_Service,
-                                as: 'ps_sc',
-                                include: [
-                                    {
-                                        model: Service,
-                                        as: 'service',
-                                    }
-                                ]
-                            },
-                            {
-                                model: PermissionSet_Application,
-                                as: 'ps_app',
-                                include: [
-                                    {
-                                        model: Application,
-                                        as: 'application',
-                                    }
-                                ]
-                            }
-                        ]
-                    }]
+                    model: PermissionSet,
+                    as: 'ps',
+                    include: [
+                        {
+                            model: PermissionSet_Service,
+                            as: 'ps_sc',
+                            include: [
+                                {
+                                    model: Service,
+                                    as: 'service',
+                                }
+                            ]
+                        },
+                        {
+                            model: PermissionSet_Application,
+                            as: 'ps_app',
+                            include: [
+                                {
+                                    model: Application,
+                                    as: 'application',
+                                }
+                            ]
+                        }
+                    ]
                 }]
             }]
-        }
-        ]
+        }]
     });
     return user;
 }
@@ -95,7 +90,7 @@ const getUserWithPermissionRelations = async (whereCondition) => {
 async function getProfileAndRolePermissions(user) {
     let applications = [];
     let countries = [];
-    let service_categories = [];
+    let services = [];
 
     if (user.userProfile) {
         const profilePermissionSets = user.userProfile.up_ps;
@@ -103,24 +98,24 @@ async function getProfileAndRolePermissions(user) {
             const [profile_applications, profile_countries, profile_serviceCategories] = await getPermissionsFromPermissionSet(userProPermSet.ps);
             applications = applications.concat(profile_applications);
             countries = countries.concat(profile_countries);
-            service_categories = service_categories.concat(profile_serviceCategories);
+            services = services.concat(profile_serviceCategories);
         }
     }
 
-    for (const userRole of user.userRoles) {
-        for (const rolePermSet of userRole.role.role_ps) {
+    if (user.userRole) {
+        for (const rolePermSet of user.userRole.role_ps) {
             const [role_applications, role_countries, role_serviceCategories] = await getPermissionsFromPermissionSet(rolePermSet.ps);
             applications = applications.concat(role_applications);
             countries = countries.concat(role_countries);
-            service_categories = service_categories.concat(role_serviceCategories);
+            services = services.concat(role_serviceCategories);
         }
     }
 
     const user_countries = [...new Set(countries)];
     const user_applications = _.uniqBy(applications, app => app.slug);
-    const user_service_categories = _.uniqBy(service_categories, sc => sc.slug);
+    const user_services = _.uniqBy(services, sc => sc.slug);
 
-    return [user_applications, user_countries, user_service_categories];
+    return [user_applications, user_countries, user_services];
 }
 
 async function getUserPermissions(userId) {

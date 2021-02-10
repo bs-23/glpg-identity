@@ -5,7 +5,7 @@ const Sequelize = require('sequelize');
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const UserProfile = require(path.join(process.cwd(), 'src/modules/platform/profile/server/user-profile.model.js'));
-const User_Role = require(path.join(process.cwd(), 'src/modules/platform/role/server/user-role.model.js'));
+// const User_Role = require(path.join(process.cwd(), 'src/modules/platform/role/server/user-role.model.js'));
 const Role = require(path.join(process.cwd(), 'src/modules/platform/role/server/role.model.js'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
@@ -20,6 +20,10 @@ const User = sequelize.cdpConnector.define('users', {
         }
     },
     profileId: {
+        type: DataTypes.UUID,
+        allowNull: true
+    },
+    role_id: {
         type: DataTypes.UUID,
         allowNull: true
     },
@@ -111,7 +115,7 @@ User.prototype.validPassword = function(password) {
 
 User.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by' });
 User.belongsTo(UserProfile, { as: 'userProfile', foreignKey: 'profileId' });
-User.hasMany(User_Role, {as: 'userRoles', foreignKey: 'userId', sourceKey: 'id'});
-User.belongsToMany(Role, { through: User_Role });
+User.belongsTo(Role, { as: 'userRole', foreignKey: 'role_id' });
+// User.hasMany(User_Role, {as: 'userRoles', foreignKey: 'userId', sourceKey: 'id'});
 
 module.exports = User;

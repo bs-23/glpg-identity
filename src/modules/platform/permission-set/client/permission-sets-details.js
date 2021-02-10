@@ -34,7 +34,7 @@ const PermissionSetDetails = ({ permissionSetId }) => {
         const serviceCategories = permissionDetails.ps_sc;
         if(!serviceCategories) return nullValueToken;
 
-        const serviceCatNames = serviceCategories.map(sc => sc.serviceCategory.title);
+        const serviceCatNames = serviceCategories.map(sc => sc.service.title);
         return serviceCatNames.length ? serviceCatNames.join(', ') : nullValueToken;
     }
 

@@ -74,27 +74,26 @@ async function getProfilePermissions(profile) {
     }
 }
 
-async function getRolePermissions(roles) {
+async function getRolePermissions(userRole) {
+    if (!userRole) return [];
+
     const serviceCategories = [];
-    for (const userRole of roles) {
-        for (const rolePermSet of userRole.role.role_ps) {
-            let permissionSet = rolePermSet.ps;
-            for (const psc of permissionSet.ps_sc) {
-                serviceCategories.push(psc.service);
-            }
 
+    for (const rolePermSet of userRole.role_ps) {
+        let permissionSet = rolePermSet.ps;
+        for (const psc of permissionSet.ps_sc) {
+            serviceCategories.push(psc.service);
         }
-
     }
-    return serviceCategories;
 
+    return serviceCategories;
 }
 
 const ModuleGuard = (services) => {
     return async function (req, res, next) {
         const user = await getUserWithProfiles(req.user.id);
         const profileServices = await getProfilePermissions(user.userProfile);
-        const roleServices = await getRolePermissions(user.userRoles);
+        const roleServices = await getRolePermissions(user.userRole);
         let userServices = profileServices.concat(roleServices);
 
         const allowedServices = await evaluateAllowedServices(services);

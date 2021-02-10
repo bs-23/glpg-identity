@@ -44,7 +44,7 @@ async function init() {
     const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-application.model"));
     const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/userProfile-permissionSet.model"));
     require(path.join(process.cwd(), "src/modules/platform/role/server/role.model"));
-    require(path.join(process.cwd(), "src/modules/platform/role/server/user-role.model"));
+    // require(path.join(process.cwd(), "src/modules/platform/role/server/user-role.model"));
     require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
     const Faq = require(path.join(process.cwd(), 'src/modules/platform/faq/server/faq.model'));
     require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model'));

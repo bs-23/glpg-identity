@@ -26,7 +26,7 @@ export default function Users() {
     const history = useHistory();
 
     const [codBase, setCodBase] = useState(null);
-    const [userCountries, setUserCountries] = useState([]);
+    // const [userCountries, setUserCountries] = useState([]);
     const [sort, setSort] = useState({ type: 'asc', value: null });
 
     const [showFilter, setShowFilter] = useState(false);
@@ -49,31 +49,30 @@ export default function Users() {
         const profile_permission_sets = safeGet(data, 'userProfile')('up_ps')();
         const profile_countries = profile_permission_sets ? profile_permission_sets.map(pps => safeGet(pps, 'ps')('countries')()) : [];
 
-        const userRoles = safeGet(data, 'userRoles')();
-        const roles_countries = userRoles ? userRoles.map(role => {
-            const role_permission_sets = safeGet(role, 'role')('role_ps')();
-            return role_permission_sets.map(rps => safeGet(rps, 'ps')('countries')());
-        }) : [];
+        const userRole = safeGet(data, 'userRole')();
+
+        const role_permission_sets = safeGet(userRole, 'role_ps')();
+        const roles_countries = (role_permission_sets || []).map(rps => safeGet(rps, 'ps')('countries')());
 
         const user_countries = union(flatten(profile_countries), flatten(roles_countries)).filter(e => e);
 
         return user_countries;
     }
 
-    const extractLoggedInUserCountries = (data) => {
-        const profile_permission_sets = safeGet(data, 'profile')('permissionSets')();
-        const profile_countries = profile_permission_sets ? profile_permission_sets.map(pps => safeGet(pps, 'countries')() || []) : [];
+    // const extractLoggedInUserCountries = (data) => {
+    //     const profile_permission_sets = safeGet(data, 'profile')('permissionSets')();
+    //     const profile_countries = profile_permission_sets ? profile_permission_sets.map(pps => safeGet(pps, 'countries')() || []) : [];
 
-        const userRoles = safeGet(data, 'role')();
-        const roles_countries = userRoles ? userRoles.map(role => {
-            const role_permission_sets = safeGet(role, 'permissionSets')();
-            return role_permission_sets.map(rps => safeGet(rps, 'countries')() || []);
-        }) : [];
+    //     const userRoles = safeGet(data, 'role')();
+    //     const roles_countries = userRoles ? userRoles.map(role => {
+    //         const role_permission_sets = safeGet(role, 'permissionSets')();
+    //         return role_permission_sets.map(rps => safeGet(rps, 'countries')() || []);
+    //     }) : [];
 
-        const user_countries = union(flatten(profile_countries), flatten(roles_countries)).filter(e => e);
+    //     const user_countries = union(flatten(profile_countries), flatten(roles_countries)).filter(e => e);
 
-        return user_countries;
-    }
+    //     return user_countries;
+    // }
 
     const sortCountries = (user_countries) => {
         let countryArr = [];
@@ -93,14 +92,14 @@ export default function Users() {
         return countryString;
     }
 
-    useEffect(() => {
-        async function getCountries() {
-            const userProfile = (await axios.get('/api/users/profile')).data;
-            const user_countries = extractLoggedInUserCountries(userProfile);
-            setUserCountries(fetchUserCountries(user_countries, countries));
-        }
-        getCountries();
-    }, []);
+    // useEffect(() => {
+    //     async function getCountries() {
+    //         const userProfile = (await axios.get('/api/users/profile')).data;
+    //         const user_countries = extractLoggedInUserCountries(userProfile);
+    //         setUserCountries(fetchUserCountries(user_countries, countries));
+    //     }
+    //     getCountries();
+    // }, []);
 
     useEffect(() => {
         setCodBase(params.get('codbase') ? params.get('codbase') : null);
