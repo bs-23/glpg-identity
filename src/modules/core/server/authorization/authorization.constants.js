@@ -65,7 +65,8 @@ const Services = {
     CONSENT_PERFORMANCE: {
         value: 'consent-performance',
         title: 'Generate Data Privacy & Consent Performance Report'
-    }
+    },
+    MANAGE_CLINICAL_TRIALS: 'manage-clinical-trials'
 }
 
 module.exports = {

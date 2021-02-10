@@ -151,10 +151,15 @@ async function init() {
                             { title: "Generate Data Privacy & Consent Performance Report", slug: "consent-performance", parent_id: privacy.id, created_by: admin.id, updated_by: admin.id }
                         ];
 
+                        const clinicalTrialsServices = [
+                            { title: "Manage Content Clinical Trail", slug: "manage-clinical-trials", parent_id: clinicalTrials.id, created_by: admin.id, updated_by: admin.id },
+                        ]
+
                         const allServices = [
                             ...platformServices,
                             ...informationServices,
-                            ...privacyServices
+                            ...privacyServices,
+                            ...clinicalTrialsServices
                         ]
 
                         Service.bulkCreate(allServices, { returning: true, ignoreDuplicates: false }).then(res => { callback() });
