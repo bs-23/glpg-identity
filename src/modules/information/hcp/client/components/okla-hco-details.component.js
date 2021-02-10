@@ -50,6 +50,14 @@ const OklaHcoDetails = ({ hco, setSelectedHco }) => {
                                     <strong className="okla-search__details-title">OneKey Workplace ID</strong>
                                     <span className="okla-search__details-value">{hcoDetails.workplaceEid || '--'}</span>
                                 </div>
+                                {
+                                    hcoDetails.externalIdentifiers.map((identifier, identifierIdx) => (
+                                        <div className="col-12 col-sm-6 mb-3" key={'id-' + identifierIdx}>
+                                            <strong className="okla-search__details-title">{identifier.name}</strong>
+                                            <span className="okla-search__details-value">{identifier.value || '--'}</span>
+                                        </div>
+                                    ))
+                                }
                                 <div className="col-12 col-sm-6 mb-3">
                                     <strong className="okla-search__details-title">Specialties</strong>
                                     <span className="okla-search__details-value">{hcoDetails.specialties ? hcoDetails.specialties.join(', ') : '--'}</span>

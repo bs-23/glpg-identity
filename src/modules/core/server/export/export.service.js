@@ -1,6 +1,6 @@
 const XLSX = require('xlsx');
 
-function exportDataToExcel(data, workSheetName) {
+function exportExcel(data, workSheetName) {
     const workBook = XLSX.utils.book_new();
     const workSheet = XLSX.utils.json_to_sheet(data);
     XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
@@ -12,4 +12,4 @@ function exportDataToExcel(data, workSheetName) {
     return fileBuffer;
 }
 
-exports.exportDataToExcel = exportDataToExcel;
+exports.exportExcel = exportExcel;

@@ -93,7 +93,7 @@ async function assignConsentToCountry(req, res) {
             changes: createdCountryConsent.dataValues
         });
 
-        // clearApplicationCache();
+        clearApplicationCache();
 
         res.json(createdCountryConsent);
     } catch (err) {
@@ -131,7 +131,7 @@ async function updateCountryConsent(req, res) {
             });
         }
 
-        // clearApplicationCache();
+        clearApplicationCache();
 
         res.json(consentCountry);
     } catch (err) {
@@ -161,7 +161,7 @@ async function deleteCountryConsent(req, res) {
             changes: consentCountry.dataValues
         });
 
-        // clearApplicationCache();
+        clearApplicationCache();
 
         res.sendStatus(200);
     } catch (err) {

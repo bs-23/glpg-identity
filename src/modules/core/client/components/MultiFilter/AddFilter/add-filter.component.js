@@ -14,6 +14,7 @@ const AddFilter = (props) => {
         logic: alreadyAddedLogic,
         filterOptions,
         maxNumberOfFilters,
+        maxNumberOfValues,
         onDone,
         onHide
     } = props;
@@ -95,6 +96,10 @@ const AddFilter = (props) => {
     }
 
     const handleChange = (propertyName, value, index) => {
+        if (Array.isArray(filters[index][propertyName]) && filters[index][propertyName].length === maxNumberOfValues) {
+            return;
+        }
+
         const updatedFilters = [...filters];
 
         updatedFilters[index][propertyName] = value;
