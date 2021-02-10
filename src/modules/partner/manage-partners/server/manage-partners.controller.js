@@ -408,6 +408,7 @@ async function createPartnerHco(req, res) {
         data.first_name = contact_first_name;
         data.last_name = contact_last_name;
         data.organization_type = type;
+        data.onekey_id = partnerRequest.onekey_id;
 
         const [partnerHco, created] = await Partner.findOrCreate({
             where: { request_id: request_id },
