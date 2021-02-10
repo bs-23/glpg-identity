@@ -12,6 +12,7 @@ const SpecialtyFilter = (props) => {
         filterOptions,
         isTouched,
         validationError,
+        maxNumberOfValues,
         onChange,
         onRemove
     } = props;
@@ -136,6 +137,8 @@ const SpecialtyFilter = (props) => {
                     menuPortalTarget={document.body}
                     value={selectedSpecialties}
                     onChange={selectedOption => {
+                        if (selectedOption && selectedOption.length > maxNumberOfValues) return;
+
                         const value = (selectedOption || []).map(o => o.value);
                         const displayText = (selectedOption || []).map(o => o.label);
 
