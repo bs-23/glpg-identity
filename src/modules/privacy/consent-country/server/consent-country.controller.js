@@ -90,10 +90,10 @@ async function assignConsentToCountry(req, res) {
             object_id: createdCountryConsent.id,
             table_name: 'consent_countries',
             actor: req.user.id,
-            changes: JSON.stringify(createdCountryConsent.dataValues)
+            changes: createdCountryConsent.dataValues
         });
 
-        // clearApplicationCache();
+        clearApplicationCache();
 
         res.json(createdCountryConsent);
     } catch (err) {
@@ -127,11 +127,11 @@ async function updateCountryConsent(req, res) {
                 object_id: consentCountry.id,
                 table_name: 'consent_countries',
                 actor: req.user.id,
-                changes: JSON.stringify(updatesInConsentCountry)
+                changes: updatesInConsentCountry
             });
         }
 
-        // clearApplicationCache();
+        clearApplicationCache();
 
         res.json(consentCountry);
     } catch (err) {
@@ -158,10 +158,10 @@ async function deleteCountryConsent(req, res) {
             object_id: id,
             table_name: 'consent_countries',
             actor: req.user.id,
-            changes: JSON.stringify(consentCountry.dataValues)
+            changes: consentCountry.dataValues
         });
 
-        // clearApplicationCache();
+        clearApplicationCache();
 
         res.sendStatus(200);
     } catch (err) {

@@ -73,11 +73,10 @@ async function createConsentCategory(req, res) {
             object_id: data.id,
             table_name: 'consent_categories',
             actor: req.user.id,
-            changes: JSON.stringify(data.dataValues)
+            changes: data.dataValues
         });
 
-        // clearApplicationCache();
-
+        clearApplicationCache();
         res.json(data);
     } catch (err) {
         console.error(err);
@@ -115,11 +114,11 @@ async function updateConsentCategory(req, res) {
                 object_id: consentCategory.id,
                 table_name: 'consent_categories',
                 actor: req.user.id,
-                changes: JSON.stringify(updatesInCategory)
+                changes: updatesInCategory
             });
         }
 
-        // clearApplicationCache();
+        clearApplicationCache();
 
         res.json(data);
     } catch (err) {

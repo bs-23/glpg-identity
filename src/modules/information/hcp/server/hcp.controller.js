@@ -10,9 +10,9 @@ const DatasyncHcp = require('./datasync-hcp-profile.model');
 const archiveService = require(path.join(process.cwd(), 'src/modules/core/server/archive/archive.service'));
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-consents.model'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
-const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model.js'));
-const ConsentLocale = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent-locale.model.js'));
-const ConsentCountry = require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model.js'));
+const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model'));
+const ConsentLocale = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent-locale.model'));
+const ConsentCountry = require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model'));
 const Application = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.model'));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
@@ -546,7 +546,7 @@ async function updateHcps(req, res) {
                 table_name: 'hcp_profiles',
                 actor: req.user.id,
                 remarks: Hcps[index].comment.trim(),
-                changes: JSON.stringify(allUpdateRecordsForLogging[index])
+                changes: allUpdateRecordsForLogging[index]
             });
         }));
 
@@ -692,13 +692,13 @@ async function createHcpProfile(req, res) {
 
         if (req.body.consents && req.body.consents.length) {
             await Promise.all(req.body.consents.map(async consent => {
-                const preferenceSlug = Object.keys(consent)[0];
+                const preferenceId = Object.keys(consent)[0];
                 const consentResponse = Object.values(consent)[0];
                 let richTextLocale = `${language_code}_${country_iso2}`;
 
                 if (!consentResponse) return;
 
-                const consentDetails = await Consent.findOne({ where: { slug: preferenceSlug } });
+                const consentDetails = await Consent.findOne({ where: { id: preferenceId } });
 
                 if (!consentDetails) {
                     response.errors.push(new CustomError('Invalid consents.', 400));
@@ -725,7 +725,7 @@ async function createHcpProfile(req, res) {
 
                 let consentLocale = await ConsentLocale.findOne({
                     where: {
-                        consent_id: consentDetails.id,
+                        consent_id: preferenceId,
                         locale: { [Op.iLike]: `${language_code}_${country_iso2}` }
                     }
                 });
@@ -745,7 +745,7 @@ async function createHcpProfile(req, res) {
 
                     consentLocale = await ConsentLocale.findOne({
                         where: {
-                            consent_id: consentDetails.id,
+                            consent_id: preferenceId,
                             locale: { [Op.iLike]: localeUsingParentCountryISO }
                         }
                     });

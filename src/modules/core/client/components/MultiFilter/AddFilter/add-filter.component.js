@@ -14,6 +14,7 @@ const AddFilter = (props) => {
         logic: alreadyAddedLogic,
         filterOptions,
         maxNumberOfFilters,
+        maxNumberOfValues,
         onDone,
         onHide
     } = props;
@@ -184,6 +185,7 @@ const AddFilter = (props) => {
                                 filterOptions={filterOptions}
                                 isTouched={isTouched}
                                 validationError={validationErrors[index]}
+                                maxNumberOfValues={maxNumberOfValues}
                                 onChange={handleChange}
                                 onRemove={handleRemove}
                             />
@@ -197,6 +199,7 @@ const AddFilter = (props) => {
                                 filterOptions={filterOptions}
                                 isTouched={isTouched}
                                 validationError={validationErrors[index]}
+                                maxNumberOfValues={maxNumberOfValues}
                                 onChange={handleChange}
                                 onRemove={handleRemove}
                             />

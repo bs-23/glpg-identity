@@ -1,15 +1,17 @@
 const path = require('path');
-const _ = require('lodash');
+const fs = require('fs');
 const { QueryTypes, Op } = require('sequelize');
 
-const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model.js'));
-const ConsentCountry = require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model.js'));
-const ConsentCategory = require(path.join(process.cwd(), 'src/modules/privacy/consent-category/server/consent-category.model.js'));
+const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model'));
+const ConsentCountry = require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model'));
+const ConsentCategory = require(path.join(process.cwd(), 'src/modules/privacy/consent-category/server/consent-category.model'));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const HCPS = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-profile.model'));
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-consents.model'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
-const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/platform/user/server/permission/permissions.js'));
+const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/platform/user/server/permission/permissions'));
+const ExportService = require(path.join(process.cwd(), 'src/modules/core/server/export/export.service'));
+const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
 function ignoreCaseArray(str) {
     return [str.toLowerCase(), str.toUpperCase(), str.charAt(0).toLowerCase() + str.charAt(1).toUpperCase(), str.charAt(0).toUpperCase() + str.charAt(1).toLowerCase()];
@@ -42,6 +44,7 @@ async function getCdpConsentsReport(req, res) {
             if (orderBy === 'preferences') order.push([Consent, 'preference', orderType]);
             if (orderBy === 'date') order.push(['updated_at', orderType]);
         }
+
         order.push([HCPS, 'created_at', 'DESC']);
         order.push([HCPS, 'id', 'DESC']);
 
@@ -53,7 +56,6 @@ async function getCdpConsentsReport(req, res) {
         const userPermittedApplications = userCountriesApplication[0].map(app => app.id);
 
         const application_list = (await HCPS.findAll()).map(i => i.get("application_id"));
-
 
         const country_iso2_list_for_codbase = countries.filter(i => i.codbase === codbase).map(i => i.country_iso2);
         const countries_with_ignorecase = [].concat.apply([], country_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
@@ -142,7 +144,7 @@ async function getCdpConsentsReport(req, res) {
         response.data = data;
         res.json(response);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -197,6 +199,7 @@ async function getVeevaConsentsReport(req, res) {
                 ciam.vw_veeva_consent_master.opt_type = 'Opt_Out_vod'`
             return `ciam.vw_veeva_consent_master.country_code = ANY($countries)`;
         }
+
         const consent_filter = getConsentFilter();
 
         const hcp_consents = await sequelize.datasyncConnector.query(
@@ -240,7 +243,6 @@ async function getVeevaConsentsReport(req, res) {
                 type: QueryTypes.SELECT
             }))[0];
 
-
         hcp_consents.forEach(hcp_consent => {
             hcp_consent.name = hcp_consent.account_name;
             hcp_consent.first_name = hcp_consent.firstname;
@@ -279,11 +281,147 @@ async function getVeevaConsentsReport(req, res) {
         res.json(response);
     }
     catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
 }
 
+async function exportCdpConsentsReport(req, res) {
+    try {
+        const order = [];
+        order.push([HCPS, 'created_at', 'DESC']);
+        order.push([HCPS, 'id', 'DESC']);
+
+        const countries = await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT });
+        const userCountriesApplication = await getUserPermissions(req.user.id);
+        const userPermittedCodbases = countries.filter(i => userCountriesApplication[1].includes(i.country_iso2)).map(i => i.codbase);
+        const userPermittedCountries = countries.filter(i => userPermittedCodbases.includes(i.codbase)).map(i => i.country_iso2);
+        const userPermittedApplications = userCountriesApplication[0].map(app => app.id);
+
+        const application_list = (await HCPS.findAll()).map(i => i.get("application_id"));
+
+        const codbase_list = countries.filter(i => userPermittedCountries.includes(i.country_iso2)).map(i => i.codbase);
+        const country_iso2_list = countries.filter(i => codbase_list.includes(i.codbase)).map(i => i.country_iso2);
+        const country_iso2_list_with_ignorecase = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
+
+        const consent_filter = {
+            [Op.or]: [{ 'consent_confirmed': true }, { 'opt_type': 'opt-out' }],
+            '$hcp_profile.application_id$': req.user.type === 'admin' ? { [Op.or]: application_list } : userPermittedApplications,
+            '$hcp_profile.country_iso2$': { [Op.any]: [country_iso2_list_with_ignorecase] },
+        };
+
+        const hcp_consents = await HcpConsents.findAll({
+            where: consent_filter,
+            include: [
+                {
+                    model: HCPS,
+                    attributes: ['first_name', 'last_name', 'email'],
+                },
+                {
+                    model: Consent,
+                    attributes: ['preference', 'legal_basis', 'updated_at'],
+                    include: [
+                        {
+                            model: ConsentCategory,
+                            attributes: ['title', 'slug']
+                        }
+                    ]
+                }
+            ],
+            attributes: ['consent_id', 'opt_type', 'consent_confirmed', 'updated_at'],
+            order: order,
+            subQuery: false
+        });
+
+        const data = hcp_consents.map(hcp_consent => ({
+            'First Name': hcp_consent.hcp_profile.first_name,
+            'Last Name': hcp_consent.hcp_profile.last_name,
+            'Email': hcp_consent.hcp_profile.email,
+            'Consent Type': hcp_consent.consent.consent_category.title,
+            'Preferences': hcp_consent.consent.preference,
+            'Opt Type': hcp_consent.opt_type,
+            'Date': (new Date(hcp_consent.updated_at)).toLocaleDateString('en-GB').replace(/\//g, '.')
+        }));
+
+        const filePath = ExportService.exportExcel(data, 'cdp-consents.xlsx', 'CDP consents report');
+
+        res.download(filePath, function (err) {
+            if (err) {
+                logger.error(err);
+            } else {
+                fs.unlink(filePath, function(e) {
+                    if(e) {
+                        logger.error(e);
+                    }
+                });
+            }
+        });
+    } catch (err) {
+        logger.error(err);
+        res.status(500).send(err);
+    }
+}
+
+async function exportVeevaConsentsReport(req, res) {
+    try {
+        const [, userPermittedCountries] = await getUserPermissions(req.user.id);
+        const countries = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry;", { type: QueryTypes.SELECT });
+
+        async function getCountryIso2() {
+            const user_codbase_list_for_iso2 = countries.filter(i => userPermittedCountries.includes(i.country_iso2)).map(i => i.codbase);
+            const user_country_iso2_list = countries.filter(i => user_codbase_list_for_iso2.includes(i.codbase)).map(i => i.country_iso2);
+            return user_country_iso2_list;
+        }
+
+        const country_iso2_list = await getCountryIso2();
+
+        const hcp_consents = await sequelize.datasyncConnector.query(
+            `SELECT
+                account_name,
+                channel_value,
+                opt_type,
+                double_opt_in,
+                content_type,
+                capture_datetime
+            FROM
+                ciam.vw_veeva_consent_master
+            WHERE ciam.vw_veeva_consent_master.country_code = ANY($countries)`
+            , {
+                bind: {
+                    countries: country_iso2_list
+                },
+                type: QueryTypes.SELECT
+            });
+
+        const data = hcp_consents.map(hcp_consent => ({
+            'Name': hcp_consent.account_name,
+            'Email': hcp_consent.channel_value,
+            'Preferences': hcp_consent.content_type,
+            'Opt Type': hcp_consent.opt_type === 'Opt_In_vod' ? hcp_consent.double_opt_in ? 'double-opt-in' : 'single-opt-in' : 'opt-out',
+            'Date': (new Date(hcp_consent.capture_datetime)).toLocaleDateString('en-GB').replace(/\//g, '.')
+        }));
+
+        const filePath = ExportService.exportExcel(data, 'veeva-consents.xlsx', 'VeevaCRM consent report');
+
+        res.download(filePath, function (err) {
+            if (err) {
+                logger.error(err);
+            } else {
+                fs.unlink(filePath, function(e) {
+                    if(e) {
+                        logger.error(e);
+                    }
+                });
+            }
+        });
+    } catch (err) {
+        logger.error(err);
+        res.status(500).send(err);
+    }
+}
+
 exports.getCdpConsentsReport = getCdpConsentsReport;
 exports.getVeevaConsentsReport = getVeevaConsentsReport;
+exports.exportCdpConsentsReport = exportCdpConsentsReport;
+exports.exportVeevaConsentsReport = exportVeevaConsentsReport;
