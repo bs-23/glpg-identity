@@ -59,39 +59,41 @@ const PartnerStatusManage = (props) => {
 
     return (
         <Modal size="" centered show={props.statusShow} onHide={handleClose}>
-            <Modal.Header closeButton>
+            <Modal.Header className="p-3 p-sm-4" closeButton>
                 <Modal.Title className="modal-title_small">
                     Status Update
                 </Modal.Title>
             </Modal.Header>
-            <Modal.Body className="p-3 p-sm-5">
+            <Modal.Body className="p-3 p-sm-4">
                 {partner &&
                     <div className="row">
                         <div className="col-12">
-                            <h4 className="mb-3">{props.detailType === 'hcps' || props.detailType === 'hcos' ?
+                            <h4 className="mb-0">{props.detailType === 'hcps' || props.detailType === 'hcos' ?
                                 partner.first_name + ' ' + partner.last_name : partner.name}</h4>
 
                             <p>{partner.email}</p>
                         </div>
                         <div className="col-12">
-                            <div className="row">
+                            <div className="row mt-3">
                                 {partner.documents && partner.documents.length > 0 &&
-                                    <div className="col-6">
-                                        <div className="mt-4">
-                                            <h4 className="font-weight-bold-light">Galapagos Contracts</h4>
-                                            <div className="py-3">
-                                                {partner.documents && partner.documents.map(doc => (
-                                                    <a key={doc.id} onClick={() => downloadFile(doc.id)} className="d-block text-primary">{doc.name}</a>
-                                                ))
-                                                }
-                                            </div>
+                                    <div className="col-12 col-sm-7">
+                                        <h5 className="font-weight-bold-light mb-0">Legal Contracts</h5>
+                                        <div className="py-3">
+                                            {partner.documents && partner.documents.map(doc => (
+                                                <a type="button" key={doc.id} onClick={() => downloadFile(doc.id)} className="cdp-text-primary small font-weight-bold-light mb-2 text-break d-flex align-items-baseline">
+                                                    <i className="fas fa-circle cdp-text-primary mr-2 small"></i> {doc.name}
+                                                </a>
+                                            ))
+                                            }
                                         </div>
                                     </div>
                                 }
                                 {partner.bank_account_no &&
-                                    <div className="col-6">
-                                        <h4 className="font-weight-bold-light">Bank Account</h4>
-                                        <span className="d-block py-1">{partner.bank_account_no}</span>
+                                    <div className="col-12 col-sm-5">
+                                        <h5 className="font-weight-bold-light mb-0">Bank Account</h5>
+                                        <div className="py-3">
+                                            <span className="d-block mb-2 text-break">{partner.bank_account_no}</span>
+                                        </div>
                                     </div>
                                 }
                             </div>

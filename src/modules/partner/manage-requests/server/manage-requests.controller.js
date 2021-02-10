@@ -96,6 +96,7 @@ async function createPartnerRequest(req, res) {
             data.workplace_type = workplace_type;
             data.procurement_contact = procurement_contact;
             data.specialty = specialty;
+            data.onekey_id = onekey_id;
         }
         else if (entity_type === 'vendor') {
             data.procurement_contact = procurement_contact;

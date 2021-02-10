@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import Modal from 'react-bootstrap/Modal';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -9,12 +9,15 @@ import { useToasts } from 'react-toast-notifications';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { partnerRequestSchemaForHcos } from '../manage-requests.schema'
 import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm } from '../manage-requests.actions';
+import SearchHcoModal from './search-hco-modal.component';
 
 const HcoPartnerRequests = () => {
     const dispatch = useDispatch();
     const location = useLocation();
     const history = useHistory();
     const { addToast } = useToasts();
+    const formikRef = useRef();
+    const formikBag = formikRef.current;
 
     const [selectedCountry, setSelectedCountry] = useState('');
     const [showForm, setShowForm] = useState(false);
@@ -43,6 +46,35 @@ const HcoPartnerRequests = () => {
 
     const countries = useSelector(state => state.countryReducer.countries);
     const allCountries = useSelector(state => state.countryReducer.allCountries);
+
+
+    const [showSearch, setShowSearch] = useState(false);
+    const [searchInput, setSearchInput] = useState(false);
+    const openSearch = (values) => {
+        setSearchInput({
+            uuid: values.uuid,
+            countryIso2: values.country_iso2,
+            specialty: values.specialty
+        });
+        setShowSearch(true);
+    };
+    const resultSelected = (selectedHco = {}) => {
+        if (selectedHco.externalIdentifiers && selectedHco.externalIdentifiers.length) {
+            formikBag.setFieldValue('uuid', selectedHco.externalIdentifiers[0].value);
+        }
+
+        if (selectedHco.workplaceEid) {
+            formikBag.setFieldValue('onekey_id', selectedHco.workplaceEid);
+        }
+
+        if (!formikBag.values.workplace_name && selectedHco.name) {
+            formikBag.setFieldValue('workplace_name', selectedHco.name);
+        }
+
+        setShowSearch(false);
+    }
+
+
 
     const getCountryName = (country_iso2) => {
         if (!countries || !country_iso2) return null;
@@ -164,6 +196,9 @@ const HcoPartnerRequests = () => {
                             </Dropdown>
                             <span className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary"></i></span>
                         </nav>
+
+                        {SearchHcoModal && <SearchHcoModal show={showSearch} resultSelected={resultSelected} searchInput={searchInput}/>}
+
                         <Modal show={showFaq} onHide={handleCloseFaq} size="xl" centered>
                             <Modal.Header closeButton>
                                 <Modal.Title>Questions You May Have</Modal.Title>
@@ -278,7 +313,9 @@ const HcoPartnerRequests = () => {
                             country_iso2: partnerRequestId && Object.keys(request).length ? request.country_iso2 : '',
                             language: partnerRequestId && Object.keys(request).length ? request.locale.split('_')[0] : 'en',
                             uuid: partnerRequestId && Object.keys(request).length ? request.uuid : '',
+                            onekey_id: partnerRequestId && Object.keys(request).length ? request.onekey_id : '',
                         }}
+                        innerRef={formikRef}
                         displayName="PartnerRequestsForm"
                         validationSchema={partnerRequestSchemaForHcos}
                         enableReinitialize={true}
@@ -326,6 +363,7 @@ const HcoPartnerRequests = () => {
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="uuid">UUID <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="uuid" />
+                                            <i title="OKLA Search" type="button" className="fas fa-search ml-2 cdp-text-primary" onClick={() => openSearch(formikProps.values)}></i>
                                             <div className="invalid-feedback"><ErrorMessage name="uuid" /></div>
                                         </div>
                                     </div>

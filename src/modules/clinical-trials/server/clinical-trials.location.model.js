@@ -12,6 +12,11 @@ let locationModel = {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4
         },
+        location_status: {
+            unique: false,
+            allowNull: true,
+            type: DataTypes.STRING(1024)
+        },
         location_facility: {
             unique: false,
             allowNull: true,
@@ -37,7 +42,7 @@ let locationModel = {
             allowNull: true,
             type: DataTypes.FLOAT()
         },
-        long: {
+        lng: {
             unique: false,
             allowNull: true,
             type: DataTypes.FLOAT()
