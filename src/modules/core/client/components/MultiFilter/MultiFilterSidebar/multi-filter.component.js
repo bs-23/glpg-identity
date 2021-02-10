@@ -23,7 +23,8 @@ const MultiFilter = (props, ref) => {
         selectedSettingID,
         scopeOptions,
         selectedScopeKey,
-        maxNumberOfFilters = 10
+        maxNumberOfFilters = 10,
+        maxNumberOfValues = 10
     } = props;
 
     const [show, setShow] = useState({
@@ -409,6 +410,7 @@ const MultiFilter = (props, ref) => {
                                             filterOptions={options}
                                             logic={formikProps.values.logic}
                                             maxNumberOfFilters={maxNumberOfFilters}
+                                            maxNumberOfValues={maxNumberOfValues}
                                             onDone={(filters, logic) => handleAddFilterDone(filters, logic, formikProps)}
                                             onHide={() => setShow({ ...show, addFilter: false })}
                                         />
