@@ -9,6 +9,7 @@ const PartnerRequest = require(path.join(process.cwd(), 'src/modules/partner/man
 const storageService = require(path.join(process.cwd(), 'src/modules/core/server/storage/storage.service'));
 const File = require(path.join(process.cwd(), 'src/modules/core/server/storage/file.model'));
 const ExportService = require(path.join(process.cwd(), 'src/modules/core/server/export/export.service'));
+const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
 async function uploadDucuments(owner, type, files) {
     const bucketName = 'cdp-development';
@@ -96,7 +97,7 @@ async function getPartnerHcps(req, res) {
 
         res.json(responseData);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -118,7 +119,7 @@ async function registrationLookup(req, res) {
 
         res.json(response);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -144,7 +145,7 @@ async function getPartnerHcp(req, res) {
 
         res.json(partnerHcp);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -215,7 +216,7 @@ async function createPartnerHcp(req, res) {
         res.json(response);
 
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -292,7 +293,7 @@ async function updatePartnerHcp(req, res) {
         res.json(response);
 
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -343,7 +344,7 @@ async function getPartnerHcos(req, res) {
 
         res.json(responseData);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -369,7 +370,7 @@ async function getPartnerHco(req, res) {
 
         res.json(partnerHco);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -437,7 +438,7 @@ async function createPartnerHco(req, res) {
         res.json(response);
 
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -488,7 +489,7 @@ async function updatePartnerHco(req, res) {
         res.json(updated_data);
 
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -538,7 +539,7 @@ async function getNonHealthcarePartners(req, res, type) {
 
         res.json(responseData);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -569,7 +570,7 @@ async function getNonHealthcarePartner(req, res) {
 
         res.json(partnerVendor);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -637,7 +638,7 @@ async function createPartnerVendor(req, res) {
         res.json(response);
 
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -675,7 +676,7 @@ async function updatePartnerVendor(req, res) {
         res.json(updated_data);
 
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -692,7 +693,7 @@ async function getDownloadUrl(req, res) {
 
         res.json(url)
     } catch (error) {
-        console.error(error);
+        logger.error(error);
         res.status(500).send('Internal server error');
     }
 }
@@ -727,7 +728,7 @@ async function approvePartner(req, res) {
 
         res.sendStatus(200);
     } catch (error) {
-        console.error(error);
+        logger.error(error);
         res.status(500).send('Internal server error');
     }
 }
@@ -866,7 +867,7 @@ async function exportApprovedPartners(req, res) {
         });
         res.end(fileBuffer);
     } catch (error) {
-        console.error(error);
+        logger.error(error);
         res.status(500).send('Internal server error');
     }
 }
@@ -909,7 +910,7 @@ async function getPartnerById(req, res) {
 
         res.json(partner);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
