@@ -46,9 +46,9 @@ const PermissionSet = sequelize.cdpConnector.define('permission_sets', {
     updatedAt: 'updated_at'
 });
 
-PermissionSet.belongsTo(Application, {as: 'application', foreignKey: 'applicationId'});
-PermissionSet.hasMany(PermissionSet_Application, {as: 'ps_app', foreignKey: 'permissionSetId', sourceKey: 'id'});
-PermissionSet.belongsToMany(Application, { through: PermissionSet_Application });
+// PermissionSet.belongsTo(Application, {as: 'application', foreignKey: 'applicationId'});
+PermissionSet.hasMany(PermissionSet_Application, {as: 'ps_app', foreignKey: 'permissionset_id', sourceKey: 'id'});
+PermissionSet.belongsToMany(Application, { through: PermissionSet_Application, foreignKey: 'permissionset_id', otherKey: 'application_id' });
 
 PermissionSet.hasMany(PermissionSet_Service, {as: 'ps_sc', foreignKey: 'permissionset_id', sourceKey: 'id'});
 PermissionSet.belongsToMany(Service, { through: PermissionSet_Service, foreignKey: 'permissionset_id', otherKey: 'service_id' });

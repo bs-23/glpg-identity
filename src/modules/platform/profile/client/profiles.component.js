@@ -144,8 +144,8 @@ export default function ManageProfiles() {
     const extractPermissionSetNames = (data) => {
         if (!data || !data.up_ps || !data.up_ps.length) return '';
         return data.up_ps.map((item, index) => {
-            return <React.Fragment key={item.permissionSetId}>
-                <a type="button" className="link-with-underline" key={item.permissionSetId} onClick={() => handlePermissionSetClick(item.permissionSetId)}>
+            return <React.Fragment key={item.permissionset_id}>
+                <a type="button" className="link-with-underline" key={item.permissionset_id} onClick={() => handlePermissionSetClick(item.permissionset_id)}>
                     {item.ps.title}
                 </a>
                 {index < data.up_ps.length - 1 ? <span>,&nbsp;</span> : null}
@@ -174,7 +174,7 @@ export default function ManageProfiles() {
             id: data.id,
             title: data.title,
             description: data.description,
-            permissionssetIDs: (data.up_ps || []).map(item => item.permissionSetId)
+            permissionssetIDs: (data.up_ps || []).map(item => item.permissionset_id)
         };
         setProfileEditData(editData);
         setModalShow({ ...modalShow, createProfile: true });

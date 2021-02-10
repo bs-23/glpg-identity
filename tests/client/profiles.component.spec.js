@@ -30,7 +30,7 @@ describe('Profiles component', () => {
                 "type":"standard",
                 "countries":["BE","FR","DE","IT","NL","ES","GB"],
                 "description":"This is the default permission set for System Admin",
-                "applicationId":null
+                "application_id":null
             }
         ];
 

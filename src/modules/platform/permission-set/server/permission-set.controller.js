@@ -149,7 +149,7 @@ async function createPermissionSet(req, res) {
 
         let applications_permissionSet = [];
 
-        applications_permissionSet = applications.map(id => ({ permissionSetId: doc.id, applicationId: id }));
+        applications_permissionSet = applications.map(id => ({ permissionset_id: doc.id, application_id: id }));
 
 
         await PermissionSet_Application.bulkCreate(applications_permissionSet);

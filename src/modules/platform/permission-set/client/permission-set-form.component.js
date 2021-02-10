@@ -295,6 +295,7 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
                                                         {
                                                             serviceCategories.map(sc => {
                                                                 return <ToggleList
+                                                                    key={sc.id}
                                                                     name="serviceCategories"
                                                                     allOptionID={sc.id}
                                                                     options={

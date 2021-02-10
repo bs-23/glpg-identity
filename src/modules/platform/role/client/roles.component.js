@@ -146,8 +146,8 @@ export default function ManageRoles() {
         if (!data) return '';
         if (!data.role_ps || !data.role_ps.length) return '';
         return data.role_ps.map((item, index) => {
-            return <React.Fragment key={item.permissionSetId}>
-                <a type="button" className="link-with-underline" onClick={() => handlePermissionSetClick(item.permissionSetId)}>
+            return <React.Fragment key={item.permissionset_id}>
+                <a type="button" className="link-with-underline" onClick={() => handlePermissionSetClick(item.permissionset_id)}>
                     {item.ps.title}
                 </a>
                 {index < data.role_ps.length - 1 ? <span>,&nbsp;</span> : null}
@@ -176,7 +176,7 @@ export default function ManageRoles() {
             id: data.id,
             title: data.title,
             description: data.description,
-            permissionssetIDs: (data.role_ps || []).map(item => item.permissionSetId)
+            permissionssetIDs: (data.role_ps || []).map(item => item.permissionset_id)
         };
         setRoleEditData(editData);
         setModalShow({ ...modalShow, createRole: true });

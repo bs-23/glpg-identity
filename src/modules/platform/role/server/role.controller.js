@@ -11,7 +11,7 @@ async function getRoles(req, res) {
             include: [{
                 model: RolePermissionSet,
                 as: 'role_ps',
-                attributes: ['permissionSetId'],
+                attributes: ['permissionset_id'],
             include: [{
                     model: PermissionSet,
                     as: 'ps',
@@ -49,7 +49,7 @@ async function createRole(req, res) {
 
         if(!created) return res.status(400).send('role name already exists.');
 
-        const permission_sets = permissionSets.map(id => ({ roleId: role.id, permissionSetId: id }));
+        const permission_sets = permissionSets.map(id => ({ role_id: role.id, permissionset_id: id }));
 
         await RolePermissionSet.bulkCreate(permission_sets);
 

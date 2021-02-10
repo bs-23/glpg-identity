@@ -3,7 +3,6 @@ const _ = require('lodash');
 const Application = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.model'));
 const UserProfile = require(path.join(process.cwd(), "src/modules/platform/profile/server/user-profile.model.js"));
 const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/userProfile-permissionSet.model.js"));
-const User_Role = require(path.join(process.cwd(), "src/modules/platform/role/server/user-role.model.js"));
 const Role_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/role-permissionSet.model.js"));
 const Role = require(path.join(process.cwd(), "src/modules/platform/role/server/role.model.js"));
 const PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permission-set.model.js"));

@@ -33,7 +33,7 @@ const UpdateMyProfile = () => {
             })
         }
 
-        if(myRole.permissionSets) {
+        if(myRole && myRole.permissionSets) {
             myRole.permissionSets.map(ps => {
                 if(ps.countries){
                     ps.countries.map(country_iso2 => myRoleCountries.push(country_iso2));
@@ -62,7 +62,7 @@ const UpdateMyProfile = () => {
             })
         }
 
-        if(myRole.permissionSets) {
+        if(myRole && myRole.permissionSets) {
             myRole.permissionSets.map(ps => {
                 if(ps.application) {
                     ps.application.map(({name}) => myRoleApplications.push(name));

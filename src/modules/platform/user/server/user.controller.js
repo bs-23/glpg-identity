@@ -329,7 +329,7 @@ async function createUser(req, res) {
                 last_name,
                 phone: phone_number ? phone_number.replace(/\s+/g, '') : null,
                 profileId: profile,
-                role_id: role,
+                role_id: role || null,
                 created_by: req.user.id,
                 updated_by: req.user.id,
                 expiry_date: new Date(currentDate.setMonth(currentDate.getMonth() + validForMonths))

@@ -315,11 +315,11 @@ async function init() {
 
         Promise.all([systemAdminProfile, systemAdminPermissionSet, sitedminProfile, siteAdminPermissionSet, gdsProfile, gdsPermissionSet, dpoProfile, dpoPermissionSet, ldsProfile, ldsPermissionSet]).then((values) => {
             const userprofile_permissionSet = [
-                { userProfileId: values[0].id, permissionSetId: values[1].id },
-                { userProfileId: values[2].id, permissionSetId: values[3].id },
-                { userProfileId: values[6].id, permissionSetId: values[7].id },
-                { userProfileId: values[4].id, permissionSetId: values[5].id },
-                { userProfileId: values[8].id, permissionSetId: values[9].id }
+                { user_profile_id: values[0].id, permissionset_id: values[1].id },
+                { user_profile_id: values[2].id, permissionset_id: values[3].id },
+                { user_profile_id: values[6].id, permissionset_id: values[7].id },
+                { user_profile_id: values[4].id, permissionset_id: values[5].id },
+                { user_profile_id: values[8].id, permissionset_id: values[9].id }
             ];
 
             UserProfile_PermissionSet.destroy({ truncate: { cascade: true } }).then(() => {
@@ -399,8 +399,8 @@ async function init() {
 
             Promise.all([systemAdmin_permissionSet, jyselecaApplication, hcpPortalApplication]).then((values) => {
                 const permissionSet_applications = [
-                    { permissionSetId: values[0].id, applicationId: values[1].id },
-                    { permissionSetId: values[0].id, applicationId: values[2].id },
+                    { permissionset_id: values[0].id, application_id: values[1].id },
+                    { permissionset_id: values[0].id, application_id: values[2].id },
                 ];
 
                 PermissionSet_Application.destroy({ truncate: { cascade: true } }).then(() => {
