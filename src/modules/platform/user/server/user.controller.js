@@ -55,7 +55,7 @@ async function getProfilePermissions(user) {
             serviceCategories = permissions[2];
 
             permissionSets.push({
-                serviceCategories: serviceCategories.map(sc => ({ title: sc.title, slug: sc.slug })),
+                serviceCategories: serviceCategories.map(sc => ({ id: sc.id, title: sc.title, slug: sc.slug, parent_id: sc.parent_id })),
                 application: applications.length > 0 ? applications : null,
                 countries: countries
             });
@@ -86,7 +86,7 @@ async function getRolePermissions(user) {
             serviceCategories = permissions[2];
 
             permissionSets.push({
-                serviceCategories: serviceCategories.map(sc => ({ title: sc.title, slug: sc.slug })),
+                serviceCategories: serviceCategories.map(sc => ({ id: sc.id, title: sc.title, slug: sc.slug, parent_id: sc.parent_id })),
                 application: applications.length > 0 ? applications : null,
                 countries: countries
             });

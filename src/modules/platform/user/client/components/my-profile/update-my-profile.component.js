@@ -183,6 +183,33 @@ const UpdateMyProfile = () => {
         }
     }
 
+    const renderServices = () => {
+        const services = myProfileInfo.serviceCategories;
+        const servicesGrouped = new Map();
+
+        services.forEach(s => {
+            if (!s.parent_id) servicesGrouped.set(s.id, [s.title]);
+        });
+
+        services.forEach(s => {
+            if (s.parent_id && servicesGrouped.has(s.parent_id)) {
+                const servicesUnderTheGroup = servicesGrouped.get(s.parent_id);
+                servicesUnderTheGroup.push(s.title);
+                servicesGrouped.set(s.parent_id, servicesUnderTheGroup);
+            }
+        })
+
+        return Array.from(servicesGrouped.keys()).map(key => {
+            const serviceGroup = servicesGrouped.get(key);
+            return serviceGroup.map((service, index) => {
+                return <div key={service} className={`${index === 0 ? '' : 'ml-3'}`}>
+                    {index > 0 && <i className="icon icon-check-filled cdp-text-primary mr-4 consent-check"></i>}
+                    <span>{service}</span>
+                </div>;
+            });
+        })
+    }
+
     useEffect(() => {
         if(myProfileInfo) activateCountryCodeFlagFromPhone(myProfileInfo.phone);
     }, [myProfileInfo, countries])
@@ -322,15 +349,8 @@ const UpdateMyProfile = () => {
                                             <div className="form-group">
                                                 <label className="font-weight-bold-light" htmlFor="countries">Countries<span className="text-danger"></span></label>
                                                 {getCodbaseDescriptionsFromISOCodes(getMyCountryISO2()).map(country => <div key={country} className="custom-control custom-checkbox">
-                                                    <input
-                                                        name="countries"
-                                                        type="checkbox"
-                                                        value={country}
-                                                        className="custom-control-input"
-                                                        checked
-                                                        disabled
-                                                    />
-                                                    <label className="custom-control-label" for={country}>{country}</label>
+                                                    <i className="icon icon-check-filled cdp-text-primary mr-4 consent-check"></i>
+                                                    <span>{country}</span>
                                                 </div>)}
                                             </div>
                                         </div>
@@ -341,13 +361,8 @@ const UpdateMyProfile = () => {
                                                 <label className="font-weight-bold-light" htmlFor="applications">Applications<span className="text-danger"></span></label>
                                                 <ul className="list-unstyled pl-0 py-2 mb-0">
                                                     {getMyApplicationNames().map(appName => <li key={appName} className="">
-                                                        <label className="d-flex justify-content-between align-items-center">
-                                                            <span className="switch-label">{appName}</span>
-                                                            <span className="switch">
-                                                                <input name="roles" type="checkbox" value={appName} checked disabled />
-                                                                <span className="slider round"></span>
-                                                            </span>
-                                                        </label>
+                                                        <i className="icon icon-check-filled cdp-text-primary mr-4 consent-check"></i>
+                                                        {appName}
                                                     </li>)}
                                                 </ul>
                                             </div>
@@ -356,17 +371,9 @@ const UpdateMyProfile = () => {
                                     {myProfileInfo && myProfileInfo.serviceCategories && myProfileInfo.serviceCategories.length > 0 && <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
-                                                <label className="font-weight-bold-light" htmlFor="serviceCategories">Service Categories<span className="text-danger"></span></label>
+                                                <label className="font-weight-bold-light" htmlFor="serviceCategories">Services<span className="text-danger"></span></label>
                                                 <ul className="list-unstyled pl-0 py-2 mb-0">
-                                                    {myProfileInfo.serviceCategories.map(sc => <li key={sc.slug} className="">
-                                                        <label className="d-flex justify-content-between align-items-center">
-                                                            <span className="switch-label">{sc.title}</span>
-                                                            <span className="switch">
-                                                                <input name="serviceCategories" type="checkbox" value={sc.title} checked disabled />
-                                                                <span className="slider round"></span>
-                                                            </span>
-                                                        </label>
-                                                    </li>)}
+                                                    {renderServices()}
                                                 </ul>
                                             </div>
                                         </div>
