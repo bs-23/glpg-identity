@@ -141,7 +141,7 @@ const ToggleList = ({ name, options, labelExtractor, idExtractor, allOptionID })
     return <FieldArray
                 name={name}
                 render={arrayHelpers => (
-                    options.map(item => <label key={idExtractor(item)} className={`d-flex  align-items-center ${allOptionID && idExtractor(item) === allOptionID ? '' : 'pl-3'}`}>
+                    options.map(item => <label key={idExtractor(item)} className={`d-flex  align-items-center ${allOptionID && idExtractor(item) === allOptionID ? 'font-weight-bold-light pt-3 pb-1' : 'pl-5 font-weight-normal'}`}>
                         <span className="switch">
                             <input name={name}
                                 className="custom-control-input"
