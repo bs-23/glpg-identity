@@ -89,7 +89,7 @@ const PartnerManagement = () => {
              */
             error.response.data.text().then(text => {
                 addToast(text, {
-                    appearance: 'error',
+                    appearance: 'warning',
                     autoDismiss: true
                 });
             });
