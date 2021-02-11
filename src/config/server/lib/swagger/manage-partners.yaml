@@ -336,6 +336,10 @@ paths:
                                     items:
                                         type: string
                                         format: binary
+                                remove_files:
+                                    type: array
+                                    items:
+                                        type: string
             responses:
                 200:
                     description: The request has succeeded.
@@ -572,6 +576,10 @@ paths:
                                     items:
                                         type: string
                                         format: binary
+                                remove_files:
+                                    type: array
+                                    items:
+                                        type: string
             responses:
                 200:
                     description: The request has succeeded.

@@ -238,7 +238,8 @@ async function updatePartnerHcp(req, res) {
         });
 
         if (!partner) {
-            return res.status(404).send('Partner not found.');
+            response.errors.push(new CustomError('Partner not found.', 400));
+            return res.status(400).send(response);
         }
 
         const data = {
@@ -445,10 +446,11 @@ async function createPartnerHco(req, res) {
 }
 
 async function updatePartnerHco(req, res) {
+    const response = new Response({}, []);
     try {
         const files = req.files;
 
-        const { contact_first_name, contact_last_name, organization_name, address, city, post_code, email, telephone, type, uuid, country_iso2, locale, registration_number, iban, bank_name, bank_account_no, currency } = req.body;
+        const { contact_first_name, contact_last_name, organization_name, address, city, post_code, email, telephone, type, uuid, country_iso2, locale, registration_number, iban, bank_name, bank_account_no, currency, remove_files } = req.body;
 
         const partner = await Partner.findOne({
             where: {
@@ -457,12 +459,43 @@ async function updatePartnerHco(req, res) {
         });
 
         if (!partner) {
-            return res.status(404).send('Partner not found.');
+            response.errors.push(new CustomError('Partner not found.', 400));
+            return res.status(400).send(response);
         }
 
         const data = {
             contact_first_name, contact_last_name, organization_name, address, city, post_code, email, telephone, type, uuid, country_iso2, locale, registration_number, iban, bank_name, bank_account_no, currency
         };
+
+        if (remove_files) {
+            const documents = await File.findAll({ where: { table_name: 'partners', owner_id: req.params.id } });
+            fileIds = documents.map(function (obj) {
+                return obj.id;
+            });
+
+            function fileExists(mainArr, subArr) {
+                return subArr.every(i => mainArr.includes(i));
+            }
+
+            let files = null;
+            (typeof remove_files === 'string') ? files = [remove_files] : files = remove_files;
+
+            const check = fileExists(fileIds, files);
+            if (!check) {
+                response.errors.push(new CustomError('File does not exist', 404));
+                return res.status(404).send(response);
+            }
+
+            let file_keys = [];
+
+            files.forEach(element => {
+                file_keys.push(documents.find(x => x.id === element).key);
+            });
+
+            await removeDocuments(file_keys);
+
+        }
+
 
         data.entity_type = entityType;
         data.first_name = contact_first_name;
@@ -485,12 +518,13 @@ async function updatePartnerHco(req, res) {
         delete updated_data.dataValues.created_at;
         delete updated_data.dataValues.updated_at;
 
-
-        res.json(updated_data);
+        response.data = updated_data;
+        res.json(response);
 
     } catch (err) {
         logger.error(err);
-        res.status(500).send('Internal server error');
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
     }
 }
 
@@ -645,10 +679,11 @@ async function createPartnerVendor(req, res) {
 }
 
 async function updatePartnerVendor(req, res) {
+    const response = new Response({}, []);
     try {
         const files = req.files;
 
-        const { type, country_iso2, locale, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency } = req.body;
+        const { type, country_iso2, locale, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency, remove_files } = req.body;
 
         const partner = await PartnerVendors.findOne({
             where: {
@@ -657,13 +692,44 @@ async function updatePartnerVendor(req, res) {
         });
 
         if (!partner) {
-            return res.status(404).send('Partner not found.');
+            response.errors.push(new CustomError('Partner not found.', 400));
+            return res.status(400).send(response);
         }
 
         const data = {
             type, country_iso2, locale, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency,
             entity_type: type
         };
+
+        if (remove_files) {
+            const documents = await File.findAll({ where: { table_name: 'partner_vendors', owner_id: req.params.id } });
+            fileIds = documents.map(function (obj) {
+                return obj.id;
+            });
+
+            function fileExists(mainArr, subArr) {
+                return subArr.every(i => mainArr.includes(i));
+            }
+
+            let files = null;
+            (typeof remove_files === 'string') ? files = [remove_files] : files = remove_files;
+
+            const check = fileExists(fileIds, files);
+            if (!check) {
+                response.errors.push(new CustomError('File does not exist', 404));
+                return res.status(404).send(response);
+            }
+
+            let file_keys = [];
+
+            files.forEach(element => {
+                file_keys.push(documents.find(x => x.id === element).key);
+            });
+
+            await removeDocuments(file_keys);
+
+        }
+
 
 
         const updated_data = await partner.update(data);
@@ -673,11 +739,13 @@ async function updatePartnerVendor(req, res) {
         delete updated_data.dataValues.created_at;
         delete updated_data.dataValues.updated_at;
 
-        res.json(updated_data);
+        response.data = updated_data;
+        res.json(response);
 
     } catch (err) {
         logger.error(err);
-        res.status(500).send('Internal server error');
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
     }
 }
 
