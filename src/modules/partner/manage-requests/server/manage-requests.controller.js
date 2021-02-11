@@ -12,7 +12,7 @@ async function getPartnerRequests(req, res) {
         const page = req.query.page ? req.query.page - 1 : 0;
         if (page < 0) return res.status(404).send("page must be greater or equal 1");
 
-        const limit = 1;
+        const limit = 15;
         const offset = page * limit;
         const entitytype = req.query.entitytype;
 
