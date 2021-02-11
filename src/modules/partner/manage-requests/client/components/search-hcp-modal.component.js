@@ -492,6 +492,7 @@ const SearchHcpModal = (props) => {
                             <table className="table table-hover table-sm mb-0 cdp-table  cdp-table__responsive">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
+                                            <th>Select</th>
                                             <th>Name
                                                 {/* <OverlayTrigger trigger="click" rootClose placement="right" overlay={nameHintPopup}>
                                                     <i className="fas fa-info-circle ml-1 text-white" role="button"></i>
@@ -511,6 +512,12 @@ const SearchHcpModal = (props) => {
                                         {
                                             users.results.map((user, idx) => (
                                                 <tr key={idx} onClick={() => handleResultSelection(user)}>
+                                                    <td data-for="Select">
+                                                        <div className="custom-control custom-radio">
+                                                            <input type="radio" className="custom-control-input" id="customControlValidation2" name="radio-stacked" />
+                                                            <label className="custom-control-label" for="customControlValidation2"></label>
+                                                        </div>
+                                                    </td>
                                                     <td data-for="Name">{user.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary" title="In my contract"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary" title="Not in my contract"></i>} {`${user.firstName} ${user.lastName}`}</td>
                                                     <td data-for="Specialty">{(user.specialties || ['--']).join(', ')}</td>
                                                     <td data-for="Workplace">
