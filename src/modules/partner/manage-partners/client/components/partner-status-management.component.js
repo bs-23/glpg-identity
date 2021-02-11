@@ -68,10 +68,10 @@ const PartnerStatusManage = (props) => {
                 {partner &&
                     <div className="row">
                         <div className="col-12">
-                            <h4 className="mb-0">{props.detailType === 'hcps' || props.detailType === 'hcos' ?
+                        <h4 className="mb-0 font-weight-bold-light">{props.detailType === 'hcps' || props.detailType === 'hcos' ?
                                 partner.first_name + ' ' + partner.last_name : partner.name}</h4>
 
-                            <p>{partner.email}</p>
+                            <p className="mt-3 mb-0">{partner.email}</p>
                             <p>{(new Date(partner.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</p>
                         </div>
                         <div className="col-12">
@@ -82,7 +82,7 @@ const PartnerStatusManage = (props) => {
                                         <div className="py-3">
                                             {partner.documents && partner.documents.length > 0 && partner.documents.map(doc => (
                                                 <a type="button" key={doc.id} onClick={() => downloadFile(doc.id)} className="cdp-text-primary small font-weight-bold-light mb-2 text-break d-flex align-items-baseline">
-                                                    <i className="fas fa-circle cdp-text-primary mr-2 small"></i> {doc.name}
+                                                    <i className="fas fa-paperclip cdp-text-primary mr-2"></i> {doc.name}
                                                 </a>
                                             ))
                                             }
