@@ -77,6 +77,10 @@ const HcpPartnerRequests = () => {
             formikBag.setFieldValue('last_name', selectedHcp.lastName);
         }
 
+        if (!formikBag.values.country_iso2 && selectedHcp.countryIso2) {
+            formikBag.setFieldValue('country_iso2', selectedHcp.countryIso2);
+        }
+
         setShowSearch(false);
     }
 

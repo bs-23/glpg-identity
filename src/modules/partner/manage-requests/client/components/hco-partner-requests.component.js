@@ -71,6 +71,10 @@ const HcoPartnerRequests = () => {
             formikBag.setFieldValue('workplace_name', selectedHco.name);
         }
 
+        if (!formikBag.values.country_iso2 && selectedHco.countryIso2) {
+            formikBag.setFieldValue('country_iso2', selectedHco.countryIso2);
+        }
+
         setShowSearch(false);
     }
 
