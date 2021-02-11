@@ -68,7 +68,7 @@ const PartnerStatusManage = (props) => {
                 {partner &&
                     <div className="row">
                         <div className="col-12">
-                        <h4 className="mb-0 font-weight-bold-light">{props.detailType === 'hcps' || props.detailType === 'hcos' ?
+                            <h4 className="mb-0 font-weight-bold-light">{props.detailType === 'hcps' || props.detailType === 'hcos' ?
                                 partner.first_name + ' ' + partner.last_name : partner.name}</h4>
 
                             <p className="mt-3 mb-0">{partner.email}</p>
@@ -107,7 +107,7 @@ const PartnerStatusManage = (props) => {
                         </div>
                         <div className="col-12 d-flex">
                             <button onClick={() => setStatusSelect("approve")} className={statusSelect === 'approve' ? "btn btn-block mr-2 cdp-btn-primary mt-4 p-2 font-weight-bold text-white" : "btn btn-block mr-2 cdp-btn-outline-primary mt-4 p-2 font-weight-bold"}>Approve User</button>
-                            <button disabled className="btn btn-block ml-2 btn-danger mt-4 p-2 font-weight-bold">Reject Selected</button>
+                            <button disabled className="btn btn-block ml-2 btn-danger mt-4 p-2 font-weight-bold">Resend Form</button>
                         </div>
                         <div className="col-12">
                             <button disabled={!statusSelect} onClick={() => confirmStatus()} className="btn btn-block btn-secondary mt-4 p-2 font-weight-bold">Confirm and Approve for SAP Export</button>
