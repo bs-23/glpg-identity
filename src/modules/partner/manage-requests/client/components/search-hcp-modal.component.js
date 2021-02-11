@@ -488,8 +488,8 @@ const SearchHcpModal = (props) => {
                             </div>
 
 
-                            <div className="table-responsive shadow-sm bg-white">
-                                <table className="table table-hover table-sm mb-0 cdp-table">
+                        <div className="table-responsive shadow-sm bg-white  cdp-table__responsive-wrapper">
+                            <table className="table table-hover table-sm mb-0 cdp-table  cdp-table__responsive">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
                                             <th>Name
@@ -511,9 +511,9 @@ const SearchHcpModal = (props) => {
                                         {
                                             users.results.map((user, idx) => (
                                                 <tr key={idx} onClick={() => handleResultSelection(user)}>
-                                                    <td>{user.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary" title="In my contract"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary" title="Not in my contract"></i>} {`${user.firstName} ${user.lastName}`}</td>
-                                                    <td>{(user.specialties || ['--']).join(', ')}</td>
-                                                    <td>
+                                                    <td data-for="Name">{user.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary" title="In my contract"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary" title="Not in my contract"></i>} {`${user.firstName} ${user.lastName}`}</td>
+                                                    <td data-for="Specialty">{(user.specialties || ['--']).join(', ')}</td>
+                                                    <td data-for="Workplace">
                                                         {
                                                             user.workplaces.map((item, idxOfWorkPlace) => (
                                                                 <div key={idxOfWorkPlace} className="currentWorkplace">
@@ -530,8 +530,8 @@ const SearchHcpModal = (props) => {
                                                             ))
                                                         }
                                                     </td>
-                                                    <td>{user.individualEid}</td>
-                                                    <td>{getCountryName(user.countryIso2)}</td>
+                                                    <td data-for="Individual Onekey ID">{user.individualEid}</td>
+                                                    <td data-for="Country">{getCountryName(user.countryIso2)}</td>
                                                 </tr>
                                             ))
                                         }

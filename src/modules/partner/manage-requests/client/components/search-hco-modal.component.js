@@ -443,8 +443,8 @@ const SearchHcoModal = (props) => {
                             </div>
 
 
-                            <div className="table-responsive shadow-sm bg-white">
-                                <table className="table table-hover table-sm mb-0 cdp-table">
+                        <div className="table-responsive shadow-sm bg-white cdp-table__responsive-wrapper">
+                            <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
                                             <th>
@@ -463,11 +463,11 @@ const SearchHcoModal = (props) => {
                                         {
                                             hcos.results.map((hco, idx) => (
                                                 <tr key={idx} onClick={() => handleResultSelection(hco)}>
-                                                    <td>{hco.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary" title="In my contract"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary" title="Not In my contract"></i>} {`${hco.name}`}</td>
-                                                    <td>{(hco.specialties || ['--']).join(', ')}</td>
-                                                    <td>{hco.address}</td>
-                                                    <td>{hco.city}</td>
-                                                    <td>{getCountryName(hco.countryIso2)}</td>
+                                                    <td data-for="Name">{hco.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary" title="In my contract"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary" title="Not In my contract"></i>} {`${hco.name}`}</td>
+                                                    <td data-for="Specialty">{(hco.specialties || ['--']).join(', ')}</td>
+                                                    <td data-for="Address">{hco.address}</td>
+                                                    <td data-for="City">{hco.city}</td>
+                                                    <td data-for="Country">{getCountryName(hco.countryIso2)}</td>
                                                 </tr>
                                             ))
                                         }
