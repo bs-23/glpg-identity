@@ -202,8 +202,8 @@ const UpdateMyProfile = () => {
         return Array.from(servicesGrouped.keys()).map(key => {
             const serviceGroup = servicesGrouped.get(key);
             return serviceGroup.map((service, index) => {
-                return <div key={service} className={`${index === 0 ? '' : 'ml-3'}`}>
-                    {index > 0 && <i className="icon icon-check-filled cdp-text-primary mr-4 consent-check"></i>}
+                return <div key={service} className={`${index === 0 ? 'font-weight-bold-light pt-3 pb-1' : 'ml-3'}`}>
+                    {index > 0 && <i className="icon icon-check-filled cdp-text-primary mr-2 consent-check"></i>}
                     <span>{service}</span>
                 </div>;
             });
@@ -348,8 +348,8 @@ const UpdateMyProfile = () => {
                                         <div className="col-12">
                                             <div className="form-group">
                                                 <label className="font-weight-bold-light" htmlFor="countries">Countries<span className="text-danger"></span></label>
-                                                {getCodbaseDescriptionsFromISOCodes(getMyCountryISO2()).map(country => <div key={country} className="custom-control custom-checkbox">
-                                                    <i className="icon icon-check-filled cdp-text-primary mr-4 consent-check"></i>
+                                                {getCodbaseDescriptionsFromISOCodes(getMyCountryISO2()).map(country => <div key={country} className="custom-control custom-checkbox pl-3">
+                                                    <i className="icon icon-check-filled cdp-text-primary mr-2 consent-check"></i>
                                                     <span>{country}</span>
                                                 </div>)}
                                             </div>
@@ -360,8 +360,8 @@ const UpdateMyProfile = () => {
                                             <div className="form-group">
                                                 <label className="font-weight-bold-light" htmlFor="applications">Applications<span className="text-danger"></span></label>
                                                 <ul className="list-unstyled pl-0 py-2 mb-0">
-                                                    {getMyApplicationNames().map(appName => <li key={appName} className="">
-                                                        <i className="icon icon-check-filled cdp-text-primary mr-4 consent-check"></i>
+                                                    {getMyApplicationNames().map(appName => <li key={appName} className="ml-3">
+                                                        <i className="icon icon-check-filled cdp-text-primary mr-2 consent-check"></i>
                                                         {appName}
                                                     </li>)}
                                                 </ul>
@@ -371,7 +371,7 @@ const UpdateMyProfile = () => {
                                     {myProfileInfo && myProfileInfo.serviceCategories && myProfileInfo.serviceCategories.length > 0 && <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
-                                                <label className="font-weight-bold-light" htmlFor="serviceCategories">Services<span className="text-danger"></span></label>
+                                                <label className="font-weight-bold-light mb-0 h4" htmlFor="serviceCategories">Services<span className="text-danger"></span></label>
                                                 <ul className="list-unstyled pl-0 py-2 mb-0">
                                                     {renderServices()}
                                                 </ul>
