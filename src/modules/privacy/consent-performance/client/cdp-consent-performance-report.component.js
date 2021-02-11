@@ -9,6 +9,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 import axios from 'axios';
 import _ from 'lodash';
 import parse from 'html-react-parser';
+import { useToasts } from 'react-toast-notifications';
 import fileDownload from 'js-file-download';
 
 import { getAllCountries } from '../../../core/client/country/country.actions';
@@ -16,6 +17,7 @@ import Faq from '../../../platform/faq/client/faq.component';
 import { getConsentReport } from './consent-performace.actions';
 
 const CdpConsentPerformanceReport = () => {
+    const { addToast } = useToasts();
     const dispatch = useDispatch();
     const allOptTypes = ["single-opt-in", "double-opt-in", "opt-out"];
     const [show, setShow] = useState({ profileManage: false, updateStatus: false });
@@ -105,11 +107,44 @@ const CdpConsentPerformanceReport = () => {
         return splitStr.join(' ');
     }
 
-    function exportExcelFile() {
-        axios.get('/api/export-cdp-consent-performance-report', { responseType: 'blob'}).then(res => {
-            fileDownload(res.data, 'cdp-consent-report.xlsx');
+    // function exportExcelFile() {
+    //     axios.get('/api/export-cdp-consent-performance-report', { responseType: 'blob'})
+    //         .then(res => {
+    //             fileDownload(res.data, 'cdp-consent-report.xlsx');
+    //         })
+    //         .catch(err => {
+    //             error.response.data.text().then(text => {
+    //                 addToast(text, {
+    //                     appearance: 'error',
+    //                     autoDismiss: true
+    //                 });
+    //             });
+    //         });
+    // }
+
+    const exportExcelFile = () => {
+        axios.get(`/api/export-cdp-consent-performance-report`, {
+            responseType: 'blob',
+        }).then(res => {
+            const pad2 = (n) => (n < 10 ? '0' + n : n);
+
+            var date = new Date();
+            const timestamp = date.getFullYear().toString() + pad2(date.getMonth() + 1) + pad2(date.getDate()) + pad2(date.getHours()) + pad2(date.getMinutes()) + pad2(date.getSeconds());
+
+            fileDownload(res.data, `cdp-consent-report_${timestamp}.xlsx`);
+        }).catch(error => {
+            /**
+             * the error response is a blob because of the responseType option.
+             * text() converts it back to string
+             */
+            error.response.data.text().then(text => {
+                addToast(text, {
+                    appearance: 'error',
+                    autoDismiss: true
+                });
+            });
         });
-    }
+    };
 
     useEffect(() => {
         dispatch(getAllCountries());
