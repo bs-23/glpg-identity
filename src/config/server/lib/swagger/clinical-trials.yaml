@@ -3,7 +3,7 @@ paths:
         get:
             tags:
                 - clinical-trials
-            summary: get all (default first 100 items, when no parameter is given) or search trials by keyword
+            summary: get all (default first 100 items,when no parameter is given) or search trials by keyword
             parameters:
                 - name: items_per_page
                   in: query
@@ -21,17 +21,18 @@ paths:
                     type: integer
                 - name: status
                   in: query
-                  type: string
+                  required: false
+                  description: Options-RECSTATUS_ALL,RECSTATUS_RECRUITING,RECSTATUS_NOT_YET_RECRUITING,RECSTATUS_ENROLLING_BY_INVITATION,RECSTATUS_ACTIVE_NOT_RECRUITING,RECSTATUS_SUSPENDED,RECSTATUS_TERMINATED,RECSTATUS_STUDY_COMPLETED,RECSTATUS_WITHDRAWN
+                  example: RECSTATUS_RECRUITING
                   schema:
-                    type: array
-                    items:
-                        type: string
-                        enum:
-                        - RECSTATUS_RECRUITING
-                        - RECSTATUS_NOT_YET_RECRUITING
-                        - RECSTATUS_STUDY_COMPLETED
-                        - RECSTATUS_TERMINATED
-                    style: matrix
+                    type: string
+                - name: indication
+                  in: query
+                  required: false
+                  description: Options-Ankylosing Spondylitis,Crohn's Disease,Lupus Erythematosus,Sjogren's Syndrome,Ulcerative Colitis,Systemic Sclerosis,Uveitis,Rheumatoid Arthritis,Atopic Dermatitis,Autosomal Dominant Polycystic Kidney Disease,Idiopathic Pulmonary Fibrosis,Osteoarthritis,Psoriatic Arthritis
+                  example: "Ankylosing Spondylitis"
+                  schema:
+                    type: string
                 - name: diseases
                   in: query
                   type: string
@@ -43,45 +44,25 @@ paths:
                   type: string
                 - name: age_ranges
                   in: query
-                  type: string
+                  required: false
+                  description: Options-AGERANGE_ONE,AGERANGE_TWO,AGERANGE_THREE. Elaboration AGERANGE_ONE(0-17 years),AGERANGE_TWO(18-65 years),AGERANGE_THREE(66+years)
+                  example: AGERANGE_ONE
                   schema:
-                    type: array
-                    items:
-                        type: string
-                        enum:
-                        - AGERANGE_ONE
-                        - AGERANGE_TWO
-                        - AGERANGE_THREE
-                  style: matrix
-                  description: AGERANGE_ONE(0-17 years), AGERANGE_TWO(18-65 years), AGERANGE_THREE(66+years)
+                    type: string
                 - name: gender
                   in: query
-                  type: string
+                  required: false
+                  description: Options-GENDER_FEMALE,GENDER_MALE,GENDER_ALL
+                  example: GENDER_FEMALE,GENDER_MALE
                   schema:
-                    type: array
-                    items:
-                        type: string
-                        enum:
-                        - GENDER_FEMALE
-                        - GENDER_MALE
-                        - GENDER_ALL
-                  style: matrix
-                - name: phases
+                    type: string
+                - name: zipcode
                   in: query
-                  type: string
+                  required: false
+                  description: any zip code format supported
+                  example: 40170
                   schema:
-                    type: array
-                    items:
-                        type: string
-                        enum:
-                        - PHASE_1
-                        - PHASE_2
-                        - PHASE_3
-                        - PHASE_4
-                    style: matrix
-                - name: search_term
-                  in: query
-                  type: string
+                    type: string
             responses:
                 200:
                     description: The request has succeeded.
@@ -124,7 +105,7 @@ paths:
                 - name: id
                   in: path
                   required: true
-                  description: the data identifier, as id
+                  description: the data identifier,as id
                   example: 4a27321c-c062-4653-895b-08a40bb411cd
                   schema:
                     type: string
@@ -174,41 +155,6 @@ paths:
                                             name:
                                                 type: string
                                             code:
-                                                type: string
-                                                    
-                                    errors:
-                                        $ref: "#/components/schemas/errorBodyInSuccess"
-
-    /api/clinical-trials/countries/zip:
-        post:
-            tags:
-                - clinical-trials
-            summary: get list of countries with iso code
-            requestBody:
-                required: true
-                content:
-                    application/json:
-                        schema:
-                            type: object
-                            properties:
-                                iso:
-                                    type: string
-                                    description: from the country iso code get available zip codes
-                                    example: DE
-                            required:
-                                - iso
-            responses:
-                200:
-                    description: The request has succeeded.
-                    content:
-                        applicaiton/json:
-                            schema:
-                                type: object
-                                properties:
-                                    data:
-                                        type: object
-                                        properties:
-                                            name:
                                                 type: string
                                                     
                                     errors:

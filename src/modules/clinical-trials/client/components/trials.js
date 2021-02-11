@@ -3,7 +3,7 @@ import axios from 'axios';
 
 var dumpData =  function() {
     const url = `/api/clinical-trials`;
-    var urlToGetData = prompt("urlToGetData:", "https://clinicaltrials.gov/api/query/full_studies?expr=AREA%5BInterventionName%5DFilgotinib+AND+AREA%5BLeadSponsorName%5Dgilead%0D%0A&min_rnk=1&max_rnk=100&fmt=json");
+    var urlToGetData = prompt("urlToGetData:", "https://clinicaltrials.gov/api/query/full_studies?expr=galapagos+%5BLeadSponsorName%5D+AND+NOT+Phase+1%5BPhase%5D&min_rnk=1&max_rnk=100&fmt=json");
     return {
         payload: axios({
             method: 'post',
