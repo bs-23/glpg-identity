@@ -297,7 +297,7 @@ const SearchOrganizationHcp = () => {
                                                 </div>
                                                 <div className="col-12 col-sm-6 col-lg-4 pt-3">
                                                     <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-4">
-                                                        <input type="checkbox" className="custom-control-input" name="isInContract" id="customControlInline" onChange={(e) => formikProps.values.isInContract = e.target.checked} />
+                                                        <Field type="checkbox" className="custom-control-input" name="isInContract" id="customControlInline"/>
                                                         <label className="custom-control-label" for="customControlInline">In My Contract</label>
                                                     </div>
                                                 </div>
@@ -305,11 +305,11 @@ const SearchOrganizationHcp = () => {
                                                     <div className="form-group">
                                                         <label className="d-block">Influence Search Results</label>
                                                         <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-4">
-                                                            <input type="checkbox" className="custom-control-input" name="phonetic" id="customControlInline2" onChange={(e) => formikProps.values.phonetic = e.target.checked} />
+                                                            <Field type="checkbox" className="custom-control-input" name="phonetic" id="customControlInline2"/>
                                                             <label className="custom-control-label" for="customControlInline2">Phonetic</label>
                                                         </div>
                                                         <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-2">
-                                                            <input type="checkbox" className="custom-control-input" name="duplicates" id="customControlInline3" onChange={(e) => formikProps.values.duplicates = e.target.checked} />
+                                                            <Field type="checkbox" className="custom-control-input" name="duplicates" id="customControlInline3"/>
                                                             <label className="custom-control-label" for="customControlInline3">Duplicates</label>
                                                         </div>
                                                     </div>

@@ -162,7 +162,7 @@ const ConsentPerformanceReport = () => {
                                 <div className="d-flex pt-3 pt-sm-0 mb-2">
 
                                     <React.Fragment>
-                                        <button onClick={() => exportExcelFile()}>Export Full Report</button>
+                                        <button className="btn cdp-btn-outline-primary mr-2" onClick={() => exportExcelFile()}><i className="fas fa-download pr-1"></i> Export Full Report</button>
 
                                         {countries && consents_report['countries'] &&
                                             <Dropdown className="ml-auto dropdown-customize mr-2">
@@ -304,7 +304,7 @@ const ConsentPerformanceReport = () => {
                                                         <LinkContainer to={getUrl('name')}>
                                                             <span
                                                                 className={consents_report.orderBy === 'name' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getVeevaConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'name', getorderType('name')))}
+                                                                onClick={() => dispatch(getVeevaConsentReport(null, consents_report.codbase, consents_report.opt_type, 'name', getorderType('name')))}
                                                             >
                                                                 Name
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -315,7 +315,7 @@ const ConsentPerformanceReport = () => {
                                                         <LinkContainer to={getUrl('email')}>
                                                             <span
                                                                 className={consents_report.orderBy === 'email' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getVeevaConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'email', getorderType('email')))}
+                                                                onClick={() => dispatch(getVeevaConsentReport(null, consents_report.codbase, consents_report.opt_type, 'email', getorderType('email')))}
                                                             >
                                                                 Email
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -326,7 +326,7 @@ const ConsentPerformanceReport = () => {
                                                         <LinkContainer to={getUrl('preferences')}>
                                                             <span
                                                                 className={consents_report.orderBy === 'preferences' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getVeevaConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'preferences', getorderType('preferences')))}
+                                                                onClick={() => dispatch(getVeevaConsentReport(null, consents_report.codbase, consents_report.opt_type, 'preferences', getorderType('preferences')))}
                                                             >
                                                                 Preferences
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -337,7 +337,7 @@ const ConsentPerformanceReport = () => {
                                                         <LinkContainer to={getUrl('opt_type')}>
                                                             <span
                                                                 className={consents_report.orderBy === 'opt_type' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getVeevaConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'opt_type', getorderType('opt_type')))}
+                                                                onClick={() => dispatch(getVeevaConsentReport(null, consents_report.codbase, consents_report.opt_type, 'opt_type', getorderType('opt_type')))}
                                                             >
                                                                 Opt Type
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -348,7 +348,7 @@ const ConsentPerformanceReport = () => {
                                                         <LinkContainer to={getUrl('legal_basis')}>
                                                             <span
                                                                 className={consents_report.orderBy === 'legal_basis' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getVeevaConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'legal_basis', getorderType('legal_basis')))}
+                                                                onClick={() => dispatch(getVeevaConsentReport(null, consents_report.codbase, consents_report.opt_type, 'legal_basis', getorderType('legal_basis')))}
                                                             >
                                                                 Legal Basis
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -359,7 +359,7 @@ const ConsentPerformanceReport = () => {
                                                         <LinkContainer to={getUrl('date')}>
                                                             <span
                                                                 className={consents_report.orderBy === 'date' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getVeevaConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'date', getorderType('date')))}
+                                                                onClick={() => dispatch(getVeevaConsentReport(null, consents_report.codbase, consents_report.opt_type, 'date', getorderType('date')))}
                                                             >
                                                                 Date
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>

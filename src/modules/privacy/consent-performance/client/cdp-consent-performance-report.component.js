@@ -164,7 +164,7 @@ const CdpConsentPerformanceReport = () => {
                                 </div>
                                 <div className="d-flex pt-3 pt-sm-0 mb-2">
                                     <React.Fragment>
-                                        <button onClick={() => exportExcelFile()}>Export Full Report</button>
+                                        <button className="btn cdp-btn-outline-primary mr-2" onClick={() => exportExcelFile()}><i className="fas fa-download pr-1"></i>Export Full Report</button>
 
                                         {countries && consents_report['countries'] &&
                                             <Dropdown className="ml-auto dropdown-customize mr-2">
@@ -320,7 +320,7 @@ const CdpConsentPerformanceReport = () => {
                                                         <LinkContainer to={getUrl('first_name')}>
                                                             <span
                                                                 className={consents_report.orderBy === 'first_name' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'first_name', getorderType('first_name')))}
+                                                                onClick={() => dispatch(getConsentReport(null, consents_report.codbase, consents_report.opt_type, 'first_name', getorderType('first_name')))}
                                                             >
                                                                 First Name
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -331,7 +331,7 @@ const CdpConsentPerformanceReport = () => {
                                                         <LinkContainer to={getUrl('last_name')}>
                                                             <span
                                                                 className={consents_report.orderBy === 'last_name' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'last_name', getorderType('last_name')))}
+                                                                onClick={() => dispatch(getConsentReport(null, consents_report.codbase, consents_report.opt_type, 'last_name', getorderType('last_name')))}
                                                             >
                                                                 Last Name
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -342,7 +342,7 @@ const CdpConsentPerformanceReport = () => {
                                                         <LinkContainer to={getUrl('email')}>
                                                             <span
                                                                 className={consents_report.orderBy === 'email' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'email', getorderType('email')))}
+                                                                onClick={() => dispatch(getConsentReport(null, consents_report.codbase, consents_report.opt_type, 'email', getorderType('email')))}
                                                             >
                                                                 Email
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -353,7 +353,7 @@ const CdpConsentPerformanceReport = () => {
                                                         <LinkContainer to={getUrl('consent_type')}>
                                                             <span
                                                                 className={consents_report.orderBy === 'consent_type' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'consent_type', getorderType('consent_type')))}
+                                                                onClick={() => dispatch(getConsentReport(null, consents_report.codbase, consents_report.opt_type, 'consent_type', getorderType('consent_type')))}
                                                             >
                                                                 Consent Type
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -364,7 +364,7 @@ const CdpConsentPerformanceReport = () => {
                                                         <LinkContainer to={getUrl('preferences')}>
                                                             <span
                                                                 className={consents_report.orderBy === 'preferences' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'preferences', getorderType('preferences')))}
+                                                                onClick={() => dispatch(getConsentReport(null, consents_report.codbase, consents_report.opt_type, 'preferences', getorderType('preferences')))}
                                                             >
                                                                 Preferences
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -375,7 +375,7 @@ const CdpConsentPerformanceReport = () => {
                                                         <LinkContainer to={getUrl('opt_type')}>
                                                             <span
                                                                 className={consents_report.orderBy === 'opt_type' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'opt_type', getorderType('opt_type')))}
+                                                                onClick={() => dispatch(getConsentReport(null, consents_report.codbase, consents_report.opt_type, 'opt_type', getorderType('opt_type')))}
                                                             >
                                                                 Opt Type
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -386,7 +386,7 @@ const CdpConsentPerformanceReport = () => {
                                                         <LinkContainer to={getUrl('legal_basis')}>
                                                             <span
                                                                 className={consents_report.orderBy === 'legal_basis' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'legal_basis', getorderType('legal_basis')))}
+                                                                onClick={() => dispatch(getConsentReport(null, consents_report.codbase, consents_report.opt_type, 'legal_basis', getorderType('legal_basis')))}
                                                             >
                                                                 Legal Basis
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
@@ -396,7 +396,7 @@ const CdpConsentPerformanceReport = () => {
                                                         <LinkContainer to={getUrl('date')}>
                                                             <span
                                                                 className={consents_report.orderBy === 'date' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getConsentReport(consents_report.page, consents_report.codbase, consents_report.opt_type, 'date', getorderType('date')))}
+                                                                onClick={() => dispatch(getConsentReport(null, consents_report.codbase, consents_report.opt_type, 'date', getorderType('date')))}
                                                             >
                                                                 Date
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
