@@ -203,13 +203,14 @@ const PartnerManagement = () => {
                                                         <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
+                                                            <Dropdown.Item onClick={() => { setDetailShow(true); setPartner(item); }}>Profile</Dropdown.Item>
                                                             {item.status === 'pending' &&
                                                                 <>
                                                                     <Dropdown.Item onClick={() => { setStatusShow(true); setPartner(item); }}>Manage Status</Dropdown.Item>
 
                                                                 </>
                                                             }
-                                                            <Dropdown.Item onClick={() => { setDetailShow(true); setPartner(item); }}>Profile</Dropdown.Item>
+
                                                         </Dropdown.Menu>
                                                     </Dropdown></td>
                                                 </tr>
