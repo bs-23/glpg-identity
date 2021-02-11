@@ -6,7 +6,7 @@ const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/platfo
 
 module.exports = app => {
     app.route('/api/roles')
-        .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_ROLE]),controller.getRoles)
+        .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_ROLE, Services.MANAGE_USER]),controller.getRoles)
         .post(CDPAuthStrategy, ServiceGuard([Services.MANAGE_ROLE]),controller.createRole);
     app.route('/api/roles/:id')
         .put(CDPAuthStrategy, ServiceGuard([Services.MANAGE_ROLE]),controller.editRole);

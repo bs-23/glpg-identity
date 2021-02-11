@@ -6,7 +6,7 @@ const controller = require('./userProfile.controller');
 
 module.exports = app => {
     app.route('/api/profiles')
-        .get(passport.authenticate('user-jwt', { session: false }), ServiceGuard([Services.MANAGE_PROFILE]),  controller.getProfiles)
+        .get(passport.authenticate('user-jwt', { session: false }), ServiceGuard([Services.MANAGE_PROFILE, Services.MANAGE_USER]),  controller.getProfiles)
         .post(passport.authenticate('user-jwt', { session: false }), ServiceGuard([Services.MANAGE_PROFILE]), controller.createProfile);
     app.route('/api/profiles/:id')
         .put(passport.authenticate('user-jwt', { session: false }), ServiceGuard([Services.MANAGE_PROFILE]), controller.editProfile);

@@ -12,7 +12,7 @@ module.exports = app => {
         .post(CDPAuthStrategy, ServiceGuard([Services.MANAGE_HCP]), controller.getHcps);
 
     app.route('/api/hcps/specialties')
-        .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_HCP]), controller.getSpecialtiesForCdp);
+        .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_HCP, Services.DISCOVER_HCP_HCO]), controller.getSpecialtiesForCdp);
 
     app.route('/api/hcps/:id')
         .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_HCP]), controller.getHcpProfile);
