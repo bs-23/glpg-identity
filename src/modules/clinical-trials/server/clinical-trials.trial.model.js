@@ -13,11 +13,6 @@ let trialModel = {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4
         },
-        rank: {
-            unique: false,
-            allowNull: true,
-            type: DataTypes.INTEGER
-        },
         protocol_number: {
             unique: false,
             allowNull: true,
@@ -56,35 +51,88 @@ let trialModel = {
         std_age: {
             unique: false,
             allowNull: true,
-            type: DataTypes.ARRAY(DataTypes.STRING)
+            type: DataTypes.STRING(100)
         },
         phase: {
             unique: false,
             allowNull: true,
-            type: DataTypes.ARRAY(DataTypes.STRING)
+            type: DataTypes.STRING(100)
         },
         trial_status: {
             unique: false,
             allowNull: true,
             type: DataTypes.STRING(60)
         },
-        inclusion_exclusion_criteria: {
-            unique: false,
-            allowNull: true,
-            type: DataTypes.STRING(10485760)
-        },
         type_of_drug: {
             unique: false,
             allowNull: true,
             type: DataTypes.STRING(60)
+        },
+        eudract_number: {
+            unique: false,
+            allowNull: true,
+            type: DataTypes.STRING(60)
+        },
+        trial_start_date: {
+            allowNull: true,
+            type: DataTypes.DATE,
+            defaultValue: null
+        },
+        trial_end_date: {
+            allowNull: true,
+            type: DataTypes.DATE,
+            defaultValue: null
+        },
+        story_telling: {
+            unique: false,
+            allowNull: true,
+            type: DataTypes.STRING(10485760)
+        },
+        official_title: {
+            unique: false,
+            allowNull: true,
+            type: DataTypes.STRING(10485760)
+        },
+        indication: {
+            unique: false,
+            allowNull: true,
+            type: DataTypes.STRING(60)
+        },
+        indication_group: {
+            unique: false,
+            allowNull: true,
+            type: DataTypes.STRING(60)
+        },
+        trial_fixed_id: {
+            unique: false,
+            allowNull: true,
+            type: DataTypes.STRING(60)
+        },
+        inclusion_criteria: {
+            unique: false,
+            allowNull: true,
+            type: DataTypes.STRING(10485760)
+        },
+        exclusion_criteria: {
+            unique: false,
+            allowNull: true,
+            type: DataTypes.STRING(10485760)
+        },
+        note_criteria: {
+            unique: false,
+            allowNull: true,
+            type: DataTypes.STRING(10485760)
         }
+
     },
     db_schema: {
         schema: `${nodecache.getValue('POSTGRES_CLINICAL_TRIALS_SCHEMA')}`,
         tableName: 'clinical_trials',
         timestamps: true,
         createdAt: 'created_at',
-        updatedAt: 'updated_at'
+        updatedAt: 'updated_at',
+        charset: 'utf8',
+        collate: 'utf8_unicode_ci'
     }
 };
 

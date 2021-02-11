@@ -12,6 +12,7 @@ const Filter = (props) => {
         filterOptions,
         isTouched,
         validationError,
+        maxNumberOfValues,
         onChange,
         onRemove
     } = props;
@@ -40,6 +41,7 @@ const Filter = (props) => {
     };
 
     const handleAddition = (tag) => {
+        if (value.length === maxNumberOfValues) return;
         if(!tag.text.trim()) return;
         onChange('value', [...value, tag.text.trim()], index);
     };
@@ -120,6 +122,8 @@ const Filter = (props) => {
                         menuPortalTarget={document.body}
                         value={getSelectedOptions()}
                         onChange={selectedOption => {
+                            if (selectedOption && selectedOption.length > maxNumberOfValues) return;
+
                             const value = (selectedOption || []).map(o => o.value);
                             const displayText = (selectedOption || []).map(o => o.label);
 
@@ -141,6 +145,12 @@ const Filter = (props) => {
                         handleInputBlur={handleInputBlur}
                         autofocus={false}
                         maxLength={filterOption.maxLength}
+                        ref={ref => {
+                            if (ref && ref.ref.current) {
+                                if (value.length >= maxNumberOfValues) ref.ref.current.textInput.setAttribute("disabled", true);
+                                else ref.ref.current.textInput.removeAttribute("disabled");
+                            }
+                        }}
                     />
                     {isTouched && <div className="invalid-feedback">{validationError.value}</div>}
                 </div>

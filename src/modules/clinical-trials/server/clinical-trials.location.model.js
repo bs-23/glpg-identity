@@ -53,7 +53,9 @@ let locationModel = {
         tableName: 'locations',
         timestamps: true,
         createdAt: 'created_at',
-        updatedAt: 'updated_at'
+        updatedAt: 'updated_at',
+        charset: 'utf8',
+        collate: 'utf8_unicode_ci'
     }
 };
 
