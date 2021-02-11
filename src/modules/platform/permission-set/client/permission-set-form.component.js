@@ -291,7 +291,7 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
                                                             labelExtractor={item => item.name}
                                                         />
                                                     </FormField>
-                                                    <FormFieldFluid label="Select Service Categories" name="serviceCategories" required={false} >
+                                                    <FormFieldFluid label="Select Services" name="serviceCategories" required={false} >
                                                         {
                                                             serviceCategories.map(sc => {
                                                                 return <ToggleList
