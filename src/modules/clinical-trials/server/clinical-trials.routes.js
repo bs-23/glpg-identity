@@ -20,9 +20,6 @@ module.exports = app => {
     app.route('/api/clinical-trials/countries')
         .get(auth, controller.getCountryList);
 
-    app.route('/api/clinical-trials/countries/zip')
-        .post(auth, controller.getPostalCodes);
-
     app.route('/api/clinical-trials/countries/zip/validate')
         .post(auth, controller.validateAddress);
 
