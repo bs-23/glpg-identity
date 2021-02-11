@@ -470,7 +470,7 @@ const WholesalerPartnerRequests = () => {
                                     </div>
 
                                 </div>
-                                <div className="row">
+                                <div className="row justify-content-center">
                                     <div className="col-12 col-sm-6">
                                         <button type="submit" disabled={showError} className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" >Submit</button>
                                     </div>
