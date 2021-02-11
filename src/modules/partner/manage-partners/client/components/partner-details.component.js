@@ -63,30 +63,30 @@ const PartnerDetails = (props) => {
                                             <ul className="p-3 m-0 list-unstyled">
                                                 <li className="pb-3">
                                                     <strong className="h5 font-weight-bold-light d-block">Beneficiary Type</strong>
-                                                    <span className="h5 d-block">{partner.beneficiary_category}</span>
+                                                    <span className="h5 d-block text-secondary">{partner.beneficiary_category}</span>
                                                 </li>
                                                 <li className="pb-3">
                                                     <strong className="h5 font-weight-bold-light d-block">Customer OneKey Id</strong>
-                                                    <span className="h5 d-block">{partner.onekey_id}</span>
+                                                    <span className="h5 d-block text-secondary">{partner.onekey_id}</span>
                                                 </li>
                                                 <li className="pb-3">
                                                     <strong className="h5 font-weight-bold-light d-block">Local UUID</strong>
-                                                    <span className="h5 d-block">{partner.uuid}</span>
+                                                    <span className="h5 d-block text-secondary">{partner.uuid}</span>
                                                 </li>
                                             </ul>
                                             :
                                             <ul className="p-3 m-0 list-unstyled">
                                                 <li className="pb-3">
                                                     <strong className="h5 font-weight-bold-light d-block">Requestor Name</strong>
-                                                    <span className="h5 d-block">{partner.requestor_first_name + ' ' + partner.requestor_last_name}</span>
+                                                    <span className="h5 d-block  text-secondary">{partner.requestor_first_name + ' ' + partner.requestor_last_name}</span>
                                                 </li>
                                                 <li className="pb-3">
                                                     <strong className="h5 font-weight-bold-light d-block">Registration no/VAT code</strong>
-                                                    <span className="h5 d-block">{partner.registration_number}</span>
+                                                    <span className="h5 d-block text-secondary">{partner.registration_number}</span>
                                                 </li>
                                                 <li className="pb-3">
                                                     <strong className="h5 font-weight-bold-light d-block">Purchasing Organization</strong>
-                                                    <span className="h5 d-block">{partner.purchasing_org}</span>
+                                                    <span className="h5 d-block text-secondary">{partner.purchasing_org}</span>
                                                 </li>
                                             </ul>
 
@@ -100,15 +100,15 @@ const PartnerDetails = (props) => {
                                         <ul className="p-3 m-0 list-unstyled">
                                             <li className="pb-3">
                                                 <strong className="h5 font-weight-bold-light d-block">Streetname & House no</strong>
-                                                <span className="h5 d-block">{partner.address}</span>
+                                                <span className="h5 d-block text-secondary">{partner.address}</span>
                                             </li>
                                             <li className="pb-3">
                                                 <strong className="h5 font-weight-bold-light d-block">Postcode & City</strong>
-                                                <span className="h5 d-block">{partner.post_code + ' ' + partner.city}</span>
+                                                <span className="h5 d-block text-secondary">{partner.post_code + ' ' + partner.city}</span>
                                             </li>
                                             <li className="pb-3">
                                                 <strong className="h5 font-weight-bold-light d-block">Country</strong>
-                                                {partner.country_iso2 && <span className="h5 d-block">{(props.countries.find(i => i.country_iso2.toLowerCase() === partner.country_iso2.toLowerCase())).countryname}</span>}
+                                                {partner.country_iso2 && <span className="h5 d-block text-secondary">{(props.countries.find(i => i.country_iso2.toLowerCase() === partner.country_iso2.toLowerCase())).countryname}</span>}
                                             </li>
                                         </ul>
                                     </div>
@@ -123,7 +123,9 @@ const PartnerDetails = (props) => {
                                     <h6 className="bg-light p-3 font-weight-bold-light rounded-top">Galapagos Contracts</h6>
                                     <div className="p-3">
                                         {partner.documents && partner.documents.map(doc => (
-                                            <a key={doc.id} onClick={() => downloadFile(doc.id)} className="d-block text-primary">{doc.name}</a>
+                                            <a key={doc.id} onClick={() => downloadFile(doc.id)} type="button" className="d-block mb-2 d-flex align-items-baseline cdp-text-primary">
+                                                <i className="fas fa-paperclip mr-2"></i>{doc.name}
+                                            </a>
                                         ))
                                         }
                                     </div>
