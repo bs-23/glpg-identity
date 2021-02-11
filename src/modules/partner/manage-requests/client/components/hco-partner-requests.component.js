@@ -51,11 +51,17 @@ const HcoPartnerRequests = () => {
     const [showSearch, setShowSearch] = useState(false);
     const [searchInput, setSearchInput] = useState(false);
     const openSearch = (values) => {
-        setSearchInput({
+        const searchInput = {
             uuid: values.uuid,
             countryIso2: values.country_iso2,
             specialty: values.specialty
-        });
+        };
+
+        if (formikBag && formikBag.values && formikBag.values.onekey_id) {
+            searchInput.onekeyId = formikBag.values.onekey_id;
+        }
+
+        setSearchInput(searchInput);
         setShowSearch(true);
     };
     const resultSelected = (selectedHco = {}) => {

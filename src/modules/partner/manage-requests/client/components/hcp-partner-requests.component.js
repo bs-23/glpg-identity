@@ -52,12 +52,18 @@ const HcpPartnerRequests = () => {
     const [showSearch, setShowSearch] = useState(false);
     const [searchInput, setSearchInput] = useState(false);
     const openSearch = (values) => {
-        setSearchInput({
+        const searchInput = {
             firstName: values.first_name,
             lastName: values.last_name,
             uuid: values.uuid,
             countryIso2: values.country_iso2
-        });
+        };
+
+        if (formikBag && formikBag.values && formikBag.values.onekey_id) {
+            searchInput.onekeyId = formikBag.values.onekey_id;
+        }
+
+        setSearchInput(searchInput);
         setShowSearch(true);
     };
     const resultSelected = (selectedHcp = {}) => {

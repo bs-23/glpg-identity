@@ -505,17 +505,18 @@ const SearchHcpModal = (props) => {
                                             </th>
                                             <th>Individual Onekey ID</th>
                                             <th>Country</th>
+                                            <th>Select</th>
                                         </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
                                         {
-                                            users.results.map((user, idx) => (
-                                                <tr key={idx} onClick={() => handleResultSelection(user)}>
-                                                    <td data-for="Name">{user.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary" title="In my contract"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary" title="Not in my contract"></i>} {`${user.firstName} ${user.lastName}`}</td>
-                                                    <td data-for="Specialty">{(user.specialties || ['--']).join(', ')}</td>
+                                            users.results.map((hcp, idx) => (
+                                                <tr key={idx} className={searchInput.onekeyId && searchInput.onekeyId === hcp.individualEid ? 'selected' : ''}>
+                                                    <td data-for="Name">{hcp.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary" title="In my contract"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary" title="Not in my contract"></i>} {`${hcp.firstName} ${hcp.lastName}`}</td>
+                                                    <td data-for="Specialty">{(hcp.specialties || ['--']).join(', ')}</td>
                                                     <td data-for="Workplace">
                                                         {
-                                                            user.workplaces.map((item, idxOfWorkPlace) => (
+                                                            hcp.workplaces.map((item, idxOfWorkPlace) => (
                                                                 <div key={idxOfWorkPlace} className="currentWorkplace">
                                                                     <span className="okla-search__workplace-icons position-relative">
                                                                         {
@@ -530,8 +531,15 @@ const SearchHcpModal = (props) => {
                                                             ))
                                                         }
                                                     </td>
-                                                    <td data-for="Individual Onekey ID">{user.individualEid}</td>
-                                                    <td data-for="Country">{getCountryName(user.countryIso2)}</td>
+                                                    <td data-for="Individual Onekey ID">{hcp.individualEid}</td>
+                                                    <td data-for="Country">{getCountryName(hcp.countryIso2)}</td>
+                                                    <td>
+                                                        <input
+                                                            type="radio"
+                                                            name="hcp-result"
+                                                            checked={searchInput.onekeyId && searchInput.onekeyId === hcp.individualEid}
+                                                            onChange={() => handleResultSelection(hcp)}/>
+                                                    </td>
                                                 </tr>
                                             ))
                                         }

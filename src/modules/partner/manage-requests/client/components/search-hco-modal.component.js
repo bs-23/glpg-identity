@@ -457,17 +457,25 @@ const SearchHcoModal = (props) => {
                                             <th>Address</th>
                                             <th>City</th>
                                             <th>Country</th>
+                                            <th>Select</th>
                                         </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
                                         {
                                             hcos.results.map((hco, idx) => (
-                                                <tr key={idx} onClick={() => handleResultSelection(hco)}>
+                                                <tr key={idx} className={searchInput.onekeyId && searchInput.onekeyId === hco.workplaceEid ? 'selected' : ''}>
                                                     <td data-for="Name">{hco.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary" title="In my contract"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary" title="Not In my contract"></i>} {`${hco.name}`}</td>
                                                     <td data-for="Specialty">{(hco.specialties || ['--']).join(', ')}</td>
                                                     <td data-for="Address">{hco.address}</td>
                                                     <td data-for="City">{hco.city}</td>
                                                     <td data-for="Country">{getCountryName(hco.countryIso2)}</td>
+                                                    <td>
+                                                        <input
+                                                            type="radio"
+                                                            name="hco-result"
+                                                            checked={searchInput.onekeyId && searchInput.onekeyId === hco.workplaceEid}
+                                                            onChange={() => handleResultSelection(hco)}/>
+                                                    </td>
                                                 </tr>
                                             ))
                                         }
