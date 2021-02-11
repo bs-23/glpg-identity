@@ -334,6 +334,8 @@ async function exportCdpConsentsReport(req, res) {
             subQuery: false
         });
 
+        if (!hcp_consents || !hcp_consents.length) return res.status(404).send(`No consents found.`);
+
         const data = hcp_consents.map(hcp_consent => ({
             'First Name': hcp_consent.hcp_profile.first_name,
             'Last Name': hcp_consent.hcp_profile.last_name,
@@ -344,19 +346,15 @@ async function exportCdpConsentsReport(req, res) {
             'Date': (new Date(hcp_consent.updated_at)).toLocaleDateString('en-GB').replace(/\//g, '.')
         }));
 
-        const filePath = ExportService.exportExcel(data, 'cdp-consents.xlsx', 'CDP consents report');
+        const sheetName = 'CDP consents report';
+        const fileBuffer = ExportService.exportToExcel(data, sheetName);
 
-        res.download(filePath, function (err) {
-            if (err) {
-                logger.error(err);
-            } else {
-                fs.unlink(filePath, function(e) {
-                    if(e) {
-                        logger.error(e);
-                    }
-                });
-            }
+        res.writeHead(200, {
+            'Content-Disposition': `attachment;filename=${sheetName.replace(' ', '_')}.xlsx`,
+            'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         });
+
+        res.end(fileBuffer);
     } catch (err) {
         logger.error(err);
         res.status(500).send(err);
@@ -394,6 +392,8 @@ async function exportVeevaConsentsReport(req, res) {
                 type: QueryTypes.SELECT
             });
 
+        if (!hcp_consents || !hcp_consents.length) return res.status(404).send(`No consents found.`);
+
         const data = hcp_consents.map(hcp_consent => ({
             'Name': hcp_consent.account_name,
             'Email': hcp_consent.channel_value,
@@ -402,19 +402,14 @@ async function exportVeevaConsentsReport(req, res) {
             'Date': (new Date(hcp_consent.capture_datetime)).toLocaleDateString('en-GB').replace(/\//g, '.')
         }));
 
-        const filePath = ExportService.exportExcel(data, 'veeva-consents.xlsx', 'VeevaCRM consent report');
+        const sheetName = 'Veeva CRM consent report';
+        const fileBuffer = ExportService.exportToExcel(data, sheetName);
 
-        res.download(filePath, function (err) {
-            if (err) {
-                logger.error(err);
-            } else {
-                fs.unlink(filePath, function(e) {
-                    if(e) {
-                        logger.error(e);
-                    }
-                });
-            }
+        res.writeHead(200, {
+            'Content-Disposition': `attachment;filename=${sheetName.replace(' ', '_')}.xlsx`,
+            'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         });
+        res.end(fileBuffer);
     } catch (err) {
         logger.error(err);
         res.status(500).send(err);

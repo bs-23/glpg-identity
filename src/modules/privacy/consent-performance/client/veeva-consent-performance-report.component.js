@@ -104,11 +104,29 @@ const ConsentPerformanceReport = () => {
         return splitStr.join(' ');
     }
 
-    function exportExcelFile() {
-        axios.get('/api/export-veeva-consent-performance-report', { responseType: 'blob'}).then(res => {
-            fileDownload(res.data, 'veeva-consent-report.xlsx');
+    const exportExcelFile = () => {
+        axios.get(`/api/export-veeva-consent-performance-report`, {
+            responseType: 'blob',
+        }).then(res => {
+            const pad2 = (n) => (n < 10 ? '0' + n : n);
+
+            var date = new Date();
+            const timestamp = date.getFullYear().toString() + pad2(date.getMonth() + 1) + pad2(date.getDate()) + pad2(date.getHours()) + pad2(date.getMinutes()) + pad2(date.getSeconds());
+
+            fileDownload(res.data, `veeva-consent-report_${timestamp}.xlsx`);
+        }).catch(error => {
+            /**
+             * the error response is a blob because of the responseType option.
+             * text() converts it back to string
+             */
+            error.response.data.text().then(text => {
+                addToast(text, {
+                    appearance: 'warning',
+                    autoDismiss: true
+                });
+            });
         });
-    }
+    };
 
     useEffect(() => {
         dispatch(getAllCountries());

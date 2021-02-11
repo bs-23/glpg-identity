@@ -128,7 +128,7 @@ async function getPartnerHcp(req, res) {
     try {
         const partnerHcp = await Partner.findOne({
             where: { id: req.params.id },
-            attributes: { exclude: ['entity_type', 'organization_name', 'organization_type', 'created_at', 'updated_at'] }
+            attributes: { exclude: ['entity_type', 'organization_name', 'organization_type'] }
         });
 
         if (!partnerHcp) return res.status(404).send('The partner does not exist');
@@ -354,7 +354,7 @@ async function getPartnerHco(req, res) {
     try {
         const partnerHco = await Partner.findOne({
             where: { id: req.params.id },
-            attributes: { exclude: ['entity_type', 'is_italian_hcp', 'should_report_hco', 'beneficiary_category', 'created_at', 'updated_at'] }
+            attributes: { exclude: ['entity_type', 'is_italian_hcp', 'should_report_hco', 'beneficiary_category'] }
         });
 
         if (!partnerHco) return res.status(404).send('The partner does not exist');
@@ -591,7 +591,7 @@ async function getNonHealthcarePartner(req, res) {
     try {
         const partnerVendor = await PartnerVendors.findOne({
             where: { id: req.params.id },
-            attributes: { exclude: ['entity_type', 'created_at', 'updated_at'] }
+            attributes: { exclude: ['entity_type'] }
         });
 
         if (!partnerVendor) return res.status(404).send('The partner does not exist');
@@ -928,7 +928,7 @@ async function exportApprovedPartners(req, res) {
         };
 
         const sheetName = sheetNames[entityType];
-        const fileBuffer = ExportService.exportDataToExcel(data, sheetName);
+        const fileBuffer = ExportService.exportToExcel(data, sheetName);
 
         res.writeHead(200, {
             'Content-Disposition': `attachment;filename=${sheetNames[entityType].replace(' ', '_')}.xlsx`,
