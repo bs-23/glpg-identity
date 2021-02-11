@@ -1,7 +1,7 @@
 const path = require("path");
 const controller = require('./user.controller');
-const { Modules, Services } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
-const { ModuleGuard } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.middleware'));
+const { Services } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
+const { ServiceGuard } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.middleware'));
 const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/platform/user/server/user-authentication.middleware.js'));
 
 module.exports = app => {
@@ -10,10 +10,10 @@ module.exports = app => {
     app.get('/api/logout', CDPAuthStrategy, controller.logout);
 
     app.route('/api/cdp-users')
-        .post(CDPAuthStrategy, ModuleGuard([Services.MANAGE_USER.value]), controller.getUsers);
+        .post(CDPAuthStrategy, ServiceGuard([Services.MANAGE_USER]), controller.getUsers);
 
     app.route('/api/users')
-        .post(CDPAuthStrategy, ModuleGuard([Services.MANAGE_USER.value]), controller.createUser);
+        .post(CDPAuthStrategy, ServiceGuard([Services.MANAGE_USER]), controller.createUser);
 
     app.route('/api/users/profile')
         .get(CDPAuthStrategy, controller.getSignedInUserProfile)

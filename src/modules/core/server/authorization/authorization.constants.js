@@ -1,75 +1,23 @@
-const Modules = {
-    PLATFORM: {
-        value: 'platform',
-        title: 'Management of Customer Data Platform'
-    },
-    INFORMATION: {
-        value: 'information',
-        title: 'Information Management'
-    },
-    PRIVACY: {
-        value: 'privacy',
-        title: 'Data Privacy & Consent Management'
-    },
-    BUSINESS_PARTNER: {
-        value: 'business-partner',
-        title: 'Business Partner Management'
-    },
-    CLINICAL_TRIALS: {
-        value: 'clinical-trials',
-        title: 'Clinical Trials Management'
-    }
-}
-
 const Services = {
-    MANAGE_USER: {
-        title: "User & Access Management",
-        value: "manage-user"
-    },
-    MANAGE_PROFILE: {
-        title: "Manage Profiles",
-        value: "manage-profile"
-    },
-    MANAGE_ROLE: {
-        title: "Define Roles",
-        value: "manage-role"
-    },
-    MANAGE_PERMISSION_SETS: {
-        title: "Manage Permission Sets",
-        value: "manage-permission-sets"
-    },
-    MANAGE_FAQS: {
-        title: "Manage FAQs",
-        value: "manage-faqs"
-    },
-    MANAGE_HCP: {
-        title: "Manage HCP Master Data",
-        value: "manage-hcp"
-    },
-    DISCOVER_HCP_HCO: {
-        title: "Discover Missing HCPs and HCOs",
-        value: "discover-hcp-hco"
-    },
-    MANAGE_CONSENT: {
-        value: 'manage-consent',
-        title: 'Manage New Consent'
-    },
-    CONSENT_COUNTRY: {
-        value: 'consent-country',
-        title: 'Assign Consent to Country'
-    },
-    CONSENT_CATEGORY: {
-        value: 'consent-category',
-        title: 'Configure Consent Category'
-    },
-    CONSENT_PERFORMANCE: {
-        value: 'consent-performance',
-        title: 'Generate Data Privacy & Consent Performance Report'
-    },
+    PLATFORM: 'platform',
+    INFORMATION: 'information',
+    PRIVACY: 'privacy',
+    BUSINESS_PARTNER: 'business-partner',
+    CLINICAL_TRIALS: 'clinical-trials',
+    MANAGE_USER: "manage-user",
+    MANAGE_PROFILE: "manage-profile",
+    MANAGE_ROLE: "manage-role",
+    MANAGE_PERMISSION_SETS: "manage-permission-sets",
+    MANAGE_FAQS: "manage-faqs",
+    MANAGE_HCP: "manage-hcp",
+    DISCOVER_HCP_HCO: "discover-hcp-hco",
+    MANAGE_CONSENT: 'manage-consent',
+    CONSENT_COUNTRY: 'consent-country',
+    CONSENT_CATEGORY: 'consent-category',
+    CONSENT_PERFORMANCE: 'consent-performance',
     MANAGE_CLINICAL_TRIALS: 'manage-clinical-trials'
 }
 
 module.exports = {
-    Modules,
     Services
 };

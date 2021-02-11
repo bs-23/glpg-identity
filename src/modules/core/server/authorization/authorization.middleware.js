@@ -89,7 +89,7 @@ async function getRolePermissions(userRole) {
     return serviceCategories;
 }
 
-const ModuleGuard = (services) => {
+const ServiceGuard = (services) => {
     return async function (req, res, next) {
         const user = await getUserWithProfiles(req.user.id);
         const profileServices = await getProfilePermissions(user.userProfile);
@@ -111,4 +111,4 @@ const ModuleGuard = (services) => {
     }
 };
 
-exports.ModuleGuard = ModuleGuard;
+exports.ServiceGuard = ServiceGuard;

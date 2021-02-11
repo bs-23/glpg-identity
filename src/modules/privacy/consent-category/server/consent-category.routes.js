@@ -1,20 +1,15 @@
 const path = require("path");
 const controller = require('./consent-category.controller');
 const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/platform/user/server/user-authentication.middleware.js'));
-const { Modules, Services } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
-const { ModuleGuard } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.middleware'));
+const { Services } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
+const { ServiceGuard } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.middleware'));
 
 module.exports = app => {
     app.route('/api/privacy/consent-categories')
-        .get(CDPAuthStrategy,
-            ModuleGuard([{
-                serviceCategory: Modules.PRIVACY.value,
-                services: { exclude: Services.CONSENT_PERFORMANCE.value }
-            }]),
-            controller.getConsentCategories)
-        .post(CDPAuthStrategy, ModuleGuard([Services.CONSENT_CATEGORY.value]), controller.createConsentCategory);
+        .get(CDPAuthStrategy, ServiceGuard([Services.CONSENT_CATEGORY, Services.MANAGE_CONSENT, Services.CONSENT_COUNTRY]), controller.getConsentCategories)
+        .post(CDPAuthStrategy, ServiceGuard([Services.CONSENT_CATEGORY]), controller.createConsentCategory);
 
     app.route('/api/privacy/consent-categories/:id')
-        .get(CDPAuthStrategy, ModuleGuard([Services.CONSENT_CATEGORY.value]), controller.getConsentCategory)
-        .put(CDPAuthStrategy, ModuleGuard([Services.CONSENT_CATEGORY.value]), controller.updateConsentCategory);
+        .get(CDPAuthStrategy, ServiceGuard([Services.CONSENT_CATEGORY]), controller.getConsentCategory)
+        .put(CDPAuthStrategy, ServiceGuard([Services.CONSENT_CATEGORY]), controller.updateConsentCategory);
 };
