@@ -928,7 +928,7 @@ async function exportApprovedPartners(req, res) {
         };
 
         const sheetName = sheetNames[entityType];
-        const fileBuffer = ExportService.exportDataToExcel(data, sheetName);
+        const fileBuffer = ExportService.exportToExcel(data, sheetName);
 
         res.writeHead(200, {
             'Content-Disposition': `attachment;filename=${sheetNames[entityType].replace(' ', '_')}.xlsx`,
