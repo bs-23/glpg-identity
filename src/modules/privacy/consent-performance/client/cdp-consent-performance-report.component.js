@@ -107,21 +107,6 @@ const CdpConsentPerformanceReport = () => {
         return splitStr.join(' ');
     }
 
-    // function exportExcelFile() {
-    //     axios.get('/api/export-cdp-consent-performance-report', { responseType: 'blob'})
-    //         .then(res => {
-    //             fileDownload(res.data, 'cdp-consent-report.xlsx');
-    //         })
-    //         .catch(err => {
-    //             error.response.data.text().then(text => {
-    //                 addToast(text, {
-    //                     appearance: 'error',
-    //                     autoDismiss: true
-    //                 });
-    //             });
-    //         });
-    // }
-
     const exportExcelFile = () => {
         axios.get(`/api/export-cdp-consent-performance-report`, {
             responseType: 'blob',
