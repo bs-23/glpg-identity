@@ -48,7 +48,7 @@ const PartnerDetails = (props) => {
                 {props.countries && props.countries.length > 0 && partner &&
                     <div className="row">
                         <div className="col-12">
-                        <h4 className="mb-4 pb-2 font-weight-bold-light">{(props.detailType === 'hcps' || props.detailType === 'hcos') ?
+                            <h4 className="mb-4 pb-2 font-weight-bold-light">{(props.detailType === 'hcps' || props.detailType === 'hcos') ?
                                 partner.first_name + ' ' + partner.last_name : partner.name}</h4>
 
                         </div>
@@ -61,32 +61,32 @@ const PartnerDetails = (props) => {
                                         <h5 className="bg-light p-3 cdp-text-primary font-weight-bold-light rounded-top">Information</h5>
                                         {(props.detailType === 'hcps' || props.detailType === 'hcos') ?
                                             <ul className="p-3 m-0 list-unstyled">
-                                                <li className="pb-3">
+                                                {props.detailType !== 'hcos' && <li className="pb-3">
                                                     <strong className="h6 font-weight-bold-light d-block">Beneficiary Type</strong>
-                                                <span className="h6 d-block text-secondary">{partner.beneficiary_category}</span>
+                                                    <span className="h6 d-block text-secondary">{partner.beneficiary_category}</span>
+                                                </li>}
+                                                <li className="pb-3">
+                                                    <strong className="h6 font-weight-bold-light d-block">Customer OneKey Id</strong>
+                                                    <span className="h6 d-block text-secondary">{partner.onekey_id}</span>
                                                 </li>
                                                 <li className="pb-3">
-                                                <strong className="h6 font-weight-bold-light d-block">Customer OneKey Id</strong>
-                                                <span className="h6 d-block text-secondary">{partner.onekey_id}</span>
-                                                </li>
-                                                <li className="pb-3">
-                                                <strong className="h6 font-weight-bold-light d-block">Local UUID</strong>
-                                                <span className="h6 d-block text-secondary">{partner.uuid}</span>
+                                                    <strong className="h6 font-weight-bold-light d-block">Local UUID</strong>
+                                                    <span className="h6 d-block text-secondary">{partner.uuid}</span>
                                                 </li>
                                             </ul>
                                             :
                                             <ul className="p-3 m-0 list-unstyled">
                                                 <li className="pb-3">
-                                                <strong className="h6 font-weight-bold-light d-block">Requestor Name</strong>
-                                                <span className="h6 d-block  text-secondary">{partner.requestor_first_name + ' ' + partner.requestor_last_name}</span>
+                                                    <strong className="h6 font-weight-bold-light d-block">Requestor Name</strong>
+                                                    <span className="h6 d-block  text-secondary">{partner.requestor_first_name + ' ' + partner.requestor_last_name}</span>
                                                 </li>
                                                 <li className="pb-3">
-                                                <strong className="h6 font-weight-bold-light d-block">Registration no/VAT code</strong>
-                                                <span className="h6 d-block text-secondary">{partner.registration_number}</span>
+                                                    <strong className="h6 font-weight-bold-light d-block">Registration no/VAT code</strong>
+                                                    <span className="h6 d-block text-secondary">{partner.registration_number}</span>
                                                 </li>
                                                 <li className="pb-3">
-                                                <strong className="h6 font-weight-bold-light d-block">Purchasing Organization</strong>
-                                                <span className="h6 d-block text-secondary">{partner.purchasing_org}</span>
+                                                    <strong className="h6 font-weight-bold-light d-block">Purchasing Organization</strong>
+                                                    <span className="h6 d-block text-secondary">{partner.purchasing_org}</span>
                                                 </li>
                                             </ul>
 
@@ -99,16 +99,16 @@ const PartnerDetails = (props) => {
                                         <h5 className="bg-light p-3 cdp-text-primary font-weight-bold-light rounded-top">Address</h5>
                                         <ul className="p-3 m-0 list-unstyled">
                                             <li className="pb-3">
-                                            <strong className="h6 font-weight-bold-light d-block">Streetname & House no</strong>
-                                            <span className="h6 d-block text-secondary">{partner.address}</span>
+                                                <strong className="h6 font-weight-bold-light d-block">Streetname & House no</strong>
+                                                <span className="h6 d-block text-secondary">{partner.address}</span>
                                             </li>
                                             <li className="pb-3">
-                                            <strong className="h6 font-weight-bold-light d-block">Postcode & City</strong>
-                                            <span className="h6 d-block text-secondary">{partner.post_code + ' ' + partner.city}</span>
+                                                <strong className="h6 font-weight-bold-light d-block">Postcode & City</strong>
+                                                <span className="h6 d-block text-secondary">{partner.post_code + ' ' + partner.city}</span>
                                             </li>
                                             <li className="pb-3">
-                                            <strong className="h6 font-weight-bold-light d-block">Country</strong>
-                                            {partner.country_iso2 && <span className="h6 d-block text-secondary">{(props.countries.find(i => i.country_iso2.toLowerCase() === partner.country_iso2.toLowerCase())).countryname}</span>}
+                                                <strong className="h6 font-weight-bold-light d-block">Country</strong>
+                                                {partner.country_iso2 && <span className="h6 d-block text-secondary">{(props.countries.find(i => i.country_iso2.toLowerCase() === partner.country_iso2.toLowerCase())).countryname}</span>}
                                             </li>
                                         </ul>
                                     </div>
