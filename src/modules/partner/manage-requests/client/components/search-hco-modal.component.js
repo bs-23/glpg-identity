@@ -446,36 +446,41 @@ const SearchHcoModal = (props) => {
                         <div className="table-responsive shadow-sm bg-white cdp-table__responsive-wrapper">
                             <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
-                                        <tr>
-                                            <th>
-                                                Name
-                                                {/* <OverlayTrigger trigger="click" rootClose placement="right" overlay={namehintpopup}>
-                                                    <i className="fas fa-info-circle ml-1 text-white" role="button"></i>
-                                                </OverlayTrigger> */}
-                                            </th>
-                                            <th>Specialty</th>
-                                            <th>Address</th>
-                                            <th>City</th>
-                                            <th>Country</th>
-                                            <th>Select</th>
-                                        </tr>
+                                    <tr>
+                                        <th>Select</th>
+                                        <th>
+                                            Name
+                                            {/* <OverlayTrigger trigger="click" rootClose placement="right" overlay={namehintpopup}>
+                                                <i className="fas fa-info-circle ml-1 text-white" role="button"></i>
+                                            </OverlayTrigger> */}
+                                        </th>
+                                        <th>Specialty</th>
+                                        <th>Address</th>
+                                        <th>City</th>
+                                        <th>Country</th>
+                                    </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
                                         {
                                             hcos.results.map((hco, idx) => (
                                                 <tr key={idx} className={searchInput.onekeyId && searchInput.onekeyId === hco.workplaceEid ? 'selected' : ''}>
+                                                    <td data-for="Select">
+                                                        <div className="custom-control custom-radio">
+                                                            <input
+                                                                type="radio"
+                                                                className="custom-control-input"
+                                                                id={'hco-selection-' + idx}
+                                                                name="hco-result"
+                                                                checked={searchInput.onekeyId && searchInput.onekeyId === hco.workplaceEid}
+                                                                onChange={() => handleResultSelection(hco)} />
+                                                            <label className="custom-control-label" for={'hco-selection-' + idx}></label>
+                                                        </div>
+                                                    </td>
                                                     <td data-for="Name">{hco.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary" title="In my contract"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary" title="Not In my contract"></i>} {`${hco.name}`}</td>
                                                     <td data-for="Specialty">{(hco.specialties || ['--']).join(', ')}</td>
                                                     <td data-for="Address">{hco.address}</td>
                                                     <td data-for="City">{hco.city}</td>
                                                     <td data-for="Country">{getCountryName(hco.countryIso2)}</td>
-                                                    <td>
-                                                        <input
-                                                            type="radio"
-                                                            name="hco-result"
-                                                            checked={searchInput.onekeyId && searchInput.onekeyId === hco.workplaceEid}
-                                                            onChange={() => handleResultSelection(hco)}/>
-                                                    </td>
                                                 </tr>
                                             ))
                                         }

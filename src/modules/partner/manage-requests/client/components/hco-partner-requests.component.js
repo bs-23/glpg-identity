@@ -79,6 +79,7 @@ const HcoPartnerRequests = () => {
 
         if (!formikBag.values.country_iso2 && selectedHco.countryIso2) {
             formikBag.setFieldValue('country_iso2', selectedHco.countryIso2);
+            setSelectedCountry(selectedHco.countryIso2);
         }
 
         setShowSearch(false);
@@ -372,8 +373,10 @@ const HcoPartnerRequests = () => {
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="uuid">UUID <span className="text-danger">*</span></label>
-                                            <Field className="form-control" type="text" name="uuid" />
-                                            <i title="OKLA Search" type="button" className="fas fa-search ml-2 cdp-text-primary" onClick={() => openSearch(formikProps.values)}></i>
+                                            <div className="d-flex align-items-center">
+                                                <Field className="form-control" type="text" name="uuid" />
+                                                <i title="OKLA Search" type="button" className="fas fa-search ml-2 cdp-text-primary" onClick={() => openSearch(formikProps.values)}></i>
+                                            </div>
                                             <div className="invalid-feedback"><ErrorMessage name="uuid" /></div>
                                         </div>
                                     </div>

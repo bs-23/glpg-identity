@@ -68,31 +68,37 @@ const PartnerStatusManage = (props) => {
                 {partner &&
                     <div className="row">
                         <div className="col-12">
-                            <h4 className="mb-0">{props.detailType === 'hcps' || props.detailType === 'hcos' ?
+                        <h4 className="mb-0 font-weight-bold-light">{props.detailType === 'hcps' || props.detailType === 'hcos' ?
                                 partner.first_name + ' ' + partner.last_name : partner.name}</h4>
 
-                            <p>{partner.email}</p>
+                            <p className="mt-3 mb-0">{partner.email}</p>
+                            <p>{(new Date(partner.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</p>
                         </div>
                         <div className="col-12">
                             <div className="row mt-3">
-                                {partner.documents && partner.documents.length > 0 &&
+                                {
                                     <div className="col-12 col-sm-7">
                                         <h5 className="font-weight-bold-light mb-0">Legal Contracts</h5>
                                         <div className="py-3">
-                                            {partner.documents && partner.documents.map(doc => (
+                                            {partner.documents && partner.documents.length > 0 && partner.documents.map(doc => (
                                                 <a type="button" key={doc.id} onClick={() => downloadFile(doc.id)} className="cdp-text-primary small font-weight-bold-light mb-2 text-break d-flex align-items-baseline">
-                                                    <i className="fas fa-circle cdp-text-primary mr-2 small"></i> {doc.name}
+                                                    <i className="fas fa-paperclip cdp-text-primary mr-2"></i> {doc.name}
                                                 </a>
                                             ))
+                                            }
+                                            {
+                                                partner.documents && partner.documents.length === 0 &&
+                                                <p>--</p>
                                             }
                                         </div>
                                     </div>
                                 }
-                                {partner.bank_account_no &&
+                                {
                                     <div className="col-12 col-sm-5">
                                         <h5 className="font-weight-bold-light mb-0">Bank Account</h5>
                                         <div className="py-3">
-                                            <span className="d-block mb-2 text-break">{partner.bank_account_no}</span>
+                                            {partner.bank_account_no && <span className="d-block mb-2 text-break">{partner.bank_account_no}</span>}
+                                            {partner.bank_account_no === null && <p>--</p>}
                                         </div>
                                     </div>
                                 }
@@ -101,10 +107,10 @@ const PartnerStatusManage = (props) => {
                         </div>
                         <div className="col-12 d-flex">
                             <button onClick={() => setStatusSelect("approve")} className={statusSelect === 'approve' ? "btn btn-block mr-2 cdp-btn-primary mt-4 p-2 font-weight-bold text-white" : "btn btn-block mr-2 cdp-btn-outline-primary mt-4 p-2 font-weight-bold"}>Approve User</button>
-                            <button disabled className="btn btn-block ml-2 btn-danger mt-4 p-2 font-weight-bold">Reject User</button>
+                            <button disabled className="btn btn-block ml-2 btn-danger mt-4 p-2 font-weight-bold">Reject Selected</button>
                         </div>
                         <div className="col-12">
-                            <button disabled={!statusSelect} onClick={() => confirmStatus()} className="btn btn-block btn-secondary mt-4 p-2 font-weight-bold">Confirm and Request SAP Export</button>
+                            <button disabled={!statusSelect} onClick={() => confirmStatus()} className="btn btn-block btn-secondary mt-4 p-2 font-weight-bold">Confirm and Approve for SAP Export</button>
                         </div>
                     </div>
                 }

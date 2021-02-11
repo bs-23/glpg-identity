@@ -488,10 +488,11 @@ const SearchHcpModal = (props) => {
                             </div>
 
 
-                        <div className="table-responsive shadow-sm bg-white  cdp-table__responsive-wrapper">
-                            <table className="table table-hover table-sm mb-0 cdp-table  cdp-table__responsive">
+                            <div className="table-responsive shadow-sm bg-white  cdp-table__responsive-wrapper">
+                                <table className="table table-hover table-sm mb-0 cdp-table  cdp-table__responsive">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
+                                            <th>Select</th>
                                             <th>Name
                                                 {/* <OverlayTrigger trigger="click" rootClose placement="right" overlay={nameHintPopup}>
                                                     <i className="fas fa-info-circle ml-1 text-white" role="button"></i>
@@ -505,13 +506,24 @@ const SearchHcpModal = (props) => {
                                             </th>
                                             <th>Individual Onekey ID</th>
                                             <th>Country</th>
-                                            <th>Select</th>
                                         </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
                                         {
                                             users.results.map((hcp, idx) => (
                                                 <tr key={idx} className={searchInput.onekeyId && searchInput.onekeyId === hcp.individualEid ? 'selected' : ''}>
+                                                    <td data-for="Select">
+                                                        <div className="custom-control custom-radio">
+                                                            <input
+                                                                type="radio"
+                                                                className="custom-control-input"
+                                                                id={'hcp-selection-' + idx}
+                                                                name="hcp-result"
+                                                                checked={searchInput.onekeyId && searchInput.onekeyId === hcp.individualEid}
+                                                                onChange={() => handleResultSelection(hcp)} />
+                                                            <label className="custom-control-label" for={'hcp-selection-' + idx}></label>
+                                                        </div>
+                                                    </td>
                                                     <td data-for="Name">{hcp.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary" title="In my contract"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary" title="Not in my contract"></i>} {`${hcp.firstName} ${hcp.lastName}`}</td>
                                                     <td data-for="Specialty">{(hcp.specialties || ['--']).join(', ')}</td>
                                                     <td data-for="Workplace">
@@ -533,13 +545,6 @@ const SearchHcpModal = (props) => {
                                                     </td>
                                                     <td data-for="Individual Onekey ID">{hcp.individualEid}</td>
                                                     <td data-for="Country">{getCountryName(hcp.countryIso2)}</td>
-                                                    <td>
-                                                        <input
-                                                            type="radio"
-                                                            name="hcp-result"
-                                                            checked={searchInput.onekeyId && searchInput.onekeyId === hcp.individualEid}
-                                                            onChange={() => handleResultSelection(hcp)}/>
-                                                    </td>
                                                 </tr>
                                             ))
                                         }
