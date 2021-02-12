@@ -13,7 +13,7 @@ export const permissionSetCreateSchema = object().shape({
     serviceCategories: array().of(string()),
     app_country_service: string()
         .test('One of three required',
-            'One of the fields countries, applications or service is required.',
+            'You need to select at least one of the value from countries, applications, or services.',
             function() {
                 const { countries, serviceCategories, applications } = this.parent;
                 return countries.length || serviceCategories.length || applications.length;
