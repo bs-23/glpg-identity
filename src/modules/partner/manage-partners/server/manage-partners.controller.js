@@ -941,16 +941,31 @@ async function exportApprovedPartners(req, res) {
     }
 }
 
-async function getPartnerById(req, res) {
+async function getHcpPartnerById(req, res) {
+    return await getPartnerById('hcp', req, res);
+}
 
+async function getHcoPartnerById(req, res) {
+    return await getPartnerById('hco', req, res);
+}
+
+async function getVendorPartnerById(req, res) {
+    return await getPartnerById('vendor', req, res);
+}
+
+async function getPartnerById(entityType, req, res) {
     try {
         let excludedFields = [];
-        const entityType = req.params.entityType;
 
-        if (entityType === 'hcp') { excludedFields = ['entity_type', 'organization_name', 'organization_type', 'created_at', 'updated_at'] }
-        else if (entityType === 'hco') { excludedFields = ['entity_type', 'is_italian_hcp', 'should_report_hco', 'beneficiary_category', 'created_at', 'updated_at'] }
-        else if (entityType === 'vendor' || 'wholesaler') { excludedFields = ['entity_type', 'created_at', 'updated_at'] }
-        else { return res.status(404).send(`The ${entityType} does not exist`); }
+        if (entityType === 'hcp') {
+            excludedFields = ['entity_type', 'organization_name', 'organization_type', 'created_at', 'updated_at'];
+        } else if (entityType === 'hco') {
+            excludedFields = ['entity_type', 'is_italian_hcp', 'should_report_hco', 'beneficiary_category', 'created_at', 'updated_at'];
+        } else if (entityType === 'vendor' || 'wholesaler') {
+            excludedFields = ['entity_type', 'created_at', 'updated_at'];
+        } else {
+            return res.status(404).send(`The ${entityType} does not exist`);
+        }
 
         let partner = null;
         if (entityType === 'hcp' || entityType === 'hco') {
@@ -984,21 +999,34 @@ async function getPartnerById(req, res) {
     }
 }
 
+async function getPartnerInformation(req, res) {
+    const entityType = req.params.entityType;
+    if (entityType === 'hcps') {
+        return await getPartnerHcp(req, res);
+    } else if (entityType === 'hcos') {
+        return await getPartnerHco(req, res);
+    } else if (entityType === 'vendors' || entityType === 'wholesalers') {
+        return await getNonHealthcarePartner(req, res);
+    } else {
+        return res.status(404).send('The partner does not exist');
+    }
+}
+
 exports.getPartnerHcps = getPartnerHcps;
-exports.getPartnerHcp = getPartnerHcp;
 exports.createPartnerHcp = createPartnerHcp;
 exports.updatePartnerHcp = updatePartnerHcp;
 exports.getPartnerHcos = getPartnerHcos;
-exports.getPartnerHco = getPartnerHco;
 exports.createPartnerHco = createPartnerHco;
 exports.updatePartnerHco = updatePartnerHco;
 exports.getPartnerVendors = getPartnerVendors;
 exports.getPartnerWholesalers = getPartnerWholesalers;
-exports.getNonHealthcarePartner = getNonHealthcarePartner;
 exports.createPartnerVendor = createPartnerVendor;
 exports.updatePartnerVendor = updatePartnerVendor;
 exports.getDownloadUrl = getDownloadUrl;
 exports.registrationLookup = registrationLookup;
 exports.approvePartner = approvePartner;
 exports.exportApprovedPartners = exportApprovedPartners;
-exports.getPartnerById = getPartnerById;
+exports.getPartnerInformation = getPartnerInformation;
+exports.getHcpPartnerById = getHcpPartnerById;
+exports.getHcoPartnerById = getHcoPartnerById;
+exports.getVendorPartnerById = getVendorPartnerById;

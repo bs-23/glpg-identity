@@ -13,11 +13,8 @@ module.exports = app => {
         .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getPartnerHcps)
         .post(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), validate(partnerHcpSchema), controller.createPartnerHcp);
 
-    app.route('/api/partners/lookup/:entityType/:id')
-        .get(passport.authenticate('application-jwt', { session: false }), controller.getPartnerById);
-
     app.route('/api/partners/hcps/:id')
-        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getPartnerHcp)
+        .get(passport.authenticate('application-jwt', { session: false }), controller.getHcpPartnerById)
         .put(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), controller.updatePartnerHcp);
 
     app.route('/api/partners/hcos')
@@ -25,7 +22,7 @@ module.exports = app => {
         .post(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), validate(partnerHcoSchema), controller.createPartnerHco);
 
     app.route('/api/partners/hcos/:id')
-        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getPartnerHco)
+        .get(passport.authenticate('application-jwt', { session: false }), controller.getHcoPartnerById)
         .put(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), controller.updatePartnerHco);
 
     app.route('/api/partners/vendors')
@@ -33,14 +30,11 @@ module.exports = app => {
         .post(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), validate(partnerVendorSchema), controller.createPartnerVendor);
 
     app.route('/api/partners/vendors/:id')
-        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getNonHealthcarePartner)
+        .get(passport.authenticate('application-jwt', { session: false }), controller.getVendorPartnerById)
         .put(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), controller.updatePartnerVendor);
 
     app.route('/api/partners/wholesalers')
         .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getPartnerWholesalers);
-
-    app.route('/api/partners/wholesalers/:id')
-        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getNonHealthcarePartner);
 
     app.route('/api/partners/documents/:id')
         .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getDownloadUrl);
@@ -48,8 +42,8 @@ module.exports = app => {
     app.route('/api/partners/registration-lookup')
         .get(passport.authenticate('application-jwt', { session: false }), controller.registrationLookup);
 
-    app.route('/api/partners/lookup/:entityType/:id')
-        .get(passport.authenticate('application-jwt', { session: false }), controller.getPartnerById);
+    app.route('/api/partners/information/:entityType/:id')
+        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getPartnerInformation);
 
     app.route('/api/partners/approve/:entityType/:id')
         .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.approvePartner);

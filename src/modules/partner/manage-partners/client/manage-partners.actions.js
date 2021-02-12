@@ -92,7 +92,7 @@ export function getPartnerById(id, type) {
         type: Types.GET_PARTNER_BY_ID,
         payload: axios({
             method: 'get',
-            url: `/api/partners/${type}/${id}`
+            url: `/api/partners/information/${type}/${id}`
         })
     };
 }

@@ -96,10 +96,6 @@ const AddFilter = (props) => {
     }
 
     const handleChange = (propertyName, value, index) => {
-        if (Array.isArray(filters[index][propertyName]) && filters[index][propertyName].length === maxNumberOfValues) {
-            return;
-        }
-
         const updatedFilters = [...filters];
 
         updatedFilters[index][propertyName] = value;
@@ -189,6 +185,7 @@ const AddFilter = (props) => {
                                 filterOptions={filterOptions}
                                 isTouched={isTouched}
                                 validationError={validationErrors[index]}
+                                maxNumberOfValues={maxNumberOfValues}
                                 onChange={handleChange}
                                 onRemove={handleRemove}
                             />
@@ -202,6 +199,7 @@ const AddFilter = (props) => {
                                 filterOptions={filterOptions}
                                 isTouched={isTouched}
                                 validationError={validationErrors[index]}
+                                maxNumberOfValues={maxNumberOfValues}
                                 onChange={handleChange}
                                 onRemove={handleRemove}
                             />
