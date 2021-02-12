@@ -23,28 +23,49 @@ const PermissionSetDetails = ({ permissionSetId }) => {
         setPermissionDetails(response.data);
     }
 
-    const getCountryNames = () => {
+    const renderCountryRights = () => {
         if(!permissionDetails || !permissionDetails.countries || !countries) return nullValueToken;
         const countryNames = countries.filter(i => permissionDetails.countries.includes(i.country_iso2)).map(i => i.codbase_desc);
-        return countryNames.length ? countryNames.join(', ') : nullValueToken;
+        return countryNames.length
+            ? countryNames.map(country => <div key={country}>
+                <i className="icon icon-check-filled cdp-text-primary mr-2 consent-check"></i>
+                {country}
+            </div>)
+            : <div>{nullValueToken}</div>;
     }
 
-    const getServiceCategoryNames = () => {
+    const renderServices = () => {
         if(!permissionDetails) return nullValueToken;
-        const serviceCategories = permissionDetails.ps_sc;
-        if(!serviceCategories) return nullValueToken;
 
-        const serviceCatNames = serviceCategories.map(sc => sc.service.title);
-        return serviceCatNames.length ? serviceCatNames.join(', ') : nullValueToken;
+        let services = permissionDetails.ps_sc;
+
+        if(!services) return nullValueToken;
+
+        services = services.filter(sc => sc.service.parent_id).map(sc => sc.service.title);
+
+        return services.length
+            ? services.map(service =>
+                <div key={service}>
+                    <i className="icon icon-check-filled cdp-text-primary mr-2 consent-check"></i>
+                    {service}
+                </div>)
+            : <div>{nullValueToken}</div>
     }
 
-    const getApplicationNames = () => {
+    const renderApplicationRights = () => {
         if(!permissionDetails) return nullValueToken;
         const applications = permissionDetails.ps_app;
         if(!applications) return nullValueToken;
 
         const appNames = applications.map(app => app.application.name);
-        return appNames.length ? appNames.join(', ') : nullValueToken;
+        return appNames.length
+            ? appNames.map(app =>
+                <div key={app}>
+                    <i className="icon icon-check-filled cdp-text-primary mr-2 consent-check"></i>
+                    {app}
+                </div>
+            )
+            : nullValueToken;
     }
 
     const getUsedInProfileNames = () => {
@@ -80,11 +101,11 @@ const PermissionSetDetails = ({ permissionSetId }) => {
         <div className="profile-detail__row pb-0 pb-sm-2 d-block d-sm-flex">
             <div className="profile-detail__col pb-3">
                 <span className="mr-2 d-block profile-detail__label">Countries</span>
-                <span className="profile-detail__value">{getCountryNames()}</span>
+                <span className="profile-detail__value">{renderCountryRights()}</span>
             </div>
             <div className="profile-detail__col pb-3">
                 <span className="mr-2 d-block profile-detail__label">Applications</span>
-                <span className="profile-detail__value">{getApplicationNames()}</span>
+                <span className="profile-detail__value">{renderApplicationRights()}</span>
             </div>
         </div>
         <div className="pb-0 pb-sm-2 d-block d-sm-flex">
@@ -109,7 +130,7 @@ const PermissionSetDetails = ({ permissionSetId }) => {
         <div className="pb-0 pb-sm-2 d-block d-sm-flex">
             <div className="pb-3">
                 <span className="mr-2 d-block profile-detail__label">Services</span>
-                <span className="profile-detail__value">{getServiceCategoryNames()}</span>
+                <span className="profile-detail__value">{renderServices()}</span>
             </div>
         </div>
     </div>
