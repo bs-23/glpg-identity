@@ -33,9 +33,6 @@ async function init() {
         });
         ClinicalTrialTrialModel.destroy({ truncate: { cascade: true } }).then(() => {
             ClinicalTrialTrialModel.bulkCreate([
-                {
-                    
-                }
                 
             ], {
                 returning: true,

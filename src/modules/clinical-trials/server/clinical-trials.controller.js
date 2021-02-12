@@ -12,6 +12,7 @@ const { DataTypes } = require('sequelize');
 const { NonceProvider } = require('react-select');
 
 var seed = 1;
+String.prototype.capitalize = function(){return this.split(' ').map(x=>x.charAt(0).toUpperCase() + x.slice(1)).join(' ')};
 function random() {
     var x = Math.sin(seed++) * 10000;
     return x - Math.floor(x);
@@ -66,6 +67,107 @@ function groupIndications(indication) {
         default:
             return null;
     }
+}
+
+function statusInputTextMapping(status){
+    status = status? status.split(',').map(x=>{
+        switch(x){
+            case 'RECSTATUS_ALL':
+                return 'All';
+                break;
+            case 'RECSTATUS_RECRUITING':
+                return 'Recruiting'
+                break;
+            case 'RECSTATUS_NOT_YET_RECRUITING':
+                return 'Not yet recruiting'
+                break;
+            case 'RECSTATUS_ENROLLING_BY_INVITATION':
+                return 'Enrolling by invitation'
+                break;
+            case 'RECSTATUS_ACTIVE_NOT_RECRUITING':
+                return 'Active, not recruiting'
+                break;
+            case 'RECSTATUS_SUSPENDED':
+                return 'Suspended'
+                break;
+            case 'RECSTATUS_TERMINATED':
+                return 'Terminated'
+                break;
+            case 'RECSTATUS_STUDY_COMPLETED':
+                return 'Completed'
+                break;
+            case 'RECSTATUS_WITHDRAWN':
+                return 'Withdrawn'
+                break;
+            default:
+                return '';
+                break;
+        }
+    }) : null;
+    if( status && status.includes('All')){
+        status = ['Recruiting', 'Not yet recruiting', 'Enrolling by invitation', 'Active, not recruiting', 'Suspended', 'Terminated', 'Completed', 'Withdrawn']
+    }
+    return status;
+}
+
+function phaseInputTextMapping(phase){
+    phase = phase? phase.split(',').map(x=>{
+        switch(x){
+            case 'PHASE_2':
+                return 'Phase 2';
+                break;
+            case 'PHASE_3':
+                return 'Phase 3'
+                break;
+            case 'PHASE_4':
+                return 'Phase 4'
+                break;
+            default:
+                return '';
+                break;
+        }
+    }) : null;
+    return phase;
+}
+
+function ageRangeInputTextMapping(age_range) {
+    age_range = age_range? age_range.split(',').map(x=>{
+        switch(x){
+            case 'AGERANGE_ONE':
+                return 'Child';
+                break;
+            case 'AGERANGE_TWO':
+                return 'Adult'
+                break;
+            case 'AGERANGE_THREE':
+                return 'Adult,Older Adult'
+                break;
+            default:
+                return '';
+                break;
+        }
+    }) : null;
+    return age_range;
+}
+
+function genderInputTextMapping(gender) {
+    gender = gender? gender.split(',').map(x=>{
+        switch(x){
+            case 'GENDER_ALL':
+                return 'Child';
+                break;
+            case 'GENDER_MALE':
+                return 'Male'
+                break;
+            case 'GENDER_FEMALE':
+                return 'Female'
+                break;
+            default:
+                return '';
+                break;
+        }
+    }) : null;
+    return gender;
 }
 
 async function dumpAllData(req, res) {
@@ -178,17 +280,17 @@ async function mergeProcessData(req, res) {
                  }
                  return { 
                     'trial_fixed_id': uuid(),
-                    'indication': element.Study.ProtocolSection.ConditionsModule.ConditionList.Condition[0].split('|').join(','),
+                    'indication': element.Study.ProtocolSection.ConditionsModule.ConditionList.Condition[0].capitalize().split('|').join(','),
                     'indication_group': groupIndications(element.Study.ProtocolSection.ConditionsModule.ConditionList.Condition[0]),
                     'protocol_number': element.Study.ProtocolSection.IdentificationModule.OrgStudyIdInfo.OrgStudyId,
                     'gov_identifier': element.Study.ProtocolSection.IdentificationModule.NCTId,
                     'eudract_number': element.Study.ProtocolSection.IdentificationModule.SecondaryIdInfoList && element.Study.ProtocolSection.IdentificationModule.SecondaryIdInfoList.SecondaryIdInfo.length ? element.Study.ProtocolSection.IdentificationModule.SecondaryIdInfoList.SecondaryIdInfo[0].SecondaryId : null,
-                    'clinical_trial_purpose': element.Study.ProtocolSection.DescriptionModule.BriefSummary,
-                    'clinical_trial_summary': element.Study.ProtocolSection.IdentificationModule.BriefTitle,
+                    'clinical_trial_brief_summary': element.Study.ProtocolSection.DescriptionModule.BriefSummary,
+                    'clinical_trial_brief_title': element.Study.ProtocolSection.IdentificationModule.BriefTitle,
                     'official_title': element.Study.ProtocolSection.IdentificationModule.OfficialTitle,
                     'gender': element.Study.ProtocolSection.EligibilityModule.Gender,
-                    'min_age': element.Study.ProtocolSection.EligibilityModule.MinimumAge? element.Study.ProtocolSection.EligibilityModule.MinimumAge.toLowerCase().replace('years', ' ').trim() : 'Younger',
-                    'max_age': element.Study.ProtocolSection.EligibilityModule.MaximumAge? element.Study.ProtocolSection.EligibilityModule.MaximumAge.toLowerCase().replace('years', ' ').trim() : 'Older',
+                    'min_age': element.Study.ProtocolSection.EligibilityModule.MinimumAge? element.Study.ProtocolSection.EligibilityModule.MinimumAge.toLowerCase().replace('years', ' ').trim() : null,
+                    'max_age': element.Study.ProtocolSection.EligibilityModule.MaximumAge? element.Study.ProtocolSection.EligibilityModule.MaximumAge.toLowerCase().replace('years', ' ').trim() : null,
                     'std_age': element.Study.ProtocolSection.EligibilityModule.StdAgeList.StdAge.join(','),
                     'phase': element.Study.ProtocolSection.DesignModule.PhaseList.Phase[0],
                     'trial_status': element.Study.ProtocolSection.StatusModule.OverallStatus,
@@ -254,41 +356,40 @@ async function getTrials(req, res) {
         location,
         distance,
         search_term,
-        diseases,
-        age_range,
+        free_text_search,
+        age_ranges,
         zipcode,
+        phase,
         indication } = req.query;
 
     page_number = page_number ? Number(page_number) : 1;
     items_per_page = items_per_page? Number(items_per_page) : 100;
     indication = indication? indication : null;
-    status = status? status.split(',').map(x=>{
-        switch(x){
-            case 'RECSTATUS_RECRUITING':
-                return 'Enrolling by invitation';
-                break;
-            case 'RECSTATUS_NOT_YET_RECRUITING':
-                return 'Active, not recruiting'
-                break;
-            case 'RECSTATUS_STUDY_COMPLETED':
-                return 'Completed'
-                break;
-            case 'RECSTATUS_TERMINATED':
-                return 'Withdrawn'
-                break;
-            default:
-                return '';
-                break;
-        }
-    }) : null;
+    status = statusInputTextMapping(status);
+    phase = phaseInputTextMapping(phase);
+    age_ranges = ageRangeInputTextMapping(age_ranges);
+    gender = genderInputTextMapping(gender);
 
     try {
-
-        let query = {
+        let query = !free_text_search? {
             [Op.or]: [
             {trial_status: status},
             {indication: indication},
-            {indication_group: indication}
+            {indication_group: indication},
+            {phase: phase},
+            {std_age: age_ranges},
+            {gender: gender},
+            ]
+        } : {
+            [Op.or]: [
+            {trial_status: {[Op.like]: '%' + free_text_search+  '%'}},
+            {indication: {[Op.like]: '%' + free_text_search+  '%'}},
+            {indication_group: {[Op.like]: '%' + free_text_search+  '%'}},
+            {phase: {[Op.like]: '%' + free_text_search+  '%'}},
+            {std_age: {[Op.like]: '%' + free_text_search+  '%'}},
+            {gender: {[Op.like]: '%' + free_text_search+  '%'}},
+            {indication: {[Op.like]: '%' + free_text_search+  '%'}},
+            {indication_group: {[Op.like]: '%' + free_text_search+  '%'}}
             ]
         }
         let remove_index = [];
@@ -312,16 +413,13 @@ async function getTrials(req, res) {
                 delete query[key]
             }
         });
-
-
-
         let pageing = {
             offset: items_per_page * Number(page_number - 1),
             limit: items_per_page,
         }
         let result = await Trial.findAll({
             where: query,
-            attributes: ['protocol_number', 'indication_group', 'indication', 'trial_fixed_id', 'trial_status', 'max_age', 'min_age', 'official_title'],
+            attributes: ['protocol_number', 'indication_group', 'indication', 'trial_fixed_id', 'trial_status', 'max_age', 'min_age', 'official_title', 'gender', 'clinical_trial_brief_title', 'phase', 'std_age'],
             ...pageing});
 
         let total_item_count = await Trial.count({
@@ -334,7 +432,7 @@ async function getTrials(req, res) {
         }
 
         response.data = {
-           search_result: result.map(x=>{ return {...x.dataValues, distance: random()*10 + ' km'}}),
+           search_result: result.map(x=>{ return {...x.dataValues, distance: Math.round(random()*10*100) / 100 + ' km'}}),
            total_count: total_item_count
         }
         res.json(response);

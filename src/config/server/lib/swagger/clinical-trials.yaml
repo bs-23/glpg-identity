@@ -33,7 +33,7 @@ paths:
                   example: "Ankylosing Spondylitis"
                   schema:
                     type: string
-                - name: diseases
+                - name: free_text_search
                   in: query
                   type: string
                 - name: location
@@ -61,6 +61,13 @@ paths:
                   required: false
                   description: any zip code format supported
                   example: 40170
+                  schema:
+                    type: string
+                - name: phase
+                  in: query
+                  required: false
+                  description: Options-PHASE_2,PHASE_3,PHASE_4
+                  example: PHASE_2,PHASE_3
                   schema:
                     type: string
             responses:
