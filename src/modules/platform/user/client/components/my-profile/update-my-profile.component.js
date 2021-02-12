@@ -300,15 +300,7 @@ const UpdateMyProfile = () => {
                                         <div className="col-12">
                                             <div className="form-group">
                                                 <label className="font-weight-bold-light" htmlFor="status">Status<span className="text-danger"></span></label>
-                                                <Field
-                                                    as="select"
-                                                    name="status"
-                                                    className="form-control"
-                                                    disabled
-                                                >
-                                                    <option value="active">Active</option>
-                                                    <option value="inactive">Inactive</option>
-                                                </Field>
+                                                <div>{myProfileInfo.status === 'active' ? 'Active' : 'Inactive'}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -316,15 +308,7 @@ const UpdateMyProfile = () => {
                                         <div className="col-12">
                                             <div className="form-group">
                                                 <label className="font-weight-bold-light" htmlFor="profile">Profile<span className="text-danger"></span></label>
-                                                <Field
-                                                    as="select"
-                                                    name="profile"
-                                                    className="form-control"
-                                                    value={myProfileInfo && myProfileInfo.profile ? myProfileInfo.profile.title : ''}
-                                                    disabled
-                                                >
-                                                    <option value={myProfileInfo && myProfileInfo.profile ? myProfileInfo.profile.title : ''}>{myProfileInfo && myProfileInfo.profile ? myProfileInfo.profile.title : ''}</option>
-                                                </Field>
+                                                <div>{myProfileInfo && myProfileInfo.profile ? myProfileInfo.profile.title : 'The user has no profile.'}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -332,15 +316,7 @@ const UpdateMyProfile = () => {
                                         <div className="col-12">
                                             <div className="form-group">
                                                 <label className="font-weight-bold-light" htmlFor="role">Role<span className="text-danger"></span></label>
-                                                <Field
-                                                    as="select"
-                                                    name="role"
-                                                    className="form-control"
-                                                    value={myProfileInfo && myProfileInfo.role ? myProfileInfo.role.title : ''}
-                                                    disabled
-                                                >
-                                                    <option value={myProfileInfo && myProfileInfo.role ? myProfileInfo.role.title : ''}>{myProfileInfo && myProfileInfo.role ? myProfileInfo.role.title : ''}</option>
-                                                </Field>
+                                                <div>{myProfileInfo && myProfileInfo.role ? myProfileInfo.role.title : 'The user has no role.'}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -382,7 +358,7 @@ const UpdateMyProfile = () => {
                                         <div className="col-12">
                                             <div className="form-group">
                                                 <label className="font-weight-bold-light" htmlFor="last-login">Last Login</label>
-                                                <Field data-testid="last-login" className="form-control" type="text" name="last-login" disabled value={myProfileInfo.last_login ? new Date(myProfileInfo.last_login).toLocaleDateString('en-GB').replace(/\//g, '.') : ''} />
+                                                <div>{myProfileInfo.last_login ? new Date(myProfileInfo.last_login).toLocaleDateString('en-GB').replace(/\//g, '.') : ''}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -390,7 +366,9 @@ const UpdateMyProfile = () => {
                                         <div className="col-12">
                                             <div className="form-group">
                                                 <label className="font-weight-bold-light" htmlFor="expiry-date">Expiry Date</label>
-                                                <Field data-testid="expiry-date" className="form-control" type="text" name="expiry-date" disabled value={myProfileInfo.expiry_date ? new Date(myProfileInfo.expiry_date).toLocaleDateString('en-GB').replace(/\//g, '.') : ''} />
+                                                <div>
+                                                    {myProfileInfo.expiry_date ? new Date(myProfileInfo.expiry_date).toLocaleDateString('en-GB').replace(/\//g, '.') : ''}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>}
