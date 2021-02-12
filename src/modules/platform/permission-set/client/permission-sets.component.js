@@ -117,7 +117,7 @@ export default function ManagePermissionSets() {
                                             <th className="py-2" width="15%">Description</th>
                                             <th className="py-2" width="9%">Applications</th>
                                             <th className="py-2" width="17%">Countries</th>
-                                            <th className="py-2" width="32%">Service Categories</th>
+                                            <th className="py-2" width="32%">Services</th>
                                             <th className="py-2" width="5%">Action</th>
                                         </tr>
                                     </thead>
