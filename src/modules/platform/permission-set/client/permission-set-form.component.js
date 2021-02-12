@@ -141,8 +141,8 @@ const ToggleList = ({ name, options, labelExtractor, idExtractor, allOptionID })
     return <FieldArray
                 name={name}
                 render={arrayHelpers => (
-                    options.map(item => <label key={idExtractor(item)} className={`d-flex  align-items-center ${allOptionID && idExtractor(item) === allOptionID ? 'font-weight-bold-light pt-3 pb-1' : 'pl-4 font-weight-normal'}`}>
-                        <span className="custom-control custom-checkbox">
+                    options.map(item =>
+                        <div key={idExtractor(item)} className={`d-flex align-items-center custom-control custom-checkbox ${allOptionID && idExtractor(item) === allOptionID ? 'font-weight-bold-light pt-3 pb-1' : 'ml-4 font-weight-normal'}`}>
                             <input name={name}
                                 className="custom-control-input"
                                 type="checkbox"
@@ -152,10 +152,9 @@ const ToggleList = ({ name, options, labelExtractor, idExtractor, allOptionID })
                                 onChange={(e) => handleChange(e, arrayHelpers)}
                                 disabled={item.hasOwnProperty('disabled') ? item.disabled : false}
                             />
-                            <span className="custom-control-label"></span>
-                        </span>
-                        <span className="switch-label text-left">{labelExtractor(item)}</span>
-                    </label>)
+                            <label className="custom-control-label" for={idExtractor(item)}>{labelExtractor(item)}</label>
+                        </div>
+                    )
                 )}
             />
 }
