@@ -200,7 +200,7 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
 
     const getApplications = async () => {
         const response = await axios.get('/api/applications');
-        setApplications(response.data);
+        setApplications(response.data.filter(app => app.type === 'hcp-portal'));
     }
 
     const getServiceCategories = async () => {
