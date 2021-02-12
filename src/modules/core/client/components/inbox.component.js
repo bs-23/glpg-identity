@@ -90,7 +90,7 @@ export default function Inbox() {
                                     }
                                 </div>
                                 : <div className="cdp-inbox__tab-detail">
-                                    <span className="d-block py-5 px-2 text-uppercase text-center mb-0">You do not have permission to approve HCP users.</span>
+                                    <span className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="fas fa-ban mr-2 cdp-text-secondary"></i>You do not have permission to approve HCP users.</span>
                                 </div>
                             }
                         </Panel>
