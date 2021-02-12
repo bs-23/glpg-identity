@@ -145,6 +145,12 @@ const Filter = (props) => {
                         handleInputBlur={handleInputBlur}
                         autofocus={false}
                         maxLength={filterOption.maxLength}
+                        ref={ref => {
+                            if (ref && ref.ref.current) {
+                                if (value.length >= maxNumberOfValues) ref.ref.current.textInput.setAttribute("disabled", true);
+                                else ref.ref.current.textInput.removeAttribute("disabled");
+                            }
+                        }}
                     />
                     {isTouched && <div className="invalid-feedback">{validationError.value}</div>}
                 </div>
