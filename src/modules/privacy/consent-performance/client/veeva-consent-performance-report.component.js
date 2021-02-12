@@ -328,7 +328,7 @@ const ConsentPerformanceReport = () => {
                                                                 className={consents_report.orderBy === 'preferences' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
                                                                 onClick={() => dispatch(getVeevaConsentReport(null, consents_report.codbase, consents_report.opt_type, 'preferences', getorderType('preferences')))}
                                                             >
-                                                                Preferences
+                                                                Content Type
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
                                                         </LinkContainer>
                                                     </th>

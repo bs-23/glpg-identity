@@ -23,12 +23,12 @@ let trialModel = {
             allowNull: true,
             type: DataTypes.STRING(60)
         },
-        clinical_trial_purpose: {
+        clinical_trial_brief_summary: {
             unique: false,
             allowNull: true,
             type: DataTypes.STRING(10485760)
         },
-        clinical_trial_summary: {
+        clinical_trial_brief_title: {
             unique: false,
             allowNull: true,
             type: DataTypes.STRING(10485760)
@@ -41,12 +41,12 @@ let trialModel = {
         min_age: {
             unique: false,
             allowNull: true,
-            type: DataTypes.STRING(60)
+            type: DataTypes.INTEGER()
         },
         max_age: {
             unique: false,
             allowNull: true,
-            type: DataTypes.STRING(60)
+            type: DataTypes.INTEGER()
         },
         std_age: {
             unique: false,
