@@ -44,7 +44,6 @@ async function init() {
     const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-application.model"));
     const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/userProfile-permissionSet.model"));
     require(path.join(process.cwd(), "src/modules/platform/role/server/role.model"));
-    // require(path.join(process.cwd(), "src/modules/platform/role/server/user-role.model"));
     require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
     const Faq = require(path.join(process.cwd(), 'src/modules/platform/faq/server/faq.model'));
     require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model'));
@@ -345,6 +344,7 @@ async function init() {
                     id: '3252888b-530a-441b-8358-3e423dbce08a',
                     name: 'HCP Portal',
                     slug: convertToSlug('HCP Portal'),
+                    type: 'hcp-portal',
                     email: 'hcp-portal@glpg.com',
                     password: 'P@ssword123',
                     approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
@@ -360,6 +360,7 @@ async function init() {
                     id: 'a7959308-7ec5-4090-94ff-2367113a454d',
                     name: 'Jyseleca',
                     slug: convertToSlug('Jyseleca'),
+                    type: 'hcp-portal',
                     email: 'jyseleca@glpg.com',
                     password: 'P@ssword123',
                     approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
