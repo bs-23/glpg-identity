@@ -107,7 +107,7 @@ const PartnerStatusManage = (props) => {
                         </div>
                         <div className="col-12 d-flex">
                             <button onClick={() => setStatusSelect("approve")} className={statusSelect === 'approve' ? "btn btn-block mr-2 cdp-btn-primary mt-4 p-2 font-weight-bold text-white" : "btn btn-block mr-2 cdp-btn-outline-primary mt-4 p-2 font-weight-bold"}>Approve User</button>
-                            <button disabled className="btn btn-block ml-2 btn-danger mt-4 p-2 font-weight-bold">Resend Form</button>
+                            <button disabled className="btn btn-block ml-2 btn-danger mt-4 p-2 font-weight-bold">Correction Required</button>
                         </div>
                         <div className="col-12">
                             <button disabled={!statusSelect} onClick={() => confirmStatus()} className="btn btn-block btn-secondary mt-4 p-2 font-weight-bold">Confirm and Approve for SAP Export</button>
