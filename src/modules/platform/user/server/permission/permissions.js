@@ -9,7 +9,7 @@ const PermissionSet = require(path.join(process.cwd(), "src/modules/platform/per
 const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
 const PermissionSet_Service = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionset-service.model.js"));
 const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-application.model.js"));
-const Service = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/service.model.js"));
+const Service = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/service.model"));
 
 const getUserWithPermissionRelations = async (whereCondition) => {
     const user = await User.findOne({
