@@ -50,6 +50,7 @@ const ClinicalTrials = () => {
             <button onClick={dumpData}>Dump Data</button>
             <button onClick={showAllVersions}>Show All Versions</button>
             <button onClick={mergeProcessData}>Merge</button>
+            <button onClick={()=>{}}>Add Story</button>
         </div>
     );
 }
