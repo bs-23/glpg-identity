@@ -41,6 +41,18 @@
     &__list {
     }
 
+    @media (max-width: $screen-tablet) {
+
+        &__link {
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        &__icon {
+            font-size: 48px;
+        }
+    }
+
     @media (max-width: $screen-phone) {
         &__item {
             width: 100%;
@@ -48,6 +60,16 @@
 
         &__link {
             width: 100%;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: left;
+            padding-top: 15px;
+            padding-bottom: 12px;
+        }
+
+        &__icon {
+            font-size: 48px;
+            flex: 0 0 20%;
         }
     }
 }
