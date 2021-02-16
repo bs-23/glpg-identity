@@ -6,6 +6,7 @@ const axios = require('axios');
 const validator = require('validator');
 const { QueryTypes, Op, where, col, fn } = require('sequelize');
 const Hcp = require('./hcp-profile.model');
+const articles = require('./hcp-articles.model');
 const DatasyncHcp = require('./datasync-hcp-profile.model');
 const archiveService = require(path.join(process.cwd(), 'src/modules/core/server/archive/archive.service'));
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-consents.model'));
@@ -378,6 +379,25 @@ async function getHcps(req, res) {
         };
 
         response.data = data;
+        res.json(response);
+    } catch (err) {
+        logger.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
+    }
+}
+
+async function getHcpArticles(req, res) {
+    const response = new Response({}, []);
+    let id = req.params.id;
+    
+    try{
+        const article_details = await articles.findAll({
+            where: {
+                uuid: id
+            }
+        });
+        response.data = article_details;
         res.json(response);
     } catch (err) {
         logger.error(err);
@@ -1739,3 +1759,4 @@ exports.getSpecialtiesWithEnglishTranslation = getSpecialtiesWithEnglishTranslat
 exports.updateHCPUserConsents = updateHCPUserConsents;
 exports.getSpecialtiesForCdp = getSpecialtiesForCdp;
 exports.getHcpsFromDatasync = getHcpsFromDatasync;
+exports.getHcpArticles = getHcpArticles;

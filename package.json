@@ -13,6 +13,7 @@
         "production": "run-s webpack:production pm2:docker",
         "seed": "node seeder.js",
         "ct-seed": "node clinical-trials.seeder.js",
+        "ppi-seed": "node ppi.seeder.js",
         "test": "jest --forceExit --detectOpenHandles",
         "sonarqube": "node sonarqube.js"
     },

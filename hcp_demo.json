@@ -1,0 +1,1002 @@
+[
+	{
+		"author_name": "Brenden",
+		"article_title": "nec tempus scelerisque, lorem ipsum sodales purus, in",
+		"article_abstract": "id, libero.",
+		"article_url": "facilisis non, bibendum sed, est. Nunc laoreet lectus quis massa.",
+		"citation_count": 2,
+		"co_authors": "luctus,",
+		"individual_onekeyID": "Z9J 6R0",
+		"uuid": "B2T 9N6"
+	},
+	{
+		"author_name": "Malcolm",
+		"article_title": "Nulla eget metus eu erat semper rutrum. Fusce",
+		"article_abstract": "a felis ullamcorper viverra. Maecenas iaculis",
+		"article_url": "ac urna. Ut tincidunt vehicula risus. Nulla eget metus eu",
+		"citation_count": 6,
+		"co_authors": "purus. Nullam",
+		"individual_onekeyID": "S3O 7T8",
+		"uuid": "N2T 9U7"
+	},
+	{
+		"author_name": "Forrest",
+		"article_title": "dignissim lacus. Aliquam rutrum",
+		"article_abstract": "orci luctus et ultrices posuere cubilia Curae; Phasellus ornare.",
+		"article_url": "sem molestie sodales. Mauris blandit enim consequat purus. Maecenas libero",
+		"citation_count": 9,
+		"co_authors": "Phasellus vitae mauris sit amet lorem semper auctor. Mauris vel",
+		"individual_onekeyID": "Y5X 0V3",
+		"uuid": "E1X 6F5"
+	},
+	{
+		"author_name": "Linus",
+		"article_title": "Donec elementum, lorem ut aliquam iaculis, lacus pede sagittis",
+		"article_abstract": "Suspendisse non leo. Vivamus nibh dolor,",
+		"article_url": "Nunc pulvinar arcu et pede. Nunc sed orci lobortis augue",
+		"citation_count": 5,
+		"co_authors": "id, blandit",
+		"individual_onekeyID": "U5O 7O1",
+		"uuid": "V3Y 6O3"
+	},
+	{
+		"author_name": "Paki",
+		"article_title": "sed sem",
+		"article_abstract": "ut lacus. Nulla",
+		"article_url": "euismod mauris eu elit. Nulla facilisi. Sed neque. Sed eget",
+		"citation_count": 7,
+		"co_authors": "Cras pellentesque. Sed dictum. Proin eget odio.",
+		"individual_onekeyID": "S3Z 3J0",
+		"uuid": "X1Z 7A5"
+	},
+	{
+		"author_name": "Tanner",
+		"article_title": "lobortis risus. In mi pede, nonummy ut, molestie in,",
+		"article_abstract": "semper egestas, urna justo faucibus lectus, a",
+		"article_url": "ac metus vitae velit egestas lacinia. Sed congue, elit sed",
+		"citation_count": 6,
+		"co_authors": "ut, nulla. Cras",
+		"individual_onekeyID": "V5P 2C1",
+		"uuid": "M2Y 9A4"
+	},
+	{
+		"author_name": "Ivan",
+		"article_title": "dictum",
+		"article_abstract": "ipsum sodales purus, in molestie tortor nibh sit amet",
+		"article_url": "at pretium aliquet, metus urna convallis erat, eget tincidunt dui",
+		"citation_count": 7,
+		"co_authors": "imperdiet dictum magna. Ut tincidunt orci",
+		"individual_onekeyID": "O3E 6E6",
+		"uuid": "O3N 5C0"
+	},
+	{
+		"author_name": "Kevyn",
+		"article_title": "lobortis, nisi nibh lacinia",
+		"article_abstract": "vitae nibh. Donec est mauris, rhoncus",
+		"article_url": "blandit enim consequat purus. Maecenas libero est, congue a, aliquet",
+		"citation_count": 5,
+		"co_authors": "vel, faucibus id, libero.",
+		"individual_onekeyID": "H9K 0B8",
+		"uuid": "G4H 9S3"
+	},
+	{
+		"author_name": "Lila",
+		"article_title": "arcu. Nunc mauris. Morbi",
+		"article_abstract": "diam lorem, auctor",
+		"article_url": "vestibulum nec, euismod in, dolor. Fusce feugiat. Lorem ipsum dolor",
+		"citation_count": 7,
+		"co_authors": "amet ornare lectus justo eu arcu. Morbi sit",
+		"individual_onekeyID": "Z3V 5Z0",
+		"uuid": "P5F 2N8"
+	},
+	{
+		"author_name": "Thor",
+		"article_title": "malesuada fames ac turpis egestas. Aliquam fringilla cursus purus. Nullam",
+		"article_abstract": "orci. Ut semper",
+		"article_url": "eget varius ultrices, mauris ipsum porta elit, a feugiat tellus",
+		"citation_count": 6,
+		"co_authors": "ipsum. Phasellus",
+		"individual_onekeyID": "C5J 5A0",
+		"uuid": "V7V 4P0"
+	},
+	{
+		"author_name": "Keefe",
+		"article_title": "tempus risus. Donec egestas. Duis ac arcu. Nunc mauris.",
+		"article_abstract": "nulla. Donec non justo. Proin non massa non ante bibendum",
+		"article_url": "quis diam. Pellentesque habitant morbi tristique senectus et netus et",
+		"citation_count": 2,
+		"co_authors": "et, lacinia vitae, sodales at, velit.",
+		"individual_onekeyID": "T2N 6X6",
+		"uuid": "O8J 2L0"
+	},
+	{
+		"author_name": "Fleur",
+		"article_title": "elit.",
+		"article_abstract": "penatibus",
+		"article_url": "inceptos hymenaeos. Mauris ut quam vel sapien imperdiet ornare. In",
+		"citation_count": 6,
+		"co_authors": "vitae diam. Proin dolor. Nulla semper tellus",
+		"individual_onekeyID": "G9C 6U7",
+		"uuid": "P6M 2T7"
+	},
+	{
+		"author_name": "Brielle",
+		"article_title": "per",
+		"article_abstract": "Curabitur dictum. Phasellus",
+		"article_url": "neque venenatis lacus. Etiam bibendum fermentum metus. Aenean sed pede",
+		"citation_count": 10,
+		"co_authors": "tincidunt pede ac urna. Ut tincidunt vehicula",
+		"individual_onekeyID": "N6T 7F3",
+		"uuid": "H1U 9L6"
+	},
+	{
+		"author_name": "Lyle",
+		"article_title": "Fusce dolor quam, elementum",
+		"article_abstract": "eget massa. Suspendisse eleifend. Cras sed leo.",
+		"article_url": "orci quis lectus. Nullam suscipit, est ac facilisis facilisis, magna",
+		"citation_count": 2,
+		"co_authors": "ut aliquam iaculis,",
+		"individual_onekeyID": "P6B 5D6",
+		"uuid": "Q3A 9W4"
+	},
+	{
+		"author_name": "Yuri",
+		"article_title": "vitae risus. Duis a mi fringilla",
+		"article_abstract": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit.",
+		"article_url": "Aliquam tincidunt, nunc ac mattis ornare, lectus ante dictum mi,",
+		"citation_count": 9,
+		"co_authors": "gravida mauris ut mi.",
+		"individual_onekeyID": "R7L 3F7",
+		"uuid": "R3Z 6M4"
+	},
+	{
+		"author_name": "Sebastian",
+		"article_title": "nascetur ridiculus mus. Proin vel arcu eu odio",
+		"article_abstract": "semper. Nam tempor diam dictum sapien.",
+		"article_url": "cursus. Integer mollis. Integer tincidunt aliquam arcu. Aliquam ultrices iaculis",
+		"citation_count": 6,
+		"co_authors": "in, hendrerit consectetuer, cursus et, magna. Praesent interdum ligula eu",
+		"individual_onekeyID": "I1I 7P6",
+		"uuid": "J6L 2Q9"
+	},
+	{
+		"author_name": "Eleanor",
+		"article_title": "faucibus id, libero. Donec consectetuer mauris id sapien.",
+		"article_abstract": "neque non quam.",
+		"article_url": "libero. Donec consectetuer mauris id sapien. Cras dolor dolor, tempus",
+		"citation_count": 8,
+		"co_authors": "risus",
+		"individual_onekeyID": "B1P 6E0",
+		"uuid": "V5K 5Q2"
+	},
+	{
+		"author_name": "Alice",
+		"article_title": "Integer urna. Vivamus molestie dapibus ligula. Aliquam erat volutpat.",
+		"article_abstract": "dui. Cras pellentesque. Sed",
+		"article_url": "sit amet luctus vulputate, nisi sem semper erat, in consectetuer",
+		"citation_count": 1,
+		"co_authors": "Duis elementum, dui quis accumsan convallis, ante",
+		"individual_onekeyID": "H9S 3C0",
+		"uuid": "H7D 6E6"
+	},
+	{
+		"author_name": "Abraham",
+		"article_title": "feugiat metus sit amet ante. Vivamus non lorem vitae",
+		"article_abstract": "Donec egestas. Aliquam nec enim.",
+		"article_url": "arcu ac orci. Ut semper pretium neque. Morbi quis urna.",
+		"citation_count": 4,
+		"co_authors": "et nunc. Quisque ornare tortor at risus. Nunc ac",
+		"individual_onekeyID": "E9Y 3G3",
+		"uuid": "B6R 3L7"
+	},
+	{
+		"author_name": "Abraham",
+		"article_title": "consequat enim diam vel arcu.",
+		"article_abstract": "gravida mauris ut",
+		"article_url": "eget odio. Aliquam vulputate ullamcorper magna. Sed eu eros. Nam",
+		"citation_count": 8,
+		"co_authors": "blandit at, nisi. Cum sociis natoque penatibus et magnis dis",
+		"individual_onekeyID": "U7C 2R5",
+		"uuid": "R9I 8S6"
+	},
+	{
+		"author_name": "Jeanette",
+		"article_title": "sit amet ultricies sem magna nec quam. Curabitur vel lectus.",
+		"article_abstract": "Phasellus in felis. Nulla tempor augue ac ipsum.",
+		"article_url": "bibendum sed, est. Nunc laoreet lectus quis massa. Mauris vestibulum,",
+		"citation_count": 8,
+		"co_authors": "rhoncus. Proin nisl",
+		"individual_onekeyID": "Q0V 7I7",
+		"uuid": "O2I 9X6"
+	},
+	{
+		"author_name": "Macaulay",
+		"article_title": "consequat purus. Maecenas libero est, congue a, aliquet",
+		"article_abstract": "Cras vehicula aliquet libero. Integer in magna. Phasellus dolor",
+		"article_url": "convallis erat, eget tincidunt dui augue eu tellus. Phasellus elit",
+		"citation_count": 4,
+		"co_authors": "nascetur ridiculus mus. Proin vel",
+		"individual_onekeyID": "W1O 8R5",
+		"uuid": "Z4N 2F5"
+	},
+	{
+		"author_name": "Malik",
+		"article_title": "dictum magna. Ut tincidunt orci quis lectus.",
+		"article_abstract": "Mauris molestie pharetra nibh. Aliquam ornare,",
+		"article_url": "Suspendisse dui. Fusce diam nunc, ullamcorper eu, euismod ac, fermentum",
+		"citation_count": 8,
+		"co_authors": "sed dictum eleifend, nunc risus varius orci, in consequat",
+		"individual_onekeyID": "M6T 6E3",
+		"uuid": "B6B 6H7"
+	},
+	{
+		"author_name": "Stella",
+		"article_title": "ullamcorper",
+		"article_abstract": "mauris",
+		"article_url": "sit amet ultricies sem magna nec quam. Curabitur vel lectus.",
+		"citation_count": 4,
+		"co_authors": "molestie arcu. Sed eu",
+		"individual_onekeyID": "Z6P 5K1",
+		"uuid": "Y5A 1D2"
+	},
+	{
+		"author_name": "Christine",
+		"article_title": "tellus. Nunc lectus",
+		"article_abstract": "ultricies ornare, elit elit fermentum risus, at fringilla purus mauris",
+		"article_url": "elit sed consequat auctor, nunc nulla vulputate dui, nec tempus",
+		"citation_count": 8,
+		"co_authors": "dis parturient montes, nascetur ridiculus mus. Proin vel nisl. Quisque",
+		"individual_onekeyID": "O2L 1H4",
+		"uuid": "O6O 7Z1"
+	},
+	{
+		"author_name": "Hayes",
+		"article_title": "Integer mollis. Integer tincidunt aliquam arcu. Aliquam ultrices iaculis",
+		"article_abstract": "enim consequat purus. Maecenas",
+		"article_url": "risus a ultricies adipiscing, enim mi tempor lorem, eget mollis",
+		"citation_count": 10,
+		"co_authors": "volutpat.",
+		"individual_onekeyID": "S1Z 0F4",
+		"uuid": "U1Q 9Q3"
+	},
+	{
+		"author_name": "Mason",
+		"article_title": "tortor. Integer aliquam adipiscing lacus. Ut nec urna",
+		"article_abstract": "lorem, sit amet ultricies sem",
+		"article_url": "ipsum. Curabitur consequat, lectus sit amet luctus vulputate, nisi sem",
+		"citation_count": 9,
+		"co_authors": "felis orci, adipiscing non, luctus sit amet,",
+		"individual_onekeyID": "K0F 1Y7",
+		"uuid": "A8U 4P8"
+	},
+	{
+		"author_name": "Kyra",
+		"article_title": "magna. Phasellus dolor elit, pellentesque a, facilisis",
+		"article_abstract": "tincidunt,",
+		"article_url": "ornare, facilisis eget, ipsum. Donec sollicitudin adipiscing ligula. Aenean gravida",
+		"citation_count": 9,
+		"co_authors": "mauris, rhoncus id, mollis nec,",
+		"individual_onekeyID": "C9L 9T3",
+		"uuid": "A4A 5W7"
+	},
+	{
+		"author_name": "Caleb",
+		"article_title": "vitae, orci. Phasellus dapibus quam quis diam. Pellentesque",
+		"article_abstract": "Phasellus dapibus quam quis diam. Pellentesque",
+		"article_url": "elementum, dui quis accumsan convallis, ante lectus convallis est, vitae",
+		"citation_count": 4,
+		"co_authors": "tellus. Aenean",
+		"individual_onekeyID": "T6V 8U9",
+		"uuid": "S6H 3U4"
+	},
+	{
+		"author_name": "Jasper",
+		"article_title": "venenatis vel, faucibus",
+		"article_abstract": "egestas hendrerit neque. In ornare sagittis",
+		"article_url": "Cras lorem lorem, luctus ut, pellentesque eget, dictum placerat, augue.",
+		"citation_count": 1,
+		"co_authors": "ornare. Fusce",
+		"individual_onekeyID": "E8D 8U8",
+		"uuid": "J3H 9F2"
+	},
+	{
+		"author_name": "Jack",
+		"article_title": "enim consequat purus. Maecenas libero est, congue a,",
+		"article_abstract": "ultricies adipiscing, enim mi tempor lorem, eget mollis",
+		"article_url": "arcu. Sed et libero. Proin mi. Aliquam gravida mauris ut",
+		"citation_count": 1,
+		"co_authors": "nisl sem, consequat nec, mollis vitae, posuere",
+		"individual_onekeyID": "U9E 4A6",
+		"uuid": "X3F 3M1"
+	},
+	{
+		"author_name": "Steel",
+		"article_title": "elit pede, malesuada vel, venenatis vel,",
+		"article_abstract": "Nulla aliquet. Proin velit. Sed",
+		"article_url": "non justo. Proin non massa non ante bibendum ullamcorper. Duis",
+		"citation_count": 9,
+		"co_authors": "Nunc ac sem",
+		"individual_onekeyID": "U0Q 1Y8",
+		"uuid": "M1U 0N8"
+	},
+	{
+		"author_name": "Cora",
+		"article_title": "nibh. Aliquam ornare, libero at auctor ullamcorper, nisl arcu iaculis",
+		"article_abstract": "dictum placerat, augue. Sed",
+		"article_url": "condimentum eget, volutpat ornare, facilisis eget, ipsum. Donec sollicitudin adipiscing",
+		"citation_count": 10,
+		"co_authors": "mus. Aenean eget magna. Suspendisse tristique neque venenatis lacus.",
+		"individual_onekeyID": "D8P 7G1",
+		"uuid": "O5M 8Z7"
+	},
+	{
+		"author_name": "Dacey",
+		"article_title": "nibh sit amet orci. Ut sagittis lobortis mauris. Suspendisse",
+		"article_abstract": "diam nunc, ullamcorper eu, euismod ac, fermentum vel, mauris. Integer",
+		"article_url": "elit, pharetra ut, pharetra sed, hendrerit a, arcu. Sed et",
+		"citation_count": 2,
+		"co_authors": "est, mollis non, cursus non,",
+		"individual_onekeyID": "P7N 8J0",
+		"uuid": "L3M 8Z9"
+	},
+	{
+		"author_name": "Marvin",
+		"article_title": "tortor, dictum eu, placerat",
+		"article_abstract": "Aliquam ultrices iaculis odio. Nam interdum",
+		"article_url": "ut mi. Duis risus odio, auctor vitae, aliquet nec, imperdiet",
+		"citation_count": 10,
+		"co_authors": "quis",
+		"individual_onekeyID": "F8Y 0X5",
+		"uuid": "F6A 2P9"
+	},
+	{
+		"author_name": "Herrod",
+		"article_title": "mauris. Morbi",
+		"article_abstract": "nec urna suscipit nonummy. Fusce fermentum",
+		"article_url": "velit. Sed malesuada augue ut lacus. Nulla tincidunt, neque vitae",
+		"citation_count": 9,
+		"co_authors": "sed, est. Nunc laoreet lectus quis massa.",
+		"individual_onekeyID": "E7W 2R9",
+		"uuid": "Y5P 4U4"
+	},
+	{
+		"author_name": "Simon",
+		"article_title": "adipiscing non, luctus sit amet, faucibus ut, nulla.",
+		"article_abstract": "gravida non,",
+		"article_url": "Donec dignissim magna a tortor. Nunc commodo auctor velit. Aliquam",
+		"citation_count": 6,
+		"co_authors": "quis diam. Pellentesque habitant morbi tristique senectus et netus et",
+		"individual_onekeyID": "B7S 4Y7",
+		"uuid": "C8U 8T4"
+	},
+	{
+		"author_name": "Gay",
+		"article_title": "augue ut lacus. Nulla tincidunt, neque vitae semper",
+		"article_abstract": "non, vestibulum nec,",
+		"article_url": "Vestibulum ut eros non enim commodo hendrerit. Donec porttitor tellus",
+		"citation_count": 9,
+		"co_authors": "lorem tristique aliquet. Phasellus fermentum convallis ligula. Donec luctus",
+		"individual_onekeyID": "P6Y 5M6",
+		"uuid": "V6C 4G0"
+	},
+	{
+		"author_name": "Chaney",
+		"article_title": "elit, pharetra ut, pharetra",
+		"article_abstract": "iaculis quis, pede. Praesent eu dui. Cum sociis natoque penatibus",
+		"article_url": "ligula. Aliquam erat volutpat. Nulla dignissim. Maecenas ornare egestas ligula.",
+		"citation_count": 9,
+		"co_authors": "eu neque pellentesque massa lobortis ultrices.",
+		"individual_onekeyID": "M5I 9D0",
+		"uuid": "X4X 4B3"
+	},
+	{
+		"author_name": "Lewis",
+		"article_title": "amet, faucibus ut, nulla. Cras eu",
+		"article_abstract": "mollis vitae, posuere at, velit. Cras lorem lorem,",
+		"article_url": "volutpat nunc sit amet metus. Aliquam erat volutpat. Nulla facilisis.",
+		"citation_count": 9,
+		"co_authors": "Etiam",
+		"individual_onekeyID": "S3F 8M7",
+		"uuid": "G1P 0O9"
+	},
+	{
+		"author_name": "Cara",
+		"article_title": "augue, eu tempor erat neque non quam.",
+		"article_abstract": "gravida mauris ut mi. Duis risus odio, auctor vitae, aliquet",
+		"article_url": "dictum mi, ac mattis velit justo nec ante. Maecenas mi",
+		"citation_count": 6,
+		"co_authors": "at lacus. Quisque purus sapien, gravida",
+		"individual_onekeyID": "N7E 9O9",
+		"uuid": "P7Z 6W2"
+	},
+	{
+		"author_name": "Bertha",
+		"article_title": "nec tempus mauris erat eget ipsum.",
+		"article_abstract": "dictum magna. Ut tincidunt orci",
+		"article_url": "amet luctus vulputate, nisi sem semper erat, in consectetuer ipsum",
+		"citation_count": 4,
+		"co_authors": "convallis erat, eget tincidunt dui",
+		"individual_onekeyID": "E5Y 4H8",
+		"uuid": "R4Z 6C8"
+	},
+	{
+		"author_name": "Amy",
+		"article_title": "et libero.",
+		"article_abstract": "Praesent luctus. Curabitur egestas nunc sed libero. Proin sed",
+		"article_url": "amet metus. Aliquam erat volutpat. Nulla facilisis. Suspendisse commodo tincidunt",
+		"citation_count": 3,
+		"co_authors": "pede.",
+		"individual_onekeyID": "Z3D 3B9",
+		"uuid": "B7T 3V5"
+	},
+	{
+		"author_name": "Kennedy",
+		"article_title": "Nunc mauris sapien, cursus in, hendrerit consectetuer, cursus et, magna.",
+		"article_abstract": "ut, pharetra sed, hendrerit a, arcu. Sed et libero. Proin",
+		"article_url": "Nam ligula elit, pretium et, rutrum non, hendrerit id, ante.",
+		"citation_count": 3,
+		"co_authors": "amet, dapibus id, blandit at, nisi. Cum",
+		"individual_onekeyID": "Z2B 6D8",
+		"uuid": "K9D 3B5"
+	},
+	{
+		"author_name": "Jeremy",
+		"article_title": "Praesent luctus. Curabitur egestas nunc sed libero. Proin",
+		"article_abstract": "In scelerisque scelerisque dui. Suspendisse ac metus vitae velit",
+		"article_url": "arcu iaculis enim, sit amet ornare lectus justo eu arcu.",
+		"citation_count": 3,
+		"co_authors": "dapibus rutrum, justo. Praesent luctus. Curabitur egestas nunc sed libero.",
+		"individual_onekeyID": "C8R 3O7",
+		"uuid": "G2B 2I1"
+	},
+	{
+		"author_name": "Alfreda",
+		"article_title": "lobortis quis, pede. Suspendisse dui. Fusce",
+		"article_abstract": "Phasellus libero mauris,",
+		"article_url": "convallis, ante lectus convallis est, vitae sodales nisi magna sed",
+		"citation_count": 5,
+		"co_authors": "scelerisque scelerisque dui. Suspendisse ac metus vitae",
+		"individual_onekeyID": "R1D 9E9",
+		"uuid": "P6K 6J7"
+	},
+	{
+		"author_name": "Uma",
+		"article_title": "eu erat semper rutrum. Fusce dolor",
+		"article_abstract": "lacinia at, iaculis quis, pede. Praesent eu dui. Cum",
+		"article_url": "lacus. Etiam bibendum fermentum metus. Aenean sed pede nec ante",
+		"citation_count": 8,
+		"co_authors": "turpis nec mauris blandit mattis. Cras eget nisi",
+		"individual_onekeyID": "D5F 7Y6",
+		"uuid": "K1F 1Q2"
+	},
+	{
+		"author_name": "Noah",
+		"article_title": "fringilla est. Mauris",
+		"article_abstract": "nisi dictum augue malesuada malesuada. Integer id magna et ipsum",
+		"article_url": "nibh. Donec est mauris, rhoncus id, mollis nec, cursus a,",
+		"citation_count": 2,
+		"co_authors": "magnis dis parturient montes, nascetur ridiculus mus. Proin vel nisl.",
+		"individual_onekeyID": "G5Y 7T3",
+		"uuid": "U8T 5K9"
+	},
+	{
+		"author_name": "Nerea",
+		"article_title": "enim mi tempor lorem, eget",
+		"article_abstract": "adipiscing",
+		"article_url": "dui, semper et, lacinia vitae, sodales at, velit. Pellentesque ultricies",
+		"citation_count": 7,
+		"co_authors": "odio semper cursus.",
+		"individual_onekeyID": "S9A 5V1",
+		"uuid": "L2J 6C4"
+	},
+	{
+		"author_name": "Stephen",
+		"article_title": "Phasellus elit pede, malesuada vel, venenatis vel, faucibus",
+		"article_abstract": "nec mauris blandit mattis. Cras eget nisi dictum augue",
+		"article_url": "ipsum nunc id enim. Curabitur massa. Vestibulum accumsan neque et",
+		"citation_count": 5,
+		"co_authors": "leo. Vivamus nibh dolor, nonummy",
+		"individual_onekeyID": "H4J 9D6",
+		"uuid": "I0W 6P7"
+	},
+	{
+		"author_name": "Marcia",
+		"article_title": "libero lacus, varius et, euismod et, commodo at,",
+		"article_abstract": "Integer tincidunt",
+		"article_url": "risus, at fringilla purus mauris a nunc. In at pede.",
+		"citation_count": 5,
+		"co_authors": "egestas ligula. Nullam",
+		"individual_onekeyID": "P7M 4R3",
+		"uuid": "E3J 7G0"
+	},
+	{
+		"author_name": "Aristotle",
+		"article_title": "sodales at, velit. Pellentesque ultricies dignissim lacus. Aliquam rutrum",
+		"article_abstract": "faucibus leo, in lobortis tellus",
+		"article_url": "mollis nec, cursus a, enim. Suspendisse aliquet, sem ut cursus",
+		"citation_count": 2,
+		"co_authors": "hendrerit id, ante. Nunc mauris sapien, cursus in, hendrerit consectetuer,",
+		"individual_onekeyID": "N5M 0T5",
+		"uuid": "Z6R 3L9"
+	},
+	{
+		"author_name": "Ocean",
+		"article_title": "consectetuer,",
+		"article_abstract": "velit eu sem. Pellentesque ut ipsum",
+		"article_url": "neque. Sed eget lacus. Mauris non dui nec urna suscipit",
+		"citation_count": 8,
+		"co_authors": "tellus id nunc interdum feugiat. Sed nec metus",
+		"individual_onekeyID": "W8K 8Z6",
+		"uuid": "Y0J 9V9"
+	},
+	{
+		"author_name": "Kylynn",
+		"article_title": "vulputate velit eu sem. Pellentesque ut ipsum",
+		"article_abstract": "tempus, lorem fringilla ornare placerat, orci lacus",
+		"article_url": "mauris sagittis placerat. Cras dictum ultricies ligula. Nullam enim. Sed",
+		"citation_count": 5,
+		"co_authors": "ultrices sit amet, risus.",
+		"individual_onekeyID": "X9M 9H9",
+		"uuid": "J5C 4K3"
+	},
+	{
+		"author_name": "Hadley",
+		"article_title": "ridiculus mus. Proin",
+		"article_abstract": "Mauris non dui nec urna suscipit nonummy. Fusce",
+		"article_url": "mauris erat eget ipsum. Suspendisse sagittis. Nullam vitae diam. Proin",
+		"citation_count": 4,
+		"co_authors": "Phasellus",
+		"individual_onekeyID": "G6M 8N1",
+		"uuid": "R5S 3L9"
+	},
+	{
+		"author_name": "Brynn",
+		"article_title": "dui augue eu tellus. Phasellus elit pede,",
+		"article_abstract": "lobortis quam a felis ullamcorper viverra. Maecenas iaculis aliquet",
+		"article_url": "Suspendisse sed dolor. Fusce mi lorem, vehicula et, rutrum eu,",
+		"citation_count": 10,
+		"co_authors": "dui. Suspendisse ac metus vitae",
+		"individual_onekeyID": "M9T 9C2",
+		"uuid": "L9K 9O5"
+	},
+	{
+		"author_name": "Brooke",
+		"article_title": "turpis. Nulla aliquet. Proin velit. Sed malesuada augue ut lacus.",
+		"article_abstract": "pretium",
+		"article_url": "sem elit, pharetra ut, pharetra sed, hendrerit a, arcu. Sed",
+		"citation_count": 7,
+		"co_authors": "nulla magna, malesuada vel,",
+		"individual_onekeyID": "O5E 7H2",
+		"uuid": "C1K 6J1"
+	},
+	{
+		"author_name": "Branden",
+		"article_title": "ut odio vel est tempor bibendum. Donec felis orci,",
+		"article_abstract": "non magna. Nam ligula",
+		"article_url": "auctor quis, tristique ac, eleifend vitae, erat. Vivamus nisi. Mauris",
+		"citation_count": 7,
+		"co_authors": "amet, consectetuer adipiscing elit.",
+		"individual_onekeyID": "O1R 8O5",
+		"uuid": "Y8V 4L4"
+	},
+	{
+		"author_name": "Aubrey",
+		"article_title": "eget, volutpat ornare,",
+		"article_abstract": "Integer",
+		"article_url": "arcu ac orci. Ut semper pretium neque. Morbi quis urna.",
+		"citation_count": 5,
+		"co_authors": "faucibus orci luctus et ultrices",
+		"individual_onekeyID": "K9V 5K5",
+		"uuid": "I6Q 5E6"
+	},
+	{
+		"author_name": "Perry",
+		"article_title": "in felis. Nulla tempor augue",
+		"article_abstract": "Etiam bibendum fermentum metus. Aenean sed pede",
+		"article_url": "auctor non, feugiat nec, diam. Duis mi enim, condimentum eget,",
+		"citation_count": 5,
+		"co_authors": "In tincidunt congue turpis. In condimentum.",
+		"individual_onekeyID": "R7R 4Y3",
+		"uuid": "V3B 7R0"
+	},
+	{
+		"author_name": "Chanda",
+		"article_title": "diam. Duis",
+		"article_abstract": "a nunc. In at pede.",
+		"article_url": "neque. In ornare sagittis felis. Donec tempor, est ac mattis",
+		"citation_count": 9,
+		"co_authors": "Cras vehicula aliquet libero.",
+		"individual_onekeyID": "H5T 7T0",
+		"uuid": "L3A 3U9"
+	},
+	{
+		"author_name": "Nathan",
+		"article_title": "libero est, congue a, aliquet vel, vulputate eu,",
+		"article_abstract": "felis. Nulla tempor augue ac ipsum. Phasellus vitae mauris",
+		"article_url": "tortor nibh sit amet orci. Ut sagittis lobortis mauris. Suspendisse",
+		"citation_count": 2,
+		"co_authors": "feugiat metus sit amet ante.",
+		"individual_onekeyID": "C4L 7O9",
+		"uuid": "L2U 2A6"
+	},
+	{
+		"author_name": "Lee",
+		"article_title": "auctor odio a purus. Duis elementum, dui quis",
+		"article_abstract": "urna convallis erat,",
+		"article_url": "nunc ac mattis ornare, lectus ante dictum mi, ac mattis",
+		"citation_count": 10,
+		"co_authors": "sapien, gravida non, sollicitudin a, malesuada",
+		"individual_onekeyID": "E3H 3A1",
+		"uuid": "O0O 0R1"
+	},
+	{
+		"author_name": "Deanna",
+		"article_title": "nibh.",
+		"article_abstract": "pede, ultrices a, auctor non, feugiat nec, diam. Duis mi",
+		"article_url": "Quisque ornare tortor at risus. Nunc ac sem ut dolor",
+		"citation_count": 8,
+		"co_authors": "gravida non, sollicitudin",
+		"individual_onekeyID": "J2A 7H0",
+		"uuid": "J2U 2S4"
+	},
+	{
+		"author_name": "Ciaran",
+		"article_title": "diam luctus lobortis. Class aptent taciti sociosqu ad litora",
+		"article_abstract": "dictum eu, eleifend nec, malesuada ut, sem. Nulla",
+		"article_url": "nulla ante, iaculis nec, eleifend non, dapibus rutrum, justo. Praesent",
+		"citation_count": 7,
+		"co_authors": "varius et, euismod et,",
+		"individual_onekeyID": "W1R 3G8",
+		"uuid": "E4A 4F5"
+	},
+	{
+		"author_name": "Uta",
+		"article_title": "iaculis aliquet diam. Sed",
+		"article_abstract": "Donec nibh. Quisque nonummy ipsum non arcu. Vivamus",
+		"article_url": "ut nisi a odio semper cursus. Integer mollis. Integer tincidunt",
+		"citation_count": 8,
+		"co_authors": "Etiam",
+		"individual_onekeyID": "L8V 2C0",
+		"uuid": "F9W 9K4"
+	},
+	{
+		"author_name": "Lucas",
+		"article_title": "est arcu ac orci. Ut semper pretium",
+		"article_abstract": "varius. Nam porttitor scelerisque",
+		"article_url": "auctor, velit eget laoreet posuere, enim nisl elementum purus, accumsan",
+		"citation_count": 5,
+		"co_authors": "lacinia",
+		"individual_onekeyID": "B3P 3J9",
+		"uuid": "C2N 5R3"
+	},
+	{
+		"author_name": "Wylie",
+		"article_title": "pede. Cras",
+		"article_abstract": "malesuada fringilla est. Mauris eu turpis.",
+		"article_url": "laoreet, libero et tristique pellentesque, tellus sem mollis dui, in",
+		"citation_count": 9,
+		"co_authors": "mattis. Integer eu lacus.",
+		"individual_onekeyID": "N4H 5Q4",
+		"uuid": "Y7V 5H4"
+	},
+	{
+		"author_name": "Azalia",
+		"article_title": "non enim. Mauris quis turpis vitae purus gravida",
+		"article_abstract": "ac arcu.",
+		"article_url": "lacus. Aliquam rutrum lorem ac risus. Morbi metus. Vivamus euismod",
+		"citation_count": 7,
+		"co_authors": "a neque. Nullam ut nisi a odio semper cursus.",
+		"individual_onekeyID": "Y6G 3R4",
+		"uuid": "T9H 5C3"
+	},
+	{
+		"author_name": "Adrienne",
+		"article_title": "aliquet molestie tellus. Aenean egestas hendrerit neque. In",
+		"article_abstract": "Morbi non sapien molestie orci tincidunt adipiscing. Mauris",
+		"article_url": "risus. Morbi metus. Vivamus euismod urna. Nullam lobortis quam a",
+		"citation_count": 5,
+		"co_authors": "mauris elit, dictum eu, eleifend nec,",
+		"individual_onekeyID": "L6A 6O2",
+		"uuid": "P4F 6X5"
+	},
+	{
+		"author_name": "Fay",
+		"article_title": "tellus, imperdiet non, vestibulum nec,",
+		"article_abstract": "cursus. Nunc mauris elit,",
+		"article_url": "eleifend vitae, erat. Vivamus nisi. Mauris nulla. Integer urna. Vivamus",
+		"citation_count": 7,
+		"co_authors": "urna",
+		"individual_onekeyID": "T5S 2E5",
+		"uuid": "U6P 7V3"
+	},
+	{
+		"author_name": "Mannix",
+		"article_title": "molestie tortor nibh sit amet orci.",
+		"article_abstract": "amet massa. Quisque porttitor eros nec tellus. Nunc",
+		"article_url": "vulputate, lacus. Cras interdum. Nunc sollicitudin commodo ipsum. Suspendisse non",
+		"citation_count": 6,
+		"co_authors": "arcu vel",
+		"individual_onekeyID": "H2I 1L9",
+		"uuid": "E4X 3H1"
+	},
+	{
+		"author_name": "Caleb",
+		"article_title": "eu eros. Nam consequat dolor",
+		"article_abstract": "pharetra, felis eget varius ultrices, mauris",
+		"article_url": "neque pellentesque massa lobortis ultrices. Vivamus rhoncus. Donec est. Nunc",
+		"citation_count": 6,
+		"co_authors": "Cras vulputate velit eu sem.",
+		"individual_onekeyID": "Y9F 9C4",
+		"uuid": "X2E 9L8"
+	},
+	{
+		"author_name": "Erich",
+		"article_title": "vel turpis. Aliquam adipiscing",
+		"article_abstract": "pede sagittis",
+		"article_url": "leo, in lobortis tellus justo sit amet nulla. Donec non",
+		"citation_count": 4,
+		"co_authors": "enim. Etiam imperdiet",
+		"individual_onekeyID": "A1C 2U3",
+		"uuid": "Z0L 6G1"
+	},
+	{
+		"author_name": "Knox",
+		"article_title": "Curabitur vel lectus. Cum",
+		"article_abstract": "in molestie tortor",
+		"article_url": "Nunc ut erat. Sed nunc est, mollis non, cursus non,",
+		"citation_count": 2,
+		"co_authors": "ornare",
+		"individual_onekeyID": "P3B 1T4",
+		"uuid": "S6F 1N9"
+	},
+	{
+		"author_name": "Regan",
+		"article_title": "volutpat. Nulla",
+		"article_abstract": "Donec est mauris, rhoncus id,",
+		"article_url": "magnis dis parturient montes, nascetur ridiculus mus. Donec dignissim magna",
+		"citation_count": 5,
+		"co_authors": "quam vel sapien imperdiet ornare. In faucibus. Morbi vehicula.",
+		"individual_onekeyID": "A3Z 6S4",
+		"uuid": "I9J 2R6"
+	},
+	{
+		"author_name": "Wylie",
+		"article_title": "Vivamus",
+		"article_abstract": "risus a",
+		"article_url": "Donec sollicitudin adipiscing ligula. Aenean gravida nunc sed pede. Cum",
+		"citation_count": 1,
+		"co_authors": "tincidunt adipiscing. Mauris molestie pharetra nibh. Aliquam ornare, libero",
+		"individual_onekeyID": "W4K 0W5",
+		"uuid": "D5E 1X4"
+	},
+	{
+		"author_name": "Hilel",
+		"article_title": "Praesent luctus. Curabitur egestas nunc sed libero. Proin",
+		"article_abstract": "fermentum risus, at fringilla purus mauris a",
+		"article_url": "faucibus id, libero. Donec consectetuer mauris id sapien. Cras dolor",
+		"citation_count": 8,
+		"co_authors": "blandit congue. In scelerisque scelerisque dui. Suspendisse ac",
+		"individual_onekeyID": "Y6D 7E9",
+		"uuid": "V8P 3C3"
+	},
+	{
+		"author_name": "Gary",
+		"article_title": "ante dictum mi, ac",
+		"article_abstract": "eu augue porttitor interdum. Sed auctor",
+		"article_url": "Fusce aliquam, enim nec tempus scelerisque, lorem ipsum sodales purus,",
+		"citation_count": 6,
+		"co_authors": "luctus aliquet odio. Etiam ligula",
+		"individual_onekeyID": "P7N 8W1",
+		"uuid": "Q8G 9J1"
+	},
+	{
+		"author_name": "Lila",
+		"article_title": "vitae risus. Duis a mi fringilla mi lacinia mattis. Integer",
+		"article_abstract": "Curabitur dictum. Phasellus",
+		"article_url": "scelerisque dui. Suspendisse ac metus vitae velit egestas lacinia. Sed",
+		"citation_count": 9,
+		"co_authors": "Sed eu nibh vulputate mauris sagittis placerat. Cras",
+		"individual_onekeyID": "K7K 5N0",
+		"uuid": "Z0Z 0Y7"
+	},
+	{
+		"author_name": "Brady",
+		"article_title": "magna. Nam ligula elit, pretium et, rutrum non, hendrerit",
+		"article_abstract": "ac, eleifend vitae,",
+		"article_url": "gravida. Praesent eu nulla at sem molestie sodales. Mauris blandit",
+		"citation_count": 5,
+		"co_authors": "Cum sociis natoque penatibus et",
+		"individual_onekeyID": "F5T 2W1",
+		"uuid": "P1F 0Z7"
+	},
+	{
+		"author_name": "Phoebe",
+		"article_title": "vulputate ullamcorper magna. Sed eu eros. Nam consequat dolor",
+		"article_abstract": "dictum. Proin eget odio.",
+		"article_url": "Maecenas ornare egestas ligula. Nullam feugiat placerat velit. Quisque varius.",
+		"citation_count": 10,
+		"co_authors": "dictum. Proin eget odio. Aliquam vulputate ullamcorper magna. Sed",
+		"individual_onekeyID": "U3R 0K5",
+		"uuid": "U8S 2X6"
+	},
+	{
+		"author_name": "Oleg",
+		"article_title": "cubilia Curae; Phasellus ornare. Fusce",
+		"article_abstract": "sodales purus, in molestie tortor nibh sit amet orci.",
+		"article_url": "interdum. Sed auctor odio a purus. Duis elementum, dui quis",
+		"citation_count": 6,
+		"co_authors": "ornare egestas ligula. Nullam feugiat placerat velit. Quisque varius. Nam",
+		"individual_onekeyID": "Q3I 3Z0",
+		"uuid": "W0X 9Z6"
+	},
+	{
+		"author_name": "Stacey",
+		"article_title": "et ultrices posuere cubilia",
+		"article_abstract": "scelerisque neque sed sem egestas blandit. Nam",
+		"article_url": "ridiculus mus. Proin vel arcu eu odio tristique pharetra. Quisque",
+		"citation_count": 2,
+		"co_authors": "fermentum convallis ligula. Donec luctus aliquet odio. Etiam ligula",
+		"individual_onekeyID": "F1W 5Y1",
+		"uuid": "J2G 1A4"
+	},
+	{
+		"author_name": "Dylan",
+		"article_title": "lorem,",
+		"article_abstract": "ipsum. Donec sollicitudin",
+		"article_url": "varius. Nam porttitor scelerisque neque. Nullam nisl. Maecenas malesuada fringilla",
+		"citation_count": 8,
+		"co_authors": "Aenean egestas hendrerit neque. In ornare sagittis felis. Donec tempor,",
+		"individual_onekeyID": "O4E 8U9",
+		"uuid": "A4V 5L8"
+	},
+	{
+		"author_name": "Uriah",
+		"article_title": "arcu. Nunc mauris. Morbi non sapien molestie orci tincidunt",
+		"article_abstract": "Sed molestie. Sed id risus",
+		"article_url": "lorem ac risus. Morbi metus. Vivamus euismod urna. Nullam lobortis",
+		"citation_count": 5,
+		"co_authors": "Quisque varius. Nam porttitor scelerisque neque. Nullam",
+		"individual_onekeyID": "Q9H 0N9",
+		"uuid": "X2Q 1M2"
+	},
+	{
+		"author_name": "Montana",
+		"article_title": "enim nisl elementum purus, accumsan interdum libero dui",
+		"article_abstract": "egestas lacinia. Sed congue, elit sed consequat",
+		"article_url": "lacinia vitae, sodales at, velit. Pellentesque ultricies dignissim lacus. Aliquam",
+		"citation_count": 4,
+		"co_authors": "nunc",
+		"individual_onekeyID": "R5Y 6R5",
+		"uuid": "A4B 0W4"
+	},
+	{
+		"author_name": "Roth",
+		"article_title": "non enim commodo hendrerit. Donec",
+		"article_abstract": "condimentum eget, volutpat ornare, facilisis eget, ipsum.",
+		"article_url": "porttitor scelerisque neque. Nullam nisl. Maecenas malesuada fringilla est. Mauris",
+		"citation_count": 6,
+		"co_authors": "augue, eu tempor erat neque non quam.",
+		"individual_onekeyID": "N7I 1F9",
+		"uuid": "P6T 5I2"
+	},
+	{
+		"author_name": "Felicia",
+		"article_title": "dignissim magna a tortor. Nunc",
+		"article_abstract": "Sed malesuada",
+		"article_url": "metus sit amet ante. Vivamus non lorem vitae odio sagittis",
+		"citation_count": 10,
+		"co_authors": "laoreet posuere, enim nisl elementum purus, accumsan",
+		"individual_onekeyID": "H2O 6O8",
+		"uuid": "W0I 4E6"
+	},
+	{
+		"author_name": "Cain",
+		"article_title": "Donec tempus, lorem",
+		"article_abstract": "ac sem ut dolor dapibus gravida. Aliquam tincidunt, nunc",
+		"article_url": "aliquam adipiscing lacus. Ut nec urna et arcu imperdiet ullamcorper.",
+		"citation_count": 1,
+		"co_authors": "sed libero. Proin",
+		"individual_onekeyID": "W4C 5L3",
+		"uuid": "X8U 5I2"
+	},
+	{
+		"author_name": "Kevyn",
+		"article_title": "neque et nunc. Quisque ornare",
+		"article_abstract": "Donec egestas. Duis ac arcu. Nunc mauris. Morbi non",
+		"article_url": "placerat. Cras dictum ultricies ligula. Nullam enim. Sed nulla ante,",
+		"citation_count": 5,
+		"co_authors": "mollis non, cursus non,",
+		"individual_onekeyID": "H5J 1V5",
+		"uuid": "T7Z 4Q8"
+	},
+	{
+		"author_name": "Kenneth",
+		"article_title": "Donec consectetuer mauris id sapien.",
+		"article_abstract": "blandit viverra. Donec tempus,",
+		"article_url": "nascetur ridiculus mus. Proin vel nisl. Quisque fringilla euismod enim.",
+		"citation_count": 9,
+		"co_authors": "egestas. Aliquam fringilla cursus purus. Nullam scelerisque neque",
+		"individual_onekeyID": "L6Y 1Y5",
+		"uuid": "F7B 1E8"
+	},
+	{
+		"author_name": "Salvador",
+		"article_title": "ultrices",
+		"article_abstract": "enim commodo hendrerit. Donec",
+		"article_url": "malesuada augue ut lacus. Nulla tincidunt, neque vitae semper egestas,",
+		"citation_count": 2,
+		"co_authors": "tellus justo sit amet nulla. Donec non justo.",
+		"individual_onekeyID": "B0R 9F2",
+		"uuid": "C3G 6D8"
+	},
+	{
+		"author_name": "Anastasia",
+		"article_title": "ac tellus. Suspendisse sed",
+		"article_abstract": "volutpat nunc sit amet metus. Aliquam erat volutpat.",
+		"article_url": "varius. Nam porttitor scelerisque neque. Nullam nisl. Maecenas malesuada fringilla",
+		"citation_count": 8,
+		"co_authors": "Mauris non dui nec urna suscipit nonummy. Fusce",
+		"individual_onekeyID": "Z2X 5O4",
+		"uuid": "R1M 1P5"
+	},
+	{
+		"author_name": "Garth",
+		"article_title": "ac facilisis facilisis, magna tellus",
+		"article_abstract": "et",
+		"article_url": "Ut tincidunt vehicula risus. Nulla eget metus eu erat semper",
+		"citation_count": 6,
+		"co_authors": "bibendum.",
+		"individual_onekeyID": "K2O 1Q3",
+		"uuid": "H2A 2Y3"
+	},
+	{
+		"author_name": "Neville",
+		"article_title": "consectetuer rhoncus. Nullam velit dui, semper et, lacinia vitae,",
+		"article_abstract": "egestas. Duis ac arcu. Nunc mauris. Morbi",
+		"article_url": "egestas. Sed pharetra, felis eget varius ultrices, mauris ipsum porta",
+		"citation_count": 3,
+		"co_authors": "dapibus ligula. Aliquam erat",
+		"individual_onekeyID": "E1D 1O7",
+		"uuid": "P0Z 5J0"
+	},
+	{
+		"author_name": "Chadwick",
+		"article_title": "feugiat. Sed nec metus facilisis lorem tristique",
+		"article_abstract": "Donec egestas. Duis ac arcu. Nunc mauris. Morbi non sapien",
+		"article_url": "gravida molestie arcu. Sed eu nibh vulputate mauris sagittis placerat.",
+		"citation_count": 6,
+		"co_authors": "egestas",
+		"individual_onekeyID": "O3Z 2Z6",
+		"uuid": "X6U 2D5"
+	},
+	{
+		"author_name": "Regan",
+		"article_title": "gravida mauris",
+		"article_abstract": "ultrices. Vivamus rhoncus. Donec est.",
+		"article_url": "nunc risus varius orci, in consequat enim diam vel arcu.",
+		"citation_count": 6,
+		"co_authors": "rhoncus. Proin nisl sem, consequat nec, mollis",
+		"individual_onekeyID": "C6K 1F3",
+		"uuid": "J3Y 9F0"
+	},
+	{
+		"author_name": "Jena",
+		"article_title": "ac arcu. Nunc mauris. Morbi non sapien molestie",
+		"article_abstract": "ipsum ac mi eleifend egestas. Sed pharetra,",
+		"article_url": "erat neque non quam. Pellentesque habitant morbi tristique senectus et",
+		"citation_count": 10,
+		"co_authors": "sed orci lobortis augue",
+		"individual_onekeyID": "H1N 5D1",
+		"uuid": "W9E 3O0"
+	},
+	{
+		"author_name": "Gray",
+		"article_title": "ligula. Nullam enim. Sed",
+		"article_abstract": "ac ipsum.",
+		"article_url": "Phasellus dapibus quam quis diam. Pellentesque habitant morbi tristique senectus",
+		"citation_count": 2,
+		"co_authors": "nulla. In tincidunt congue turpis.",
+		"individual_onekeyID": "R4T 3L5",
+		"uuid": "U2H 1V2"
+	}
+]
