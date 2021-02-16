@@ -241,6 +241,13 @@
                 }
             }
 
+            &-sticky-panel {
+                position: sticky;
+                top: 0px;
+                background: #F4F4F5;
+                z-index: 100;
+            }
+
             &-wrapper {
                 background-color: transparent !important;
 
