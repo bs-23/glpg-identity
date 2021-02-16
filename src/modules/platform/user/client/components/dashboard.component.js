@@ -18,49 +18,49 @@ export default function Dashboard() {
                             <div>
                                 <ul className="d-flex flex-wrap list-unstyled service__list mb-0">
                                     <li className="pr-sm-4 pb-4 service__item">
-                                        <NavLink to="/information" className="d-flex align-items-center d-sm-block px-3 service__link">
+                                        <NavLink to="/information" className="d-flex align-items-center d-sm-block px-3 py-lg-5 service__link">
                                             <i className="icon icon-information-management d-block service__icon"></i>
                                             Information Management
                                         </NavLink>
                                     </li>
                                     <li className="pr-sm-4 pb-4 service__item">
-                                        <NavLink to="/platform" className="d-flex align-items-center d-sm-block px-3 service__link">
+                                        <NavLink to="/platform" className="d-flex align-items-center d-sm-block px-3 py-lg-5 service__link">
                                             <i className="icon icon-customer-data-platform d-block service__icon"></i>
                                           Management of Customer Data Platform
                                         </NavLink>
                                     </li>
                                     <li className="pr-sm-4 pb-4 service__item">
-                                        <NavLink to="/consent" className="d-flex align-items-center d-sm-block px-3 service__link">
+                                        <NavLink to="/consent" className="d-flex align-items-center d-sm-block px-3 py-lg-5 service__link">
                                             <i className="icon icon-data-consent-management d-block service__icon"></i>
                                             Data Privacy & Consent Management
                                         </NavLink>
                                     </li>
                                     <li className="pr-sm-4 pb-4 service__item">
-                                        <NavLink to="/" className="d-flex align-items-center d-sm-block px-3 service__link disabled">
+                                        <NavLink to="/" className="d-flex align-items-center d-sm-block px-3 py-lg-5 service__link disabled">
                                             <i className="icon icon-partner d-block service__icon"></i>
                                             Business Partner Management
                                         </NavLink>
                                     </li>
                                     <li className="pr-sm-4 pb-4 service__item">
-                                        <NavLink to="/" className="d-flex align-items-center d-sm-block px-3 service__link disabled">
+                                        <NavLink to="/" className="d-flex align-items-center d-sm-block px-3 py-lg-5 service__link disabled">
                                             <i className="icon icon-marketing-promotion d-block service__icon"></i>
                                             Marketing and Promotional
                                         </NavLink>
                                     </li>
                                     <li className="pr-sm-4 pb-4 service__item">
-                                        <NavLink to="/" className="d-flex align-items-center d-sm-block px-3 service__link disabled">
+                                        <NavLink to="/" className="d-flex align-items-center d-sm-block px-3 py-lg-5 service__link disabled">
                                             <i className="icon icon-market-research d-block service__icon"></i>
                                            Market Research
                                         </NavLink>
                                     </li>
                                     <li className="pr-sm-4 pb-4 service__item">
-                                        <NavLink to="/" className="d-flex align-items-center d-sm-block px-3 service__link disabled">
+                                        <NavLink to="/" className="d-flex align-items-center d-sm-block px-3 py-lg-5 service__link disabled">
                                             <i className="icon icon-infield-team d-block service__icon"></i>
                                             InField-Team Effectiveness
                                         </NavLink>
                                     </li>
                                     <li className="pr-sm-4 pb-4 service__item">
-                                        <NavLink to="/clinical-trials" className="d-flex align-items-center d-sm-block px-3 service__link">
+                                        <NavLink to="/clinical-trials" className="d-flex align-items-center d-sm-block px-3 py-lg-5 service__link">
                                             <i className="icon icon-ct-management d-block service__icon"></i>
                                             Clinical Trials
                                         </NavLink>
