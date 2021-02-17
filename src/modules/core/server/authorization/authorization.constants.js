@@ -15,7 +15,10 @@ const Services = {
     CONSENT_COUNTRY: 'consent-country',
     CONSENT_CATEGORY: 'consent-category',
     CONSENT_PERFORMANCE: 'consent-performance',
-    MANAGE_CLINICAL_TRIALS: 'manage-clinical-trials'
+    MANAGE_CLINICAL_TRIALS: 'manage-clinical-trials',
+    MANAGE_VENDOR_REQUEST: 'manage-vendor-request',
+    MANAGE_ENTITY_REQUEST: 'manage-entity-request',
+    MANAGE_BUSINESS_PARTNER: 'manage-business-partners'
 }
 
 module.exports = {

@@ -158,11 +158,18 @@ async function init() {
                             { title: "Manage Content Clinical Trail", slug: "manage-clinical-trials", parent_id: clinicalTrials.id, created_by: admin.id, updated_by: admin.id },
                         ]
 
+                        const businessPartnerServices = [
+                            { title: "Manage Vendor Request", slug: "manage-vendor-request", parent_id: businessPartner.id, created_by: admin.id, updated_by: admin.id },
+                            { title: "Manage Healthcare Entity Request", slug: "manage-entity-request", parent_id: businessPartner.id, created_by: admin.id, updated_by: admin.id },
+                            { title: "Business Partner Management to Submit to ERP Systems", slug: "manage-business-partners", parent_id: businessPartner.id, created_by: admin.id, updated_by: admin.id },
+                        ]
+
                         const allServices = [
                             ...platformServices,
                             ...informationServices,
                             ...privacyServices,
-                            ...clinicalTrialsServices
+                            ...clinicalTrialsServices,
+                            ...businessPartnerServices
                         ]
 
                         Service.bulkCreate(allServices, { returning: true, ignoreDuplicates: false }).then(res => { callback() });

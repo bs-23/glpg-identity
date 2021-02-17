@@ -6,14 +6,14 @@ const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/platfo
 
 module.exports = app => {
     app.route('/api/okla/hcps/search')
-        .post(CDPAuthStrategy, ServiceGuard([Services.DISCOVER_HCP_HCO]), controller.searchOklaHcps);
+        .post(CDPAuthStrategy, ServiceGuard([Services.DISCOVER_HCP_HCO, Services.MANAGE_ENTITY_REQUEST]), controller.searchOklaHcps);
 
     app.route('/api/okla/hcps/:codbase/:id')
-        .get(CDPAuthStrategy, ServiceGuard([Services.DISCOVER_HCP_HCO]), controller.getOklaHcpDetails);
+        .get(CDPAuthStrategy, ServiceGuard([Services.DISCOVER_HCP_HCO, Services.MANAGE_ENTITY_REQUEST]), controller.getOklaHcpDetails);
 
     app.route('/api/okla/hcos/search')
-        .post(CDPAuthStrategy, ServiceGuard([Services.DISCOVER_HCP_HCO]), controller.searchOklaHcos);
+        .post(CDPAuthStrategy, ServiceGuard([Services.DISCOVER_HCP_HCO, Services.MANAGE_ENTITY_REQUEST]), controller.searchOklaHcos);
 
     app.route('/api/okla/hcos/:codbase/:id')
-        .get(CDPAuthStrategy, ServiceGuard([Services.DISCOVER_HCP_HCO]), controller.getOklaHcoDetails);
+        .get(CDPAuthStrategy, ServiceGuard([Services.DISCOVER_HCP_HCO, Services.MANAGE_ENTITY_REQUEST]), controller.getOklaHcoDetails);
 };
