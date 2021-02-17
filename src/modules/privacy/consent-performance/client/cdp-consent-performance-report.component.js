@@ -375,7 +375,7 @@ const CdpConsentPerformanceReport = () => {
                                                                 className={consents_report.orderBy === 'consent_type' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
                                                                 onClick={() => dispatch(getConsentReport(null, consents_report.codbase, consents_report.opt_type, 'consent_type', getorderType('consent_type')))}
                                                             >
-                                                                Consent Type
+                                                                Consent Category
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
                                                         </LinkContainer>
                                                     </th>
