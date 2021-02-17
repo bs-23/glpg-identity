@@ -184,7 +184,7 @@ const UpdateMyProfile = () => {
     }
 
     const renderServices = () => {
-        const services = myProfileInfo.serviceCategories;
+        const services = myProfileInfo.services;
         const servicesGrouped = new Map();
 
         services.forEach(s => {
@@ -344,10 +344,10 @@ const UpdateMyProfile = () => {
                                             </div>
                                         </div>
                                     </div>}
-                                    {myProfileInfo && myProfileInfo.serviceCategories && myProfileInfo.serviceCategories.length > 0 && <div className="row">
+                                    {myProfileInfo && myProfileInfo.services && myProfileInfo.services.length > 0 && <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
-                                                <label className="font-weight-bold-light mb-0 h4" htmlFor="serviceCategories">Services<span className="text-danger"></span></label>
+                                                <label className="font-weight-bold-light mb-0 h4" htmlFor="services">Services<span className="text-danger"></span></label>
                                                 <ul className="list-unstyled pl-0 py-2 mb-0">
                                                     {renderServices()}
                                                 </ul>

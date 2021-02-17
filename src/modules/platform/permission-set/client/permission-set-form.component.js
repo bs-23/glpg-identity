@@ -162,14 +162,14 @@ const ToggleList = ({ name, options, labelExtractor, idExtractor, allOptionID })
 
 export default function PermissionSetForm({ onSuccess, onError, permissionSetId }) {
     const [applications, setApplications] = useState([]);
-    const [serviceCategories, setServiceCategories] = useState([]);
+    const [services, setServices] = useState([]);
     const [permissionSet, setPermissionSet] = useState(null);
     const countries = useSelector(state => state.countryReducer.countries);
     const { addToast } = useToasts();
 
-    const initializeServiceCategoryValues = () => {
-        if(permissionSet && permissionSet.serviceCategories){
-            return permissionSet.serviceCategories;
+    const initializeServicesValues = () => {
+        if(permissionSet && permissionSet.services){
+            return permissionSet.services;
         }
         return [];
     }
@@ -192,7 +192,7 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
         title: permissionSet && permissionSet.title || '',
         description: permissionSet && permissionSet.description || '',
         countries: initializeCountryValues(),
-        serviceCategories: initializeServiceCategoryValues(),
+        services: initializeServicesValues(),
         applications: initializeApplicationValues(),
         app_country_service: ''
     };
@@ -202,9 +202,9 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
         setApplications(response.data.filter(app => app.type === 'hcp-portal'));
     }
 
-    const getServiceCategories = async () => {
-        const response = await axios.get('/api/serviceCategories');
-        setServiceCategories(response.data);
+    const getServices = async () => {
+        const response = await axios.get('/api/services');
+        setServices(response.data);
     }
 
     const getPermissionSet = async () => {
@@ -212,7 +212,7 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
         setPermissionSet({
             ...permSet,
             applications: permSet.ps_app.map(app => app.application.id),
-            serviceCategories: permSet.ps_sc.map(sc => sc.service.id),
+            services: permSet.ps_sc.map(sc => sc.service.id),
         });
     }
 
@@ -252,7 +252,7 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
     useEffect(() => {
         if(permissionSetId) getPermissionSet();
         getApplications();
-        getServiceCategories();
+        getServices();
     }, []);
 
     return (
@@ -290,12 +290,12 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
                                                             labelExtractor={item => item.name}
                                                         />
                                                     </FormField>
-                                                    <FormFieldFluid label="Select Services" name="serviceCategories" required={false} >
+                                                    <FormFieldFluid label="Select Services" name="services" required={false} >
                                                         {
-                                                            serviceCategories.map(sc => {
+                                                            services.map(sc => {
                                                                 return <ToggleList
                                                                     key={sc.id}
-                                                                    name="serviceCategories"
+                                                                    name="services"
                                                                     allOptionID={sc.id}
                                                                     options={
                                                                         [sc, ...(sc.childServices.map(cs => cs))]

@@ -36,7 +36,7 @@ describe('Permission sets component', () => {
             "slug": "hcp-portal"
         }]);
 
-        fakeAxios.onGet('/api/serviceCategories').reply(200, [{
+        fakeAxios.onGet('/api/services').reply(200, [{
             "id": "6ae61e07-c7b2-4c95-addb-e985eeab2202",
             "title": "Management of Customer Data Platform",
             "slug": "platform"

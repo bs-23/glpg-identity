@@ -119,7 +119,7 @@ async function createPermissionSet(req, res) {
             title,
             description,
             countries,
-            serviceCategories,
+            services,
             applications
         } = req.body;
 
@@ -139,18 +139,15 @@ async function createPermissionSet(req, res) {
 
         if(!created) return res.status(400).send('Permission set with the same title already exists.');
 
+        let services_permissionSet = [];
 
-        let serviceCategories_permissionSet = [];
+        services_permissionSet = services.map(id => ({ permissionset_id: doc.id, service_id: id }));
 
-        serviceCategories_permissionSet = serviceCategories.map(id => ({ permissionset_id: doc.id, service_id: id }));
-
-
-        await PermissionSet_Service.bulkCreate(serviceCategories_permissionSet);
+        await PermissionSet_Service.bulkCreate(services_permissionSet);
 
         let applications_permissionSet = [];
 
         applications_permissionSet = applications.map(id => ({ permissionset_id: doc.id, application_id: id }));
-
 
         await PermissionSet_Application.bulkCreate(applications_permissionSet);
 
@@ -170,7 +167,7 @@ async function createPermissionSet(req, res) {
 }
 
 async function editPermissionSet(req, res) {
-    const { title, description, countries, serviceCategories, applications } = req.body;
+    const { title, description, countries, services, applications } = req.body;
 
     try {
         if(!title.trim()) return res.status(400).send('Permission set title can not be empty.');
@@ -199,7 +196,7 @@ async function editPermissionSet(req, res) {
             updated_by: req.user.id
         });
 
-        await doc.setServices(serviceCategories);
+        await doc.setServices(services);
 
         await doc.setApplications(applications);
 

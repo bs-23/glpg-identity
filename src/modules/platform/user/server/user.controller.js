@@ -10,7 +10,6 @@ const logService = require(path.join(process.cwd(), 'src/modules/core/server/aud
 const ResetPassword = require('./reset-password.model');
 const UserProfile = require(path.join(process.cwd(), "src/modules/platform/profile/server/user-profile.model.js"));
 const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/userProfile-permissionSet.model"));
-// const User_Role = require(path.join(process.cwd(), "src/modules/platform/role/server/user-role.model"));
 const Role_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/role-permissionSet.model"));
 const Role = require(path.join(process.cwd(), "src/modules/platform/role/server/role.model"));
 const PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permission-set.model"));
@@ -40,7 +39,7 @@ function generateRefreshToken(doc) {
 }
 
 async function getProfilePermissions(user) {
-    let serviceCategories = [];
+    let services = [];
     const permissionSets = [];
     const userProfile = user.userProfile;
     let applications = [];
@@ -52,10 +51,10 @@ async function getProfilePermissions(user) {
 
             applications = permissions[0];
             countries = permissions[1];
-            serviceCategories = permissions[2];
+            services = permissions[2];
 
             permissionSets.push({
-                serviceCategories: serviceCategories.map(sc => ({ id: sc.id, title: sc.title, slug: sc.slug, parent_id: sc.parent_id })),
+                services: services.map(sc => ({ id: sc.id, title: sc.title, slug: sc.slug, parent_id: sc.parent_id })),
                 application: applications.length > 0 ? applications : null,
                 countries: countries
             });
@@ -71,7 +70,7 @@ async function getProfilePermissions(user) {
 }
 
 async function getRolePermissions(user) {
-    let serviceCategories = [];
+    let services = [];
     const permissionSets = [];
     let applications = [];
     let countries = [];
@@ -83,10 +82,10 @@ async function getRolePermissions(user) {
 
             applications = permissions[0];
             countries = permissions[1];
-            serviceCategories = permissions[2];
+            services = permissions[2];
 
             permissionSets.push({
-                serviceCategories: serviceCategories.map(sc => ({ id: sc.id, title: sc.title, slug: sc.slug, parent_id: sc.parent_id })),
+                services: services.map(sc => ({ id: sc.id, title: sc.title, slug: sc.slug, parent_id: sc.parent_id })),
                 application: applications.length > 0 ? applications : null,
                 countries: countries
             });

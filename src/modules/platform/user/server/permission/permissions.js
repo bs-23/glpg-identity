@@ -94,19 +94,19 @@ async function getProfileAndRolePermissions(user) {
     if (user.userProfile) {
         const profilePermissionSets = user.userProfile.up_ps;
         for (const userProPermSet of profilePermissionSets) {
-            const [profile_applications, profile_countries, profile_serviceCategories] = await getPermissionsFromPermissionSet(userProPermSet.ps);
+            const [profile_applications, profile_countries, profile_services] = await getPermissionsFromPermissionSet(userProPermSet.ps);
             applications = applications.concat(profile_applications);
             countries = countries.concat(profile_countries);
-            services = services.concat(profile_serviceCategories);
+            services = services.concat(profile_services);
         }
     }
 
     if (user.userRole) {
         for (const rolePermSet of user.userRole.role_ps) {
-            const [role_applications, role_countries, role_serviceCategories] = await getPermissionsFromPermissionSet(rolePermSet.ps);
+            const [role_applications, role_countries, role_services] = await getPermissionsFromPermissionSet(rolePermSet.ps);
             applications = applications.concat(role_applications);
             countries = countries.concat(role_countries);
-            services = services.concat(role_serviceCategories);
+            services = services.concat(role_services);
         }
     }
 
@@ -130,7 +130,7 @@ async function getUserPermissions(userId) {
 async function getPermissionsFromPermissionSet(permissionSet) {
     let applications = [];
     let countries = [];
-    let serviceCategories = [];
+    let services = [];
 
     if (permissionSet.ps_app) {
         for (const ps_app of permissionSet.ps_app) {
@@ -146,7 +146,7 @@ async function getPermissionsFromPermissionSet(permissionSet) {
         for (const ps_sc of permissionSet.ps_sc) {
             const userServiceCategory = ps_sc.service;
 
-            serviceCategories.push(userServiceCategory);
+            services.push(userServiceCategory);
         }
     }
 
@@ -155,7 +155,7 @@ async function getPermissionsFromPermissionSet(permissionSet) {
     }
 
 
-    return [applications, countries, serviceCategories];
+    return [applications, countries, services];
 }
 
 async function getRequestingUserPermissions(user) {

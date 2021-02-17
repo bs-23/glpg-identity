@@ -15,15 +15,15 @@ const getPermissionsFromPermissionSet = (permissionSets) => {
 
     let countries = [];
     let applications = [];
-    let serviceCategories = [];
+    let services = [];
 
     permissionSets.map(ps => {
         ps.countries && (countries = countries.concat(ps.countries));
         ps.application && (applications = applications.concat(ps.application));
-        ps.serviceCategories && (serviceCategories = serviceCategories.concat(ps.serviceCategories));
+        ps.services && (services = services.concat(ps.services));
     })
 
-    return [countries, applications, serviceCategories];
+    return [countries, applications, services];
 }
 
 const getUserPermissions = (loggedInUser) => {
@@ -57,9 +57,9 @@ const getUserPermissions = (loggedInUser) => {
 
     const userCountries = [...new Set([...profile_countries, ...role_countries])];
     const userApps = _.uniqBy([...profile_applications, ...role_applications], app => app.slug);
-    const userServiceCategories = _.uniqBy([...profile_service_categories, ...role_service_categories], sc => sc.slug);
+    const userServices = _.uniqBy([...profile_service_categories, ...role_service_categories], sc => sc.slug);
 
-    return [userCountries, userApps, userServiceCategories];
+    return [userCountries, userApps, userServices];
 }
 
 function sortItems(items, propertyName, type) {
@@ -98,11 +98,11 @@ export default function reducer(state = initialState, action) {
         case Types.LOGIN_FULFILLED:
         case Types.GET_PROFILE_FULFILLED: {
             const loggedInUser = action.payload.data;
-            const [userCountires, userApps, userServiceCategories] = getUserPermissions(loggedInUser);
+            const [userCountires, userApps, userServices] = getUserPermissions(loggedInUser);
 
             loggedInUser.countries = userCountires;
             loggedInUser.applications = userApps;
-            loggedInUser.serviceCategories = userServiceCategories;
+            loggedInUser.services = userServices;
 
             return {
                 ...state,
@@ -111,11 +111,11 @@ export default function reducer(state = initialState, action) {
         }
         case Types.UPDATE_PROFILE_FULFILLED: {
             const loggedInUser = action.payload.data;
-            const [userCountires, userApps, userServiceCategories] = getUserPermissions(loggedInUser);
+            const [userCountires, userApps, userServices] = getUserPermissions(loggedInUser);
 
             loggedInUser.countries = userCountires;
             loggedInUser.applications = userApps;
-            loggedInUser.serviceCategories = userServiceCategories;
+            loggedInUser.services = userServices;
 
             return {
                 ...state,

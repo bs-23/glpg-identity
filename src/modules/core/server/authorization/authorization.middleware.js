@@ -15,33 +15,33 @@ async function getUserWithProfiles(id) {
 }
 
 async function getProfilePermissions(profile) {
-    const serviceCategories = [];
+    const services = [];
     if (profile) {
         for (const userProPermSet of profile.up_ps) {
             let permissionSet = userProPermSet.ps;
             for (const psc of permissionSet.ps_sc) {
-                serviceCategories.push(psc.service);
+                services.push(psc.service);
             }
 
         }
 
-        return serviceCategories;
+        return services;
     }
 }
 
 async function getRolePermissions(userRole) {
     if (!userRole) return [];
 
-    const serviceCategories = [];
+    const services = [];
 
     for (const rolePermSet of userRole.role_ps) {
         let permissionSet = rolePermSet.ps;
         for (const psc of permissionSet.ps_sc) {
-            serviceCategories.push(psc.service);
+            services.push(psc.service);
         }
     }
 
-    return serviceCategories;
+    return services;
 }
 
 const ServiceGuard = (allowedServices) => {
