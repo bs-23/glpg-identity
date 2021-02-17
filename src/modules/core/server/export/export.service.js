@@ -1,13 +1,15 @@
 const XLSX = require('xlsx');
-const path = require('path');
 
-function exportExcel(data, filename, workSheetName) {
+function exportToExcel(data, workSheetName) {
     const workBook = XLSX.utils.book_new();
     const workSheet = XLSX.utils.json_to_sheet(data);
     XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
-    XLSX.writeFile(workBook, filename);
-    const filePath = path.join(process.cwd(), filename);
-    return filePath;
+
+    var wbbuf = XLSX.write(workBook, {
+        type: 'base64'
+    });
+    const fileBuffer = Buffer.from(wbbuf, 'base64');
+    return fileBuffer;
 }
 
-exports.exportExcel = exportExcel;
+exports.exportToExcel = exportToExcel;

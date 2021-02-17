@@ -8,8 +8,8 @@ import { BrowserRouter } from 'react-router-dom';
 import MockAdapter from 'axios-mock-adapter'
 import { ToastProvider } from 'react-toast-notifications';
 import store from '../../src/modules/core/client/store.js';
-import ConsentCategories from '../../src/modules/privacy/client/consent-category/categories.component';
-import { getConsentCategories } from '../../src/modules/privacy/client/consent-category/category.actions';
+import { ConsentCategories } from '../../src/modules/privacy/';
+import { categoryActions } from '../../src/modules/privacy/';
 import { act } from 'react-dom/test-utils';
 import { screen } from '@testing-library/dom'
 import { login } from '../../src/modules/platform/user/client/user.actions';
@@ -48,7 +48,7 @@ describe('Consent categories component', () => {
         }]
         mockAxios.onGet('/api/privacy/consent-categories').reply(200, consent_categories);
 
-        await store.dispatch(getConsentCategories());
+        await store.dispatch(categoryActions.getConsentCategories());
 
         const category = {
             id: "1",

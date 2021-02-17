@@ -359,7 +359,10 @@ const SearchProfessionalHcp = (props) => {
                                                     scrollToResult(response.data.results.length === 0);
                                                 }
                                                 catch(err){
-                                                    console.log(err);
+                                                    addToast('Error! Please try again.', {
+                                                        appearance: 'error',
+                                                        autoDismiss: true
+                                                    });
                                                 }
                                             })
                                             .catch(err => {

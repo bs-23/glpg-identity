@@ -224,7 +224,7 @@ async function searchOklaHcos(req, res) {
         const data = {
             totalNumberOfResults: searchResponse.totalNumberOfResults,
             numberOfWorkplaces: searchResponse.numberOfWorkplaces,
-            resultSize: searchResponse.resultSize,
+            resultSize: limit,
             results
         };
 

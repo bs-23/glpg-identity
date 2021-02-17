@@ -2,7 +2,8 @@ const archive = require('./archive.model');
 
 async function archiveData(data) {
     try {
-        await archive.create(data);
+        const arc = await archive.create(data);
+        return arc.dataValues;
     } catch (err) {
         console.error(err);
     }

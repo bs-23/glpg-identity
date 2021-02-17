@@ -108,7 +108,6 @@ describe('Search hcp organizational component', () => {
         expect(screen.getByText('Postal Code')).toBeTruthy();
         expect(screen.getByText('Specialty')).toBeTruthy();
         expect(screen.getByText('Identifiers')).toBeTruthy();
-        expect(screen.getByText('Workplace - Identifier')).toBeTruthy();
         expect(screen.getByText('CLEAR')).toBeTruthy();
         expect(screen.getByText('SEARCH')).toBeTruthy();
     });

@@ -54,6 +54,10 @@ async function init() {
     require(path.join(process.cwd(), 'src/modules/core/server/filter/filter.model'));
     require(path.join(process.cwd(), 'src/modules/platform/application/server/data.model'));
     require(path.join(process.cwd(), 'src/modules/core/server/archive/archive.model'));
+    require(path.join(process.cwd(), 'src/modules/partner/manage-requests/server/partner-request.model'));
+    require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-vendor.model'));
+    require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner.model'));
+    require(path.join(process.cwd(), 'src/modules/core/server/storage/file.model'));
 
     await sequelize.cdpConnector.sync();
 
@@ -383,6 +387,21 @@ async function init() {
                     logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
                     created_by: admin.id,
                     updated_by: admin.id
+                },
+                {
+                    id: 'addd1e75-cc32-4d16-b88b-38e62dd224c4',
+                    name: 'Patients Organization',
+                    slug: convertToSlug('Patients Organization'),
+                    email: 'patients-organization@glpg.com',
+                    password: 'P@ssword123',
+                    approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
+                    auth_secret: 'b248eaa4-583f-4ecd-9e9c-be8f58ab3c3e',
+                    logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
+                    created_by: admin.id,
+                    updated_by: admin.id,
+                    metadata: JSON.stringify({
+                        request_notification_link: 'https://patients-organization-dev.glpg.com/bin/public/glpg-forms/sendForm.invitation.html'
+                    })
                 }
             ];
 
@@ -584,10 +603,10 @@ async function init() {
         applicationSeeder,
         permissionSetApplicationsSeeder,
         consentSeeder], function (err) {
-        if (err) console.error(err);
-        else console.info('DB seed completed!');
-        process.exit();
-    });
+            if (err) console.error(err);
+            else console.info('DB seed completed!');
+            process.exit();
+        });
 }
 
 init();

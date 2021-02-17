@@ -101,7 +101,7 @@ describe('Consent Routes', () => {
             });
 
         expect(response2.statusCode).toBe(200);
-        expect(response2.res.headers['content-type']).toMatch('text/plain');
+        expect(response2.res.headers['content-type']).toMatch('application/json');
 
         const response3 = await request
             .get(`/api/cdp-consents/${response1.body.id}`)
