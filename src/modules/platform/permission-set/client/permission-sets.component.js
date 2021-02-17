@@ -113,12 +113,12 @@ export default function ManagePermissionSets() {
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
                                             <th className="py-2" width="15%">Title</th>
-                                            <th className="py-2" width="6%">Type</th>
+                                            <th className="py-2" width="8%">Type</th>
                                             <th className="py-2" width="15%">Description</th>
                                             <th className="py-2" width="9%">Applications</th>
-                                            <th className="py-2" width="17%">Countries</th>
-                                            <th className="py-2" width="32%">Services</th>
-                                            <th className="py-2" width="5%">Action</th>
+                                            <th className="py-2" width="15%">Countries</th>
+                                            <th className="py-2" width="30%">Services</th>
+                                            <th className="py-2" width="8%">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">

@@ -138,11 +138,11 @@ const ToggleList = ({ name, options, labelExtractor, idExtractor, allOptionID })
         options.unshift(allOptionsObject);
     }
 
-    return <FieldArray
+    return <div className="col-12 col-sm-6"><FieldArray
                 name={name}
                 render={arrayHelpers => (
                     options.map(item =>
-                        <div key={idExtractor(item)} className={`d-flex align-items-center custom-control custom-checkbox ${allOptionID && idExtractor(item) === allOptionID ? 'font-weight-bold-light pt-3 pb-1' : 'ml-4 font-weight-normal'}`}>
+                        <div key={idExtractor(item)} className={`d-flex align-items-center custom-control custom-checkbox ${allOptionID && idExtractor(item) === allOptionID ? 'font-weight-bold-light pt-3 pb-1' : 'ml-4  font-weight-normal'}`}>
                             <input name={name}
                                 className="custom-control-input"
                                 type="checkbox"
@@ -155,8 +155,8 @@ const ToggleList = ({ name, options, labelExtractor, idExtractor, allOptionID })
                             <label className="custom-control-label" for={idExtractor(item)}>{labelExtractor(item)}</label>
                         </div>
                     )
-                )}
-            />
+        )}
+     /></div>
 }
 
 
@@ -291,7 +291,7 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
                                                         />
                                                     </FormField>
                                                     <FormFieldFluid label="Select Services" name="services" required={false} >
-                                                        {
+                                                        <div className="row align-items-start">{
                                                             services.map(sc => {
                                                                 return <ToggleList
                                                                     key={sc.id}
@@ -304,7 +304,7 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
                                                                     labelExtractor={item => item.title}
                                                                 />
                                                             })
-                                                        }
+                                                        }</div>
                                                     </FormFieldFluid>
                                                     {permissionSetId &&
                                                         <div className="col-12 py-2">
