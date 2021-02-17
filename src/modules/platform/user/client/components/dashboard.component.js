@@ -36,7 +36,7 @@ export default function Dashboard() {
                                         </NavLink>
                                     </li>
                                     <li className="pr-sm-4 pb-4 service__item">
-                                        <NavLink to="/business-partner" className="d-flex align-items-center d-sm-block px-3 py-lg-5 service__link disabled">
+                                        <NavLink to="/business-partner" className="d-flex align-items-center d-sm-block px-3 py-lg-5 service__link">
                                             <i className="icon icon-partner d-block service__icon"></i>
                                             Business Partner Management
                                         </NavLink>
