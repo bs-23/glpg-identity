@@ -136,4 +136,25 @@
             }
         }
     }
+
+    @media (min-width: $screen-phone) {
+        &__list {
+
+            &-item {
+
+                &-col {
+                    padding-right: 10px !important;
+                    flex: 0 0 30%;
+
+                    &.small {
+                        flex: 0 0 40px;
+                    }
+
+                    &.large {
+                        flex: 0 0 calc(100% - (30% + 40px));
+                    }
+                }
+            }
+        }
+    }
 }
