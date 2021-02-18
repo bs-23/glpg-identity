@@ -69,13 +69,13 @@ export default function Inbox() {
                                 ? <div className="cdp-inbox__tab-detail">
                                     {hcps.users !== undefined && hcps.users.length < 6 &&
                                         hcps.users.map((user, key) => <ul key={key} className="cdp-inbox__list p-0 m-0">
-                                            <li key={key} className="cdp-inbox__list-item d-flex justify-content-between  align-items-center border-bottom py-3 px-3">
+                                            <li key={key} className="cdp-inbox__list-item d-flex justify-content-between  align-items-center border-bottom p-2 p-lg-3">
                                                 <span className="cdp-inbox__list-item-col large cdp-text-primary font-weight-bold text-break">{user.email}</span>
                                                 <span className="cdp-inbox__list-item-col cdp-text-primary font-weight-bold px-3 text-break">{new Date(user.created_at).toLocaleDateString('en-GB', {
                                                     day: 'numeric', month: 'short', year: 'numeric'
                                                 }).replace(/ /g, ' ')}</span>
-                                                <span className="cdp-inbox__list-item-col text-break">
-                                                    <button className="btn cdp-btn-secondary btn-sm text-white" onClick={() => { setModalId(key); setShowModal(true) }}>Update Status</button>
+                                                <span className="cdp-inbox__list-item-col small text-break">
+                                                    <button className="btn cdp-btn-secondary btn-sm text-white" onClick={() => { setModalId(key); setShowModal(true) }}><i className="fas fa-user-edit d-block d-sm-none"></i><span className="d-none d-sm-inline-block">Update Status</span></button>
                                                 </span>
                                             </li>
                                             {(showModal && modalId === key) && <StatusupdateModal user={user} show={showModal} onHide={() => { setShowModal(false) }} type={'inbox'}/>}
@@ -83,7 +83,7 @@ export default function Inbox() {
                                     )}
 
                                     {hcps.users !== undefined && hcps.users.length !== 0 ?
-                                        <Link to={{ pathname: "/information/list/cdp",  state: { filterSetting } }} className="d-inline-block p-3 text-uppercase cdp-text-secondary active small font-weight-bold">
+                                        <Link to={{ pathname: "/information/list/cdp",  state: { filterSetting } }} className="d-inline-block p-2 p-lg-3 text-uppercase cdp-text-secondary active small font-weight-bold">
                                             {hcps.total > 5 && 'More Pending'}
                                         </Link>
                                         : <h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found</h5>
