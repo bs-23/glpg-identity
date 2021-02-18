@@ -10,7 +10,7 @@ export default function ManageRequestsRoutes() {
 
     return (
         <Switch>
-            <PrivateRoute exact path={path} component={BusinessPartnerManagement} />
+            <PrivateRoute exact path={path} component={BusinessPartnerManagement} module="business-partner" />
         </Switch>
     );
 }
