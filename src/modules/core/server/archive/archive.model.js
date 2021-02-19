@@ -20,7 +20,7 @@ const Archive = sequelize.cdpConnector.define('archive', {
     },
     data: {
         allowNull: false,
-        type: DataTypes.STRING(10000)
+        type: DataTypes.JSON
     },
     actor: {
         allowNull: false,

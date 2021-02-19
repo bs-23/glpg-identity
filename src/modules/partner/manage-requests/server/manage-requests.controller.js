@@ -272,7 +272,7 @@ async function deletePartnerRequest(req, res) {
         const archive = await ArchiveService.archiveData({
             object_id: partnerRequest.id,
             table_name: 'partner_requests',
-            data: JSON.stringify(partnerRequest.dataValues),
+            data: partnerRequest.dataValues,
             actor: req.user.id
         });
 
