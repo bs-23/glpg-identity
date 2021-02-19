@@ -11,12 +11,20 @@ paths:
                         schema:
                             type: object
                             properties:
+                                type:
+                                    type: string
+                                    enum:
+                                    - hcp
+                                    - hco
                                 request_id:
                                     type: string
                                 first_name:
                                     type: string
                                 last_name:
                                     type: string
+                                organization_name:
+                                    type: string
+                                    description: Only for HCO (required)
                                 address:
                                     type: string
                                 city:
@@ -27,11 +35,18 @@ paths:
                                     type: string
                                 telephone:
                                     type: string
-                                type:
+                                individual_type:
                                     type: string
+                                    description: Only for HCP
                                     enum:
                                     - individual
                                     - legal_entity
+                                organization_type:
+                                    type: string
+                                    description: Only for HCO
+                                    enum:
+                                    - healthcare_org
+                                    - patient_org
                                 registration_number:
                                     type: string
                                 country_iso2:
@@ -42,10 +57,13 @@ paths:
                                     type: string
                                 is_italian_hcp:
                                     type: boolean
+                                    description: Only for HCP
                                 should_report_hco:
                                     type: boolean
+                                    description: Only for HCP
                                 beneficiary_category:
                                     type: string
+                                    description: Only for HCP
                                     enum:
                                     - beneficiary_category_1
                                     - beneficiary_category_2
@@ -64,11 +82,11 @@ paths:
                                         type: string
                                         format: binary
                             required:
+                              - type
                               - request_id
                               - first_name
                               - last_name
                               - email
-                              - type
                               - country_iso2
                               - locale
                               - uuid
@@ -81,7 +99,7 @@ paths:
                                 type: object
                                 properties:
                                     data:
-                                        $ref: "#/components/schemas/partnerHcpProfile"
+                                        $ref: "#/components/schemas/partnerProfile"
                                     errors:
                                         $ref: "#/components/schemas/errorBodyInSuccess"
                 400:
@@ -112,7 +130,7 @@ paths:
                                 type: object
                                 properties:
                                     data:
-                                        $ref: "#/components/schemas/partnerHcpProfile"
+                                        $ref: "#/components/schemas/partnerProfile"
                                     errors:
                                         $ref: "#/components/schemas/errorBodyInSuccess"
                 401:
@@ -205,7 +223,7 @@ paths:
                                 type: object
                                 properties:
                                     data:
-                                        $ref: "#/components/schemas/partnerHcpProfile"
+                                        $ref: "#/components/schemas/partnerProfile"
                                     errors:
                                         $ref: "#/components/schemas/errorBodyInSuccess"
                 400:
@@ -725,11 +743,16 @@ paths:
 
 components:
     schemas:
-        partnerHcpProfile:
+        partnerProfile:
             type: object
             properties:
                 id:
                     type: string
+                type:
+                    type: string
+                    enum:
+                    - hcp
+                    - hco
                 status:
                     type: string
                     enum:
@@ -740,8 +763,13 @@ components:
                     type: string
                 first_name:
                     type: string
+                    description: Value of Contact's first name of HCO
                 last_name:
                     type: string
+                    description: Value of Contact's last name of HCO
+                organization_name:
+                    type: string
+                    description: Only for HCO
                 address:
                     type: string
                 city:
@@ -752,11 +780,18 @@ components:
                     type: string
                 telephone:
                     type: string
-                type:
+                individual_type:
                     type: string
+                    description: Only for HCP
                     enum:
                     - individual
                     - legal_entity
+                organization_type:
+                    type: string
+                    description: Only for HCO
+                    enum:
+                    - healthcare_org
+                    - patient_org
                 registration_number:
                     type: string
                 country_iso2:
@@ -767,10 +802,13 @@ components:
                     type: string
                 is_italian_hcp:
                     type: boolean
+                    description: Only for HCP
                 should_report_hco:
                     type: boolean
+                    description: Only for HCP
                 beneficiary_category:
                     type: string
+                    description: Only for HCP
                     enum:
                     - beneficiary_category_1
                     - beneficiary_category_2

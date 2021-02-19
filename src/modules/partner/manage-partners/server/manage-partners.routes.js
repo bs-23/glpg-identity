@@ -11,7 +11,7 @@ const multer = require(path.join(process.cwd(), 'src/config/server/lib/multer'))
 module.exports = app => {
     app.route('/api/partners/hcps')
         .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_BUSINESS_PARTNER]), controller.getPartnerHcps)
-        .post(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), validate(partnerHcpSchema), controller.createPartnerHcp);
+        .post(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), controller.createPartnerHcp);
 
     app.route('/api/partners/hcps/:id')
         .get(passport.authenticate('application-jwt', { session: false }), controller.getHcpPartnerById)

@@ -152,13 +152,12 @@ async function getPartnerHcp(req, res) {
 
 async function createPartnerHcp(req, res) {
     const response = new Response({}, []);
-    const entityType = 'hcp';
     try {
         const files = req.files;
 
-        const { request_id, first_name, last_name, address, city, post_code, email, telephone,
-            type, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
-            iban, bank_name, bank_account_no, currency } = req.body;
+        const { type, request_id, first_name, last_name, organization_name, address, city, post_code, email, telephone, country_iso2, locale, registration_number, uuid, individual_type, organization_type, is_italian_hcp, should_report_hco, beneficiary_category, iban, bank_name, bank_account_no, currency } = req.body;
+
+        const entityType = type;
 
         if (response.errors.length) return res.status(400).send(response);
 
@@ -184,10 +183,17 @@ async function createPartnerHcp(req, res) {
         };
 
         data.entity_type = entityType;
-        data.individual_type = type;
+        if (entityType === 'hcp') {
+            data.individual_type = individual_type;
+        }
+
+        if (entityType === 'hco') {
+            data.organization_type = organization_type;
+            data.organization_name = organization_name;
+        }
         data.onekey_id = partnerRequest.onekey_id;
 
-        const [partnerHcp, created] = await Partner.findOrCreate({
+        const [partnerHcx, created] = await Partner.findOrCreate({
             where: { request_id: request_id },
             defaults: data
         });
@@ -199,20 +205,29 @@ async function createPartnerHcp(req, res) {
 
         await partnerRequest.update({ status: 'submitted' });
 
-        await uploadDucuments(partnerHcp, entityType, files);
+        await uploadDucuments(partnerHcx, entityType, files);
 
-        partnerHcp.dataValues.type = partnerHcp.dataValues.individual_type;
+        partnerHcx.dataValues.type = partnerHcx.dataValues.individual_type;
 
-        delete partnerHcp.dataValues.created_at;
-        delete partnerHcp.dataValues.updated_at;
-        delete partnerHcp.dataValues.individual_type;
-        delete partnerHcp.dataValues.organization_name;
-        delete partnerHcp.dataValues.organization_type;
-        delete partnerHcp.dataValues.entity_type;
-        delete partnerHcp.dataValues.onekey_id;
+        if (entityType === 'hcp') {
+            delete partnerHcx.dataValues.organization_name;
+            delete partnerHcx.dataValues.organization_type;
+        }
 
+        if (entityType === 'hco') {
+            delete partnerHcx.dataValues.individual_type;
+            delete partnerHcx.dataValues.is_italian_hcp;
+            delete partnerHcx.dataValues.should_report_hco;
+            delete partnerHcx.dataValues.beneficiary_category;
+        }
 
-        response.data = partnerHcp;
+        partnerHcx.dataValues.type = partnerHcx.dataValues.entity_type;
+        delete partnerHcx.dataValues.entity_type;
+        delete partnerHcx.dataValues.created_at;
+        delete partnerHcx.dataValues.updated_at;
+        delete partnerHcx.dataValues.onekey_id;
+
+        response.data = partnerHcx;
         res.json(response);
 
     } catch (err) {
