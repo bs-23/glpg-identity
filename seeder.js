@@ -43,6 +43,7 @@ async function init() {
     const PermissionSet_Service = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionset-service.model"));
     const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-application.model"));
     const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/userProfile-permissionSet.model"));
+    const Localization = require(path.join(process.cwd(), 'src/modules/core/server/localization/localization.model'));
     require(path.join(process.cwd(), "src/modules/platform/role/server/role.model"));
     require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
     const Faq = require(path.join(process.cwd(), 'src/modules/platform/faq/server/faq.model'));
@@ -598,6 +599,29 @@ async function init() {
         });
     }
 
+    function localizationSeeder(callback) {
+        const localizations = [
+            { language_family: 'English', language_variant: 'British English', country_iso2: 'GB', locale: 'en_GB' },
+            { language_family: 'English', language_variant: 'English', locale: 'en' },
+            { language_family: 'Dutch', language_variant: 'Belgian Dutch', country_iso2: 'BE', locale: 'nl_BE' },
+            { language_family: 'Dutch', language_variant: 'Standard Dutch', country_iso2: 'NL', locale: 'nl_NL' },
+            { language_family: 'French', language_variant: 'Belgian French', country_iso2: 'BE', locale: 'fr_BE' },
+            { language_family: 'French', language_variant: 'Standard French', country_iso2: 'FR', locale: 'fr_FR' },
+            { language_family: 'French', language_variant: 'Luxembourgish French', country_iso2: 'LU', locale: 'fr_LU' },
+            { language_family: 'German', language_variant: 'Standard German', country_iso2: 'DE', locale: 'de_DE' },
+            { language_family: 'Spanish', language_variant: 'Castilian Spanish', country_iso2: 'ES', locale: 'es_ES' },
+        ]
+
+        Localization.destroy({ truncate: { cascade: true } }).then(() => {
+            Localization.bulkCreate(localizations, {
+                returning: true,
+                ignoreDuplicates: false
+            }).then(function () {
+                callback();
+            });
+        });
+    }
+
     async.waterfall([
         userSeeder,
         userProfileSeeder,
@@ -609,7 +633,9 @@ async function init() {
         userProfilePermissionSetSeeder,
         applicationSeeder,
         permissionSetApplicationsSeeder,
-        consentSeeder], function (err) {
+        consentSeeder,
+        localizationSeeder
+    ], function (err) {
             if (err) console.error(err);
             else console.info('DB seed completed!');
             process.exit();

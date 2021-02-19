@@ -12,6 +12,8 @@ AWS.config.update({
 });
 
 async function send(options) {
+    options.data.year = new Date().getFullYear();
+
     const template = options.template || await getTemplate(options.templateUrl);
 
     const htmlBody = options.data

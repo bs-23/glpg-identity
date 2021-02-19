@@ -290,12 +290,12 @@ async function createConsent(req, res) {
             return res.status(400).send('Please provide at least one translation.');
         }
 
-        const invalidTranslations = translations.filter(t => !t.country_iso2 || !t.lang_code || !t.rich_text);
+        const invalidTranslations = translations.filter(t => !t.locale || !t.rich_text);
         if (invalidTranslations && invalidTranslations.length) {
             return res.status(400).send('Translations not valid.');
         }
 
-        const uniqueTranslations = new Set(translations.map(t => t.country_iso2.toLowerCase() + t.lang_code.toLowerCase()));
+        const uniqueTranslations = new Set(translations.map(t => t.locale.toLowerCase()));
         if (uniqueTranslations.size < translations.length) {
             return res.status(400).send('Please remove duplicate translations.');
         }
@@ -330,18 +330,17 @@ async function createConsent(req, res) {
         if (created) {
             data.translations = [];
             await Promise.all(translations
-                .filter(translation => translation.country_iso2 && translation.lang_code && translation.rich_text)
+                .filter(translation => translation.locale && translation.rich_text)
                 .map(async (translation) => {
-                    const locale = `${translation.lang_code.toLowerCase()}_${translation.country_iso2.toUpperCase()}`;
                     const [consentTransation, translationCreated] = await ConsentLanguage.findOrCreate({
                         where: {
                             consent_id: consent.id,
                             locale: {
-                                [Op.iLike]: locale
+                                [Op.iLike]: translation.locale
                             }
                         },
                         defaults: {
-                            locale: locale,
+                            locale: translation.locale,
                             rich_text: translation.rich_text,
                             consent_id: consent.id
                         }
@@ -393,7 +392,7 @@ async function updateCdpConsent(req, res) {
         if (!translations || !translations.length) {
             return res.status(400).send('Please provide at least one translation.');
         } else {
-            const uniqueTranslations = new Set(translations.map(t => t.country_iso2.toLowerCase() + t.lang_code.toLowerCase()));
+            const uniqueTranslations = new Set(translations.map(t => t.locale.toLowerCase()));
             if (uniqueTranslations.size < translations.length) return res.status(400).send('Please remove duplicate translations.');
         }
 
@@ -435,10 +434,8 @@ async function updateCdpConsent(req, res) {
 
         if (translations) {
             await Promise.all(translations
-                .filter(translation => translation.country_iso2 && translation.lang_code && translation.rich_text)
+                .filter(translation => translation.locale && translation.rich_text)
                 .map(async (translation, idx) => {
-                    const locale = `${translation.lang_code.toLowerCase()}_${translation.country_iso2.toUpperCase()}`;
-
                     const currentTranslationFromDB = allTranslationsForConsent.find(at => at.id === translation.id);
 
                     if (currentTranslationFromDB) {
@@ -446,7 +443,7 @@ async function updateCdpConsent(req, res) {
                             const previousTranslation = { ...currentTranslationFromDB.dataValues };
 
                             await currentTranslationFromDB.update({
-                                locale,
+                                locale: translation.locale,
                                 rich_text: translation.rich_text,
                                 consent_id: consent.id
                             })
@@ -471,7 +468,7 @@ async function updateCdpConsent(req, res) {
                         try{
                             const createdTranslation = await ConsentLanguage.create({
                                 consent_id: consent.id,
-                                locale,
+                                locale: translation.locale,
                                 rich_text: translation.rich_text
                             });
 
