@@ -11,6 +11,7 @@ const archiveService = require(path.join(process.cwd(), 'src/modules/core/server
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-consents.model'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model'));
+const ConsentCategory = require(path.join(process.cwd(), 'src/modules/privacy/consent-category/server/consent-category.model'));
 const ConsentLocale = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent-locale.model'));
 const ConsentCountry = require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model'));
 const Application = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.model'));
@@ -627,6 +628,80 @@ async function registrationLookup(req, res) {
         logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
+    }
+}
+
+async function syncConsent(onekeyid, email, consents){
+    async function extractDirectMarketingConsent(hcp_consents){
+        let selected_consent = null;
+
+        await Promise.all(hcp_consents.map(async hcp_consent => {
+            const consent = await Consent.findOne({
+                where: {
+                    id: hcp_consent.consent_id
+                },
+                include: [
+                    {
+                        model: ConsentCategory,
+                        attributes: ['title']
+                    }
+                ],
+                attributes: ['consent_id', 'opt_type', 'consent_confirmed', 'updated_at'],
+                subQuery: false
+            });
+
+            if(consent?.consent_category?.title.toLowerCase() === 'direct_marketing') selected_consent = consent;
+        }));
+
+        return selected_consent;
+    }
+
+    const consent = extractDirectMarketingConsent(consents);
+
+    try{
+        const searchUrl = 'https://cs110.salesforce.com/services/data/v48.0';
+
+        // get account from salesforce
+        const query = `SELECT + id, PersonEmail, Secondary_Email__c + from + Account + WHERE + QIDC__OneKeyId_IMS__c = ${onekeyid}`;
+        const account = await axios.get(`${searchUrl}/query?q=${query}`);
+        const userInfo = account.data?.records[0];
+
+        if(userInfo?.length === 0) return;
+
+        const account_id = userInfo.Id;
+        // update email
+        if(!userInfo.PersonEmail){
+            await axios.patch(`${searchUrl}/sobjects/Account/${account_id}`, {
+                PersonEmail: email
+            });
+        }
+        if(userInfo.PersonEmail && userInfo.PersonEmail != email && !userInfo.Secondary_Email__c){
+            await axios.patch(`${searchUrl}/sobjects/Account/${account_id}`, {
+                Secondary_Email__c: email
+            });
+        }
+
+        // get dynamically content type id of Galapagos News
+
+        const content_type = await axios.get(`${searchUrl}/query?q=SELECT + id + from + Content_Type_vod__c + WHERE + name = 'Galapagos news'`);
+        const content_type_id = content_type.data?.records[0]?.Id;
+
+        // create multi-channel consent
+        // RecordTypeId hidden value
+        if(consent){
+            await axios.post(`${searchUrl}/sobjects/Multichannel_Consent_vod__c`, {
+                "Account_vod__c": account_id,
+                "RecordTypeId": "0124J000000ouUlQAI",
+                "Capture_Datetime_vod__c": consent.updated_at,
+                "Channel_Value_vod__c": email,
+                "Opt_Type_vod__c": "Opt_In_vod",
+                "Content_Type_vod__c": content_type_id,
+                "GLPG_Consent_Source__c": "Website"
+            });
+        }
+    }
+    catch(err){
+        console.log(err);
     }
 }
 
