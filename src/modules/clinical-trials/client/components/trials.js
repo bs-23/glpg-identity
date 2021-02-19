@@ -1,5 +1,6 @@
-import React from 'react';
+import React, {useState } from 'react';
 import axios from 'axios';
+import StoryForm from './clinical-trials-story-form.component';
 
 var dumpData =  function() {
     const url = `/api/clinical-trials`;
@@ -45,12 +46,24 @@ var mergeProcessData =  function() {
 
 
 const ClinicalTrials = () => {
+    const [show, setShow] = useState(false);
+    const [addMode, setAddMode] = useState(false);
+    const addDataSample = {
+        title: 'Sample Title',
+        trials : [1,2,3],
+        version: 'v1',
+        story: 'sample story',
+        story_plaintext: 'sample story plain text'
+    }
     return (
         <div>
             <button onClick={dumpData}>Dump Data</button>
             <button onClick={showAllVersions}>Show All Versions</button>
             <button onClick={mergeProcessData}>Merge</button>
-            <button onClick={()=>{}}>Add Story</button>
+            <button onClick={()=>{setShow(true); setAddMode(true);}}>Add Story</button>
+            
+    
+            {show ? <StoryForm addMode={addMode} changeShow={(val) => setShow(val)} show={show} trialIDs={[1,2,3]} addData = {addDataSample} /> : null}
         </div>
     );
 }

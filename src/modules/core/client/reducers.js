@@ -4,6 +4,7 @@ import countryReducer from '../../core/client/country/country.reducer';
 import consentReducer from '../../consent/client/consent.reducer';
 import { faqReducer, userReducer, profileReducer, roleReducer, permissionSetReducer } from '../../platform';
 import consentCategoryReducer from '../../consent/client/consent-category/category.reducer';
+import clinicalTrialsReducer from '../../clinical-trials/client/components/clinical-trials.reducer'
 
 export default combineReducers({
     userReducer,
@@ -14,5 +15,6 @@ export default combineReducers({
     faqReducer,
     profileReducer,
     roleReducer,
-    permissionSetReducer
+    permissionSetReducer,
+    clinicalTrialsReducer
 })
