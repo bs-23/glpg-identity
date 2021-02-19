@@ -631,73 +631,90 @@ async function registrationLookup(req, res) {
     }
 }
 
-async function syncConsent(onekeyid, email, consents){
-    async function extractDirectMarketingConsent(hcp_consents){
-        let selected_consent = null;
-
-        await Promise.all(hcp_consents.map(async hcp_consent => {
-            const consent = await Consent.findOne({
-                where: {
-                    id: hcp_consent.consent_id
-                },
-                include: [
-                    {
-                        model: ConsentCategory,
-                        attributes: ['title']
-                    }
-                ],
-                attributes: ['consent_id', 'opt_type', 'consent_confirmed', 'updated_at'],
-                subQuery: false
-            });
-
-            if(consent?.consent_category?.title.toLowerCase() === 'direct_marketing') selected_consent = consent;
-        }));
-
-        return selected_consent;
-    }
-
-    const consent = extractDirectMarketingConsent(consents);
+async function syncConsent(hcpUser){
+    if(!hcpUser.individual_id_onekey) return;
 
     try{
-        const searchUrl = 'https://cs110.salesforce.com/services/data/v48.0';
+        const searchUrl = 'https://cs110.salesforce.com/services';
+
+        // direct marketing consent capture datetime
+        let consent_capture_datetime = null;
+
+        const hcp_consents = await HcpConsents.findAll({
+            where: {
+                user_id: hcpUser.id,
+                consent_confirmed: true
+            },
+            include: [
+                {
+                    model: Consent,
+                    attributes: ['id'],
+                    include: [
+                        {
+                            model: ConsentCategory,
+                            attributes: ['title']
+                        }
+                    ]
+                }
+            ],
+            attributes: ['consent_id', 'opt_type', 'consent_confirmed', 'updated_at'],
+            subQuery: false
+        });
+
+        hcp_consents.forEach(hcp_consent => {
+            if(hcp_consent.consent.consent_category.title.toLowerCase() === 'direct marketing'){
+                consent_capture_datetime = hcp_consent.updated_at;
+            }
+        });
+
+        const auth = async function(){
+            const grant_type = 'password';
+            const client_id = '3MVG91LYYD8O4krRFZk502yUZjpx.U666K_a1MZoS8lDxX4ZFyX92s0DzUBS3FV4B.P3PuQOdbCQF0jkaTt6b';
+            const client_secret = '20D622DE96C1F10A185A0D6A31EFDAB6591C05500A9BB9CC5D28B7C93F2CD57B';
+            const username = 'app_user_martech@glpg.com.full';
+            const password = 'Galapagos2021Xcxor9PaUvXAEUwQX9jKKDGy';
+
+            const { data } = await axios.post(`${searchUrl}/oauth2/token?grant_type=${grant_type}&client_id=${client_id}&client_secret=${client_secret}&username=${username}&password=${password}`);
+
+            return data.access_token;
+        };
+        const access_token = await auth();
+        const headers = { authorization: 'Bearer ' + access_token };
+
 
         // get account from salesforce
-        const query = `SELECT + id, PersonEmail, Secondary_Email__c + from + Account + WHERE + QIDC__OneKeyId_IMS__c = ${onekeyid}`;
-        const account = await axios.get(`${searchUrl}/query?q=${query}`);
+        const query = `SELECT + id, PersonEmail, Secondary_Email__c + from + Account + WHERE + QIDC__OneKeyId_IMS__c = '${hcpUser.individual_id_onekey}'`;
+        const account = await axios.get(`${searchUrl}/data/v48.0/query?q=${query}`, { headers });
         const userInfo = account.data?.records[0];
 
-        if(userInfo?.length === 0) return;
+        if(!userInfo) return;
 
         const account_id = userInfo.Id;
         // update email
         if(!userInfo.PersonEmail){
-            await axios.patch(`${searchUrl}/sobjects/Account/${account_id}`, {
-                PersonEmail: email
-            });
+            await axios.patch(`${searchUrl}/data/v48.0/sobjects/Account/${account_id}`, { PersonEmail: hcpUser.email}, { headers });
         }
-        if(userInfo.PersonEmail && userInfo.PersonEmail != email && !userInfo.Secondary_Email__c){
-            await axios.patch(`${searchUrl}/sobjects/Account/${account_id}`, {
-                Secondary_Email__c: email
-            });
+        if(userInfo.PersonEmail && userInfo.PersonEmail != hcpUser.email && !userInfo.Secondary_Email__c){
+            await axios.patch(`${searchUrl}/data/v48.0/sobjects/Account/${account_id}`, { Secondary_Email__c: hcpUser.email }, { headers })
         }
 
         // get dynamically content type id of Galapagos News
-
-        const content_type = await axios.get(`${searchUrl}/query?q=SELECT + id + from + Content_Type_vod__c + WHERE + name = 'Galapagos news'`);
+        const content_type = await axios.get(`${searchUrl}/data/v48.0/query?q=SELECT + id + from + Content_Type_vod__c + WHERE + name = 'Galapagos news'`, { headers });
         const content_type_id = content_type.data?.records[0]?.Id;
 
         // create multi-channel consent
         // RecordTypeId hidden value
-        if(consent){
-            await axios.post(`${searchUrl}/sobjects/Multichannel_Consent_vod__c`, {
+        if(consent_capture_datetime){
+            await axios.post(`${searchUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c`, {
                 "Account_vod__c": account_id,
                 "RecordTypeId": "0124J000000ouUlQAI",
-                "Capture_Datetime_vod__c": consent.updated_at,
-                "Channel_Value_vod__c": email,
+                "Capture_Datetime_vod__c": consent_capture_datetime,
+                "Channel_Value_vod__c": hcpUser.email,
                 "Opt_Type_vod__c": "Opt_In_vod",
                 "Content_Type_vod__c": content_type_id,
                 "GLPG_Consent_Source__c": "Website"
-            });
+            },
+            { headers });
         }
     }
     catch(err){
@@ -887,6 +904,8 @@ async function createHcpProfile(req, res) {
         }
 
         response.data = getHcpViewModel(hcpUser.dataValues);
+
+        await syncConsent(hcpUser);
 
         if (hcpUser.dataValues.status === 'consent_pending') {
             response.data.consent_confirmation_token = generateConsentConfirmationAccessToken(hcpUser);
