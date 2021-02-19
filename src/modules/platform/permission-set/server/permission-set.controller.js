@@ -22,7 +22,7 @@ async function getPermissionSets(req, res) {
                 include: [{
                     model: Service,
                     as: 'service',
-                    attributes: [ 'id', 'title', 'slug' ]
+                    attributes: [ 'id', 'title', 'slug', 'parent_id' ]
 
                 }]
             },
