@@ -220,7 +220,7 @@ export default function ManageRoles() {
                 </div>
                 <div className="row">
                     <div className="col-12 col-sm-12">
-                        <div className="d-flex justify-content-between align-items-center p-3 cdp-table__responsive-sticky-panel mx-n3">
+                        <div className="d-flex justify-content-between align-items-center py-3 cdp-table__responsive-sticky-panel">
                             <h4 className="cdp-text-primary font-weight-bold mb-0">Define Roles</h4>
                             <button className="btn cdp-btn-secondary text-white ml-auto " onClick={() => setModalShow({ ...modalShow, createRole: true })}>
                                 <i className="icon icon-plus"></i> <span className="d-none d-sm-inline-block pl-1">Add New Role</span>
