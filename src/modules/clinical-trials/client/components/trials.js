@@ -8,7 +8,7 @@ import axios from 'axios';
 
 var dumpData =  function() {
     const url = `/api/clinical-trials`;
-    var urlToGetData = prompt("urlToGetData:", "https://clinicaltrials.gov/api/query/full_studies?expr=galapagos+%5BLeadSponsorName%5D+AND+NOT+Phase+1%5BPhase%5D&min_rnk=1&max_rnk=100&fmt=json");
+    var urlToGetData = prompt("urlToGetData:", "https://clinicaltrials.gov/api/query/full_studies?expr=%28gilead+%5BLeadSponsorName%5D+AND+filgotinib+%5BInterventionName%5D+AND+NOT+Phase+1%5BPhase%5D%29+OR+%28galapagos+%5BLeadSponsorName%5D+AND+NOT+Phase+1%5BPhase%5D%29%0D%0A&min_rnk=1&max_rnk=100&fmt=json");
     return {
         payload: axios({
             method: 'post',
@@ -81,11 +81,6 @@ const ClinicalTrials = (props) => {
         ]
     }
     return (
-        // <div>
-        //     <button onClick={dumpData}>Dump Data</button>
-        //     <button onClick={showAllVersions}>Show All Versions</button>
-        //     <button onClick={mergeProcessData}>Merge</button>
-        // </div>
         <main className="app__content cdp-light-bg">
             <div className="container-fluid">
                 <div className="row">
@@ -355,6 +350,11 @@ const ClinicalTrials = (props) => {
                     tableName="crdlp-hcp-profiles"
                     selectedScopeKey={'scope-hcp'}
                 /> */}
+                <div>
+                    <button onClick={dumpData}>Dump Data</button>
+                    <button onClick={showAllVersions}>Show All Versions</button>
+                    <button onClick={mergeProcessData}>Merge</button>
+                </div>
             </div>
         </main>
     
