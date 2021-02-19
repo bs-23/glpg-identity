@@ -102,7 +102,7 @@ async function saveData(req, res) {
         const info = await Data.create({
             application_id: req.user.id,
             type,
-            data,
+            data: JSON.parse(data),
             created_by: req.user.id,
             updated_by: req.user.id
         });
@@ -110,7 +110,7 @@ async function saveData(req, res) {
         response.data = {
             id: info.id,
             type: info.type,
-            data: info.data,
+            data: JSON.stringify(info.data),
             created_at: info.created_at,
             updated_at: info.updated_at
         };
@@ -139,7 +139,9 @@ async function getData(req, res) {
             response.errors.push(new CustomError('Profile not found.', 404));
             return res.status(404).send(response);
         }
+
         response.data = doc;
+        response.data.data = JSON.stringify(doc.data);
 
         res.json(response);
     } catch(err) {
