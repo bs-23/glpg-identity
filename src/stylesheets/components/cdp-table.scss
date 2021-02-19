@@ -241,6 +241,16 @@
                 }
             }
 
+            &-sticky-panel {
+                position: sticky;
+                top: 0px;
+                background: $light-bg-color;
+                z-index: 100;
+                margin: 0px -15px;
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+
             &-wrapper {
                 background-color: transparent !important;
 

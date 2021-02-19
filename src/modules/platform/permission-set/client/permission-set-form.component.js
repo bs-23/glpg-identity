@@ -81,28 +81,52 @@ const CheckList = ({ name, options, labelExtractor, idExtractor, allOptionID }) 
 }
 
 const ToggleList = ({ name, options, labelExtractor, idExtractor, allOptionID }) => {
+    const optionIds = options.map(op => idExtractor(op));
+
     const isChecked = (id, arrayHelpers) => arrayHelpers.form.values[name].includes(id);
 
     const handleChange = (e, arrayHelpers) => {
         const optionId = e.target.value;
         if (e.target.checked) {
             if(allOptionID && (optionId === allOptionID)) {
-                arrayHelpers.form.setFieldValue(name, options.map(op => idExtractor(op)));
+                arrayHelpers.form.setFieldValue(name, [...arrayHelpers.form.values[name], ...(options.map(op => idExtractor(op)))]);
             }
             else{
-                if(arrayHelpers.form.values[name].includes(allOptionID)) {
-                    const idx = arrayHelpers.form.values[name].indexOf(allOptionID);
-                    arrayHelpers.remove(idx);
+                if(!arrayHelpers.form.values[name].includes(allOptionID)) {
+                    arrayHelpers.push(allOptionID);
                 }
                 arrayHelpers.push(optionId);
             }
         }
         else {
             if(allOptionID && (optionId === allOptionID)){
-                arrayHelpers.form.setFieldValue(name, []);
-            }else{
-                let filteredOptionIds = arrayHelpers.form.values[name].filter(id => id !== allOptionID).filter(id => id !== optionId);
+                const filteredOptionIds = arrayHelpers.form.values[name]
+                    .filter(id => !optionIds.includes(id));
+
                 arrayHelpers.form.setFieldValue(name, filteredOptionIds);
+            }else{
+                let isLastActiveOption = true;
+
+                optionIds.forEach(id => {
+                    const idsToExclude = [allOptionID, optionId];
+                    if (
+                        !idsToExclude.includes(id) &&
+                        arrayHelpers.form.values[name].includes(id)
+                    ) {
+                        isLastActiveOption = false;
+                    }
+                })
+
+                if (isLastActiveOption) {
+                    const filteredOptionIds = arrayHelpers.form.values[name]
+                        .filter(id => !optionIds.includes(id));
+
+                    arrayHelpers.form.setFieldValue(name, filteredOptionIds);
+                } else {
+                    const filteredOptionIds = arrayHelpers.form.values[name]
+                        .filter(id => id !== optionId);
+                    arrayHelpers.form.setFieldValue(name, filteredOptionIds);
+                }
             }
         }
     }
@@ -114,11 +138,11 @@ const ToggleList = ({ name, options, labelExtractor, idExtractor, allOptionID })
         options.unshift(allOptionsObject);
     }
 
-    return <FieldArray
+    return <div className="col-12 col-sm-6"><FieldArray
                 name={name}
                 render={arrayHelpers => (
-                    options.map(item => <label key={idExtractor(item)} className="d-flex  align-items-center">
-                        <span className="switch">
+                    options.map(item =>
+                        <div key={idExtractor(item)} className={`d-flex align-items-center custom-control custom-checkbox ${allOptionID && idExtractor(item) === allOptionID ? 'font-weight-bold-light pt-3 pb-1' : 'ml-4  font-weight-normal'}`}>
                             <input name={name}
                                 className="custom-control-input"
                                 type="checkbox"
@@ -128,25 +152,24 @@ const ToggleList = ({ name, options, labelExtractor, idExtractor, allOptionID })
                                 onChange={(e) => handleChange(e, arrayHelpers)}
                                 disabled={item.hasOwnProperty('disabled') ? item.disabled : false}
                             />
-                            <span className="slider round"></span>
-                        </span>
-                        <span className="switch-label text-left pl-2">{labelExtractor(item)}</span>
-                    </label>)
-                )}
-            />
+                            <label className="custom-control-label" for={idExtractor(item)}>{labelExtractor(item)}</label>
+                        </div>
+                    )
+        )}
+     /></div>
 }
 
 
 export default function PermissionSetForm({ onSuccess, onError, permissionSetId }) {
     const [applications, setApplications] = useState([]);
-    const [serviceCategories, setServiceCategories] = useState([]);
+    const [services, setServices] = useState([]);
     const [permissionSet, setPermissionSet] = useState(null);
     const countries = useSelector(state => state.countryReducer.countries);
     const { addToast } = useToasts();
 
-    const initializeServiceCategoryValues = () => {
-        if(permissionSet && permissionSet.serviceCategories){
-            return permissionSet.serviceCategories;
+    const initializeServicesValues = () => {
+        if(permissionSet && permissionSet.services){
+            return permissionSet.services;
         }
         return [];
     }
@@ -169,19 +192,19 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
         title: permissionSet && permissionSet.title || '',
         description: permissionSet && permissionSet.description || '',
         countries: initializeCountryValues(),
-        serviceCategories: initializeServiceCategoryValues(),
+        services: initializeServicesValues(),
         applications: initializeApplicationValues(),
         app_country_service: ''
     };
 
     const getApplications = async () => {
         const response = await axios.get('/api/applications');
-        setApplications(response.data);
+        setApplications(response.data.filter(app => app.type === 'hcp-portal'));
     }
 
-    const getServiceCategories = async () => {
-        const response = await axios.get('/api/serviceCategories');
-        setServiceCategories(response.data);
+    const getServices = async () => {
+        const response = await axios.get('/api/services');
+        setServices(response.data);
     }
 
     const getPermissionSet = async () => {
@@ -189,7 +212,7 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
         setPermissionSet({
             ...permSet,
             applications: permSet.ps_app.map(app => app.application.id),
-            serviceCategories: permSet.ps_sc.map(sc => sc.serviceCategory.id),
+            services: permSet.ps_sc.map(sc => sc.service.id),
         });
     }
 
@@ -229,7 +252,7 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
     useEffect(() => {
         if(permissionSetId) getPermissionSet();
         getApplications();
-        getServiceCategories();
+        getServices();
     }, []);
 
     return (
@@ -267,13 +290,21 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
                                                             labelExtractor={item => item.name}
                                                         />
                                                     </FormField>
-                                                    <FormFieldFluid label="Select Service Categories" name="serviceCategories" required={false} >
-                                                        <ToggleList
-                                                            name="serviceCategories"
-                                                            options={serviceCategories}
-                                                            idExtractor={item => item.id}
-                                                            labelExtractor={item => item.title}
-                                                        />
+                                                    <FormFieldFluid label="Select Services" name="services" required={false} >
+                                                        <div className="row align-items-start">{
+                                                            services.map(sc => {
+                                                                return <ToggleList
+                                                                    key={sc.id}
+                                                                    name="services"
+                                                                    allOptionID={sc.id}
+                                                                    options={
+                                                                        [sc, ...(sc.childServices.map(cs => cs))]
+                                                                    }
+                                                                    idExtractor={item => item.id}
+                                                                    labelExtractor={item => item.title}
+                                                                />
+                                                            })
+                                                        }</div>
                                                     </FormFieldFluid>
                                                     {permissionSetId &&
                                                         <div className="col-12 py-2">

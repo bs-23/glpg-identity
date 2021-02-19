@@ -2,20 +2,20 @@ const path = require('path');
 const passport = require('passport');
 const controller = require('./hcp.controller');
 const { validate } = require(path.join(process.cwd(), 'src/modules/core/server/middlewares/validator.middleware'));
-const { Modules } = require('../../../core/server/authorization/authorization.constants');
-const { ModuleGuard } = require('../../../core/server/authorization/authorization.middleware');
+const { Services } = require('../../../core/server/authorization/authorization.constants');
+const { ServiceGuard } = require('../../../core/server/authorization/authorization.middleware');
 const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/platform/user/server/user-authentication.middleware.js'));
 const { hcpProfile, registrationLookup, getAccessToken, updateHCPUserConsents, changePassword, forgetPassword, resetPassword, confirmConsents } = require('./hcp.schema');
 
 module.exports = app => {
     app.route('/api/hcps')
-        .post(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getHcps);
+        .post(CDPAuthStrategy, ServiceGuard([Services.MANAGE_HCP]), controller.getHcps);
 
     app.route('/api/hcps/specialties')
-        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getSpecialtiesForCdp);
+        .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_HCP, Services.DISCOVER_HCP_HCO, Services.MANAGE_ENTITY_REQUEST]), controller.getSpecialtiesForCdp);
 
     app.route('/api/hcps/:id')
-        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getHcpProfile);
+        .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_HCP]), controller.getHcpProfile);
 
     app.route('/api/hcp-profiles/registration-lookup')
         .post(passport.authenticate('application-jwt', { session: false }), validate(registrationLookup), controller.registrationLookup);
@@ -45,21 +45,21 @@ module.exports = app => {
         .get(CDPAuthStrategy, controller.getSpecialtiesWithEnglishTranslation);
 
     app.route('/api/hcp-profiles/update-hcps')
-        .put(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.updateHcps);
+        .put(CDPAuthStrategy, ServiceGuard([Services.MANAGE_HCP]), controller.updateHcps);
 
     app.route('/api/hcp-profiles/:id/approve')
-        .put(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.approveHCPUser);
+        .put(CDPAuthStrategy, ServiceGuard([Services.MANAGE_HCP]), controller.approveHCPUser);
 
     app.route('/api/hcp-profiles/:id/reject')
-        .put(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.rejectHCPUser);
+        .put(CDPAuthStrategy, ServiceGuard([Services.MANAGE_HCP]), controller.rejectHCPUser);
 
     app.route('/api/hcp-profiles/:id/consents')
-        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getHCPUserConsents)
+        .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_HCP]), controller.getHCPUserConsents)
         .put(passport.authenticate('application-jwt', { session: false }), validate(updateHCPUserConsents), controller.updateHCPUserConsents);
 
     app.route('/api/hcp-profiles/:id')
         .get(passport.authenticate('application-jwt', { session: false }), controller.getHcpProfile);
 
     app.route('/api/datasync/hcps')
-        .post(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getHcpsFromDatasync);
+        .post(CDPAuthStrategy, ServiceGuard([Services.MANAGE_HCP]), controller.getHcpsFromDatasync);
 };

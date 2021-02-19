@@ -1,33 +1,42 @@
 const path = require('path');
 const { DataTypes } = require('sequelize');
-const ServiceCategory = require('../../user/server/permission/service-category.model');
-
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
-const PermissionSet_ServiceCategory = sequelize.cdpConnector.define('permissionSets_serviceCategories', {
+const File = sequelize.cdpConnector.define('files', {
     id: {
         allowNull: false,
         primaryKey: true,
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4
     },
-    permissionSetId: {
+    name: {
         allowNull: false,
+        type: DataTypes.STRING(224)
+    },
+    bucket_name: {
+        allowNull: false,
+        type: DataTypes.STRING
+    },
+    key: {
+        allowNull: false,
+        type: DataTypes.STRING
+    },
+    owner_id: {
         type: DataTypes.UUID
     },
-    serviceCategoryId  : {
+    table_name: {
         allowNull: false,
-        type: DataTypes.UUID
+        type: DataTypes.ENUM,
+        values: ['partners', 'partner_vendors'],
+        defaultValue: 'partners'
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
-    tableName: 'permissionSets_serviceCategories',
+    tableName: 'files',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
 
-PermissionSet_ServiceCategory.belongsTo(ServiceCategory, {as: 'serviceCategory', foreignKey: 'serviceCategoryId'});
-
-module.exports = PermissionSet_ServiceCategory;
+module.exports = File;

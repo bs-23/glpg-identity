@@ -67,7 +67,7 @@ module.exports = {
             password: faker.internet.password(8),
             updated_by: defaultAdminId,
             countries: ['BE', 'AD', 'DE', 'IT', 'NL', 'ES', 'IE'],
-            profileId: SystemAdminProfileID,
+            profile_id: SystemAdminProfileID,
             access_token: jwt.sign({ id: defaultAdminId }, process.env.CDP_TOKEN_SECRET, { expiresIn: '2d', issuer: defaultAdminId }),
         },
         defaultUser: {
@@ -78,7 +78,7 @@ module.exports = {
             email: 'default-user@cdp.com',
             password: 'strong-password',
             expiry_date: new Date(Date.now() + 24 * 60 * 60 * 1000),
-            profileId: SystemAdminProfileID,
+            profile_id: SystemAdminProfileID,
             created_by: defaultAdminId,
             updated_by: defaultAdminId,
             access_token: jwt.sign({ id: defaultUserId }, process.env.CDP_TOKEN_SECRET, { expiresIn: '2d', issuer: defaultUserId }),
@@ -198,14 +198,14 @@ module.exports = {
         { id: systemAdminPermissionSetID, title: "System Admin Permission Set", slug: "system_admin", type: 'standard', countries: ["BE", "FR", "DE", "IT", "NL", "ES", "GB"], description: "This is the default permission set for System Admin", created_by: defaultAdminId, updated_by: defaultAdminId, },
     ],
     permissionSet_serviceCategories: [
-        { permissionSetId: systemAdminPermissionSetID, serviceCategoryId: userManagementServiceCategoryID },
-        { permissionSetId: systemAdminPermissionSetID, serviceCategoryId: HCPServiceCategoryID },
-        { permissionSetId: systemAdminPermissionSetID, serviceCategoryId: DPOServiceCategoryID }
+        { permissionset_id: systemAdminPermissionSetID, serviceCategoryId: userManagementServiceCategoryID },
+        { permissionset_id: systemAdminPermissionSetID, serviceCategoryId: HCPServiceCategoryID },
+        { permissionset_id: systemAdminPermissionSetID, serviceCategoryId: DPOServiceCategoryID }
     ],
     userProfile: [
         { id: SystemAdminProfileID, title: "System Admin", slug: "system_admin", type: 'standard', description: "This is the default profile for System Admin", created_by: defaultAdminId, updated_by: defaultAdminId }
     ],
     userProfile_permissionSet: [
-        { userProfileId: SystemAdminProfileID, permissionSetId: systemAdminPermissionSetID }
+        { user_profile_id: SystemAdminProfileID, permissionset_id: systemAdminPermissionSetID }
     ]
 };

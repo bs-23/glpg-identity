@@ -3,9 +3,9 @@ const { DataTypes } = require('sequelize');
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const Application = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.model'));
-const PermissionSet_ServiceCategory = require('./permissionSet-serviceCategory.model');
+const PermissionSet_Service = require('./permissionset-service.model');
 const PermissionSet_Application = require('./permissionSet-application.model');
-const ServiceCategory = require('../../user/server/permission/service-category.model');
+const Service = require('../../user/server/permission/service.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
 const PermissionSet = sequelize.cdpConnector.define('permission_sets', {
@@ -46,10 +46,12 @@ const PermissionSet = sequelize.cdpConnector.define('permission_sets', {
     updatedAt: 'updated_at'
 });
 
-PermissionSet.belongsTo(Application, {as: 'application', foreignKey: 'applicationId'});
-PermissionSet.hasMany(PermissionSet_ServiceCategory, {as: 'ps_sc', foreignKey: 'permissionSetId', sourceKey: 'id'});
-PermissionSet.hasMany(PermissionSet_Application, {as: 'ps_app', foreignKey: 'permissionSetId', sourceKey: 'id'});
-PermissionSet.belongsToMany(ServiceCategory, { through: PermissionSet_ServiceCategory });
-PermissionSet.belongsToMany(Application, { through: PermissionSet_Application });
+// PermissionSet.belongsTo(Application, {as: 'application', foreignKey: 'applicationId'});
+PermissionSet.hasMany(PermissionSet_Application, {as: 'ps_app', foreignKey: 'permissionset_id', sourceKey: 'id'});
+PermissionSet.belongsToMany(Application, { through: PermissionSet_Application, foreignKey: 'permissionset_id', otherKey: 'application_id' });
+
+PermissionSet.hasMany(PermissionSet_Service, {as: 'ps_sc', foreignKey: 'permissionset_id', sourceKey: 'id'});
+PermissionSet.belongsToMany(Service, { through: PermissionSet_Service, foreignKey: 'permissionset_id', otherKey: 'service_id' });
+PermissionSet_Service.belongsTo(PermissionSet, {as: 'permission_set', foreignKey: 'permissionset_id' });
 
 module.exports = PermissionSet;

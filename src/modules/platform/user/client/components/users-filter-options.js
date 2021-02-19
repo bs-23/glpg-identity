@@ -54,7 +54,7 @@ export function getFilterOptions(userCountries, allProfiles) {
             maxLength: 25
         },
         {
-            fieldName: 'profileId',
+            fieldName: 'profile_id',
             valueType: 'select',
             displayText: 'Profile',
             operators: operators.getSelectOperators(),

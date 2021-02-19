@@ -12,11 +12,11 @@ const PermissionSet_Application = sequelize.cdpConnector.define('permissionSets_
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4
     },
-    permissionSetId: {
+    permissionset_id: {
         allowNull: false,
         type: DataTypes.UUID
     },
-    applicationId  : {
+    application_id  : {
         allowNull: false,
         type: DataTypes.UUID
     }
@@ -28,6 +28,6 @@ const PermissionSet_Application = sequelize.cdpConnector.define('permissionSets_
     updatedAt: 'updated_at'
 });
 
-PermissionSet_Application.belongsTo(Application, {as: 'application', foreignKey: 'applicationId'});
+PermissionSet_Application.belongsTo(Application, {as: 'application', foreignKey: 'application_id'});
 
 module.exports = PermissionSet_Application;

@@ -10,7 +10,7 @@ async function getProfiles(req, res) {
             include: [{
                 model: UserProfilePermissionSet,
                 as: 'up_ps',
-                attributes: ['permissionSetId'],
+                attributes: ['permissionset_id'],
                 include: [{
                     model: PermissionSet,
                     as: 'ps',
@@ -51,7 +51,7 @@ async function createProfile(req, res) {
 
         if(!created) return res.status(400).send('Profile name already exists.');
 
-        const permission_sets = permissionSets.map(id => ({ userProfileId: profile.id, permissionSetId: id }));
+        const permission_sets = permissionSets.map(id => ({ user_profile_id: profile.id, permissionset_id: id }));
 
         await UserProfilePermissionSet.bulkCreate(permission_sets);
 

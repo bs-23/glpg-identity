@@ -17,7 +17,7 @@ import { Dashboard, Login, ForgotPassword, ResetPassword, PlatformRoutes, userAc
 import { ConsentRoutes } from "../../privacy";
 import SwaggerLogin from '../../../config/server/lib/swagger/swagger-login.component';
 import store from './store';
-import BusinessPartnerRoutes from '../../business-partner/client/business-partner.routes';
+import { PartnerRoutes } from '../../partner';
 import { getAllCountries } from '../../core/client/country/country.actions';
 import HelpComponent from '../../core/client/components/help.component';
 import { InformationRoutes } from '../../information';
@@ -92,7 +92,7 @@ export default function App() {
 
                 <Route path="/forgot-password" component={ForgotPassword}/>
 
-                <Route path='/business-partner' component={BusinessPartnerRoutes} />
+                <Route path='/business-partner' component={PartnerRoutes} />
 
                 <Route path="/forbidden" component={Forbidden}/>
 

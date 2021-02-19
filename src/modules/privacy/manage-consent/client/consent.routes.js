@@ -11,9 +11,9 @@ export default function ConsentRoutes() {
     return (
         <Switch>
             <PrivateRoute exact path={path} component={DataPrivacyAndConsentManagement} module={'privacy'} />
-            <PrivateRoute path={`${path}/list`} component={ConsentsComponent} module={'privacy'} />
-            <PrivateRoute path={`${path}/create`} component={ConsentForm} module={'privacy'} />
-            <PrivateRoute path={`${path}/edit/:id`} component={ConsentForm} module={'privacy'} />
+            <PrivateRoute path={`${path}/list`} component={ConsentsComponent} module={'manage-consent'} />
+            <PrivateRoute path={`${path}/create`} component={ConsentForm} module={'manage-consent'} />
+            <PrivateRoute path={`${path}/edit/:id`} component={ConsentForm} module={'manage-consent'} />
         </Switch>
     );
 }

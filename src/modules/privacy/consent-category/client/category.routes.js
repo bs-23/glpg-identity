@@ -9,7 +9,7 @@ export default function ConsentCategoryRoutes() {
 
     return (
         <Switch>
-            <PrivateRoute path={`${path}/consent-categories`} component={ConsentCategory} module={'privacy'} />
+            <PrivateRoute path={`${path}/consent-categories`} component={ConsentCategory} module={'consent-category'} />
         </Switch>
     );
 }

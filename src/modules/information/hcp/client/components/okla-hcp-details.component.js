@@ -170,7 +170,11 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
                                             <div className="mt-1 font-weight-bold">Post Code</div>
                                             <div>{selectedWorkplace.postCode}</div>
                                         </div>
-                                        <div className="col-12">
+                                        <div className="col-12 col-sm-6 pb-3">
+                                            <div className="mt-1 font-weight-bold">Country</div>
+                                            <div className="text-capitalize">{selectedWorkplace.country.toLowerCase()}</div>
+                                        </div>
+                                        <div className="col-12 col-sm-6 pb-3">
                                             <div className="mt-1 font-weight-bold">Contact Numbers:</div>
                                             {selectedWorkplace.contactNumbers.map((c, i) => (<div key={'tel-' + i}>{c.type}: {c.number}</div>))}
                                         </div>

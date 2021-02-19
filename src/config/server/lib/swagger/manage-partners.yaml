@@ -1,0 +1,962 @@
+paths:
+    /api/partners/hcps:
+        post:
+            tags:
+                - manage-partners
+            summary: Create HCP Business Partner in CDP.
+            requestBody:
+                required: true
+                content:
+                    multipart/form-data:
+                        schema:
+                            type: object
+                            properties:
+                                request_id:
+                                    type: string
+                                first_name:
+                                    type: string
+                                last_name:
+                                    type: string
+                                address:
+                                    type: string
+                                city:
+                                    type: string
+                                post_code:
+                                    type: string
+                                email:
+                                    type: string
+                                telephone:
+                                    type: string
+                                type:
+                                    type: string
+                                    enum:
+                                    - individual
+                                    - legal_entity
+                                registration_number:
+                                    type: string
+                                country_iso2:
+                                    type: string
+                                locale:
+                                    type: string
+                                uuid:
+                                    type: string
+                                is_italian_hcp:
+                                    type: boolean
+                                should_report_hco:
+                                    type: boolean
+                                beneficiary_category:
+                                    type: string
+                                    enum:
+                                    - beneficiary_category_1
+                                    - beneficiary_category_2
+                                iban:
+                                    type: string
+                                bank_name:
+                                    type: string
+                                bank_account_no:
+                                    type: string
+                                currency:
+                                    type: string
+                                documents:
+                                    type: array
+                                    description: Upto 5 files each upto 5 MB in size. File name may contain a-zA-Z0-9/!\'() .*-_
+                                    items:
+                                        type: string
+                                        format: binary
+                            required:
+                              - request_id
+                              - first_name
+                              - last_name
+                              - email
+                              - type
+                              - country_iso2
+                              - locale
+                              - uuid
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/partnerHcpProfile"
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+                400:
+                    description: Bad request.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+
+    /api/partners/hcps/{id}:
+        get:
+            tags:
+                - manage-partners
+            summary: Get HCP partner's detail by id.
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  description: the partner's identifier
+                  schema:
+                    type: string
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/partnerHcpProfile"
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+                401:
+                    description: User is not authenticated.
+                404:
+                    description: The partner does not exist.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+        put:
+            tags:
+                - manage-partners
+            summary: update HCP Business Partner in CDP.
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  description: the partner's identifier
+                  schema:
+                    type: string
+            requestBody:
+                required: true
+                content:
+                    multipart/form-data:
+                        schema:
+                            type: object
+                            properties:
+                                first_name:
+                                    type: string
+                                last_name:
+                                    type: string
+                                address:
+                                    type: string
+                                city:
+                                    type: string
+                                post_code:
+                                    type: string
+                                email:
+                                    type: string
+                                telephone:
+                                    type: string
+                                type:
+                                    type: string
+                                    enum:
+                                    - individual
+                                    - legal_entity
+                                    default: individual
+                                registration_number:
+                                    type: string
+                                country_iso2:
+                                    type: string
+                                locale:
+                                    type: string
+                                uuid:
+                                    type: string
+                                is_italian_hcp:
+                                    type: boolean
+                                should_report_hco:
+                                    type: boolean
+                                beneficiary_category:
+                                    type: string
+                                    enum:
+                                    - beneficiary_category_1
+                                    - beneficiary_category_2
+                                iban:
+                                    type: string
+                                bank_name:
+                                    type: string
+                                bank_account_no:
+                                    type: string
+                                currency:
+                                    type: string
+                                documents:
+                                    type: array
+                                    description: Upto 5 files each upto 5 MB in size. File name may contain a-zA-Z0-9/!\'() .*-_
+                                    items:
+                                        type: string
+                                        format: binary
+                                remove_files:
+                                    type: array
+                                    items:
+                                        type: string
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/partnerHcpProfile"
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+                400:
+                    description: Bad request.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+
+    /api/partners/hcos:
+        post:
+            tags:
+                - manage-partners
+            summary: Create HCO Business Partner in CDP.
+            requestBody:
+                required: true
+                content:
+                    multipart/form-data:
+                        schema:
+                            type: object
+                            allowEmptyValue: false
+                            properties:
+                                request_id:
+                                    type: string
+                                contact_first_name:
+                                    type: string
+                                contact_last_name:
+                                    type: string
+                                organization_name:
+                                    type: string
+                                address:
+                                    type: string
+                                city:
+                                    type: string
+                                post_code:
+                                    type: string
+                                email:
+                                    type: string
+                                telephone:
+                                    type: string
+                                type:
+                                    type: string
+                                    enum:
+                                    - healthcare_org
+                                    - patient_org
+                                country_iso2:
+                                    type: string
+                                locale:
+                                    type: string
+                                uuid:
+                                    type: string
+                                registration_number:
+                                    type: string
+                                iban:
+                                    type: string
+                                bank_name:
+                                    type: string
+                                bank_account_no:
+                                    type: string
+                                currency:
+                                    type: string
+                                documents:
+                                    type: array
+                                    description: Upto 5 files each upto 5 MB in size. File name may contain a-zA-Z0-9/!\'() .*-_
+                                    items:
+                                        type: string
+                                        format: binary
+                            required:
+                              - request_id
+                              - contact_first_name
+                              - contact_last_name
+                              - organization_name
+                              - registration_number
+                              - email
+                              - type
+                              - country_iso2
+                              - locale
+                              - uuid
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/partnerHcoProfile"
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+                400:
+                    description: Bad request.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+
+    /api/partners/hcos/{id}:
+        get:
+            tags:
+                - manage-partners
+            summary: Get HCO partner's detail by id.
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  description: the partner's identifier
+                  schema:
+                   type: string
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/partnerHcoProfile"
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+                401:
+                    description: User is not authenticated.
+                404:
+                    description: The partner does not exist.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+        put:
+            tags:
+                - manage-partners
+            summary: update HCO Business Partner in CDP.
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  description: the partner's identifier
+                  schema:
+                    type: string
+            requestBody:
+                required: true
+                content:
+                    multipart/form-data:
+                        schema:
+                            type: object
+                            properties:
+                                request_id:
+                                    type: string
+                                contact_first_name:
+                                    type: string
+                                contact_last_name:
+                                    type: string
+                                organization_name:
+                                    type: string
+                                address:
+                                    type: string
+                                city:
+                                    type: string
+                                post_code:
+                                    type: string
+                                email:
+                                    type: string
+                                telephone:
+                                    type: string
+                                type:
+                                    type: string
+                                    enum:
+                                    - healthcare_org
+                                    - patient_org
+                                country_iso2:
+                                    type: string
+                                locale:
+                                    type: string
+                                uuid:
+                                    type: string
+                                registration_number:
+                                    type: string
+                                iban:
+                                    type: string
+                                bank_name:
+                                    type: string
+                                bank_account_no:
+                                    type: string
+                                currency:
+                                    type: string
+                                documents:
+                                    type: array
+                                    description: Upto 5 files each upto 5 MB in size. File name may contain a-zA-Z0-9/!\'() .*-_
+                                    items:
+                                        type: string
+                                        format: binary
+                                remove_files:
+                                    type: array
+                                    items:
+                                        type: string
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/partnerHcoProfile"
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+                400:
+                    description: Bad request.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+
+    /api/partners/vendors:
+        post:
+            tags:
+                - manage-partners
+            summary: Create Vendor Business Partner in CDP.
+            requestBody:
+                required: true
+                content:
+                    multipart/form-data:
+                        schema:
+                            type: object
+                            properties:
+                                type:
+                                    type: string
+                                    enum:
+                                    - vendor
+                                    - wholesaler
+                                country_iso2:
+                                    type: string
+                                locale:
+                                    type: string
+                                request_id:
+                                    type: string
+                                requestor_first_name:
+                                    type: string
+                                requestor_last_name:
+                                    type: string
+                                purchasing_org:
+                                    type: string
+                                company_code:
+                                    type: string
+                                requestor_email:
+                                    type: string
+                                procurement_contact:
+                                    type: string
+                                name:
+                                    type: string
+                                registration_number:
+                                    type: string
+                                address:
+                                    type: string
+                                city:
+                                    type: string
+                                post_code:
+                                    type: string
+                                email:
+                                    type: string
+                                telephone:
+                                    type: string
+                                invoice_contact_name:
+                                    type: string
+                                invoice_address:
+                                    type: string
+                                invoice_post_code:
+                                    type: string
+                                invoice_email:
+                                    type: string
+                                invoice_telephone:
+                                    type: string
+                                commercial_contact_name:
+                                    type: string
+                                commercial_address:
+                                    type: string
+                                commercial_city:
+                                    type: string
+                                commercial_post_code:
+                                    type: string
+                                commercial_email:
+                                    type: string
+                                commercial_telephone:
+                                    type: string
+                                ordering_contact_name:
+                                    type: string
+                                ordering_email:
+                                    type: string
+                                ordering_telephone:
+                                    type: string
+                                iban:
+                                    type: string
+                                bank_name:
+                                    type: string
+                                bank_account_no:
+                                    type: string
+                                currency:
+                                    type: string
+                                documents:
+                                    type: array
+                                    description: Upto 5 files each upto 5 MB in size. File name may contain a-zA-Z0-9/!\'() .*-_
+                                    items:
+                                        type: string
+                                        format: binary
+                            required:
+                              - request_id
+                              - name
+                              - registration_number
+                              - address
+                              - city
+                              - ordering_email
+                              - country_iso2
+                              - locale
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/partnerVendorProfile"
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+                400:
+                    description: Bad request.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+
+    /api/partners/vendors/{id}:
+        get:
+            tags:
+                - manage-partners
+            summary: Get Vendor's/Wholesaler's detail by id.
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  description: the partner's identifier
+                  schema:
+                   type: string
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/partnerVendorProfile"
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+                401:
+                    description: User is not authenticated.
+                404:
+                    description: The partner does not exist.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+        put:
+            tags:
+                - manage-partners
+            summary: update Vendor Business Partner in CDP.
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  description: the partner's identifier
+                  schema:
+                    type: string
+            requestBody:
+                required: true
+                content:
+                    multipart/form-data:
+                        schema:
+                            type: object
+                            properties:
+                                type:
+                                    type: string
+                                    enum:
+                                    - vendor
+                                    - wholesaler
+                                country_iso2:
+                                    type: string
+                                locale:
+                                    type: string
+                                request_id:
+                                    type: string
+                                requestor_first_name:
+                                    type: string
+                                requestor_last_name:
+                                    type: string
+                                purchasing_org:
+                                    type: string
+                                company_code:
+                                    type: string
+                                requestor_email:
+                                    type: string
+                                procurement_contact:
+                                    type: string
+                                name:
+                                    type: string
+                                registration_number:
+                                    type: string
+                                address:
+                                    type: string
+                                city:
+                                    type: string
+                                post_code:
+                                    type: string
+                                email:
+                                    type: string
+                                telephone:
+                                    type: string
+                                invoice_contact_name:
+                                    type: string
+                                invoice_address:
+                                    type: string
+                                invoice_post_code:
+                                    type: string
+                                invoice_email:
+                                    type: string
+                                invoice_telephone:
+                                    type: string
+                                commercial_contact_name:
+                                    type: string
+                                commercial_address:
+                                    type: string
+                                commercial_city:
+                                    type: string
+                                commercial_post_code:
+                                    type: string
+                                commercial_email:
+                                    type: string
+                                commercial_telephone:
+                                    type: string
+                                ordering_contact_name:
+                                    type: string
+                                ordering_email:
+                                    type: string
+                                ordering_telephone:
+                                    type: string
+                                iban:
+                                    type: string
+                                bank_name:
+                                    type: string
+                                bank_account_no:
+                                    type: string
+                                currency:
+                                    type: string
+                                documents:
+                                    type: array
+                                    description: Upto 5 files each upto 5 MB in size. File name may contain a-zA-Z0-9/!\'() .*-_
+                                    items:
+                                        type: string
+                                        format: binary
+                                remove_files:
+                                    type: array
+                                    items:
+                                        type: string
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/partnerVendorProfile"
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+                400:
+                    description: Bad request.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+
+    /api/partners/registration-lookup:
+        get:
+            tags:
+                - manage-partners
+            summary: Get partner request info with request id.
+            parameters:
+                - name: request_id
+                  in: query
+                  required: true
+                  description: Partner request id
+                  schema:
+                    type: string
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/partnerRequestInfo"
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+                400:
+                    description: Bad request.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                $ref: "#/components/schemas/errorResponse"
+
+components:
+    schemas:
+        partnerHcpProfile:
+            type: object
+            properties:
+                id:
+                    type: string
+                status:
+                    type: string
+                    enum:
+                    - pending
+                    - approved
+                    - rejected
+                request_id:
+                    type: string
+                first_name:
+                    type: string
+                last_name:
+                    type: string
+                address:
+                    type: string
+                city:
+                    type: string
+                post_code:
+                    type: string
+                email:
+                    type: string
+                telephone:
+                    type: string
+                type:
+                    type: string
+                    enum:
+                    - individual
+                    - legal_entity
+                registration_number:
+                    type: string
+                country_iso2:
+                    type: string
+                locale:
+                    type: string
+                uuid:
+                    type: string
+                is_italian_hcp:
+                    type: boolean
+                should_report_hco:
+                    type: boolean
+                beneficiary_category:
+                    type: string
+                    enum:
+                    - beneficiary_category_1
+                    - beneficiary_category_2
+                iban:
+                    type: string
+                bank_name:
+                    type: string
+                bank_account_no:
+                    type: string
+                currency:
+                    type: string
+                documents:
+                    type: array
+                    items:
+                        type: string
+        partnerHcoProfile:
+            type: object
+            properties:
+                id:
+                    type: string
+                status:
+                    type: string
+                    enum:
+                    - pending
+                    - approved
+                    - rejected
+                request_id:
+                    type: string
+                contact_first_name:
+                    type: string
+                contact_last_name:
+                    type: string
+                organization_name:
+                    type: string
+                address:
+                    type: string
+                city:
+                    type: string
+                post_code:
+                    type: string
+                email:
+                    type: string
+                telephone:
+                    type: string
+                type:
+                    type: string
+                    enum:
+                    - healthcare_org
+                    - patient_org
+                country_iso2:
+                    type: string
+                locale:
+                    type: string
+                uuid:
+                    type: string
+                registration_number:
+                    type: string
+                iban:
+                    type: string
+                bank_name:
+                    type: string
+                bank_account_no:
+                    type: string
+                currency:
+                    type: string
+                documents:
+                    type: array
+                    items:
+                        type: string
+        partnerVendorProfile:
+            type: object
+            properties:
+                id:
+                    type: string
+                status:
+                    type: string
+                    enum:
+                    - pending
+                    - approved
+                    - rejected
+                type:
+                    type: string
+                    enum:
+                    - vendor
+                    - wholesaler
+                country_iso2:
+                    type: string
+                locale:
+                    type: string
+                request_id:
+                    type: string
+                requestor_first_name:
+                    type: string
+                requestor_last_name:
+                    type: string
+                purchasing_org:
+                    type: string
+                company_code:
+                    type: string
+                requestor_email:
+                    type: string
+                procurement_contact:
+                    type: string
+                name:
+                    type: string
+                registration_number:
+                    type: string
+                address:
+                    type: string
+                city:
+                    type: string
+                post_code:
+                    type: string
+                email:
+                    type: string
+                telephone:
+                    type: string
+                invoice_contact_name:
+                    type: string
+                invoice_address:
+                    type: string
+                invoice_post_code:
+                    type: string
+                invoice_email:
+                    type: string
+                invoice_telephone:
+                    type: string
+                commercial_contact_name:
+                    type: string
+                commercial_address:
+                    type: string
+                commercial_city:
+                    type: string
+                commercial_post_code:
+                    type: string
+                commercial_email:
+                    type: string
+                commercial_telephone:
+                    type: string
+                ordering_contact_name:
+                    type: string
+                ordering_email:
+                    type: string
+                ordering_telephone:
+                    type: string
+                iban:
+                    type: string
+                bank_name:
+                    type: string
+                bank_account_no:
+                    type: string
+                currency:
+                    type: string
+                documents:
+                    type: array
+                    items:
+                        type: string
+        partnerRequestInfo:
+                type: object
+                properties:
+                id:
+                    type: string
+                application_id:
+                    type: string
+                entity_type:
+                    type: string
+                    enum:
+                    - hcp
+                    - hco
+                    - vendor
+                    - wholesaler
+                first_name:
+                    type: string
+                last_name:
+                    type: string
+                email:
+                    type: string
+                procurement_contact:
+                    type: string
+                partner_type:
+                    type: string
+                uuid:
+                    type: string
+                company_codes:
+                    type: string
+                country_iso2:
+                    type: string
+                locale:
+                    type: string

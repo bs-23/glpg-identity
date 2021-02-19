@@ -10,13 +10,13 @@ export const permissionSetCreateSchema = object().shape({
         .max(500, 'This field must be at most 500 characters long'),
     applications: array().of(string()),
     countries: array().of(string()),
-    serviceCategories: array().of(string()),
+    services: array().of(string()),
     app_country_service: string()
         .test('One of three required',
-            'One of the fields countries, applications or service category is required.',
+            'You need to select at least one of the value from countries, applications, or services.',
             function() {
-                const { countries, serviceCategories, applications } = this.parent;
-                return countries.length || serviceCategories.length || applications.length;
+                const { countries, services, applications } = this.parent;
+                return countries.length || services.length || applications.length;
             }
         )
 });

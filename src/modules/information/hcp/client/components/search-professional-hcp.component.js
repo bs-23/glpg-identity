@@ -12,7 +12,7 @@ import { useToasts } from 'react-toast-notifications';
 import Modal from 'react-bootstrap/Modal';
 
 import OklaHcpDetails from './okla-hcp-details.component';
-import getUserPermittedCountries from '../../../../core/client/util/user-country';
+import { getCountryDetailsFromISO } from '../../../../core/client/util/user-country';
 import Faq from '../../../../platform/faq/client/faq.component';
 import uuidAuthorities from '../uuid-authorities.json';
 
@@ -29,7 +29,7 @@ const SearchProfessionalHcp = (props) => {
     const countries = useSelector(state => state.countryReducer.countries);
     const allCountries = useSelector(state => state.countryReducer.allCountries);
     const userProfile = useSelector(state => state.userReducer.loggedInUser);
-    const userCountries = getUserPermittedCountries(userProfile, countries);
+    const userCountries = getCountryDetailsFromISO(userProfile.countries, countries);
     const [selectedCountries, setSelectedCountries] = useState([]);
     const [specialties, setSpecialties] = useState([]);
     const [selectedSpecialties, setSelectedSpecialties] = useState([]);
@@ -359,7 +359,10 @@ const SearchProfessionalHcp = (props) => {
                                                     scrollToResult(response.data.results.length === 0);
                                                 }
                                                 catch(err){
-                                                    console.log(err);
+                                                    addToast('Error! Please try again.', {
+                                                        appearance: 'error',
+                                                        autoDismiss: true
+                                                    });
                                                 }
                                             })
                                             .catch(err => {

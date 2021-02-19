@@ -21,7 +21,7 @@ const Data = sequelize.cdpConnector.define('data', {
     },
     data: {
         allowNull: false,
-        type: DataTypes.STRING(5000)
+        type: DataTypes.JSON
     },
     created_by: {
         type: DataTypes.UUID

@@ -5,9 +5,12 @@ module.exports = {
     },
     server: {
         routes: [
+            "src/modules/partner/manage-partners/server/manage-partners.routes.js",
+            "src/modules/partner/manage-requests/server/manage-requests.routes.js",
             "src/modules/!(core)/server/**/*.routes.js",
             "src/modules/core/server/country/country.routes.js",
             "src/modules/core/server/filter/filter.routes.js",
+            "src/modules/core/server/localization/localization.routes.js",
             "src/modules/information/hcp/server/**/*.routes.js",
             "src/modules/platform/faq/server/**/*.routes.js",
             "src/modules/platform/application/server/**/*.routes.js",

@@ -12,11 +12,11 @@ const Role_PermissionSet = sequelize.cdpConnector.define('role_permissionSets', 
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4
     },
-    permissionSetId: {
+    permissionset_id: {
         allowNull: false,
         type: DataTypes.UUID
     },
-    roleId  : {
+    role_id  : {
         allowNull: false,
         type: DataTypes.UUID
     }
@@ -28,7 +28,7 @@ const Role_PermissionSet = sequelize.cdpConnector.define('role_permissionSets', 
     updatedAt: 'updated_at'
 });
 
-Role_PermissionSet.belongsTo(PermissionSet, {as: 'ps', foreignKey: 'permissionSetId'});
-PermissionSet.hasMany(Role_PermissionSet, {as: 'ps_role_ps', foreignKey: 'permissionSetId'});
+Role_PermissionSet.belongsTo(PermissionSet, {as: 'ps', foreignKey: 'permissionset_id'});
+PermissionSet.hasMany(Role_PermissionSet, {as: 'ps_role_ps', foreignKey: 'permissionset_id'});
 
 module.exports = Role_PermissionSet;

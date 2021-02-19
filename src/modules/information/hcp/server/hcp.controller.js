@@ -978,7 +978,7 @@ async function rejectHCPUser(req, res) {
         await archiveService.archiveData({
             object_id: hcpUser.id,
             table_name: 'hcp_profiles',
-            data: JSON.stringify(hcpUser.dataValues),
+            data: hcpUser.dataValues,
             actor: req.user.id,
             remarks: (req.body.comment || '').trim()
         });
@@ -986,7 +986,7 @@ async function rejectHCPUser(req, res) {
         await logService.log({
             event_type: 'CREATE',
             object_id: hcpUser.id,
-            table_name: 'archives',
+            table_name: 'archive',
             actor: req.user.id,
             remarks: (req.body.comment || '').trim()
         });

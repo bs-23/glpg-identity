@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import Modal from 'react-bootstrap/Modal'
 import { useToasts } from 'react-toast-notifications';
@@ -21,15 +21,13 @@ const ConsentForm = (props) => {
     const [consent, setConsent] = useState({});
     const [consentId, setConsentId] = useState();
     const [categories, setCategories] = useState([]);
-    const [userCountries, setUserCountries] = useState([]);
     const [countryLanguages, setCountryLanguages] = useState([]);
     const [isActive, setIsActive] = useState(true);
     const [translations, setTranslations] = useState([]);
     const [translationToDelete, setTranslationToDelete] = useState(null);
     const [showError, setShowError] = useState(false);
-    const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
-    const countries = useSelector(state => state.countryReducer.countries);
     const [showFaq, setShowFaq] = useState(false);
+    const [localizations, setLocalizations] = useState([]);
     const handleCloseFaq = () => setShowFaq(false);
     const handleShowFaq = () => setShowFaq(true);
 
@@ -47,7 +45,7 @@ const ConsentForm = (props) => {
     }
 
     const addNewTranslation = () => {
-        const newTranslations = [...translations, { id: Math.random(), country_iso2: '', lang_code: '', rich_text: '' }];
+        const newTranslations = [...translations, { id: Math.random(), locale: '', rich_text: '' }];
         setTranslations(newTranslations);
         setShowError(false);
         setTimeout(() => {
@@ -67,8 +65,6 @@ const ConsentForm = (props) => {
         setTranslationToDelete(index);
     };
 
-    const fetchUserCountries = (userCountries, allCountries) => userCountries.map(element => allCountries.find(x => x.country_iso2 == element)).filter(element => element);
-
     const resetForm = () => {
         setTranslations([]);
         setIsActive(true);
@@ -76,12 +72,15 @@ const ConsentForm = (props) => {
 
     useEffect(() => {
         const { id } = props ? props.match ? props.match.params : '' : '';
-
+        async function getLocalizations() {
+            const { data } = await axios.get('/api/localizations');
+            setLocalizations(data);
+        }
         async function getConsent() {
             const response = await axios.get(`/api/cdp-consents/${id}`);
             setConsentId(id);
             setConsent(response.data);
-            setTranslations(response.data.translations.map(i => ({ ...i, country_iso2: i.locale.split('_')[1], lang_code: i.locale.split('_')[0] })));
+            setTranslations(response.data.translations);
             setIsActive(response.data.is_active);
         }
         async function getConsentCatogories() {
@@ -111,20 +110,13 @@ const ConsentForm = (props) => {
         if (id) getConsent();
         getConsentCatogories();
         getLanguages();
+        getLocalizations();
     }, [props]);
-
-    useEffect(() => {
-        async function getCountries() {
-            setUserCountries(fetchUserCountries(loggedInUser.countries, countries));
-        }
-        getCountries();
-    }, [loggedInUser, countries])
 
     const getTranslations = (formikProps) => {
         return translations.map((item, idx) => {
             const translationId = `translation-${idx + 1}`;
-            const countryId = `country-${idx}`;
-            const languageId = `language-${idx}`;
+            const localeId = `locale-${idx}`;
             const richTextId = `rich-text-${idx}`;
 
             return (<React.Fragment key={item.id}>
@@ -136,26 +128,16 @@ const ConsentForm = (props) => {
                         </label>
                         <div className="col-12 col-sm-6">
                             <div className="form-group">
-                                <label className="font-weight-bold" htmlFor={countryId}>Country <span className="text-danger">*</span></label>
-                                <Field className="form-control country_iso2" value={item.country_iso2.toLowerCase()} onChange={(e) => handleChange(e)} data-id={idx} as="select" name={countryId} id={countryId}>
-                                    <option key={'country-' + item.id} value="" disabled>--Select Country--</option>
-                                    {userCountries.map(element => <option key={element.countryid} value={element.country_iso2.toLowerCase()}>{element.codbase_desc}</option>)}
-                                </Field>
-                                {showError && !item.country_iso2 && <div class="invalid-feedback">This field must not be empty.</div>}
-                            </div>
-                        </div>
-
-                        <div className="col-12 col-sm-6">
-                            <div className="form-group">
-                                <label className="font-weight-bold" htmlFor={languageId}>Language <span className="text-danger">*</span></label>
-                                <Field className="form-control lang_code" value={item.lang_code} onChange={(e) => handleChange(e)} data-id={idx} as="select" name={languageId} id={languageId}>
-                                    <option key={'language-' + item.id} value="" disabled>--Select Language--</option>
-                                    {countryLanguages.map(element => {
-                                        const [country_iso2, language_code, language_name] = element.split(' ');
-                                        return language_name && <option key={country_iso2} value={language_code}>{language_name.replace(/,/g, '')}</option>
+                                <label className="font-weight-bold" htmlFor={localeId}>Localization <span className="text-danger">*</span></label>
+                                <Field className="form-control locale" value={item.locale} onChange={(e) => handleChange(e)} data-id={idx} as="select" name={localeId} id={localeId}>
+                                    <option key={'country-' + item.id} value="" disabled>--Select Localization--</option>
+                                    {localizations.filter(l => l.country_iso2).map(localization => {
+                                        return <option key={localization.locale} value={localization.locale}>
+                                            {localization.language_variant} ({localization.locale})
+                                        </option>
                                     })}
                                 </Field>
-                                {showError && !item.lang_code && <div class="invalid-feedback">This field must not be empty.</div>}
+                                {showError && !item.locale && <div class="invalid-feedback">This field must not be empty.</div>}
                             </div>
                         </div>
 
@@ -250,8 +232,7 @@ const ConsentForm = (props) => {
                                                 values.is_active = isActive;
 
                                                 const validTranslations = translations.filter(item =>
-                                                    item.country_iso2 &&
-                                                    item.lang_code &&
+                                                    item.locale &&
                                                     item.rich_text &&
                                                     item.rich_text !== '<p><br></p>' &&
                                                     item.rich_text.replace(/&nbsp;/g, '') !== '<p></p>' &&
@@ -271,7 +252,7 @@ const ConsentForm = (props) => {
                                                     actions.setSubmitting(false);
                                                     return;
                                                 } else {
-                                                    const uniqueTranslations = new Set(validTranslations.map(t => t.country_iso2.toLowerCase() + t.lang_code.toLowerCase()));
+                                                    const uniqueTranslations = new Set(validTranslations.map(t => t.locale.toLowerCase()));
                                                     if (uniqueTranslations.size < validTranslations.length) {
                                                         addToast('Please remove duplicate translations.', {
                                                             appearance: 'error',
