@@ -518,7 +518,7 @@ async function updateCdpConsent(req, res) {
             await archiveService.archiveData({
                 object_id: dt.id,
                 table_name: 'consent_locales',
-                data: JSON.stringify(dt.dataValues),
+                data: dt.dataValues,
                 actor: req.user.id
             });
         }));
