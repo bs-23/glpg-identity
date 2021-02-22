@@ -218,7 +218,7 @@ export default function ManageProfiles() {
                 </div>
                 <div className="row">
                     <div className="col-12 col-sm-12">
-                        <div className="d-flex justify-content-between align-items-center p-3 cdp-table__responsive-sticky-panel mx-n3">
+                        <div className="d-flex justify-content-between align-items-center py-3 cdp-table__responsive-sticky-panel">
                             <h4 className="cdp-text-primary font-weight-bold mb-0">Manage Profiles</h4>
                             <button hidden disabled className="btn cdp-btn-secondary text-white ml-auto " onClick={() => setModalShow({ ...modalShow, createProfile: true })}>
                                 <i className="icon icon-plus pr-1"></i> Add New Profile
