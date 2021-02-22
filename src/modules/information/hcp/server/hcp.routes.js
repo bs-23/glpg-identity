@@ -63,6 +63,6 @@ module.exports = app => {
     app.route('/api/datasync/hcps')
         .post(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getHcpsFromDatasync);
 
-    app.route('/api/hcps-articles/:id')
+    app.route('/api/hcp-profiles/:id-articles')
         .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getHcpArticles);
 };
