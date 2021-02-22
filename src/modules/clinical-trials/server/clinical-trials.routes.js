@@ -23,10 +23,12 @@ module.exports = app => {
     app.route('/api/clinical-trials/countries/zip/validate')
         .post(auth, controller.validateAddress);
 
+    app.route('/api/clinical-trials/conditions-with-details')
+        .get(auth, controller.getConditionsWithDetails);
+
     app.route('/api/clinical-trials/conditions')
         .get(auth, controller.getConditions);
 
     app.route('/api/clinical-trials/:id')
         .get(auth, controller.getTrialDetails);
-
 };

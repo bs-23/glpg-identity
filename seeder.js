@@ -85,7 +85,8 @@ async function init() {
                 { title: "Site Admin", slug: "site_admin", type: 'standard', description: "This is the default profile for Site Admin", created_by: admin.id, updated_by: admin.id },
                 { title: "Global Data Steward", type: 'standard', slug: "global_data_steward", description: "This is the default profile for Global Data Steward", created_by: admin.id, updated_by: admin.id },
                 { title: "Local Data Steward", type: 'standard', slug: "local_data_steward", description: "This is the default profile for Local Data Steward", created_by: admin.id, updated_by: admin.id },
-                { title: "Data Privacy Officer", type: 'standard', slug: "data_privacy_officer", description: "This is the default profile for Data Privacy Officer", created_by: admin.id, updated_by: admin.id }
+                { title: "Data Privacy Officer", type: 'standard', slug: "data_privacy_officer", description: "This is the default profile for Data Privacy Officer", created_by: admin.id, updated_by: admin.id },
+                { title: "Default Profile", type: 'standard', slug: "default_profile", description: "This is the default profile with no permission", created_by: admin.id, updated_by: admin.id }
             ];
 
             UserProfile.destroy({ truncate: { cascade: true } }).then(() => {
@@ -208,6 +209,7 @@ async function init() {
                 { title: "GDS Permission Set", slug: "gds", type: 'standard', countries: ["BE", "FR", "DE", "IT", "NL", "ES", "GB"], description: "This is the default permission set for Global Data Steward", created_by: admin.id, updated_by: admin.id },
                 { title: "LDS Permission Set", slug: "lds", type: 'standard', description: "This is the default permission set for Local Data Steward", created_by: admin.id, updated_by: admin.id },
                 { title: "DPO Permission Set", slug: "data_privacy_officer", type: 'standard', description: "This is the default permission set for Data Privacy Officer", created_by: admin.id, updated_by: admin.id },
+                { title: "Default Permission Set", slug: "default", type: 'standard', description: "This is the default permission for default profile", created_by: admin.id, updated_by: admin.id }
             ];
 
             PermissionSet.destroy({ truncate: { cascade: true } }).then(() => {
@@ -328,14 +330,17 @@ async function init() {
         const dpoPermissionSet = PermissionSet.findOne({ where: { slug: 'data_privacy_officer' } });
         const ldsProfile = UserProfile.findOne({ where: { slug: 'local_data_steward' } });
         const ldsPermissionSet = PermissionSet.findOne({ where: { slug: 'lds' } });
+        const defaultProfile = UserProfile.findOne({ where: { slug: 'default_profile' } });
+        const defaultPermissionSet = PermissionSet.findOne({ where: { slug: 'default' } });
 
-        Promise.all([systemAdminProfile, systemAdminPermissionSet, sitedminProfile, siteAdminPermissionSet, gdsProfile, gdsPermissionSet, dpoProfile, dpoPermissionSet, ldsProfile, ldsPermissionSet]).then((values) => {
+        Promise.all([systemAdminProfile, systemAdminPermissionSet, sitedminProfile, siteAdminPermissionSet, gdsProfile, gdsPermissionSet, dpoProfile, dpoPermissionSet, ldsProfile, ldsPermissionSet, defaultProfile, defaultPermissionSet]).then((values) => {
             const userprofile_permissionSet = [
                 { user_profile_id: values[0].id, permissionset_id: values[1].id },
                 { user_profile_id: values[2].id, permissionset_id: values[3].id },
                 { user_profile_id: values[6].id, permissionset_id: values[7].id },
                 { user_profile_id: values[4].id, permissionset_id: values[5].id },
-                { user_profile_id: values[8].id, permissionset_id: values[9].id }
+                { user_profile_id: values[8].id, permissionset_id: values[9].id },
+                { user_profile_id: values[10].id, permissionset_id: values[11].id }
             ];
 
             UserProfile_PermissionSet.destroy({ truncate: { cascade: true } }).then(() => {
