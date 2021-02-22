@@ -637,14 +637,15 @@ async function syncConsent(hcpUser){
     try{
         const searchUrl = 'https://cs110.salesforce.com/services';
 
-        // direct marketing consent capture datetime
-        let consent_capture_datetime = null;
+        // find direct marketing consent capture datetime
+        const consent_filter = {
+            user_id: hcpUser.id,
+            consent_confirmed: true,
+            '$consent.consent_category.title$': { [Op.iLike]: 'direct marketing' }
+        };
 
-        const hcp_consents = await HcpConsents.findAll({
-            where: {
-                user_id: hcpUser.id,
-                consent_confirmed: true
-            },
+        const hcp_consent = await HcpConsents.findOne({
+            where: consent_filter,
             include: [
                 {
                     model: Consent,
@@ -657,15 +658,11 @@ async function syncConsent(hcpUser){
                     ]
                 }
             ],
-            attributes: ['consent_id', 'opt_type', 'consent_confirmed', 'updated_at'],
+            attributes: ['updated_at'],
             subQuery: false
         });
 
-        hcp_consents.forEach(hcp_consent => {
-            if(hcp_consent.consent.consent_category.title.toLowerCase() === 'direct marketing'){
-                consent_capture_datetime = hcp_consent.updated_at;
-            }
-        });
+        const consent_capture_datetime = hcp_consent?.updated_at;
 
         const auth = async function(){
             const grant_type = 'password';
