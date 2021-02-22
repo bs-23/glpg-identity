@@ -121,7 +121,7 @@ export default function ManageFaq() {
 
                 <div className="row">
                     <div className="col-12">
-                        <div className="d-flex justify-content-between align-items-center p-3 cdp-table__responsive-sticky-panel mx-n3">
+                        <div className="d-flex justify-content-between align-items-center py-3  cdp-table__responsive-sticky-panel">
                             <h4 className="cdp-text-primary font-weight-bold mb-0 mb-sm-0 d-flex align-items-end pr-2">
                                 FAQ List
                                 {faqData.faq && faqData.faq.length > 0 && serviceTopics && serviceTopics.length > 0 &&

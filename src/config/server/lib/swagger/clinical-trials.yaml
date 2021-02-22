@@ -36,12 +36,6 @@ paths:
                 - name: free_text_search
                   in: query
                   type: string
-                - name: location
-                  in: query
-                  type: string
-                - name: distance
-                  in: query
-                  type: string
                 - name: age_ranges
                   in: query
                   required: false
@@ -56,11 +50,24 @@ paths:
                   example: GENDER_FEMALE,GENDER_MALE
                   schema:
                     type: string
+                - name: distance
+                  in: query
+                  type: string
+                  required: false
+                  description: distance in km
+                  example: 16
                 - name: zipcode
                   in: query
                   required: false
                   description: any zip code format supported
-                  example: 40170
+                  example: 1925
+                  schema:
+                    type: string
+                - name: country
+                  in: query
+                  required: false
+                  description: any zip code format supported
+                  example: canada
                   schema:
                     type: string
                 - name: phase
@@ -212,6 +219,28 @@ paths:
             tags:
                 - clinical-trials
             summary: get list of conditions
+            responses:
+                200:
+                    description: The request has succeeded.
+                    content:
+                        applicaiton/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        type: object
+                                        properties:
+                                            name:
+                                                type: string
+                                                    
+                                    errors:
+                                        $ref: "#/components/schemas/errorBodyInSuccess"
+
+    /api/clinical-trials/conditions-with-details:
+        get:
+            tags:
+                - clinical-trials
+            summary: get list of conditions with details
             responses:
                 200:
                     description: The request has succeeded.

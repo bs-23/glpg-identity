@@ -10,10 +10,49 @@ const { object } = require('yup');
 const fetch = require('cross-fetch');
 const { DataTypes } = require('sequelize');
 const { NonceProvider } = require('react-select');
+const nodecache = require('../../../config/server/lib/nodecache');
 
 var seed = 1;
+var API_KEY = nodecache.getValue('GOOGLE_MAP_API_KEY');
+
+async function getCoordinates(facility, zip, city, state, country, index)
+{
+    var params = [facility, zip, city, state, country]
+    var filteredParams = params.filter((el) => el != null);
+    var BASE_URL = 'https://maps.googleapis.com/maps/api/geocode/json?address=';
+    var joinedURL = BASE_URL + filteredParams.join('+') + '&key=' + API_KEY;
+    var url = encodeURI(joinedURL.replace(/\s/g,'+').replace('#',''));
+    
+    try { 
+        await new Promise(resolve => setTimeout(resolve, index*1000));
+        const response = await fetch(url);
+        const json = await response.json();
+        return json.results[0].geometry.location;
+    }catch (error) {
+        return {lat: -1, lng: -1}    
+    }
+}
+
+function haversineDistanceInKM(lat1,lon1, lat2, lon2){
+	// ref: https://www.movable-type.co.uk/scripts/latlong.html
+    const R = 6371e3; // metres
+    const φ1 = lat1 * Math.PI/180; // φ, λ in radians
+    const φ2 = lat2 * Math.PI/180;
+    const Δφ = (lat2-lat1) * Math.PI/180;
+    const Δλ = (lon2-lon1) * Math.PI/180;
+    
+    const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+              Math.cos(φ1) * Math.cos(φ2) *
+              Math.sin(Δλ/2) * Math.sin(Δλ/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    
+    return R * c * 0.001; // in km
+}
+
 String.prototype.capitalize = function(){return this.split(' ').map(x=>x.charAt(0).toUpperCase() + x.slice(1)).join(' ')};
-function random() {
+
+function random(new_seed) {
+    if (new_seed) seed = new_seed;
     var x = Math.sin(seed++) * 10000;
     return x - Math.floor(x);
 }
@@ -232,29 +271,6 @@ async function showAllVersions(req, res) {
     }
 }
 
-async function getCoordinates(facility, zip, city, state, country, index)
-{
-    var params = [facility, zip, city, state, country]
-    var filteredParams = params.filter(function (el) {
-        return el != null;
-      });
-      
-    var API_KEY = "AIzaSyAXBeTXzlo_-vwKTza6MGrzNwRHn8ppHrQ";
-    var BASE_URL = "https://maps.googleapis.com/maps/api/geocode/json?address=";
-    var joinedURL = BASE_URL + filteredParams.join('+') + "&key=" + API_KEY;
-    var url = encodeURI(joinedURL.replace(/\s/g,'+').replace('#',''));
-    
-    try {
-        return {lat: -1, lng: -1}   
-        await new Promise(resolve => setTimeout(resolve, index*1000));
-        const response = await fetch(url);
-        const json = await response.json();
-        return json.results[0].geometry.location;
-    }catch (error) {
-        return {lat: -1, lng: -1}    
-    }
-    
-}
 
 async function mergeProcessData(req, res) {
     const response = new Response({}, []);
@@ -296,7 +312,7 @@ async function mergeProcessData(req, res) {
                     'trial_status': element.Study.ProtocolSection.StatusModule.OverallStatus,
                     'inclusion_criteria': element.Study.ProtocolSection.EligibilityModule.EligibilityCriteria,
                     'exclusion_criteria': element.Study.ProtocolSection.EligibilityModule.EligibilityCriteria,
-                    'type_of_drug': element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList && element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention.length ? element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention[0].InterventionName: null,
+                    'type_of_drug': element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList && element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention.length ? element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention.reduce((a,b)=>{a.concat = a.InterventionName+','+b.InterventionName; return a}).concat: null,
                     'story_telling': 'In this trial, doctors hope to find out how the study drug works together with your current standard treatment in terms of its effects on your lung function and IPF in general. People with IPF have increased levels of something called autotaxin, which is thought to have a role in the progression of IPF. The trial is investigating whether decreasing the activity of autotaxin can have a positive effect. It will also look at how well the study drug is tolerated.',
                     'trial_start_date': new Date(element.Study.ProtocolSection.StatusModule.StartDateStruct.StartDate),
                     'trial_end_date': element.Study.ProtocolSection.StatusModule.CompletionDateStruct.CompletionDate ? new Date(element.Study.ProtocolSection.StatusModule.CompletionDateStruct.CompletionDate) : null,
@@ -353,11 +369,11 @@ async function getTrials(req, res) {
         page_number,
         status,
         gender,
-        location,
         distance,
         search_term,
         free_text_search,
         age_ranges,
+        country,
         zipcode,
         phase,
         indication } = req.query;
@@ -369,27 +385,14 @@ async function getTrials(req, res) {
     phase = phaseInputTextMapping(phase);
     age_ranges = ageRangeInputTextMapping(age_ranges);
     gender = genderInputTextMapping(gender);
+    cordinates = await getCoordinates('', zipcode, '', '', country, 1);
 
     try {
-        let query = !free_text_search? {
+        let query = {
             [Op.or]: [
             {trial_status: status},
             {indication: indication},
-            {indication_group: indication},
-            {phase: phase},
-            {std_age: age_ranges},
-            {gender: gender},
-            ]
-        } : {
-            [Op.or]: [
-            {trial_status: {[Op.like]: '%' + free_text_search+  '%'}},
-            {indication: {[Op.like]: '%' + free_text_search+  '%'}},
-            {indication_group: {[Op.like]: '%' + free_text_search+  '%'}},
-            {phase: {[Op.like]: '%' + free_text_search+  '%'}},
-            {std_age: {[Op.like]: '%' + free_text_search+  '%'}},
-            {gender: {[Op.like]: '%' + free_text_search+  '%'}},
-            {indication: {[Op.like]: '%' + free_text_search+  '%'}},
-            {indication_group: {[Op.like]: '%' + free_text_search+  '%'}}
+            {indication_group: indication}
             ]
         }
         let remove_index = [];
@@ -420,7 +423,7 @@ async function getTrials(req, res) {
         let result = await Trial.findAll({
             where: query,
             attributes: ['protocol_number', 'indication_group', 'indication', 'trial_fixed_id', 'trial_status', 'max_age', 'min_age', 'official_title', 'gender', 'clinical_trial_brief_title', 'phase', 'std_age'],
-            ...pageing});
+            include: ['locations'], ...pageing});
 
         let total_item_count = await Trial.count({
             where: query
@@ -432,7 +435,15 @@ async function getTrials(req, res) {
         }
 
         response.data = {
-           search_result: result.map(x=>{ return {...x.dataValues, distance: Math.round(random()*10*100) / 100 + ' km'}}),
+           search_result: result.map(x=>{ 
+                let least_distance = Number.MAX_SAFE_INTEGER;
+                x.dataValues.locations.map(location=>{
+                    let distance = haversineDistanceInKM(cordinates.lat, cordinates.lng, location.lat, location.lng)
+                    least_distance = Math.min(least_distance, distance);
+                    return {...location, distance};
+                });
+                delete x.dataValues.locations;
+            return {...x.dataValues,  distance: Math.round(least_distance*10*100) / 100 + ' km'}}),
            total_count: total_item_count
         }
         res.json(response);
@@ -479,7 +490,7 @@ async function getTrialDetails(req, res) {
 async function getCountryList(req, res) {
     const response = new Response({}, []);
     res.set({ 'content-type': 'application/json; charset=utf-8' });
-    let countriesWithISO = [{"code":"AD","name":"Andorra"},{"code":"AE","name":"United Arab Emirates"},{"code":"AF","name":"Afghanistan"},{"code":"AG","name":"Antigua and Barbuda"},{"code":"AI","name":"Anguilla"},{"code":"AL","name":"Albania"},{"code":"AM","name":"Armenia"},{"code":"AO","name":"Angola"},{"code":"AQ","name":"Antarctica"},{"code":"AR","name":"Argentina"},{"code":"AS","name":"American Samoa"},{"code":"AT","name":"Austria"},{"code":"AU","name":"Australia"},{"code":"AW","name":"Aruba"},{"code":"AX","name":"Åland Islands"},{"code":"AZ","name":"Azerbaijan"},{"code":"BA","name":"Bosnia and Herzegovina"},{"code":"BB","name":"Barbados"},{"code":"BD","name":"Bangladesh"},{"code":"BE","name":"Belgium"},{"code":"BF","name":"Burkina Faso"},{"code":"BG","name":"Bulgaria"},{"code":"BH","name":"Bahrain"},{"code":"BI","name":"Burundi"},{"code":"BJ","name":"Benin"},{"code":"BL","name":"Saint Barthélemy"},{"code":"BM","name":"Bermuda"},{"code":"BN","name":"Brunei Darussalam"},{"code":"BO","name":"Bolivia, Plurinational State of"},{"code":"BQ","name":"Bonaire, Sint Eustatius and Saba"},{"code":"BR","name":"Brazil"},{"code":"BS","name":"Bahamas"},{"code":"BT","name":"Bhutan"},{"code":"BV","name":"Bouvet Island"},{"code":"BW","name":"Botswana"},{"code":"BY","name":"Belarus"},{"code":"BZ","name":"Belize"},{"code":"CA","name":"Canada"},{"code":"CC","name":"Cocos (Keeling) Islands"},{"code":"CD","name":"Congo, Democratic Republic of the"},{"code":"CF","name":"Central African Republic"},{"code":"CG","name":"Congo"},{"code":"CH","name":"Switzerland"},{"code":"CI","name":"Côte d'Ivoire"},{"code":"CK","name":"Cook Islands"},{"code":"CL","name":"Chile"},{"code":"CM","name":"Cameroon"},{"code":"CN","name":"China"},{"code":"CO","name":"Colombia"},{"code":"CR","name":"Costa Rica"},{"code":"CU","name":"Cuba"},{"code":"CV","name":"Cabo Verde"},{"code":"CW","name":"Curaçao"},{"code":"CX","name":"Christmas Island"},{"code":"CY","name":"Cyprus"},{"code":"CZ","name":"Czechia"},{"code":"DE","name":"Germany"},{"code":"DJ","name":"Djibouti"},{"code":"DK","name":"Denmark"},{"code":"DM","name":"Dominica"},{"code":"DO","name":"Dominican Republic"},{"code":"DZ","name":"Algeria"},{"code":"EC","name":"Ecuador"},{"code":"EE","name":"Estonia"},{"code":"EG","name":"Egypt"},{"code":"EH","name":"Western Sahara"},{"code":"ER","name":"Eritrea"},{"code":"ES","name":"Spain"},{"code":"ET","name":"Ethiopia"},{"code":"FI","name":"Finland"},{"code":"FJ","name":"Fiji"},{"code":"FK","name":"Falkland Islands (Malvinas)"},{"code":"FM","name":"Micronesia, Federated States of"},{"code":"FO","name":"Faroe Islands"},{"code":"FR","name":"France"},{"code":"GA","name":"Gabon"},{"code":"GB","name":"United Kingdom of Great Britain and Northern Ireland"},{"code":"GD","name":"Grenada"},{"code":"GE","name":"Georgia"},{"code":"GF","name":"French Guiana"},{"code":"GG","name":"Guernsey"},{"code":"GH","name":"Ghana"},{"code":"GI","name":"Gibraltar"},{"code":"GL","name":"Greenland"},{"code":"GM","name":"Gambia"},{"code":"GN","name":"Guinea"},{"code":"GP","name":"Guadeloupe"},{"code":"GQ","name":"Equatorial Guinea"},{"code":"GR","name":"Greece"},{"code":"GS","name":"South Georgia and the South Sandwich Islands"},{"code":"GT","name":"Guatemala"},{"code":"GU","name":"Guam"},{"code":"GW","name":"Guinea-Bissau"},{"code":"GY","name":"Guyana"},{"code":"HK","name":"Hong Kong"},{"code":"HM","name":"Heard Island and McDonald Islands"},{"code":"HN","name":"Honduras"},{"code":"HR","name":"Croatia"},{"code":"HT","name":"Haiti"},{"code":"HU","name":"Hungary"},{"code":"ID","name":"Indonesia"},{"code":"IE","name":"Ireland"},{"code":"IL","name":"Israel"},{"code":"IM","name":"Isle of Man"},{"code":"IN","name":"India"},{"code":"IO","name":"British Indian Ocean Territory"},{"code":"IQ","name":"Iraq"},{"code":"IR","name":"Iran, Islamic Republic of"},{"code":"IS","name":"Iceland"},{"code":"IT","name":"Italy"},{"code":"JE","name":"Jersey"},{"code":"JM","name":"Jamaica"},{"code":"JO","name":"Jordan"},{"code":"JP","name":"Japan"},{"code":"KE","name":"Kenya"},{"code":"KG","name":"Kyrgyzstan"},{"code":"KH","name":"Cambodia"},{"code":"KI","name":"Kiribati"},{"code":"KM","name":"Comoros"},{"code":"KN","name":"Saint Kitts and Nevis"},{"code":"KP","name":"Korea, Democratic People's Republic of"},{"code":"KR","name":"Korea, Republic of"},{"code":"KW","name":"Kuwait"},{"code":"KY","name":"Cayman Islands"},{"code":"KZ","name":"Kazakhstan"},{"code":"LA","name":"Lao People's Democratic Republic"},{"code":"LB","name":"Lebanon"},{"code":"LC","name":"Saint Lucia"},{"code":"LI","name":"Liechtenstein"},{"code":"LK","name":"Sri Lanka"},{"code":"LR","name":"Liberia"},{"code":"LS","name":"Lesotho"},{"code":"LT","name":"Lithuania"},{"code":"LU","name":"Luxembourg"},{"code":"LV","name":"Latvia"},{"code":"LY","name":"Libya"},{"code":"MA","name":"Morocco"},{"code":"MC","name":"Monaco"},{"code":"MD","name":"Moldova, Republic of"},{"code":"ME","name":"Montenegro"},{"code":"MF","name":"Saint Martin, (French part)"},{"code":"MG","name":"Madagascar"},{"code":"MH","name":"Marshall Islands"},{"code":"MK","name":"North Macedonia"},{"code":"ML","name":"Mali"},{"code":"MM","name":"Myanmar"},{"code":"MN","name":"Mongolia"},{"code":"MO","name":"Macao"},{"code":"MP","name":"Northern Mariana Islands"},{"code":"MQ","name":"Martinique"},{"code":"MR","name":"Mauritania"},{"code":"MS","name":"Montserrat"},{"code":"MT","name":"Malta"},{"code":"MU","name":"Mauritius"},{"code":"MV","name":"Maldives"},{"code":"MW","name":"Malawi"},{"code":"MX","name":"Mexico"},{"code":"MY","name":"Malaysia"},{"code":"MZ","name":"Mozambique"},{"code":"NA","name":"Namibia"},{"code":"NC","name":"New Caledonia"},{"code":"NE","name":"Niger"},{"code":"NF","name":"Norfolk Island"},{"code":"NG","name":"Nigeria"},{"code":"NI","name":"Nicaragua"},{"code":"NL","name":"Netherlands"},{"code":"NO","name":"Norway"},{"code":"NP","name":"Nepal"},{"code":"NR","name":"Nauru"},{"code":"NU","name":"Niue"},{"code":"NZ","name":"New Zealand"},{"code":"OM","name":"Oman"},{"code":"PA","name":"Panama"},{"code":"PE","name":"Peru"},{"code":"PF","name":"French Polynesia"},{"code":"PG","name":"Papua New Guinea"},{"code":"PH","name":"Philippines"},{"code":"PK","name":"Pakistan"},{"code":"PL","name":"Poland"},{"code":"PM","name":"Saint Pierre and Miquelon"},{"code":"PN","name":"Pitcairn"},{"code":"PR","name":"Puerto Rico"},{"code":"PS","name":"Palestine, State of"},{"code":"PT","name":"Portugal"},{"code":"PW","name":"Palau"},{"code":"PY","name":"Paraguay"},{"code":"QA","name":"Qatar"},{"code":"RE","name":"Réunion"},{"code":"RO","name":"Romania"},{"code":"RS","name":"Serbia"},{"code":"RU","name":"Russian Federation"},{"code":"RW","name":"Rwanda"},{"code":"SA","name":"Saudi Arabia"},{"code":"SB","name":"Solomon Islands"},{"code":"SC","name":"Seychelles"},{"code":"SD","name":"Sudan"},{"code":"SE","name":"Sweden"},{"code":"SG","name":"Singapore"},{"code":"SH","name":"Saint Helena, Ascension and Tristan da Cunha"},{"code":"SI","name":"Slovenia"},{"code":"SJ","name":"Svalbard and Jan Mayen"},{"code":"SK","name":"Slovakia"},{"code":"SL","name":"Sierra Leone"},{"code":"SM","name":"San Marino"},{"code":"SN","name":"Senegal"},{"code":"SO","name":"Somalia"},{"code":"SR","name":"Suriname"},{"code":"SS","name":"South Sudan"},{"code":"ST","name":"Sao Tome and Principe"},{"code":"SV","name":"El Salvador"},{"code":"SX","name":"Sint Maarten, (Dutch part)"},{"code":"SY","name":"Syrian Arab Republic"},{"code":"SZ","name":"Eswatini"},{"code":"TC","name":"Turks and Caicos Islands"},{"code":"TD","name":"Chad"},{"code":"TF","name":"French Southern Territories"},{"code":"TG","name":"Togo"},{"code":"TH","name":"Thailand"},{"code":"TJ","name":"Tajikistan"},{"code":"TK","name":"Tokelau"},{"code":"TL","name":"Timor-Leste"},{"code":"TM","name":"Turkmenistan"},{"code":"TN","name":"Tunisia"},{"code":"TO","name":"Tonga"},{"code":"TR","name":"Turkey"},{"code":"TT","name":"Trinidad and Tobago"},{"code":"TV","name":"Tuvalu"},{"code":"TW","name":"Taiwan, Province of China"},{"code":"TZ","name":"Tanzania, United Republic of"},{"code":"UA","name":"Ukraine"},{"code":"UG","name":"Uganda"},{"code":"UM","name":"United States Minor Outlying Islands"},{"code":"US","name":"United States of America"},{"code":"UY","name":"Uruguay"},{"code":"UZ","name":"Uzbekistan"},{"code":"VA","name":"Holy See"},{"code":"VC","name":"Saint Vincent and the Grenadines"},{"code":"VE","name":"Venezuela, Bolivarian Republic of"},{"code":"VG","name":"Virgin Islands, British"},{"code":"VI","name":"Virgin Islands, U.S."},{"code":"VN","name":"Viet Nam"},{"code":"VU","name":"Vanuatu"},{"code":"WF","name":"Wallis and Futuna"},{"code":"WS","name":"Samoa"},{"code":"YE","name":"Yemen"},{"code":"YT","name":"Mayotte"},{"code":"ZA","name":"South Africa"},{"code":"ZM","name":"Zambia"},{"code":"ZW","name":"Zimbabwe"}]
+    let countriesWithISO = [{'code':'IL','name':'Israel'},{'code':'IT','name':'Italy'},{'code':'JP','name':'Japan'},{'code':'KR','name':'Korea, Republic of'},{'code':'LV','name':'Latvia'},{'code':'MY','name':'Malaysia'},{'code':'MX','name':'Mexico'},{'code':'NZ','name':'New Zealand'},{'code':'MD','name':'Moldova, Republic of'},{'code':'NL','name':'Netherlands'},{'code':'NZ','name':'New Zealand'},{'code':'NO','name':'Norway'},{'code':'OM','name':'Oman'},{'code':'PE','name':'Peru'},{'code':'PL','name':'Poland'},{'code':'PT','name':'Portugal'},{'code':'RO','name':'Romania'},{'code':'RU','name':'Russian Federation'},{'code':'RS','name':'Serbia'},{'code':'SG','name':'Singapore'},{'code':'SK','name':'Slovakia'},{'code':'ZA','name':'South Africa'},{'code':'ES','name':'Spain'},{'code':'LK','name':'Sri Lanka'},{'code':'SE','name':'Sweden'},{'code':'CH','name':'Switzerland'},{'code':'TW','name':'Taiwan'},{'code':'TH','name':'Thailand'},{'code':'TR','name':'Turkey'},{'code':'UA','name':'Ukraine'},{'code':'GB','name':'United Kingdom'},{'code':'US','name':'United States of America'}];
     try {
         response.data = countriesWithISO;
         res.json(response);
@@ -491,20 +502,20 @@ async function getCountryList(req, res) {
 async function getConditions(req, res) {
     const response = new Response({}, []);
     let conditions = [
-        "Ankylosing Spondylitis",
-        "Crohn's Disease",
-        "Lupus Erythematosus",
-        "Sjogren's Syndrome",
-        "Ulcerative Colitis",
-        "Systemic Sclerosis",
-        "Uveitis",
-        "Rheumatoid Arthritis",
-        "Atopic Dermatitis",
-        "Autosomal Dominant Polycystic Kidney Disease",
-        "Idiopathic Pulmonary Fibrosis",
-        "Osteoarthritis",
-        "Psoriatic Arthritis"
-    ]
+        'Ankylosing Spondylitis',
+        'Atopic Dermatitis',
+        'Autosomal Dominant Polycystic Kidney Disease',
+        'Crohn\'s Disease',
+        'Idiopathic Pulmonary Fibrosis',
+        'Lupus Erythematosus',
+        'Psoriatic Arthritis',
+        'Osteoarthritis',
+        'Rheumatoid Arthritis',
+        'Sjogren\'s Syndrome',
+        'Systemic Sclerosis',
+        'Ulcerative Colitis',
+        'Uveitis'
+    ].sort();
     try {
         response.data = conditions;
         res.json(response);
@@ -514,13 +525,39 @@ async function getConditions(req, res) {
     }
 }
 
+async function getConditionsWithDetails(req, res) {
+    const response = new Response({}, []);
+    let conditions = [
+        {indication: 'Ankylosing Spondylitis', description: 'Ankylosing spondylitis (AS) is a type of arthritis in which there is a long-term inflammation of the joints of the spine. Typically the joints where the spine joins the pelvis are also affected. Occasionally other joints such as the shoulders or hips are involved. Eye and bowel problems may also occur.'},
+        {indication: 'Atopic Dermatitis', description: 'Atopic dermatitis (eczema) is a condition that makes your skin red and itchy. It\'s common in children but can occur at any age. Atopic dermatitis is long lasting (chronic) and tends to flare periodically. It may be accompanied by asthma or hay fever.'},
+        {indication: 'Autosomal Dominant Polycystic Kidney Disease', description:  'Autosomal dominant polycystic kidney disease (ADPKD) is a genetic disorder characterized by the growth of numerous cysts in the kidneys. Symptoms vary in severity and age of onset, but usually develop between the ages of 30 and 40. ADPKD is a progressive disease and symptoms tend to get worse over time. The most common symptoms are kidney cysts, pain in the back and the sides and headaches. Other symptoms include liver and pancreatic cysts, urinary tract infections, abnormal heart valves, high blood pressure, kidney stones, and brain aneurysms. ADPKD is most often caused by changes in the PKD1 and PKD2 genes, and less often by changes in the GANAB and DNAJB11 genes.[1] It is inherited in a dominant pattern. Treatment for ADPKD involves managing the symptoms and slowing disease progression. The most serious complication of ADPKD is kidney disease and kidney failure. ADPKD is the most common inherited disorder of the kidneys.'},
+        {indication: 'Crohn\'s Disease', description:  'Crohn\'s disease is a type of inflammatory bowel disease (IBD). It causes inflammation of your digestive tract, which can lead to abdominal pain, severe diarrhea, fatigue, weight loss and malnutrition.'},
+        {indication: 'Idiopathic Pulmonary Fibrosis', description:  'Idiopathic pulmonary fibrosis (IPF) is a rare, progressive illness of the respiratory system, characterized by the thickening and stiffening of lung tissue, associated with the formation of scar tissue. It is a type of chronic scarring lung disease characterized by a progressive and irreversible decline in lung function.[3][4] The tissue in the lungs becomes thick and stiff, which affects the tissue that surrounds the air sacs in the lungs.'},
+        {indication: 'Lupus Erythematosus', description:  'Lupus, technically known as systemic lupus erythematosus (SLE), is an autoimmune disease in which the body\'s immune system mistakenly attacks healthy tissue in many parts of the body.[1] Symptoms vary between people and may be mild to severe.[1] Common symptoms include painful and swollen joints, fever, chest pain, hair loss, mouth ulcers, swollen lymph nodes, feeling tired, and a red rash which is most commonly on the face.[1] Often there are periods of illness, called flares, and periods of remission during which there are few symptoms.'},
+        {indication: 'Psoriatic Arthritis', description:  'Psoriatic arthritis is a form of arthritis that affects some people who have psoriasis — a condition that features red patches of skin topped with silvery scales. Most people develop psoriasis first and are later diagnosed with psoriatic arthritis, but the joint problems can sometimes begin before skin patches appear.'},
+        {indication: 'OsteoarthritisOsteoarthritis (OA) is a type of joint disease that results from breakdown of joint cartilage and underlying bone. The most common symptoms are joint pain and stiffness. Usually the symptoms progress slowly over years. Initially they may occur only after exercise but can become constant over time.'},
+        {indication: 'Rheumatoid Arthritis', description:  'Rheumatoid arthritis is a chronic inflammatory disorder that can affect more than just your joints. In some people, the condition can damage a wide variety of body systems, including the skin, eyes, lungs, heart and blood vessels.'},
+        {indication: 'Sjogren\'s Syndrome', description:  'Sjogren\'s syndrome is an autoimmune disease. This means that your immune system attacks parts of your own body by mistake. In Sjogren\'s syndrome, it attacks the glands that make tears and saliva. This causes a dry mouth and dry eyes. You may have dryness in other places that need moisture, such as your nose, throat, and skin. Sjogren\'s can also affect other parts of the body, including your joints, lungs, kidneys, blood vessels, digestive organs, and nerves.'},
+        {indication: 'Systemic scleroderma, or systemic sclerosis, is an autoimmune rheumatic disease characterised by excessive production and accumulation of collagen, called fibrosis, in the skin and internal organs and by injuries to small arteries. There are two major subgroups of systemic sclerosis based on the extent of skin involvement: limited and diffuse. The limited form affects areas below, but not above, the elbows and knees with or without involvement of the face. The diffuse form also affects the skin above the elbows and knees and can also spread to the torso. Visceral organs, including the kidneys, heart, lungs, and gastrointestinal tract can also be affected by the fibrotic process. Prognosis is determined by the form of the disease and the extent of visceral involvement. Patients with limited systemic sclerosis have a better prognosis than those with the diffuse form. Death is most often caused by lung, heart, and kidney involvement. There is also a slight increase in the risk of cancer.'},
+        {indication: 'Ulcerative Colitis', description: 'Ulcerative colitis (UC) is a long-term condition that results in inflammation and ulcers of the colon and rectum. The primary symptoms of active disease are abdominal pain and diarrhea mixed with blood. Weight loss, fever, and anemia may also occur.'},
+        {indication: 'Uveitis', description:  'Uveitis is a form of eye inflammation. It affects the middle layer of tissue in the eye wall (uvea). Uveitis (u-vee-I-tis) warning signs often come on suddenly and get worse quickly. They include eye redness, pain and blurred vision.'}
+    ].sort();
+    try {
+        response.data = conditions;
+        res.json(response);
+        res.json(conditions);
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+
 async function validateAddress(req, res) {
     const response = new Response({}, []);
     let {country, zipcode} = req.body;
-    const api_res = await fetch(`https://maps.google.com/maps/api/geocode/json?address=${country},%20${zipcode}&key=AIzaSyAXBeTXzlo_-vwKTza6MGrzNwRHn8ppHrQ`);
-    const json = await api_res.json()
+    let coordinate = await getCoordinates('', zipcode, '', '', country, 1)
     try {
-        response.data = !!json.results.length;
+        response.data = coordinate.lat !=-1 && coordinate.lng !=-1;
         res.json(response);
         console.log(country,zipcode)
     } catch (err) {
@@ -535,4 +572,5 @@ exports.getTrials = getTrials;
 exports.getTrialDetails = getTrialDetails;
 exports.getCountryList = getCountryList;
 exports.getConditions = getConditions;
+exports.getConditionsWithDetails = getConditionsWithDetails;
 exports.validateAddress = validateAddress;

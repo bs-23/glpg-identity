@@ -66,7 +66,7 @@ let trialModel = {
         type_of_drug: {
             unique: false,
             allowNull: true,
-            type: DataTypes.STRING(60)
+            type: DataTypes.STRING(500)
         },
         eudract_number: {
             unique: false,
