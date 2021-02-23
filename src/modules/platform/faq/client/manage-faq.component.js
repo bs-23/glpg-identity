@@ -109,7 +109,7 @@ export default function ManageFaq() {
                             </Dropdown>
                             <span className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary"></i></span>
                         </nav>
-                       
+
                         <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
                             <Modal.Header closeButton>
                                 <Modal.Title>Questions You May Have</Modal.Title>
@@ -141,22 +141,29 @@ export default function ManageFaq() {
                             {serviceTopics && serviceTopics.length > 0 && faqData.metadata &&
                                 <div className="d-flex justify-content-between align-items-center">
                                     <Dropdown className="ml-auto dropdown-customize">
-                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center">
-                                        <i className="icon icon-filter mr-2 mb-n1"></i> <span className="d-none d-sm-inline-block">{faqData.metadata.topic === null || history.action === "PUSH" ? 'Filter by Topics' : serviceTopics.find(x => x.slug === faqData.metadata.topic).title}</span>
+                                        <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center">
+                                            <i className="icon icon-filter mr-2 mb-n1"></i> <span className="d-none d-sm-inline-block">{faqData.metadata.topic === null ? 'Filter by Topics' : serviceTopics.find(x => x.slug === faqData.metadata.topic).title}</span>
                                         </Dropdown.Toggle>
                                         <Dropdown.Menu>
                                             {serviceTopics.length > 0 && faqData.metadata.topic && <Dropdown.Item onClick={() => urlChange(1, 'null', params.get('orderBy'))}>All</Dropdown.Item>
                                             }
                                             {
-                                            serviceTopics.length > 0 && serviceTopics.map((item, index) => (
-                                                item.title !== faqData.metadata.topic && <Dropdown.Item className="text-break" key={index} onClick={() => urlChange(1, item.slug, params.get('orderBy'))}>{item.title}</Dropdown.Item>
+                                                serviceTopics.length > 0 && serviceTopics.map((item, index) => (
+                                                    item.title !== faqData.metadata.topic && <Dropdown.Item className="text-break" key={index} onClick={() => urlChange(1, item.slug, params.get('orderBy'))}>{item.title}</Dropdown.Item>
                                                 ))
                                             }
+
+                                            {/* {
+                                                //using href
+                                                serviceTopics.length > 0 && serviceTopics.map((item, index) => (
+                                                    item.title !== faqData.metadata.topic && <Dropdown.Item href={`/platform/manage-faq?page=1&topic=${item.slug}`} key={index}>{item.title}</Dropdown.Item>
+                                                ))
+                                            } */}
                                         </Dropdown.Menu>
                                     </Dropdown>
 
                                     <button onClick={() => { setShow(true); setEditMode(false); setEditData(null); }} className="btn cdp-btn-secondary text-white ml-2">
-                                    <i className="icon icon-plus"></i> <span className="d-none d-sm-inline-block pl-1">Add New FAQ</span>
+                                        <i className="icon icon-plus"></i> <span className="d-none d-sm-inline-block pl-1">Add New FAQ</span>
                                     </button>
                                 </div>
                             }
@@ -164,7 +171,7 @@ export default function ManageFaq() {
 
                         {faqData.faq && faqData.faq.length > 0 && serviceTopics && serviceTopics.length > 0 &&
                             <div className="table-responsive shadow-sm bg-white mb-3 cdp-table__responsive-wrapper">
-                            <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
+                                <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
                                             <th width="25%"><span className={sort.value === 'question' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, faqData.metadata.topic, 'question')}>Question<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
