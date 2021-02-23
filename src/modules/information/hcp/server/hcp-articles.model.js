@@ -36,13 +36,11 @@ const HcpArticles = sequelize.ppiConnector.define('hcp_articles', {
         type: DataTypes.STRING
     },
     individual_id_onekey: {
-        unique: true,
         allowNull: false,
         type: DataTypes.STRING
     }, 
     uuid: {
         allowNull: false,
-        unique: true,
         type: DataTypes.STRING
     }
 }, {

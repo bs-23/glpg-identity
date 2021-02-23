@@ -7,7 +7,8 @@ const initialState = {
     oklaHcpDetails: null,
     oklaHcoDetails: null,
     filterPresetsCdp: null,
-    filterPresetsCrdlp: null
+    filterPresetsCrdlp: null,
+    hcpArticles: null
 };
 
 const tablePresetPathMap = {
@@ -118,6 +119,13 @@ export default function reducer(state = initialState, action) {
             return {
                 ...state,
                 [path]: action.payload.data
+            };
+        }
+
+        case Types.GET_HCP_ARTICLES_FULFILLED: {
+            return {
+                ...state,
+                hcpArticles: action.payload.data
             };
         }
     }

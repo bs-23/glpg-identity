@@ -389,7 +389,7 @@ async function getHcps(req, res) {
 
 async function getHcpArticles(req, res) {
     const response = new Response({}, []);
-    let id = req.params.id;
+    const id = req.params.id;
     
     try{
         const article_details = await articles.findAll({
@@ -398,7 +398,8 @@ async function getHcpArticles(req, res) {
             }
         });
         response.data = article_details;
-        res.json(response);
+        // res.json(response);
+        res.json(article_details);
     } catch (err) {
         logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));

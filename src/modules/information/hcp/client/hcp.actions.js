@@ -151,3 +151,20 @@ export function getHcpFilterSettings(tableName) {
         })
     };
 }
+
+export function getHcpArticles(individualEid){
+    return {
+        type: Types.GET_HCP_ARTICLES,
+        payload: axios({
+            method: 'get',
+            url: `/api/hcps-articles/${individualEid}`
+        })
+    };
+}
+
+export function setHcpArticles(articleDetails) {
+    return {
+        type: Types.SET_HCP_ARTICLES,
+        payload: articleDetails
+    };
+}

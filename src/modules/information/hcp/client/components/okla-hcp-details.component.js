@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Modal from 'react-bootstrap/Modal';
-import { getOklaHcpDetails, setOklaHcpDetails } from '../hcp.actions';
+import Accordion from 'react-bootstrap/Accordion';
+import Card from 'react-bootstrap/Card';
+import parse from 'html-react-parser';
+import { getOklaHcpDetails, setOklaHcpDetails, getHcpArticles, setHcpArticles } from '../hcp.actions';
 import MapView from '../../../../core/client/components/map-view';
 import { Tabs, Tab } from 'react-bootstrap';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -13,9 +16,11 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
 
     const hcpDetails = useSelector(state => state.hcpReducer.oklaHcpDetails);
     const allCountries = useSelector(state => state.countryReducer.allCountries);
+    const hcpArticles = useSelector(state => state.hcpReducer.hcpArticles);
 
     const hideHcpDetails = () => {
         dispatch(setOklaHcpDetails(null));
+        dispatch(setHcpArticles(null));
         setSelectedIndividual(null);
     };
 
@@ -25,6 +30,7 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
     };
 
     useEffect(() => {
+        dispatch(getHcpArticles(individual.id));
         dispatch(getOklaHcpDetails(individual.codbase, individual.id));
     }, [individual]);
 
@@ -41,6 +47,10 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
             const mainWorkplace = hcpDetails.workplaces.find(w => w.isMainActivity);
             setSelectedWorkplace(mainWorkplace || hcpDetails.workplaces[0]);
         }
+
+        // else if (hcpDetails && selectedTab == 'Articles') {
+        //     dispatch(getHcpArticles(hcpDetails.individualEid));
+        // }
     }, [hcpDetails, selectedTab]);
 
     return <Modal
@@ -179,6 +189,31 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
 
                             {selectedWorkplace && selectedWorkplace.location && <MapView location={selectedWorkplace.location} />}
                         </Tab>
+                        
+                        {hcpArticles.length > 0 && 
+                            <Tab eventKey="Articles" title="Articles">
+                            <div className="faq shadow-sm bg-white">
+                                <Accordion defaultActiveKey="0"  className='faq__body'>
+                                    {hcpArticles.map((article,index) => (
+                                        <Card key={index}>
+                                            <Accordion.Collapse eventKey={index + ""}>
+                                                <Card.Body>{parse(parse(article.article_abstract))}</Card.Body>
+                                            </Accordion.Collapse>
+                                            <Accordion.Toggle as={Card.Header} eventKey={index + ""} className="p-3 d-flex align-items-baseline justify-content-between" role="button" >
+                                                <span className="faq__question">
+                                                    {article.article_title} &nbsp;
+                                                    <a href={article.article_url} target="_blank">Go to Article</a> &nbsp;
+                                                    Citation Count: {article.citation_count}
+                                                </span>
+                                                
+                                                <i className="icon icon-arrow-down ml-2 faq__icon-down"></i>
+                                            </Accordion.Toggle>
+                                        </Card>
+                                    ))}
+                                </Accordion>
+                            </div>
+                        </Tab>
+                        }
                     </Tabs>
                 </div>
             ) : (<div></div>)}
