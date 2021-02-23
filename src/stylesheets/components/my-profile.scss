@@ -1,9 +1,15 @@
 .my-profile {
     &__btn {
         max-width: 200px;
-        text-overflow: ellipsis;
         white-space: nowrap;
         overflow: hidden;
+        align-items: center;
+        display: flex;
+
+        &-text {
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
     }
 
     &__sidebar {
