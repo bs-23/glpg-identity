@@ -1,5 +1,7 @@
 import { string, object, array } from 'yup';
 
+const MAX_PERMISSION_SETS = 5;
+
 export const roleSchema = object().shape({
     name: string()
         .required('This field must not be empty'),
@@ -22,5 +24,10 @@ export const roleCreateSchema = object().shape({
     description: string()
         .transform(value => value.trim())
         .max(500, 'This field must be at most 500 characters long')
-        .nullable()
+        .nullable(),
+    permissionSetsError: string()
+        .test('is-max', `A maximum of ${MAX_PERMISSION_SETS} permission sets can be selected`, function() {
+            const { permissionSets } = this.parent;
+            return permissionSets.length <= MAX_PERMISSION_SETS;
+        })
 });

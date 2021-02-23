@@ -1,7 +1,7 @@
 const passport = require('passport');
 const path = require('path');
 const controller = require('./manage-partners.controller');
-const { partnerHcpSchema, partnerHcoSchema, partnerVendorSchema, validateFile } = require('./partner.schema');
+const { createPartnerSchema, updatePartnerSchema, createPartnerVendorSchema, updatePartnerVendorSchema, validateFile } = require('./partner.schema');
 const { validate } = require(path.join(process.cwd(), 'src/modules/core/server/middlewares/validator.middleware'));
 const { Services } = require('../../../core/server/authorization/authorization.constants');
 const { ServiceGuard } = require('../../../core/server/authorization/authorization.middleware');
@@ -9,29 +9,21 @@ const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/platfo
 const multer = require(path.join(process.cwd(), 'src/config/server/lib/multer'));
 
 module.exports = app => {
-    app.route('/api/partners/hcps')
-        .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_BUSINESS_PARTNER]), controller.getPartnerHcps)
-        .post(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), validate(partnerHcpSchema), controller.createPartnerHcp);
+    app.route('/api/partners')
+        .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_BUSINESS_PARTNER]), controller.getPartners)
+        .post(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), validate(createPartnerSchema), controller.createPartner);
 
-    app.route('/api/partners/hcps/:id')
-        .get(passport.authenticate('application-jwt', { session: false }), controller.getHcpPartnerById)
-        .put(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), controller.updatePartnerHcp);
-
-    app.route('/api/partners/hcos')
-        .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_BUSINESS_PARTNER]), controller.getPartnerHcos)
-        .post(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), validate(partnerHcoSchema), controller.createPartnerHco);
-
-    app.route('/api/partners/hcos/:id')
-        .get(passport.authenticate('application-jwt', { session: false }), controller.getHcoPartnerById)
-        .put(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), controller.updatePartnerHco);
+    app.route('/api/partners/:id')
+        .get(passport.authenticate('application-jwt', { session: false }), controller.getPartnerById)
+        .put(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), validate(updatePartnerSchema), controller.updatePartner);
 
     app.route('/api/partners/vendors')
         .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_BUSINESS_PARTNER]), controller.getPartnerVendors)
-        .post(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), validate(partnerVendorSchema), controller.createPartnerVendor);
+        .post(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), validate(createPartnerVendorSchema), controller.createPartnerVendor);
 
     app.route('/api/partners/vendors/:id')
-        .get(passport.authenticate('application-jwt', { session: false }), controller.getVendorPartnerById)
-        .put(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), controller.updatePartnerVendor);
+        .get(passport.authenticate('application-jwt', { session: false }), controller.getPartnerVendorById)
+        .put(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), validate(updatePartnerVendorSchema), controller.updatePartnerVendor);
 
     app.route('/api/partners/wholesalers')
         .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_BUSINESS_PARTNER]), controller.getPartnerWholesalers);
