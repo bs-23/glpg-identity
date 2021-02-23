@@ -78,7 +78,8 @@ const ProfileForm = ({ onSuccess, permissionSets, preFill }) => {
                         initialValues={{
                             title: preFill ? preFill.title : '',
                             description: preFill ? preFill.description : '',
-                            permissionSets: preFill ? Array.isArray(preFill.permissionssetIDs) ? preFill.permissionssetIDs : [] : []
+                            permissionSets: preFill ? Array.isArray(preFill.permissionssetIDs) ? preFill.permissionssetIDs : [] : [],
+                            permissionSetsError: ''
                         }}
                         displayName="ProfileForm"
                         validationSchema={profileCreateSchema}
@@ -103,6 +104,7 @@ const ProfileForm = ({ onSuccess, permissionSets, preFill }) => {
                                             <FormField name="permissionSets" label="Select Permission Sets">
                                                 <ToggleListSlider name="permissionSets" options={getToggleListOptions()} valueExtractor={item => item.id} idExtractor={item => item.id} labelExtractor={item => item.title} />
                                             </FormField>
+                                            <div className="invalid-feedback col-12"><ErrorMessage name="permissionSetsError" /></div>
                                         </div>
                                         <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting} > Submit </button>
                                     </div>

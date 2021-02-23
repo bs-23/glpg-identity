@@ -77,7 +77,8 @@ const RoleForm = ({ onSuccess, permissionSets, preFill }) => {
                         initialValues={{
                             title: preFill ? preFill.title : '',
                             description: preFill ? preFill.description : '',
-                            permissionSets: preFill ? Array.isArray(preFill.permissionssetIDs) ? preFill.permissionssetIDs : [] : []
+                            permissionSets: preFill ? Array.isArray(preFill.permissionssetIDs) ? preFill.permissionssetIDs : [] : [],
+                            permissionSetsError: ''
                         }}
                         displayName="RoleForm"
                         validationSchema={roleCreateSchema}
@@ -104,6 +105,7 @@ const RoleForm = ({ onSuccess, permissionSets, preFill }) => {
                                                     <ToggleListSlider name="permissionSets" options={filteredPermissonSet} valueExtractor={item => item.id} idExtractor={item => item.id} labelExtractor={item => item.title} /> :
                                                     <div>No custom permission set found. <Link to={{ pathname: "/platform/permission-sets", state: { showCreateModal: true } }}  >Click here to create one.</Link></div>}
                                             </FormField>
+                                            <div className="invalid-feedback col-12"><ErrorMessage name="permissionSetsError" /></div>
                                         </div>
                                         <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting || !filteredPermissonSet.length} > Submit </button>
                                     </div>
