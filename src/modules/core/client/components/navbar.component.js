@@ -71,7 +71,7 @@ export default function Navigationbar() {
                                 </div>
                             </div>}
                             <div className="mb-2 mb-sm-0 d-flex justify-content-end align-items-center">
-                                <button className="mr-2 btn cdp-btn-secondary text-white my-profile__btn" onClick={myProfileClickHandler}><i className="icon icon-user-round mr-1 app__header-icon-user "></i> <span className="d-none d-lg-inline-block">{first_name + " " + last_name}</span></button>
+                                <button className="mr-2 btn cdp-btn-secondary text-white my-profile__btn" onClick={myProfileClickHandler}><i className="icon icon-user-round mr-1 app__header-icon-user "></i> <span className="d-none d-lg-inline-block my-profile__btn-text">{first_name + " " + last_name}</span></button>
                                 <a className="btn cdp-btn-outline-primary d-flex align-items-center" title="Sign out" onClick={handleLogOut} href="/api/logout"><i className="icon icon-logout mr-1 app__header-icon-logout"></i> <span className="d-none d-lg-inline-block">Sign out</span></a>
                             </div>
                         </div>
