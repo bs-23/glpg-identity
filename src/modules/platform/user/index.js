@@ -6,6 +6,7 @@ import Dashboard from './client/components/dashboard.component';
 import ForgotPassword from './client/components/forgot-password.component';
 import ResetPassword from './client/components/reset-password.component';
 import MyProfile from './client/components/my-profile/my-profile.component';
+import UserForm from './client/components/user-form.component';
 import * as userActions from './client/user.actions';
 
 export function UserClientRoutes(props) {
@@ -19,5 +20,6 @@ export {
     Dashboard,
     ForgotPassword,
     ResetPassword,
-    MyProfile
+    MyProfile,
+    UserForm
 };

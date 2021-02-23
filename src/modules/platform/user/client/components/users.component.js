@@ -9,6 +9,7 @@ import Modal from 'react-bootstrap/Modal';
 import Accordion from 'react-bootstrap/Accordion';
 import Faq from '../../../faq/client/faq.component';
 import UsersFilter from './users-filter.component';
+import { UserForm } from '../../../../platform';
 
 const safeGet = (object, property) => {
     const propData = (object || {})[property];
@@ -27,14 +28,13 @@ export default function Users() {
     const history = useHistory();
 
     const [codBase, setCodBase] = useState(null);
-    // const [userCountries, setUserCountries] = useState([]);
     const [sort, setSort] = useState({ type: 'asc', value: null });
-
     const [showFilter, setShowFilter] = useState(false);
     const [isFilterEnabled, setIsFilterEnabled] = useState(false);
     const [selectedFilterSetting, setSelectedFilterSetting] = useState(null);
-
+    const [showCreateUser, setShowCreateUser] = useState(false);
     const [showFaq, setShowFaq] = useState(false);
+
     const handleCloseFaq = () => setShowFaq(false);
     const handleShowFaq = () => setShowFaq(true);
 
@@ -60,21 +60,6 @@ export default function Users() {
         return user_countries;
     }
 
-    // const extractLoggedInUserCountries = (data) => {
-    //     const profile_permission_sets = safeGet(data, 'profile')('permissionSets')();
-    //     const profile_countries = profile_permission_sets ? profile_permission_sets.map(pps => safeGet(pps, 'countries')() || []) : [];
-
-    //     const userRoles = safeGet(data, 'role')();
-    //     const roles_countries = userRoles ? userRoles.map(role => {
-    //         const role_permission_sets = safeGet(role, 'permissionSets')();
-    //         return role_permission_sets.map(rps => safeGet(rps, 'countries')() || []);
-    //     }) : [];
-
-    //     const user_countries = union(flatten(profile_countries), flatten(roles_countries)).filter(e => e);
-
-    //     return user_countries;
-    // }
-
     const sortCountries = (user_countries) => {
         let countryArr = [];
         let countryString = "";
@@ -92,15 +77,6 @@ export default function Users() {
 
         return countryString;
     }
-
-    // useEffect(() => {
-    //     async function getCountries() {
-    //         const userProfile = (await axios.get('/api/users/profile')).data;
-    //         const user_countries = extractLoggedInUserCountries(userProfile);
-    //         setUserCountries(fetchUserCountries(user_countries, countries));
-    //     }
-    //     getCountries();
-    // }, []);
 
     useEffect(() => {
         setCodBase(params.get('codbase') ? params.get('codbase') : null);
@@ -133,15 +109,6 @@ export default function Users() {
 
         setSort({ type: params.get('orderType') || 'asc', value: params.get('orderBy') });
     }, [location]);
-
-
-    const fetchUserCountries = (args, allCountries) => {
-        const countryList = [];
-        args.forEach(element => {
-            countryList.push(allCountries.find(x => x.country_iso2 == element));
-        });
-        return countryList.filter(c => c);
-    }
 
     const urlChange = (pageNo, country_codbase, orderColumn, pageChange = false) => {
         let orderType = params.get('orderType');
@@ -317,9 +284,9 @@ export default function Users() {
                                         <span className="d-none d-sm-inline-block">Reset</span>
                                     </button>
                                 }
-                                <NavLink to="/platform/create-user" className="btn cdp-btn-secondary text-white ml-2">
+                                <button to="/platform/create-user" className="btn cdp-btn-secondary text-white ml-2" onClick={() => setShowCreateUser(true)}>
                                     <i className="icon icon-plus"></i> <span className="d-none d-sm-inline-block pl-1">Create new user</span>
-                                </NavLink>
+                                </button>
                             </div>
                         </div>
 
@@ -386,6 +353,15 @@ export default function Users() {
                                 </div>
                             </div>
                         }
+
+                        <Modal show={showCreateUser} onHide={() => setShowCreateUser(false)} size="lg" centered>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Create New User</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body className="faq__in-modal">
+                                <UserForm />
+                            </Modal.Body>
+                        </Modal>
                     </div>
                 </div>
             </div>
