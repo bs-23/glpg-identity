@@ -1,9 +1,9 @@
 paths:
-    /api/partners/hcps:
+    /api/partners:
         post:
             tags:
                 - manage-partners
-            summary: Create HCP Business Partner in CDP.
+            summary: Create HCP/HCO Business Partner in CDP.
             requestBody:
                 required: true
                 content:
@@ -37,13 +37,13 @@ paths:
                                     type: string
                                 individual_type:
                                     type: string
-                                    description: Only for HCP
+                                    description: Only for HCP  (required)
                                     enum:
                                     - individual
                                     - legal_entity
                                 organization_type:
                                     type: string
-                                    description: Only for HCO
+                                    description: Only for HCO  (required)
                                     enum:
                                     - healthcare_org
                                     - patient_org
@@ -109,11 +109,11 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/errorResponse"
 
-    /api/partners/hcps/{id}:
+    /api/partners/{id}:
         get:
             tags:
                 - manage-partners
-            summary: Get HCP partner's detail by id.
+            summary: Get HCP/HCO partner's detail by id.
             parameters:
                 - name: id
                   in: path
@@ -144,7 +144,7 @@ paths:
         put:
             tags:
                 - manage-partners
-            summary: update HCP Business Partner in CDP.
+            summary: update HCP/HCO Business Partner in CDP.
             parameters:
                 - name: id
                   in: path
@@ -159,10 +159,18 @@ paths:
                         schema:
                             type: object
                             properties:
+                                type:
+                                    type: string
+                                    enum:
+                                    - hcp
+                                    - hco
                                 first_name:
                                     type: string
                                 last_name:
                                     type: string
+                                organization_name:
+                                    type: string
+                                    description: Only for HCO
                                 address:
                                     type: string
                                 city:
@@ -173,12 +181,19 @@ paths:
                                     type: string
                                 telephone:
                                     type: string
-                                type:
+                                individual_type:
                                     type: string
+                                    description: Only for HCP
                                     enum:
                                     - individual
                                     - legal_entity
                                     default: individual
+                                organization_type:
+                                    type: string
+                                    description: Only for HCO
+                                    enum:
+                                    - healthcare_org
+                                    - patient_org
                                 registration_number:
                                     type: string
                                 country_iso2:
@@ -189,10 +204,13 @@ paths:
                                     type: string
                                 is_italian_hcp:
                                     type: boolean
+                                    description: Only for HCP
                                 should_report_hco:
                                     type: boolean
+                                    description: Only for HCP
                                 beneficiary_category:
                                     type: string
+                                    description: Only for HCP
                                     enum:
                                     - beneficiary_category_1
                                     - beneficiary_category_2
@@ -224,212 +242,6 @@ paths:
                                 properties:
                                     data:
                                         $ref: "#/components/schemas/partnerProfile"
-                                    errors:
-                                        $ref: "#/components/schemas/errorBodyInSuccess"
-                400:
-                    description: Bad request.
-                    content:
-                        applicaiton/json:
-                            schema:
-                                $ref: "#/components/schemas/errorResponse"
-
-    /api/partners/hcos:
-        post:
-            tags:
-                - manage-partners
-            summary: Create HCO Business Partner in CDP.
-            requestBody:
-                required: true
-                content:
-                    multipart/form-data:
-                        schema:
-                            type: object
-                            allowEmptyValue: false
-                            properties:
-                                request_id:
-                                    type: string
-                                contact_first_name:
-                                    type: string
-                                contact_last_name:
-                                    type: string
-                                organization_name:
-                                    type: string
-                                address:
-                                    type: string
-                                city:
-                                    type: string
-                                post_code:
-                                    type: string
-                                email:
-                                    type: string
-                                telephone:
-                                    type: string
-                                type:
-                                    type: string
-                                    enum:
-                                    - healthcare_org
-                                    - patient_org
-                                country_iso2:
-                                    type: string
-                                locale:
-                                    type: string
-                                uuid:
-                                    type: string
-                                registration_number:
-                                    type: string
-                                iban:
-                                    type: string
-                                bank_name:
-                                    type: string
-                                bank_account_no:
-                                    type: string
-                                currency:
-                                    type: string
-                                documents:
-                                    type: array
-                                    description: Upto 5 files each upto 5 MB in size. File name may contain a-zA-Z0-9/!\'() .*-_
-                                    items:
-                                        type: string
-                                        format: binary
-                            required:
-                              - request_id
-                              - contact_first_name
-                              - contact_last_name
-                              - organization_name
-                              - registration_number
-                              - email
-                              - type
-                              - country_iso2
-                              - locale
-                              - uuid
-            responses:
-                200:
-                    description: The request has succeeded.
-                    content:
-                        applicaiton/json:
-                            schema:
-                                type: object
-                                properties:
-                                    data:
-                                        $ref: "#/components/schemas/partnerHcoProfile"
-                                    errors:
-                                        $ref: "#/components/schemas/errorBodyInSuccess"
-                400:
-                    description: Bad request.
-                    content:
-                        applicaiton/json:
-                            schema:
-                                $ref: "#/components/schemas/errorResponse"
-
-    /api/partners/hcos/{id}:
-        get:
-            tags:
-                - manage-partners
-            summary: Get HCO partner's detail by id.
-            parameters:
-                - name: id
-                  in: path
-                  required: true
-                  description: the partner's identifier
-                  schema:
-                   type: string
-            responses:
-                200:
-                    description: The request has succeeded.
-                    content:
-                        application/json:
-                            schema:
-                                type: object
-                                properties:
-                                    data:
-                                        $ref: "#/components/schemas/partnerHcoProfile"
-                                    errors:
-                                        $ref: "#/components/schemas/errorBodyInSuccess"
-                401:
-                    description: User is not authenticated.
-                404:
-                    description: The partner does not exist.
-                    content:
-                        applicaiton/json:
-                            schema:
-                                $ref: "#/components/schemas/errorResponse"
-        put:
-            tags:
-                - manage-partners
-            summary: update HCO Business Partner in CDP.
-            parameters:
-                - name: id
-                  in: path
-                  required: true
-                  description: the partner's identifier
-                  schema:
-                    type: string
-            requestBody:
-                required: true
-                content:
-                    multipart/form-data:
-                        schema:
-                            type: object
-                            properties:
-                                request_id:
-                                    type: string
-                                contact_first_name:
-                                    type: string
-                                contact_last_name:
-                                    type: string
-                                organization_name:
-                                    type: string
-                                address:
-                                    type: string
-                                city:
-                                    type: string
-                                post_code:
-                                    type: string
-                                email:
-                                    type: string
-                                telephone:
-                                    type: string
-                                type:
-                                    type: string
-                                    enum:
-                                    - healthcare_org
-                                    - patient_org
-                                country_iso2:
-                                    type: string
-                                locale:
-                                    type: string
-                                uuid:
-                                    type: string
-                                registration_number:
-                                    type: string
-                                iban:
-                                    type: string
-                                bank_name:
-                                    type: string
-                                bank_account_no:
-                                    type: string
-                                currency:
-                                    type: string
-                                documents:
-                                    type: array
-                                    description: Upto 5 files each upto 5 MB in size. File name may contain a-zA-Z0-9/!\'() .*-_
-                                    items:
-                                        type: string
-                                        format: binary
-                                remove_files:
-                                    type: array
-                                    items:
-                                        type: string
-            responses:
-                200:
-                    description: The request has succeeded.
-                    content:
-                        applicaiton/json:
-                            schema:
-                                type: object
-                                properties:
-                                    data:
-                                        $ref: "#/components/schemas/partnerHcoProfile"
                                     errors:
                                         $ref: "#/components/schemas/errorBodyInSuccess"
                 400:
@@ -812,60 +624,6 @@ components:
                     enum:
                     - beneficiary_category_1
                     - beneficiary_category_2
-                iban:
-                    type: string
-                bank_name:
-                    type: string
-                bank_account_no:
-                    type: string
-                currency:
-                    type: string
-                documents:
-                    type: array
-                    items:
-                        type: string
-        partnerHcoProfile:
-            type: object
-            properties:
-                id:
-                    type: string
-                status:
-                    type: string
-                    enum:
-                    - pending
-                    - approved
-                    - rejected
-                request_id:
-                    type: string
-                contact_first_name:
-                    type: string
-                contact_last_name:
-                    type: string
-                organization_name:
-                    type: string
-                address:
-                    type: string
-                city:
-                    type: string
-                post_code:
-                    type: string
-                email:
-                    type: string
-                telephone:
-                    type: string
-                type:
-                    type: string
-                    enum:
-                    - healthcare_org
-                    - patient_org
-                country_iso2:
-                    type: string
-                locale:
-                    type: string
-                uuid:
-                    type: string
-                registration_number:
-                    type: string
                 iban:
                     type: string
                 bank_name:
