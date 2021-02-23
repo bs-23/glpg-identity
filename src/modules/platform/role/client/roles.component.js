@@ -21,7 +21,7 @@ const FormField = ({ label, name, type, required = true, children, ...rest }) =>
 const ToggleListSlider = (props) => <ToggleList {...props} >
     {
         ({ id, name, label, value, isChecked, onChange, disabled }) =>
-        <label key={id} className="d-flex justify-content-between align-items-center">
+        <label key={id} className="d-flex justify-content-between align-items-center col-12 col-sm-6">
             <span className="switch-label">{label}</span>
             <span className="switch">
                 <input name={name}
@@ -102,7 +102,7 @@ const RoleForm = ({ onSuccess, permissionSets, preFill }) => {
                                         <div className="row">
                                             <FormField name="permissionSets" label="Select Permission Sets">
                                                 {filteredPermissonSet.length ?
-                                                    <ToggleListSlider name="permissionSets" options={filteredPermissonSet} valueExtractor={item => item.id} idExtractor={item => item.id} labelExtractor={item => item.title} /> :
+                                                    <div className="row"><ToggleListSlider name="permissionSets" options={filteredPermissonSet} valueExtractor={item => item.id} idExtractor={item => item.id} labelExtractor={item => item.title} /></div> :
                                                     <div>No custom permission set found. <Link to={{ pathname: "/platform/permission-sets", state: { showCreateModal: true } }}  >Click here to create one.</Link></div>}
                                             </FormField>
                                             <div className="invalid-feedback col-12"><ErrorMessage name="permissionSetsError" /></div>
@@ -269,6 +269,7 @@ export default function ManageRoles() {
                             dialogClassName="modal-90w modal-customize"
                             aria-labelledby="example-custom-modal-styling-title"
                             centered
+                            size="lg"
                         >
                             <Modal.Header closeButton>
                                 <Modal.Title id="example-custom-modal-styling-title">

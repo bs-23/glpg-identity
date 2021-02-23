@@ -52,8 +52,11 @@ async function removeDocuments(fileKeys) {
     await File.destroy({ where: { key: fileKeys } });
 }
 
-async function getPartnerHcps(req, res) {
+async function getPartners(req, res) {
     try {
+        const type = req.query.type;
+        if (!type) return res.status(400).send('type not specified');
+
         const page = req.query.page ? +req.query.page - 1 : 0;
         const limit = req.query.limit ? +req.query.limit : 15;
         const offset = page * limit;
@@ -75,14 +78,14 @@ async function getPartnerHcps(req, res) {
         if (orderBy !== 'created_at') order.push(['created_at', 'DESC']);
 
         const hcpPartners = await Partner.findAll({
-            where: { entity_type: 'hcp' },
+            where: { entity_type: type },
             offset,
             limit,
             order,
             attributes: ['id', 'onekey_id', 'uuid', 'first_name', 'last_name', 'address', 'city', 'country_iso2', 'locale', 'status']
         });
 
-        const total = await Partner.count({ where: { entity_type: 'hcp' }, });
+        const total = await Partner.count({ where: { entity_type: type }, });
 
         const responseData = {
             partners: hcpPartners,
@@ -150,15 +153,14 @@ async function getPartnerHcp(req, res) {
     }
 }
 
-async function createPartnerHcp(req, res) {
+async function createPartner(req, res) {
     const response = new Response({}, []);
-    const entityType = 'hcp';
     try {
         const files = req.files;
 
-        const { request_id, first_name, last_name, address, city, post_code, email, telephone,
-            type, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
-            iban, bank_name, bank_account_no, currency } = req.body;
+        const { type, request_id, first_name, last_name, organization_name, address, city, post_code, email, telephone, country_iso2, locale, registration_number, uuid, individual_type, organization_type, is_italian_hcp, should_report_hco, beneficiary_category, iban, bank_name, bank_account_no, currency } = req.body;
+
+        const entityType = type;
 
         if (response.errors.length) return res.status(400).send(response);
 
@@ -184,10 +186,17 @@ async function createPartnerHcp(req, res) {
         };
 
         data.entity_type = entityType;
-        data.individual_type = type;
+        if (entityType === 'hcp') {
+            data.individual_type = individual_type;
+        }
+
+        if (entityType === 'hco') {
+            data.organization_type = organization_type;
+            data.organization_name = organization_name;
+        }
         data.onekey_id = partnerRequest.onekey_id;
 
-        const [partnerHcp, created] = await Partner.findOrCreate({
+        const [partnerHcx, created] = await Partner.findOrCreate({
             where: { request_id: request_id },
             defaults: data
         });
@@ -199,20 +208,29 @@ async function createPartnerHcp(req, res) {
 
         await partnerRequest.update({ status: 'submitted' });
 
-        await uploadDucuments(partnerHcp, entityType, files);
+        await uploadDucuments(partnerHcx, entityType, files);
 
-        partnerHcp.dataValues.type = partnerHcp.dataValues.individual_type;
+        partnerHcx.dataValues.type = partnerHcx.dataValues.individual_type;
 
-        delete partnerHcp.dataValues.created_at;
-        delete partnerHcp.dataValues.updated_at;
-        delete partnerHcp.dataValues.individual_type;
-        delete partnerHcp.dataValues.organization_name;
-        delete partnerHcp.dataValues.organization_type;
-        delete partnerHcp.dataValues.entity_type;
-        delete partnerHcp.dataValues.onekey_id;
+        if (entityType === 'hcp') {
+            delete partnerHcx.dataValues.organization_name;
+            delete partnerHcx.dataValues.organization_type;
+        }
 
+        if (entityType === 'hco') {
+            delete partnerHcx.dataValues.individual_type;
+            delete partnerHcx.dataValues.is_italian_hcp;
+            delete partnerHcx.dataValues.should_report_hco;
+            delete partnerHcx.dataValues.beneficiary_category;
+        }
 
-        response.data = partnerHcp;
+        partnerHcx.dataValues.type = partnerHcx.dataValues.entity_type;
+        delete partnerHcx.dataValues.entity_type;
+        delete partnerHcx.dataValues.created_at;
+        delete partnerHcx.dataValues.updated_at;
+        delete partnerHcx.dataValues.onekey_id;
+
+        response.data = partnerHcx;
         res.json(response);
 
     } catch (err) {
@@ -222,18 +240,17 @@ async function createPartnerHcp(req, res) {
     }
 }
 
-async function updatePartnerHcp(req, res) {
+async function updatePartner(req, res) {
     const response = new Response({}, []);
     try {
         const files = req.files;
 
-        const { first_name, last_name, address, city, post_code, email, telephone,
-            type, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category,
-            iban, bank_name, bank_account_no, currency, remove_files } = req.body;
+        const { type, first_name, last_name, organization_name, address, city, post_code, email, telephone, individual_type, organization_type, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category, iban, bank_name, bank_account_no, currency, remove_files } = req.body;
 
         const partner = await Partner.findOne({
             where: {
-                id: req.params.id
+                id: req.params.id,
+                entity_type: type
             }
         });
 
@@ -243,9 +260,20 @@ async function updatePartnerHcp(req, res) {
         }
 
         const data = {
-            first_name, last_name, address, city, post_code, email, telephone, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category, iban, bank_name, bank_account_no, currency,
-            individual_type: type
+            first_name, last_name, address, city, post_code, email, telephone, country_iso2, locale, registration_number, uuid, iban, bank_name, bank_account_no, currency
         };
+
+        if (partner.dataValues.entity_type === 'hcp') {
+            data.individual_type = individual_type;
+            data.is_italian_hcp = is_italian_hcp;
+            data.should_report_hco = should_report_hco;
+            data.beneficiary_category = beneficiary_category;
+        }
+
+        if (partner.dataValues.entity_type === 'hco') {
+            data.organization_name = organization_name;
+            data.organization_type = organization_type;
+        }
 
         if (remove_files) {
             const documents = await File.findAll({ where: { table_name: 'partners', owner_id: req.params.id } });
@@ -280,15 +308,19 @@ async function updatePartnerHcp(req, res) {
 
         await uploadDucuments(partner, updated_data.dataValues.entity_type, files);
 
-        updated_data.dataValues.type = partner.dataValues.individual_type;
-
         delete updated_data.dataValues.created_at;
         delete updated_data.dataValues.updated_at;
-        delete updated_data.dataValues.individual_type;
-        delete updated_data.dataValues.organization_name;
-        delete updated_data.dataValues.organization_type;
-        delete updated_data.dataValues.entity_type;
         delete updated_data.dataValues.onekey_id;
+        if (type === 'hcp') {
+            delete updated_data.dataValues.organization_name;
+            delete updated_data.dataValues.organization_type;
+        }
+        if (type === 'hco') {
+            delete updated_data.dataValues.individual_type;
+            delete updated_data.dataValues.is_italian_hcp;
+            delete updated_data.dataValues.should_report_hco;
+            delete updated_data.dataValues.beneficiary_category;
+        }
 
         response.data = updated_data;
         res.json(response);
@@ -297,56 +329,6 @@ async function updatePartnerHcp(req, res) {
         logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
-    }
-}
-
-async function getPartnerHcos(req, res) {
-    try {
-        const page = req.query.page ? +req.query.page - 1 : 0;
-        const limit = req.query.limit ? +req.query.limit : 15;
-        const offset = page * limit;
-
-        const orderBy = req.query.orderBy === 'null'
-            ? null
-            : req.query.orderBy;
-        const orderType = req.query.orderType === 'asc' || req.query.orderType === 'desc'
-            ? req.query.orderType
-            : 'asc';
-
-        const sortableColumns = ['first_name', 'last_name', 'onekey_id', 'uuid', 'locale', 'city'];
-
-        const order = [];
-        if (orderBy && (sortableColumns || []).includes(orderBy)) {
-            order.push([orderBy, orderType]);
-        }
-
-        if (orderBy !== 'created_at') order.push(['created_at', 'DESC']);
-
-        const hcoPartners = await Partner.findAll({
-            where: { entity_type: 'hco' },
-            offset,
-            limit,
-            order,
-            attributes: ['id', 'onekey_id', 'uuid', 'first_name', 'last_name', 'address', 'city', 'country_iso2', 'locale', 'status']
-        });
-
-        const total = await Partner.count({ where: { entity_type: 'hco' } });
-
-        const responseData = {
-            partners: hcoPartners,
-            metadata: {
-                page: page + 1,
-                limit,
-                total,
-                start: limit * page + 1,
-                end: offset + limit > total ? parseInt(total) : parseInt(offset + limit)
-            }
-        };
-
-        res.json(responseData);
-    } catch (err) {
-        logger.error(err);
-        res.status(500).send('Internal server error');
     }
 }
 
@@ -373,159 +355,6 @@ async function getPartnerHco(req, res) {
     } catch (err) {
         logger.error(err);
         res.status(500).send('Internal server error');
-    }
-}
-
-
-async function createPartnerHco(req, res) {
-    const entityType = 'hco';
-    const response = new Response({}, []);
-    try {
-        const files = req.files;
-
-        const { request_id, contact_first_name, contact_last_name, organization_name, address, city, post_code, email, telephone, type, uuid, country_iso2, locale, registration_number, iban, bank_name, bank_account_no, currency } = req.body;
-
-        const partnerRequest = await PartnerRequest.findOne({
-            where: {
-                id: request_id,
-                entity_type: entityType
-            }
-        });
-
-        if (!partnerRequest) {
-            response.errors.push(new CustomError('Partner request not found.', 404));
-            return res.status(404).send(response);
-        }
-
-        if (partnerRequest && partnerRequest.status !== 'pending') {
-            response.errors.push(new CustomError('Invalid partner request status.', 400));
-            return res.status(404).send(response);
-        }
-
-        const data = {
-            request_id, organization_name, address, city, post_code, email, telephone, uuid, country_iso2, locale, registration_number, iban, bank_name, bank_account_no, currency
-        };
-        data.entity_type = entityType;
-        data.first_name = contact_first_name;
-        data.last_name = contact_last_name;
-        data.organization_type = type;
-        data.onekey_id = partnerRequest.onekey_id;
-
-        const [partnerHco, created] = await Partner.findOrCreate({
-            where: { request_id: request_id },
-            defaults: data
-        });
-
-        if (!created) {
-            response.errors.push(new CustomError('Partner with VAT number/Registration number already exists.', 400, 'registration_number'));
-            return res.status(400).send(response);
-        }
-
-        await partnerRequest.update({ status: 'submitted' });
-
-        await uploadDucuments(partnerHco, entityType, files);
-
-        partnerHco.dataValues.contact_first_name = partnerHco.dataValues.first_name;
-        partnerHco.dataValues.contact_last_name = partnerHco.dataValues.last_name;
-
-        delete partnerHco.dataValues.individual_type;
-        delete partnerHco.dataValues.is_italian_hcp;
-        delete partnerHco.dataValues.should_report_hco;
-        delete partnerHco.dataValues.beneficiary_category;
-        delete partnerHco.dataValues.onekey_id;
-        delete partnerHco.dataValues.created_at;
-        delete partnerHco.dataValues.updated_at;
-
-        response.data = partnerHco;
-        res.json(response);
-
-    } catch (err) {
-        logger.error(err);
-        response.errors.push(new CustomError('Internal server error', 500));
-        res.status(500).send(response);
-    }
-}
-
-async function updatePartnerHco(req, res) {
-    const response = new Response({}, []);
-    try {
-        const files = req.files;
-
-        const { contact_first_name, contact_last_name, organization_name, address, city, post_code, email, telephone, type, uuid, country_iso2, locale, registration_number, iban, bank_name, bank_account_no, currency, remove_files } = req.body;
-
-        const partner = await Partner.findOne({
-            where: {
-                id: req.params.id
-            }
-        });
-
-        if (!partner) {
-            response.errors.push(new CustomError('Partner not found.', 400));
-            return res.status(400).send(response);
-        }
-
-        const data = {
-            contact_first_name, contact_last_name, organization_name, address, city, post_code, email, telephone, type, uuid, country_iso2, locale, registration_number, iban, bank_name, bank_account_no, currency
-        };
-
-        if (remove_files) {
-            const documents = await File.findAll({ where: { table_name: 'partners', owner_id: req.params.id } });
-            fileIds = documents.map(function (obj) {
-                return obj.id;
-            });
-
-            function fileExists(mainArr, subArr) {
-                return subArr.every(i => mainArr.includes(i));
-            }
-
-            let files = null;
-            (typeof remove_files === 'string') ? files = [remove_files] : files = remove_files;
-
-            const check = fileExists(fileIds, files);
-            if (!check) {
-                response.errors.push(new CustomError('File does not exist', 404));
-                return res.status(404).send(response);
-            }
-
-            let file_keys = [];
-
-            files.forEach(element => {
-                file_keys.push(documents.find(x => x.id === element).key);
-            });
-
-            await removeDocuments(file_keys);
-
-        }
-
-
-        data.entity_type = entityType;
-        data.first_name = contact_first_name;
-        data.last_name = contact_last_name;
-        data.organization_type = type;
-
-
-        const updated_data = await partner.update(data);
-
-        await uploadDucuments(partner, updated_data.dataValues.entity_type, files);
-
-        updated_data.dataValues.contact_first_name = updated_data.dataValues.first_name;
-        updated_data.dataValues.contact_last_name = updated_data.dataValues.last_name;
-
-        delete updated_data.dataValues.individual_type;
-        delete updated_data.dataValues.is_italian_hcp;
-        delete updated_data.dataValues.should_report_hco;
-        delete updated_data.dataValues.beneficiary_category;
-        delete updated_data.dataValues.onekey_id;
-        delete updated_data.dataValues.created_at;
-        delete updated_data.dataValues.updated_at;
-
-        response.data = updated_data;
-        res.json(response);
-
-    } catch (err) {
-        logger.error(err);
-        response.errors.push(new CustomError('Internal server error', 500));
-        res.status(500).send(response);
     }
 }
 
@@ -941,49 +770,56 @@ async function exportApprovedPartners(req, res) {
     }
 }
 
-async function getHcpPartnerById(req, res) {
-    return await getPartnerById('hcp', req, res);
-}
 
-async function getHcoPartnerById(req, res) {
-    return await getPartnerById('hco', req, res);
-}
-
-async function getVendorPartnerById(req, res) {
-    return await getPartnerById('vendor', req, res);
-}
-
-async function getPartnerById(entityType, req, res) {
+async function getPartnerVendorById(req, res) {
     try {
-        let excludedFields = [];
+        const partnerVendor = await PartnerVendors.findOne({
+            where: { id: req.params.id },
+            attributes: { exclude: ['entity_type', 'created_at', 'updated_at'] }
+        });
 
-        if (entityType === 'hcp') {
-            excludedFields = ['entity_type', 'organization_name', 'organization_type', 'created_at', 'updated_at'];
-        } else if (entityType === 'hco') {
-            excludedFields = ['entity_type', 'is_italian_hcp', 'should_report_hco', 'beneficiary_category', 'created_at', 'updated_at'];
-        } else if (entityType === 'vendor' || 'wholesaler') {
-            excludedFields = ['entity_type', 'created_at', 'updated_at'];
-        } else {
-            return res.status(404).send(`The ${entityType} does not exist`);
-        }
+        if (!partnerVendor) return res.status(404).send('The partner vendor does not exist');
 
-        let partner = null;
-        if (entityType === 'hcp' || entityType === 'hco') {
-            partner = await Partner.findOne({
-                where: { id: req.params.id },
-                attributes: { exclude: excludedFields }
-            });
-        } else {
-            partner = await PartnerVendors.findOne({
-                where: { id: req.params.id },
-                attributes: { exclude: excludedFields }
-            });
-        }
+        partnerVendor.dataValues.type = partnerVendor.dataValues.individual_type;
+        delete partnerVendor.dataValues.individual_type;
+
+        const documents = await File.findAll({ where: { owner_id: partnerVendor.id } });
+
+        partnerVendor.dataValues.documents = documents.map(d => ({
+            name: d.dataValues.name,
+            id: d.dataValues.id
+        }));
+
+        res.json(partnerVendor);
+    } catch (err) {
+        logger.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function getPartnerById(req, res) {
+    try {
+        const partner = await Partner.findOne({
+            where: { id: req.params.id },
+            attributes: { exclude: ['created_at', 'updated_at'] }
+        });
 
         if (!partner) return res.status(404).send('The partner does not exist');
 
-        partner.dataValues.type = partner.dataValues.individual_type;
-        delete partner.dataValues.individual_type;
+        if (partner.dataValues.entity_type === 'hcp') {
+            delete partner.dataValues.organization_name;
+            delete partner.dataValues.organization_type;
+        }
+
+        if (partner.dataValues.entity_type === 'hco') {
+            delete partner.dataValues.individual_type;
+            delete partner.dataValues.is_italian_hcp;
+            delete partner.dataValues.should_report_hco;
+            delete partner.dataValues.beneficiary_category;
+        }
+
+        partner.dataValues.type = partner.dataValues.entity_type;
+        delete partner.dataValues.entity_type;
 
         const documents = await File.findAll({ where: { owner_id: partner.id } });
 
@@ -1012,21 +848,19 @@ async function getPartnerInformation(req, res) {
     }
 }
 
-exports.getPartnerHcps = getPartnerHcps;
-exports.createPartnerHcp = createPartnerHcp;
-exports.updatePartnerHcp = updatePartnerHcp;
-exports.getPartnerHcos = getPartnerHcos;
-exports.createPartnerHco = createPartnerHco;
-exports.updatePartnerHco = updatePartnerHco;
+exports.getPartners = getPartners;
+exports.getPartnerById = getPartnerById;
+exports.createPartner = createPartner;
+exports.updatePartner = updatePartner;
+
 exports.getPartnerVendors = getPartnerVendors;
 exports.getPartnerWholesalers = getPartnerWholesalers;
 exports.createPartnerVendor = createPartnerVendor;
 exports.updatePartnerVendor = updatePartnerVendor;
+
 exports.getDownloadUrl = getDownloadUrl;
 exports.registrationLookup = registrationLookup;
 exports.approvePartner = approvePartner;
 exports.exportApprovedPartners = exportApprovedPartners;
 exports.getPartnerInformation = getPartnerInformation;
-exports.getHcpPartnerById = getHcpPartnerById;
-exports.getHcoPartnerById = getHcoPartnerById;
-exports.getVendorPartnerById = getVendorPartnerById;
+exports.getPartnerVendorById = getPartnerVendorById;
