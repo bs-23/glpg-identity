@@ -8,14 +8,14 @@ export default function PrivateRoute({ component: Component, module, ...rest }) 
     const [cookies] = useCookies();
     const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
 
-    let serviceCategories = loggedInUser && loggedInUser.serviceCategories
-        ? loggedInUser.serviceCategories.map(sc => sc.slug)
+    let services = loggedInUser && loggedInUser.services
+        ? loggedInUser.services.map(sc => sc.slug)
         : [];
 
     return (
         <Route {...rest} render={props => {
             return (
-                loggedInUser && cookies.logged_in ? (!module || serviceCategories.some( module_permission => module_permission === module)) ? (
+                loggedInUser && cookies.logged_in ? (!module || services.some( module_permission => module_permission === module)) ? (
                     <>
                         <Navbar />
                         <Component {...props} />

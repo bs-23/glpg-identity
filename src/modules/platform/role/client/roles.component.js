@@ -146,8 +146,8 @@ export default function ManageRoles() {
         if (!data) return '';
         if (!data.role_ps || !data.role_ps.length) return '';
         return data.role_ps.map((item, index) => {
-            return <React.Fragment key={item.permissionSetId}>
-                <a type="button" className="link-with-underline" onClick={() => handlePermissionSetClick(item.permissionSetId)}>
+            return <React.Fragment key={item.permissionset_id}>
+                <a type="button" className="link-with-underline" onClick={() => handlePermissionSetClick(item.permissionset_id)}>
                     {item.ps.title}
                 </a>
                 {index < data.role_ps.length - 1 ? <span>,&nbsp;</span> : null}
@@ -176,7 +176,7 @@ export default function ManageRoles() {
             id: data.id,
             title: data.title,
             description: data.description,
-            permissionssetIDs: (data.role_ps || []).map(item => item.permissionSetId)
+            permissionssetIDs: (data.role_ps || []).map(item => item.permissionset_id)
         };
         setRoleEditData(editData);
         setModalShow({ ...modalShow, createRole: true });
@@ -220,7 +220,7 @@ export default function ManageRoles() {
                 </div>
                 <div className="row">
                     <div className="col-12 col-sm-12">
-                        <div className="d-flex justify-content-between align-items-center p-3 cdp-table__responsive-sticky-panel mx-n3">
+                        <div className="d-flex justify-content-between align-items-center py-3 cdp-table__responsive-sticky-panel">
                             <h4 className="cdp-text-primary font-weight-bold mb-0">Define Roles</h4>
                             <button className="btn cdp-btn-secondary text-white ml-auto " onClick={() => setModalShow({ ...modalShow, createRole: true })}>
                                 <i className="icon icon-plus"></i> <span className="d-none d-sm-inline-block pl-1">Add New Role</span>

@@ -7,7 +7,7 @@ import { OverlayTrigger, Popover } from 'react-bootstrap';
 import { useToasts } from 'react-toast-notifications';
 import axios from 'axios';
 
-import getUserPermittedCountries from '../../../../core/client/util/user-country';
+import { getCountryDetailsFromISO } from '../../../../core/client/util/user-country';
 import uuidAuthorities from '../../../../information/hcp/client/uuid-authorities.json';
 
 const SearchHcpModal = (props) => {
@@ -40,7 +40,7 @@ const SearchHcpModal = (props) => {
     const countries = useSelector(state => state.countryReducer.countries);
     const allCountries = useSelector(state => state.countryReducer.allCountries);
     const userProfile = useSelector(state => state.userReducer.loggedInUser);
-    const userCountries = getUserPermittedCountries(userProfile, countries);
+    const userCountries = getCountryDetailsFromISO(userProfile.countries, countries);
 
     const [initVal, setInitVal] = useState(defaultFormValue);
     const [users, setUsers] = useState({});

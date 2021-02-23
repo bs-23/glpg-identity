@@ -12,10 +12,10 @@ export default function ManageRequestsRoutes() {
 
     return (
         <Switch>
-            <PrivateRoute path={`${path}/requests/hcos`} component={HcoPartnerRequests} />
-            <PrivateRoute path={`${path}/requests/hcps`} component={HcpPartnerRequests} />
-            <PrivateRoute path={`${path}/requests/vendors`} component={VendorPartnerRequests} />
-            <PrivateRoute path={`${path}/requests/wholesalers`} component={WholesalerPartnerRequests} />
+            <PrivateRoute path={`${path}/requests/hcos`} module="manage-entity-request" component={HcoPartnerRequests} />
+            <PrivateRoute path={`${path}/requests/hcps`} module="manage-entity-request" component={HcpPartnerRequests} />
+            <PrivateRoute path={`${path}/requests/vendors`} module="manage-vendor-request" component={VendorPartnerRequests} />
+            <PrivateRoute path={`${path}/requests/wholesalers`} module="manage-vendor-request" component={WholesalerPartnerRequests} />
         </Switch>
     );
 }

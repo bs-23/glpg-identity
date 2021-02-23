@@ -1,13 +1,13 @@
 const passport = require('passport');
 const path = require('path');
-const { Modules } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
-const { ModuleGuard } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.middleware'));
+const { Services } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
+const { ServiceGuard } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.middleware'));
 const controller = require('./userProfile.controller');
 
 module.exports = app => {
     app.route('/api/profiles')
-        .get(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.PLATFORM.value),  controller.getProfiles)
-        .post(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.PLATFORM.value), controller.createProfile);
+        .get(passport.authenticate('user-jwt', { session: false }), ServiceGuard([Services.MANAGE_PROFILE, Services.MANAGE_USER]),  controller.getProfiles)
+        .post(passport.authenticate('user-jwt', { session: false }), ServiceGuard([Services.MANAGE_PROFILE]), controller.createProfile);
     app.route('/api/profiles/:id')
-        .put(passport.authenticate('user-jwt', { session: false }), ModuleGuard(Modules.PLATFORM.value), controller.editProfile);
+        .put(passport.authenticate('user-jwt', { session: false }), ServiceGuard([Services.MANAGE_PROFILE]), controller.editProfile);
 };

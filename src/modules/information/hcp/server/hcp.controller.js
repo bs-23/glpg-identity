@@ -694,7 +694,7 @@ async function createHcpProfile(req, res) {
             await Promise.all(req.body.consents.map(async consent => {
                 const preferenceId = Object.keys(consent)[0];
                 const consentResponse = Object.values(consent)[0];
-                let richTextLocale = `${language_code}_${country_iso2}`;
+                let richTextLocale = `${language_code}_${country_iso2.toUpperCase()}`;
 
                 if (!consentResponse) return;
 
@@ -741,7 +741,7 @@ async function createHcpProfile(req, res) {
                         type: QueryTypes.SELECT
                     });
 
-                    const localeUsingParentCountryISO = `${language_code}_${codbaseCountry[0].country_iso2}`;
+                    const localeUsingParentCountryISO = `${language_code}_${(codbaseCountry[0].country_iso2 || '').toUpperCase()}`;
 
                     consentLocale = await ConsentLocale.findOne({
                         where: {
@@ -978,7 +978,7 @@ async function rejectHCPUser(req, res) {
         await archiveService.archiveData({
             object_id: hcpUser.id,
             table_name: 'hcp_profiles',
-            data: JSON.stringify(hcpUser.dataValues),
+            data: hcpUser.dataValues,
             actor: req.user.id,
             remarks: (req.body.comment || '').trim()
         });

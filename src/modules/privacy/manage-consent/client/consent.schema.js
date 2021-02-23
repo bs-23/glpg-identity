@@ -1,4 +1,4 @@
-import { string, object, boolean } from 'yup';
+import { string, object, boolean, array } from 'yup';
 
 export const consentSchema = object().shape({
     preference: string()
@@ -10,6 +10,19 @@ export const consentSchema = object().shape({
     legal_basis: string()
         .required('This field must not be empty.'),
     is_active: boolean(),
+    translations: array().of(
+        object().shape({
+            locale: string().required('This field must not be empty.'),
+            rich_text: string()
+                .test('is-empty', 'This field must not be empty.', rich_text => {
+                    return (rich_text||'').length !== 0 && rich_text !== '<p><br></p>' && (rich_text||'').replace(/&nbsp;/g, '') !== '<p></p>';
+                })
+                .test('is-max', 'Maximum character limit has been exceeded.', rich_text => {
+                    return (rich_text||'').escapedHtmlLength() <= 976;
+                })
+                .required('This field must not be empty.')
+        })
+    )
 });
 
 

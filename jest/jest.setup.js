@@ -41,8 +41,8 @@ module.exports = async function () {
     require(path.join(process.cwd(), 'src/modules/core/server/archive/archive.model.js'));
     require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model.js'));
 
-    const PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permission-set.model.js"));
-    const ServiceCategory = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/service-category.model.js"));
+    const PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permission-set.model"));
+    const ServiceCategory = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/service.model"));
     const UserProfile = require(path.join(process.cwd(), "src/modules/platform/profile/server/user-profile.model.js"));
     const PermissionSetServiceCategories = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-serviceCategory.model.js"));
     const UserProfilePermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/userProfile-permissionSet.model.js"));

@@ -1,8 +1,8 @@
 import axios from 'axios';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavLink } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { Form, Formik, Field, ErrorMessage } from 'formik';
+import { useDispatch } from 'react-redux';
+import { Form, Formik, Field, ErrorMessage, getIn } from 'formik';
 import Modal from 'react-bootstrap/Modal'
 import { useToasts } from 'react-toast-notifications';
 import parse from 'html-react-parser';
@@ -14,6 +14,16 @@ import { consentSchema } from './consent.schema';
 import DraftEditor from '../../../core/client/components/draft-editor';
 import Faq from '../../../platform/faq/client/faq.component';
 
+const ValidationError = ({ name }) => (
+    <Field name={name} >
+        {({ form }) => {
+            const error = getIn(form.errors, name);
+            const touch = getIn(form.touched, name);
+            return <div className="invalid-feedback">{touch && error ? error : null}</div>
+        }}
+    </Field>
+);
+
 const ConsentForm = (props) => {
     const CountryCodesObject = Object.values(CountryCodes.customList('countryCode', '{countryCode} {officialLanguageCode} {officialLanguageNameEn}'));
     const { addToast } = useToasts();
@@ -21,15 +31,13 @@ const ConsentForm = (props) => {
     const [consent, setConsent] = useState({});
     const [consentId, setConsentId] = useState();
     const [categories, setCategories] = useState([]);
-    const [userCountries, setUserCountries] = useState([]);
     const [countryLanguages, setCountryLanguages] = useState([]);
-    const [isActive, setIsActive] = useState(true);
-    const [translations, setTranslations] = useState([]);
+
     const [translationToDelete, setTranslationToDelete] = useState(null);
-    const [showError, setShowError] = useState(false);
-    const loggedInUser = useSelector(state => state.userReducer.loggedInUser);
-    const countries = useSelector(state => state.countryReducer.countries);
     const [showFaq, setShowFaq] = useState(false);
+    const [localizations, setLocalizations] = useState([]);
+    const formikRef = useRef();
+
     const handleCloseFaq = () => setShowFaq(false);
     const handleShowFaq = () => setShowFaq(true);
 
@@ -38,28 +46,27 @@ const ConsentForm = (props) => {
         { id: 'contract', value: 'Contract' }
     ];
 
-    const handleChange = (e) => {
-        const newTranslations = [...translations];
-        const field = e.target.className.split(' ');
-        const translation = newTranslations[e.target.dataset.id];
-        translation[field[1]] = e.target.value;
-        setTranslations(newTranslations);
+    const handleTranslationChange = (value, index, property, formikProps) => {
+        const { translations } = formikProps.values;
+        const updatedTranslations = [...translations];
+        updatedTranslations[index][property] = value;
+        formikProps.setFieldValue('translations', updatedTranslations);
     }
 
-    const addNewTranslation = () => {
-        const newTranslations = [...translations, { id: Math.random(), country_iso2: '', lang_code: '', rich_text: '' }];
-        setTranslations(newTranslations);
-        setShowError(false);
+    const addNewTranslation = (formikProps) => {
+        const newTranslations = [...formikProps.values.translations, { id: Math.random(), locale: '', rich_text: '' }];
+        formikProps.setFieldValue('translations', newTranslations);
+
         setTimeout(() => {
-            const lastTranslation = document.getElementById(`translation-${translations.length + 1}`);
+            const lastTranslation = document.getElementById(`translation-${formikProps.values.translations.length + 1}`);
             lastTranslation.scrollIntoView({ behavior: 'smooth' });
         }, 50);
     }
 
     const removeTranslation = (idx) => {
-        const newTranslations = [...translations];
+        const newTranslations = [...formikRef.current.values.translations];
         newTranslations.splice(idx, 1);
-        setTranslations(newTranslations);
+        formikRef.current.setFieldValue('translations', newTranslations);
         setTranslationToDelete(null);
     }
 
@@ -67,22 +74,16 @@ const ConsentForm = (props) => {
         setTranslationToDelete(index);
     };
 
-    const fetchUserCountries = (userCountries, allCountries) => userCountries.map(element => allCountries.find(x => x.country_iso2 == element)).filter(element => element);
-
-    const resetForm = () => {
-        setTranslations([]);
-        setIsActive(true);
-    }
-
     useEffect(() => {
         const { id } = props ? props.match ? props.match.params : '' : '';
-
+        async function getLocalizations() {
+            const { data } = await axios.get('/api/localizations');
+            setLocalizations(data);
+        }
         async function getConsent() {
             const response = await axios.get(`/api/cdp-consents/${id}`);
             setConsentId(id);
             setConsent(response.data);
-            setTranslations(response.data.translations.map(i => ({ ...i, country_iso2: i.locale.split('_')[1], lang_code: i.locale.split('_')[0] })));
-            setIsActive(response.data.is_active);
         }
         async function getConsentCatogories() {
             const response = await axios.get('/api/privacy/consent-categories');
@@ -111,20 +112,15 @@ const ConsentForm = (props) => {
         if (id) getConsent();
         getConsentCatogories();
         getLanguages();
+        getLocalizations();
     }, [props]);
 
-    useEffect(() => {
-        async function getCountries() {
-            setUserCountries(fetchUserCountries(loggedInUser.countries, countries));
-        }
-        getCountries();
-    }, [loggedInUser, countries])
-
     const getTranslations = (formikProps) => {
+        const { translations } = formikProps.values;
+
         return translations.map((item, idx) => {
             const translationId = `translation-${idx + 1}`;
-            const countryId = `country-${idx}`;
-            const languageId = `language-${idx}`;
+            const localeId = `locale-${idx}`;
             const richTextId = `rich-text-${idx}`;
 
             return (<React.Fragment key={item.id}>
@@ -136,26 +132,16 @@ const ConsentForm = (props) => {
                         </label>
                         <div className="col-12 col-sm-6">
                             <div className="form-group">
-                                <label className="font-weight-bold" htmlFor={countryId}>Country <span className="text-danger">*</span></label>
-                                <Field className="form-control country_iso2" value={item.country_iso2.toLowerCase()} onChange={(e) => handleChange(e)} data-id={idx} as="select" name={countryId} id={countryId}>
-                                    <option key={'country-' + item.id} value="" disabled>--Select Country--</option>
-                                    {userCountries.map(element => <option key={element.countryid} value={element.country_iso2.toLowerCase()}>{element.codbase_desc}</option>)}
-                                </Field>
-                                {showError && !item.country_iso2 && <div class="invalid-feedback">This field must not be empty.</div>}
-                            </div>
-                        </div>
-
-                        <div className="col-12 col-sm-6">
-                            <div className="form-group">
-                                <label className="font-weight-bold" htmlFor={languageId}>Language <span className="text-danger">*</span></label>
-                                <Field className="form-control lang_code" value={item.lang_code} onChange={(e) => handleChange(e)} data-id={idx} as="select" name={languageId} id={languageId}>
-                                    <option key={'language-' + item.id} value="" disabled>--Select Language--</option>
-                                    {countryLanguages.map(element => {
-                                        const [country_iso2, language_code, language_name] = element.split(' ');
-                                        return language_name && <option key={country_iso2} value={language_code}>{language_name.replace(/,/g, '')}</option>
+                                <label className="font-weight-bold" htmlFor={localeId}>Localization <span className="text-danger">*</span></label>
+                                <Field className="form-control locale" value={item.locale} onChange={(e) => handleTranslationChange(e.target.value, idx, 'locale', formikProps)} data-id={idx} as="select" name={localeId} id={localeId}>
+                                    <option key={'country-' + item.id} value="" disabled>--Select Localization--</option>
+                                    {localizations.filter(l => l.country_iso2).map(localization => {
+                                        return <option key={localization.locale} value={localization.locale}>
+                                            {localization.language_variant} ({localization.locale})
+                                        </option>
                                     })}
                                 </Field>
-                                {showError && !item.lang_code && <div class="invalid-feedback">This field must not be empty.</div>}
+                                <ValidationError name={`translations[${idx}].locale`} />
                             </div>
                         </div>
 
@@ -165,21 +151,10 @@ const ConsentForm = (props) => {
                                 <div className="border rounded draft-editor">
                                     <DraftEditor htmlContent={item.rich_text} onChangeHTML={(html, { plainText, cleanupEmptyHtmlTags }) => {
                                         const rich_text = cleanupEmptyHtmlTags(html);
-                                        if (plainText.trim().length === 0 || rich_text.escapedHtmlLength() > 976) setShowError(true);
-                                        else setShowError(false);
-                                        handleChange({
-                                            target: {
-                                                value: rich_text,
-                                                className: "form-control rich_text",
-                                                dataset: {
-                                                    id: idx
-                                                }
-                                            }
-                                        });
+                                        handleTranslationChange(rich_text, idx, 'rich_text', formikProps);
                                     }}/>
                                 </div>
-                                {showError && (item.rich_text.length === 0 || item.rich_text === '<p><br></p>' || item.rich_text.replace(/&nbsp;/g, '') === '<p></p>') && <div class="invalid-feedback">This field must not be empty.</div>}
-                                {showError && item.rich_text.escapedHtmlLength() > 976 && <div class="invalid-feedback">Maximum character limit has been exceeded.</div>}
+                                <ValidationError name={`translations[${idx}].rich_text`} />
                             </div>
                         </div>
                     </div>
@@ -242,59 +217,33 @@ const ConsentForm = (props) => {
                                                 legal_basis: consentId && Object.keys(consent).length ? consent.legal_basis : '',
                                                 preference: consentId && Object.keys(consent).length ? consent.preference : '',
                                                 translations: consentId && Object.keys(consent).length ? consent.translations : [],
-                                                is_active: consentId && Object.keys(consent).length ? consent.is_active : isActive
+                                                is_active: consentId && Object.keys(consent).length ? consent.is_active : true
                                             }}
                                             displayName="ConsentForm"
                                             validationSchema={consentSchema}
+                                            innerRef={formikRef}
                                             onSubmit={(values, actions) => {
-                                                values.is_active = isActive;
+                                                const uniqueTranslations = new Set(values.translations.map(t => t.locale.toLowerCase()));
 
-                                                const validTranslations = translations.filter(item =>
-                                                    item.country_iso2 &&
-                                                    item.lang_code &&
-                                                    item.rich_text &&
-                                                    item.rich_text !== '<p><br></p>' &&
-                                                    item.rich_text.replace(/&nbsp;/g, '') !== '<p></p>' &&
-                                                    item.rich_text.escapedHtmlLength() <= 976
-                                                );
-
-                                                if (translations.length !== validTranslations.length) {
-                                                    setShowError(true);
-                                                    return;
-                                                }
-
-                                                if (!validTranslations || !validTranslations.length) {
-                                                    addToast('Please provide at least one translation', {
+                                                if (uniqueTranslations.size < values.translations.length) {
+                                                    addToast('Please remove duplicate translations.', {
                                                         appearance: 'error',
                                                         autoDismiss: true
                                                     });
                                                     actions.setSubmitting(false);
                                                     return;
-                                                } else {
-                                                    const uniqueTranslations = new Set(validTranslations.map(t => t.country_iso2.toLowerCase() + t.lang_code.toLowerCase()));
-                                                    if (uniqueTranslations.size < validTranslations.length) {
-                                                        addToast('Please remove duplicate translations.', {
-                                                            appearance: 'error',
-                                                            autoDismiss: true
-                                                        });
-                                                        actions.setSubmitting(false);
-                                                        return;
-                                                    }
                                                 }
-
-                                                values.translations = validTranslations;
 
                                                 if (consentId) {
                                                     dispatch(updateConsent(values, consentId))
                                                         .then(res => {
                                                             const updatedTranslations = res.value.data.translations;
-                                                            const newTranslations = translations.map((tr, ind) => {
+                                                            const newTranslations = values.translations.map((tr, ind) => {
                                                                 tr.id = updatedTranslations[ind].id;
                                                                 return tr;
                                                             });
 
-                                                            setTranslations(newTranslations);
-
+                                                            actions.setFieldValue('translations', newTranslations);
                                                             addToast('Consent updated successfully', {
                                                                 appearance: 'success',
                                                                 autoDismiss: true
@@ -311,7 +260,6 @@ const ConsentForm = (props) => {
                                                 else {
                                                     dispatch(createConsent(values))
                                                         .then(res => {
-                                                            resetForm();
                                                             actions.resetForm();
                                                             addToast('Consent created successfully', {
                                                                 appearance: 'success',
@@ -369,12 +317,10 @@ const ConsentForm = (props) => {
                                                                         <label className="d-flex justify-content-between align-items-center">
                                                                             <span className="switch-label font-weight-bold"> Active Status </span>
                                                                             <span className="switch">
-                                                                                <input
+                                                                                <Field
                                                                                     name="is_active"
                                                                                     type="checkbox"
-                                                                                    value={isActive}
-                                                                                    checked={isActive}
-                                                                                    onChange={() => setIsActive(!isActive)}
+                                                                                    checked={formikProps.values.is_active}
                                                                                 />
                                                                                 <span className="slider round"></span>
                                                                             </span>
@@ -386,14 +332,14 @@ const ConsentForm = (props) => {
 
                                                                 <div className="col-12">
                                                                     <div className="form-group">
-                                                                        <label className="d-flex align-items-center cdp-text-primary hover-opacity" type="button" onClick={addNewTranslation}>
+                                                                        <label className="d-flex align-items-center cdp-text-primary hover-opacity" type="button" onClick={() => addNewTranslation(formikProps)}>
                                                                             <i className="fas fa-plus  fa-2x mr-3" ></i>
                                                                             <span className="h4 mb-0">Add Localizations</span>
                                                                         </label>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <button type="submit" disabled={showError} className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" >Submit</button>
+                                                            <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" >Submit</button>
                                                         </div>
                                                     </div>
                                                 </Form>
@@ -413,11 +359,11 @@ const ConsentForm = (props) => {
                     <Modal.Title className="modal-title_small">Remove Localization</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {translationToDelete !== null && translations[translationToDelete] ? (
+                    {translationToDelete !== null && formikRef.current.values.translations[translationToDelete] ? (
                         <div>
                             Are you sure you want to remove the following localization?
                             <div className="alert alert-info my-3">
-                                {parse(translations[translationToDelete].rich_text)}
+                                {parse(formikRef.current.values.translations[translationToDelete].rich_text)}
                             </div>
                         </div>
                     ) : null}

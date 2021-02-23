@@ -32,7 +32,13 @@ function fetchUserCountries(args, allCountries) {
     return countryList.filter(c => c);
 }
 
-export default function getUserPermittedCountries(userProfile, countries) {
+export function getUserPermittedCountries(userProfile, countries) {
     const userCountries = extractLoggedInUserCountries(userProfile);
     return fetchUserCountries(userCountries, countries);
+}
+
+export function getCountryDetailsFromISO(country_iso2, countries) {
+    if (!countries || !country_iso2) return [];
+
+    return countries.filter(c => country_iso2.includes(c.country_iso2));
 }

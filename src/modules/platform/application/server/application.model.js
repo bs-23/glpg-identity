@@ -21,6 +21,10 @@ const Application = sequelize.cdpConnector.define('applications', {
         allowNull: false,
         type: DataTypes.STRING
     },
+    type: {
+        type: DataTypes.ENUM,
+        values: ['hcp-portal']
+    },
     email: {
         unique: true,
         allowNull: false,

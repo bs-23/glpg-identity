@@ -289,6 +289,7 @@ async function getOklaHcpDetails(req, res) {
                     longitude: workplace.workplaceAddresses['P,1'].address.geocodingAddresses.W.longitude
                 } : null,
                 city: workplace.workplaceAddresses['P,1'].address.postalTownReference.villageLabel,
+                country: workplace.workplaceAddresses['P,1'].address.postalTownReference.subdivisions['COUNTRY'].longLocalizedLabel,
                 contactNumbers,
                 type: workplace.typeCorporateLabel,
                 isInContract: g.isInContract

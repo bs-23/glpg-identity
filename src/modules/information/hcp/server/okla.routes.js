@@ -1,19 +1,19 @@
 const path = require('path');
 const controller = require('./okla.controller');
-const { Modules } = require('../../../core/server/authorization/authorization.constants');
-const { ModuleGuard } = require('../../../core/server/authorization/authorization.middleware');
+const { Services } = require('../../../core/server/authorization/authorization.constants');
+const { ServiceGuard } = require('../../../core/server/authorization/authorization.middleware');
 const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/platform/user/server/user-authentication.middleware.js'));
 
 module.exports = app => {
     app.route('/api/okla/hcps/search')
-        .post(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.searchOklaHcps);
+        .post(CDPAuthStrategy, ServiceGuard([Services.DISCOVER_HCP_HCO, Services.MANAGE_ENTITY_REQUEST]), controller.searchOklaHcps);
 
     app.route('/api/okla/hcps/:codbase/:id')
-        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getOklaHcpDetails);
+        .get(CDPAuthStrategy, ServiceGuard([Services.DISCOVER_HCP_HCO, Services.MANAGE_ENTITY_REQUEST]), controller.getOklaHcpDetails);
 
     app.route('/api/okla/hcos/search')
-        .post(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.searchOklaHcos);
+        .post(CDPAuthStrategy, ServiceGuard([Services.DISCOVER_HCP_HCO, Services.MANAGE_ENTITY_REQUEST]), controller.searchOklaHcos);
 
     app.route('/api/okla/hcos/:codbase/:id')
-        .get(CDPAuthStrategy, ModuleGuard(Modules.INFORMATION.value), controller.getOklaHcoDetails);
+        .get(CDPAuthStrategy, ServiceGuard([Services.DISCOVER_HCP_HCO, Services.MANAGE_ENTITY_REQUEST]), controller.getOklaHcoDetails);
 };

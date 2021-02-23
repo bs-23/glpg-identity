@@ -12,11 +12,11 @@ const UserProfile_PermissionSet = sequelize.cdpConnector.define('userProfiles_pe
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4
     },
-    permissionSetId: {
+    permissionset_id: {
         allowNull: false,
         type: DataTypes.UUID
     },
-    userProfileId  : {
+    user_profile_id: {
         allowNull: false,
         type: DataTypes.UUID
     }
@@ -28,7 +28,7 @@ const UserProfile_PermissionSet = sequelize.cdpConnector.define('userProfiles_pe
     updatedAt: 'updated_at'
 });
 
-UserProfile_PermissionSet.belongsTo(PermissionSet, {as: 'ps', foreignKey: 'permissionSetId'});
-PermissionSet.hasMany(UserProfile_PermissionSet, {as: 'ps_up_ps', foreignKey: 'permissionSetId', sourceKey: 'id'});
+UserProfile_PermissionSet.belongsTo(PermissionSet, { as: 'ps', foreignKey: 'permissionset_id' });
+PermissionSet.hasMany(UserProfile_PermissionSet, { as: 'ps_up_ps', foreignKey: 'permissionset_id', sourceKey: 'id' });
 
 module.exports = UserProfile_PermissionSet;

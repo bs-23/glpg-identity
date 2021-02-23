@@ -38,7 +38,7 @@ export default function ManagePermissionSets() {
 
     const getServiceCategoryNames = (data) => {
         if (!data.ps_sc) return '';
-        return data.ps_sc.map(item => item.serviceCategory.title).sort().join(', ');
+        return data.ps_sc.filter(item => item.service.parent_id).map(item => item.service.title).sort().join(', ');
     }
 
     const getApplicationNames = (data) => {
@@ -100,7 +100,7 @@ export default function ManagePermissionSets() {
                 </div>
                 <div className="row">
                     <div className="col-12 col-sm-12">
-                        <div className="d-flex justify-content-between align-items-center p-3 cdp-table__responsive-sticky-panel mx-n3">
+                        <div className="d-flex justify-content-between align-items-center py-3 cdp-table__responsive-sticky-panel">
                             <h4 className="cdp-text-primary font-weight-bold mb-0">Manage Permission Sets</h4>
                             <button className="btn cdp-btn-secondary text-white ml-auto " onClick={() => { setPermissionModalShow(true) }}>
                                 <i className="icon icon-plus"></i> <span className="d-none d-sm-inline-block pl-1">Add New Permission Set</span>
@@ -113,12 +113,12 @@ export default function ManagePermissionSets() {
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
                                             <th className="py-2" width="15%">Title</th>
-                                            <th className="py-2" width="6%">Type</th>
+                                            <th className="py-2" width="8%">Type</th>
                                             <th className="py-2" width="15%">Description</th>
                                             <th className="py-2" width="9%">Applications</th>
-                                            <th className="py-2" width="17%">Countries</th>
-                                            <th className="py-2" width="32%">Service Categories</th>
-                                            <th className="py-2" width="5%">Action</th>
+                                            <th className="py-2" width="15%">Countries</th>
+                                            <th className="py-2" width="30%">Services</th>
+                                            <th className="py-2" width="8%">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
