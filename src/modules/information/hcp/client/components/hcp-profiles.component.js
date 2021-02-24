@@ -345,7 +345,7 @@ export default function hcpUsers() {
                 : status === 'consent_pending'
                     ? <span><i className="fa fa-xs fa-circle text-warning pr-2 hcp-status-icon"></i>Consent Pending</span>
                     : status === 'not_verified'
-                        ? <span class="text-nowrap"><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Not Verified <i type="button" className="fas fa-search search-in-okla ml-1 cdp-text-primary" onClick={() => openDiscoverHcpsWindow(row)}></i></span>
+                        ? <span class="text-nowrap"><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Not Verified <i className="fas fa-search search-in-okla ml-1 cdp-text-primary cursor-pointer" onClick={() => openDiscoverHcpsWindow(row)}></i></span>
                         : status === 'rejected'
                             ? <span><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Rejected</span>
                             : <span></span>
@@ -380,7 +380,7 @@ export default function hcpUsers() {
                 <>
                     <div className="d-flex position-absolute inline-editing__btn-wrap">
                         <i style={isValid ? {} : { pointerEvents: 'none' }} onClick={() => onTableRowSave(hcps.users[rowIndex], { rowIndex, editableTableProps: editProps, formikProps })} disabled={!dirty} className={isValid ? 'fas fa-check mr-3 cdp-text-primary fa-1_5x' : 'fas fa-check mr-3 cdp-text-primary fa-1_5x inline-editing__btn-disable'} title="Save Changes" type="button"></i>
-                        <i onClick={resetForm} className="fas fa-times text-danger fa-1_5x" title="Cancel Changes" type="button"></i>
+                        <i onClick={resetForm} className="fas fa-times text-danger fa-1_5x cursor-pointer" title="Cancel Changes"></i>
                     </div>
                 </>
             }
@@ -600,7 +600,7 @@ export default function hcpUsers() {
                                     <Dropdown.Item className="px-2" active><i className="fas fa-link mr-2"></i> HCP Profile List</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
-                            <span className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary"></i></span>
+                            <span className="ml-auto mr-3"><i onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary cursor-pointer"></i></span>
                             <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
                                 <Modal.Header closeButton>
                                     <Modal.Title>Questions You May Have</Modal.Title>
