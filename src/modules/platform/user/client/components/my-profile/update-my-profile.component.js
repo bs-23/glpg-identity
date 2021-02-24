@@ -159,11 +159,18 @@ const UpdateMyProfile = () => {
     }
 
     const handleCountryFlagClick = (index, formikProps) => {
-        const { setFieldValue } = formikProps;
+        console.log("index: ", index, "----props: ", formikProps);
+        const { setFieldValue, values, dirty} = formikProps;
         setFieldValue('isCountryFlagActive', true);
         setSelectedCountryCode(index);
         const countryCode = CountryCodesObject[countries[index].country_iso2];
         setFieldValue('country_code', countryCode);
+        if(dirty){
+            myProfileInfo.first_name = values.first_name;
+            myProfileInfo.last_name = values.last_name;
+            myProfileInfo.email = values.email;
+            myProfileInfo.phone = values.phone;
+        }
     }
 
     const handlePhoneFieldChange = (e, formikProps) => {
@@ -216,7 +223,7 @@ const UpdateMyProfile = () => {
 
     return <div className="px-3 py-2 bg-white shadow-sm rounded">
                 <Formik
-                    initialValues={initialFormValues}
+                    initialValues={ initialFormValues}
                     displayName="UpdateMyProfileForm"
                     validationSchema={updateMyProfileSchema}
                     onSubmit={formSubmitHandler}
@@ -277,7 +284,7 @@ const UpdateMyProfile = () => {
                                                                     {
                                                                         countries.map( (country, index) => {
                                                                             return index === selectedCountryCode ? null :
-                                                                            (<Dropdown.Item onClick={() => handleCountryFlagClick(index, formikProps)} key={index} className="px-2 d-flex align-items-center">
+                                                                            (<Dropdown.Item onClick={(e) => handleCountryFlagClick(index, formikProps)} key={index} className="px-2 d-flex align-items-center">
                                                                                 <img height="20" width="20" src={generateCountryIconPath(country.codbase_desc)} title={country.codbase_desc} />
                                                                                 <span className="country-name pl-2">{ country.codbase_desc }</span>
                                                                                 <span className="country-phone-code pl-1">{ CountryCodesObject[country.country_iso2] }</span>

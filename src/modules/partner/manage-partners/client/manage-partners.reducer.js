@@ -41,16 +41,6 @@ export default function reducer(state = initialState, action) {
                 partnersData: state.partnersData.concat(action.payload.data)
             };
         }
-        case Types.UPDATE_PARTNER_FULFILLED: {
-            const requests = [...state.partnersData];
-            const idx = requests.findIndex(request => request.id === action.payload.data.id);
-            requests.splice(idx, 1, action.payload.data);
-
-            return {
-                ...state,
-                partnersData: requests
-            };
-        }
         case Types.DELETE_PARTNER_FULFILLED: {
             const requests = [...state.partnersData];
             const idx = requests.findIndex(request => request.id === action.payload.data.id);
