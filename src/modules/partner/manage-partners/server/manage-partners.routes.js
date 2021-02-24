@@ -24,7 +24,6 @@ module.exports = app => {
         .get(passport.authenticate('application-jwt', { session: false }), controller.getPartnerVendorById)
         .put(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), validate(updatePartnerVendorSchema), controller.updatePartnerVendor);
 
-
     app.route('/api/partners/documents/:id')
         .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_BUSINESS_PARTNER]), controller.getDownloadUrl);
 
