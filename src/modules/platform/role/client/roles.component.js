@@ -72,7 +72,7 @@ const RoleForm = ({ onSuccess, permissionSets, preFill }) => {
     return <div className="row">
         <div className="col-12">
             <div className="">
-                <div className="add-user p-3">
+                <div className="add-user">
                     <Formik
                         initialValues={{
                             title: preFill ? preFill.title : '',

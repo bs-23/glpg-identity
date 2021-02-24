@@ -1,12 +1,11 @@
-const Faq = require('./faq.model');
 const path = require('path');
 const { Op } = require('sequelize');
-const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
-const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
 const Sequelize = require('sequelize');
-const { IgnorePlugin } = require('webpack');
-const faqCategories = require('../faq.json');
-
+const Faq = require('./faq.model');
+const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
+const auditService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
+const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model'));
+const faqCategories = require('./faq.json');
 
 async function getFaqItem(req, res) {
     try {
@@ -46,24 +45,19 @@ function sort_category(items, orderType, limit, offset) {
     return data;
 }
 
-
 async function getFaqItems(req, res) {
     try {
-
-
         const page = req.query.page ? req.query.page - 1 : 0;
         if (page < 0) return res.status(404).send("page must be greater or equal 1");
-
 
         const limit = req.query.limit ? req.query.limit : 30;
         const offset = page * limit;
 
-        const topic = req.query.topic === 'null' || req.query.topic === undefined ? null : req.query.topic;
-
         const orderBy = req.query.orderBy === 'null'
             ? null
             : req.query.orderBy;
-        let orderType = req.query.orderType === 'asc' || req.query.orderType === 'desc'
+
+        const orderType = req.query.orderType === 'asc' || req.query.orderType === 'desc'
             ? req.query.orderType
             : 'asc';
 
@@ -74,8 +68,6 @@ async function getFaqItems(req, res) {
 
         const sortableColumns = ['question', 'answer', 'topics', 'updated_at'];
 
-        if (orderBy === 'topics') orderType === 'asc' ? orderType = 'desc' : orderType = 'asc';
-
         if (orderBy && sortableColumns.includes(orderBy)) {
             order.splice(0, 0, [orderBy, orderType]);
         }
@@ -84,18 +76,21 @@ async function getFaqItems(req, res) {
             order = [[Sequelize.literal('"createdByUser.first_name"'), orderType]];
         }
 
-        const filter = {
-            topics: {
-                [Op.overlap]: [topic]
+        let where = {};
+
+        if (req.query.topic) {
+            where = {
+                topics: {
+                    [Op.overlap]: [req.query.topic]
+                }
             }
-        };
+        }
 
         const inclusions = [
             {
                 model: User,
                 as: 'createdByUser',
-                attributes: ['first_name', 'last_name'],
-
+                attributes: ['first_name', 'last_name']
             },
             {
                 model: User,
@@ -104,21 +99,17 @@ async function getFaqItems(req, res) {
             }
         ];
 
-
         const response = await Faq.findAndCountAll({
             include: inclusions,
-            where: topic ? filter : {},
+            where: where,
             offset: orderBy === 'topics' || req.query.page === 'null' ? null : offset,
             limit: orderBy === 'topics' || req.query.page === 'null' ? null : limit,
-            order: orderBy === 'topics' ? [] : order,
-
+            order: orderBy === 'topics' ? [] : order
         });
-
 
         let data = [];
         if (orderBy === 'topics') {
             data = sort_category(response, orderType, limit, offset).rows;
-
         } else {
             data = response.rows.map(c => {
                 const createdBy = `${c.createdByUser.first_name} ${c.createdByUser.last_name}`;
@@ -133,22 +124,21 @@ async function getFaqItems(req, res) {
             });
         }
 
-
         const responseData = {
             faq: data,
             metadata: {
                 page: page + 1,
                 limit,
-                total: response.count,
+                total_items: response.count,
                 start: limit * page + 1,
                 end: offset + limit > response.count ? parseInt(response.count) : parseInt(offset + limit),
-                topic: topic,
+                total_pages: Math.ceil(response.count / limit)
             }
-        }
+        };
 
         res.json(responseData);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -157,7 +147,7 @@ async function getFaqCategories(req, res) {
     try {
         res.json(faqCategories.topics);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -183,7 +173,7 @@ async function createFaqItem(req, res) {
         response.dataValues.createdBy = `${user.dataValues.first_name} ${user.dataValues.last_name}`;
         response.dataValues.updatedBy = `${user.dataValues.first_name} ${user.dataValues.last_name}`;
 
-        await logService.log({
+        await auditService.log({
             event_type: 'CREATE',
             object_id: response.id,
             table_name: 'faq',
@@ -238,7 +228,7 @@ async function updateFaqItem(req, res) {
 
         await faq.update({ question, answer, topics });
 
-        await logService.log({
+        await auditService.log({
             event_type: 'UPDATE',
             object_id: faq.id,
             table_name: 'faq',
@@ -249,7 +239,7 @@ async function updateFaqItem(req, res) {
         res.json(faq);
 
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -268,7 +258,7 @@ async function deleteFaqItem(req, res) {
 
         await Faq.destroy({ where: { id } });
 
-        await logService.log({
+        await auditService.log({
             event_type: 'DELETE',
             object_id: faq.id,
             table_name: 'faq',
@@ -280,7 +270,7 @@ async function deleteFaqItem(req, res) {
         res.sendStatus(200);
 
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }

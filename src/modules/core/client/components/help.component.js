@@ -21,19 +21,13 @@ export default function Help() {
 
     useEffect(() => {
 
-        if (faqTopics) {
-            if (faq.faq && faq.faq.length > 0) {
-                setFaqData(faqMapping(faqTopics, faq.faq));
-            } else {
-                setFaqData(faqMapping(faqTopics, null));
-            }
-
+        if (faqTopics && faq.faq) {
+            setFaqData(faqMapping(faqTopics, faq.faq.length > 0 ? faq.faq : null));
         }
-
-    }, [faq]);
+    }, [faqTopics, faq]);
 
     useEffect(() => {
-        dispatch(getFaqItems("?page=null"));
+        dispatch(getFaqItems());
         dispatch(getFaqCategories());
     }, []);
 
@@ -45,15 +39,17 @@ export default function Help() {
 
         parentCategories.forEach(element => {
             const subcategories = topics.filter(x => x.category === element);
+
             subcategories.forEach(item => {
-                delete item.category;
                 if (faqs) item.faq = faqs.filter(x => x.topics.indexOf(item.slug) >= 0);
             });
+
             faqWithTopics.push({
                 category: element,
                 subcategories: subcategories
             });
         });
+
         return faqWithTopics;
     }
 

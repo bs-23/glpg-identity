@@ -36,7 +36,6 @@ async function createProfile(req, res) {
     try {
         if(!title.trim()) return res.status(400).send('Profile title must not be empty.');
         if(!Array.isArray(permissionSets)) return res.status(400).send('Invalid format for permission sets.');
-        if(!permissionSets.length) return res.status(400).send('Must provide permission sets.');
 
         const [profile, created] = await Profile.findOrCreate({
             where: { title },
@@ -69,7 +68,6 @@ async function editProfile(req, res) {
     try {
         if(!title.trim()) return res.status(400).send('Profile title must not be empty.');
         if(!Array.isArray(permissionSets)) return res.status(400).send('Invalid format for permission sets.');
-        if(!permissionSets.length) return res.status(400).send('Must provide permission sets.');
 
         const foundProfile = await Profile.findOne({ where: { id } });
 
