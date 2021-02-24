@@ -23,11 +23,10 @@ export default function Help() {
         if (faqTopics && faq.faq) {
             setFaqData(faqMapping(faqTopics, faq.faq.length > 0 ? faq.faq : null));
         }
-
     }, [faqTopics, faq]);
 
     useEffect(() => {
-        dispatch(getFaqItems("?page=null"));
+        dispatch(getFaqItems());
         dispatch(getFaqCategories());
     }, []);
 
