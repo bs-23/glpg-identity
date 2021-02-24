@@ -1,5 +1,5 @@
 import axios from "axios";
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { Form, Formik, Field, ErrorMessage } from "formik";
 import { useToasts } from "react-toast-notifications";
@@ -101,8 +101,12 @@ const ProfileForm = ({ onSuccess, permissionSets, preFill }) => {
                                     </div>
                                     <div className="col-12">
                                         <div className="row">
-                                            <FormField name="permissionSets" label="Select Permission Sets">
-                                                <ToggleListSlider name="permissionSets" options={getToggleListOptions()} valueExtractor={item => item.id} idExtractor={item => item.id} labelExtractor={item => item.title} />
+                                            <FormField name="permissionSets" label="Select Permission Sets" required={false}>
+                                                {
+                                                    getToggleListOptions().length
+                                                        ? <ToggleListSlider name="permissionSets" options={getToggleListOptions()} valueExtractor={item => item.id} idExtractor={item => item.id} labelExtractor={item => item.title} />
+                                                        : <div>No custom permission set found. <Link to={{ pathname: "/platform/permission-sets", state: { showCreateModal: true } }}  >Click here to create one.</Link></div>
+                                                }
                                             </FormField>
                                             <div className="invalid-feedback col-12"><ErrorMessage name="permissionSetsError" /></div>
                                         </div>
