@@ -631,55 +631,45 @@ async function registrationLookup(req, res) {
     }
 }
 
-async function syncConsent(hcpUser){
+async function syncConsentInVeevaCRM(hcpUser) {
     if(!hcpUser.individual_id_onekey) return;
 
-    try{
-        const searchUrl = 'https://cs110.salesforce.com/services';
-
-        // find direct marketing consent capture datetime
-        const consent_filter = {
-            user_id: hcpUser.id,
-            consent_confirmed: true,
-            '$consent.consent_category.title$': { [Op.iLike]: 'direct marketing' }
-        };
+    try {
+        const searchUrl = nodecache.getValue('SALESFORCE_SERVICE_URL');
 
         const hcp_consent = await HcpConsents.findOne({
-            where: consent_filter,
-            include: [
-                {
-                    model: Consent,
-                    attributes: ['id'],
-                    include: [
-                        {
-                            model: ConsentCategory,
-                            attributes: ['title']
-                        }
-                    ]
-                }
-            ],
+            where: {
+                user_id: hcpUser.id,
+                consent_confirmed: true,
+                '$consent.consent_category.title$': { [Op.iLike]: 'direct marketing' }
+            },
+            include: [{
+                model: Consent,
+                attributes: ['id'],
+                include: [{
+                    model: ConsentCategory,
+                    attributes: ['title']
+                }]
+            }],
             attributes: ['updated_at'],
             subQuery: false
         });
 
-        const consent_capture_datetime = hcp_consent?.updated_at;
-
-        const auth = async function(){
+        const auth = async function() {
             const grant_type = 'password';
-            const client_id = '3MVG91LYYD8O4krRFZk502yUZjpx.U666K_a1MZoS8lDxX4ZFyX92s0DzUBS3FV4B.P3PuQOdbCQF0jkaTt6b';
-            const client_secret = '20D622DE96C1F10A185A0D6A31EFDAB6591C05500A9BB9CC5D28B7C93F2CD57B';
-            const username = 'app_user_martech@glpg.com.full';
-            const password = 'Galapagos2021Xcxor9PaUvXAEUwQX9jKKDGy';
+            const client_id = nodecache.getValue('SALESFORCE_SERVICE_CLIENT_ID');;
+            const client_secret = nodecache.getValue('SALESFORCE_SERVICE_CLIENT_SECRET');
+            const username = nodecache.getValue('SALESFORCE_SERVICE_USERNAME');
+            const password = nodecache.getValue('SALESFORCE_SERVICE_PASSWORD');
 
             const { data } = await axios.post(`${searchUrl}/oauth2/token?grant_type=${grant_type}&client_id=${client_id}&client_secret=${client_secret}&username=${username}&password=${password}`);
 
             return data.access_token;
         };
+
         const access_token = await auth();
-        const headers = { authorization: 'Bearer ' + access_token };
+        const headers = { authorization: `Bearer ${access_token}` };
 
-
-        // get account from salesforce
         const query = `SELECT + Id, Name, PersonEmail, Secondary_Email__c, (SELECT + Id, Capture_Datetime_vod__c, Channel_Value_vod__c, Content_Type_vod__c, GLPG_Consent_Source__c +
             FROM + Multichannel_Consent_vod__r + WHERE + Content_Type_vod__r.Name = 'Galapagos news' + and + channel_value_vod__c = '${hcpUser.email}') +
             FROM + Account + WHERE + QIDC__OneKeyId_IMS__c = '${hcpUser.individual_id_onekey}'`;
@@ -688,38 +678,34 @@ async function syncConsent(hcpUser){
 
         if(!account) return;
 
-        // update email
-        if(!account.PersonEmail){
+        if(!account.PersonEmail) {
             await axios.patch(`${searchUrl}/data/v48.0/sobjects/Account/${account.Id}`, { PersonEmail: hcpUser.email}, { headers });
         }
-        if(account.PersonEmail && account.PersonEmail != hcpUser.email && !account.Secondary_Email__c){
-            await axios.patch(`${searchUrl}/data/v48.0/sobjects/Account/${account.Id}`, { Secondary_Email__c: hcpUser.email }, { headers })
+
+        if(account.PersonEmail && account.PersonEmail != hcpUser.email && !account.Secondary_Email__c) {
+            await axios.patch(`${searchUrl}/data/v48.0/sobjects/Account/${account.Id}`, { Secondary_Email__c: hcpUser.email }, { headers });
         }
 
-        // get dynamically content type id of Galapagos News
-        const content_type = await axios.get(`${searchUrl}/data/v48.0/query?q=SELECT + id + from + Content_Type_vod__c + WHERE + name = 'Galapagos news'`, { headers });
-        const content_type_id = content_type.data?.records[0]?.Id;
+        if(hcp_consent) {
+            const galapagos_news_content_type = await axios.get(`${searchUrl}/data/v48.0/query?q=SELECT + id + from + Content_Type_vod__c + WHERE + name = 'Galapagos news'`, { headers });
+            const galapagos_news_content_type_id = galapagos_news_content_type.data.records[0]?.Id;
 
-        // find any multi-channel consent of direct marketing with given email
-        const user_consents = account.Multichannel_Consent_vod__r?.records;
+            const account_consents = account.Multichannel_Consent_vod__r?.records;
 
-        // create multi-channel consent
-        // RecordTypeId hidden value
-        if(consent_capture_datetime && !(user_consents?.length) ){
-            await axios.post(`${searchUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c`, {
-                "Account_vod__c": account_id,
-                "RecordTypeId": "0124J000000ouUlQAI",
-                "Capture_Datetime_vod__c": consent_capture_datetime,
-                "Channel_Value_vod__c": hcpUser.email,
-                "Opt_Type_vod__c": "Opt_In_vod",
-                "Content_Type_vod__c": content_type_id,
-                "GLPG_Consent_Source__c": "Website"
-            },
-            { headers });
+            if(!(account_consents?.length)) {
+                await axios.post(`${searchUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c`, {
+                    "Account_vod__c": account.Id,
+                    "RecordTypeId": "0124J000000ouUlQAI",
+                    "Capture_Datetime_vod__c": hcp_consent.updated_at,
+                    "Channel_Value_vod__c": hcpUser.email,
+                    "Opt_Type_vod__c": "Opt_In_vod",
+                    "Content_Type_vod__c": galapagos_news_content_type_id,
+                    "GLPG_Consent_Source__c": "Website"
+                }, { headers });
+            }
         }
-    }
-    catch(err){
-        console.log(err);
+    } catch(err) {
+        logger.error(err);
     }
 }
 
@@ -906,8 +892,6 @@ async function createHcpProfile(req, res) {
 
         response.data = getHcpViewModel(hcpUser.dataValues);
 
-        await syncConsent(hcpUser);
-
         if (hcpUser.dataValues.status === 'consent_pending') {
             response.data.consent_confirmation_token = generateConsentConfirmationAccessToken(hcpUser);
         }
@@ -918,6 +902,8 @@ async function createHcpProfile(req, res) {
             response.data.password_reset_token = hcpUser.dataValues.reset_password_token;
             response.data.retention_period = '1 hour';
         }
+
+        await syncConsentInVeevaCRM(hcpUser);
 
         await logService.log({
             event_type: 'CREATE',
@@ -969,8 +955,6 @@ async function confirmConsents(req, res) {
 
         hcpUser.status = hcpUser.individual_id_onekey ? 'self_verified' : 'manually_verified';
 
-        await syncConsent(hcpUser);
-
         await addPasswordResetTokenToUser(hcpUser);
 
         response.data = {
@@ -978,6 +962,8 @@ async function confirmConsents(req, res) {
             password_reset_token: hcpUser.dataValues.reset_password_token,
             retention_period: '1 hour'
         };
+
+        await syncConsentInVeevaCRM(hcpUser);
 
         res.json(response);
     } catch (err) {
