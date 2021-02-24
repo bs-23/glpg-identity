@@ -680,34 +680,32 @@ async function syncConsent(hcpUser){
 
 
         // get account from salesforce
-        const query = `SELECT + id, PersonEmail, Secondary_Email__c + from + Account + WHERE + QIDC__OneKeyId_IMS__c = '${hcpUser.individual_id_onekey}'`;
-        const account = await axios.get(`${searchUrl}/data/v48.0/query?q=${query}`, { headers });
-        const userInfo = account.data?.records[0];
+        const query = `SELECT + Id, Name, PersonEmail, Secondary_Email__c, (SELECT + Id, Capture_Datetime_vod__c, Channel_Value_vod__c, Content_Type_vod__c, GLPG_Consent_Source__c +
+            FROM + Multichannel_Consent_vod__r + WHERE + Content_Type_vod__r.Name = 'Galapagos news' + and + channel_value_vod__c = '${hcpUser.email}') +
+            FROM + Account + WHERE + QIDC__OneKeyId_IMS__c = '${hcpUser.individual_id_onekey}'`;
+        const account_response = await axios.get(`${searchUrl}/data/v48.0/query?q=${query}`, { headers });
+        const account = account_response.data.totalSize ? account_response.data.records[0] : null;
 
-        if(!userInfo) return;
+        if(!account) return;
 
-        const account_id = userInfo.Id;
         // update email
-        if(!userInfo.PersonEmail){
-            await axios.patch(`${searchUrl}/data/v48.0/sobjects/Account/${account_id}`, { PersonEmail: hcpUser.email}, { headers });
+        if(!account.PersonEmail){
+            await axios.patch(`${searchUrl}/data/v48.0/sobjects/Account/${account.Id}`, { PersonEmail: hcpUser.email}, { headers });
         }
-        if(userInfo.PersonEmail && userInfo.PersonEmail != hcpUser.email && !userInfo.Secondary_Email__c){
-            await axios.patch(`${searchUrl}/data/v48.0/sobjects/Account/${account_id}`, { Secondary_Email__c: hcpUser.email }, { headers })
+        if(account.PersonEmail && account.PersonEmail != hcpUser.email && !account.Secondary_Email__c){
+            await axios.patch(`${searchUrl}/data/v48.0/sobjects/Account/${account.Id}`, { Secondary_Email__c: hcpUser.email }, { headers })
         }
 
         // get dynamically content type id of Galapagos News
         const content_type = await axios.get(`${searchUrl}/data/v48.0/query?q=SELECT + id + from + Content_Type_vod__c + WHERE + name = 'Galapagos news'`, { headers });
         const content_type_id = content_type.data?.records[0]?.Id;
 
-        // find any multi-channel consent of direct marketing
-        const getMultiChannelConsentsQuery = `SELECT + id, Content_Type_vod__c, Account_vod__c, Channel_Source_vod__c + from + Multichannel_Consent_vod__c + WHERE + Account_vod__c='${account_id}'`
-        const consents_response = await axios.get(`${searchUrl}/data/v48.0/query?q=${getMultiChannelConsentsQuery}`, { headers });
-        const user_consents = consents_response?.data.records;
-        const exist_direct_marekting_consent = user_consents.find(i => i.Content_Type_vod__c === content_type_id && i.Channel_Value_vod__c === hcpUser.email);
+        // find any multi-channel consent of direct marketing with given email
+        const user_consents = account.Multichannel_Consent_vod__r?.records;
 
         // create multi-channel consent
         // RecordTypeId hidden value
-        if(consent_capture_datetime && !exist_direct_marekting_consent){
+        if(consent_capture_datetime && !(user_consents?.length) ){
             await axios.post(`${searchUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c`, {
                 "Account_vod__c": account_id,
                 "RecordTypeId": "0124J000000ouUlQAI",
