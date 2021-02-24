@@ -213,7 +213,12 @@ const HcpPartnerRequests = () => {
     useEffect(() => {
         if (formData) {
             dispatch(sendForm(formData)).then(() => {
-                dispatch(updatePartnerRequest(formData.id, { ...formData, status: "pending" }));
+                dispatch(updatePartnerRequest(formData.id, { ...formData, status: 'pending' })).then(() => {
+                    addToast('Form sent successfully.', {
+                        appearance: 'success',
+                        autoDismiss: true
+                    });
+                });
             }).catch(() => {
                 addToast('An error occured. Please try again.', {
                     appearance: 'error',

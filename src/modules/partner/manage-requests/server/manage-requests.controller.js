@@ -174,6 +174,7 @@ async function sendForm(req, res) {
         const sendFormLink = JSON.parse(metaData[0].dataValues.metadata).request_notification_link;
 
         await axios.post(sendFormLink, payload);
+        res.json('Form sent successfully.');
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal server error');
@@ -189,7 +190,7 @@ async function updatePartnerRequest(req, res) {
             email,
             mdr_id,
             country_iso2,
-            language,
+            locale,
             uuid,
             is_supplier,
             is_customer,
@@ -199,6 +200,7 @@ async function updatePartnerRequest(req, res) {
             workplace_name,
             workplace_type,
             specialty,
+            status,
             iqvia_wholesaler_id,
         } = req.body;
 
@@ -221,7 +223,8 @@ async function updatePartnerRequest(req, res) {
             email,
             mdr_id,
             country_iso2,
-            locale: language.toLowerCase() + "_" + country_iso2.toUpperCase(),
+            locale,
+            status,
             updated_by: req.user.id
         };
 
