@@ -651,8 +651,7 @@ async function syncConsentInVeevaCRM(hcpUser) {
                     attributes: ['title']
                 }]
             }],
-            attributes: ['updated_at'],
-            subQuery: false
+            attributes: ['updated_at']
         });
 
         const auth = async function() {
