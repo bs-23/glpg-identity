@@ -35,6 +35,7 @@ export default function Input (props) {
             type={type}
             value={dateValue}
             max={"9999-12-31"}
+            placeholder="dd.mm.yyyy"
             {...rest}
         />
     }

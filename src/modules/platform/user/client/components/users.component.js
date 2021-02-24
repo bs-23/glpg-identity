@@ -284,7 +284,7 @@ export default function Users() {
                                         <span className="d-none d-sm-inline-block">Reset</span>
                                     </button>
                                 }
-                                <button to="/platform/create-user" className="btn cdp-btn-secondary text-white ml-2" onClick={() => setShowCreateUser(true)}>
+                                <button className="btn cdp-btn-secondary text-white ml-2" onClick={() => setShowCreateUser(true)}>
                                     <i className="icon icon-plus"></i> <span className="d-none d-sm-inline-block pl-1">Create new user</span>
                                 </button>
                             </div>
@@ -347,9 +347,9 @@ export default function Users() {
                                     <i class="icon icon-team icon-6x cdp-text-secondary"></i>
                                     <h3 className="font-weight-bold cdp-text-primary pt-4">No Users Found!</h3>
                                     <h4 className="cdp-text-primary pt-3 pb-5">Click on the button below to create new one</h4>
-                                    <NavLink to="/platform/create-user" className="btn cdp-btn-secondary text-white px-5 py-2 font-weight-bold">
+                                    <button onClick={() => setShowCreateUser(true)} className="btn cdp-btn-secondary text-white px-5 py-2 font-weight-bold">
                                         <i className="icon icon-plus pr-1"></i> Create New User
-                                    </NavLink>
+                                    </button>
                                 </div>
                             </div>
                         }
