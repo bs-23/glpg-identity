@@ -20,14 +20,14 @@ export default function Help() {
     const dispatch = useDispatch();
 
     useEffect(() => {
+
         if (faqTopics && faq.faq) {
             setFaqData(faqMapping(faqTopics, faq.faq.length > 0 ? faq.faq : null));
         }
-
     }, [faqTopics, faq]);
 
     useEffect(() => {
-        dispatch(getFaqItems("?page=null"));
+        dispatch(getFaqItems());
         dispatch(getFaqCategories());
     }, []);
 
@@ -41,7 +41,6 @@ export default function Help() {
             const subcategories = topics.filter(x => x.category === element);
 
             subcategories.forEach(item => {
-                delete item.category;
                 if (faqs) item.faq = faqs.filter(x => x.topics.indexOf(item.slug) >= 0);
             });
 

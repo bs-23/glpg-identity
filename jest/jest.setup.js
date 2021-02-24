@@ -31,6 +31,7 @@ module.exports = async function () {
     const ConsentLocale = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent-locale.model.js'));
     const ConsentCountry = require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model.js'));
     const Faq = require(path.join(process.cwd(), 'src/modules/platform/faq/server/faq.model.js'));
+    const Localization = require(path.join(process.cwd(), 'src/modules/core/server/localization/localization.model.js'));
 
     require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model.js'));
     require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent-locale.model.js'));
@@ -44,7 +45,7 @@ module.exports = async function () {
     const PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permission-set.model"));
     const ServiceCategory = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/service.model"));
     const UserProfile = require(path.join(process.cwd(), "src/modules/platform/profile/server/user-profile.model.js"));
-    const PermissionSetServiceCategories = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-serviceCategory.model.js"));
+    const PermissionSetService = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionset-service.model.js"));
     const UserProfilePermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/userProfile-permissionSet.model.js"));
 
     await sequelize.cdpConnector.sync();
@@ -52,7 +53,7 @@ module.exports = async function () {
     await PermissionSet.bulkCreate(specHelper.permissionSet, { returning: true, ignoreDuplicates: false });
     await ServiceCategory.bulkCreate(specHelper.serviceCategories, { returning: true, ignoreDuplicates: false });
     await UserProfile.bulkCreate(specHelper.userProfile, { returning: true, ignoreDuplicates: false });
-    await PermissionSetServiceCategories.bulkCreate(specHelper.permissionSet_serviceCategories, { returning: true, ignoreDuplicates: false });
+    await PermissionSetService.bulkCreate(specHelper.permissionSet_service, { returning: true, ignoreDuplicates: false });
     await UserProfilePermissionSet.bulkCreate(specHelper.userProfile_permissionSet, { returning: true, ignoreDuplicates: false });
     await Application.create(specHelper.defaultApplication);
     await User.create(specHelper.users.defaultAdmin);
@@ -63,4 +64,5 @@ module.exports = async function () {
     await ConsentLocale.bulkCreate(specHelper.consent.demoConsentLocales, { returning: true, ignoreDuplicates: false });
     await ConsentCountry.bulkCreate(specHelper.consent.demoConsentCountry, { returning: true, ignoreDuplicates: false });
     await Faq.create(specHelper.faq.demoFaq);
+    await Localization.bulkCreate(specHelper.localizations, { returning: true, ignoreDuplicates: false });
 };

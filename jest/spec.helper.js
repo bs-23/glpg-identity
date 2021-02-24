@@ -197,15 +197,26 @@ module.exports = {
     permissionSet: [
         { id: systemAdminPermissionSetID, title: "System Admin Permission Set", slug: "system_admin", type: 'standard', countries: ["BE", "FR", "DE", "IT", "NL", "ES", "GB"], description: "This is the default permission set for System Admin", created_by: defaultAdminId, updated_by: defaultAdminId, },
     ],
-    permissionSet_serviceCategories: [
-        { permissionset_id: systemAdminPermissionSetID, serviceCategoryId: userManagementServiceCategoryID },
-        { permissionset_id: systemAdminPermissionSetID, serviceCategoryId: HCPServiceCategoryID },
-        { permissionset_id: systemAdminPermissionSetID, serviceCategoryId: DPOServiceCategoryID }
+    permissionSet_service: [
+        { permissionset_id: systemAdminPermissionSetID, service_id: userManagementServiceCategoryID },
+        { permissionset_id: systemAdminPermissionSetID, service_id: HCPServiceCategoryID },
+        { permissionset_id: systemAdminPermissionSetID, service_id: DPOServiceCategoryID }
     ],
     userProfile: [
         { id: SystemAdminProfileID, title: "System Admin", slug: "system_admin", type: 'standard', description: "This is the default profile for System Admin", created_by: defaultAdminId, updated_by: defaultAdminId }
     ],
     userProfile_permissionSet: [
         { user_profile_id: SystemAdminProfileID, permissionset_id: systemAdminPermissionSetID }
+    ],
+    localizations: [
+        { language_family: 'English', language_variant: 'British English', country_iso2: 'GB', locale: 'en_GB' },
+        { language_family: 'English', language_variant: 'English', locale: 'en' },
+        { language_family: 'Dutch', language_variant: 'Belgian Dutch', country_iso2: 'BE', locale: 'nl_BE' },
+        { language_family: 'Dutch', language_variant: 'Standard Dutch', country_iso2: 'NL', locale: 'nl_NL' },
+        { language_family: 'French', language_variant: 'Belgian French', country_iso2: 'BE', locale: 'fr_BE' },
+        { language_family: 'French', language_variant: 'Standard French', country_iso2: 'FR', locale: 'fr_FR' },
+        { language_family: 'French', language_variant: 'Luxembourgish French', country_iso2: 'LU', locale: 'fr_LU' },
+        { language_family: 'German', language_variant: 'Standard German', country_iso2: 'DE', locale: 'de_DE' },
+        { language_family: 'Spanish', language_variant: 'Castilian Spanish', country_iso2: 'ES', locale: 'es_ES' },
     ]
 };
