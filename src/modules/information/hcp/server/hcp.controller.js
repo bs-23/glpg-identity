@@ -703,7 +703,7 @@ async function syncConsent(hcpUser){
         const getMultiChannelConsentsQuery = `SELECT + id, Content_Type_vod__c, Account_vod__c, Channel_Source_vod__c + from + Multichannel_Consent_vod__c + WHERE + Account_vod__c='${account_id}'`
         const consents_response = await axios.get(`${searchUrl}/data/v48.0/query?q=${getMultiChannelConsentsQuery}`, { headers });
         const user_consents = consents_response?.data.records;
-        const exist_direct_marekting_consent = user_consents.find(i => i.Content_Type_vod__c === content_type_id);
+        const exist_direct_marekting_consent = user_consents.find(i => i.Content_Type_vod__c === content_type_id && i.Channel_Value_vod__c === hcpUser.email);
 
         // create multi-channel consent
         // RecordTypeId hidden value
