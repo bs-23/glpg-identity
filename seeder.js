@@ -413,7 +413,7 @@ async function init() {
                     created_by: admin.id,
                     updated_by: admin.id,
                     metadata: JSON.stringify({
-                        request_notification_link: 'https://patients-organization-dev.glpg.com/bin/public/glpg-forms/sendForm.invitation.html'
+                        request_notification_link: 'https://onboarding-business-partner-dev.glpg.com/bin/public/glpg-forms/sendForm.invitation.html'
                     })
                 }
             ];
