@@ -13,9 +13,8 @@ module.exports = app => {
         .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_BUSINESS_PARTNER]), controller.getPartners)
         .post(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), validate(createPartnerSchema), controller.createPartner);
 
-    app.route('/api/partners/:id')
-        .get(passport.authenticate('application-jwt', { session: false }), controller.getPartnerById)
-        .put(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), validate(updatePartnerSchema), controller.updatePartner);
+    app.route('/api/partners/wholesalers')
+        .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_BUSINESS_PARTNER]), controller.getPartnerWholesalers);
 
     app.route('/api/partners/vendors')
         .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_BUSINESS_PARTNER]), controller.getPartnerVendors)
@@ -25,8 +24,6 @@ module.exports = app => {
         .get(passport.authenticate('application-jwt', { session: false }), controller.getPartnerVendorById)
         .put(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), validate(updatePartnerVendorSchema), controller.updatePartnerVendor);
 
-    app.route('/api/partners/wholesalers')
-        .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_BUSINESS_PARTNER]), controller.getPartnerWholesalers);
 
     app.route('/api/partners/documents/:id')
         .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_BUSINESS_PARTNER]), controller.getDownloadUrl);
@@ -42,4 +39,8 @@ module.exports = app => {
 
     app.route('/api/partners/export/:entityType')
         .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_BUSINESS_PARTNER]), controller.exportApprovedPartners);
+
+    app.route('/api/partners/:id')
+        .get(passport.authenticate('application-jwt', { session: false }), controller.getPartnerById)
+        .put(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), validate(updatePartnerSchema), controller.updatePartner);
 };
