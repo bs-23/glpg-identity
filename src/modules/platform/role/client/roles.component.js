@@ -72,7 +72,7 @@ const RoleForm = ({ onSuccess, permissionSets, preFill }) => {
     return <div className="row">
         <div className="col-12">
             <div className="">
-                <div className="add-user">
+                <div className="add-user p-sm-3">
                     <Formik
                         initialValues={{
                             title: preFill ? preFill.title : '',
@@ -149,7 +149,7 @@ export default function ManageRoles() {
         if (!data.role_ps || !data.role_ps.length) return '';
         return data.role_ps.map((item, index) => {
             return <React.Fragment key={item.permissionset_id}>
-                <a type="button" className="link-with-underline" onClick={() => handlePermissionSetClick(item.permissionset_id)}>
+                <a className="link-with-underline cursor-pointer" onClick={() => handlePermissionSetClick(item.permissionset_id)}>
                     {item.ps.title}
                 </a>
                 {index < data.role_ps.length - 1 ? <span>,&nbsp;</span> : null}
@@ -210,7 +210,7 @@ export default function ManageRoles() {
                                     <Dropdown.Item className="px-2" active><i className="fas fa-link mr-2"></i> Define Roles</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
-                            <span className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary"></i></span>
+                            <span className="ml-auto mr-3"><i onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary cursor-pointer"></i></span>
                         </nav>
                         <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
                             <Modal.Header closeButton>
