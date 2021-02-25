@@ -11,7 +11,15 @@ export default function IdleTimeOutModalComponent(props) {
     const [show, setShow] = useState(props.show);
     const [, setCookie, removeCookie] = useCookies();
 
-    const handleShow = () => (location.pathname !== '/login' && location.pathname !== '/swagger/login' && location.pathname != '/api-docs/') ? setShow(true) : setShow(false);
+    const handleShow = () => {
+        axios.get('/api/users/profile')
+        .then(res => {
+            (location.pathname !== '/swagger/login' && location.pathname != '/api-docs/') ? setShow(true) : setShow(false);
+        })
+        .catch(err => {
+
+        })
+    }
     const handleClose = () => setShow(false);
 
     const handleLogout = () => {
