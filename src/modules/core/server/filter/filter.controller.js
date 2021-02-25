@@ -2,6 +2,7 @@ const path = require('path');
 const FilterSettings = require(path.join(process.cwd(), "src/modules/core/server/filter/filter.model.js"));
 const filterService = require(path.join(process.cwd(), 'src/modules/platform/user/server/filter.js'));
 const { Op } = require('sequelize');
+const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
 const tables = ['hcp-profiles', 'crdlp-hcp-profiles', 'cdp-users']
 
@@ -20,7 +21,7 @@ async function getUserFilters(req, res) {
         const data = userFilters.map(({ id, title, settings }) => ({ id, title, settings }));
         res.json(data);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -51,7 +52,7 @@ async function createUserFilter(req, res) {
 
         res.json(filter);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -85,7 +86,7 @@ async function updateUserFilter(req, res) {
 
         res.sendStatus(200);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -102,7 +103,7 @@ async function getFilterSetting(req, res) {
 
         res.json(filter);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }

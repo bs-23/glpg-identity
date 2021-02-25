@@ -3,6 +3,7 @@ const { Op } = require('sequelize');
 const Profile = require('./user-profile.model');
 const UserProfilePermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/userProfile-permissionSet.model.js"));
 const PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permission-set.model.js"));
+const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
 async function getProfiles(req, res) {
     try {
@@ -25,7 +26,7 @@ async function getProfiles(req, res) {
 
         res.json(profiles);
     } catch (error) {
-        console.error(error);
+        logger.error(error);
         res.status(500).send('Internal server error');
     }
 }
@@ -56,7 +57,7 @@ async function createProfile(req, res) {
 
         res.json(profile);
     } catch (error) {
-        console.error(error);
+        logger.error(error);
         res.status(500).send('Internal server error');
     }
 }
@@ -88,7 +89,7 @@ async function editProfile(req, res) {
 
         res.json(foundProfile);
     } catch (error) {
-        console.error(error);
+        logger.error(error);
         res.status(500).send('Internal server error');
     }
 }

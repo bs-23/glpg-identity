@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const PasswordHistory = require(path.join(process.cwd(), "src/modules/core/server/password/password-history.model.js"));
 const bcrypt = require('bcryptjs');
+const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
 async function isOldPassword(newPassword, user) {
     try {
@@ -47,7 +48,7 @@ async function saveOldPassword(user) {
             });
         }
     } catch (err) {
-        console.error(err);
+        logger.error(err);
     }
 }
 

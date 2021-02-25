@@ -43,7 +43,6 @@ const SpecialtyFilter = (props) => {
     };
 
     useEffect(() => {
-        // console.log('Refetching sp......................')
         if(filter.country) {
             dispatch(getHCPSpecialities(filter.country, 'en'));
             setSelectedSpecialties(getSelectedOptions());
