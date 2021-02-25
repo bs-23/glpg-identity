@@ -2,7 +2,7 @@ const path = require('path');
 const _ = require('lodash');
 const axios = require('axios');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
-
+const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
 const searchUrl = nodecache.getValue('OKLA_SEARCH_URL');
 const auth = {
@@ -133,7 +133,7 @@ async function searchOklaHcps(req, res) {
         }
         res.json(data);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         if (err.response.status === 400) {
             res.status(400).send(err.response.data.response.errors[0].message);
         } else {
@@ -230,7 +230,7 @@ async function searchOklaHcos(req, res) {
 
         res.json(data);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         if (err.response.status === 400) {
             res.status(400).send(err.response.data.response.errors[0].message);
         } else {
@@ -332,7 +332,7 @@ async function getOklaHcpDetails(req, res) {
 
         res.json(data);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -405,7 +405,7 @@ async function getOklaHcoDetails(req, res) {
 
         res.json(data);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }

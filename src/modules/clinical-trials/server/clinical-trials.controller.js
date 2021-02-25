@@ -11,6 +11,7 @@ const fetch = require('cross-fetch');
 const { DataTypes } = require('sequelize');
 const { NonceProvider } = require('react-select');
 const nodecache = require('../../../config/server/lib/nodecache');
+const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
 var seed = 1;
 var API_KEY = nodecache.getValue('GOOGLE_MAP_API_KEY');
@@ -22,14 +23,14 @@ async function getCoordinates(facility, zip, city, state, country, index)
     var BASE_URL = 'https://maps.googleapis.com/maps/api/geocode/json?address=';
     var joinedURL = BASE_URL + filteredParams.join('+') + '&key=' + API_KEY;
     var url = encodeURI(joinedURL.replace(/\s/g,'+').replace('#',''));
-    
-    try { 
+
+    try {
         await new Promise(resolve => setTimeout(resolve, index*1000));
         const response = await fetch(url);
         const json = await response.json();
         return json.results[0].geometry.location;
     }catch (error) {
-        return {lat: -1, lng: -1}    
+        return {lat: -1, lng: -1}
     }
 }
 
@@ -40,12 +41,12 @@ function haversineDistanceInKM(lat1,lon1, lat2, lon2){
     const φ2 = lat2 * Math.PI/180;
     const Δφ = (lat2-lat1) * Math.PI/180;
     const Δλ = (lon2-lon1) * Math.PI/180;
-    
+
     const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
               Math.cos(φ1) * Math.cos(φ2) *
               Math.sin(Δλ/2) * Math.sin(Δλ/2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    
+
     return R * c * 0.001; // in km
 }
 
@@ -242,7 +243,7 @@ async function dumpAllData(req, res) {
         });
     });
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -265,7 +266,7 @@ async function showAllVersions(req, res) {
         response.data = result;
         res.json(response);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -289,12 +290,12 @@ async function mergeProcessData(req, res) {
              let data_chunk = await Promise.all(jsonValue.FullStudiesResponse.FullStudies.map(async element=>{
                  let locationList = element.Study.ProtocolSection.ContactsLocationsModule.LocationList;
 
-                 if (element.Study.ProtocolSection.ConditionsModule.ConditionList.Condition[0].toLowerCase().includes('Acute Exacerbation of Remitting Relapsing Multiple Sclerosis'.toLowerCase()) || 
-                    element.Study.ProtocolSection.ConditionsModule.ConditionList.Condition[0].toLowerCase().includes('Clinically Isolated Syndrome'.toLowerCase()) || 
+                 if (element.Study.ProtocolSection.ConditionsModule.ConditionList.Condition[0].toLowerCase().includes('Acute Exacerbation of Remitting Relapsing Multiple Sclerosis'.toLowerCase()) ||
+                    element.Study.ProtocolSection.ConditionsModule.ConditionList.Condition[0].toLowerCase().includes('Clinically Isolated Syndrome'.toLowerCase()) ||
                     element.Study.ProtocolSection.ConditionsModule.ConditionList.Condition[0].toLowerCase().includes('Cystic Fibrosis'.toLowerCase())){
                      return {};
                  }
-                 return { 
+                 return {
                     'trial_fixed_id': uuid(),
                     'indication': element.Study.ProtocolSection.ConditionsModule.ConditionList.Condition[0].capitalize().split('|').join(','),
                     'indication_group': groupIndications(element.Study.ProtocolSection.ConditionsModule.ConditionList.Condition[0]),
@@ -322,7 +323,7 @@ async function mergeProcessData(req, res) {
                             location.LocationCity,
                             location.LocationState,
                             location.LocationCountry,
-                            index);   
+                            index);
                         return {
                         'location_status': location.LocationStatus? location.LocationStatus : element.Study.ProtocolSection.StatusModule.OverallStatus,
                         'location_facility': location.LocationFacility,
@@ -357,7 +358,7 @@ async function mergeProcessData(req, res) {
         };
         res.json(response);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -365,7 +366,7 @@ async function mergeProcessData(req, res) {
 
 async function getTrials(req, res) {
     const response = new Response({}, []);
-    let { items_per_page, 
+    let { items_per_page,
         page_number,
         status,
         gender,
@@ -435,7 +436,7 @@ async function getTrials(req, res) {
         }
 
         response.data = {
-           search_result: result.map(x=>{ 
+           search_result: result.map(x=>{
                 let least_distance = Number.MAX_SAFE_INTEGER;
                 x.dataValues.locations.map(location=>{
                     let distance = haversineDistanceInKM(cordinates.lat, cordinates.lng, location.lat, location.lng)
@@ -448,7 +449,7 @@ async function getTrials(req, res) {
         }
         res.json(response);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -470,7 +471,7 @@ async function getTrialDetails(req, res) {
                 {id: id}
                 ]
             },
-            include: ['locations'] 
+            include: ['locations']
         });
 
         if (!result) {
@@ -481,7 +482,7 @@ async function getTrialDetails(req, res) {
         response.data = result;
         res.json(response);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -495,7 +496,7 @@ async function getCountryList(req, res) {
         response.data = countriesWithISO;
         res.json(response);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
     }
 }
 
@@ -521,7 +522,7 @@ async function getConditions(req, res) {
         res.json(response);
         res.json(conditions);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
     }
 }
 
@@ -547,7 +548,7 @@ async function getConditionsWithDetails(req, res) {
         res.json(response);
         res.json(conditions);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
     }
 }
 
@@ -561,7 +562,7 @@ async function validateAddress(req, res) {
         res.json(response);
         console.log(country,zipcode)
     } catch (err) {
-        console.error(err);
+        logger.error(err);
     }
 }
 

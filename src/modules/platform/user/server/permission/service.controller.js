@@ -1,4 +1,6 @@
 const Service = require('./service.model');
+const path = require('path');
+const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
 async function getServices(req, res) {
     try {
@@ -12,7 +14,7 @@ async function getServices(req, res) {
 
         res.json(services);
     } catch(err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }

@@ -2,6 +2,7 @@ const path = require('path');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
+const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
 async function login(req, res) {
     try {
@@ -33,7 +34,7 @@ async function login(req, res) {
 
         res.sendStatus(200);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }

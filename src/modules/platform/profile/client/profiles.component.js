@@ -151,7 +151,7 @@ export default function ManageProfiles() {
         if (!data || !data.up_ps || !data.up_ps.length) return '';
         return data.up_ps.map((item, index) => {
             return <React.Fragment key={item.permissionset_id}>
-                <a type="button" className="link-with-underline" key={item.permissionset_id} onClick={() => handlePermissionSetClick(item.permissionset_id)}>
+                <a className="link-with-underline cursor-pointer" key={item.permissionset_id} onClick={() => handlePermissionSetClick(item.permissionset_id)}>
                     {item.ps.title}
                 </a>
                 {index < data.up_ps.length - 1 ? <span>,&nbsp;</span> : null}
@@ -212,7 +212,7 @@ export default function ManageProfiles() {
                                     <Dropdown.Item className="px-2" active><i className="fas fa-link mr-2"></i> Manage Profiles</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
-                            <span className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary"></i></span>
+                            <span className="ml-auto mr-3"><i onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary cursor-pointer"></i></span>
                         </nav>
                         <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
                             <Modal.Header closeButton>

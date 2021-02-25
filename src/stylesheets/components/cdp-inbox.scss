@@ -144,14 +144,15 @@
 
                 &-col {
                     padding-right: 10px !important;
-                    flex: 0 0 30%;
+                    flex: 0 0 32%;
+                    font-weight: normal !important;
 
                     &.small {
                         flex: 0 0 40px;
                     }
 
                     &.large {
-                        flex: 0 0 calc(100% - (30% + 40px));
+                        flex: 0 0 calc(100% - (32% + 40px));
                     }
                 }
             }

@@ -249,6 +249,17 @@
                 margin: 0px -15px;
                 padding-left: 15px;
                 padding-right: 15px;
+
+                .dropdown {
+
+                    &-customize {
+                        position: inherit;
+                    }
+
+                    &-item {
+                        white-space: inherit;
+                    }
+                }
             }
 
             &-wrapper {
@@ -280,7 +291,7 @@
                 }
 
                 &:nth-child(even) {
-                    background: $white-color;
+                    background: $white-color !important;
                 }
             }
 

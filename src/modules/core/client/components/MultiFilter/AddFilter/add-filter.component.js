@@ -168,7 +168,7 @@ const AddFilter = (props) => {
         <ScrollBars ref={scrollRef} className="custom-scroll" minScrollSize={394} autoHide={true} smoothScrolling={true} style={scrollBarStyle}>
             <div className="bg-light p-2 rounded-top d-flex justify-content-between border-bottom">
                 <span className="font-weight-bold">Add Filter</span>
-                <i className="fas fa-times mr-2 text-secondary font-weight-bold h4 mb-0" type="button" onClick={handleHide} />
+                <i className="fas fa-times mr-2 text-secondary font-weight-bold h4 mb-0 cursor-pointer" onClick={handleHide} />
             </div>
             <div className="px-3 pb-3 pt-2">
                 {

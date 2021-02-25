@@ -167,7 +167,7 @@ const FaqForm = (props) => {
                                     </div>
                                 </Modal.Body>
                                 <Modal.Footer className="border-0  pt-0 px-3">
-                                    {/*<button type="button" className="btn cdp-btn-secondary text-white shadow-sm" onClick={handleClose}>Close</button>*/}
+                                {/*<button className="btn cdp-btn-secondary text-white shadow-sm cursor-pointer" onClick={handleClose}>Close</button>*/}
                                     <button type="submit" className="btn btn-block cdp-btn-secondary mt-3 text-white ">Submit</button>
                                 </Modal.Footer>
                             </Form>
