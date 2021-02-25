@@ -137,7 +137,7 @@ const UserDetails = (props) => {
                                 <Dropdown.Menu>
                                     <Dropdown.Item className="px-2" href="/"><i className="fas fa-link mr-2"></i> Dashboard</Dropdown.Item>
                                     <Dropdown.Item className="px-2" href="/platform"><i className="fas fa-link mr-2"></i> Management of Customer Data platform</Dropdown.Item>
-                                    <Dropdown.Item className="px-2" href="/platform/user"><i className="fas fa-link mr-2"></i> CDP User List</Dropdown.Item>
+                                    <Dropdown.Item className="px-2" href="/platform/users"><i className="fas fa-link mr-2"></i> CDP User List</Dropdown.Item>
                                     <Dropdown.Item className="px-2" active><i className="fas fa-link mr-2"></i> Profile Details</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
