@@ -280,7 +280,7 @@
                 }
 
                 &:nth-child(even) {
-                    background: $white-color;
+                    background: $white-color !important;
                 }
             }
 
