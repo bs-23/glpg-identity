@@ -6,6 +6,7 @@ const ConsentCategory = require('./consent-category.model');
 const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const { clearApplicationCache } = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.controller'));
+const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
 const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
 
@@ -14,7 +15,7 @@ async function getConsentCategory(req, res) {
         const data = await ConsentCategory.findOne({ where: { id: req.params.id } });
         res.json(data);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -43,7 +44,7 @@ async function getConsentCategories(req, res) {
 
         res.json(data);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -79,7 +80,7 @@ async function createConsentCategory(req, res) {
         clearApplicationCache();
         res.json(data);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -122,7 +123,7 @@ async function updateConsentCategory(req, res) {
 
         res.json(data);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }

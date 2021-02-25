@@ -19,6 +19,7 @@ const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequel
 const { QueryTypes, Op, where, col, fn, literal } = require('sequelize');
 const { getRequestingUserPermissions, getPermissionsFromPermissionSet, getUserWithPermissionRelations } = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/permissions.js"));
 const filterService = require(path.join(process.cwd(), 'src/modules/platform/user/server/filter.js'));
+const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
 function generateAccessToken(doc) {
     return jwt.sign({
@@ -208,7 +209,7 @@ async function getSignedInUserProfile(req, res) {
     try {
         res.json(await formatProfile(req.user));
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -290,7 +291,7 @@ async function login(req, res) {
 
         res.json(await formatProfile(user));
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -396,7 +397,7 @@ async function createUser(req, res) {
 
         res.json(user);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -683,7 +684,7 @@ async function getUsers(req, res) {
 
         res.json(data);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -699,7 +700,7 @@ async function getUser(req, res) {
         res.json(formattedUser);
     }
     catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -761,7 +762,7 @@ async function updateSignedInUserProfile(req, res) {
 
         res.json(await formatProfile(signedInUser));
     }catch(err){
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -814,7 +815,7 @@ async function updateUserDetails(req, res) {
         res.json(formatProfile(user));
     }
     catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -867,7 +868,7 @@ async function sendPasswordResetLink(req, res) {
 
         res.json({ message: 'An email has been sent to the provided email with further instructions.' });
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -932,7 +933,7 @@ async function changePassword(req, res) {
 
         res.json(await formatProfile(user));
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -1043,7 +1044,7 @@ async function resetPassword(req, res) {
         res.sendStatus(200);
 
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }

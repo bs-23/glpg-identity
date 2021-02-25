@@ -4,11 +4,12 @@ const passport = require('passport');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const { generateAccessToken } = require(path.join(process.cwd(), "src/modules/platform/user/server/user.controller.js"));
 const { getUserWithPermissionRelations } = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/permissions.js"));
+const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
 const CDPAuthStrategy = (req, res, next) => (
     passport.authenticate('user-jwt', async function(err, user) {
         if (err) {
-            console.error(err);
+            logger.error(err);
             return res.status(500).send('Internal server error');
         }
 
