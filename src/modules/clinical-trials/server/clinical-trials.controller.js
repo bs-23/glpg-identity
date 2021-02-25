@@ -299,8 +299,10 @@ async function mergeProcessData(req, res) {
                 var paragraph = element.Study.ProtocolSection.EligibilityModule.EligibilityCriteria;
                 var paragraph_lowercase = paragraph.toLowerCase();
                 var inclusion_label_text = paragraph_lowercase.indexOf('key inclusion criteria')!==-1? 'key inclusion criteria' : 'inclusion criteria';
-                var exclusion_label_text = paragraph_lowercase.lastIndexOf('key exclusion criteria')!==-1? 'key exclusion criteria' : 'exclusion criteria';
-                var note_label_text = 'note';
+                var exclusion_label_text = paragraph_lowercase.lastIndexOf('key exclusion criteria')!==-1? 'key exclusion criteria' : 
+                                            paragraph_lowercase.lastIndexOf('exclusion criteria')!==-1? 'exclusion criteria':
+                                            paragraph_lowercase.lastIndexOf('note')!==-1? 'note': '';
+                var note_label_text = paragraph_lowercase.lastIndexOf('note')!==-1?  'note' : '';
                  return { 
                     'trial_fixed_id': uuid(),
                     'indication': element.Study.ProtocolSection.ConditionsModule.ConditionList.Condition[0].capitalize().split('|').join(','),
@@ -319,8 +321,8 @@ async function mergeProcessData(req, res) {
                     'trial_status': element.Study.ProtocolSection.StatusModule.OverallStatus,
                     'inclusion_criteria': (()=>{
                         try{
-                            var inclusion_boundary = [paragraph_lowercase.indexOf(inclusion_label_text)+inclusion_label_text.length, paragraph_lowercase.indexOf(exclusion_label_text)]
-                            var inclusion_text = paragraph.substring(inclusion_boundary[0],inclusion_boundary[1])
+                            var inclusion_boundary = [paragraph_lowercase.indexOf(inclusion_label_text)+inclusion_label_text.length, paragraph_lowercase.indexOf(exclusion_label_text)];
+                            var inclusion_text = paragraph.substring(inclusion_boundary[0],inclusion_boundary[1]);
                             var inclusion_html_single_list = `<li>${inclusion_text.replace(/^[ :]+/g,'').split('\n').join('</li><li>')}</li>`;
                             var inclusion_nested_sections = inclusion_html_single_list.match(/:<\/li>(<li><\/li>.+?<li><\/li>)/g);
                             var inclusion_html_nested_list = inclusion_html_single_list.split(/:<\/li><li><\/li>.+?<li><\/li>/g);
@@ -334,7 +336,8 @@ async function mergeProcessData(req, res) {
                     })(),
                     'exclusion_criteria': (()=>{
                         try{
-                            var exclusion_end_index = paragraph_lowercase.indexOf(note_text) !==-1? paragraph_lowercase.indexOf(note_text) : paragraph_lowercase.length;
+                            if (exclusion_label_text === 'note') return '';
+                            var exclusion_end_index = paragraph_lowercase.indexOf(note_label_text) !==-1 && note_label_text !== ''? paragraph_lowercase.indexOf(note_label_text) : paragraph_lowercase.length;
                             var exclusion_boundary = [paragraph_lowercase.indexOf(exclusion_label_text)+exclusion_label_text.length, exclusion_end_index];
                             var exclusion_text = paragraph.substring(exclusion_boundary[0],exclusion_boundary[1])
                             var exclusion_html_single_list = `<li>${exclusion_text.replace(/^[ :]+/g,'').split('\n').join('</li><li>')}</li>`;
@@ -350,8 +353,9 @@ async function mergeProcessData(req, res) {
                     })(),
                     'note_criteria':(()=>{
                         try{
+                            if(note_label_text == '') return  '';
                             var note_boundary = [paragraph_lowercase.indexOf(note_label_text)+note_label_text.length, paragraph_lowercase.length];
-                            var note_text = paragraph.substring(note_boundary[0],note_boundary[1]).replace(/^[ :]+/g,'').split('\n').join('</li><li>').replace('note:', '');
+                            var note_text = paragraph.substring(note_boundary[0],note_boundary[1]).replace(/^[ :]+/g,'').replace('note:', '');
                             return note_text;
                         }catch(ex){
                             return '';
