@@ -6,6 +6,7 @@ const ArchiveService = require(path.join(process.cwd(), 'src/modules/core/server
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
+const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
 async function getPartnerRequests(req, res) {
     try {
@@ -38,7 +39,7 @@ async function getPartnerRequests(req, res) {
 
         res.json(data);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -121,7 +122,7 @@ async function createPartnerRequest(req, res) {
 
         res.json(user);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -131,7 +132,7 @@ async function getPartnerRequest(req, res) {
         const data = await PartnerRequest.findOne({ where: { id: req.params.id } });
         res.json(data);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -176,7 +177,7 @@ async function sendForm(req, res) {
         await axios.post(sendFormLink, payload);
         res.json('Form sent successfully.');
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -258,7 +259,7 @@ async function updatePartnerRequest(req, res) {
 
         res.json(updated_data);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -298,7 +299,7 @@ async function deletePartnerRequest(req, res) {
 
         res.json(partnerRequest);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }

@@ -14,7 +14,7 @@ const FilterSummary = (props) => {
         <div className="py-2 px-2 w-100">
             <div className="d-flex justify-content-between">
                 <span className="cdp-text-secondary font-weight-bold-light">{fieldName}</span>
-                <i className="fas fa-times mr-2 cdp-text-secondary" type="button" onClick={() => onRemove(index)} />
+                <i className="fas fa-times mr-2 cdp-text-secondary cursor-pointer" onClick={() => onRemove(index)} />
             </div>
             <div className="d-flex">
                 <span className="mr-3">{operatorName}</span>
