@@ -24,8 +24,7 @@ async function getCoordinates(facility, zip, city, state, country, index)
     var url = encodeURI(joinedURL.replace(/\s/g,'+').replace('#',''));
     
     try { 
-        return {lat: -1, lng: -1}
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise(resolve => setTimeout(resolve, index*1000));
         const response = await fetch(url);
         const json = await response.json();
         return json.results[0].geometry.location;
@@ -272,6 +271,56 @@ async function showAllVersions(req, res) {
     }
 }
 
+async function updateLatLngCode(location, count, location_facility, location_zip, latLngNotFound){
+    var {lat,lng} = await getCoordinates(location_facility, location_zip, location.location_city, location.location_state, location.location_country, count.to_update);
+                location.lat = lat;
+                location.lng = lng;
+                count.to_update++;
+                if(!latLngNotFound(location)) {
+                    await location.save({ fields: ['lat', 'lng'] });
+                    count.updated++
+                }
+                return location;
+}
+
+async function syncGeoCodes(req, res) {
+    const response = new Response({}, []);
+    res.set({ 'content-type': 'application/json; charset=utf-8' });
+
+    try {
+        let result = await Location.findAll({
+        });
+        let count = {
+            to_update : 0,
+            updated : 0
+        };
+        await Promise.all(result.map(async (location, index)=>{
+            let latLngNotFound = (location)=>location.lat === -1 && location.lng === -1;
+            if(latLngNotFound(location)) {
+                location = await updateLatLngCode(location, count, location.location_facility, location.location_zip, latLngNotFound);
+                if(latLngNotFound(location)) {
+                    count.to_update--;
+                    location = await updateLatLngCode(location, count, '', location.location_zip, latLngNotFound);
+                    if(latLngNotFound(location)) {
+                        count.to_update--;
+                        location = await updateLatLngCode(location, count, '', '', latLngNotFound);
+                    }
+                }
+            }
+            return location;
+        }));
+
+
+        response.data = {
+            count
+        };
+        res.json(response);
+        } catch (err) {
+            console.error(err);
+            response.errors.push(new CustomError('Internal server error', 500));
+            res.status(500).send(response);
+        }
+}
 
 async function mergeProcessData(req, res) {
     const response = new Response({}, []);
@@ -732,3 +781,4 @@ exports.getCountryList = getCountryList;
 exports.getConditions = getConditions;
 exports.getConditionsWithDetails = getConditionsWithDetails;
 exports.validateAddress = validateAddress;
+exports.syncGeoCodes = syncGeoCodes;

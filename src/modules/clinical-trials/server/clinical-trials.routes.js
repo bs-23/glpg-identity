@@ -17,6 +17,9 @@ module.exports = app => {
     app.route('/api/clinical-trials/merge-versions')
         .post(CDPAuthStrategy, ServiceGuard([Services.MANAGE_CLINICAL_TRIALS]), controller.mergeProcessData);
 
+    app.route('/api/clinical-trials/sync-geocodes')
+        .post(CDPAuthStrategy, ServiceGuard([Services.MANAGE_CLINICAL_TRIALS]), controller.syncGeoCodes);
+
     app.route('/api/clinical-trials/countries')
         .get(auth, controller.getCountryList);
 
