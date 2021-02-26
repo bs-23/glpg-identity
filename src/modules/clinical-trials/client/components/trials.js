@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
 import Modal from 'react-bootstrap/Modal';
 import axios from 'axios';
+import StoryForm from './clinical-trials-story-form.component';
 
 var dumpData =  function() {
     const url = `/api/clinical-trials`;
@@ -32,6 +33,17 @@ var showAllVersions =  function() {
     };
 }
 
+var showAllClinicalTrials =  function() {
+    const url = `/api/clinical-trials-cdp`;
+
+    return {
+        payload: axios({
+            method: 'get',
+            url
+        }).then(out=>console.log(out))
+    };
+}
+
 var mergeProcessData =  function() {
     const url = `/api/clinical-trials/merge-versions`;
 
@@ -50,7 +62,6 @@ var mergeProcessData =  function() {
 
 var syncGeocodes =  function() {
     const url = `/api/clinical-trials/sync-geocodes`;
-
     return {
         payload: axios({
             method: 'post',
@@ -70,6 +81,15 @@ const ClinicalTrials = (props) => {
     const handleShowFaq = () => setShowFaq(true);
     const [profileDetails, setProfileDetails] = useState(null);
     const [sort, setSort] = useState({ type: 'asc', value: null });
+    const [show, setShow] = useState(false);
+    const [addMode, setAddMode] = useState(false);
+    const addDataSample = {
+        title: 'Sample Title',
+        trials : [1,2,3],
+        version: 'v1',
+        story: 'sample story',
+        story_plaintext: 'sample story plain text'
+    }
     const allCountries = useSelector(state => state.countryReducer.allCountries);
     const pageLeft = () => {
         if (hcpUsers.page > 1) urlChange(hcpUsers.page - 1, hcpUsers.codBase, params.get('orderBy'), true);
@@ -204,7 +224,8 @@ const ClinicalTrials = (props) => {
                                                     </td>
                                                     <td className="text-break">{row.telephone || '--'}</td>
                                                     <td>
-                                                        <button className="btn cdp-btn-outline-primary btn-sm" onClick={() => setProfileDetails(row)}><i class="icon icon-user mr-2" ></i>Profile</button>
+                                                    <button onClick={()=>{setShow(true); setAddMode(true);}}>Add Story</button>
+                                                    {show ? <StoryForm addMode={addMode} changeShow={(val) => setShow(val)} show={show} trialIDs={[1,2,3]} addData = {addDataSample} /> : null}
                                                     </td>
                                                 </tr>
                                             ))}
@@ -368,10 +389,12 @@ const ClinicalTrials = (props) => {
                     <button onClick={showAllVersions}>Show All Versions</button>
                     <button onClick={mergeProcessData}>Merge</button>
                     <button onClick={syncGeocodes}>Sync Geocodes</button>
+                    <button onClick={showAllClinicalTrials}>Show All Clinical Trials</button>
                 </div>
             </div>
         </main>
     
+
     );
 }
 
