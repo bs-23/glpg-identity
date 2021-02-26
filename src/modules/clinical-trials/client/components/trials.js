@@ -45,6 +45,16 @@ var showAllClinicalTrials =  function() {
     };
 }
 
+var getClinicalTrialDetails =  function() {
+    let id = prompt("set your id:", 'bf3fcdd9-2c14-4a1e-b02c-787c379c0aa9');
+    const url = `/api/clinical-trials-cdp/${id}`;
+    return {
+        payload: axios({
+            method: 'get',
+            url
+        }).then(out=>console.log(out))
+    };
+}
 
 var mergeProcessData =  function() {
     const url = `/api/clinical-trials/merge-versions`;
@@ -426,6 +436,7 @@ const ClinicalTrials = (props) => {
                     <button onClick={syncGeocodes}>Sync Geocodes</button>
                     <button onClick={showAllClinicalTrials}>Show All Clinical Trials</button>
                     <button onClick={update_clinicalTrials}>Update Clinical Trials</button>
+                    <button onClick={getClinicalTrialDetails}>Show trial details</button>
                 </div>
             </div>
         </main>
