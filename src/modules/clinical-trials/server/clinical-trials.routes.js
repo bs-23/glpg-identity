@@ -7,6 +7,9 @@ const { Services } = require(path.join(process.cwd(), 'src/modules/core/server/a
 const { ServiceGuard } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.middleware.js'));
 
 module.exports = app => {
+    app.route('/api/clinical-trials-cdp')
+        .get(CDPAuthStrategy, controller.getTrials)
+        
     app.route('/api/clinical-trials')
         .get(auth, controller.getTrials)
         .post(CDPAuthStrategy, ServiceGuard([Services.MANAGE_CLINICAL_TRIALS]), controller.dumpAllData);
